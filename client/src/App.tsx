@@ -20,7 +20,17 @@ const SearchContext = createContext<{
   setSearchTerm: () => {},
 });
 
+// Create a context for page title functionality
+const PageTitleContext = createContext<{
+  pageTitle: string;
+  setPageTitle: (title: string) => void;
+}>({
+  pageTitle: "",
+  setPageTitle: () => {},
+});
+
 export const useSearch = () => useContext(SearchContext);
+export const usePageTitle = () => useContext(PageTitleContext);
 
 function Router() {
   return (
@@ -38,6 +48,7 @@ function Router() {
 function AppContent() {
   const [location] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
+  const [pageTitle, setPageTitle] = useState("");
 
   // Reset search when navigating between pages
   const isTeachersActive = location === "/" || location === "/teachers" || location.startsWith("/teacher/");
@@ -45,14 +56,17 @@ function AppContent() {
 
   return (
     <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>
-      <div className="min-h-screen bg-slate-50">
-        <Header 
-          searchTerm={searchTerm} 
-          onSearchChange={setSearchTerm}
-        />
-        <Router />
-        <Toaster />
-      </div>
+      <PageTitleContext.Provider value={{ pageTitle, setPageTitle }}>
+        <div className="min-h-screen bg-slate-50">
+          <Header 
+            searchTerm={searchTerm} 
+            onSearchChange={setSearchTerm}
+            pageTitle={pageTitle}
+          />
+          <Router />
+          <Toaster />
+        </div>
+      </PageTitleContext.Provider>
     </SearchContext.Provider>
   );
 }

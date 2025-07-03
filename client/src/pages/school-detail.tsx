@@ -13,11 +13,12 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { School2, User } from "lucide-react";
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation } from "@shared/schema";
 import { getInitials, getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { usePageTitle } from "../App";
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
 
 export default function SchoolDetail() {
@@ -25,6 +26,7 @@ export default function SchoolDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { toast } = useToast();
+  const { setPageTitle } = usePageTitle();
 
   const { data: school, isLoading } = useQuery<School>({
     queryKey: ["/api/schools", id],
@@ -56,13 +58,18 @@ export default function SchoolDetail() {
       city: school?.city || "",
       state: school?.state || "",
       zipCode: school?.zipCode || "",
-      type: school?.type || "Elementary",
-      established: school?.established || 2020,
       status: school?.status || "Active",
       phone: school?.phone || "",
       email: school?.email || "",
     },
   });
+
+  useEffect(() => {
+    if (school) {
+      setPageTitle(school.name);
+    }
+    return () => setPageTitle(""); // Clear title when component unmounts
+  }, [school, setPageTitle]);
 
   const updateSchoolMutation = useMutation({
     mutationFn: async (data: any) => {
