@@ -128,8 +128,16 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
                 
                 {/* Race/Ethnicity */}
                 <TableCell>
-                  <div className="text-sm text-slate-900">
-                    {teacher.raceEthnicity?.join(', ') || 'Not specified'}
+                  <div className="flex flex-wrap gap-1">
+                    {teacher.raceEthnicity?.length ? (
+                      teacher.raceEthnicity.map((race, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {race}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-sm text-slate-500">Not specified</span>
+                    )}
                   </div>
                 </TableCell>
                 
