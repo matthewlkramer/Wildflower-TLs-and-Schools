@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
-import TeachersTable from "@/components/teachers-table";
+import TeachersGrid from "@/components/teachers-grid";
 import { type Teacher } from "@shared/schema";
 
 export default function Teachers() {
@@ -66,7 +66,7 @@ export default function Teachers() {
           </div>
         </div>
         
-        <TeachersTable teachers={filteredTeachers || []} isLoading={isLoading} />
+        <TeachersGrid teachers={filteredTeachers || []} isLoading={isLoading} />
       </div>
     </main>
   );
