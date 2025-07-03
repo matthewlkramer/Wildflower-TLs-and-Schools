@@ -1,14 +1,26 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useState, createContext, useContext } from "react";
 import Header from "@/components/header";
 import Teachers from "@/pages/teachers";
 import Schools from "@/pages/schools";
 import TeacherDetail from "@/pages/teacher-detail";
 import SchoolDetail from "@/pages/school-detail";
 import NotFound from "@/pages/not-found";
+
+// Create a context for search functionality
+const SearchContext = createContext<{
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+}>({
+  searchTerm: "",
+  setSearchTerm: () => {},
+});
+
+export const useSearch = () => useContext(SearchContext);
 
 function Router() {
   return (
@@ -23,15 +35,33 @@ function Router() {
   );
 }
 
+function AppContent() {
+  const [location] = useLocation();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Reset search when navigating between pages
+  const isTeachersActive = location === "/" || location === "/teachers" || location.startsWith("/teacher/");
+  const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
+
+  return (
+    <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>
+      <div className="min-h-screen bg-slate-50">
+        <Header 
+          searchTerm={searchTerm} 
+          onSearchChange={setSearchTerm}
+        />
+        <Router />
+        <Toaster />
+      </div>
+    </SearchContext.Provider>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="min-h-screen bg-slate-50">
-          <Header />
-          <Router />
-          <Toaster />
-        </div>
+        <AppContent />
       </TooltipProvider>
     </QueryClientProvider>
   );

@@ -1,11 +1,18 @@
 import { Link, useLocation } from "wouter";
-import { Sprout, Plus, User } from "lucide-react";
+import { Sprout, Plus, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import AddTeacherModal from "./add-teacher-modal";
 import AddSchoolModal from "./add-school-modal";
 
-export default function Header() {
+interface HeaderProps {
+  searchTerm?: string;
+  onSearchChange?: (value: string) => void;
+  searchPlaceholder?: string;
+}
+
+export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder }: HeaderProps) {
   const [location] = useLocation();
   const [showAddTeacherModal, setShowAddTeacherModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -19,6 +26,13 @@ export default function Header() {
     } else if (isSchoolsActive) {
       setShowAddSchoolModal(true);
     }
+  };
+
+  const getSearchPlaceholder = () => {
+    if (searchPlaceholder) return searchPlaceholder;
+    if (isTeachersActive) return "Search teachers...";
+    if (isSchoolsActive) return "Search schools...";
+    return "Search...";
   };
 
   return (
@@ -49,6 +63,18 @@ export default function Header() {
               </nav>
             </div>
             <div className="flex items-center space-x-4">
+              {onSearchChange && (
+                <div className="relative">
+                  <Input
+                    type="text"
+                    placeholder={getSearchPlaceholder()}
+                    value={searchTerm}
+                    onChange={(e) => onSearchChange(e.target.value)}
+                    className="w-64 pl-10"
+                  />
+                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                </div>
+              )}
               <Button 
                 onClick={handleAddNew}
                 className="bg-wildflower-blue hover:bg-blue-700 text-white"
