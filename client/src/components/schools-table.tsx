@@ -111,8 +111,16 @@ export default function SchoolsTable({ schools, isLoading }: SchoolsTableProps) 
                 
                 {/* Ages Served */}
                 <TableCell>
-                  <div className="text-sm text-slate-900">
-                    {school.agesServed?.join(', ') || 'Not specified'}
+                  <div className="flex flex-wrap gap-1">
+                    {school.agesServed?.length ? (
+                      school.agesServed.map((age, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {age}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-sm text-slate-500">Not specified</span>
+                    )}
                   </div>
                 </TableCell>
                 
