@@ -1,0 +1,81 @@
+import { Link, useLocation } from "wouter";
+import { Sprout, Plus, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import AddTeacherModal from "./add-teacher-modal";
+import AddSchoolModal from "./add-school-modal";
+
+export default function Header() {
+  const [location] = useLocation();
+  const [showAddTeacherModal, setShowAddTeacherModal] = useState(false);
+  const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
+
+  const isTeachersActive = location === "/" || location === "/teachers" || location.startsWith("/teacher/");
+  const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
+
+  const handleAddNew = () => {
+    if (isTeachersActive) {
+      setShowAddTeacherModal(true);
+    } else if (isSchoolsActive) {
+      setShowAddSchoolModal(true);
+    }
+  };
+
+  return (
+    <>
+      <header className="bg-white shadow-sm border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 flex items-center">
+                <Sprout className="text-wildflower-green h-8 w-8 mr-2" />
+                <span className="text-xl font-bold text-slate-900">Wildflower Schools</span>
+              </div>
+              <nav className="ml-8 flex space-x-8">
+                <Link href="/teachers">
+                  <a className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors ${
+                    isTeachersActive
+                      ? "wildflower-blue border-wildflower-blue"
+                      : "text-slate-500 hover:text-slate-700 border-transparent"
+                  }`}>
+                    Teachers
+                  </a>
+                </Link>
+                <Link href="/schools">
+                  <a className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors ${
+                    isSchoolsActive
+                      ? "wildflower-blue border-wildflower-blue"
+                      : "text-slate-500 hover:text-slate-700 border-transparent"
+                  }`}>
+                    Schools
+                  </a>
+                </Link>
+              </nav>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button 
+                onClick={handleAddNew}
+                className="bg-wildflower-blue hover:bg-blue-700 text-white"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add New
+              </Button>
+              <div className="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center">
+                <User className="h-4 w-4 text-slate-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <AddTeacherModal 
+        open={showAddTeacherModal} 
+        onOpenChange={setShowAddTeacherModal}
+      />
+      <AddSchoolModal 
+        open={showAddSchoolModal} 
+        onOpenChange={setShowAddSchoolModal}
+      />
+    </>
+  );
+}
