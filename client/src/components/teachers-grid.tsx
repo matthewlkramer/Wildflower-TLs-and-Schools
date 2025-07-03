@@ -219,11 +219,9 @@ const ActionsCellRenderer = (params: any) => {
 export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps) {
   const { toast } = useToast();
   const { showFilters } = useSearch();
+  console.log('showFilters in TeachersGrid:', showFilters);
   const [filters, setFilters] = useState<FilterState>({});
   
-  // Debug logging
-  console.log('TeachersGrid received:', { teachers, isLoading, count: teachers?.length });
-
   // Get unique values for filter dropdowns
   const getUniqueValues = (field: string) => {
     const values = new Set<string>();
@@ -257,7 +255,9 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
           if (Array.isArray(teacherValue)) {
             return filterValue.some(fv => fv !== '__BLANK__' && teacherValue.includes(fv));
           } else if (teacherValue) {
-            return filterValue.includes(teacherValue as string);
+            // Handle boolean values for multi-select filters
+            const stringValue = typeof teacherValue === 'boolean' ? (teacherValue ? 'Yes' : 'No') : String(teacherValue);
+            return filterValue.includes(stringValue);
           }
           return false;
         } else {
@@ -277,7 +277,13 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
     });
   }, [teachers, filters]);
 
+  // Debug logging
+  console.log('TeachersGrid received:', { teachers, isLoading, count: teachers?.length });
+  console.log('Current filters:', filters);
+  console.log('Filtered teachers count:', filteredTeachers?.length);
+
   const handleFilterChange = (field: string, value: string | string[]) => {
+    console.log('Filter change:', field, value);
     setFilters(prev => ({
       ...prev,
       [field]: value
@@ -379,22 +385,22 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
 
     return (
       <div className="border-b border-slate-200 bg-slate-50 p-2">
-        <div className="grid grid-cols-8 gap-2 items-center">
-          <div className="w-[200px]">
+        <div className="flex gap-2 items-center" style={{ paddingLeft: '12px' }}>
+          <div style={{ width: '200px' }}>
             <TextFilter
               value={filters.fullName as string || ''}
               onChange={(value) => handleFilterChange('fullName', value)}
               placeholder="Filter names..."
             />
           </div>
-          <div className="w-[180px]">
+          <div style={{ width: '180px' }}>
             <TextFilter
               value={filters.currentlyActiveSchool as string || ''}
               onChange={(value) => handleFilterChange('currentlyActiveSchool', value)}
               placeholder="Filter schools..."
             />
           </div>
-          <div className="w-[160px]">
+          <div style={{ width: '160px' }}>
             <MultiSelectFilter
               value={filters.startupStageForActiveSchool as string[] || []}
               onChange={(value) => handleFilterChange('startupStageForActiveSchool', value)}
@@ -402,7 +408,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
               placeholder="Stage..."
             />
           </div>
-          <div className="w-[140px]">
+          <div style={{ width: '140px' }}>
             <MultiSelectFilter
               value={filters.currentRole as string[] || []}
               onChange={(value) => handleFilterChange('currentRole', value)}
@@ -410,7 +416,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
               placeholder="Role..."
             />
           </div>
-          <div className="w-[140px]">
+          <div style={{ width: '140px' }}>
             <MultiSelectFilter
               value={filters.montessoriCertified as string[] || []}
               onChange={(value) => handleFilterChange('montessoriCertified', value)}
@@ -418,7 +424,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
               placeholder="Certified..."
             />
           </div>
-          <div className="w-[180px]">
+          <div style={{ width: '180px' }}>
             <MultiSelectFilter
               value={filters.raceEthnicity as string[] || []}
               onChange={(value) => handleFilterChange('raceEthnicity', value)}
@@ -426,7 +432,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
               placeholder="Race/Ethnicity..."
             />
           </div>
-          <div className="w-[140px]">
+          <div style={{ width: '140px' }}>
             <MultiSelectFilter
               value={filters.discoveryStatus as string[] || []}
               onChange={(value) => handleFilterChange('discoveryStatus', value)}
@@ -434,7 +440,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
               placeholder="Status..."
             />
           </div>
-          <div className="w-[140px]">
+          <div style={{ width: '140px' }}>
             <MultiSelectFilter
               value={filters.individualType as string[] || []}
               onChange={(value) => handleFilterChange('individualType', value)}

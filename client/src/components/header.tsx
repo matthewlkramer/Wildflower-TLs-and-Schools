@@ -81,7 +81,10 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={onToggleFilters}
+                  onClick={() => {
+                    console.log('Filter button clicked, current showFilters:', showFilters);
+                    onToggleFilters();
+                  }}
                   className={`${showFilters ? 'bg-slate-100' : ''}`}
                 >
                   <Filter className="h-4 w-4" />
