@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Sprout, Plus, User, Search, Filter } from "lucide-react";
+import { Sprout, Plus, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -77,19 +77,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                 </div>
               )}
-              {onToggleFilters && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    console.log('Filter button clicked, current showFilters:', showFilters);
-                    onToggleFilters();
-                  }}
-                  className={`${showFilters ? 'bg-slate-100' : ''}`}
-                >
-                  <Filter className="h-4 w-4" />
-                </Button>
-              )}
+
               <Button 
                 onClick={handleAddNew}
                 className="bg-wildflower-blue hover:bg-blue-700 text-white"
