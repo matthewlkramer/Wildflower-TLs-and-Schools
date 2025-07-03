@@ -189,33 +189,135 @@ export default function SchoolDetail() {
 
               <div className="p-6">
                 <TabsContent value="summary" className="mt-0">
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      <div className="bg-slate-50 rounded-lg p-4">
-                        <h4 className="font-medium text-slate-900 mb-2">Basic Info</h4>
-                        <div className="space-y-1 text-sm">
-                          <p><span className="text-slate-600">Name:</span> {school.name}</p>
-                          <p><span className="text-slate-600">Short Name:</span> {school.shortName || '-'}</p>
-                          <p><span className="text-slate-600">Status:</span> <Badge className={getStatusColor(school.status || '')}>{school.status || '-'}</Badge></p>
-                          <p><span className="text-slate-600">Type:</span> {school.schoolType || '-'}</p>
+                  <div className="space-y-8">
+                    {/* Basic School Information */}
+                    <div>
+                      <div className="flex items-center mb-4">
+                        <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mr-4">
+                          <School2 className="h-6 w-6 text-slate-600" />
+                        </div>
+                        <h3 className="text-lg font-medium text-slate-900">School Information</h3>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="space-y-3">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">School Name</label>
+                            <p className="text-sm text-slate-900">{school.name || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Governance Model</label>
+                            <p className="text-sm text-slate-900">{school.governanceModel || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">School Open Date</label>
+                            <p className="text-sm text-slate-900">{school.openDate || '-'}</p>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Short Name</label>
+                            <p className="text-sm text-slate-900">{school.shortName || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Founders</label>
+                            <p className="text-sm text-slate-900">-</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">School Status</label>
+                            <div className="mt-1">
+                              <Badge className={getStatusColor(school.status || '')}>{school.status || '-'}</Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Ages Served</label>
+                            <p className="text-sm text-slate-900">{school.agesServed?.join(', ') || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Current TLs</label>
+                            <p className="text-sm text-slate-900">
+                              {typeof school.currentTLs === 'string' 
+                                ? school.currentTLs
+                                : school.currentTLs && Array.isArray(school.currentTLs) && school.currentTLs.length > 0 
+                                  ? school.currentTLs.join(', ')
+                                  : '-'
+                              }
+                            </p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Membership Status</label>
+                            <p className="text-sm text-slate-900">{school.membershipFeeStatus || '-'}</p>
+                          </div>
                         </div>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-4">
-                        <h4 className="font-medium text-slate-900 mb-2">Location</h4>
-                        <div className="space-y-1 text-sm">
-                          <p><span className="text-slate-600">Address:</span> {school.address || '-'}</p>
-                          <p><span className="text-slate-600">City:</span> {school.city || '-'}</p>
-                          <p><span className="text-slate-600">State:</span> {school.state || '-'}</p>
-                          <p><span className="text-slate-600">ZIP:</span> {school.zipCode || '-'}</p>
+                    </div>
+
+                    {/* School Information Section */}
+                    <div>
+                      <h3 className="text-lg font-medium text-slate-900 mb-4">School Information</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Program Focus</label>
+                          <p className="text-sm text-slate-900">-</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Max Capacity</label>
+                          <p className="text-sm text-slate-900">{school.enrollmentCap || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Number of Classrooms</label>
+                          <p className="text-sm text-slate-900">-</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Public Funding</label>
+                          <p className="text-sm text-slate-900">{school.publicFunding ? 'Yes' : 'No'}</p>
                         </div>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-4">
-                        <h4 className="font-medium text-slate-900 mb-2">Current TLs</h4>
-                        <div className="text-sm">
-                          {school.currentTLs && Array.isArray(school.currentTLs) && school.currentTLs.length > 0 
-                            ? school.currentTLs.join(', ')
-                            : 'No TLs assigned'
-                          }
+                    </div>
+
+                    {/* Contact Information Section */}
+                    <div>
+                      <h3 className="text-lg font-medium text-slate-900 mb-4">Contact Information</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">School Email</label>
+                          <p className="text-sm text-slate-900">{school.email || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">School Phone</label>
+                          <p className="text-sm text-slate-900">{school.phone || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Website</label>
+                          <p className="text-sm text-slate-900">{school.website || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Email Domain</label>
+                          <p className="text-sm text-slate-900">-</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Legal Entity Section */}
+                    <div>
+                      <h3 className="text-lg font-medium text-slate-900 mb-4">Legal Entity</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">EIN</label>
+                          <p className="text-sm text-slate-900">-</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Legal Name</label>
+                          <p className="text-sm text-slate-900">{school.fullName || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Incorporation Date</label>
+                          <p className="text-sm text-slate-900">-</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Nonprofit Status</label>
+                          <p className="text-sm text-slate-900">-</p>
                         </div>
                       </div>
                     </div>
