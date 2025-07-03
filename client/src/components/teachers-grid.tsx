@@ -208,7 +208,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       )
     },
     {
-      headerName: "Individual Type",
+      headerName: "Type",
       field: "individualType",
       filter: 'agTextColumnFilter',
       minWidth: 120,
