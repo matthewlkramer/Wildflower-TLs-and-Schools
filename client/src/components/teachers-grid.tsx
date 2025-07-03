@@ -24,17 +24,36 @@ interface TeachersGridProps {
 }
 
 // Badge renderer for status fields (Discovery Status, Stage/Status, Montessori Certified)
-const BadgeRenderer = ({ value }: { value: string | string[] }) => {
+const BadgeRenderer = ({ value, field }: { value: string | string[]; field?: string }) => {
   if (!value) return null;
   
   const values = Array.isArray(value) ? value : [value];
+  
+  const getFieldColor = (val: string, fieldName?: string) => {
+    if (fieldName === 'montessoriCertified') {
+      return val?.toLowerCase() === 'yes' 
+        ? 'bg-green-100 text-green-800 border-green-200' 
+        : 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+    
+    if (fieldName === 'discoveryStatus') {
+      const status = val?.toLowerCase();
+      if (status === 'complete') return 'bg-green-100 text-green-800 border-green-200';
+      if (status === 'in process' || status === 'in progress') return 'bg-green-50 text-green-700 border-green-200';
+      if (status === 'paused') return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+    
+    // Default to existing color logic for other fields
+    return getStatusColor(val);
+  };
+  
   return (
     <div className="flex flex-wrap gap-1">
       {values.map((val, index) => (
         <Badge 
           key={index}
           variant="outline" 
-          className={`text-xs ${getStatusColor(val)}`}
+          className={`text-xs ${getFieldColor(val, field)}`}
         >
           {val}
         </Badge>
@@ -149,7 +168,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       filter: 'agTextColumnFilter',
       minWidth: 180,
       cellRenderer: ({ data }: { data: Teacher }) => (
-        <BadgeRenderer value={data.startupStageForActiveSchool} />
+        <BadgeRenderer value={data.startupStageForActiveSchool || []} field="stageStatus" />
       )
     },
     {
@@ -158,7 +177,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       filter: 'agTextColumnFilter',
       minWidth: 150,
       cellRenderer: ({ data }: { data: Teacher }) => (
-        <PillRenderer value={data.currentRole} />
+        <PillRenderer value={data.currentRole || ''} />
       )
     },
     {
@@ -167,7 +186,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       filter: 'agTextColumnFilter',
       minWidth: 160,
       cellRenderer: ({ data }: { data: Teacher }) => (
-        <BadgeRenderer value={data.montessoriCertified} />
+        <BadgeRenderer value={String(data.montessoriCertified || 'No')} field="montessoriCertified" />
       )
     },
     {
@@ -176,7 +195,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       filter: 'agTextColumnFilter',
       minWidth: 140,
       cellRenderer: ({ data }: { data: Teacher }) => (
-        <PillRenderer value={data.raceEthnicity} />
+        <PillRenderer value={data.raceEthnicity || []} />
       )
     },
     {
@@ -184,7 +203,9 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "discoveryStatus",
       filter: 'agTextColumnFilter',
       minWidth: 140,
-      cellRenderer: BadgeRenderer,
+      cellRenderer: ({ data }: { data: Teacher }) => (
+        <BadgeRenderer value={data.discoveryStatus || ''} field="discoveryStatus" />
+      )
     },
     {
       headerName: "Individual Type",
@@ -192,7 +213,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       filter: 'agTextColumnFilter',
       minWidth: 120,
       cellRenderer: ({ data }: { data: Teacher }) => (
-        <PillRenderer value={data.individualType} />
+        <PillRenderer value={data.individualType || ''} />
       )
     },
     {
