@@ -7,7 +7,7 @@ import "ag-grid-community/styles/ag-theme-alpine.css";
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 import { Link } from "wouter";
-import { Edit, Trash2, School2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type School } from "@shared/schema";
@@ -26,13 +26,8 @@ const SchoolNameCellRenderer = (params: any) => {
   const school = params.data;
   return (
     <Link href={`/school/${school.id}`}>
-      <div className="flex items-center space-x-3 cursor-pointer hover:bg-slate-50 p-1 rounded">
-        <div className="w-8 h-8 bg-wildflower-green rounded-lg flex items-center justify-center">
-          <School2 className="h-4 w-4 text-white" />
-        </div>
-        <div>
-          <div className="font-medium text-slate-900">{school.shortName || school.name}</div>
-        </div>
+      <div className="flex items-center cursor-pointer hover:bg-slate-50 p-1 rounded">
+        <div className="font-medium text-slate-900">{school.shortName || school.name}</div>
       </div>
     </Link>
   );
@@ -40,7 +35,7 @@ const SchoolNameCellRenderer = (params: any) => {
 
 const StatusBadgeCellRenderer = (params: any) => {
   const value = params.value;
-  if (!value) return <span className="text-slate-500">Not specified</span>;
+  if (!value) return <span></span>;
   
   return (
     <Badge className={getStatusColor(value)}>
@@ -51,9 +46,11 @@ const StatusBadgeCellRenderer = (params: any) => {
 
 const MembershipStatusCellRenderer = (params: any) => {
   const value = params.value;
+  if (!value) return <span></span>;
+  
   return (
     <Badge variant={value === 'Active' ? "default" : "secondary"}>
-      {value || 'Not specified'}
+      {value}
     </Badge>
   );
 };
@@ -61,7 +58,7 @@ const MembershipStatusCellRenderer = (params: any) => {
 const MultiValueCellRenderer = (params: any) => {
   const values = params.value;
   if (!values || !Array.isArray(values) || values.length === 0) {
-    return <span className="text-slate-500">Not specified</span>;
+    return <span></span>;
   }
   
   return (

@@ -12,7 +12,7 @@ import { Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type Teacher } from "@shared/schema";
-import { getInitials, getStatusColor } from "@/lib/utils";
+import { getStatusColor } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -28,15 +28,8 @@ const NameCellRenderer = (params: any) => {
   const teacher = params.data;
   return (
     <Link href={`/teacher/${teacher.id}`}>
-      <div className="flex items-center space-x-3 cursor-pointer hover:bg-slate-50 p-1 rounded">
-        <div className="w-8 h-8 bg-wildflower-green rounded-full flex items-center justify-center">
-          <span className="text-white font-medium text-xs">
-            {getInitials(teacher.fullName || 'N/A')}
-          </span>
-        </div>
-        <div>
-          <div className="font-medium text-slate-900">{teacher.fullName}</div>
-        </div>
+      <div className="flex items-center cursor-pointer hover:bg-slate-50 p-1 rounded">
+        <div className="font-medium text-slate-900">{teacher.fullName}</div>
       </div>
     </Link>
   );
@@ -44,7 +37,7 @@ const NameCellRenderer = (params: any) => {
 
 const BadgeCellRenderer = (params: any) => {
   const value = params.value;
-  if (!value) return <span className="text-slate-500">Not specified</span>;
+  if (!value) return <span></span>;
   
   return (
     <Badge className={getStatusColor(value)}>
@@ -65,7 +58,7 @@ const BooleanCellRenderer = (params: any) => {
 const MultiValueCellRenderer = (params: any) => {
   const values = params.value;
   if (!values || !Array.isArray(values) || values.length === 0) {
-    return <span className="text-slate-500">Not specified</span>;
+    return <span></span>;
   }
   
   return (
