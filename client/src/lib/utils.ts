@@ -45,8 +45,18 @@ export function getStatusColor(status: string): string {
       return "bg-yellow-100 text-yellow-800";
     case "inactive":
       return "bg-gray-100 text-gray-800";
+    
+    // Placeholder/empty values
+    case "":
+    case "placeholder":
+    case "tbd":
+    case "to be determined":
+    case "pending":
+    case "unknown":
+      return "bg-gray-100 text-gray-600";
+    
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100 text-gray-600";
   }
 }
 
