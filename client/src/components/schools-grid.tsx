@@ -132,17 +132,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       field: "status",
       headerName: "Stage/Status",
       width: 140,
-      cellRenderer: ({ data }: { data: any }) => {
-        console.log(`School ${data.name} status field:`, data.status);
-        if (data.status) {
-          return (
-            <Badge className={getStatusColor(data.status)}>
-              {data.status}
-            </Badge>
-          );
-        }
-        return <span className="text-slate-400">No status</span>;
-      },
+      cellRenderer: StatusBadgeCellRenderer,
       filter: "agTextColumnFilter",
     },
     {
@@ -176,36 +166,14 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       headerName: "Governance Model",
       width: 160,
       cellRenderer: StatusBadgeCellRenderer,
-      filter: "agSetColumnFilter",
-      filterParams: {
-        values: () => {
-          const allValues = new Set<string>();
-          schools.forEach(school => {
-            if (school.governanceModel) {
-              allValues.add(school.governanceModel);
-            }
-          });
-          return Array.from(allValues);
-        }
-      },
+      filter: "agTextColumnFilter",
     },
     {
       field: "membershipFeeStatus",
       headerName: "Membership Status",
       width: 160,
       cellRenderer: StatusBadgeCellRenderer,
-      filter: "agSetColumnFilter",
-      filterParams: {
-        values: () => {
-          const allValues = new Set<string>();
-          schools.forEach(school => {
-            if (school.membershipFeeStatus) {
-              allValues.add(school.membershipFeeStatus);
-            }
-          });
-          return Array.from(allValues);
-        }
-      },
+      filter: "agTextColumnFilter",
     },
     {
       field: "actions",
