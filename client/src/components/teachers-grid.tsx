@@ -1,8 +1,11 @@
 import { useState, useMemo, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { ColDef, GridReadyEvent, FilterChangedEvent } from "ag-grid-community";
+import { ColDef, GridReadyEvent, FilterChangedEvent, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+
+// Register AG Grid modules
+ModuleRegistry.registerModules([AllCommunityModule]);
 import { Link } from "wouter";
 import { Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -102,6 +105,9 @@ const ActionsCellRenderer = (params: any) => {
 
 export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps) {
   const { toast } = useToast();
+  
+  // Debug logging
+  console.log('TeachersGrid received:', { teachers, isLoading, count: teachers?.length });
   
   const columnDefs: ColDef[] = [
     {
