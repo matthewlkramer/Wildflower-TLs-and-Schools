@@ -104,7 +104,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
 
   const columnDefs: ColDef[] = useMemo(() => [
     {
-      headerName: "Name",
+      headerName: "Full Name",
       field: "fullName",
       filter: 'agTextColumnFilter',
       minWidth: 200,
@@ -125,24 +125,30 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       }
     },
     {
-      headerName: "Discovery Status",
-      field: "discoveryStatus",
+      headerName: "Current School Stage/Status",
+      field: "startupStageForActiveSchool",
       filter: 'agTextColumnFilter',
-      minWidth: 140,
-      cellRenderer: BadgeRenderer,
+      minWidth: 180,
+      valueGetter: (params) => {
+        const stage = params.data?.startupStageForActiveSchool;
+        return Array.isArray(stage) ? stage.join(', ') : (stage || '');
+      }
     },
     {
-      headerName: "Individual Type",
-      field: "individualType",
+      headerName: "Current Role",
+      field: "currentRole",
       filter: 'agTextColumnFilter',
-      minWidth: 120,
-      cellRenderer: BadgeRenderer,
+      minWidth: 150,
+      valueGetter: (params) => {
+        const role = params.data?.currentRole;
+        return Array.isArray(role) ? role.join(', ') : (role || '');
+      }
     },
     {
-      headerName: "Gender",
-      field: "gender",
+      headerName: "Montessori Certified",
+      field: "montessoriCertified",
       filter: 'agTextColumnFilter',
-      minWidth: 100,
+      minWidth: 160,
     },
     {
       headerName: "Race/Ethnicity",
@@ -155,14 +161,18 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       }
     },
     {
-      headerName: "Primary Language",
-      field: "primaryLanguage", 
+      headerName: "Discovery Status",
+      field: "discoveryStatus",
       filter: 'agTextColumnFilter',
       minWidth: 140,
-      valueGetter: (params) => {
-        const lang = params.data?.primaryLanguage;
-        return Array.isArray(lang) ? lang.join(', ') : (lang || '');
-      }
+      cellRenderer: BadgeRenderer,
+    },
+    {
+      headerName: "Individual Type",
+      field: "individualType",
+      filter: 'agTextColumnFilter',
+      minWidth: 120,
+      cellRenderer: BadgeRenderer,
     },
     {
       headerName: "Actions",
