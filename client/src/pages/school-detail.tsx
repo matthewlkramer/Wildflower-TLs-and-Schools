@@ -180,260 +180,198 @@ export default function SchoolDetail() {
           </CardHeader>
 
           <CardContent className="p-0">
-            <Tabs defaultValue="basic" className="w-full">
+            <Tabs defaultValue="summary" className="w-full">
               <div className="border-b border-slate-200">
-                <TabsList className="grid w-full grid-cols-3 bg-transparent h-auto p-0">
-                  <TabsTrigger 
-                    value="basic" 
-                    className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-6"
-                  >
-                    Basic Information
+                <TabsList className="grid w-full grid-cols-11 bg-transparent h-auto p-0">
+                  <TabsTrigger value="summary" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs">
+                    Summary
                   </TabsTrigger>
-                  <TabsTrigger 
-                    value="teachers" 
-                    className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-6"
-                  >
-                    Associated Teachers
+                  <TabsTrigger value="details" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs">
+                    Details
                   </TabsTrigger>
-                  <TabsTrigger 
-                    value="additional" 
-                    className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-6"
-                  >
-                    Additional Details
+                  <TabsTrigger value="tls" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs">
+                    TLs
+                  </TabsTrigger>
+                  <TabsTrigger value="locations" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs">
+                    Locations
+                  </TabsTrigger>
+                  <TabsTrigger value="governance" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs">
+                    Governance
+                  </TabsTrigger>
+                  <TabsTrigger value="guides" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs">
+                    Guides
+                  </TabsTrigger>
+                  <TabsTrigger value="support" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs">
+                    Support
+                  </TabsTrigger>
+                  <TabsTrigger value="grants" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs">
+                    Grants/Loans
+                  </TabsTrigger>
+                  <TabsTrigger value="membership" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs">
+                    Membership Fees
+                  </TabsTrigger>
+                  <TabsTrigger value="notes" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs">
+                    Notes/Actions
+                  </TabsTrigger>
+                  <TabsTrigger value="linked" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs">
+                    Linked Email/Meetings
                   </TabsTrigger>
                 </TabsList>
               </div>
 
               <div className="p-6">
-                <TabsContent value="basic" className="mt-0">
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>School Name</FormLabel>
-                              <FormControl>
-                                <Input {...field} disabled={!isEditing} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="type"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>School Type</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value} disabled={!isEditing}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select type" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Elementary">Elementary</SelectItem>
-                                  <SelectItem value="Middle School">Middle School</SelectItem>
-                                  <SelectItem value="High School">High School</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="address"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Address</FormLabel>
-                              <FormControl>
-                                <Input {...field} disabled={!isEditing} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="city"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>City</FormLabel>
-                              <FormControl>
-                                <Input {...field} disabled={!isEditing} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="state"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>State</FormLabel>
-                              <FormControl>
-                                <Input {...field} disabled={!isEditing} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="zipCode"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>ZIP Code</FormLabel>
-                              <FormControl>
-                                <Input {...field} disabled={!isEditing} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="phone"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Phone</FormLabel>
-                              <FormControl>
-                                <Input {...field} type="tel" disabled={!isEditing} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email</FormLabel>
-                              <FormControl>
-                                <Input {...field} type="email" disabled={!isEditing} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="established"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Established Year</FormLabel>
-                              <FormControl>
-                                <Input {...field} type="number" disabled={!isEditing} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="status"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Status</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value} disabled={!isEditing}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select status" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Active">Active</SelectItem>
-                                  <SelectItem value="Inactive">Inactive</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      {isEditing && (
-                        <div className="flex justify-end space-x-3">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setIsEditing(false)}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            type="submit"
-                            className="bg-wildflower-blue hover:bg-blue-700"
-                            disabled={updateSchoolMutation.isPending}
-                          >
-                            {updateSchoolMutation.isPending ? "Saving..." : "Save Changes"}
-                          </Button>
+                <TabsContent value="summary" className="mt-0">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="bg-slate-50 rounded-lg p-4">
+                        <h4 className="font-medium text-slate-900 mb-2">Basic Info</h4>
+                        <div className="space-y-1 text-sm">
+                          <p><span className="text-slate-600">Name:</span> {school.name}</p>
+                          <p><span className="text-slate-600">Short Name:</span> {school.shortName || '-'}</p>
+                          <p><span className="text-slate-600">Status:</span> <Badge className={getStatusColor(school.status || '')}>{school.status || '-'}</Badge></p>
+                          <p><span className="text-slate-600">Type:</span> {school.schoolType || '-'}</p>
                         </div>
-                      )}
-                    </form>
-                  </Form>
-                </TabsContent>
-
-                <TabsContent value="teachers" className="mt-0">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium text-slate-900">Associated Teachers</h3>
-                      <Button className="bg-wildflower-green hover:bg-green-700 text-white">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Teacher
-                      </Button>
+                      </div>
+                      <div className="bg-slate-50 rounded-lg p-4">
+                        <h4 className="font-medium text-slate-900 mb-2">Location</h4>
+                        <div className="space-y-1 text-sm">
+                          <p><span className="text-slate-600">Address:</span> {school.address || '-'}</p>
+                          <p><span className="text-slate-600">City:</span> {school.city || '-'}</p>
+                          <p><span className="text-slate-600">State:</span> {school.state || '-'}</p>
+                          <p><span className="text-slate-600">ZIP:</span> {school.zipCode || '-'}</p>
+                        </div>
+                      </div>
+                      <div className="bg-slate-50 rounded-lg p-4">
+                        <h4 className="font-medium text-slate-900 mb-2">Current TLs</h4>
+                        <div className="text-sm">
+                          {school.currentTLs && Array.isArray(school.currentTLs) && school.currentTLs.length > 0 
+                            ? school.currentTLs.join(', ')
+                            : 'No TLs assigned'
+                          }
+                        </div>
+                      </div>
                     </div>
-                    
-                    {associations && associations.length > 0 ? (
-                      <div className="space-y-3">
-                        {associations.map((association) => {
-                          const teacher = teachers?.find(t => t.id === association.teacherId);
-                          return (
-                            <div key={association.id} className="bg-slate-50 rounded-lg p-4">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-3">
-                                  <div className="w-10 h-10 bg-wildflower-blue rounded-full flex items-center justify-center">
-                                    <span className="text-white font-medium text-sm">
-                                      {teacher ? getInitials(teacher.name) : "?"}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <div className="font-medium text-slate-900">{teacher?.name || 'Unknown Teacher'}</div>
-                                    <div className="text-sm text-slate-500">
-                                      {association.role} • Since {new Date(association.startDate).toLocaleDateString()}
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <Badge variant={association.isPrimary ? "default" : "secondary"}>
-                                    {association.isPrimary ? "Primary" : "Secondary"}
-                                  </Badge>
-                                  <Button variant="ghost" size="sm" className="text-wildflower-red hover:text-red-700">
-                                    <X className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-slate-500">
-                        No associated teachers found
-                      </div>
-                    )}
                   </div>
                 </TabsContent>
 
-                <TabsContent value="additional" className="mt-0">
+                <TabsContent value="details" className="mt-0">
                   <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-slate-900">School Information</h4>
+                        <div className="space-y-2 text-sm">
+                          <p><span className="text-slate-600">Full Name:</span> {school.fullName || '-'}</p>
+                          <p><span className="text-slate-600">Website:</span> {school.website || '-'}</p>
+                          <p><span className="text-slate-600">Phone:</span> {school.phone || '-'}</p>
+                          <p><span className="text-slate-600">Email:</span> {school.email || '-'}</p>
+                          <p><span className="text-slate-600">Ages Served:</span> {school.agesServed?.join(', ') || '-'}</p>
+                          <p><span className="text-slate-600">Grades:</span> {school.grades?.join(', ') || '-'}</p>
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-slate-900">Operations</h4>
+                        <div className="space-y-2 text-sm">
+                          <p><span className="text-slate-600">Open Date:</span> {school.openDate || '-'}</p>
+                          <p><span className="text-slate-600">Target Open Date:</span> {school.targetOpenDate || '-'}</p>
+                          <p><span className="text-slate-600">Current Enrollment:</span> {school.currentEnrollment || '-'}</p>
+                          <p><span className="text-slate-600">Enrollment Cap:</span> {school.enrollmentCap || '-'}</p>
+                          <p><span className="text-slate-600">Tuition Range:</span> {school.tuitionRange || '-'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="tls" className="mt-0">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-slate-900">Teacher Leaders</h4>
                     <div className="text-center py-8 text-slate-500">
-                      Additional school details and metadata can be added here
+                      Teacher Leader information will be displayed here
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="locations" className="mt-0">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-slate-900">Location Details</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2 text-sm">
+                        <p><span className="text-slate-600">Target Community:</span> {school.targetCommunity || '-'}</p>
+                        <p><span className="text-slate-600">Latitude:</span> {school.latitude || '-'}</p>
+                        <p><span className="text-slate-600">Longitude:</span> {school.longitude || '-'}</p>
+                        <p><span className="text-slate-600">Timezone:</span> {school.timezone || '-'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="governance" className="mt-0">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-slate-900">Governance & Legal</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2 text-sm">
+                        <p><span className="text-slate-600">Governance Model:</span> {school.governanceModel || '-'}</p>
+                        <p><span className="text-slate-600">Charter Status:</span> {school.charterStatus || '-'}</p>
+                        <p><span className="text-slate-600">Authorizer:</span> {school.authorizer || '-'}</p>
+                        <p><span className="text-slate-600">Public Funding:</span> {school.publicFunding ? 'Yes' : 'No'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="guides" className="mt-0">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-slate-900">Guides & Staff</h4>
+                    <div className="text-center py-8 text-slate-500">
+                      Guide and staff information will be displayed here
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="support" className="mt-0">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-slate-900">Support & Resources</h4>
+                    <div className="text-center py-8 text-slate-500">
+                      Support and resource information will be displayed here
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="grants" className="mt-0">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-slate-900">Grants & Loans</h4>
+                    <div className="text-center py-8 text-slate-500">
+                      Grant and loan information will be displayed here
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="membership" className="mt-0">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-slate-900">Membership Fees</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2 text-sm">
+                        <p><span className="text-slate-600">Membership Fee Status:</span> {school.membershipFeeStatus || '-'}</p>
+                        <p><span className="text-slate-600">Membership Fee Amount:</span> {school.membershipFeeAmount ? `$${school.membershipFeeAmount}` : '-'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="notes" className="mt-0">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-slate-900">Notes & Actions</h4>
+                    <div className="text-center py-8 text-slate-500">
+                      Notes and action items will be displayed here
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="linked" className="mt-0">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-slate-900">Linked Email & Meetings</h4>
+                    <div className="text-center py-8 text-slate-500">
+                      Linked emails and meeting information will be displayed here
                     </div>
                   </div>
                 </TabsContent>
