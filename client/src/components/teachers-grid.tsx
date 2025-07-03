@@ -163,7 +163,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       }
     },
     {
-      headerName: "Current School Stage/Status",
+      headerName: "Stage/Status",
       field: "startupStageForActiveSchool",
       filter: 'agTextColumnFilter',
       minWidth: 180,
