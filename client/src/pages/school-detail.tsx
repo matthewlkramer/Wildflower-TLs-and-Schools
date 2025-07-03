@@ -145,47 +145,8 @@ export default function SchoolDetail() {
 
   return (
     <>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
         <Card>
-          <CardHeader className="border-b border-slate-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Link href="/schools">
-                  <Button variant="ghost" size="sm" className="text-slate-500 hover:text-slate-700">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Schools
-                  </Button>
-                </Link>
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-wildflower-green rounded-lg flex items-center justify-center">
-                    <School2 className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-slate-900">{school.name}</h2>
-                    <p className="text-sm text-slate-600">{school.type} • Est. {school.established}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Button
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="bg-wildflower-blue hover:bg-blue-700 text-white"
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  {isEditing ? "Cancel" : "Edit School"}
-                </Button>
-                <Button
-                  onClick={() => setShowDeleteModal(true)}
-                  variant="destructive"
-                  className="bg-wildflower-red hover:bg-red-700"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-
           <CardContent className="p-0">
             <Tabs defaultValue="summary" className="w-full">
               <div className="border-b border-slate-200">

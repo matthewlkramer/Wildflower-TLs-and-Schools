@@ -53,7 +53,7 @@ export default function TeacherDetail() {
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <Card>
         <CardContent className="p-0">
           <Tabs defaultValue="summary" className="w-full">
@@ -98,7 +98,7 @@ export default function TeacherDetail() {
                       <div className="space-y-1 text-sm">
                         <p><span className="text-slate-600">Name:</span> {teacher.fullName}</p>
                         <p><span className="text-slate-600">Current Role:</span> {teacher.currentRole ? (Array.isArray(teacher.currentRole) ? teacher.currentRole.join(', ') : teacher.currentRole) : '-'}</p>
-                        <p><span className="text-slate-600">Discovery Status:</span> <Badge className={getStatusColor(teacher.discoveryStatus || '')}>{teacher.discoveryStatus || '-'}</Badge></p>
+                        <div><span className="text-slate-600">Discovery Status:</span> <Badge className={getStatusColor(teacher.discoveryStatus || '')}>{teacher.discoveryStatus || '-'}</Badge></div>
                         <p><span className="text-slate-600">Individual Type:</span> {teacher.individualType || '-'}</p>
                       </div>
                     </div>
@@ -106,7 +106,7 @@ export default function TeacherDetail() {
                       <h4 className="font-medium text-slate-900 mb-2">Education & Certs</h4>
                       <div className="space-y-1 text-sm">
                         <p><span className="text-slate-600">Educational Attainment:</span> {teacher.educationalAttainment || '-'}</p>
-                        <p><span className="text-slate-600">Montessori Certified:</span> <Badge className={teacher.montessoriCertified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>{teacher.montessoriCertified ? 'Yes' : 'No'}</Badge></p>
+                        <div><span className="text-slate-600">Montessori Certified:</span> <Badge className={teacher.montessoriCertified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>{teacher.montessoriCertified ? 'Yes' : 'No'}</Badge></div>
                         <p><span className="text-slate-600">Certification Levels:</span> {teacher.certificationLevels ? (Array.isArray(teacher.certificationLevels) ? teacher.certificationLevels.join(', ') : teacher.certificationLevels) : '-'}</p>
                       </div>
                     </div>
@@ -115,7 +115,7 @@ export default function TeacherDetail() {
                       <div className="space-y-1 text-sm">
                         <p><span className="text-slate-600">Currently Active:</span> {teacher.currentlyActiveAtSchool ? 'Yes' : 'No'}</p>
                         <p><span className="text-slate-600">Current School:</span> {teacher.currentlyActiveSchool ? (Array.isArray(teacher.currentlyActiveSchool) ? teacher.currentlyActiveSchool.join(', ') : teacher.currentlyActiveSchool) : '-'}</p>
-                        <p><span className="text-slate-600">Stage/Status:</span> <Badge className={getStatusColor(teacher.startupStageForActiveSchool ? (Array.isArray(teacher.startupStageForActiveSchool) ? teacher.startupStageForActiveSchool[0] : teacher.startupStageForActiveSchool) : '')}>{teacher.startupStageForActiveSchool ? (Array.isArray(teacher.startupStageForActiveSchool) ? teacher.startupStageForActiveSchool.join(', ') : teacher.startupStageForActiveSchool) : '-'}</Badge></p>
+                        <div><span className="text-slate-600">Stage/Status:</span> <Badge className={getStatusColor(teacher.startupStageForActiveSchool ? (Array.isArray(teacher.startupStageForActiveSchool) ? teacher.startupStageForActiveSchool[0] : teacher.startupStageForActiveSchool) : '')}>{teacher.startupStageForActiveSchool ? (Array.isArray(teacher.startupStageForActiveSchool) ? teacher.startupStageForActiveSchool.join(', ') : teacher.startupStageForActiveSchool) : '-'}</Badge></div>
                       </div>
                     </div>
                   </div>
