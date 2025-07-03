@@ -68,16 +68,21 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50">
-              <TableHead>Teacher</TableHead>
-              <TableHead>School</TableHead>
-              <TableHead>Subject</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Full Name</TableHead>
+              <TableHead>Current School</TableHead>
+              <TableHead>School Stage Status</TableHead>
+              <TableHead>Current Role</TableHead>
+              <TableHead>Montessori Certified</TableHead>
+              <TableHead>Race/Ethnicity</TableHead>
+              <TableHead>Discovery Status</TableHead>
+              <TableHead>Individual Type</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {teachers.map((teacher) => (
               <TableRow key={teacher.id} className="hover:bg-slate-50">
+                {/* Full Name */}
                 <TableCell>
                   <Link href={`/teacher/${teacher.id}`}>
                     <div className="flex items-center space-x-3 cursor-pointer">
@@ -88,23 +93,61 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
                       </div>
                       <div>
                         <div className="font-medium text-slate-900">{teacher.fullName}</div>
-                        <div className="text-sm text-slate-500">{teacher.primaryPhone || 'No phone'}</div>
                       </div>
                     </div>
                   </Link>
                 </TableCell>
+                
+                {/* Current School */}
                 <TableCell>
-                  <div className="text-sm text-slate-900">Primary School</div>
-                  <div className="text-sm text-slate-500">Main Campus</div>
+                  <div className="text-sm text-slate-900">
+                    {teacher.currentlyActiveSchool?.join(', ') || 'No current school'}
+                  </div>
                 </TableCell>
+                
+                {/* School Stage Status */}
                 <TableCell>
-                  <span className="text-sm text-slate-900">{teacher.currentRole?.join(', ') || 'No role specified'}</span>
+                  <div className="text-sm text-slate-900">
+                    {teacher.startupStageForActiveSchool?.join(', ') || 'Not specified'}
+                  </div>
                 </TableCell>
+                
+                {/* Current Role */}
+                <TableCell>
+                  <div className="text-sm text-slate-900">
+                    {teacher.currentRole?.join(', ') || 'No role specified'}
+                  </div>
+                </TableCell>
+                
+                {/* Montessori Certified */}
+                <TableCell>
+                  <Badge variant={teacher.montessoriCertified ? "default" : "secondary"}>
+                    {teacher.montessoriCertified ? 'Yes' : 'No'}
+                  </Badge>
+                </TableCell>
+                
+                {/* Race/Ethnicity */}
+                <TableCell>
+                  <div className="text-sm text-slate-900">
+                    {teacher.raceEthnicity?.join(', ') || 'Not specified'}
+                  </div>
+                </TableCell>
+                
+                {/* Discovery Status */}
                 <TableCell>
                   <Badge className={getStatusColor(teacher.discoveryStatus || 'unknown')}>
                     {teacher.discoveryStatus || 'Unknown'}
                   </Badge>
                 </TableCell>
+                
+                {/* Individual Type */}
+                <TableCell>
+                  <div className="text-sm text-slate-900">
+                    {teacher.individualType || 'Not specified'}
+                  </div>
+                </TableCell>
+                
+                {/* Actions */}
                 <TableCell>
                   <div className="flex space-x-2">
                     <Link href={`/teacher/${teacher.id}`}>

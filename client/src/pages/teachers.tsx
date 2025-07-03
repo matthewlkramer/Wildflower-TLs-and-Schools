@@ -55,7 +55,7 @@ export default function Teachers() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Schools</SelectItem>
-                  {schools?.map((school: any) => (
+                  {(schools as any[])?.map((school: any) => (
                     <SelectItem key={school.id} value={school.id.toString()}>
                       {school.name}
                     </SelectItem>
