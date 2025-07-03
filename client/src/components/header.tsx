@@ -32,23 +32,19 @@ export default function Header() {
                 <span className="text-xl font-bold text-slate-900">Wildflower Schools</span>
               </div>
               <nav className="ml-8 flex space-x-8">
-                <Link href="/teachers">
-                  <a className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors ${
-                    isTeachersActive
-                      ? "wildflower-blue border-wildflower-blue"
-                      : "text-slate-500 hover:text-slate-700 border-transparent"
-                  }`}>
-                    Teachers
-                  </a>
+                <Link href="/teachers" className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors ${
+                  isTeachersActive
+                    ? "wildflower-blue border-wildflower-blue"
+                    : "text-slate-500 hover:text-slate-700 border-transparent"
+                }`}>
+                  Teachers
                 </Link>
-                <Link href="/schools">
-                  <a className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors ${
-                    isSchoolsActive
-                      ? "wildflower-blue border-wildflower-blue"
-                      : "text-slate-500 hover:text-slate-700 border-transparent"
-                  }`}>
-                    Schools
-                  </a>
+                <Link href="/schools" className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors ${
+                  isSchoolsActive
+                    ? "wildflower-blue border-wildflower-blue"
+                    : "text-slate-500 hover:text-slate-700 border-transparent"
+                }`}>
+                  Schools
                 </Link>
               </nav>
             </div>

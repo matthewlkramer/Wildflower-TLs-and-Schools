@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef, GridReadyEvent, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -222,7 +222,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
 
   if (isLoading) {
     return (
-      <div className="ag-theme-quartz" style={{ height: 400, width: "100%" }}>
+      <div className="ag-theme-alpine" style={{ height: 400, width: "100%" }}>
         <div className="flex items-center justify-center h-full">
           <div className="text-slate-500">Loading schools...</div>
         </div>
@@ -231,7 +231,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
   }
 
   return (
-    <div className="ag-theme-quartz" style={{ height: 600, width: "100%" }}>
+    <div className="ag-theme-alpine" style={{ height: 600, width: "100%" }}>
       <AgGridReact
         rowData={schools}
         columnDefs={columnDefs}

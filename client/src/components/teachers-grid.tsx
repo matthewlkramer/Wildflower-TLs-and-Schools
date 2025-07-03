@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import { ColDef, GridReadyEvent, FilterChangedEvent } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -272,7 +272,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
   }
 
   return (
-    <div className="ag-theme-quartz" style={{ height: 600, width: "100%" }}>
+    <div className="ag-theme-alpine" style={{ height: 600, width: "100%" }}>
       <AgGridReact
         rowData={teachers}
         columnDefs={columnDefs}
