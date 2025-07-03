@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { ColDef, GridReadyEvent, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import { ColDef, GridReadyEvent, GridApi } from "ag-grid-community";
+import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
@@ -72,8 +73,27 @@ const MultiValueCellRenderer = (params: any) => {
   );
 };
 
-const PlaceholderCellRenderer = () => {
-  return <span className="text-slate-500">TL data pending</span>;
+const CurrentTLsCellRenderer = (params: any) => {
+  const school = params.data;
+  const currentTLs = school.currentTLs;
+  
+  if (currentTLs && Array.isArray(currentTLs) && currentTLs.length > 0) {
+    return (
+      <div className="flex flex-wrap gap-1">
+        {currentTLs.map((name: string, index: number) => (
+          <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            {name}
+          </span>
+        ))}
+      </div>
+    );
+  }
+  
+  if (currentTLs && typeof currentTLs === 'string') {
+    return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{currentTLs}</span>;
+  }
+  
+  return <span className="text-slate-400">No TLs</span>;
 };
 
 const ActionsCellRenderer = (params: any) => {
@@ -105,9 +125,9 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
   
   const columnDefs: ColDef[] = [
     {
-      field: "shortName",
-      headerName: "Short Name",
-      width: 180,
+      field: "name",
+      headerName: "Name",
+      width: 200,
       cellRenderer: SchoolNameCellRenderer,
       filter: "agTextColumnFilter",
       filterParams: {
@@ -118,7 +138,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
     },
     {
       field: "status",
-      headerName: "Stage Status",
+      headerName: "Stage/Status",
       width: 140,
       cellRenderer: StatusBadgeCellRenderer,
       filter: "agSetColumnFilter",
@@ -138,7 +158,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       field: "currentTLs",
       headerName: "Current TLs",
       width: 120,
-      cellRenderer: PlaceholderCellRenderer,
+      cellRenderer: CurrentTLsCellRenderer,
       sortable: false,
       filter: false,
     },
@@ -164,6 +184,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       field: "governanceModel",
       headerName: "Governance Model",
       width: 160,
+      cellRenderer: StatusBadgeCellRenderer,
       filter: "agSetColumnFilter",
       filterParams: {
         values: () => {
@@ -181,7 +202,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       field: "membershipFeeStatus",
       headerName: "Membership Status",
       width: 160,
-      cellRenderer: MembershipStatusCellRenderer,
+      cellRenderer: StatusBadgeCellRenderer,
       filter: "agSetColumnFilter",
       filterParams: {
         values: () => {

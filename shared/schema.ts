@@ -85,6 +85,7 @@ export interface School {
   created?: string;
   lastModified?: string;
   createdBy?: string;
+  currentTLs?: string | number;
 }
 
 export interface EducatorSchoolAssociation {

@@ -140,6 +140,13 @@ export class SimpleAirtableStorage implements IStorage {
       created: fields["Created"] || undefined,
       lastModified: fields["Last Modified"] || undefined,
       createdBy: fields["Created By"]?.name || undefined,
+      // Try different possible field names for Current TLs
+      currentTLs: fields["Current TLs"] || 
+                  fields["Current TL"] || 
+                  fields["Current Teacher Leaders"] ||
+                  fields["Teacher Leaders"] ||
+                  fields["TLs"] ||
+                  undefined,
     };
   }
 
