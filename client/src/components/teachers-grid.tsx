@@ -8,20 +8,101 @@ import "ag-grid-community/styles/ag-theme-alpine.css";
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 import { Link } from "wouter";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { type Teacher } from "@shared/schema";
 import { getStatusColor } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
+import { useSearch } from "@/App";
 
 interface TeachersGridProps {
   teachers: Teacher[];
   isLoading: boolean;
 }
+
+interface FilterState {
+  [key: string]: string[] | string;
+}
+
+// Custom filter components
+const TextFilter = ({ value, onChange, placeholder }: { value: string; onChange: (value: string) => void; placeholder: string }) => {
+  return (
+    <Input
+      type="text"
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="h-8 text-xs"
+    />
+  );
+};
+
+const MultiSelectFilter = ({ 
+  value, 
+  onChange, 
+  options, 
+  placeholder 
+}: { 
+  value: string[]; 
+  onChange: (value: string[]) => void; 
+  options: string[]; 
+  placeholder: string;
+}) => {
+  const [open, setOpen] = useState(false);
+  
+  const handleToggle = (option: string) => {
+    const newValue = value.includes(option) 
+      ? value.filter(v => v !== option)
+      : [...value, option];
+    onChange(newValue);
+  };
+
+  const displayText = value.length === 0 ? placeholder : `${value.length} selected`;
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className="h-8 w-full justify-between text-xs px-2"
+          onClick={() => setOpen(!open)}
+        >
+          <span className="truncate">{displayText}</span>
+          <ChevronDown className="h-3 w-3 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-2" align="start">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="is-blank"
+              checked={value.includes('__BLANK__')}
+              onCheckedChange={(checked) => handleToggle('__BLANK__')}
+            />
+            <label htmlFor="is-blank" className="text-xs">Is blank</label>
+          </div>
+          {options.map((option) => (
+            <div key={option} className="flex items-center space-x-2">
+              <Checkbox
+                id={option}
+                checked={value.includes(option)}
+                onCheckedChange={(checked) => handleToggle(option)}
+              />
+              <label htmlFor={option} className="text-xs">{option}</label>
+            </div>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 // Custom cell renderers
 const NameCellRenderer = (params: any) => {
@@ -137,9 +218,71 @@ const ActionsCellRenderer = (params: any) => {
 
 export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps) {
   const { toast } = useToast();
+  const { showFilters } = useSearch();
+  const [filters, setFilters] = useState<FilterState>({});
   
   // Debug logging
   console.log('TeachersGrid received:', { teachers, isLoading, count: teachers?.length });
+
+  // Get unique values for filter dropdowns
+  const getUniqueValues = (field: string) => {
+    const values = new Set<string>();
+    teachers.forEach(teacher => {
+      const value = teacher[field as keyof Teacher];
+      if (Array.isArray(value)) {
+        value.forEach(v => values.add(v));
+      } else if (value && typeof value === 'string') {
+        values.add(value);
+      }
+    });
+    return Array.from(values).sort();
+  };
+
+  // Apply filters to teachers data
+  const filteredTeachers = useMemo(() => {
+    return teachers.filter(teacher => {
+      return Object.entries(filters).every(([field, filterValue]) => {
+        if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0)) {
+          return true;
+        }
+
+        const teacherValue = teacher[field as keyof Teacher];
+
+        if (Array.isArray(filterValue)) {
+          // Multi-select filter
+          if (filterValue.includes('__BLANK__') && (!teacherValue || (Array.isArray(teacherValue) && teacherValue.length === 0))) {
+            return true;
+          }
+          
+          if (Array.isArray(teacherValue)) {
+            return filterValue.some(fv => fv !== '__BLANK__' && teacherValue.includes(fv));
+          } else if (teacherValue) {
+            return filterValue.includes(teacherValue as string);
+          }
+          return false;
+        } else {
+          // Text filter
+          let textValue = '';
+          if (Array.isArray(teacherValue)) {
+            textValue = teacherValue.join(' ');
+          } else if (typeof teacherValue === 'boolean') {
+            textValue = teacherValue ? 'Yes' : 'No';
+          } else {
+            textValue = String(teacherValue || '');
+          }
+          const filterStr = String(filterValue || '');
+          return textValue.toLowerCase().includes(filterStr.toLowerCase());
+        }
+      });
+    });
+  }, [teachers, filters]);
+
+  const handleFilterChange = (field: string, value: string | string[]) => {
+    setFilters(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
   
   const columnDefs: ColDef[] = [
     {
@@ -147,129 +290,56 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       headerName: "Full Name",
       width: 200,
       cellRenderer: NameCellRenderer,
-      filter: "agTextColumnFilter",
-      filterParams: {
-        filterOptions: ["contains", "startsWith", "endsWith"],
-        suppressAndOrCondition: true,
-      },
+      filter: false,
     },
     {
       field: "currentlyActiveSchool",
       headerName: "Current School",
       width: 180,
       cellRenderer: CurrentSchoolCellRenderer,
-      filter: "agSetColumnFilter",
-      filterParams: {
-        values: () => {
-          const allValues = new Set<string>();
-          teachers.forEach(teacher => {
-            if (teacher.currentlyActiveSchool) {
-              teacher.currentlyActiveSchool.forEach(school => allValues.add(school));
-            }
-          });
-          return Array.from(allValues);
-        }
-      },
+      filter: false,
     },
     {
       field: "startupStageForActiveSchool",
       headerName: "School Stage Status",
       width: 160,
       cellRenderer: MultiValueCellRenderer,
-      filter: "agSetColumnFilter",
-      filterParams: {
-        values: () => {
-          const allValues = new Set<string>();
-          teachers.forEach(teacher => {
-            if (teacher.startupStageForActiveSchool) {
-              teacher.startupStageForActiveSchool.forEach(stage => allValues.add(stage));
-            }
-          });
-          return Array.from(allValues);
-        }
-      },
+      filter: false,
     },
     {
       field: "currentRole",
       headerName: "Current Role",
       width: 140,
       cellRenderer: MultiValueCellRenderer,
-      filter: "agSetColumnFilter",
-      filterParams: {
-        values: () => {
-          const allValues = new Set<string>();
-          teachers.forEach(teacher => {
-            if (teacher.currentRole) {
-              teacher.currentRole.forEach(role => allValues.add(role));
-            }
-          });
-          return Array.from(allValues);
-        }
-      },
+      filter: false,
     },
     {
       field: "montessoriCertified",
       headerName: "Montessori Certified",
       width: 140,
       cellRenderer: BooleanCellRenderer,
-      filter: "agSetColumnFilter",
-      filterParams: {
-        values: ["Yes", "No"],
-      },
+      filter: false,
     },
     {
       field: "raceEthnicity",
       headerName: "Race/Ethnicity",
       width: 180,
       cellRenderer: MultiValueCellRenderer,
-      filter: "agSetColumnFilter",
-      filterParams: {
-        values: () => {
-          const allValues = new Set<string>();
-          teachers.forEach(teacher => {
-            if (teacher.raceEthnicity) {
-              teacher.raceEthnicity.forEach(race => allValues.add(race));
-            }
-          });
-          return Array.from(allValues);
-        }
-      },
+      filter: false,
     },
     {
       field: "discoveryStatus",
       headerName: "Discovery Status",
       width: 140,
       cellRenderer: DiscoveryStatusCellRenderer,
-      filter: "agSetColumnFilter",
-      filterParams: {
-        values: () => {
-          const allValues = new Set<string>();
-          teachers.forEach(teacher => {
-            if (teacher.discoveryStatus) {
-              allValues.add(teacher.discoveryStatus);
-            }
-          });
-          return Array.from(allValues);
-        }
-      },
+      filter: false,
     },
     {
       field: "individualType",
       headerName: "Individual Type",
       width: 140,
       cellRenderer: BadgeCellRenderer,
-      filter: "agSetColumnFilter",
-      filterParams: {
-        values: () => {
-          const allValues = new Set<string>();
-          teachers.forEach(teacher => {
-            if (teacher.individualType) {
-              allValues.add(teacher.individualType);
-            }
-          });
-          return Array.from(allValues);
-        }
-      },
+      filter: false,
     },
     {
       field: "actions",
@@ -284,9 +354,9 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
 
   const defaultColDef: ColDef = {
     sortable: true,
-    filter: true,
+    filter: false,
     resizable: true,
-    floatingFilter: false, // We'll show filters in the header instead
+    floatingFilter: false,
   };
 
   const onGridReady = useCallback((params: GridReadyEvent) => {
@@ -303,18 +373,95 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
     );
   }
 
+  // Define filter row components for each column
+  const renderFilterRow = () => {
+    if (!showFilters) return null;
+
+    return (
+      <div className="border-b border-slate-200 bg-slate-50 p-2">
+        <div className="grid grid-cols-8 gap-2 items-center">
+          <div className="w-[200px]">
+            <TextFilter
+              value={filters.fullName as string || ''}
+              onChange={(value) => handleFilterChange('fullName', value)}
+              placeholder="Filter names..."
+            />
+          </div>
+          <div className="w-[180px]">
+            <TextFilter
+              value={filters.currentlyActiveSchool as string || ''}
+              onChange={(value) => handleFilterChange('currentlyActiveSchool', value)}
+              placeholder="Filter schools..."
+            />
+          </div>
+          <div className="w-[160px]">
+            <MultiSelectFilter
+              value={filters.startupStageForActiveSchool as string[] || []}
+              onChange={(value) => handleFilterChange('startupStageForActiveSchool', value)}
+              options={getUniqueValues('startupStageForActiveSchool')}
+              placeholder="Stage..."
+            />
+          </div>
+          <div className="w-[140px]">
+            <MultiSelectFilter
+              value={filters.currentRole as string[] || []}
+              onChange={(value) => handleFilterChange('currentRole', value)}
+              options={getUniqueValues('currentRole')}
+              placeholder="Role..."
+            />
+          </div>
+          <div className="w-[140px]">
+            <MultiSelectFilter
+              value={filters.montessoriCertified as string[] || []}
+              onChange={(value) => handleFilterChange('montessoriCertified', value)}
+              options={['Yes', 'No']}
+              placeholder="Certified..."
+            />
+          </div>
+          <div className="w-[180px]">
+            <MultiSelectFilter
+              value={filters.raceEthnicity as string[] || []}
+              onChange={(value) => handleFilterChange('raceEthnicity', value)}
+              options={getUniqueValues('raceEthnicity')}
+              placeholder="Race/Ethnicity..."
+            />
+          </div>
+          <div className="w-[140px]">
+            <MultiSelectFilter
+              value={filters.discoveryStatus as string[] || []}
+              onChange={(value) => handleFilterChange('discoveryStatus', value)}
+              options={getUniqueValues('discoveryStatus')}
+              placeholder="Status..."
+            />
+          </div>
+          <div className="w-[140px]">
+            <MultiSelectFilter
+              value={filters.individualType as string[] || []}
+              onChange={(value) => handleFilterChange('individualType', value)}
+              options={getUniqueValues('individualType')}
+              placeholder="Type..."
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="ag-theme-alpine" style={{ height: 600, width: "100%" }}>
-      <AgGridReact
-        rowData={teachers}
-        columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
-        onGridReady={onGridReady}
-        animateRows={true}
-        rowSelection="multiple"
-        suppressRowClickSelection={true}
-        enableBrowserTooltips={true}
-      />
+    <div className="w-full">
+      {renderFilterRow()}
+      <div className="ag-theme-alpine" style={{ height: 600, width: "100%" }}>
+        <AgGridReact
+          rowData={filteredTeachers}
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          onGridReady={onGridReady}
+          animateRows={true}
+          rowSelection="multiple"
+          suppressRowClickSelection={true}
+          enableBrowserTooltips={true}
+        />
+      </div>
     </div>
   );
 }

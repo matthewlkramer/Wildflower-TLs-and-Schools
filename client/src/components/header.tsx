@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Sprout, Plus, User, Search } from "lucide-react";
+import { Sprout, Plus, User, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -10,9 +10,11 @@ interface HeaderProps {
   searchTerm?: string;
   onSearchChange?: (value: string) => void;
   searchPlaceholder?: string;
+  showFilters?: boolean;
+  onToggleFilters?: () => void;
 }
 
-export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder }: HeaderProps) {
+export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder, showFilters = false, onToggleFilters }: HeaderProps) {
   const [location] = useLocation();
   const [showAddTeacherModal, setShowAddTeacherModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -74,6 +76,16 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                   />
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                 </div>
+              )}
+              {onToggleFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onToggleFilters}
+                  className={`${showFilters ? 'bg-slate-100' : ''}`}
+                >
+                  <Filter className="h-4 w-4" />
+                </Button>
               )}
               <Button 
                 onClick={handleAddNew}

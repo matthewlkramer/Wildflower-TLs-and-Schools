@@ -15,9 +15,13 @@ import NotFound from "@/pages/not-found";
 const SearchContext = createContext<{
   searchTerm: string;
   setSearchTerm: (term: string) => void;
+  showFilters: boolean;
+  onToggleFilters: () => void;
 }>({
   searchTerm: "",
   setSearchTerm: () => {},
+  showFilters: false,
+  onToggleFilters: () => {},
 });
 
 export const useSearch = () => useContext(SearchContext);
@@ -38,17 +42,24 @@ function Router() {
 function AppContent() {
   const [location] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   // Reset search when navigating between pages
   const isTeachersActive = location === "/" || location === "/teachers" || location.startsWith("/teacher/");
   const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
 
+  const handleToggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
   return (
-    <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>
+    <SearchContext.Provider value={{ searchTerm, setSearchTerm, showFilters, onToggleFilters: handleToggleFilters }}>
       <div className="min-h-screen bg-slate-50">
         <Header 
           searchTerm={searchTerm} 
           onSearchChange={setSearchTerm}
+          showFilters={showFilters}
+          onToggleFilters={handleToggleFilters}
         />
         <Router />
         <Toaster />
