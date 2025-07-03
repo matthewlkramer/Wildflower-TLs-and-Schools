@@ -92,6 +92,10 @@ Changelog:
 - July 03, 2025. Removed pagination from data grids - now shows full scrollable lists
 - July 03, 2025. Removed initials from name columns, replaced "Not specified" with blank cells
 - July 03, 2025. Improved layout: moved search to header, removed sub-headers, expanded horizontal space usage
+- July 03, 2025. Fixed Current TLs field mapping from Airtable and changed display to plain text
+- July 03, 2025. Fixed Stage_Status field mapping for both schools and teachers from Airtable
+- July 03, 2025. Implemented color-coded Stage/Status badges: red for closed states, green gradient for progression stages, gray for placeholders
+- July 03, 2025. Replaced AG Grid SetFilter with agTextColumnFilter for Community edition compatibility
 ```
 
 ## User Preferences
