@@ -46,6 +46,44 @@ const BadgeCellRenderer = (params: any) => {
   );
 };
 
+const DiscoveryStatusCellRenderer = (params: any) => {
+  const value = params.value;
+  if (!value) return <span></span>;
+  
+  let bgColor = "bg-gray-100";
+  let textColor = "text-gray-800";
+  
+  if (value.toLowerCase() === "complete") {
+    bgColor = "bg-green-100";
+    textColor = "text-green-800";
+  } else if (value.toLowerCase() === "in process") {
+    bgColor = "bg-yellow-100";
+    textColor = "text-yellow-800";
+  } else if (value.toLowerCase() === "paused") {
+    bgColor = "bg-red-100";
+    textColor = "text-red-800";
+  }
+  
+  return (
+    <Badge className={`${bgColor} ${textColor} border-transparent`}>
+      {value}
+    </Badge>
+  );
+};
+
+const CurrentSchoolCellRenderer = (params: any) => {
+  const values = params.value;
+  if (!values || !Array.isArray(values) || values.length === 0) {
+    return <span></span>;
+  }
+  
+  return (
+    <span className="text-slate-900">
+      {values.join(", ")}
+    </span>
+  );
+};
+
 const BooleanCellRenderer = (params: any) => {
   const value = params.value;
   return (
@@ -119,7 +157,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "currentlyActiveSchool",
       headerName: "Current School",
       width: 180,
-      cellRenderer: MultiValueCellRenderer,
+      cellRenderer: CurrentSchoolCellRenderer,
       filter: "agSetColumnFilter",
       filterParams: {
         values: () => {
@@ -201,7 +239,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "discoveryStatus",
       headerName: "Discovery Status",
       width: 140,
-      cellRenderer: BadgeCellRenderer,
+      cellRenderer: DiscoveryStatusCellRenderer,
       filter: "agSetColumnFilter",
       filterParams: {
         values: () => {
@@ -219,6 +257,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "individualType",
       headerName: "Individual Type",
       width: 140,
+      cellRenderer: BadgeCellRenderer,
       filter: "agSetColumnFilter",
       filterParams: {
         values: () => {
