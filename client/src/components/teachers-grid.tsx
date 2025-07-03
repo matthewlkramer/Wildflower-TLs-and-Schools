@@ -107,10 +107,6 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       headerName: "Name",
       field: "fullName",
       filter: 'agTextColumnFilter',
-      filterParams: {
-        filterOptions: ['contains', 'startsWith', 'endsWith'],
-        defaultOption: 'contains'
-      },
       minWidth: 200,
       cellRenderer: ({ data: teacher }: { data: Teacher }) => (
         <Link href={`/teacher/${teacher.id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
@@ -122,7 +118,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       headerName: "Current School",
       field: "currentlyActiveSchool",
       filter: 'agTextColumnFilter',
-      minWidth: 180,
+      minWidth: 200,
       valueGetter: (params) => {
         const school = params.data?.currentlyActiveSchool;
         return Array.isArray(school) ? school.join(', ') : (school || '');
@@ -132,15 +128,21 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       headerName: "Discovery Status",
       field: "discoveryStatus",
       filter: 'agTextColumnFilter',
-      minWidth: 150,
+      minWidth: 140,
       cellRenderer: BadgeRenderer,
     },
     {
       headerName: "Individual Type",
       field: "individualType",
       filter: 'agTextColumnFilter',
-      minWidth: 140,
+      minWidth: 120,
       cellRenderer: BadgeRenderer,
+    },
+    {
+      headerName: "Gender",
+      field: "gender",
+      filter: 'agTextColumnFilter',
+      minWidth: 100,
     },
     {
       headerName: "Race/Ethnicity",
@@ -161,24 +163,6 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
         const lang = params.data?.primaryLanguage;
         return Array.isArray(lang) ? lang.join(', ') : (lang || '');
       }
-    },
-    {
-      headerName: "Home Address",
-      field: "homeAddress",
-      filter: 'agTextColumnFilter',
-      minWidth: 200,
-    },
-    {
-      headerName: "Phone",
-      field: "primaryPhone",
-      filter: 'agTextColumnFilter',
-      minWidth: 140,
-    },
-    {
-      headerName: "Montessori Certified",
-      field: "montessoriCertified",
-      filter: 'agTextColumnFilter',
-      minWidth: 160,
     },
     {
       headerName: "Actions",
