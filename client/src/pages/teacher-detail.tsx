@@ -1,12 +1,10 @@
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User } from "lucide-react";
 import { Link } from "wouter";
 import { type Teacher } from "@shared/schema";
 import { getStatusColor } from "@/lib/utils";
@@ -57,28 +55,6 @@ export default function TeacherDetail() {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Card>
-        <CardHeader className="border-b border-slate-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/teachers">
-                <Button variant="ghost" size="sm" className="text-slate-500 hover:text-slate-700">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Teachers
-                </Button>
-              </Link>
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-wildflower-blue rounded-lg flex items-center justify-center">
-                  <User className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-slate-900">{teacher.fullName}</h2>
-                  <p className="text-sm text-slate-600">{teacher.currentRole ? (Array.isArray(teacher.currentRole) ? teacher.currentRole.join(', ') : teacher.currentRole) : 'No role specified'}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardHeader>
-
         <CardContent className="p-0">
           <Tabs defaultValue="summary" className="w-full">
             <div className="border-b border-slate-200">
