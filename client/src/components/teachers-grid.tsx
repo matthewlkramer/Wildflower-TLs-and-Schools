@@ -23,7 +23,7 @@ interface TeachersGridProps {
   isLoading: boolean;
 }
 
-// Badge renderer for status fields
+// Badge renderer for status fields (Discovery Status, Stage/Status, Montessori Certified)
 const BadgeRenderer = ({ value }: { value: string | string[] }) => {
   if (!value) return null;
   
@@ -38,6 +38,25 @@ const BadgeRenderer = ({ value }: { value: string | string[] }) => {
         >
           {val}
         </Badge>
+      ))}
+    </div>
+  );
+};
+
+// Pill renderer for categorical fields (Individual Type, Current Role, Race/Ethnicity)
+const PillRenderer = ({ value }: { value: string | string[] }) => {
+  if (!value) return null;
+  
+  const values = Array.isArray(value) ? value : [value];
+  return (
+    <div className="flex flex-wrap gap-1">
+      {values.map((val, index) => (
+        <span 
+          key={index}
+          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800"
+        >
+          {val}
+        </span>
       ))}
     </div>
   );
@@ -129,36 +148,36 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "startupStageForActiveSchool",
       filter: 'agTextColumnFilter',
       minWidth: 180,
-      valueGetter: (params) => {
-        const stage = params.data?.startupStageForActiveSchool;
-        return Array.isArray(stage) ? stage.join(', ') : (stage || '');
-      }
+      cellRenderer: ({ data }: { data: Teacher }) => (
+        <BadgeRenderer value={data.startupStageForActiveSchool} />
+      )
     },
     {
       headerName: "Current Role",
       field: "currentRole",
       filter: 'agTextColumnFilter',
       minWidth: 150,
-      valueGetter: (params) => {
-        const role = params.data?.currentRole;
-        return Array.isArray(role) ? role.join(', ') : (role || '');
-      }
+      cellRenderer: ({ data }: { data: Teacher }) => (
+        <PillRenderer value={data.currentRole} />
+      )
     },
     {
       headerName: "Montessori Certified",
       field: "montessoriCertified",
       filter: 'agTextColumnFilter',
       minWidth: 160,
+      cellRenderer: ({ data }: { data: Teacher }) => (
+        <BadgeRenderer value={data.montessoriCertified} />
+      )
     },
     {
       headerName: "Race/Ethnicity",
       field: "raceEthnicity",
       filter: 'agTextColumnFilter',
       minWidth: 140,
-      valueGetter: (params) => {
-        const race = params.data?.raceEthnicity;
-        return Array.isArray(race) ? race.join(', ') : (race || '');
-      }
+      cellRenderer: ({ data }: { data: Teacher }) => (
+        <PillRenderer value={data.raceEthnicity} />
+      )
     },
     {
       headerName: "Discovery Status",
@@ -172,7 +191,9 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "individualType",
       filter: 'agTextColumnFilter',
       minWidth: 120,
-      cellRenderer: BadgeRenderer,
+      cellRenderer: ({ data }: { data: Teacher }) => (
+        <PillRenderer value={data.individualType} />
+      )
     },
     {
       headerName: "Actions",
