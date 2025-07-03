@@ -281,8 +281,6 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
         animateRows={true}
         rowSelection="multiple"
         suppressRowClickSelection={true}
-        pagination={true}
-        paginationPageSize={20}
         enableBrowserTooltips={true}
       />
     </div>

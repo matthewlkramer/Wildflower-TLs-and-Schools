@@ -89,6 +89,7 @@ This is a full-stack web application for managing teachers and schools in the Wi
 ```
 Changelog:
 - July 03, 2025. Initial setup
+- July 03, 2025. Removed pagination from data grids - now shows full scrollable lists
 ```
 
 ## User Preferences
