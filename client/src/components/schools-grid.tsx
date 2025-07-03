@@ -78,22 +78,14 @@ const CurrentTLsCellRenderer = (params: any) => {
   const currentTLs = school.currentTLs;
   
   if (currentTLs && Array.isArray(currentTLs) && currentTLs.length > 0) {
-    return (
-      <div className="flex flex-wrap gap-1">
-        {currentTLs.map((name: string, index: number) => (
-          <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            {name}
-          </span>
-        ))}
-      </div>
-    );
+    return <span>{currentTLs.join(', ')}</span>;
   }
   
   if (currentTLs && typeof currentTLs === 'string') {
-    return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{currentTLs}</span>;
+    return <span>{currentTLs}</span>;
   }
   
-  return <span className="text-slate-400">No TLs</span>;
+  return <span className="text-slate-400">-</span>;
 };
 
 const ActionsCellRenderer = (params: any) => {
@@ -140,19 +132,18 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       field: "status",
       headerName: "Stage/Status",
       width: 140,
-      cellRenderer: StatusBadgeCellRenderer,
-      filter: "agSetColumnFilter",
-      filterParams: {
-        values: () => {
-          const allValues = new Set<string>();
-          schools.forEach(school => {
-            if (school.status) {
-              allValues.add(school.status);
-            }
-          });
-          return Array.from(allValues);
+      cellRenderer: ({ data }: { data: any }) => {
+        console.log(`School ${data.name} status field:`, data.status);
+        if (data.status) {
+          return (
+            <Badge className={getStatusColor(data.status)}>
+              {data.status}
+            </Badge>
+          );
         }
+        return <span className="text-slate-400">No status</span>;
       },
+      filter: "agTextColumnFilter",
     },
     {
       field: "currentTLs",

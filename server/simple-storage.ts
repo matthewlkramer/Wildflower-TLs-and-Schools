@@ -121,7 +121,13 @@ export class SimpleAirtableStorage implements IStorage {
       agesServed: fields["Ages served"] || undefined,
       schoolType: fields["School Type"] || fields["Type"] || undefined,
       governanceModel: fields["Governance Model"] || undefined,
-      status: fields["Status"] || undefined,
+      status: fields["Stage_Status"] || 
+              fields["Status"] || 
+              fields["Stage/Status"] || 
+              fields["Stage"] || 
+              fields["School Status"] ||
+              fields["Stage Status"] ||
+              undefined,
       openDate: fields["Open Date"] || undefined,
       targetOpenDate: fields["Target Open Date"] || undefined,
       enrollmentCap: fields["Enrollment Cap"] || undefined,
