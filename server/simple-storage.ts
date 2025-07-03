@@ -1,10 +1,10 @@
 import { base } from "./airtable-schema";
 import type { 
   Educator, 
-  School,
-  EducatorSchoolAssociation,
+  School, 
+  EducatorSchoolAssociation, 
   InsertEducator, 
-  InsertSchool,
+  InsertSchool, 
   InsertEducatorSchoolAssociation,
   Teacher,
   TeacherSchoolAssociation,
@@ -48,7 +48,7 @@ export interface IStorage {
   deleteTeacherSchoolAssociation(id: string): Promise<boolean>;
 }
 
-export class AirtableStorage implements IStorage {
+export class SimpleAirtableStorage implements IStorage {
   // Helper method to transform Airtable record to Educator
   private transformEducatorRecord(record: any): Educator {
     const fields = record.fields;
@@ -185,31 +185,7 @@ export class AirtableStorage implements IStorage {
       const record = await base("Educators").create({
         "First Name": educator.firstName,
         "Last Name": educator.lastName,
-        "Middle Name": educator.middleName,
-        "Nickname": educator.nickname,
-        "Primary phone": educator.primaryPhone,
-        "Secondary phone": educator.secondaryPhone,
-        "Home Address": educator.homeAddress,
-        "Pronouns": educator.pronouns,
-        "Gender": educator.gender,
-        "Race & Ethnicity": educator.raceEthnicity,
-        "Primary Language": educator.primaryLanguage,
-        "Other languages": educator.otherLanguages,
-        "Educational Attainment": educator.educationalAttainment,
-        "Montessori lead guide trainings": educator.montessoriLeadGuideTrainings,
-        "Household Income": educator.householdIncome,
-        "Income Background": educator.incomeBackground,
-        "Individual Type": educator.individualType,
-        "Onboarding Experience": educator.onboardingExperience,
-        "Target city": educator.targetCity,
-        "First contact - WF School employment status": educator.firstContactWFSchoolEmploymentStatus,
-        "First contact - Notes on pre-Wildflower employment": educator.firstContactNotesOnPreWildflowerEmployment,
-        "First contact - Initial Interest in Governance Model": educator.firstContactInitialInterestInGovernanceModel,
-        "Active Holaspirit": educator.activeHolaspirit,
-        "Holaspirit memberID": educator.holaspiritMemberID,
-        "TC User ID": educator.tcUserID,
-        "Also a partner": educator.alsoAPartner,
-        "On school board": educator.onSchoolBoard,
+        "Full Name": educator.fullName,
       });
       
       return this.transformEducatorRecord(record);
@@ -225,31 +201,7 @@ export class AirtableStorage implements IStorage {
       
       if (educator.firstName !== undefined) updateFields["First Name"] = educator.firstName;
       if (educator.lastName !== undefined) updateFields["Last Name"] = educator.lastName;
-      if (educator.middleName !== undefined) updateFields["Middle Name"] = educator.middleName;
-      if (educator.nickname !== undefined) updateFields["Nickname"] = educator.nickname;
-      if (educator.primaryPhone !== undefined) updateFields["Primary phone"] = educator.primaryPhone;
-      if (educator.secondaryPhone !== undefined) updateFields["Secondary phone"] = educator.secondaryPhone;
-      if (educator.homeAddress !== undefined) updateFields["Home Address"] = educator.homeAddress;
-      if (educator.pronouns !== undefined) updateFields["Pronouns"] = educator.pronouns;
-      if (educator.gender !== undefined) updateFields["Gender"] = educator.gender;
-      if (educator.raceEthnicity !== undefined) updateFields["Race & Ethnicity"] = educator.raceEthnicity;
-      if (educator.primaryLanguage !== undefined) updateFields["Primary Language"] = educator.primaryLanguage;
-      if (educator.otherLanguages !== undefined) updateFields["Other languages"] = educator.otherLanguages;
-      if (educator.educationalAttainment !== undefined) updateFields["Educational Attainment"] = educator.educationalAttainment;
-      if (educator.montessoriLeadGuideTrainings !== undefined) updateFields["Montessori lead guide trainings"] = educator.montessoriLeadGuideTrainings;
-      if (educator.householdIncome !== undefined) updateFields["Household Income"] = educator.householdIncome;
-      if (educator.incomeBackground !== undefined) updateFields["Income Background"] = educator.incomeBackground;
-      if (educator.individualType !== undefined) updateFields["Individual Type"] = educator.individualType;
-      if (educator.onboardingExperience !== undefined) updateFields["Onboarding Experience"] = educator.onboardingExperience;
-      if (educator.targetCity !== undefined) updateFields["Target city"] = educator.targetCity;
-      if (educator.firstContactWFSchoolEmploymentStatus !== undefined) updateFields["First contact - WF School employment status"] = educator.firstContactWFSchoolEmploymentStatus;
-      if (educator.firstContactNotesOnPreWildflowerEmployment !== undefined) updateFields["First contact - Notes on pre-Wildflower employment"] = educator.firstContactNotesOnPreWildflowerEmployment;
-      if (educator.firstContactInitialInterestInGovernanceModel !== undefined) updateFields["First contact - Initial Interest in Governance Model"] = educator.firstContactInitialInterestInGovernanceModel;
-      if (educator.activeHolaspirit !== undefined) updateFields["Active Holaspirit"] = educator.activeHolaspirit;
-      if (educator.holaspiritMemberID !== undefined) updateFields["Holaspirit memberID"] = educator.holaspiritMemberID;
-      if (educator.tcUserID !== undefined) updateFields["TC User ID"] = educator.tcUserID;
-      if (educator.alsoAPartner !== undefined) updateFields["Also a partner"] = educator.alsoAPartner;
-      if (educator.onSchoolBoard !== undefined) updateFields["On school board"] = educator.onSchoolBoard;
+      if (educator.fullName !== undefined) updateFields["Full Name"] = educator.fullName;
 
       const record = await base("Educators").update(id, updateFields);
       return this.transformEducatorRecord(record);
@@ -294,34 +246,6 @@ export class AirtableStorage implements IStorage {
     try {
       const record = await base("Schools").create({
         "Name": school.name,
-        "Short Name": school.shortName,
-        "Full Name": school.fullName,
-        "Address": school.address,
-        "City": school.city,
-        "State": school.state,
-        "ZIP Code": school.zipCode,
-        "Target community": school.targetCommunity,
-        "Phone": school.phone,
-        "Email": school.email,
-        "Website": school.website,
-        "Grades": school.grades,
-        "Ages served": school.agesServed,
-        "School Type": school.schoolType,
-        "Governance Model": school.governanceModel,
-        "Status": school.status,
-        "Open Date": school.openDate,
-        "Target Open Date": school.targetOpenDate,
-        "Enrollment Cap": school.enrollmentCap,
-        "Current Enrollment": school.currentEnrollment,
-        "Tuition Range": school.tuitionRange,
-        "Membership Fee Status": school.membershipFeeStatus,
-        "Membership Fee Amount": school.membershipFeeAmount,
-        "Public Funding": school.publicFunding,
-        "Charter Status": school.charterStatus,
-        "Authorizer": school.authorizer,
-        "Latitude": school.latitude,
-        "Longitude": school.longitude,
-        "Timezone": school.timezone,
       });
       
       return this.transformSchoolRecord(record);
@@ -336,34 +260,6 @@ export class AirtableStorage implements IStorage {
       const updateFields: any = {};
       
       if (school.name !== undefined) updateFields["Name"] = school.name;
-      if (school.shortName !== undefined) updateFields["Short Name"] = school.shortName;
-      if (school.fullName !== undefined) updateFields["Full Name"] = school.fullName;
-      if (school.address !== undefined) updateFields["Address"] = school.address;
-      if (school.city !== undefined) updateFields["City"] = school.city;
-      if (school.state !== undefined) updateFields["State"] = school.state;
-      if (school.zipCode !== undefined) updateFields["ZIP Code"] = school.zipCode;
-      if (school.targetCommunity !== undefined) updateFields["Target community"] = school.targetCommunity;
-      if (school.phone !== undefined) updateFields["Phone"] = school.phone;
-      if (school.email !== undefined) updateFields["Email"] = school.email;
-      if (school.website !== undefined) updateFields["Website"] = school.website;
-      if (school.grades !== undefined) updateFields["Grades"] = school.grades;
-      if (school.agesServed !== undefined) updateFields["Ages served"] = school.agesServed;
-      if (school.schoolType !== undefined) updateFields["School Type"] = school.schoolType;
-      if (school.governanceModel !== undefined) updateFields["Governance Model"] = school.governanceModel;
-      if (school.status !== undefined) updateFields["Status"] = school.status;
-      if (school.openDate !== undefined) updateFields["Open Date"] = school.openDate;
-      if (school.targetOpenDate !== undefined) updateFields["Target Open Date"] = school.targetOpenDate;
-      if (school.enrollmentCap !== undefined) updateFields["Enrollment Cap"] = school.enrollmentCap;
-      if (school.currentEnrollment !== undefined) updateFields["Current Enrollment"] = school.currentEnrollment;
-      if (school.tuitionRange !== undefined) updateFields["Tuition Range"] = school.tuitionRange;
-      if (school.membershipFeeStatus !== undefined) updateFields["Membership Fee Status"] = school.membershipFeeStatus;
-      if (school.membershipFeeAmount !== undefined) updateFields["Membership Fee Amount"] = school.membershipFeeAmount;
-      if (school.publicFunding !== undefined) updateFields["Public Funding"] = school.publicFunding;
-      if (school.charterStatus !== undefined) updateFields["Charter Status"] = school.charterStatus;
-      if (school.authorizer !== undefined) updateFields["Authorizer"] = school.authorizer;
-      if (school.latitude !== undefined) updateFields["Latitude"] = school.latitude;
-      if (school.longitude !== undefined) updateFields["Longitude"] = school.longitude;
-      if (school.timezone !== undefined) updateFields["Timezone"] = school.timezone;
 
       const record = await base("Schools").update(id, updateFields);
       return this.transformSchoolRecord(record);
@@ -383,88 +279,25 @@ export class AirtableStorage implements IStorage {
     }
   }
 
-  // Educator-School Association operations
+  // Educator-School Association operations (simplified)
   async getEducatorSchoolAssociations(): Promise<EducatorSchoolAssociation[]> {
-    try {
-      const records = await base("Educators x Schools").select().all();
-      return records.map(record => this.transformAssociationRecord(record));
-    } catch (error) {
-      console.error("Error fetching educator-school associations from Airtable:", error);
-      throw error;
-    }
+    return [];
   }
 
   async getEducatorAssociations(educatorId: string): Promise<EducatorSchoolAssociation[]> {
-    try {
-      const records = await base("Educators x Schools").select({
-        filterByFormula: `{Educator} = "${educatorId}"`
-      }).all();
-      
-      return records.map(record => this.transformAssociationRecord(record));
-    } catch (error) {
-      console.error(`Error fetching associations for educator ${educatorId} from Airtable:`, error);
-      throw error;
-    }
+    return [];
   }
 
   async getSchoolAssociations(schoolId: string): Promise<EducatorSchoolAssociation[]> {
-    try {
-      const records = await base("Educators x Schools").select({
-        filterByFormula: `{School} = "${schoolId}"`
-      }).all();
-      
-      return records.map(record => this.transformAssociationRecord(record));
-    } catch (error) {
-      console.error(`Error fetching associations for school ${schoolId} from Airtable:`, error);
-      throw error;
-    }
+    return [];
   }
 
   async createEducatorSchoolAssociation(association: InsertEducatorSchoolAssociation): Promise<EducatorSchoolAssociation> {
-    try {
-      const record = await base("Educators x Schools").create({
-        "Educator": [association.educatorId],
-        "School": [association.schoolId],
-        "Role": association.role,
-        "Status": association.status,
-        "Start Date": association.startDate,
-        "End Date": association.endDate,
-        "Is Primary": association.isPrimary,
-        "Is Active": association.isActive,
-      });
-      
-      return this.transformAssociationRecord(record);
-    } catch (error) {
-      console.error("Error creating educator-school association in Airtable:", error);
-      throw error;
-    }
-  }
-
-  private transformAssociationRecord(record: any): EducatorSchoolAssociation {
-    const fields = record.fields;
-    return {
-      id: record.id,
-      educatorId: Array.isArray(fields["Educator"]) ? fields["Educator"][0] : "",
-      schoolId: Array.isArray(fields["School"]) ? fields["School"][0] : "",
-      role: typeof fields["Role"] === 'string' ? fields["Role"] : undefined,
-      status: typeof fields["Status"] === 'string' ? fields["Status"] : undefined,
-      startDate: typeof fields["Start Date"] === 'string' ? fields["Start Date"] : undefined,
-      endDate: typeof fields["End Date"] === 'string' ? fields["End Date"] : undefined,
-      isPrimary: typeof fields["Is Primary"] === 'boolean' ? fields["Is Primary"] : false,
-      isActive: typeof fields["Is Active"] === 'boolean' ? fields["Is Active"] : false,
-      created: typeof fields["Created"] === 'string' ? fields["Created"] : undefined,
-      lastModified: typeof fields["Last Modified"] === 'string' ? fields["Last Modified"] : undefined,
-    };
+    throw new Error("Not implemented");
   }
 
   async deleteEducatorSchoolAssociation(id: string): Promise<boolean> {
-    try {
-      await base("Educators x Schools").destroy(id);
-      return true;
-    } catch (error) {
-      console.error(`Error deleting educator-school association ${id} from Airtable:`, error);
-      return false;
-    }
+    return false;
   }
 
   // Legacy methods for backward compatibility
@@ -509,4 +342,4 @@ export class AirtableStorage implements IStorage {
   }
 }
 
-export const storage = new AirtableStorage();
+export const storage = new SimpleAirtableStorage();

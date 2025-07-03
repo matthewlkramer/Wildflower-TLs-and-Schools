@@ -19,9 +19,9 @@ export default function Teachers() {
   });
 
   const filteredTeachers = teachers?.filter(teacher => {
-    const matchesSearch = teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         teacher.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         teacher.subject.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (teacher.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (teacher.primaryPhone || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (teacher.currentRole?.join(' ') || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     // TODO: Filter by school when associations are implemented
     const matchesSchool = schoolFilter === "all";

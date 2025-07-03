@@ -18,11 +18,11 @@ interface TeachersTableProps {
 }
 
 export default function TeachersTable({ teachers, isLoading }: TeachersTableProps) {
-  const [deleteTeacherId, setDeleteTeacherId] = useState<number | null>(null);
+  const [deleteTeacherId, setDeleteTeacherId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const deleteTeacherMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       return await apiRequest("DELETE", `/api/teachers/${id}`);
     },
     onSuccess: () => {
@@ -41,7 +41,7 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
     },
   });
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     deleteTeacherMutation.mutate(id);
     setDeleteTeacherId(null);
   };
@@ -83,12 +83,12 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
                     <div className="flex items-center space-x-3 cursor-pointer">
                       <div className="w-10 h-10 bg-wildflower-green rounded-full flex items-center justify-center">
                         <span className="text-white font-medium text-sm">
-                          {getInitials(teacher.name)}
+                          {getInitials(teacher.fullName || 'N/A')}
                         </span>
                       </div>
                       <div>
-                        <div className="font-medium text-slate-900">{teacher.name}</div>
-                        <div className="text-sm text-slate-500">{teacher.email}</div>
+                        <div className="font-medium text-slate-900">{teacher.fullName}</div>
+                        <div className="text-sm text-slate-500">{teacher.primaryPhone || 'No phone'}</div>
                       </div>
                     </div>
                   </Link>
@@ -98,11 +98,11 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
                   <div className="text-sm text-slate-500">Main Campus</div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm text-slate-900">{teacher.subject}</span>
+                  <span className="text-sm text-slate-900">{teacher.currentRole?.join(', ') || 'No role specified'}</span>
                 </TableCell>
                 <TableCell>
-                  <Badge className={getStatusColor(teacher.status)}>
-                    {teacher.status}
+                  <Badge className={getStatusColor(teacher.discoveryStatus || 'unknown')}>
+                    {teacher.discoveryStatus || 'Unknown'}
                   </Badge>
                 </TableCell>
                 <TableCell>

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { insertTeacherSchema, insertSchoolSchema, insertTeacherSchoolAssociationSchema } from "@shared/schema";
+import { storage } from "./simple-storage";
+import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -17,7 +17,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/teachers/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const teacher = await storage.getTeacher(id);
       if (!teacher) {
         return res.status(404).json({ message: "Teacher not found" });
@@ -30,7 +30,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/teachers", async (req, res) => {
     try {
-      const teacherData = insertTeacherSchema.parse(req.body);
+      const teacherData = educatorSchema.parse(req.body);
       const teacher = await storage.createTeacher(teacherData);
       res.status(201).json(teacher);
     } catch (error) {
@@ -43,8 +43,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/teachers/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const teacherData = insertTeacherSchema.partial().parse(req.body);
+      const id = req.params.id;
+      const teacherData = educatorSchema.partial().parse(req.body);
       const teacher = await storage.updateTeacher(id, teacherData);
       if (!teacher) {
         return res.status(404).json({ message: "Teacher not found" });
