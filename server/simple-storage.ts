@@ -84,7 +84,11 @@ export class SimpleAirtableStorage implements IStorage {
       allSchools: fields["All Schools"] || undefined,
       currentlyActiveSchool: fields["Currently Active School"] || undefined,
       schoolStatuses: fields["School Statuses"] || undefined,
-      startupStageForActiveSchool: fields["Startup Stage for Active School"] || undefined,
+      startupStageForActiveSchool: fields["Stage_Status for Active School"] || 
+                                   fields["stage_status for active school"] ||
+                                   fields["Startup Stage for Active School"] || 
+                                   fields["Stage Status for Active School"] ||
+                                   undefined,
       targetCity: fields["Target city"] || undefined,
       firstContactWFSchoolEmploymentStatus: fields["First contact - WF School employment status"] || undefined,
       firstContactNotesOnPreWildflowerEmployment: fields["First contact - Notes on pre-Wildflower employment"] || undefined,
