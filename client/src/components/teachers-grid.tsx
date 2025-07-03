@@ -43,6 +43,11 @@ const BadgeRenderer = ({ value, field }: { value: string | string[]; field?: str
       if (status === 'paused') return 'bg-gray-100 text-gray-800 border-gray-200';
     }
     
+    if (fieldName === 'stageStatus') {
+      // Use the updated getStatusColor function for Stage/Status fields
+      return getStatusColor(val);
+    }
+    
     // Default to existing color logic for other fields
     return getStatusColor(val);
   };

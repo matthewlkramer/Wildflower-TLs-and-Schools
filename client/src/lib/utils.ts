@@ -16,12 +16,35 @@ export function getInitials(name: string): string {
 
 export function getStatusColor(status: string): string {
   switch (status.toLowerCase()) {
+    // Red pills for closed/disaffiliated statuses
+    case "permanently closed":
+    case "disaffiliated":
+    case "disaffiliating":
+      return "bg-red-100 text-red-800";
+    
+    // Green gradient from light to dark for progression stages
+    case "visioning":
+      return "bg-green-50 text-green-600"; // Lightest green
+    case "planning":
+      return "bg-green-100 text-green-700";
+    case "startup":
+      return "bg-green-200 text-green-800";
+    case "open":
+      return "bg-green-300 text-green-900"; // Darkest green
+    
+    // Other statuses
+    case "paused":
+      return "bg-yellow-100 text-yellow-800";
+    case "year 1":
+    case "year 2":
+    case "year 3":
+      return "bg-blue-100 text-blue-800";
     case "active":
       return "bg-green-100 text-green-800";
     case "on leave":
       return "bg-yellow-100 text-yellow-800";
     case "inactive":
-      return "bg-red-100 text-red-800";
+      return "bg-gray-100 text-gray-800";
     default:
       return "bg-gray-100 text-gray-800";
   }
