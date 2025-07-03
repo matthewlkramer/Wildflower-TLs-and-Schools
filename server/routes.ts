@@ -60,7 +60,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/teachers/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const success = await storage.deleteTeacher(id);
       if (!success) {
         return res.status(404).json({ message: "Teacher not found" });
@@ -83,7 +83,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/schools/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const school = await storage.getSchool(id);
       if (!school) {
         return res.status(404).json({ message: "School not found" });
@@ -96,7 +96,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/schools", async (req, res) => {
     try {
-      const schoolData = insertSchoolSchema.parse(req.body);
+      const schoolData = schoolSchema.parse(req.body);
       const school = await storage.createSchool(schoolData);
       res.status(201).json(school);
     } catch (error) {
@@ -109,8 +109,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/schools/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const schoolData = insertSchoolSchema.partial().parse(req.body);
+      const id = req.params.id;
+      const schoolData = schoolSchema.partial().parse(req.body);
       const school = await storage.updateSchool(id, schoolData);
       if (!school) {
         return res.status(404).json({ message: "School not found" });
@@ -126,7 +126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/schools/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const success = await storage.deleteSchool(id);
       if (!success) {
         return res.status(404).json({ message: "School not found" });
@@ -140,7 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Teacher-School Association routes
   app.get("/api/teacher-associations/:teacherId", async (req, res) => {
     try {
-      const teacherId = parseInt(req.params.teacherId);
+      const teacherId = req.params.teacherId;
       const associations = await storage.getTeacherAssociations(teacherId);
       res.json(associations);
     } catch (error) {
@@ -150,7 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/school-associations/:schoolId", async (req, res) => {
     try {
-      const schoolId = parseInt(req.params.schoolId);
+      const schoolId = req.params.schoolId;
       const associations = await storage.getSchoolAssociations(schoolId);
       res.json(associations);
     } catch (error) {
@@ -160,7 +160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/teacher-school-associations", async (req, res) => {
     try {
-      const associationData = insertTeacherSchoolAssociationSchema.parse(req.body);
+      const associationData = educatorSchoolAssociationSchema.parse(req.body);
       const association = await storage.createTeacherSchoolAssociation(associationData);
       res.status(201).json(association);
     } catch (error) {
@@ -173,7 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/teacher-school-associations/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const success = await storage.deleteTeacherSchoolAssociation(id);
       if (!success) {
         return res.status(404).json({ message: "Association not found" });
