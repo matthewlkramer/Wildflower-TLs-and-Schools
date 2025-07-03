@@ -18,11 +18,11 @@ interface SchoolsTableProps {
 }
 
 export default function SchoolsTable({ schools, isLoading }: SchoolsTableProps) {
-  const [deleteSchoolId, setDeleteSchoolId] = useState<number | null>(null);
+  const [deleteSchoolId, setDeleteSchoolId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const deleteSchoolMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       return await apiRequest("DELETE", `/api/schools/${id}`);
     },
     onSuccess: () => {
@@ -41,7 +41,7 @@ export default function SchoolsTable({ schools, isLoading }: SchoolsTableProps) 
     },
   });
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     deleteSchoolMutation.mutate(id);
     setDeleteSchoolId(null);
   };
@@ -68,17 +68,19 @@ export default function SchoolsTable({ schools, isLoading }: SchoolsTableProps) 
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50">
-              <TableHead>School Name</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Teachers</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Short Name</TableHead>
+              <TableHead>Stage Status</TableHead>
+              <TableHead>Current TLs</TableHead>
+              <TableHead>Ages Served</TableHead>
+              <TableHead>Governance Model</TableHead>
+              <TableHead>Membership Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {schools.map((school) => (
               <TableRow key={school.id} className="hover:bg-slate-50">
+                {/* Short Name */}
                 <TableCell>
                   <Link href={`/school/${school.id}`}>
                     <div className="flex items-center space-x-3 cursor-pointer">
@@ -86,40 +88,49 @@ export default function SchoolsTable({ schools, isLoading }: SchoolsTableProps) 
                         <School2 className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <div className="font-medium text-slate-900">{school.name}</div>
-                        <div className="text-sm text-slate-500">Est. {school.established}</div>
+                        <div className="font-medium text-slate-900">{school.shortName || school.name}</div>
                       </div>
                     </div>
                   </Link>
                 </TableCell>
+                
+                {/* Stage Status */}
                 <TableCell>
-                  <div className="text-sm text-slate-900">{school.address}</div>
-                  <div className="text-sm text-slate-500">{school.city}, {school.state} {school.zipCode}</div>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm text-slate-900">{school.type}</span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center">
-                    <div className="flex -space-x-2">
-                      <div className="w-6 h-6 bg-wildflower-blue rounded-full border-2 border-white flex items-center justify-center">
-                        <span className="text-white text-xs font-medium">J</span>
-                      </div>
-                      <div className="w-6 h-6 bg-wildflower-green rounded-full border-2 border-white flex items-center justify-center">
-                        <span className="text-white text-xs font-medium">M</span>
-                      </div>
-                      <div className="w-6 h-6 bg-purple-500 rounded-full border-2 border-white flex items-center justify-center">
-                        <span className="text-white text-xs font-medium">+2</span>
-                      </div>
-                    </div>
-                    <span className="ml-2 text-sm text-slate-500">4 teachers</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge className={getStatusColor(school.status)}>
-                    {school.status}
+                  <Badge className={getStatusColor(school.status || 'unknown')}>
+                    {school.status || 'Not specified'}
                   </Badge>
                 </TableCell>
+                
+                {/* Current TLs (Teacher Leaders) */}
+                <TableCell>
+                  <div className="text-sm text-slate-900">
+                    {/* TODO: Get current TLs from educator-school associations */}
+                    TL data pending
+                  </div>
+                </TableCell>
+                
+                {/* Ages Served */}
+                <TableCell>
+                  <div className="text-sm text-slate-900">
+                    {school.agesServed?.join(', ') || 'Not specified'}
+                  </div>
+                </TableCell>
+                
+                {/* Governance Model */}
+                <TableCell>
+                  <div className="text-sm text-slate-900">
+                    {school.governanceModel || 'Not specified'}
+                  </div>
+                </TableCell>
+                
+                {/* Membership Status */}
+                <TableCell>
+                  <Badge variant={school.membershipFeeStatus === 'Active' ? "default" : "secondary"}>
+                    {school.membershipFeeStatus || 'Not specified'}
+                  </Badge>
+                </TableCell>
+                
+                {/* Actions */}
                 <TableCell>
                   <div className="flex space-x-2">
                     <Link href={`/school/${school.id}`}>
