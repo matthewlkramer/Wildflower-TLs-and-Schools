@@ -514,6 +514,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug endpoint to check available tables
+  app.get("/api/debug/tables", async (req, res) => {
+    try {
+      const response = await fetch(`https://api.airtable.com/v0/meta/bases/${process.env.AIRTABLE_BASE_ID}/tables`, {
+        headers: {
+          'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch schema: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      res.json({
+        tables: data.tables.map((table: any) => ({ 
+          id: table.id, 
+          name: table.name 
+        }))
+      });
+    } catch (error) {
+      console.error("Error fetching Airtable schema:", error);
+      res.status(500).json({ error: "Failed to fetch tables" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

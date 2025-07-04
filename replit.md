@@ -104,6 +104,9 @@ Changelog:
 - July 04, 2025. Added full-width detail pages with breadcrumb navigation format ("Wildflower > [Entity Name]")
 - July 04, 2025. Added logo display area to school summary tab with proper Airtable field mapping and placeholder when no logo is present
 - July 04, 2025. Implemented horizontal scrolling tabs for mobile devices on both school and teacher detail pages to prevent tab cramming
+- July 04, 2025. Fixed location checkbox fields to use boolean values instead of strings for "Current Physical Address" and "Current Mailing Address"
+- July 04, 2025. Updated governance documents table name from "Governance documents" to "Governance docs" to match actual Airtable table name
+- July 04, 2025. Added improved error handling for missing or unauthorized Airtable tables with informative warning messages
 ```
 
 ## User Preferences

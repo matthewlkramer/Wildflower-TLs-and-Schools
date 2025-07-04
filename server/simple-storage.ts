@@ -609,8 +609,8 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getGuideAssignmentsBySchoolId(schoolId: string): Promise<GuideAssignment[]> {
     try {
-      // Try to query the "Guide assignments" table filtered by school_id
-      const records = await base("Guide assignments").select({
+      // Try to query the "Guides Assignments" table filtered by school_id
+      const records = await base("Guides Assignments").select({
         filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
@@ -638,8 +638,12 @@ export class SimpleAirtableStorage implements IStorage {
           lastModified: String(lastModified || new Date().toISOString()),
         };
       });
-    } catch (error) {
-      console.error(`Error fetching guide assignments for ${schoolId}:`, error);
+    } catch (error: any) {
+      if (error.error === 'NOT_AUTHORIZED' || error.statusCode === 403) {
+        console.warn(`Access denied to "Guides Assignments" table. This table may not exist in your Airtable base or the API key may not have permission to access it.`);
+      } else {
+        console.error(`Error fetching guide assignments for ${schoolId}:`, error);
+      }
       return [];
     }
   }
@@ -712,8 +716,8 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getGovernanceDocumentsBySchoolId(schoolId: string): Promise<GovernanceDocument[]> {
     try {
-      // Try to query the "Governance documents" table filtered by school_id
-      const records = await base("Governance documents").select({
+      // Try to query the "Governance docs" table filtered by school_id
+      const records = await base("Governance docs").select({
         filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
@@ -736,7 +740,11 @@ export class SimpleAirtableStorage implements IStorage {
         };
       });
     } catch (error) {
-      console.error(`Error fetching governance documents for ${schoolId}:`, error);
+      if (error.error === 'NOT_AUTHORIZED' || error.statusCode === 403) {
+        console.warn(`Access denied to "Governance docs" table. This table may not exist in your Airtable base or the API key may not have permission to access it.`);
+      } else {
+        console.error(`Error fetching governance documents for ${schoolId}:`, error);
+      }
       return [];
     }
   }
