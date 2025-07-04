@@ -103,6 +103,7 @@ Changelog:
 - July 04, 2025. Implemented Guides tab with guide assignments table showing guide short name, type, dates, and active status
 - July 04, 2025. Added full-width detail pages with breadcrumb navigation format ("Wildflower > [Entity Name]")
 - July 04, 2025. Added logo display area to school summary tab with proper Airtable field mapping and placeholder when no logo is present
+- July 04, 2025. Implemented horizontal scrolling tabs for mobile devices on both school and teacher detail pages to prevent tab cramming
 ```
 
 ## User Preferences
