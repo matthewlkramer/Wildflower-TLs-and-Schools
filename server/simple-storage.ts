@@ -497,10 +497,8 @@ export class SimpleAirtableStorage implements IStorage {
       return records.map(record => {
         const schoolId = record.fields["school_id"];
         const address = record.fields["Address"];
-        const currentPhysicalAddress = record.fields["Current physical address"];
-        const currentMailingAddress = record.fields["Current mailing address"];
-        const startDate = record.fields["Start date"];
-        const endDate = record.fields["End date"];
+        const startDate = record.fields["Start of time at location"];
+        const endDate = record.fields["End of time at location"];
         const created = record.fields["Created"];
         const lastModified = record.fields["Last Modified"];
         
@@ -508,8 +506,8 @@ export class SimpleAirtableStorage implements IStorage {
           id: record.id,
           schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
           address: String(address || ''),
-          currentPhysicalAddress: String(currentPhysicalAddress || ''),
-          currentMailingAddress: String(currentMailingAddress || ''),
+          currentPhysicalAddress: String(address || ''),
+          currentMailingAddress: String(address || ''),
           startDate: String(startDate || ''),
           endDate: String(endDate || ''),
           created: String(created || new Date().toISOString()),
@@ -813,20 +811,20 @@ export class SimpleAirtableStorage implements IStorage {
       
       return records.map(record => {
         const schoolId = record.fields["school_id"];
-        const dateCreated = record.fields["Date created"];
-        const createdBy = record.fields["Created by"];
-        const notes = record.fields["Notes"];
-        const created = record.fields["Created"];
-        const lastModified = record.fields["Last Modified"];
+        const assignedDate = record.fields["Assigned date"];
+        const assignee = record.fields["Assignee Short Name"];
+        const item = record.fields["Item"];
+        const status = record.fields["Status"];
+        const dueDate = record.fields["Due date"];
         
         return {
           id: record.id,
           schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
-          dateCreated: String(dateCreated || ''),
-          createdBy: String(createdBy || ''),
-          notes: String(notes || ''),
-          created: String(created || new Date().toISOString()),
-          lastModified: String(lastModified || new Date().toISOString()),
+          dateCreated: String(assignedDate || ''),
+          createdBy: String(assignee || ''),
+          notes: String(item || ''),
+          created: String(assignedDate || new Date().toISOString()),
+          lastModified: String(dueDate || new Date().toISOString()),
         };
       });
     } catch (error) {
@@ -910,9 +908,8 @@ export class SimpleAirtableStorage implements IStorage {
       return records.map(record => {
         const schoolId = record.fields["school_id"];
         const amount = record.fields["Amount"];
-        const issuedDate = record.fields["Issued date"];
-        const issuedBy = record.fields["Issued by"];
-        const status = record.fields["Status"];
+        const issueDate = record.fields["Issue Date"];
+        const status = record.fields["Grant Status"];
         const created = record.fields["Created"];
         const lastModified = record.fields["Last Modified"];
         
@@ -920,8 +917,8 @@ export class SimpleAirtableStorage implements IStorage {
           id: record.id,
           schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
           amount: Number(amount || 0),
-          issuedDate: String(issuedDate || ''),
-          issuedBy: String(issuedBy || ''),
+          issuedDate: String(issueDate || ''),
+          issuedBy: 'Wildflower Foundation', // Default since field doesn't exist
           status: String(status || ''),
           created: String(created || new Date().toISOString()),
           lastModified: String(lastModified || new Date().toISOString()),
@@ -1006,9 +1003,9 @@ export class SimpleAirtableStorage implements IStorage {
       
       return records.map(record => {
         const schoolId = record.fields["school_id"];
-        const amount = record.fields["Amount"];
-        const status = record.fields["Status"];
-        const interestRate = record.fields["Interest rate"];
+        const amount = record.fields["Amount Issued"];
+        const status = record.fields["Loan Status"];
+        const issueDate = record.fields["Effective Issue Date"];
         const created = record.fields["Created"];
         const lastModified = record.fields["Last Modified"];
         
@@ -1017,8 +1014,8 @@ export class SimpleAirtableStorage implements IStorage {
           schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
           amount: Number(amount || 0),
           status: String(status || ''),
-          interestRate: Number(interestRate || 0),
-          created: String(created || new Date().toISOString()),
+          interestRate: 0, // Field doesn't exist in this table
+          created: String(created || issueDate || new Date().toISOString()),
           lastModified: String(lastModified || new Date().toISOString()),
         };
       });
