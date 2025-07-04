@@ -1640,6 +1640,14 @@ export default function SchoolDetail() {
                           <label className="text-sm font-medium text-slate-600">Email Domain</label>
                           <p className="text-sm text-slate-900">-</p>
                         </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Instagram</label>
+                          <p className="text-sm text-slate-900">{school.instagram || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Facebook</label>
+                          <p className="text-sm text-slate-900">{school.facebook || '-'}</p>
+                        </div>
                       </div>
                     </div>
 

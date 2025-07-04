@@ -63,6 +63,8 @@ export interface School {
   phone?: string;
   email?: string;
   website?: string;
+  instagram?: string;
+  facebook?: string;
   grades?: string[];
   agesServed?: string[];
   schoolType?: string;

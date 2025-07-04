@@ -182,6 +182,8 @@ export class SimpleAirtableStorage implements IStorage {
       phone: fields["Phone"] || undefined,
       email: fields["Email"] || undefined,
       website: fields["Website"] || undefined,
+      instagram: fields["Instagram"] || undefined,
+      facebook: fields["Facebook"] || undefined,
       grades: fields["Grades"] || undefined,
       agesServed: fields["Ages served"] || undefined,
       schoolType: fields["School Type"] || fields["Type"] || undefined,
