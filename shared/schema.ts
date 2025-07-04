@@ -137,6 +137,37 @@ export interface GovernanceDocument {
   lastModified?: string;
 }
 
+export interface SchoolNote {
+  id: string; // Airtable record ID
+  schoolId: string;
+  dateCreated?: string;
+  createdBy?: string;
+  notes?: string;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface Grant {
+  id: string; // Airtable record ID
+  schoolId: string;
+  amount?: number;
+  issuedDate?: string;
+  issuedBy?: string;
+  status?: string;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface Loan {
+  id: string; // Airtable record ID
+  schoolId: string;
+  amount?: number;
+  status?: string;
+  interestRate?: number;
+  created?: string;
+  lastModified?: string;
+}
+
 // Zod schemas for validation
 export const educatorSchema = z.object({
   fullName: z.string().min(1, "Full name is required"),
@@ -253,12 +284,37 @@ export const governanceDocumentSchema = z.object({
   dateEntered: z.string().optional(),
 });
 
+export const schoolNoteSchema = z.object({
+  schoolId: z.string().min(1, "School ID is required"),
+  dateCreated: z.string().optional(),
+  createdBy: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export const grantSchema = z.object({
+  schoolId: z.string().min(1, "School ID is required"),
+  amount: z.number().optional(),
+  issuedDate: z.string().optional(),
+  issuedBy: z.string().optional(),
+  status: z.string().optional(),
+});
+
+export const loanSchema = z.object({
+  schoolId: z.string().min(1, "School ID is required"),
+  amount: z.number().optional(),
+  status: z.string().optional(),
+  interestRate: z.number().optional(),
+});
+
 export type InsertEducator = z.infer<typeof educatorSchema>;
 export type InsertSchool = z.infer<typeof schoolSchema>;
 export type InsertEducatorSchoolAssociation = z.infer<typeof educatorSchoolAssociationSchema>;
 export type InsertLocation = z.infer<typeof locationSchema>;
 export type InsertGuideAssignment = z.infer<typeof guideAssignmentSchema>;
 export type InsertGovernanceDocument = z.infer<typeof governanceDocumentSchema>;
+export type InsertSchoolNote = z.infer<typeof schoolNoteSchema>;
+export type InsertGrant = z.infer<typeof grantSchema>;
+export type InsertLoan = z.infer<typeof loanSchema>;
 
 // Legacy types and schemas for backward compatibility (renaming teachers to educators)
 export type Teacher = Educator;

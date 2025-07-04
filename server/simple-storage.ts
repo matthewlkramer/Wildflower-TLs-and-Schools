@@ -6,12 +6,18 @@ import type {
   Location,
   GuideAssignment,
   GovernanceDocument,
+  SchoolNote,
+  Grant,
+  Loan,
   InsertEducator, 
   InsertSchool, 
   InsertEducatorSchoolAssociation,
   InsertLocation,
   InsertGuideAssignment,
   InsertGovernanceDocument,
+  InsertSchoolNote,
+  InsertGrant,
+  InsertLoan,
   Teacher,
   TeacherSchoolAssociation,
   InsertTeacher,
@@ -64,6 +70,30 @@ export interface IStorage {
   createGovernanceDocument(document: InsertGovernanceDocument): Promise<GovernanceDocument>;
   updateGovernanceDocument(id: string, document: Partial<InsertGovernanceDocument>): Promise<GovernanceDocument | undefined>;
   deleteGovernanceDocument(id: string): Promise<boolean>;
+
+  // School note operations
+  getSchoolNotes(): Promise<SchoolNote[]>;
+  getSchoolNote(id: string): Promise<SchoolNote | undefined>;
+  getSchoolNotesBySchoolId(schoolId: string): Promise<SchoolNote[]>;
+  createSchoolNote(note: InsertSchoolNote): Promise<SchoolNote>;
+  updateSchoolNote(id: string, note: Partial<InsertSchoolNote>): Promise<SchoolNote | undefined>;
+  deleteSchoolNote(id: string): Promise<boolean>;
+
+  // Grant operations
+  getGrants(): Promise<Grant[]>;
+  getGrant(id: string): Promise<Grant | undefined>;
+  getGrantsBySchoolId(schoolId: string): Promise<Grant[]>;
+  createGrant(grant: InsertGrant): Promise<Grant>;
+  updateGrant(id: string, grant: Partial<InsertGrant>): Promise<Grant | undefined>;
+  deleteGrant(id: string): Promise<boolean>;
+
+  // Loan operations
+  getLoans(): Promise<Loan[]>;
+  getLoan(id: string): Promise<Loan | undefined>;
+  getLoansBySchoolId(schoolId: string): Promise<Loan[]>;
+  createLoan(loan: InsertLoan): Promise<Loan>;
+  updateLoan(id: string, loan: Partial<InsertLoan>): Promise<Loan | undefined>;
+  deleteLoan(id: string): Promise<boolean>;
 
   // Legacy methods for backward compatibility
   getTeachers(): Promise<Teacher[]>;
@@ -538,6 +568,151 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async deleteGovernanceDocument(id: string): Promise<boolean> {
+    // Mock implementation - in reality this would delete from Airtable
+    return true;
+  }
+
+  // School note operations
+  async getSchoolNotes(): Promise<SchoolNote[]> {
+    // Mock implementation - return empty array for now
+    return [];
+  }
+
+  async getSchoolNote(id: string): Promise<SchoolNote | undefined> {
+    // Mock implementation - return undefined for now
+    return undefined;
+  }
+
+  async getSchoolNotesBySchoolId(schoolId: string): Promise<SchoolNote[]> {
+    // Mock implementation - return empty array for now
+    // In reality this would query an Airtable "School Notes" table filtered by school
+    return [];
+  }
+
+  async createSchoolNote(note: InsertSchoolNote): Promise<SchoolNote> {
+    // Mock implementation - in reality this would create in Airtable
+    const newNote: SchoolNote = {
+      id: `mock_note_${Date.now()}`,
+      schoolId: note.schoolId,
+      dateCreated: note.dateCreated,
+      createdBy: note.createdBy,
+      notes: note.notes,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+    return newNote;
+  }
+
+  async updateSchoolNote(id: string, note: Partial<InsertSchoolNote>): Promise<SchoolNote | undefined> {
+    // Mock implementation - in reality this would update in Airtable
+    const existing = await this.getSchoolNote(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...note,
+      lastModified: new Date().toISOString(),
+    };
+  }
+
+  async deleteSchoolNote(id: string): Promise<boolean> {
+    // Mock implementation - in reality this would delete from Airtable
+    return true;
+  }
+
+  // Grant operations
+  async getGrants(): Promise<Grant[]> {
+    // Mock implementation - return empty array for now
+    return [];
+  }
+
+  async getGrant(id: string): Promise<Grant | undefined> {
+    // Mock implementation - return undefined for now
+    return undefined;
+  }
+
+  async getGrantsBySchoolId(schoolId: string): Promise<Grant[]> {
+    // Mock implementation - return empty array for now
+    // In reality this would query an Airtable "Grants" table filtered by school
+    return [];
+  }
+
+  async createGrant(grant: InsertGrant): Promise<Grant> {
+    // Mock implementation - in reality this would create in Airtable
+    const newGrant: Grant = {
+      id: `mock_grant_${Date.now()}`,
+      schoolId: grant.schoolId,
+      amount: grant.amount,
+      issuedDate: grant.issuedDate,
+      issuedBy: grant.issuedBy,
+      status: grant.status,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+    return newGrant;
+  }
+
+  async updateGrant(id: string, grant: Partial<InsertGrant>): Promise<Grant | undefined> {
+    // Mock implementation - in reality this would update in Airtable
+    const existing = await this.getGrant(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...grant,
+      lastModified: new Date().toISOString(),
+    };
+  }
+
+  async deleteGrant(id: string): Promise<boolean> {
+    // Mock implementation - in reality this would delete from Airtable
+    return true;
+  }
+
+  // Loan operations
+  async getLoans(): Promise<Loan[]> {
+    // Mock implementation - return empty array for now
+    return [];
+  }
+
+  async getLoan(id: string): Promise<Loan | undefined> {
+    // Mock implementation - return undefined for now
+    return undefined;
+  }
+
+  async getLoansBySchoolId(schoolId: string): Promise<Loan[]> {
+    // Mock implementation - return empty array for now
+    // In reality this would query an Airtable "Loans" table filtered by school
+    return [];
+  }
+
+  async createLoan(loan: InsertLoan): Promise<Loan> {
+    // Mock implementation - in reality this would create in Airtable
+    const newLoan: Loan = {
+      id: `mock_loan_${Date.now()}`,
+      schoolId: loan.schoolId,
+      amount: loan.amount,
+      status: loan.status,
+      interestRate: loan.interestRate,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+    return newLoan;
+  }
+
+  async updateLoan(id: string, loan: Partial<InsertLoan>): Promise<Loan | undefined> {
+    // Mock implementation - in reality this would update in Airtable
+    const existing = await this.getLoan(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...loan,
+      lastModified: new Date().toISOString(),
+    };
+  }
+
+  async deleteLoan(id: string): Promise<boolean> {
     // Mock implementation - in reality this would delete from Airtable
     return true;
   }

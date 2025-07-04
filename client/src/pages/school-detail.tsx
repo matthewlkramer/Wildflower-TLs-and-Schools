@@ -22,7 +22,7 @@ import {
 import { School2, User } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
-import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation, type Location, type GuideAssignment, type GovernanceDocument } from "@shared/schema";
+import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation, type Location, type GuideAssignment, type GovernanceDocument, type SchoolNote, type Grant, type Loan } from "@shared/schema";
 import { getInitials, getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -611,6 +611,378 @@ function GovernanceDocumentRow({
   );
 }
 
+// SchoolNoteRow component for inline editing
+function SchoolNoteRow({ 
+  note, 
+  isEditing, 
+  onEdit, 
+  onSave, 
+  onCancel, 
+  onDelete, 
+  isSaving 
+}: {
+  note: SchoolNote;
+  isEditing: boolean;
+  onEdit: () => void;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+  onDelete: () => void;
+  isSaving: boolean;
+}) {
+  const [editData, setEditData] = useState({
+    dateCreated: note.dateCreated || "",
+    createdBy: note.createdBy || "",
+    notes: note.notes || "",
+  });
+
+  useEffect(() => {
+    if (isEditing) {
+      setEditData({
+        dateCreated: note.dateCreated || "",
+        createdBy: note.createdBy || "",
+        notes: note.notes || "",
+      });
+    }
+  }, [isEditing, note]);
+
+  const handleSave = () => {
+    onSave(editData);
+  };
+
+  if (isEditing) {
+    return (
+      <TableRow>
+        <TableCell>
+          <Input
+            type="date"
+            value={editData.dateCreated}
+            onChange={(e) => setEditData({...editData, dateCreated: e.target.value})}
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={editData.createdBy}
+            onChange={(e) => setEditData({...editData, createdBy: e.target.value})}
+            placeholder="Created By"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={editData.notes}
+            onChange={(e) => setEditData({...editData, notes: e.target.value})}
+            placeholder="Notes"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+            >
+              Save
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSaving}
+              className="h-8 px-2"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  return (
+    <TableRow>
+      <TableCell>{note.dateCreated || '-'}</TableCell>
+      <TableCell>{note.createdBy || '-'}</TableCell>
+      <TableCell>{note.notes || '-'}</TableCell>
+      <TableCell>
+        <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onEdit}
+            className="h-8 w-8 p-0"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onDelete}
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+// GrantRow component for inline editing
+function GrantRow({ 
+  grant, 
+  isEditing, 
+  onEdit, 
+  onSave, 
+  onCancel, 
+  onDelete, 
+  isSaving 
+}: {
+  grant: Grant;
+  isEditing: boolean;
+  onEdit: () => void;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+  onDelete: () => void;
+  isSaving: boolean;
+}) {
+  const [editData, setEditData] = useState({
+    amount: grant.amount || 0,
+    issuedDate: grant.issuedDate || "",
+    issuedBy: grant.issuedBy || "",
+    status: grant.status || "",
+  });
+
+  useEffect(() => {
+    if (isEditing) {
+      setEditData({
+        amount: grant.amount || 0,
+        issuedDate: grant.issuedDate || "",
+        issuedBy: grant.issuedBy || "",
+        status: grant.status || "",
+      });
+    }
+  }, [isEditing, grant]);
+
+  const handleSave = () => {
+    onSave(editData);
+  };
+
+  if (isEditing) {
+    return (
+      <TableRow>
+        <TableCell>
+          <Input
+            type="number"
+            value={editData.amount}
+            onChange={(e) => setEditData({...editData, amount: parseFloat(e.target.value) || 0})}
+            placeholder="Amount"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            type="date"
+            value={editData.issuedDate}
+            onChange={(e) => setEditData({...editData, issuedDate: e.target.value})}
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={editData.issuedBy}
+            onChange={(e) => setEditData({...editData, issuedBy: e.target.value})}
+            placeholder="Issued By"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={editData.status}
+            onChange={(e) => setEditData({...editData, status: e.target.value})}
+            placeholder="Status"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+            >
+              Save
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSaving}
+              className="h-8 px-2"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  return (
+    <TableRow>
+      <TableCell>{grant.amount ? `$${grant.amount.toLocaleString()}` : '-'}</TableCell>
+      <TableCell>{grant.issuedDate || '-'}</TableCell>
+      <TableCell>{grant.issuedBy || '-'}</TableCell>
+      <TableCell>{grant.status || '-'}</TableCell>
+      <TableCell>
+        <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onEdit}
+            className="h-8 w-8 p-0"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onDelete}
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+// LoanRow component for inline editing
+function LoanRow({ 
+  loan, 
+  isEditing, 
+  onEdit, 
+  onSave, 
+  onCancel, 
+  onDelete, 
+  isSaving 
+}: {
+  loan: Loan;
+  isEditing: boolean;
+  onEdit: () => void;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+  onDelete: () => void;
+  isSaving: boolean;
+}) {
+  const [editData, setEditData] = useState({
+    amount: loan.amount || 0,
+    status: loan.status || "",
+    interestRate: loan.interestRate || 0,
+  });
+
+  useEffect(() => {
+    if (isEditing) {
+      setEditData({
+        amount: loan.amount || 0,
+        status: loan.status || "",
+        interestRate: loan.interestRate || 0,
+      });
+    }
+  }, [isEditing, loan]);
+
+  const handleSave = () => {
+    onSave(editData);
+  };
+
+  if (isEditing) {
+    return (
+      <TableRow>
+        <TableCell>
+          <Input
+            type="number"
+            value={editData.amount}
+            onChange={(e) => setEditData({...editData, amount: parseFloat(e.target.value) || 0})}
+            placeholder="Amount"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={editData.status}
+            onChange={(e) => setEditData({...editData, status: e.target.value})}
+            placeholder="Status"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            type="number"
+            step="0.01"
+            value={editData.interestRate}
+            onChange={(e) => setEditData({...editData, interestRate: parseFloat(e.target.value) || 0})}
+            placeholder="Interest Rate"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+            >
+              Save
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSaving}
+              className="h-8 px-2"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  return (
+    <TableRow>
+      <TableCell>{loan.amount ? `$${loan.amount.toLocaleString()}` : '-'}</TableCell>
+      <TableCell>{loan.status || '-'}</TableCell>
+      <TableCell>{loan.interestRate ? `${loan.interestRate}%` : '-'}</TableCell>
+      <TableCell>
+        <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onEdit}
+            className="h-8 w-8 p-0"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onDelete}
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
 export default function SchoolDetail() {
   const { id } = useParams<{ id: string }>();
   const [isEditing, setIsEditing] = useState(false);
@@ -629,6 +1001,18 @@ export default function SchoolDetail() {
   const [deletingDocumentId, setDeletingDocumentId] = useState<string | null>(null);
   const [documentDeleteModalOpen, setDocumentDeleteModalOpen] = useState(false);
   const [isCreatingDocument, setIsCreatingDocument] = useState(false);
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
+  const [noteDeleteModalOpen, setNoteDeleteModalOpen] = useState(false);
+  const [isCreatingNote, setIsCreatingNote] = useState(false);
+  const [editingGrantId, setEditingGrantId] = useState<string | null>(null);
+  const [deletingGrantId, setDeletingGrantId] = useState<string | null>(null);
+  const [grantDeleteModalOpen, setGrantDeleteModalOpen] = useState(false);
+  const [isCreatingGrant, setIsCreatingGrant] = useState(false);
+  const [editingLoanId, setEditingLoanId] = useState<string | null>(null);
+  const [deletingLoanId, setDeletingLoanId] = useState<string | null>(null);
+  const [loanDeleteModalOpen, setLoanDeleteModalOpen] = useState(false);
+  const [isCreatingLoan, setIsCreatingLoan] = useState(false);
   const [newLocation, setNewLocation] = useState({
     address: "",
     currentPhysicalAddress: "",
@@ -640,6 +1024,22 @@ export default function SchoolDetail() {
     docType: "",
     doc: "",
     dateEntered: "",
+  });
+  const [newNote, setNewNote] = useState({
+    dateCreated: "",
+    createdBy: "",
+    notes: "",
+  });
+  const [newGrant, setNewGrant] = useState({
+    amount: 0,
+    issuedDate: "",
+    issuedBy: "",
+    status: "",
+  });
+  const [newLoan, setNewLoan] = useState({
+    amount: 0,
+    status: "",
+    interestRate: 0,
   });
   const { toast } = useToast();
   const { setPageTitle } = usePageTitle();
@@ -691,6 +1091,26 @@ export default function SchoolDetail() {
     queryFn: async () => {
       const response = await fetch(`/api/governance-documents/school/${id}`, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch governance documents");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
+  const { data: grants, isLoading: grantsLoading } = useQuery<Grant[]>({
+    queryKey: [`/api/grants/school/${id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/grants/school/${id}`, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch grants");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
+  const { data: loans, isLoading: loansLoading } = useQuery<Loan[]>({
+    queryKey: [`/api/loans/school/${id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/loans/school/${id}`, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch loans");
       return response.json();
     },
     enabled: !!id,
@@ -1637,10 +2057,236 @@ export default function SchoolDetail() {
                 </TabsContent>
 
                 <TabsContent value="grants" className="mt-0">
-                  <div className="space-y-4">
-                    <h4 className="font-medium text-slate-900">Grants & Loans</h4>
-                    <div className="text-center py-8 text-slate-500">
-                      Grant and loan information will be displayed here
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Grants Table */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-slate-900">Grants</h4>
+                          <Button 
+                            size="sm" 
+                            className="bg-wildflower-blue hover:bg-wildflower-blue/90"
+                            onClick={() => setIsCreatingGrant(true)}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Grant
+                          </Button>
+                        </div>
+                        
+                        {grantsLoading ? (
+                          <div className="space-y-3">
+                            <Skeleton className="h-8 w-full" />
+                            <Skeleton className="h-8 w-full" />
+                            <Skeleton className="h-8 w-full" />
+                          </div>
+                        ) : grants && grants.length > 0 || isCreatingGrant ? (
+                          <div className="border rounded-lg">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Amount</TableHead>
+                                  <TableHead>Issued Date</TableHead>
+                                  <TableHead>Issued By</TableHead>
+                                  <TableHead>Status</TableHead>
+                                  <TableHead className="w-[100px]">Actions</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {isCreatingGrant && (
+                                  <TableRow>
+                                    <TableCell>
+                                      <Input
+                                        type="number"
+                                        value={newGrant.amount}
+                                        onChange={(e) => setNewGrant({...newGrant, amount: parseFloat(e.target.value) || 0})}
+                                        placeholder="Amount"
+                                        className="h-8"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <Input
+                                        type="date"
+                                        value={newGrant.issuedDate}
+                                        onChange={(e) => setNewGrant({...newGrant, issuedDate: e.target.value})}
+                                        className="h-8"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <Input
+                                        value={newGrant.issuedBy}
+                                        onChange={(e) => setNewGrant({...newGrant, issuedBy: e.target.value})}
+                                        placeholder="Issued By"
+                                        className="h-8"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <Input
+                                        value={newGrant.status}
+                                        onChange={(e) => setNewGrant({...newGrant, status: e.target.value})}
+                                        placeholder="Status"
+                                        className="h-8"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="flex gap-1">
+                                        <Button
+                                          size="sm"
+                                          onClick={() => {/* grant mutation here */}}
+                                          className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+                                        >
+                                          Save
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => {
+                                            setIsCreatingGrant(false);
+                                            setNewGrant({ amount: 0, issuedDate: "", issuedBy: "", status: "" });
+                                          }}
+                                          className="h-8 px-2"
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    </TableCell>
+                                  </TableRow>
+                                )}
+                                {grants?.map((grant) => (
+                                  <GrantRow
+                                    key={grant.id}
+                                    grant={grant}
+                                    isEditing={editingGrantId === grant.id}
+                                    onEdit={() => setEditingGrantId(grant.id)}
+                                    onSave={(data) => {/* grant update mutation */}}
+                                    onCancel={() => setEditingGrantId(null)}
+                                    onDelete={() => {
+                                      setDeletingGrantId(grant.id);
+                                      setGrantDeleteModalOpen(true);
+                                    }}
+                                    isSaving={false}
+                                  />
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 text-slate-500">
+                            <p>No grants found for this school.</p>
+                            <p className="text-sm mt-2">Use the "Add Grant" button above to create grants.</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Loans Table */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-slate-900">Loans</h4>
+                          <Button 
+                            size="sm" 
+                            className="bg-wildflower-blue hover:bg-wildflower-blue/90"
+                            onClick={() => setIsCreatingLoan(true)}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Loan
+                          </Button>
+                        </div>
+                        
+                        {loansLoading ? (
+                          <div className="space-y-3">
+                            <Skeleton className="h-8 w-full" />
+                            <Skeleton className="h-8 w-full" />
+                            <Skeleton className="h-8 w-full" />
+                          </div>
+                        ) : loans && loans.length > 0 || isCreatingLoan ? (
+                          <div className="border rounded-lg">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Amount</TableHead>
+                                  <TableHead>Status</TableHead>
+                                  <TableHead>Interest Rate</TableHead>
+                                  <TableHead className="w-[100px]">Actions</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {isCreatingLoan && (
+                                  <TableRow>
+                                    <TableCell>
+                                      <Input
+                                        type="number"
+                                        value={newLoan.amount}
+                                        onChange={(e) => setNewLoan({...newLoan, amount: parseFloat(e.target.value) || 0})}
+                                        placeholder="Amount"
+                                        className="h-8"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <Input
+                                        value={newLoan.status}
+                                        onChange={(e) => setNewLoan({...newLoan, status: e.target.value})}
+                                        placeholder="Status"
+                                        className="h-8"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <Input
+                                        type="number"
+                                        step="0.01"
+                                        value={newLoan.interestRate}
+                                        onChange={(e) => setNewLoan({...newLoan, interestRate: parseFloat(e.target.value) || 0})}
+                                        placeholder="Interest Rate"
+                                        className="h-8"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="flex gap-1">
+                                        <Button
+                                          size="sm"
+                                          onClick={() => {/* loan mutation here */}}
+                                          className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+                                        >
+                                          Save
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => {
+                                            setIsCreatingLoan(false);
+                                            setNewLoan({ amount: 0, status: "", interestRate: 0 });
+                                          }}
+                                          className="h-8 px-2"
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    </TableCell>
+                                  </TableRow>
+                                )}
+                                {loans?.map((loan) => (
+                                  <LoanRow
+                                    key={loan.id}
+                                    loan={loan}
+                                    isEditing={editingLoanId === loan.id}
+                                    onEdit={() => setEditingLoanId(loan.id)}
+                                    onSave={(data) => {/* loan update mutation */}}
+                                    onCancel={() => setEditingLoanId(null)}
+                                    onDelete={() => {
+                                      setDeletingLoanId(loan.id);
+                                      setLoanDeleteModalOpen(true);
+                                    }}
+                                    isSaving={false}
+                                  />
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 text-slate-500">
+                            <p>No loans found for this school.</p>
+                            <p className="text-sm mt-2">Use the "Add Loan" button above to create loans.</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </TabsContent>

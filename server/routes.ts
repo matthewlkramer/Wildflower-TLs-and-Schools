@@ -364,6 +364,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // School note routes
+  app.get("/api/school-notes/school/:schoolId", async (req, res) => {
+    try {
+      const schoolId = req.params.schoolId;
+      const notes = await storage.getSchoolNotesBySchoolId(schoolId);
+      res.json(notes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch school notes" });
+    }
+  });
+
+  app.post("/api/school-notes", async (req, res) => {
+    try {
+      const { schoolNoteSchema } = await import("@shared/schema");
+      const validatedData = schoolNoteSchema.parse(req.body);
+      const note = await storage.createSchoolNote(validatedData);
+      res.status(201).json(note);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create school note" });
+    }
+  });
+
+  app.patch("/api/school-notes/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const { schoolNoteSchema } = await import("@shared/schema");
+      const validatedData = schoolNoteSchema.partial().parse(req.body);
+      const note = await storage.updateSchoolNote(id, validatedData);
+      if (!note) {
+        return res.status(404).json({ message: "School note not found" });
+      }
+      res.json(note);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update school note" });
+    }
+  });
+
+  app.delete("/api/school-notes/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const success = await storage.deleteSchoolNote(id);
+      if (!success) {
+        return res.status(404).json({ message: "School note not found" });
+      }
+      res.json({ message: "School note deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete school note" });
+    }
+  });
+
+  // Grant routes
+  app.get("/api/grants/school/:schoolId", async (req, res) => {
+    try {
+      const schoolId = req.params.schoolId;
+      const grants = await storage.getGrantsBySchoolId(schoolId);
+      res.json(grants);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch grants" });
+    }
+  });
+
+  app.post("/api/grants", async (req, res) => {
+    try {
+      const { grantSchema } = await import("@shared/schema");
+      const validatedData = grantSchema.parse(req.body);
+      const grant = await storage.createGrant(validatedData);
+      res.status(201).json(grant);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create grant" });
+    }
+  });
+
+  app.patch("/api/grants/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const { grantSchema } = await import("@shared/schema");
+      const validatedData = grantSchema.partial().parse(req.body);
+      const grant = await storage.updateGrant(id, validatedData);
+      if (!grant) {
+        return res.status(404).json({ message: "Grant not found" });
+      }
+      res.json(grant);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update grant" });
+    }
+  });
+
+  app.delete("/api/grants/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const success = await storage.deleteGrant(id);
+      if (!success) {
+        return res.status(404).json({ message: "Grant not found" });
+      }
+      res.json({ message: "Grant deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete grant" });
+    }
+  });
+
+  // Loan routes
+  app.get("/api/loans/school/:schoolId", async (req, res) => {
+    try {
+      const schoolId = req.params.schoolId;
+      const loans = await storage.getLoansBySchoolId(schoolId);
+      res.json(loans);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch loans" });
+    }
+  });
+
+  app.post("/api/loans", async (req, res) => {
+    try {
+      const { loanSchema } = await import("@shared/schema");
+      const validatedData = loanSchema.parse(req.body);
+      const loan = await storage.createLoan(validatedData);
+      res.status(201).json(loan);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create loan" });
+    }
+  });
+
+  app.patch("/api/loans/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const { loanSchema } = await import("@shared/schema");
+      const validatedData = loanSchema.partial().parse(req.body);
+      const loan = await storage.updateLoan(id, validatedData);
+      if (!loan) {
+        return res.status(404).json({ message: "Loan not found" });
+      }
+      res.json(loan);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update loan" });
+    }
+  });
+
+  app.delete("/api/loans/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const success = await storage.deleteLoan(id);
+      if (!success) {
+        return res.status(404).json({ message: "Loan not found" });
+      }
+      res.json({ message: "Loan deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete loan" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
