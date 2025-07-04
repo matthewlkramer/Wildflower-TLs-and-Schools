@@ -1478,7 +1478,11 @@ export default function SchoolDetail() {
           <CardContent className="p-0">
             <Tabs defaultValue="summary" className="w-full">
               <div className="border-b border-slate-200 overflow-x-auto">
-                <TabsList className="flex bg-transparent h-auto p-0 w-max min-w-full">
+                <div className="flex items-center justify-between">
+                  <h1 className="text-2xl font-bold text-wildflower-blue px-3 py-3 flex-shrink-0">
+                    {school.name}
+                  </h1>
+                  <TabsList className="flex bg-transparent h-auto p-0 w-max">
                   <TabsTrigger value="summary" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
                     Summary
                   </TabsTrigger>
@@ -1512,7 +1516,8 @@ export default function SchoolDetail() {
                   <TabsTrigger value="linked" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
                     Linked Email/Meetings
                   </TabsTrigger>
-                </TabsList>
+                  </TabsList>
+                </div>
               </div>
 
               <div className="p-6">
@@ -1541,7 +1546,7 @@ export default function SchoolDetail() {
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="space-y-3">
                           <div>
-                            <p className="text-sm text-slate-900">{school.name || '-'}</p>
+                            <p className="text-sm text-wildflower-blue font-medium">{school.name || '-'}</p>
                           </div>
                           <div>
                             <label className="text-sm font-medium text-slate-600">Governance Model</label>
