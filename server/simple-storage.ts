@@ -359,37 +359,32 @@ export class SimpleAirtableStorage implements IStorage {
 
   // Educator-School Association operations (simplified)
   async getEducatorSchoolAssociations(): Promise<EducatorSchoolAssociation[]> {
-    // Return mock associations data
-    const educators = await this.getEducators();
-    const schools = await this.getSchools();
-    
-    if (educators.length === 0 || schools.length === 0) return [];
-    
-    // Create some sample associations
-    return [
-      {
-        id: 'assoc_1',
-        educatorId: educators[0]?.id || 'mock_educator_1',
-        schoolId: schools[0]?.id || 'mock_school_1',
-        role: 'Lead Teacher',
-        startDate: '2023-01-01',
-        endDate: undefined,
-        isActive: true,
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      },
-      {
-        id: 'assoc_2',
-        educatorId: educators[1]?.id || 'mock_educator_2',
-        schoolId: schools[0]?.id || 'mock_school_1',
-        role: 'Assistant Teacher',
-        startDate: '2023-03-01',
-        endDate: '2024-06-30',
-        isActive: false,
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      }
-    ];
+    try {
+      // Query the "Educators x Schools" table
+      const records = await base("Educators x Schools").select().all();
+      
+      return records.map(record => {
+        const educator = record.fields["Educator"];
+        const school = record.fields["School"];
+        const roles = record.fields["Roles"];
+        const created = record.fields["Created"];
+        
+        return {
+          id: record.id,
+          educatorId: Array.isArray(educator) ? String(educator[0] || '') : String(educator || ''),
+          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
+          role: String(roles || ''),
+          startDate: '', // Not available in this table
+          endDate: '', // Not available in this table
+          isActive: true, // Assume active if record exists
+          created: String(created || new Date().toISOString()),
+          lastModified: String(created || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching educator school associations:', error);
+      return [];
+    }
   }
 
   async getEducatorAssociations(educatorId: string): Promise<EducatorSchoolAssociation[]> {
@@ -408,10 +403,10 @@ export class SimpleAirtableStorage implements IStorage {
         id: record.id,
         educatorId: Array.isArray(record.fields["Educator"]) ? String(record.fields["Educator"][0]) : String(record.fields["Educator"] || ''),
         schoolId: Array.isArray(record.fields["School"]) ? String(record.fields["School"][0]) : String(record.fields["School"] || ''),
-        role: String(record.fields["Role"] || ''),
-        startDate: String(record.fields["Start date"] || ''),
-        endDate: String(record.fields["End date"] || ''),
-        isActive: record.fields["Status"] === 'Active',
+        role: String(record.fields["Roles"] || ''),
+        startDate: '', // Not available in this table
+        endDate: '', // Not available in this table
+        isActive: true, // Assume active if record exists
         created: String(record.fields["Created"] || new Date().toISOString()),
         lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
       }));
@@ -614,35 +609,9 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getGuideAssignmentsBySchoolId(schoolId: string): Promise<GuideAssignment[]> {
     try {
-      // Query the "Guide assignments" table filtered by school
-      const records = await base("Guide assignments").select({
-        filterByFormula: `{School} = '${schoolId}'`
-      }).all();
-      
-      return records.map(record => {
-        const school = record.fields["School"];
-        const guideId = record.fields["Guide ID"];
-        const guideShortName = record.fields["Guide short name"];
-        const type = record.fields["Type"];
-        const startDate = record.fields["Start date"];
-        const endDate = record.fields["End date"];
-        const isActive = record.fields["Is active"];
-        const created = record.fields["Created"];
-        const lastModified = record.fields["Last Modified"];
-        
-        return {
-          id: record.id,
-          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
-          guideId: String(guideId || ''),
-          guideShortName: String(guideShortName || ''),
-          type: String(type || ''),
-          startDate: String(startDate || ''),
-          endDate: String(endDate || ''),
-          isActive: Boolean(isActive),
-          created: String(created || new Date().toISOString()),
-          lastModified: String(lastModified || new Date().toISOString()),
-        };
-      });
+      // The "Guide assignments" table is not accessible in this Airtable base
+      // Return empty array since we don't have access to this data
+      return [];
     } catch (error) {
       console.error(`Error fetching guide assignments for ${schoolId}:`, error);
       return [];
@@ -717,30 +686,9 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getGovernanceDocumentsBySchoolId(schoolId: string): Promise<GovernanceDocument[]> {
     try {
-      // Query the "Governance documents" table filtered by school
-      // Note: This table might not be accessible or might not exist
-      const records = await base("Governance documents").select({
-        filterByFormula: `{School} = '${schoolId}'`
-      }).all();
-      
-      return records.map(record => {
-        const schoolId = record.fields["School"];
-        const docType = record.fields["Doc type"];
-        const doc = record.fields["Doc"];
-        const dateEntered = record.fields["Date entered"];
-        const created = record.fields["Created"];
-        const lastModified = record.fields["Last Modified"];
-        
-        return {
-          id: record.id,
-          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
-          docType: String(docType || ''),
-          doc: String(doc || ''),
-          dateEntered: String(dateEntered || ''),
-          created: String(created || new Date().toISOString()),
-          lastModified: String(lastModified || new Date().toISOString()),
-        };
-      });
+      // The "Governance documents" table is not accessible in this Airtable base
+      // Return empty array since we don't have access to this data
+      return [];
     } catch (error) {
       console.error(`Error fetching governance documents for ${schoolId}:`, error);
       return [];
