@@ -4,10 +4,12 @@ import type {
   School, 
   EducatorSchoolAssociation, 
   Location,
+  GuideAssignment,
   InsertEducator, 
   InsertSchool, 
   InsertEducatorSchoolAssociation,
   InsertLocation,
+  InsertGuideAssignment,
   Teacher,
   TeacherSchoolAssociation,
   InsertTeacher,
@@ -44,6 +46,14 @@ export interface IStorage {
   createLocation(location: InsertLocation): Promise<Location>;
   updateLocation(id: string, location: Partial<InsertLocation>): Promise<Location | undefined>;
   deleteLocation(id: string): Promise<boolean>;
+
+  // Guide assignment operations
+  getGuideAssignments(): Promise<GuideAssignment[]>;
+  getGuideAssignment(id: string): Promise<GuideAssignment | undefined>;
+  getGuideAssignmentsBySchoolId(schoolId: string): Promise<GuideAssignment[]>;
+  createGuideAssignment(assignment: InsertGuideAssignment): Promise<GuideAssignment>;
+  updateGuideAssignment(id: string, assignment: Partial<InsertGuideAssignment>): Promise<GuideAssignment | undefined>;
+  deleteGuideAssignment(id: string): Promise<boolean>;
 
   // Legacy methods for backward compatibility
   getTeachers(): Promise<Teacher[]>;
@@ -419,6 +429,57 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async deleteLocation(id: string): Promise<boolean> {
+    // Mock implementation - in reality this would delete from Airtable
+    return true;
+  }
+
+  // Guide assignment operations
+  async getGuideAssignments(): Promise<GuideAssignment[]> {
+    // Mock implementation - return empty array for now
+    return [];
+  }
+
+  async getGuideAssignment(id: string): Promise<GuideAssignment | undefined> {
+    // Mock implementation - return undefined for now
+    return undefined;
+  }
+
+  async getGuideAssignmentsBySchoolId(schoolId: string): Promise<GuideAssignment[]> {
+    // Mock implementation - return empty array for now
+    // In reality this would query an Airtable "Guide Assignments" table filtered by school
+    return [];
+  }
+
+  async createGuideAssignment(assignment: InsertGuideAssignment): Promise<GuideAssignment> {
+    // Mock implementation - in reality this would create in Airtable
+    const newAssignment: GuideAssignment = {
+      id: `mock_guide_${Date.now()}`,
+      schoolId: assignment.schoolId,
+      guideId: assignment.guideId,
+      guideShortName: assignment.guideShortName,
+      type: assignment.type,
+      startDate: assignment.startDate,
+      endDate: assignment.endDate,
+      isActive: assignment.isActive,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+    return newAssignment;
+  }
+
+  async updateGuideAssignment(id: string, assignment: Partial<InsertGuideAssignment>): Promise<GuideAssignment | undefined> {
+    // Mock implementation - in reality this would update in Airtable
+    const existing = await this.getGuideAssignment(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...assignment,
+      lastModified: new Date().toISOString(),
+    };
+  }
+
+  async deleteGuideAssignment(id: string): Promise<boolean> {
     // Mock implementation - in reality this would delete from Airtable
     return true;
   }

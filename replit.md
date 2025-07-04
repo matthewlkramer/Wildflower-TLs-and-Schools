@@ -96,6 +96,12 @@ Changelog:
 - July 03, 2025. Fixed Stage_Status field mapping for both schools and teachers from Airtable
 - July 03, 2025. Implemented color-coded Stage/Status badges: red for closed states, green gradient for progression stages, gray for placeholders
 - July 03, 2025. Replaced AG Grid SetFilter with agTextColumnFilter for Community edition compatibility
+- July 04, 2025. Fixed "School not found" error by removing parseInt from Airtable ID handling
+- July 04, 2025. Implemented comprehensive school detail tabs: Summary, Details, Teachers, Locations, Guides, Governance
+- July 04, 2025. Added inline editing functionality for Teacher associations and Locations with CRUD operations
+- July 04, 2025. Created Teachers tab with inline editable start/end dates, roles, active status, "End Stint" and "Delete Stint" actions
+- July 04, 2025. Implemented Guides tab with guide assignments table showing guide short name, type, dates, and active status
+- July 04, 2025. Added full-width detail pages with breadcrumb navigation format ("Wildflower > [Entity Name]")
 ```
 
 ## User Preferences

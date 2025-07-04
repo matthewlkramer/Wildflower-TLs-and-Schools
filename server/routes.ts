@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./simple-storage";
-import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema } from "@shared/schema";
+import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -257,6 +257,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Location deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete location" });
+    }
+  });
+
+  // Guide assignment routes
+  app.get("/api/guide-assignments/school/:schoolId", async (req, res) => {
+    try {
+      const schoolId = req.params.schoolId;
+      const assignments = await storage.getGuideAssignmentsBySchoolId(schoolId);
+      res.json(assignments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch guide assignments" });
+    }
+  });
+
+  app.post("/api/guide-assignments", async (req, res) => {
+    try {
+      const assignmentData = guideAssignmentSchema.parse(req.body);
+      const assignment = await storage.createGuideAssignment(assignmentData);
+      res.status(201).json(assignment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid guide assignment data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create guide assignment" });
+    }
+  });
+
+  app.put("/api/guide-assignments/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const assignmentData = guideAssignmentSchema.partial().parse(req.body);
+      const assignment = await storage.updateGuideAssignment(id, assignmentData);
+      if (!assignment) {
+        return res.status(404).json({ message: "Guide assignment not found" });
+      }
+      res.json(assignment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid guide assignment data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update guide assignment" });
+    }
+  });
+
+  app.delete("/api/guide-assignments/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const success = await storage.deleteGuideAssignment(id);
+      if (!success) {
+        return res.status(404).json({ message: "Guide assignment not found" });
+      }
+      res.json({ message: "Guide assignment deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete guide assignment" });
     }
   });
 

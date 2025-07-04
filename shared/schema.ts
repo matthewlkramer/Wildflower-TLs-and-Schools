@@ -114,6 +114,19 @@ export interface Location {
   lastModified?: string;
 }
 
+export interface GuideAssignment {
+  id: string; // Airtable record ID
+  schoolId: string;
+  guideId: string;
+  guideShortName?: string;
+  type?: string;
+  startDate?: string;
+  endDate?: string;
+  isActive?: boolean;
+  created?: string;
+  lastModified?: string;
+}
+
 // Zod schemas for validation
 export const educatorSchema = z.object({
   fullName: z.string().min(1, "Full name is required"),
@@ -213,10 +226,21 @@ export const locationSchema = z.object({
   endDate: z.string().optional(),
 });
 
+export const guideAssignmentSchema = z.object({
+  schoolId: z.string().min(1, "School ID is required"),
+  guideId: z.string().min(1, "Guide ID is required"),
+  guideShortName: z.string().optional(),
+  type: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  isActive: z.boolean().optional(),
+});
+
 export type InsertEducator = z.infer<typeof educatorSchema>;
 export type InsertSchool = z.infer<typeof schoolSchema>;
 export type InsertEducatorSchoolAssociation = z.infer<typeof educatorSchoolAssociationSchema>;
 export type InsertLocation = z.infer<typeof locationSchema>;
+export type InsertGuideAssignment = z.infer<typeof guideAssignmentSchema>;
 
 // Legacy types and schemas for backward compatibility (renaming teachers to educators)
 export type Teacher = Educator;
