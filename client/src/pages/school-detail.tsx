@@ -22,7 +22,7 @@ import {
 import { School2, User } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
-import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation, type Location, type GuideAssignment } from "@shared/schema";
+import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation, type Location, type GuideAssignment, type GovernanceDocument } from "@shared/schema";
 import { getInitials, getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -492,6 +492,125 @@ function LocationRow({
   );
 }
 
+// GovernanceDocumentRow component for inline editing
+function GovernanceDocumentRow({ 
+  document, 
+  isEditing, 
+  onEdit, 
+  onSave, 
+  onCancel, 
+  onDelete, 
+  isSaving 
+}: {
+  document: GovernanceDocument;
+  isEditing: boolean;
+  onEdit: () => void;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+  onDelete: () => void;
+  isSaving: boolean;
+}) {
+  const [editData, setEditData] = useState({
+    docType: document.docType || "",
+    doc: document.doc || "",
+    dateEntered: document.dateEntered || "",
+  });
+
+  useEffect(() => {
+    if (isEditing) {
+      setEditData({
+        docType: document.docType || "",
+        doc: document.doc || "",
+        dateEntered: document.dateEntered || "",
+      });
+    }
+  }, [isEditing, document]);
+
+  const handleSave = () => {
+    onSave(editData);
+  };
+
+  if (isEditing) {
+    return (
+      <TableRow>
+        <TableCell>
+          <Input
+            value={editData.docType}
+            onChange={(e) => setEditData({...editData, docType: e.target.value})}
+            placeholder="Document Type"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={editData.doc}
+            onChange={(e) => setEditData({...editData, doc: e.target.value})}
+            placeholder="Document"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            type="date"
+            value={editData.dateEntered}
+            onChange={(e) => setEditData({...editData, dateEntered: e.target.value})}
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+            >
+              Save
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSaving}
+              className="h-8 px-2"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  return (
+    <TableRow>
+      <TableCell>{document.docType || '-'}</TableCell>
+      <TableCell>{document.doc || '-'}</TableCell>
+      <TableCell>{document.dateEntered || '-'}</TableCell>
+      <TableCell>
+        <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onEdit}
+            className="h-8 w-8 p-0"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onDelete}
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
 export default function SchoolDetail() {
   const { id } = useParams<{ id: string }>();
   const [isEditing, setIsEditing] = useState(false);
@@ -506,12 +625,21 @@ export default function SchoolDetail() {
   const [editingGuideId, setEditingGuideId] = useState<string | null>(null);
   const [deletingGuideId, setDeletingGuideId] = useState<string | null>(null);
   const [guideDeleteModalOpen, setGuideDeleteModalOpen] = useState(false);
+  const [editingDocumentId, setEditingDocumentId] = useState<string | null>(null);
+  const [deletingDocumentId, setDeletingDocumentId] = useState<string | null>(null);
+  const [documentDeleteModalOpen, setDocumentDeleteModalOpen] = useState(false);
+  const [isCreatingDocument, setIsCreatingDocument] = useState(false);
   const [newLocation, setNewLocation] = useState({
     address: "",
     currentPhysicalAddress: "",
     currentMailingAddress: "",
     startDate: "",
     endDate: "",
+  });
+  const [newDocument, setNewDocument] = useState({
+    docType: "",
+    doc: "",
+    dateEntered: "",
   });
   const { toast } = useToast();
   const { setPageTitle } = usePageTitle();
@@ -553,6 +681,16 @@ export default function SchoolDetail() {
     queryFn: async () => {
       const response = await fetch(`/api/guide-assignments/school/${id}`, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch guide assignments");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
+  const { data: governanceDocuments, isLoading: documentsLoading } = useQuery<GovernanceDocument[]>({
+    queryKey: [`/api/governance-documents/school/${id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/governance-documents/school/${id}`, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch governance documents");
       return response.json();
     },
     enabled: !!id,
@@ -798,6 +936,75 @@ export default function SchoolDetail() {
       toast({
         title: "Error",
         description: "Failed to delete guide assignment",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Governance document mutations
+  const createGovernanceDocumentMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest("POST", "/api/governance-documents", {
+        ...data,
+        schoolId: id,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/governance-documents/school/${id}`] });
+      setIsCreatingDocument(false);
+      setNewDocument({ docType: "", doc: "", dateEntered: "" });
+      toast({
+        title: "Success",
+        description: "Governance document created successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to create governance document",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateGovernanceDocumentMutation = useMutation({
+    mutationFn: async ({ documentId, data }: { documentId: string; data: any }) => {
+      return await apiRequest("PATCH", `/api/governance-documents/${documentId}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/governance-documents/school/${id}`] });
+      setEditingDocumentId(null);
+      toast({
+        title: "Success",
+        description: "Governance document updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update governance document",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteGovernanceDocumentMutation = useMutation({
+    mutationFn: async (documentId: string) => {
+      return await apiRequest("DELETE", `/api/governance-documents/${documentId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/governance-documents/school/${id}`] });
+      setDocumentDeleteModalOpen(false);
+      setDeletingDocumentId(null);
+      toast({
+        title: "Success",
+        description: "Governance document deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete governance document",
         variant: "destructive",
       });
     },
@@ -1254,15 +1461,112 @@ export default function SchoolDetail() {
 
                 <TabsContent value="governance" className="mt-0">
                   <div className="space-y-4">
-                    <h4 className="font-medium text-slate-900">Governance & Legal</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2 text-sm">
-                        <p><span className="text-slate-600">Governance Model:</span> {school.governanceModel || '-'}</p>
-                        <p><span className="text-slate-600">Charter Status:</span> {school.charterStatus || '-'}</p>
-                        <p><span className="text-slate-600">Authorizer:</span> {school.authorizer || '-'}</p>
-                        <p><span className="text-slate-600">Public Funding:</span> {school.publicFunding ? 'Yes' : 'No'}</p>
-                      </div>
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium text-slate-900">Governance Documents</h4>
+                      <Button 
+                        size="sm" 
+                        className="bg-wildflower-blue hover:bg-wildflower-blue/90"
+                        onClick={() => setIsCreatingDocument(true)}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Document
+                      </Button>
                     </div>
+                    
+                    {documentsLoading ? (
+                      <div className="space-y-3">
+                        <Skeleton className="h-8 w-full" />
+                        <Skeleton className="h-8 w-full" />
+                        <Skeleton className="h-8 w-full" />
+                      </div>
+                    ) : governanceDocuments && governanceDocuments.length > 0 ? (
+                      <div className="border rounded-lg">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Document Type</TableHead>
+                              <TableHead>Document</TableHead>
+                              <TableHead>Date Entered</TableHead>
+                              <TableHead className="w-[120px]">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {isCreatingDocument && (
+                              <TableRow>
+                                <TableCell>
+                                  <Input
+                                    value={newDocument.docType}
+                                    onChange={(e) => setNewDocument({...newDocument, docType: e.target.value})}
+                                    placeholder="Document Type"
+                                    className="h-8"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    value={newDocument.doc}
+                                    onChange={(e) => setNewDocument({...newDocument, doc: e.target.value})}
+                                    placeholder="Document"
+                                    className="h-8"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="date"
+                                    value={newDocument.dateEntered}
+                                    onChange={(e) => setNewDocument({...newDocument, dateEntered: e.target.value})}
+                                    className="h-8"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex gap-1">
+                                    <Button
+                                      size="sm"
+                                      onClick={() => createGovernanceDocumentMutation.mutate(newDocument)}
+                                      disabled={createGovernanceDocumentMutation.isPending}
+                                      className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+                                    >
+                                      Save
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        setIsCreatingDocument(false);
+                                        setNewDocument({ docType: "", doc: "", dateEntered: "" });
+                                      }}
+                                      disabled={createGovernanceDocumentMutation.isPending}
+                                      className="h-8 px-2"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                            {governanceDocuments.map((document) => (
+                              <GovernanceDocumentRow
+                                key={document.id}
+                                document={document}
+                                isEditing={editingDocumentId === document.id}
+                                onEdit={() => setEditingDocumentId(document.id)}
+                                onSave={(data) => updateGovernanceDocumentMutation.mutate({ documentId: document.id, data })}
+                                onCancel={() => setEditingDocumentId(null)}
+                                onDelete={() => {
+                                  setDeletingDocumentId(document.id);
+                                  setDocumentDeleteModalOpen(true);
+                                }}
+                                isSaving={updateGovernanceDocumentMutation.isPending}
+                              />
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-slate-500">
+                        <p>No governance documents found for this school.</p>
+                        <p className="text-sm mt-2">Use the "Add Document" button above to create governance documents.</p>
+                      </div>
+                    )}
                   </div>
                 </TabsContent>
 
@@ -1422,6 +1726,19 @@ export default function SchoolDetail() {
         title="Delete Guide Assignment"
         description="Are you sure you want to delete this guide assignment? This action cannot be undone."
         isLoading={deleteGuideAssignmentMutation.isPending}
+      />
+
+      <DeleteConfirmationModal
+        open={documentDeleteModalOpen}
+        onOpenChange={setDocumentDeleteModalOpen}
+        onConfirm={() => {
+          if (deletingDocumentId) {
+            deleteGovernanceDocumentMutation.mutate(deletingDocumentId);
+          }
+        }}
+        title="Delete Governance Document"
+        description="Are you sure you want to delete this governance document? This action cannot be undone."
+        isLoading={deleteGovernanceDocumentMutation.isPending}
       />
     </>
   );

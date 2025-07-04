@@ -314,6 +314,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Governance document routes
+  app.get("/api/governance-documents/school/:schoolId", async (req, res) => {
+    try {
+      const schoolId = req.params.schoolId;
+      const documents = await storage.getGovernanceDocumentsBySchoolId(schoolId);
+      res.json(documents);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch governance documents" });
+    }
+  });
+
+  app.post("/api/governance-documents", async (req, res) => {
+    try {
+      const { governanceDocumentSchema } = await import("@shared/schema");
+      const validatedData = governanceDocumentSchema.parse(req.body);
+      const document = await storage.createGovernanceDocument(validatedData);
+      res.status(201).json(document);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create governance document" });
+    }
+  });
+
+  app.patch("/api/governance-documents/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const { governanceDocumentSchema } = await import("@shared/schema");
+      const validatedData = governanceDocumentSchema.partial().parse(req.body);
+      const document = await storage.updateGovernanceDocument(id, validatedData);
+      if (!document) {
+        return res.status(404).json({ message: "Governance document not found" });
+      }
+      res.json(document);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update governance document" });
+    }
+  });
+
+  app.delete("/api/governance-documents/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const success = await storage.deleteGovernanceDocument(id);
+      if (!success) {
+        return res.status(404).json({ message: "Governance document not found" });
+      }
+      res.json({ message: "Governance document deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete governance document" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

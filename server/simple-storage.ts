@@ -5,11 +5,13 @@ import type {
   EducatorSchoolAssociation, 
   Location,
   GuideAssignment,
+  GovernanceDocument,
   InsertEducator, 
   InsertSchool, 
   InsertEducatorSchoolAssociation,
   InsertLocation,
   InsertGuideAssignment,
+  InsertGovernanceDocument,
   Teacher,
   TeacherSchoolAssociation,
   InsertTeacher,
@@ -54,6 +56,14 @@ export interface IStorage {
   createGuideAssignment(assignment: InsertGuideAssignment): Promise<GuideAssignment>;
   updateGuideAssignment(id: string, assignment: Partial<InsertGuideAssignment>): Promise<GuideAssignment | undefined>;
   deleteGuideAssignment(id: string): Promise<boolean>;
+
+  // Governance document operations
+  getGovernanceDocuments(): Promise<GovernanceDocument[]>;
+  getGovernanceDocument(id: string): Promise<GovernanceDocument | undefined>;
+  getGovernanceDocumentsBySchoolId(schoolId: string): Promise<GovernanceDocument[]>;
+  createGovernanceDocument(document: InsertGovernanceDocument): Promise<GovernanceDocument>;
+  updateGovernanceDocument(id: string, document: Partial<InsertGovernanceDocument>): Promise<GovernanceDocument | undefined>;
+  deleteGovernanceDocument(id: string): Promise<boolean>;
 
   // Legacy methods for backward compatibility
   getTeachers(): Promise<Teacher[]>;
@@ -480,6 +490,54 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async deleteGuideAssignment(id: string): Promise<boolean> {
+    // Mock implementation - in reality this would delete from Airtable
+    return true;
+  }
+
+  // Governance document operations
+  async getGovernanceDocuments(): Promise<GovernanceDocument[]> {
+    // Mock implementation - return empty array for now
+    return [];
+  }
+
+  async getGovernanceDocument(id: string): Promise<GovernanceDocument | undefined> {
+    // Mock implementation - return undefined for now
+    return undefined;
+  }
+
+  async getGovernanceDocumentsBySchoolId(schoolId: string): Promise<GovernanceDocument[]> {
+    // Mock implementation - return empty array for now
+    // In reality this would query an Airtable "Governance Documents" table filtered by school
+    return [];
+  }
+
+  async createGovernanceDocument(document: InsertGovernanceDocument): Promise<GovernanceDocument> {
+    // Mock implementation - in reality this would create in Airtable
+    const newDocument: GovernanceDocument = {
+      id: `mock_doc_${Date.now()}`,
+      schoolId: document.schoolId,
+      docType: document.docType,
+      doc: document.doc,
+      dateEntered: document.dateEntered,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+    return newDocument;
+  }
+
+  async updateGovernanceDocument(id: string, document: Partial<InsertGovernanceDocument>): Promise<GovernanceDocument | undefined> {
+    // Mock implementation - in reality this would update in Airtable
+    const existing = await this.getGovernanceDocument(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...document,
+      lastModified: new Date().toISOString(),
+    };
+  }
+
+  async deleteGovernanceDocument(id: string): Promise<boolean> {
     // Mock implementation - in reality this would delete from Airtable
     return true;
   }
