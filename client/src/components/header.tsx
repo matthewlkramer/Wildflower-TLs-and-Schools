@@ -1,10 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { Sprout, Plus, User, Search } from "lucide-react";
+import { Plus, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import AddTeacherModal from "./add-teacher-modal";
 import AddSchoolModal from "./add-school-modal";
+import { WildflowerLogo } from "./wildflower-logo";
 
 interface HeaderProps {
   searchTerm?: string;
@@ -12,10 +13,9 @@ interface HeaderProps {
   searchPlaceholder?: string;
   showFilters?: boolean;
   onToggleFilters?: () => void;
-  pageTitle?: string; // For detail pages like teacher/school name
 }
 
-export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder, showFilters = false, onToggleFilters, pageTitle }: HeaderProps) {
+export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder, showFilters = false, onToggleFilters }: HeaderProps) {
   const [location] = useLocation();
   const [showAddTeacherModal, setShowAddTeacherModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -38,14 +38,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
     return "Search...";
   };
 
-  const getBreadcrumb = () => {
-    if (isTeachersActive) {
-      return pageTitle ? `Teachers > ${pageTitle}` : "Teachers";
-    } else if (isSchoolsActive) {
-      return pageTitle ? `Schools > ${pageTitle}` : "Schools";
-    }
-    return "";
-  };
+
 
   return (
     <>
@@ -54,16 +47,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <Sprout className="text-wildflower-green h-8 w-8 mr-2" />
-                <div className="flex items-center">
-                  <span className="text-xl font-bold text-slate-900">Wildflower</span>
-                  {getBreadcrumb() && (
-                    <>
-                      <span className="mx-2 text-slate-400">{'>'}</span>
-                      <span className="text-lg text-slate-700">{getBreadcrumb()}</span>
-                    </>
-                  )}
-                </div>
+                <WildflowerLogo className="h-10 w-auto" />
               </div>
             </div>
             <div className="flex items-center space-x-6">

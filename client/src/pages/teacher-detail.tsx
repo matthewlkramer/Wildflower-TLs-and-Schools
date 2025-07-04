@@ -8,12 +8,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { type Teacher } from "@shared/schema";
 import { getStatusColor } from "@/lib/utils";
-import { usePageTitle } from "../App";
-import { useEffect } from "react";
+
 
 export default function TeacherDetail() {
   const { id } = useParams<{ id: string }>();
-  const { setPageTitle } = usePageTitle();
 
   const { data: teacher, isLoading } = useQuery<Teacher>({
     queryKey: ["/api/teachers", id],
@@ -24,12 +22,7 @@ export default function TeacherDetail() {
     },
   });
 
-  useEffect(() => {
-    if (teacher) {
-      setPageTitle(teacher.fullName);
-    }
-    return () => setPageTitle(""); // Clear title when component unmounts
-  }, [teacher, setPageTitle]);
+
 
   if (isLoading) {
     return (

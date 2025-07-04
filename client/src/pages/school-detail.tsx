@@ -26,7 +26,7 @@ import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssoci
 import { getInitials, getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { usePageTitle } from "../App";
+
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
 
 // TeacherAssociationRow component for inline editing
@@ -1058,7 +1058,7 @@ export default function SchoolDetail() {
     interestRate: 0,
   });
   const { toast } = useToast();
-  const { setPageTitle } = usePageTitle();
+
 
   const { data: school, isLoading } = useQuery<School>({
     queryKey: ["/api/schools", id],
@@ -1146,12 +1146,7 @@ export default function SchoolDetail() {
     },
   });
 
-  useEffect(() => {
-    if (school) {
-      setPageTitle(school.name);
-    }
-    return () => setPageTitle(""); // Clear title when component unmounts
-  }, [school, setPageTitle]);
+
 
   const updateSchoolMutation = useMutation({
     mutationFn: async (data: any) => {
