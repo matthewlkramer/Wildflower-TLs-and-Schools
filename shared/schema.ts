@@ -12,6 +12,7 @@ export interface Educator {
   secondaryPhone?: string;
   homeAddress?: string;
   pronouns?: string;
+  pronounsOther?: string;
   gender?: string;
   raceEthnicity?: string[];
   primaryLanguage?: string[];
@@ -59,6 +60,13 @@ export interface School {
   city?: string;
   state?: string;
   zipCode?: string;
+  currentPhysicalAddress?: boolean;
+  currentMailingAddress?: boolean;
+  activeLocationCity?: string;
+  activeLocationState?: string;
+  targetCity?: string;
+  targetState?: string;
+  locality?: string;
   targetCommunity?: string;
   phone?: string;
   email?: string;
