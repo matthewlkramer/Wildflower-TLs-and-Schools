@@ -1546,7 +1546,6 @@ export default function SchoolDetail() {
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="space-y-3">
                           <div>
-                            <label className="text-sm font-medium text-slate-600">School Name</label>
                             <p className="text-sm text-slate-900">{school.name || '-'}</p>
                           </div>
                           <div>
