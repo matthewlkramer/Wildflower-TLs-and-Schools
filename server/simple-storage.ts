@@ -364,15 +364,15 @@ export class SimpleAirtableStorage implements IStorage {
       const records = await base("Educators x Schools").select().all();
       
       return records.map(record => {
-        const educator = record.fields["Educator"];
-        const school = record.fields["School"];
+        const educatorId = record.fields["educator_id"];
+        const schoolId = record.fields["school_id"];
         const roles = record.fields["Roles"];
         const created = record.fields["Created"];
         
         return {
           id: record.id,
-          educatorId: Array.isArray(educator) ? String(educator[0] || '') : String(educator || ''),
-          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
+          educatorId: Array.isArray(educatorId) ? String(educatorId[0] || '') : String(educatorId || ''),
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
           role: String(roles || ''),
           startDate: '', // Not available in this table
           endDate: '', // Not available in this table
@@ -394,9 +394,22 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getSchoolAssociations(schoolId: string): Promise<EducatorSchoolAssociation[]> {
     try {
-      // Get all associations and filter manually since Airtable filters are tricky with linked records
-      const allAssociations = await this.getEducatorSchoolAssociations();
-      return allAssociations.filter(assoc => assoc.schoolId === schoolId);
+      // Query the "Educators x Schools" table filtered by school_id field
+      const records = await base("Educators x Schools").select({
+        filterByFormula: `{school_id} = '${schoolId}'`
+      }).all();
+      
+      return records.map(record => ({
+        id: record.id,
+        educatorId: Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || ''),
+        schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
+        role: String(record.fields["Roles"] || ''),
+        startDate: '', // Not available in this table
+        endDate: '', // Not available in this table
+        isActive: true, // Assume active if record exists
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Created"] || new Date().toISOString()),
+      }));
     } catch (error) {
       console.error(`Error fetching school associations for ${schoolId}:`, error);
       return [];
