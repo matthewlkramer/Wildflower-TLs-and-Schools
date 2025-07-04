@@ -54,6 +54,7 @@ export interface School {
   name: string;
   shortName?: string;
   fullName?: string;
+  logo?: string;
   address?: string;
   city?: string;
   state?: string;
@@ -217,6 +218,7 @@ export const schoolSchema = z.object({
   name: z.string().min(1, "School name is required"),
   shortName: z.string().optional(),
   fullName: z.string().optional(),
+  logo: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),

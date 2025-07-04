@@ -173,6 +173,7 @@ export class SimpleAirtableStorage implements IStorage {
       name: fields["Name"] || fields["School Name"] || "",
       shortName: fields["Short Name"] || undefined,
       fullName: fields["Full Name"] || undefined,
+      logo: fields["Logo"]?.[0]?.url || undefined,
       address: fields["Address"] || undefined,
       city: fields["City"] || undefined,
       state: fields["State"] || undefined,
