@@ -1542,7 +1542,6 @@ export default function SchoolDetail() {
                             </div>
                           )}
                         </div>
-                        <h3 className="text-lg font-medium text-slate-900">School Information</h3>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="space-y-3">
