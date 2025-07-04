@@ -109,6 +109,8 @@ Changelog:
 - July 04, 2025. Added improved error handling for missing or unauthorized Airtable tables with informative warning messages
 - July 04, 2025. Fixed governance documents field mappings to correctly extract "Document type", "Date", and "Document PDF" attachment filenames from Airtable
 - July 04, 2025. Updated guide assignments table name from "Guide assignments" to "Guides Assignments" to match actual Airtable table name
+- July 04, 2025. Fixed comprehensive schema and TypeScript errors by adding all missing properties to School and Educator interfaces, including SSJ data fields, systems fields, and additional contact information
+- July 04, 2025. Corrected checkbox field types from string to boolean for currentPhysicalAddress and currentMailingAddress properties
 ```
 
 ## User Preferences

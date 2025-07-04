@@ -14,7 +14,9 @@ export interface Educator {
   pronouns?: string;
   pronounsOther?: string;
   gender?: string;
+  genderOther?: string;
   raceEthnicity?: string[];
+  raceEthnicityOther?: string;
   primaryLanguage?: string[];
   otherLanguages?: string[];
   educationalAttainment?: string;
@@ -55,6 +57,7 @@ export interface School {
   name: string;
   shortName?: string;
   fullName?: string;
+  priorNames?: string;
   logo?: string;
   address?: string;
   city?: string;
@@ -73,11 +76,22 @@ export interface School {
   website?: string;
   instagram?: string;
   facebook?: string;
+  narrative?: string;
+  institutionalPartner?: string;
+  opened?: string;
+  membershipStatus?: string;
+  founders?: string[];
+  membershipAgreementDate?: string;
+  signedMembershipAgreement?: string;
+  agreementVersion?: string;
+  about?: string;
+  aboutSpanish?: string;
   grades?: string[];
   agesServed?: string[];
   schoolType?: string;
   governanceModel?: string;
   status?: string;
+  stageStatus?: string;
   openDate?: string;
   targetOpenDate?: string;
   enrollmentCap?: number;
@@ -97,6 +111,68 @@ export interface School {
   lastModified?: string;
   createdBy?: string;
   currentTLs?: string | number;
+  // SSJ/OSS Data
+  ssjStage?: string;
+  ssjTargetCity?: string;
+  ssjTargetState?: string;
+  ssjOriginalProjectedOpenDate?: string;
+  ssjProjOpenSchoolYear?: string;
+  ssjProjectedOpen?: string;
+  riskFactors?: string[];
+  watchlist?: string[];
+  ssjBoardDevelopment?: string;
+  enteredVisioningDate?: string;
+  enteredPlanningDate?: string;
+  enteredStartupDate?: string;
+  ssjHasETLPartner?: string;
+  ssjOpsGuideTrack?: string[];
+  ssjReadinessRating?: string;
+  ssjFacility?: string;
+  building4GoodFirm?: string;
+  ssjTotalStartupFunding?: string;
+  ssjFundraisingNarrative?: string;
+  planningAlbum?: string;
+  activePodMember?: string;
+  cohorts?: string[];
+  // Systems
+  googleVoice?: string;
+  budgetUtility?: string;
+  admissionsSystem?: string;
+  qbo?: string;
+  websiteTool?: string;
+  logoDesigner?: string;
+  transparentClassroom?: string;
+  tcAdmissions?: string;
+  tcRecordkeeping?: string;
+  gusto?: string;
+  businessInsurance?: string;
+  nameSelectionProposal?: string;
+  trademarkFiled?: string;
+  billComAccount?: string;
+  googleWorkspacePath?: string;
+  budgetLink?: string;
+  bookkeeper?: string;
+  lgbtqia?: boolean;
+  excludeFromEmailLogging?: any;
+  targetGeo?: string;
+  targetIntl?: string;
+  assignedPartnerEmail?: string;
+  assignedPartnerOverride?: string;
+  assignedPartnerShortName?: string;
+  selfReflection?: string;
+  firstContactRelocate?: string;
+  firstContactGovernance?: string;
+  firstContactPreWFEmployment?: string;
+  firstContactWFSchoolEmployee?: string;
+  firstContactAges?: string[];
+  firstContactInterests?: string;
+  opsGuideMeetingPrefTime?: string;
+  opsGuideSpecificsChecklist?: string[];
+  opsGuideReqPertinentInfo?: string[];
+  opsGuideSupportTypeNeeded?: string[];
+  opsGuideFundraisingOps?: string;
+  inactiveFlag?: string;
+  createdTime?: string;
 }
 
 export interface EducatorSchoolAssociation {
@@ -190,8 +266,11 @@ export const educatorSchema = z.object({
   secondaryPhone: z.string().optional(),
   homeAddress: z.string().optional(),
   pronouns: z.string().optional(),
+  pronounsOther: z.string().optional(),
   gender: z.string().optional(),
+  genderOther: z.string().optional(),
   raceEthnicity: z.array(z.string()).optional(),
+  raceEthnicityOther: z.string().optional(),
   primaryLanguage: z.array(z.string()).optional(),
   otherLanguages: z.array(z.string()).optional(),
   educationalAttainment: z.string().optional(),
