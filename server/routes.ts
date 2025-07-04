@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./simple-storage";
-import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema } from "@shared/schema";
+import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -181,6 +181,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Association deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete association" });
+    }
+  });
+
+  // Location routes
+  app.get("/api/locations", async (req, res) => {
+    try {
+      const locations = await storage.getLocations();
+      res.json(locations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch locations" });
+    }
+  });
+
+  app.get("/api/locations/school/:schoolId", async (req, res) => {
+    try {
+      const schoolId = req.params.schoolId;
+      const locations = await storage.getLocationsBySchoolId(schoolId);
+      res.json(locations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch school locations" });
+    }
+  });
+
+  app.get("/api/locations/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const location = await storage.getLocation(id);
+      if (!location) {
+        return res.status(404).json({ message: "Location not found" });
+      }
+      res.json(location);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch location" });
+    }
+  });
+
+  app.post("/api/locations", async (req, res) => {
+    try {
+      const locationData = locationSchema.parse(req.body);
+      const location = await storage.createLocation(locationData);
+      res.status(201).json(location);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid location data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create location" });
+    }
+  });
+
+  app.put("/api/locations/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const locationData = locationSchema.partial().parse(req.body);
+      const location = await storage.updateLocation(id, locationData);
+      if (!location) {
+        return res.status(404).json({ message: "Location not found" });
+      }
+      res.json(location);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid location data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update location" });
+    }
+  });
+
+  app.delete("/api/locations/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const success = await storage.deleteLocation(id);
+      if (!success) {
+        return res.status(404).json({ message: "Location not found" });
+      }
+      res.json({ message: "Location deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete location" });
     }
   });
 

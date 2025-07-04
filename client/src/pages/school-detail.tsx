@@ -11,10 +11,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { School2, User } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
-import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation } from "@shared/schema";
+import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation, type Location } from "@shared/schema";
 import { getInitials, getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -48,6 +56,16 @@ export default function SchoolDetail() {
 
   const { data: teachers } = useQuery<Teacher[]>({
     queryKey: ["/api/teachers"],
+  });
+
+  const { data: locations, isLoading: locationsLoading } = useQuery<Location[]>({
+    queryKey: [`/api/locations/school/${id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/locations/school/${id}`, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch locations");
+      return response.json();
+    },
+    enabled: !!id,
   });
 
   const form = useForm({
@@ -363,15 +381,51 @@ export default function SchoolDetail() {
 
                 <TabsContent value="locations" className="mt-0">
                   <div className="space-y-4">
-                    <h4 className="font-medium text-slate-900">Location Details</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2 text-sm">
-                        <p><span className="text-slate-600">Target Community:</span> {school.targetCommunity || '-'}</p>
-                        <p><span className="text-slate-600">Latitude:</span> {school.latitude || '-'}</p>
-                        <p><span className="text-slate-600">Longitude:</span> {school.longitude || '-'}</p>
-                        <p><span className="text-slate-600">Timezone:</span> {school.timezone || '-'}</p>
-                      </div>
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium text-slate-900">Locations</h4>
+                      <Button size="sm" className="bg-wildflower-blue hover:bg-wildflower-blue/90">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Location
+                      </Button>
                     </div>
+                    
+                    {locationsLoading ? (
+                      <div className="space-y-3">
+                        <Skeleton className="h-8 w-full" />
+                        <Skeleton className="h-8 w-full" />
+                        <Skeleton className="h-8 w-full" />
+                      </div>
+                    ) : locations && locations.length > 0 ? (
+                      <div className="border rounded-lg">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Address</TableHead>
+                              <TableHead>Current Physical Address</TableHead>
+                              <TableHead>Current Mailing Address</TableHead>
+                              <TableHead>Start Date</TableHead>
+                              <TableHead>End Date</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {locations.map((location) => (
+                              <TableRow key={location.id}>
+                                <TableCell>{location.address || '-'}</TableCell>
+                                <TableCell>{location.currentPhysicalAddress || '-'}</TableCell>
+                                <TableCell>{location.currentMailingAddress || '-'}</TableCell>
+                                <TableCell>{location.startDate || '-'}</TableCell>
+                                <TableCell>{location.endDate || '-'}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-slate-500">
+                        <p>No locations found for this school.</p>
+                        <p className="text-sm mt-2">Click "Add Location" to create the first location entry.</p>
+                      </div>
+                    )}
                   </div>
                 </TabsContent>
 

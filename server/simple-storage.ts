@@ -3,9 +3,11 @@ import type {
   Educator, 
   School, 
   EducatorSchoolAssociation, 
+  Location,
   InsertEducator, 
   InsertSchool, 
   InsertEducatorSchoolAssociation,
+  InsertLocation,
   Teacher,
   TeacherSchoolAssociation,
   InsertTeacher,
@@ -34,6 +36,14 @@ export interface IStorage {
   getSchoolAssociations(schoolId: string): Promise<EducatorSchoolAssociation[]>;
   createEducatorSchoolAssociation(association: InsertEducatorSchoolAssociation): Promise<EducatorSchoolAssociation>;
   deleteEducatorSchoolAssociation(id: string): Promise<boolean>;
+
+  // Location operations
+  getLocations(): Promise<Location[]>;
+  getLocation(id: string): Promise<Location | undefined>;
+  getLocationsBySchoolId(schoolId: string): Promise<Location[]>;
+  createLocation(location: InsertLocation): Promise<Location>;
+  updateLocation(id: string, location: Partial<InsertLocation>): Promise<Location | undefined>;
+  deleteLocation(id: string): Promise<boolean>;
 
   // Legacy methods for backward compatibility
   getTeachers(): Promise<Teacher[]>;
@@ -356,6 +366,61 @@ export class SimpleAirtableStorage implements IStorage {
 
   async deleteTeacherSchoolAssociation(id: string): Promise<boolean> {
     return this.deleteEducatorSchoolAssociation(id);
+  }
+
+  // Location operations (mock implementation for now)
+  async getLocations(): Promise<Location[]> {
+    // For now, return mock data based on schools
+    const schools = await this.getSchools();
+    return schools.map((school, index) => ({
+      id: `loc_${school.id}`,
+      schoolId: school.id,
+      address: school.address,
+      currentPhysicalAddress: school.address,
+      currentMailingAddress: school.address,
+      startDate: '2023-01-01',
+      endDate: undefined,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    })).filter(location => location.address); // Only include if has address
+  }
+
+  async getLocation(id: string): Promise<Location | undefined> {
+    const locations = await this.getLocations();
+    return locations.find(location => location.id === id);
+  }
+
+  async getLocationsBySchoolId(schoolId: string): Promise<Location[]> {
+    const locations = await this.getLocations();
+    return locations.filter(location => location.schoolId === schoolId);
+  }
+
+  async createLocation(location: InsertLocation): Promise<Location> {
+    // Mock implementation - in reality this would create in Airtable
+    const newLocation: Location = {
+      id: `loc_${Date.now()}`,
+      ...location,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+    return newLocation;
+  }
+
+  async updateLocation(id: string, location: Partial<InsertLocation>): Promise<Location | undefined> {
+    // Mock implementation - in reality this would update in Airtable
+    const existing = await this.getLocation(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...location,
+      lastModified: new Date().toISOString(),
+    };
+  }
+
+  async deleteLocation(id: string): Promise<boolean> {
+    // Mock implementation - in reality this would delete from Airtable
+    return true;
   }
 }
 
