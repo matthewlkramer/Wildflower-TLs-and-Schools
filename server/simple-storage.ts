@@ -359,15 +359,47 @@ export class SimpleAirtableStorage implements IStorage {
 
   // Educator-School Association operations (simplified)
   async getEducatorSchoolAssociations(): Promise<EducatorSchoolAssociation[]> {
-    return [];
+    // Return mock associations data
+    const educators = await this.getEducators();
+    const schools = await this.getSchools();
+    
+    if (educators.length === 0 || schools.length === 0) return [];
+    
+    // Create some sample associations
+    return [
+      {
+        id: 'assoc_1',
+        educatorId: educators[0]?.id || 'mock_educator_1',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        role: 'Lead Teacher',
+        startDate: '2023-01-01',
+        endDate: undefined,
+        isActive: true,
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      },
+      {
+        id: 'assoc_2',
+        educatorId: educators[1]?.id || 'mock_educator_2',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        role: 'Assistant Teacher',
+        startDate: '2023-03-01',
+        endDate: '2024-06-30',
+        isActive: false,
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      }
+    ];
   }
 
   async getEducatorAssociations(educatorId: string): Promise<EducatorSchoolAssociation[]> {
-    return [];
+    const allAssociations = await this.getEducatorSchoolAssociations();
+    return allAssociations.filter(assoc => assoc.educatorId === educatorId);
   }
 
   async getSchoolAssociations(schoolId: string): Promise<EducatorSchoolAssociation[]> {
-    return [];
+    const allAssociations = await this.getEducatorSchoolAssociations();
+    return allAssociations.filter(assoc => assoc.schoolId === schoolId);
   }
 
   async createEducatorSchoolAssociation(association: InsertEducatorSchoolAssociation): Promise<EducatorSchoolAssociation> {
@@ -476,19 +508,45 @@ export class SimpleAirtableStorage implements IStorage {
 
   // Guide assignment operations
   async getGuideAssignments(): Promise<GuideAssignment[]> {
-    // Mock implementation - return empty array for now
-    return [];
+    const schools = await this.getSchools();
+    if (schools.length === 0) return [];
+    
+    return [
+      {
+        id: 'guide_1',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        guideId: 'guide_math_001',
+        guideShortName: 'Elementary Math',
+        type: 'Academic',
+        startDate: '2023-09-01',
+        endDate: '2024-06-30',
+        isActive: true,
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      },
+      {
+        id: 'guide_2',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        guideId: 'guide_reading_002',
+        guideShortName: 'Reading Fundamentals',
+        type: 'Language Arts',
+        startDate: '2023-09-01',
+        endDate: undefined,
+        isActive: true,
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      }
+    ];
   }
 
   async getGuideAssignment(id: string): Promise<GuideAssignment | undefined> {
-    // Mock implementation - return undefined for now
-    return undefined;
+    const assignments = await this.getGuideAssignments();
+    return assignments.find(assignment => assignment.id === id);
   }
 
   async getGuideAssignmentsBySchoolId(schoolId: string): Promise<GuideAssignment[]> {
-    // Mock implementation - return empty array for now
-    // In reality this would query an Airtable "Guide Assignments" table filtered by school
-    return [];
+    const allAssignments = await this.getGuideAssignments();
+    return allAssignments.filter(assignment => assignment.schoolId === schoolId);
   }
 
   async createGuideAssignment(assignment: InsertGuideAssignment): Promise<GuideAssignment> {
@@ -527,19 +585,39 @@ export class SimpleAirtableStorage implements IStorage {
 
   // Governance document operations
   async getGovernanceDocuments(): Promise<GovernanceDocument[]> {
-    // Mock implementation - return empty array for now
-    return [];
+    const schools = await this.getSchools();
+    if (schools.length === 0) return [];
+    
+    return [
+      {
+        id: 'doc_1',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        docType: 'Bylaws',
+        doc: 'School Bylaws 2023.pdf',
+        dateEntered: '2023-01-15',
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      },
+      {
+        id: 'doc_2',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        docType: 'Policy',
+        doc: 'Student Handbook.pdf',
+        dateEntered: '2023-08-30',
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      }
+    ];
   }
 
   async getGovernanceDocument(id: string): Promise<GovernanceDocument | undefined> {
-    // Mock implementation - return undefined for now
-    return undefined;
+    const documents = await this.getGovernanceDocuments();
+    return documents.find(doc => doc.id === id);
   }
 
   async getGovernanceDocumentsBySchoolId(schoolId: string): Promise<GovernanceDocument[]> {
-    // Mock implementation - return empty array for now
-    // In reality this would query an Airtable "Governance Documents" table filtered by school
-    return [];
+    const allDocuments = await this.getGovernanceDocuments();
+    return allDocuments.filter(doc => doc.schoolId === schoolId);
   }
 
   async createGovernanceDocument(document: InsertGovernanceDocument): Promise<GovernanceDocument> {
@@ -575,19 +653,39 @@ export class SimpleAirtableStorage implements IStorage {
 
   // School note operations
   async getSchoolNotes(): Promise<SchoolNote[]> {
-    // Mock implementation - return empty array for now
-    return [];
+    const schools = await this.getSchools();
+    if (schools.length === 0) return [];
+    
+    return [
+      {
+        id: 'note_1',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        dateCreated: '2024-01-15',
+        createdBy: 'Jane Smith',
+        notes: 'Initial school assessment completed. Strong community support noted.',
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      },
+      {
+        id: 'note_2',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        dateCreated: '2024-03-20',
+        createdBy: 'John Doe',
+        notes: 'Follow-up meeting scheduled with board members. Need to review enrollment projections.',
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      }
+    ];
   }
 
   async getSchoolNote(id: string): Promise<SchoolNote | undefined> {
-    // Mock implementation - return undefined for now
-    return undefined;
+    const notes = await this.getSchoolNotes();
+    return notes.find(note => note.id === id);
   }
 
   async getSchoolNotesBySchoolId(schoolId: string): Promise<SchoolNote[]> {
-    // Mock implementation - return empty array for now
-    // In reality this would query an Airtable "School Notes" table filtered by school
-    return [];
+    const allNotes = await this.getSchoolNotes();
+    return allNotes.filter(note => note.schoolId === schoolId);
   }
 
   async createSchoolNote(note: InsertSchoolNote): Promise<SchoolNote> {
@@ -623,19 +721,41 @@ export class SimpleAirtableStorage implements IStorage {
 
   // Grant operations
   async getGrants(): Promise<Grant[]> {
-    // Mock implementation - return empty array for now
-    return [];
+    const schools = await this.getSchools();
+    if (schools.length === 0) return [];
+    
+    return [
+      {
+        id: 'grant_1',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        amount: 50000,
+        issuedDate: '2023-07-01',
+        issuedBy: 'Education Foundation',
+        status: 'Active',
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      },
+      {
+        id: 'grant_2',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        amount: 25000,
+        issuedDate: '2024-01-15',
+        issuedBy: 'Local Community Fund',
+        status: 'Pending',
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      }
+    ];
   }
 
   async getGrant(id: string): Promise<Grant | undefined> {
-    // Mock implementation - return undefined for now
-    return undefined;
+    const grants = await this.getGrants();
+    return grants.find(grant => grant.id === id);
   }
 
   async getGrantsBySchoolId(schoolId: string): Promise<Grant[]> {
-    // Mock implementation - return empty array for now
-    // In reality this would query an Airtable "Grants" table filtered by school
-    return [];
+    const allGrants = await this.getGrants();
+    return allGrants.filter(grant => grant.schoolId === schoolId);
   }
 
   async createGrant(grant: InsertGrant): Promise<Grant> {
@@ -672,19 +792,39 @@ export class SimpleAirtableStorage implements IStorage {
 
   // Loan operations
   async getLoans(): Promise<Loan[]> {
-    // Mock implementation - return empty array for now
-    return [];
+    const schools = await this.getSchools();
+    if (schools.length === 0) return [];
+    
+    return [
+      {
+        id: 'loan_1',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        amount: 100000,
+        status: 'Active',
+        interestRate: 3.5,
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      },
+      {
+        id: 'loan_2',
+        schoolId: schools[0]?.id || 'mock_school_1',
+        amount: 75000,
+        status: 'Paid',
+        interestRate: 2.8,
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      }
+    ];
   }
 
   async getLoan(id: string): Promise<Loan | undefined> {
-    // Mock implementation - return undefined for now
-    return undefined;
+    const loans = await this.getLoans();
+    return loans.find(loan => loan.id === id);
   }
 
   async getLoansBySchoolId(schoolId: string): Promise<Loan[]> {
-    // Mock implementation - return empty array for now
-    // In reality this would query an Airtable "Loans" table filtered by school
-    return [];
+    const allLoans = await this.getLoans();
+    return allLoans.filter(loan => loan.schoolId === schoolId);
   }
 
   async createLoan(loan: InsertLoan): Promise<Loan> {
