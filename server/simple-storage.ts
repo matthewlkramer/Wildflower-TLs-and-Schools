@@ -489,13 +489,13 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getLocationsBySchoolId(schoolId: string): Promise<Location[]> {
     try {
-      // Query the "Locations" table filtered by school
+      // Query the "Locations" table filtered by school_id
       const records = await base("Locations").select({
-        filterByFormula: `{School} = '${schoolId}'`
+        filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
-        const school = record.fields["School"];
+        const schoolId = record.fields["school_id"];
         const address = record.fields["Address"];
         const currentPhysicalAddress = record.fields["Current physical address"];
         const currentMailingAddress = record.fields["Current mailing address"];
@@ -506,7 +506,7 @@ export class SimpleAirtableStorage implements IStorage {
         
         return {
           id: record.id,
-          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
           address: String(address || ''),
           currentPhysicalAddress: String(currentPhysicalAddress || ''),
           currentMailingAddress: String(currentMailingAddress || ''),
@@ -609,9 +609,35 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getGuideAssignmentsBySchoolId(schoolId: string): Promise<GuideAssignment[]> {
     try {
-      // The "Guide assignments" table is not accessible in this Airtable base
-      // Return empty array since we don't have access to this data
-      return [];
+      // Try to query the "Guide assignments" table filtered by school_id
+      const records = await base("Guide assignments").select({
+        filterByFormula: `{school_id} = '${schoolId}'`
+      }).all();
+      
+      return records.map(record => {
+        const schoolId = record.fields["school_id"];
+        const guideId = record.fields["Guide ID"];
+        const guideShortName = record.fields["Guide short name"];
+        const type = record.fields["Type"];
+        const startDate = record.fields["Start date"];
+        const endDate = record.fields["End date"];
+        const isActive = record.fields["Is active"];
+        const created = record.fields["Created"];
+        const lastModified = record.fields["Last Modified"];
+        
+        return {
+          id: record.id,
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+          guideId: String(guideId || ''),
+          guideShortName: String(guideShortName || ''),
+          type: String(type || ''),
+          startDate: String(startDate || ''),
+          endDate: String(endDate || ''),
+          isActive: Boolean(isActive),
+          created: String(created || new Date().toISOString()),
+          lastModified: String(lastModified || new Date().toISOString()),
+        };
+      });
     } catch (error) {
       console.error(`Error fetching guide assignments for ${schoolId}:`, error);
       return [];
@@ -686,9 +712,29 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getGovernanceDocumentsBySchoolId(schoolId: string): Promise<GovernanceDocument[]> {
     try {
-      // The "Governance documents" table is not accessible in this Airtable base
-      // Return empty array since we don't have access to this data
-      return [];
+      // Try to query the "Governance documents" table filtered by school_id
+      const records = await base("Governance documents").select({
+        filterByFormula: `{school_id} = '${schoolId}'`
+      }).all();
+      
+      return records.map(record => {
+        const schoolId = record.fields["school_id"];
+        const docType = record.fields["Doc type"];
+        const doc = record.fields["Doc"];
+        const dateEntered = record.fields["Date entered"];
+        const created = record.fields["Created"];
+        const lastModified = record.fields["Last Modified"];
+        
+        return {
+          id: record.id,
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+          docType: String(docType || ''),
+          doc: String(doc || ''),
+          dateEntered: String(dateEntered || ''),
+          created: String(created || new Date().toISOString()),
+          lastModified: String(lastModified || new Date().toISOString()),
+        };
+      });
     } catch (error) {
       console.error(`Error fetching governance documents for ${schoolId}:`, error);
       return [];
@@ -760,13 +806,13 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getSchoolNotesBySchoolId(schoolId: string): Promise<SchoolNote[]> {
     try {
-      // Query the "Action steps" table filtered by school
+      // Query the "Action steps" table filtered by school_id
       const records = await base("Action steps").select({
-        filterByFormula: `{School} = '${schoolId}'`
+        filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
-        const school = record.fields["School"];
+        const schoolId = record.fields["school_id"];
         const dateCreated = record.fields["Date created"];
         const createdBy = record.fields["Created by"];
         const notes = record.fields["Notes"];
@@ -775,7 +821,7 @@ export class SimpleAirtableStorage implements IStorage {
         
         return {
           id: record.id,
-          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
           dateCreated: String(dateCreated || ''),
           createdBy: String(createdBy || ''),
           notes: String(notes || ''),
@@ -856,13 +902,13 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getGrantsBySchoolId(schoolId: string): Promise<Grant[]> {
     try {
-      // Query the "Grants" table filtered by school
+      // Query the "Grants" table filtered by school_id
       const records = await base("Grants").select({
-        filterByFormula: `{School} = '${schoolId}'`
+        filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
-        const school = record.fields["School"];
+        const schoolId = record.fields["school_id"];
         const amount = record.fields["Amount"];
         const issuedDate = record.fields["Issued date"];
         const issuedBy = record.fields["Issued by"];
@@ -872,7 +918,7 @@ export class SimpleAirtableStorage implements IStorage {
         
         return {
           id: record.id,
-          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
           amount: Number(amount || 0),
           issuedDate: String(issuedDate || ''),
           issuedBy: String(issuedBy || ''),
@@ -953,13 +999,13 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getLoansBySchoolId(schoolId: string): Promise<Loan[]> {
     try {
-      // Query the "Loans" table filtered by school
+      // Query the "Loans" table filtered by school_id
       const records = await base("Loans").select({
-        filterByFormula: `{School} = '${schoolId}'`
+        filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
-        const school = record.fields["School"];
+        const schoolId = record.fields["school_id"];
         const amount = record.fields["Amount"];
         const status = record.fields["Status"];
         const interestRate = record.fields["Interest rate"];
@@ -968,7 +1014,7 @@ export class SimpleAirtableStorage implements IStorage {
         
         return {
           id: record.id,
-          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
           amount: Number(amount || 0),
           status: String(status || ''),
           interestRate: Number(interestRate || 0),
