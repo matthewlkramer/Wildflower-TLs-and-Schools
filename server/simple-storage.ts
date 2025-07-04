@@ -394,22 +394,9 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getSchoolAssociations(schoolId: string): Promise<EducatorSchoolAssociation[]> {
     try {
-      // Query the "Educators x Schools" table filtered by school
-      const records = await base("Educators x Schools").select({
-        filterByFormula: `{School} = '${schoolId}'`
-      }).all();
-      
-      return records.map(record => ({
-        id: record.id,
-        educatorId: Array.isArray(record.fields["Educator"]) ? String(record.fields["Educator"][0]) : String(record.fields["Educator"] || ''),
-        schoolId: Array.isArray(record.fields["School"]) ? String(record.fields["School"][0]) : String(record.fields["School"] || ''),
-        role: String(record.fields["Roles"] || ''),
-        startDate: '', // Not available in this table
-        endDate: '', // Not available in this table
-        isActive: true, // Assume active if record exists
-        created: String(record.fields["Created"] || new Date().toISOString()),
-        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
-      }));
+      // Get all associations and filter manually since Airtable filters are tricky with linked records
+      const allAssociations = await this.getEducatorSchoolAssociations();
+      return allAssociations.filter(assoc => assoc.schoolId === schoolId);
     } catch (error) {
       console.error(`Error fetching school associations for ${schoolId}:`, error);
       return [];
