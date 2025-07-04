@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef, GridReadyEvent, GridApi } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
@@ -114,6 +114,23 @@ const ActionsCellRenderer = (params: any) => {
 
 export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
   const { toast } = useToast();
+  const [viewportHeight, setViewportHeight] = useState<number>(0);
+
+  // Handle viewport height changes for orientation changes
+  useEffect(() => {
+    const updateHeight = () => {
+      setViewportHeight(window.innerHeight);
+    };
+    
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    window.addEventListener('orientationchange', updateHeight);
+    
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener('orientationchange', updateHeight);
+    };
+  }, []);
   
   const columnDefs: ColDef[] = [
     {
@@ -197,28 +214,45 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
     params.api.sizeColumnsToFit();
   }, []);
 
+  // Calculate appropriate height based on viewport
+  const getGridHeight = () => {
+    if (viewportHeight === 0) return 'calc(100vh - 200px)'; // Fallback
+    
+    // Mobile landscape mode (height < 500px)
+    if (viewportHeight < 500) {
+      return Math.max(viewportHeight - 120, 280) + 'px';
+    }
+    
+    // Regular desktop/tablet
+    return Math.min(viewportHeight - 200, 800) + 'px';
+  };
+
   if (isLoading) {
     return (
-      <div className="ag-theme-alpine" style={{ height: 400, width: "100%" }}>
-        <div className="flex items-center justify-center h-full">
-          <div className="text-slate-500">Loading schools...</div>
+      <div className="w-full min-h-[280px]" style={{ height: getGridHeight() }}>
+        <div className="ag-theme-alpine h-full">
+          <div className="flex items-center justify-center h-full">
+            <div className="text-slate-500">Loading schools...</div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="ag-theme-alpine" style={{ height: 600, width: "100%" }}>
-      <AgGridReact
-        rowData={schools}
-        columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
-        onGridReady={onGridReady}
-        animateRows={true}
-        rowSelection="multiple"
-        suppressRowClickSelection={true}
-        enableBrowserTooltips={true}
-      />
+    <div className="w-full min-h-[280px]" style={{ height: getGridHeight() }}>
+      <div className="ag-theme-alpine h-full">
+        <AgGridReact
+          rowData={schools}
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          onGridReady={onGridReady}
+          animateRows={true}
+          rowSelection="multiple"
+          suppressRowClickSelection={true}
+          enableBrowserTooltips={true}
+        />
+      </div>
     </div>
   );
 }
