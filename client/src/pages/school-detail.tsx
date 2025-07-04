@@ -29,10 +29,155 @@ import { useToast } from "@/hooks/use-toast";
 import { usePageTitle } from "../App";
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
 
+// LocationRow component for inline editing
+function LocationRow({ 
+  location, 
+  isEditing, 
+  onEdit, 
+  onSave, 
+  onCancel, 
+  onDelete, 
+  isSaving 
+}: {
+  location: Location;
+  isEditing: boolean;
+  onEdit: () => void;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+  onDelete: () => void;
+  isSaving: boolean;
+}) {
+  const [editData, setEditData] = useState({
+    address: location.address || "",
+    currentPhysicalAddress: location.currentPhysicalAddress || "",
+    currentMailingAddress: location.currentMailingAddress || "",
+    startDate: location.startDate || "",
+    endDate: location.endDate || "",
+  });
+
+  useEffect(() => {
+    if (isEditing) {
+      setEditData({
+        address: location.address || "",
+        currentPhysicalAddress: location.currentPhysicalAddress || "",
+        currentMailingAddress: location.currentMailingAddress || "",
+        startDate: location.startDate || "",
+        endDate: location.endDate || "",
+      });
+    }
+  }, [isEditing, location]);
+
+  if (isEditing) {
+    return (
+      <TableRow>
+        <TableCell>
+          <Input
+            value={editData.address}
+            onChange={(e) => setEditData({...editData, address: e.target.value})}
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={editData.currentPhysicalAddress}
+            onChange={(e) => setEditData({...editData, currentPhysicalAddress: e.target.value})}
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={editData.currentMailingAddress}
+            onChange={(e) => setEditData({...editData, currentMailingAddress: e.target.value})}
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            type="date"
+            value={editData.startDate}
+            onChange={(e) => setEditData({...editData, startDate: e.target.value})}
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            type="date"
+            value={editData.endDate}
+            onChange={(e) => setEditData({...editData, endDate: e.target.value})}
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onSave(editData)}
+              disabled={isSaving}
+              className="h-8 w-8 p-0"
+            >
+              ✓
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onCancel}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  return (
+    <TableRow>
+      <TableCell>{location.address || '-'}</TableCell>
+      <TableCell>{location.currentPhysicalAddress || '-'}</TableCell>
+      <TableCell>{location.currentMailingAddress || '-'}</TableCell>
+      <TableCell>{location.startDate || '-'}</TableCell>
+      <TableCell>{location.endDate || '-'}</TableCell>
+      <TableCell>
+        <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onEdit}
+            className="h-8 w-8 p-0"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onDelete}
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
 export default function SchoolDetail() {
   const { id } = useParams<{ id: string }>();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [editingLocationId, setEditingLocationId] = useState<string | null>(null);
+  const [deletingLocationId, setDeletingLocationId] = useState<string | null>(null);
+  const [locationDeleteModalOpen, setLocationDeleteModalOpen] = useState(false);
+  const [isCreatingLocation, setIsCreatingLocation] = useState(false);
+  const [newLocation, setNewLocation] = useState({
+    address: "",
+    currentPhysicalAddress: "",
+    currentMailingAddress: "",
+    startDate: "",
+    endDate: "",
+  });
   const { toast } = useToast();
   const { setPageTitle } = usePageTitle();
 
@@ -45,7 +190,7 @@ export default function SchoolDetail() {
     },
   });
 
-  const { data: associations } = useQuery<TeacherSchoolAssociation[]>({
+  const { data: associations, isLoading: associationsLoading } = useQuery<TeacherSchoolAssociation[]>({
     queryKey: ["/api/school-associations", id],
     queryFn: async () => {
       const response = await fetch(`/api/school-associations/${id}`, { credentials: "include" });
@@ -126,6 +271,78 @@ export default function SchoolDetail() {
       toast({
         title: "Error",
         description: "Failed to delete school",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Location mutations
+  const createLocationMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest("POST", "/api/locations", { ...data, schoolId: id });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/locations/school/${id}`] });
+      setIsCreatingLocation(false);
+      setNewLocation({
+        address: "",
+        currentPhysicalAddress: "",
+        currentMailingAddress: "",
+        startDate: "",
+        endDate: "",
+      });
+      toast({
+        title: "Success",
+        description: "Location created successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to create location",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateLocationMutation = useMutation({
+    mutationFn: async ({ locationId, data }: { locationId: string; data: any }) => {
+      return await apiRequest("PUT", `/api/locations/${locationId}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/locations/school/${id}`] });
+      setEditingLocationId(null);
+      toast({
+        title: "Success",
+        description: "Location updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update location",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteLocationMutation = useMutation({
+    mutationFn: async (locationId: string) => {
+      return await apiRequest("DELETE", `/api/locations/${locationId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/locations/school/${id}`] });
+      setLocationDeleteModalOpen(false);
+      setDeletingLocationId(null);
+      toast({
+        title: "Success",
+        description: "Location deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete location",
         variant: "destructive",
       });
     },
@@ -372,10 +589,91 @@ export default function SchoolDetail() {
 
                 <TabsContent value="tls" className="mt-0">
                   <div className="space-y-4">
-                    <h4 className="font-medium text-slate-900">Teacher Leaders</h4>
-                    <div className="text-center py-8 text-slate-500">
-                      Teacher Leader information will be displayed here
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium text-slate-900">Teachers</h4>
+                      <Button size="sm" className="bg-wildflower-blue hover:bg-wildflower-blue/90">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Teacher
+                      </Button>
                     </div>
+                    
+                    {associationsLoading ? (
+                      <div className="space-y-3">
+                        <Skeleton className="h-8 w-full" />
+                        <Skeleton className="h-8 w-full" />
+                        <Skeleton className="h-8 w-full" />
+                      </div>
+                    ) : associations && associations.length > 0 ? (
+                      <div className="border rounded-lg">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Teacher Full Name</TableHead>
+                              <TableHead>Role</TableHead>
+                              <TableHead>Start Date</TableHead>
+                              <TableHead>End Date</TableHead>
+                              <TableHead>Currently Active</TableHead>
+                              <TableHead className="w-[100px]">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {associations.map((association) => {
+                              const teacher = teachers?.find(t => t.id === association.educatorId);
+                              return (
+                                <TableRow key={association.id}>
+                                  <TableCell>
+                                    {teacher ? (
+                                      <Link 
+                                        href={`/teachers/${teacher.id}`}
+                                        className="text-wildflower-blue hover:underline"
+                                      >
+                                        {teacher.fullName}
+                                      </Link>
+                                    ) : (
+                                      association.educatorId
+                                    )}
+                                  </TableCell>
+                                  <TableCell>{association.role || '-'}</TableCell>
+                                  <TableCell>{association.startDate || '-'}</TableCell>
+                                  <TableCell>{association.endDate || '-'}</TableCell>
+                                  <TableCell>
+                                    <Badge 
+                                      variant={association.isActive ? "default" : "secondary"}
+                                      className={association.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+                                    >
+                                      {association.isActive ? 'Active' : 'Inactive'}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="flex gap-1">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-8 w-8 p-0"
+                                      >
+                                        <Edit className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-slate-500">
+                        <p>No teachers found for this school.</p>
+                        <p className="text-sm mt-2">Click "Add Teacher" to associate teachers with this school.</p>
+                      </div>
+                    )}
                   </div>
                 </TabsContent>
 
@@ -383,7 +681,11 @@ export default function SchoolDetail() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h4 className="font-medium text-slate-900">Locations</h4>
-                      <Button size="sm" className="bg-wildflower-blue hover:bg-wildflower-blue/90">
+                      <Button 
+                        size="sm" 
+                        className="bg-wildflower-blue hover:bg-wildflower-blue/90"
+                        onClick={() => setIsCreatingLocation(true)}
+                      >
                         <Plus className="h-4 w-4 mr-2" />
                         Add Location
                       </Button>
@@ -395,7 +697,7 @@ export default function SchoolDetail() {
                         <Skeleton className="h-8 w-full" />
                         <Skeleton className="h-8 w-full" />
                       </div>
-                    ) : locations && locations.length > 0 ? (
+                    ) : (
                       <div className="border rounded-lg">
                         <Table>
                           <TableHeader>
@@ -405,25 +707,113 @@ export default function SchoolDetail() {
                               <TableHead>Current Mailing Address</TableHead>
                               <TableHead>Start Date</TableHead>
                               <TableHead>End Date</TableHead>
+                              <TableHead className="w-[100px]">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {locations.map((location) => (
-                              <TableRow key={location.id}>
-                                <TableCell>{location.address || '-'}</TableCell>
-                                <TableCell>{location.currentPhysicalAddress || '-'}</TableCell>
-                                <TableCell>{location.currentMailingAddress || '-'}</TableCell>
-                                <TableCell>{location.startDate || '-'}</TableCell>
-                                <TableCell>{location.endDate || '-'}</TableCell>
+                            {/* Create new location row */}
+                            {isCreatingLocation && (
+                              <TableRow>
+                                <TableCell>
+                                  <Input
+                                    value={newLocation.address}
+                                    onChange={(e) => setNewLocation({...newLocation, address: e.target.value})}
+                                    placeholder="Enter address"
+                                    className="h-8"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    value={newLocation.currentPhysicalAddress}
+                                    onChange={(e) => setNewLocation({...newLocation, currentPhysicalAddress: e.target.value})}
+                                    placeholder="Current physical address"
+                                    className="h-8"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    value={newLocation.currentMailingAddress}
+                                    onChange={(e) => setNewLocation({...newLocation, currentMailingAddress: e.target.value})}
+                                    placeholder="Current mailing address"
+                                    className="h-8"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="date"
+                                    value={newLocation.startDate}
+                                    onChange={(e) => setNewLocation({...newLocation, startDate: e.target.value})}
+                                    className="h-8"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="date"
+                                    value={newLocation.endDate}
+                                    onChange={(e) => setNewLocation({...newLocation, endDate: e.target.value})}
+                                    className="h-8"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex gap-1">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => createLocationMutation.mutate(newLocation)}
+                                      disabled={createLocationMutation.isPending}
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      ✓
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        setIsCreatingLocation(false);
+                                        setNewLocation({
+                                          address: "",
+                                          currentPhysicalAddress: "",
+                                          currentMailingAddress: "",
+                                          startDate: "",
+                                          endDate: "",
+                                        });
+                                      }}
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
                               </TableRow>
+                            )}
+                            
+                            {/* Existing locations */}
+                            {locations && locations.map((location) => (
+                              <LocationRow
+                                key={location.id}
+                                location={location}
+                                isEditing={editingLocationId === location.id}
+                                onEdit={() => setEditingLocationId(location.id)}
+                                onSave={(data) => updateLocationMutation.mutate({ locationId: location.id, data })}
+                                onCancel={() => setEditingLocationId(null)}
+                                onDelete={() => {
+                                  setDeletingLocationId(location.id);
+                                  setLocationDeleteModalOpen(true);
+                                }}
+                                isSaving={updateLocationMutation.isPending}
+                              />
                             ))}
+                            
+                            {!locations?.length && !isCreatingLocation && (
+                              <TableRow>
+                                <TableCell colSpan={6} className="text-center py-8 text-slate-500">
+                                  <p>No locations found for this school.</p>
+                                  <p className="text-sm mt-2">Click "Add Location" to create the first location entry.</p>
+                                </TableCell>
+                              </TableRow>
+                            )}
                           </TableBody>
                         </Table>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-slate-500">
-                        <p>No locations found for this school.</p>
-                        <p className="text-sm mt-2">Click "Add Location" to create the first location entry.</p>
                       </div>
                     )}
                   </div>
@@ -512,6 +902,19 @@ export default function SchoolDetail() {
         title="Delete School"
         description="Are you sure you want to delete this school? This action cannot be undone."
         isLoading={deleteSchoolMutation.isPending}
+      />
+
+      <DeleteConfirmationModal
+        open={locationDeleteModalOpen}
+        onOpenChange={setLocationDeleteModalOpen}
+        onConfirm={() => {
+          if (deletingLocationId) {
+            deleteLocationMutation.mutate(deletingLocationId);
+          }
+        }}
+        title="Delete Location"
+        description="Are you sure you want to delete this location? This action cannot be undone."
+        isLoading={deleteLocationMutation.isPending}
       />
     </>
   );
