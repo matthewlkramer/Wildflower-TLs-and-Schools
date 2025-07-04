@@ -378,8 +378,8 @@ function LocationRow({
 }) {
   const [editData, setEditData] = useState({
     address: location.address || "",
-    currentPhysicalAddress: location.currentPhysicalAddress || "",
-    currentMailingAddress: location.currentMailingAddress || "",
+    currentPhysicalAddress: location.currentPhysicalAddress || false,
+    currentMailingAddress: location.currentMailingAddress || false,
     startDate: location.startDate || "",
     endDate: location.endDate || "",
   });
@@ -388,8 +388,8 @@ function LocationRow({
     if (isEditing) {
       setEditData({
         address: location.address || "",
-        currentPhysicalAddress: location.currentPhysicalAddress || "",
-        currentMailingAddress: location.currentMailingAddress || "",
+        currentPhysicalAddress: location.currentPhysicalAddress || false,
+        currentMailingAddress: location.currentMailingAddress || false,
         startDate: location.startDate || "",
         endDate: location.endDate || "",
       });
@@ -407,17 +407,19 @@ function LocationRow({
           />
         </TableCell>
         <TableCell>
-          <Input
-            value={editData.currentPhysicalAddress}
-            onChange={(e) => setEditData({...editData, currentPhysicalAddress: e.target.value})}
-            className="h-8"
+          <input
+            type="checkbox"
+            checked={editData.currentPhysicalAddress}
+            onChange={(e) => setEditData({...editData, currentPhysicalAddress: e.target.checked})}
+            className="h-4 w-4"
           />
         </TableCell>
         <TableCell>
-          <Input
-            value={editData.currentMailingAddress}
-            onChange={(e) => setEditData({...editData, currentMailingAddress: e.target.value})}
-            className="h-8"
+          <input
+            type="checkbox"
+            checked={editData.currentMailingAddress}
+            onChange={(e) => setEditData({...editData, currentMailingAddress: e.target.checked})}
+            className="h-4 w-4"
           />
         </TableCell>
         <TableCell>
@@ -464,8 +466,22 @@ function LocationRow({
   return (
     <TableRow>
       <TableCell>{location.address || '-'}</TableCell>
-      <TableCell>{location.currentPhysicalAddress || '-'}</TableCell>
-      <TableCell>{location.currentMailingAddress || '-'}</TableCell>
+      <TableCell>
+        <input 
+          type="checkbox" 
+          checked={location.currentPhysicalAddress || false} 
+          readOnly 
+          className="h-4 w-4"
+        />
+      </TableCell>
+      <TableCell>
+        <input 
+          type="checkbox" 
+          checked={location.currentMailingAddress || false} 
+          readOnly 
+          className="h-4 w-4"
+        />
+      </TableCell>
       <TableCell>{location.startDate || '-'}</TableCell>
       <TableCell>{location.endDate || '-'}</TableCell>
       <TableCell>
@@ -1015,8 +1031,8 @@ export default function SchoolDetail() {
   const [isCreatingLoan, setIsCreatingLoan] = useState(false);
   const [newLocation, setNewLocation] = useState({
     address: "",
-    currentPhysicalAddress: "",
-    currentMailingAddress: "",
+    currentPhysicalAddress: false,
+    currentMailingAddress: false,
     startDate: "",
     endDate: "",
   });
@@ -1189,8 +1205,8 @@ export default function SchoolDetail() {
       setIsCreatingLocation(false);
       setNewLocation({
         address: "",
-        currentPhysicalAddress: "",
-        currentMailingAddress: "",
+        currentPhysicalAddress: false,
+        currentMailingAddress: false,
         startDate: "",
         endDate: "",
       });
@@ -1796,19 +1812,19 @@ export default function SchoolDetail() {
                                   />
                                 </TableCell>
                                 <TableCell>
-                                  <Input
-                                    value={newLocation.currentPhysicalAddress}
-                                    onChange={(e) => setNewLocation({...newLocation, currentPhysicalAddress: e.target.value})}
-                                    placeholder="Current physical address"
-                                    className="h-8"
+                                  <input
+                                    type="checkbox"
+                                    checked={newLocation.currentPhysicalAddress}
+                                    onChange={(e) => setNewLocation({...newLocation, currentPhysicalAddress: e.target.checked})}
+                                    className="h-4 w-4"
                                   />
                                 </TableCell>
                                 <TableCell>
-                                  <Input
-                                    value={newLocation.currentMailingAddress}
-                                    onChange={(e) => setNewLocation({...newLocation, currentMailingAddress: e.target.value})}
-                                    placeholder="Current mailing address"
-                                    className="h-8"
+                                  <input
+                                    type="checkbox"
+                                    checked={newLocation.currentMailingAddress}
+                                    onChange={(e) => setNewLocation({...newLocation, currentMailingAddress: e.target.checked})}
+                                    className="h-4 w-4"
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -1845,8 +1861,8 @@ export default function SchoolDetail() {
                                         setIsCreatingLocation(false);
                                         setNewLocation({
                                           address: "",
-                                          currentPhysicalAddress: "",
-                                          currentMailingAddress: "",
+                                          currentPhysicalAddress: false,
+                                          currentMailingAddress: false,
                                           startDate: "",
                                           endDate: "",
                                         });

@@ -107,8 +107,8 @@ export interface Location {
   id: string; // Airtable record ID
   schoolId: string;
   address?: string;
-  currentPhysicalAddress?: string;
-  currentMailingAddress?: string;
+  currentPhysicalAddress?: boolean;
+  currentMailingAddress?: boolean;
   startDate?: string;
   endDate?: string;
   created?: string;
@@ -263,8 +263,8 @@ export const educatorSchoolAssociationSchema = z.object({
 export const locationSchema = z.object({
   schoolId: z.string().min(1, "School ID is required"),
   address: z.string().optional(),
-  currentPhysicalAddress: z.string().optional(),
-  currentMailingAddress: z.string().optional(),
+  currentPhysicalAddress: z.boolean().optional(),
+  currentMailingAddress: z.boolean().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
 });

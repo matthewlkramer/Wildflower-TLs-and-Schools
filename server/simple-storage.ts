@@ -473,8 +473,8 @@ export class SimpleAirtableStorage implements IStorage {
       id: `loc_${school.id}`,
       schoolId: school.id,
       address: school.address,
-      currentPhysicalAddress: school.address,
-      currentMailingAddress: school.address,
+      currentPhysicalAddress: false,
+      currentMailingAddress: false,
       startDate: '2023-01-01',
       endDate: undefined,
       created: new Date().toISOString(),
@@ -497,6 +497,8 @@ export class SimpleAirtableStorage implements IStorage {
       return records.map(record => {
         const schoolId = record.fields["school_id"];
         const address = record.fields["Address"];
+        const currentPhysical = record.fields["Current physical address?"];
+        const currentMailing = record.fields["Current mailing address?"];
         const startDate = record.fields["Start of time at location"];
         const endDate = record.fields["End of time at location"];
         const created = record.fields["Created"];
@@ -506,8 +508,8 @@ export class SimpleAirtableStorage implements IStorage {
           id: record.id,
           schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
           address: String(address || ''),
-          currentPhysicalAddress: String(address || ''),
-          currentMailingAddress: String(address || ''),
+          currentPhysicalAddress: Boolean(currentPhysical),
+          currentMailingAddress: Boolean(currentMailing),
           startDate: String(startDate || ''),
           endDate: String(endDate || ''),
           created: String(created || new Date().toISOString()),
@@ -524,8 +526,8 @@ export class SimpleAirtableStorage implements IStorage {
             id: `fallback_${schoolId}`,
             schoolId: schoolId,
             address: school.address,
-            currentPhysicalAddress: school.address,
-            currentMailingAddress: school.address,
+            currentPhysicalAddress: false,
+            currentMailingAddress: false,
             startDate: '',
             endDate: '',
             created: new Date().toISOString(),
