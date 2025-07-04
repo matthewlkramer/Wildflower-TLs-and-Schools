@@ -3,11 +3,11 @@ import { z } from "zod";
 // Airtable-based schema for Wildflower Schools
 export interface Educator {
   id: string; // Airtable record ID
-  fullName: string;
+  fullName?: string;
   firstName?: string;
-  lastName?: string;
-  middleName?: string;
   nickname?: string;
+  middleName?: string;
+  lastName: string;
   primaryPhone?: string;
   secondaryPhone?: string;
   homeAddress?: string;
@@ -17,12 +17,11 @@ export interface Educator {
   genderOther?: string;
   raceEthnicity?: string[];
   raceEthnicityOther?: string;
+  lgbtqia?: boolean;
   primaryLanguage?: string[];
   otherLanguages?: string[];
   educationalAttainment?: string;
   montessoriCertified?: boolean;
-  certificationLevels?: string[];
-  certifier?: string[];
   montessoriLeadGuideTrainings?: string[];
   currentRole?: string[];
   discoveryStatus?: string;
@@ -31,22 +30,27 @@ export interface Educator {
   householdIncome?: string;
   incomeBackground?: string;
   individualType?: string;
-  onboardingExperience?: string;
-  currentlyActiveAtSchool?: boolean;
-  allSchools?: string[];
-  currentlyActiveSchool?: string[];
-  schoolStatuses?: string[];
-  startupStageForActiveSchool?: string[];
+  activeSchool?: string[];
+  activeSchoolStageStatus?: string[];
   targetCity?: string;
-  firstContactWFSchoolEmploymentStatus?: string;
+  targetState?: string;
+  targetGeoCombined?: string;
+  targetIntl?: string;
   firstContactNotesOnPreWildflowerEmployment?: string;
-  firstContactInitialInterestInGovernanceModel?: string[];
+  firstContactWFSchoolEmploymentStatus?: string;
+  firstContactRelocate?: string;
+  firstContactGovernance?: string;
+  firstContactAges?: string[];
+  firstContactInterests?: string;
+  opsGuideMeetingPrefTime?: string;
+  opsGuideSpecificsChecklist?: string[];
+  opsGuideReqPertinentInfo?: string[];
+  opsGuideSupportTypeNeeded?: string[];
+  opsGuideFundraisingOps?: string;
   activeHolaspirit?: boolean;
   holaspiritMemberID?: string;
   tcUserID?: string;
-  alsoAPartner?: boolean;
-  onSchoolBoard?: string;
-  everATLInAnOpenSchool?: boolean;
+  inactiveFlag?: boolean;
   created?: string;
   lastModified?: string;
   createdBy?: string;
@@ -56,84 +60,117 @@ export interface School {
   id: string; // Airtable record ID
   name: string;
   shortName?: string;
-  fullName?: string;
   priorNames?: string;
   logo?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  currentPhysicalAddress?: boolean;
-  currentMailingAddress?: boolean;
+  programFocus?: string;
+  schoolCalendar?: string;
+  schoolSchedule?: string;
+  leftNetworkDate?: string;
+  leftNetworkReason?: string;
+  membershipStatus?: string;
+  founders?: string[];
+  currentTLs?: string[];
+  narrative?: string;
+  institutionalPartner?: string;
+  about?: string;
+  aboutSpanish?: string;
+  agesServed?: string[];
+  governanceModel?: string;
+  status?: string;
+  stageStatus?: string;  
+  openDate?: string;
+  enrollmentCap?: number;
+  numberClassrooms?: number;
+  publicFundingSources?: string[];
+  flexibleTuition?: string;
+  activePodMember?: string;
+
+  // Location
+  activePhysicalAddress?: string;
   activeLocationCity?: string;
   activeLocationState?: string;
-  targetCity?: string;
-  targetState?: string;
   locality?: string;
-  targetCommunity?: string;
+  activeLatitude?: number;
+  activeLongitude?: number;
+  ssjTargetCity?: string;
+  ssjTargetState?: string;
+
+  // Contact info
   phone?: string;
   email?: string;
+  domain?: string;
   website?: string;
   instagram?: string;
   facebook?: string;
-  narrative?: string;
-  institutionalPartner?: string;
-  opened?: string;
-  membershipStatus?: string;
-  founders?: string[];
+
+
+  // Membership
   membershipAgreementDate?: string;
   signedMembershipAgreement?: string;
   agreementVersion?: string;
-  about?: string;
-  aboutSpanish?: string;
-  grades?: string[];
-  agesServed?: string[];
-  schoolType?: string;
-  governanceModel?: string;
-  status?: string;
-  stageStatus?: string;
-  openDate?: string;
-  targetOpenDate?: string;
-  enrollmentCap?: number;
-  currentEnrollment?: number;
-  tuitionRange?: string;
   membershipFeeStatus?: string;
   membershipFeeAmount?: number;
-  publicFunding?: boolean;
-  charterStatus?: string;
-  authorizer?: string;
-  demographics?: any;
-  assessmentData?: any;
-  latitude?: number;
-  longitude?: number;
-  timezone?: string;
-  created?: string;
-  lastModified?: string;
-  createdBy?: string;
-  currentTLs?: string | number;
+  membershipTerminationLetter?: string;
+
+  // Legal entity
+  legalStructure?: string;
+  EIN?: string;
+  legalName?: string;
+  incorporationDate?: string;
+  currentFYEnd?: string;
+  nonprofitStatus?: string;
+  groupExemptionStatus?: string;
+  dateReceivedGroupExemption?: string;
+  dateWithdrawnGroupExemption?: string;
+  
+
+
   // SSJ/OSS Data
   ssjStage?: string;
-  ssjTargetCity?: string;
-  ssjTargetState?: string;
+  ssjTool?: string;
   ssjOriginalProjectedOpenDate?: string;
   ssjProjOpenSchoolYear?: string;
   ssjProjectedOpen?: string;
-  riskFactors?: string[];
-  watchlist?: string[];
-  ssjBoardDevelopment?: string;
+
   enteredVisioningDate?: string;
   enteredPlanningDate?: string;
   enteredStartupDate?: string;
   ssjHasETLPartner?: string;
   ssjOpsGuideTrack?: string[];
   ssjReadinessRating?: string;
+  
   ssjFacility?: string;
+  ssjB4GStatus?: string;
+  ssjDateSharedWithN4G?: string;
   building4GoodFirm?: string;
-  ssjTotalStartupFunding?: string;
+
+  ssjFundingGap?: string;
+  ssjAmountRaised?: string;
+  ssjLoanApprovedAmount?: string;
+  ssjLoanEligibility?: string;
+  ssjViableFundingPath?: string;
+  ssjTotalStartupFundingReq?: string;
   ssjFundraisingNarrative?: string;
+  ssjPlanningForWFFunding?: string;
+
+  ssjBudgetReady?: string;
+  ssjEnrollmentOnTrack?: string;
+  ssjCohortStatus?: string;
+  ssjBoardDevelopment?: string;
+  ssjNameReserved?: string;
+  ssjNextBigDecision?: string;
+  
   planningAlbum?: string;
-  activePodMember?: string;
+  visioningAlbum?: string;
+  visioningAlbumComplete?: boolean;
   cohorts?: string[];
+
+  riskFactors?: string[];
+  watchlist?: string[];
+  activeAssignedPartnerEmail?: string;
+  activeAssignedPartnerOverride?: string;
+  activeAssignedPartnerShortName?: string;
+  
   // Systems
   googleVoice?: string;
   budgetUtility?: string;
@@ -152,26 +189,8 @@ export interface School {
   googleWorkspacePath?: string;
   budgetLink?: string;
   bookkeeper?: string;
-  lgbtqia?: boolean;
-  excludeFromEmailLogging?: any;
-  targetGeo?: string;
-  targetIntl?: string;
-  assignedPartnerEmail?: string;
-  assignedPartnerOverride?: string;
-  assignedPartnerShortName?: string;
-  selfReflection?: string;
-  firstContactRelocate?: string;
-  firstContactGovernance?: string;
-  firstContactPreWFEmployment?: string;
-  firstContactWFSchoolEmployee?: string;
-  firstContactAges?: string[];
-  firstContactInterests?: string;
-  opsGuideMeetingPrefTime?: string;
-  opsGuideSpecificsChecklist?: string[];
-  opsGuideReqPertinentInfo?: string[];
-  opsGuideSupportTypeNeeded?: string[];
-  opsGuideFundraisingOps?: string;
-  inactiveFlag?: string;
+
+  lastModified?: string;
   createdTime?: string;
 }
 
@@ -179,11 +198,10 @@ export interface EducatorSchoolAssociation {
   id: string;
   educatorId: string;
   schoolId: string;
-  role?: string;
+  role?: string[];
   status?: string;
   startDate?: string;
   endDate?: string;
-  isPrimary?: boolean;
   isActive?: boolean;
   created?: string;
   lastModified?: string;
@@ -195,6 +213,7 @@ export interface Location {
   address?: string;
   currentPhysicalAddress?: boolean;
   currentMailingAddress?: boolean;
+  locationType?: string;
   startDate?: string;
   endDate?: string;
   created?: string;
@@ -230,7 +249,15 @@ export interface SchoolNote {
   dateCreated?: string;
   createdBy?: string;
   notes?: string;
-  created?: string;
+  lastModified?: string;
+}
+
+export interface EducatorNote {
+  id: string; // Airtable record ID
+  educatorId: string;
+  dateCreated?: string;
+  createdBy?: string;
+  notes?: string;
   lastModified?: string;
 }
 
@@ -239,8 +266,25 @@ export interface Grant {
   schoolId: string;
   amount?: number;
   issuedDate?: string;
-  issuedBy?: string;
+  issuedByShortName?: string;
   status?: string;
+  timeOfGrantLegalName?: string;
+  timeOfGrantTLs?: string;
+  timeOfGrantAddress?: string;
+  timeOfGrantEIN?: string;
+  timeOfGrantNonprofitStatus?: string;
+  timeOfGrantMembershipStatus?: string;
+  timeOfGrant501c3Proof?: string;
+  fundingSource?: string;
+  grantPurpose?: string;
+  grantPeriod?: string;
+  accountingNotes?: string;
+  textLedgerEntry?: string;
+  automationStep?: string;
+  prelimAdviceRequestTime?: string;
+  fullAdviceRequestTime?: string;
+  unsignedGrantAgreement?: string;
+  signedGrantAgreement?: string;
   created?: string;
   lastModified?: string;
 }
@@ -251,13 +295,17 @@ export interface Loan {
   amount?: number;
   status?: string;
   interestRate?: number;
+  maturityDate?: string;
+  approxOutstanding?: number;
+  notes?: string;
+  paperwork?: string;
   created?: string;
   lastModified?: string;
 }
 
 // Zod schemas for validation
 export const educatorSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
+  fullName: z.string().optional(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   middleName: z.string().optional(),
@@ -307,20 +355,41 @@ export const schoolSchema = z.object({
   name: z.string().min(1, "School name is required"),
   shortName: z.string().optional(),
   fullName: z.string().optional(),
+  priorNames: z.string().optional(),
   logo: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
   zipCode: z.string().optional(),
+  currentPhysicalAddress: z.boolean().optional(),
+  currentMailingAddress: z.boolean().optional(),
+  activeLocationCity: z.string().optional(),
+  activeLocationState: z.string().optional(),
+  targetCity: z.string().optional(),
+  targetState: z.string().optional(),
+  locality: z.string().optional(),
   targetCommunity: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().email("Invalid email format").optional().or(z.literal("")),
   website: z.string().url("Invalid URL format").optional().or(z.literal("")),
+  instagram: z.string().optional(),
+  facebook: z.string().optional(),
+  narrative: z.string().optional(),
+  institutionalPartner: z.string().optional(),
+  opened: z.string().optional(),
+  membershipStatus: z.string().optional(),
+  founders: z.array(z.string()).optional(),
+  membershipAgreementDate: z.string().optional(),
+  signedMembershipAgreement: z.string().optional(),
+  agreementVersion: z.string().optional(),
+  about: z.string().optional(),
+  aboutSpanish: z.string().optional(),
   grades: z.array(z.string()).optional(),
   agesServed: z.array(z.string()).optional(),
   schoolType: z.string().optional(),
   governanceModel: z.string().optional(),
   status: z.string().optional(),
+  stageStatus: z.string().optional(),
   openDate: z.string().optional(),
   targetOpenDate: z.string().optional(),
   enrollmentCap: z.number().optional(),
@@ -336,6 +405,69 @@ export const schoolSchema = z.object({
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   timezone: z.string().optional(),
+  currentTLs: z.union([z.string(), z.number()]).optional(),
+  // SSJ/OSS Data
+  ssjStage: z.string().optional(),
+  ssjTargetCity: z.string().optional(),
+  ssjTargetState: z.string().optional(),
+  ssjOriginalProjectedOpenDate: z.string().optional(),
+  ssjProjOpenSchoolYear: z.string().optional(),
+  ssjProjectedOpen: z.string().optional(),
+  riskFactors: z.array(z.string()).optional(),
+  watchlist: z.array(z.string()).optional(),
+  ssjBoardDevelopment: z.string().optional(),
+  enteredVisioningDate: z.string().optional(),
+  enteredPlanningDate: z.string().optional(),
+  enteredStartupDate: z.string().optional(),
+  ssjHasETLPartner: z.string().optional(),
+  ssjOpsGuideTrack: z.array(z.string()).optional(),
+  ssjReadinessRating: z.string().optional(),
+  ssjFacility: z.string().optional(),
+  building4GoodFirm: z.string().optional(),
+  ssjTotalStartupFunding: z.string().optional(),
+  ssjFundraisingNarrative: z.string().optional(),
+  planningAlbum: z.string().optional(),
+  activePodMember: z.string().optional(),
+  cohorts: z.array(z.string()).optional(),
+  // Systems
+  googleVoice: z.string().optional(),
+  budgetUtility: z.string().optional(),
+  admissionsSystem: z.string().optional(),
+  qbo: z.string().optional(),
+  websiteTool: z.string().optional(),
+  logoDesigner: z.string().optional(),
+  transparentClassroom: z.string().optional(),
+  tcAdmissions: z.string().optional(),
+  tcRecordkeeping: z.string().optional(),
+  gusto: z.string().optional(),
+  businessInsurance: z.string().optional(),
+  nameSelectionProposal: z.string().optional(),
+  trademarkFiled: z.string().optional(),
+  billComAccount: z.string().optional(),
+  googleWorkspacePath: z.string().optional(),
+  budgetLink: z.string().optional(),
+  bookkeeper: z.string().optional(),
+  lgbtqia: z.boolean().optional(),
+  excludeFromEmailLogging: z.any().optional(),
+  targetGeo: z.string().optional(),
+  targetIntl: z.string().optional(),
+  assignedPartnerEmail: z.string().optional(),
+  assignedPartnerOverride: z.string().optional(),
+  assignedPartnerShortName: z.string().optional(),
+  selfReflection: z.string().optional(),
+  firstContactRelocate: z.string().optional(),
+  firstContactGovernance: z.string().optional(),
+  firstContactPreWFEmployment: z.string().optional(),
+  firstContactWFSchoolEmployee: z.string().optional(),
+  firstContactAges: z.array(z.string()).optional(),
+  firstContactInterests: z.string().optional(),
+  opsGuideMeetingPrefTime: z.string().optional(),
+  opsGuideSpecificsChecklist: z.array(z.string()).optional(),
+  opsGuideReqPertinentInfo: z.array(z.string()).optional(),
+  opsGuideSupportTypeNeeded: z.array(z.string()).optional(),
+  opsGuideFundraisingOps: z.string().optional(),
+  inactiveFlag: z.string().optional(),
+  createdTime: z.string().optional(),
 });
 
 export const educatorSchoolAssociationSchema = z.object({
@@ -407,13 +539,13 @@ export type InsertSchoolNote = z.infer<typeof schoolNoteSchema>;
 export type InsertGrant = z.infer<typeof grantSchema>;
 export type InsertLoan = z.infer<typeof loanSchema>;
 
-// Legacy types and schemas for backward compatibility (renaming teachers to educators)
+// Legacy types for backward compatibility
 export type Teacher = Educator;
 export type InsertTeacher = InsertEducator;
 export type TeacherSchoolAssociation = EducatorSchoolAssociation;
 export type InsertTeacherSchoolAssociation = InsertEducatorSchoolAssociation;
 
-// Legacy schema exports
+// Legacy schemas for backward compatibility
 export const insertTeacherSchema = educatorSchema;
 export const insertSchoolSchema = schoolSchema;
 export const insertTeacherSchoolAssociationSchema = educatorSchoolAssociationSchema;
