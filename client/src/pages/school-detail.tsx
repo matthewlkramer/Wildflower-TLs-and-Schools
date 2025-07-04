@@ -29,6 +29,183 @@ import { useToast } from "@/hooks/use-toast";
 import { usePageTitle } from "../App";
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
 
+// TeacherAssociationRow component for inline editing
+function TeacherAssociationRow({ 
+  association, 
+  teacher,
+  isEditing, 
+  onEdit, 
+  onSave, 
+  onCancel, 
+  onDelete,
+  onEndStint,
+  isSaving 
+}: {
+  association: TeacherSchoolAssociation;
+  teacher?: Teacher;
+  isEditing: boolean;
+  onEdit: () => void;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+  onDelete: () => void;
+  onEndStint: () => void;
+  isSaving: boolean;
+}) {
+  const [editData, setEditData] = useState({
+    role: association.role || '',
+    startDate: association.startDate || '',
+    endDate: association.endDate || '',
+    isActive: association.isActive || false
+  });
+
+  useEffect(() => {
+    setEditData({
+      role: association.role || '',
+      startDate: association.startDate || '',
+      endDate: association.endDate || '',
+      isActive: association.isActive || false
+    });
+  }, [association]);
+
+  const handleSave = () => {
+    onSave(editData);
+  };
+
+  if (isEditing) {
+    return (
+      <TableRow>
+        <TableCell>
+          {teacher ? (
+            <Link 
+              href={`/teachers/${teacher.id}`}
+              className="text-wildflower-blue hover:underline"
+            >
+              {teacher.fullName}
+            </Link>
+          ) : (
+            association.educatorId
+          )}
+        </TableCell>
+        <TableCell>
+          <Input
+            value={editData.role}
+            onChange={(e) => setEditData(prev => ({ ...prev, role: e.target.value }))}
+            placeholder="Role"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            type="date"
+            value={editData.startDate}
+            onChange={(e) => setEditData(prev => ({ ...prev, startDate: e.target.value }))}
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            type="date"
+            value={editData.endDate}
+            onChange={(e) => setEditData(prev => ({ ...prev, endDate: e.target.value }))}
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Select
+            value={editData.isActive ? "true" : "false"}
+            onValueChange={(value) => setEditData(prev => ({ ...prev, isActive: value === "true" }))}
+          >
+            <SelectTrigger className="h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="true">Active</SelectItem>
+              <SelectItem value="false">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
+        </TableCell>
+        <TableCell>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+            >
+              Save
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSaving}
+              className="h-8 px-2"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  return (
+    <TableRow>
+      <TableCell>
+        {teacher ? (
+          <Link 
+            href={`/teachers/${teacher.id}`}
+            className="text-wildflower-blue hover:underline"
+          >
+            {teacher.fullName}
+          </Link>
+        ) : (
+          association.educatorId
+        )}
+      </TableCell>
+      <TableCell>{association.role || '-'}</TableCell>
+      <TableCell>{association.startDate || '-'}</TableCell>
+      <TableCell>{association.endDate || '-'}</TableCell>
+      <TableCell>
+        <Badge 
+          variant={association.isActive ? "default" : "secondary"}
+          className={association.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+        >
+          {association.isActive ? 'Active' : 'Inactive'}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 w-8 p-0"
+            onClick={onEdit}
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 px-2 text-orange-600 hover:text-orange-700"
+            onClick={onEndStint}
+          >
+            End Stint
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 px-2 text-red-600 hover:text-red-700"
+            onClick={onDelete}
+          >
+            Delete Stint
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
 // LocationRow component for inline editing
 function LocationRow({ 
   location, 
@@ -171,6 +348,9 @@ export default function SchoolDetail() {
   const [deletingLocationId, setDeletingLocationId] = useState<string | null>(null);
   const [locationDeleteModalOpen, setLocationDeleteModalOpen] = useState(false);
   const [isCreatingLocation, setIsCreatingLocation] = useState(false);
+  const [editingAssociationId, setEditingAssociationId] = useState<string | null>(null);
+  const [deletingAssociationId, setDeletingAssociationId] = useState<string | null>(null);
+  const [associationDeleteModalOpen, setAssociationDeleteModalOpen] = useState(false);
   const [newLocation, setNewLocation] = useState({
     address: "",
     currentPhysicalAddress: "",
@@ -343,6 +523,73 @@ export default function SchoolDetail() {
       toast({
         title: "Error",
         description: "Failed to delete location",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateAssociationMutation = useMutation({
+    mutationFn: async ({ associationId, data }: { associationId: string; data: any }) => {
+      return await apiRequest("PUT", `/api/teacher-school-associations/${associationId}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/school-associations", id] });
+      setEditingAssociationId(null);
+      toast({
+        title: "Success",
+        description: "Teacher association updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update teacher association",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteAssociationMutation = useMutation({
+    mutationFn: async (associationId: string) => {
+      return await apiRequest("DELETE", `/api/teacher-school-associations/${associationId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/school-associations", id] });
+      setAssociationDeleteModalOpen(false);
+      setDeletingAssociationId(null);
+      toast({
+        title: "Success",
+        description: "Teacher association deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete teacher association",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const endStintMutation = useMutation({
+    mutationFn: async (associationId: string) => {
+      const today = new Date().toISOString().split('T')[0];
+      return await apiRequest("PUT", `/api/teacher-school-associations/${associationId}`, {
+        endDate: today,
+        isActive: false
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/school-associations", id] });
+      toast({
+        title: "Success",
+        description: "Teacher stint ended successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to end teacher stint",
         variant: "destructive",
       });
     },
@@ -591,10 +838,16 @@ export default function SchoolDetail() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h4 className="font-medium text-slate-900">Teachers</h4>
-                      <Button size="sm" className="bg-wildflower-blue hover:bg-wildflower-blue/90">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Teacher
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button size="sm" className="bg-wildflower-blue hover:bg-wildflower-blue/90">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create New Educator
+                        </Button>
+                        <Button size="sm" variant="outline" className="border-wildflower-blue text-wildflower-blue hover:bg-wildflower-blue/10">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create Stint for Existing Educator
+                        </Button>
+                      </div>
                     </div>
                     
                     {associationsLoading ? (
@@ -613,56 +866,28 @@ export default function SchoolDetail() {
                               <TableHead>Start Date</TableHead>
                               <TableHead>End Date</TableHead>
                               <TableHead>Currently Active</TableHead>
-                              <TableHead className="w-[100px]">Actions</TableHead>
+                              <TableHead className="w-[200px]">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {associations.map((association) => {
                               const teacher = teachers?.find(t => t.id === association.educatorId);
                               return (
-                                <TableRow key={association.id}>
-                                  <TableCell>
-                                    {teacher ? (
-                                      <Link 
-                                        href={`/teachers/${teacher.id}`}
-                                        className="text-wildflower-blue hover:underline"
-                                      >
-                                        {teacher.fullName}
-                                      </Link>
-                                    ) : (
-                                      association.educatorId
-                                    )}
-                                  </TableCell>
-                                  <TableCell>{association.role || '-'}</TableCell>
-                                  <TableCell>{association.startDate || '-'}</TableCell>
-                                  <TableCell>{association.endDate || '-'}</TableCell>
-                                  <TableCell>
-                                    <Badge 
-                                      variant={association.isActive ? "default" : "secondary"}
-                                      className={association.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
-                                    >
-                                      {association.isActive ? 'Active' : 'Inactive'}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="flex gap-1">
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="h-8 w-8 p-0"
-                                      >
-                                        <Edit className="h-4 w-4" />
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  </TableCell>
-                                </TableRow>
+                                <TeacherAssociationRow
+                                  key={association.id}
+                                  association={association}
+                                  teacher={teacher}
+                                  isEditing={editingAssociationId === association.id}
+                                  onEdit={() => setEditingAssociationId(association.id)}
+                                  onSave={(data) => updateAssociationMutation.mutate({ associationId: association.id, data })}
+                                  onCancel={() => setEditingAssociationId(null)}
+                                  onDelete={() => {
+                                    setDeletingAssociationId(association.id);
+                                    setAssociationDeleteModalOpen(true);
+                                  }}
+                                  onEndStint={() => endStintMutation.mutate(association.id)}
+                                  isSaving={updateAssociationMutation.isPending}
+                                />
                               );
                             })}
                           </TableBody>
@@ -671,7 +896,7 @@ export default function SchoolDetail() {
                     ) : (
                       <div className="text-center py-8 text-slate-500">
                         <p>No teachers found for this school.</p>
-                        <p className="text-sm mt-2">Click "Add Teacher" to associate teachers with this school.</p>
+                        <p className="text-sm mt-2">Use the buttons above to create educators or associate existing educators with this school.</p>
                       </div>
                     )}
                   </div>
@@ -915,6 +1140,19 @@ export default function SchoolDetail() {
         title="Delete Location"
         description="Are you sure you want to delete this location? This action cannot be undone."
         isLoading={deleteLocationMutation.isPending}
+      />
+
+      <DeleteConfirmationModal
+        open={associationDeleteModalOpen}
+        onOpenChange={setAssociationDeleteModalOpen}
+        onConfirm={() => {
+          if (deletingAssociationId) {
+            deleteAssociationMutation.mutate(deletingAssociationId);
+          }
+        }}
+        title="Delete Teacher Stint"
+        description="Are you sure you want to delete this teacher stint? This action cannot be undone."
+        isLoading={deleteAssociationMutation.isPending}
       />
     </>
   );
