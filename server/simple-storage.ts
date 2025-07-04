@@ -252,8 +252,6 @@ export class SimpleAirtableStorage implements IStorage {
       excludeFromEmailLogging: fields['Exclude from email logging'],
       targetGeo: fields['Target geo combined'] || '',
       targetIntl: fields['Target - international'] || '',
-      targetCity: fields['Target city'] || '',
-      targetState: fields['Target state'] || '',
       assignedPartnerEmail: fields['Assigned Partner Email'] || '',
       assignedPartnerOverride: fields['Assigned Partner Override'] || '',
       assignedPartnerShortName: fields['Assigned Partner Short Name'] || '',
