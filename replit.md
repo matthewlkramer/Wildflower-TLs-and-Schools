@@ -107,6 +107,8 @@ Changelog:
 - July 04, 2025. Fixed location checkbox fields to use boolean values instead of strings for "Current Physical Address" and "Current Mailing Address"
 - July 04, 2025. Updated governance documents table name from "Governance documents" to "Governance docs" to match actual Airtable table name
 - July 04, 2025. Added improved error handling for missing or unauthorized Airtable tables with informative warning messages
+- July 04, 2025. Fixed governance documents field mappings to correctly extract "Document type", "Date", and "Document PDF" attachment filenames from Airtable
+- July 04, 2025. Updated guide assignments table name from "Guide assignments" to "Guides Assignments" to match actual Airtable table name
 ```
 
 ## User Preferences

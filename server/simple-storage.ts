@@ -723,20 +723,31 @@ export class SimpleAirtableStorage implements IStorage {
       
       return records.map(record => {
         const schoolId = record.fields["school_id"];
-        const docType = record.fields["Doc type"];
-        const doc = record.fields["Doc"];
-        const dateEntered = record.fields["Date entered"];
+        const docType = record.fields["Document type"];
+        const dateEntered = record.fields["Date"];
         const created = record.fields["Created"];
-        const lastModified = record.fields["Last Modified"];
+        
+        // Handle Document PDF attachment field - extract filename 
+        const documentPDFField = record.fields["Document PDF"];
+        let doc = "";
+        if (Array.isArray(documentPDFField) && documentPDFField.length > 0) {
+          try {
+            const attachment = documentPDFField[0];
+            // Access filename property directly
+            doc = attachment?.filename || "Document";
+          } catch (e) {
+            doc = "Document";
+          }
+        }
         
         return {
           id: record.id,
           schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
           docType: String(docType || ''),
-          doc: String(doc || ''),
+          doc: String(doc),
           dateEntered: String(dateEntered || ''),
           created: String(created || new Date().toISOString()),
-          lastModified: String(lastModified || new Date().toISOString()),
+          lastModified: String(created || new Date().toISOString()),
         };
       });
     } catch (error) {
