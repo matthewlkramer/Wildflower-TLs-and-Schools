@@ -549,3 +549,5 @@ export type InsertTeacherSchoolAssociation = InsertEducatorSchoolAssociation;
 export const insertTeacherSchema = educatorSchema;
 export const insertSchoolSchema = schoolSchema;
 export const insertTeacherSchoolAssociationSchema = educatorSchoolAssociationSchema;
+
+

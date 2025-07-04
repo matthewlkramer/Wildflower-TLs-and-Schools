@@ -111,6 +111,7 @@ Changelog:
 - July 04, 2025. Updated guide assignments table name from "Guide assignments" to "Guides Assignments" to match actual Airtable table name
 - July 04, 2025. Fixed comprehensive schema and TypeScript errors by adding all missing properties to School and Educator interfaces, including SSJ data fields, systems fields, and additional contact information
 - July 04, 2025. Corrected checkbox field types from string to boolean for currentPhysicalAddress and currentMailingAddress properties
+- July 04, 2025. Migrated from "Teacher" to "Educator" terminology throughout the application for consistency with Wildflower Schools naming conventions, including component names, API endpoints, and form schemas while maintaining backward compatibility
 ```
 
 ## User Preferences

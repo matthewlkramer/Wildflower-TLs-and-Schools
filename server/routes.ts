@@ -5,7 +5,73 @@ import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, location
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Teacher routes
+  // Educator routes (primary)
+  app.get("/api/educators", async (req, res) => {
+    try {
+      const educators = await storage.getEducators();
+      res.json(educators);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch educators" });
+    }
+  });
+
+  app.get("/api/educators/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const educator = await storage.getEducator(id);
+      if (!educator) {
+        return res.status(404).json({ message: "Educator not found" });
+      }
+      res.json(educator);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch educator" });
+    }
+  });
+
+  app.post("/api/educators", async (req, res) => {
+    try {
+      const educatorData = educatorSchema.parse(req.body);
+      const educator = await storage.createEducator(educatorData);
+      res.status(201).json(educator);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid educator data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create educator" });
+    }
+  });
+
+  app.put("/api/educators/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const educatorData = educatorSchema.partial().parse(req.body);
+      const educator = await storage.updateEducator(id, educatorData);
+      if (!educator) {
+        return res.status(404).json({ message: "Educator not found" });
+      }
+      res.json(educator);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid educator data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update educator" });
+    }
+  });
+
+  app.delete("/api/educators/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const deleted = await storage.deleteEducator(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Educator not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete educator" });
+    }
+  });
+
+  // Teacher routes (legacy compatibility)
   app.get("/api/teachers", async (req, res) => {
     try {
       const teachers = await storage.getTeachers();

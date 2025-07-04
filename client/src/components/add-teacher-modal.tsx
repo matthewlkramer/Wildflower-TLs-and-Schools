@@ -7,16 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { insertTeacherSchema, type School } from "@shared/schema";
+import { educatorSchema, type School } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-interface AddTeacherModalProps {
+interface AddEducatorModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export default function AddTeacherModal({ open, onOpenChange }: AddTeacherModalProps) {
+export default function AddEducatorModal({ open, onOpenChange }: AddEducatorModalProps) {
   const { toast } = useToast();
 
   const { data: schools } = useQuery<School[]>({
@@ -24,32 +24,26 @@ export default function AddTeacherModal({ open, onOpenChange }: AddTeacherModalP
   });
 
   const form = useForm({
-    resolver: zodResolver(insertTeacherSchema),
+    resolver: zodResolver(educatorSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      department: "",
-      subject: "",
-      status: "Active",
-      startDate: "",
-      education: "",
-      certifications: "",
-      experience: 0,
-      emergencyContact: "",
-      biography: "",
+      fullName: "",
+      firstName: "",
+      lastName: "",
+      primaryPhone: "",
+      homeAddress: "",
     },
   });
 
-  const createTeacherMutation = useMutation({
+  const createEducatorMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("POST", "/api/teachers", data);
+      return await apiRequest("POST", "/api/educators", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/teachers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/educators"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/teachers"] }); // Legacy compatibility
       toast({
         title: "Success",
-        description: "Teacher created successfully",
+        description: "Educator created successfully",
       });
       form.reset();
       onOpenChange(false);
@@ -57,27 +51,27 @@ export default function AddTeacherModal({ open, onOpenChange }: AddTeacherModalP
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to create teacher",
+        description: "Failed to create educator",
         variant: "destructive",
       });
     },
   });
 
   const onSubmit = (data: any) => {
-    createTeacherMutation.mutate(data);
+    createEducatorMutation.mutate(data);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New Teacher</DialogTitle>
+          <DialogTitle>Add New Educator</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="name"
+              name="fullName"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Full Name</FormLabel>
@@ -90,12 +84,12 @@ export default function AddTeacherModal({ open, onOpenChange }: AddTeacherModalP
             />
             <FormField
               control={form.control}
-              name="email"
+              name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>First Name</FormLabel>
                   <FormControl>
-                    <Input {...field} type="email" placeholder="Enter email address" />
+                    <Input {...field} placeholder="Enter first name" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -103,10 +97,23 @@ export default function AddTeacherModal({ open, onOpenChange }: AddTeacherModalP
             />
             <FormField
               control={form.control}
-              name="phone"
+              name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone</FormLabel>
+                  <FormLabel>Last Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter last name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="primaryPhone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Primary Phone</FormLabel>
                   <FormControl>
                     <Input {...field} type="tel" placeholder="Enter phone number" />
                   </FormControl>
@@ -116,49 +123,12 @@ export default function AddTeacherModal({ open, onOpenChange }: AddTeacherModalP
             />
             <FormField
               control={form.control}
-              name="department"
+              name="homeAddress"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Department</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select department" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Mathematics">Mathematics</SelectItem>
-                      <SelectItem value="Science">Science</SelectItem>
-                      <SelectItem value="English">English</SelectItem>
-                      <SelectItem value="History">History</SelectItem>
-                      <SelectItem value="Arts">Arts</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="subject"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Subject</FormLabel>
+                  <FormLabel>Home Address</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter subject" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="startDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Start Date</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="date" />
+                    <Input {...field} placeholder="Enter home address" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -175,9 +145,9 @@ export default function AddTeacherModal({ open, onOpenChange }: AddTeacherModalP
               <Button
                 type="submit"
                 className="bg-wildflower-blue hover:bg-blue-700"
-                disabled={createTeacherMutation.isPending}
+                disabled={createEducatorMutation.isPending}
               >
-                {createTeacherMutation.isPending ? "Creating..." : "Add Teacher"}
+                {createEducatorMutation.isPending ? "Creating..." : "Add Educator"}
               </Button>
             </div>
           </form>

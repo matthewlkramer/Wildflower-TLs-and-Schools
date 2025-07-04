@@ -3,7 +3,7 @@ import { Plus, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import AddTeacherModal from "./add-teacher-modal";
+import AddEducatorModal from "./add-teacher-modal";
 import AddSchoolModal from "./add-school-modal";
 import { WildflowerLogo } from "./wildflower-logo";
 
@@ -17,7 +17,7 @@ interface HeaderProps {
 
 export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder, showFilters = false, onToggleFilters }: HeaderProps) {
   const [location] = useLocation();
-  const [showAddTeacherModal, setShowAddTeacherModal] = useState(false);
+  const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
 
   const isTeachersActive = location === "/" || location === "/teachers" || location.startsWith("/teacher/");
@@ -25,7 +25,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
 
   const handleAddNew = () => {
     if (isTeachersActive) {
-      setShowAddTeacherModal(true);
+      setShowAddEducatorModal(true);
     } else if (isSchoolsActive) {
       setShowAddSchoolModal(true);
     }
@@ -98,9 +98,9 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
         </div>
       </header>
 
-      <AddTeacherModal 
-        open={showAddTeacherModal} 
-        onOpenChange={setShowAddTeacherModal}
+      <AddEducatorModal 
+        open={showAddEducatorModal} 
+        onOpenChange={setShowAddEducatorModal}
       />
       <AddSchoolModal 
         open={showAddSchoolModal} 
