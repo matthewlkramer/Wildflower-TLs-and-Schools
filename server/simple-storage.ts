@@ -176,8 +176,8 @@ export class SimpleAirtableStorage implements IStorage {
         : fields['SSJ - Target City']
           ? `${fields['SSJ - Target City']}${fields['SSJ - Target State'] ? ', ' + fields['SSJ - Target State'] : ''}`
           : ''),
-      phone: fields["Phone"] || undefined,
-      email: fields["Email"] || undefined,
+      phone: fields["Shool Phone"] || undefined,
+      email: fields["School Email"] || undefined,
       website: fields["Website"] || undefined,
       instagram: fields["Instagram"] || undefined,
       facebook: fields["Facebook"] || undefined,
@@ -195,13 +195,7 @@ export class SimpleAirtableStorage implements IStorage {
       agesServed: fields["Ages served"] || undefined,
       schoolType: fields["School Type"] || fields["Type"] || undefined,
       governanceModel: fields["Governance Model"] || undefined,
-      status: fields["Stage_Status"] || 
-              fields["Status"] || 
-              fields["Stage/Status"] || 
-              fields["Stage"] || 
-              fields["School Status"] ||
-              fields["Stage Status"] ||
-              undefined,
+      stageStatus: fields["Stage_Status"] || undefined,
       openDate: fields["Open Date"] || undefined,
       targetOpenDate: fields["Target Open Date"] || undefined,
       enrollmentCap: fields["Enrollment at Full Capacity"] || undefined,
@@ -254,6 +248,31 @@ export class SimpleAirtableStorage implements IStorage {
       googleWorkspacePath: fields['Google Workspace Org Unit Path'] || '',
       budgetLink: fields['Budget Link'] || '',
       bookkeeper: fields['Bookkeeper / Accountant'] || '',
+      lgbtqia: fields['LGBTQIA'] === 'TRUE',
+      excludeFromEmailLogging: fields['Exclude from email logging'],
+      targetGeo: fields['Target geo combined'] || '',
+      targetIntl: fields['Target - international'] || '',
+      targetCity: fields['Target city'] || '',
+      targetState: fields['Target state'] || '',
+      assignedPartnerEmail: fields['Assigned Partner Email'] || '',
+      assignedPartnerOverride: fields['Assigned Partner Override'] || '',
+      assignedPartnerShortName: fields['Assigned Partner Short Name'] || '',
+      selfReflection: fields['Self-reflection'] || '',
+      firstContactRelocate: fields['First Contact - Willingness to Relocate'] || '',
+      firstContactGovernance: fields['First Contact - Initial Interest in Governance Model'] || '',
+      firstContactPreWFEmployment: fields['First Contact - Notes on pre-Wildflower Employment'] || '',
+      firstContactWFSchoolEmployee: fields['First Contact - WF School Employment Status'] || '',
+      firstContactAges: fields['First Contact - initial interest in ages'] || [],
+      firstContactInterests: fields['First Contact - Initial Interests'] || '',
+      opsGuideMeetingPrefTime: fields['Ops Guide Meeting Preferrence Time'] || '',
+      opsGuideSpecificsChecklist: fields['Ops Guide Specifics Checklist'] || [],
+      opsGuideReqPertinentInfo: fields['Ops Guide Request Pertinent Info'] || [],
+      opsGuideSupportTypeNeeded: fields['Ops Guide Support Type Needed'] || [],
+      opsGuideFundraisingOps: fields['Ops Guide Any fundraising opportunities?'] || '',
+      inactiveFlag: fields['Inactive Flag'] || '',
+      createdTime: record.createdTime
+
+      
     };
   }
 
