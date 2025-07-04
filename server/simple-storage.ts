@@ -398,8 +398,27 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getSchoolAssociations(schoolId: string): Promise<EducatorSchoolAssociation[]> {
-    const allAssociations = await this.getEducatorSchoolAssociations();
-    return allAssociations.filter(assoc => assoc.schoolId === schoolId);
+    try {
+      // Query the "Educators x Schools" table filtered by school
+      const records = await base("Educators x Schools").select({
+        filterByFormula: `{School} = '${schoolId}'`
+      }).all();
+      
+      return records.map(record => ({
+        id: record.id,
+        educatorId: Array.isArray(record.fields["Educator"]) ? String(record.fields["Educator"][0]) : String(record.fields["Educator"] || ''),
+        schoolId: Array.isArray(record.fields["School"]) ? String(record.fields["School"][0]) : String(record.fields["School"] || ''),
+        role: String(record.fields["Role"] || ''),
+        startDate: String(record.fields["Start date"] || ''),
+        endDate: String(record.fields["End date"] || ''),
+        isActive: record.fields["Status"] === 'Active',
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+      }));
+    } catch (error) {
+      console.error(`Error fetching school associations for ${schoolId}:`, error);
+      return [];
+    }
   }
 
   async createEducatorSchoolAssociation(association: InsertEducatorSchoolAssociation): Promise<EducatorSchoolAssociation> {
@@ -474,8 +493,57 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getLocationsBySchoolId(schoolId: string): Promise<Location[]> {
-    const locations = await this.getLocations();
-    return locations.filter(location => location.schoolId === schoolId);
+    try {
+      // Query the "Locations" table filtered by school
+      const records = await base("Locations").select({
+        filterByFormula: `{School} = '${schoolId}'`
+      }).all();
+      
+      return records.map(record => {
+        const school = record.fields["School"];
+        const address = record.fields["Address"];
+        const currentPhysicalAddress = record.fields["Current physical address"];
+        const currentMailingAddress = record.fields["Current mailing address"];
+        const startDate = record.fields["Start date"];
+        const endDate = record.fields["End date"];
+        const created = record.fields["Created"];
+        const lastModified = record.fields["Last Modified"];
+        
+        return {
+          id: record.id,
+          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
+          address: String(address || ''),
+          currentPhysicalAddress: String(currentPhysicalAddress || ''),
+          currentMailingAddress: String(currentMailingAddress || ''),
+          startDate: String(startDate || ''),
+          endDate: String(endDate || ''),
+          created: String(created || new Date().toISOString()),
+          lastModified: String(lastModified || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error(`Error fetching locations for ${schoolId}:`, error);
+      // Fallback to using school's address if locations table doesn't exist
+      try {
+        const school = await this.getSchool(schoolId);
+        if (school && school.address) {
+          return [{
+            id: `fallback_${schoolId}`,
+            schoolId: schoolId,
+            address: school.address,
+            currentPhysicalAddress: school.address,
+            currentMailingAddress: school.address,
+            startDate: '',
+            endDate: '',
+            created: new Date().toISOString(),
+            lastModified: new Date().toISOString(),
+          }];
+        }
+      } catch (fallbackError) {
+        console.error(`Fallback location fetch failed:`, fallbackError);
+      }
+      return [];
+    }
   }
 
   async createLocation(location: InsertLocation): Promise<Location> {
@@ -545,8 +613,40 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getGuideAssignmentsBySchoolId(schoolId: string): Promise<GuideAssignment[]> {
-    const allAssignments = await this.getGuideAssignments();
-    return allAssignments.filter(assignment => assignment.schoolId === schoolId);
+    try {
+      // Query the "Guide assignments" table filtered by school
+      const records = await base("Guide assignments").select({
+        filterByFormula: `{School} = '${schoolId}'`
+      }).all();
+      
+      return records.map(record => {
+        const school = record.fields["School"];
+        const guideId = record.fields["Guide ID"];
+        const guideShortName = record.fields["Guide short name"];
+        const type = record.fields["Type"];
+        const startDate = record.fields["Start date"];
+        const endDate = record.fields["End date"];
+        const isActive = record.fields["Is active"];
+        const created = record.fields["Created"];
+        const lastModified = record.fields["Last Modified"];
+        
+        return {
+          id: record.id,
+          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
+          guideId: String(guideId || ''),
+          guideShortName: String(guideShortName || ''),
+          type: String(type || ''),
+          startDate: String(startDate || ''),
+          endDate: String(endDate || ''),
+          isActive: Boolean(isActive),
+          created: String(created || new Date().toISOString()),
+          lastModified: String(lastModified || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error(`Error fetching guide assignments for ${schoolId}:`, error);
+      return [];
+    }
   }
 
   async createGuideAssignment(assignment: InsertGuideAssignment): Promise<GuideAssignment> {
@@ -616,8 +716,35 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getGovernanceDocumentsBySchoolId(schoolId: string): Promise<GovernanceDocument[]> {
-    const allDocuments = await this.getGovernanceDocuments();
-    return allDocuments.filter(doc => doc.schoolId === schoolId);
+    try {
+      // Query the "Governance documents" table filtered by school
+      // Note: This table might not be accessible or might not exist
+      const records = await base("Governance documents").select({
+        filterByFormula: `{School} = '${schoolId}'`
+      }).all();
+      
+      return records.map(record => {
+        const schoolId = record.fields["School"];
+        const docType = record.fields["Doc type"];
+        const doc = record.fields["Doc"];
+        const dateEntered = record.fields["Date entered"];
+        const created = record.fields["Created"];
+        const lastModified = record.fields["Last Modified"];
+        
+        return {
+          id: record.id,
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+          docType: String(docType || ''),
+          doc: String(doc || ''),
+          dateEntered: String(dateEntered || ''),
+          created: String(created || new Date().toISOString()),
+          lastModified: String(lastModified || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error(`Error fetching governance documents for ${schoolId}:`, error);
+      return [];
+    }
   }
 
   async createGovernanceDocument(document: InsertGovernanceDocument): Promise<GovernanceDocument> {
@@ -684,8 +811,34 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getSchoolNotesBySchoolId(schoolId: string): Promise<SchoolNote[]> {
-    const allNotes = await this.getSchoolNotes();
-    return allNotes.filter(note => note.schoolId === schoolId);
+    try {
+      // Query the "Action steps" table filtered by school
+      const records = await base("Action steps").select({
+        filterByFormula: `{School} = '${schoolId}'`
+      }).all();
+      
+      return records.map(record => {
+        const school = record.fields["School"];
+        const dateCreated = record.fields["Date created"];
+        const createdBy = record.fields["Created by"];
+        const notes = record.fields["Notes"];
+        const created = record.fields["Created"];
+        const lastModified = record.fields["Last Modified"];
+        
+        return {
+          id: record.id,
+          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
+          dateCreated: String(dateCreated || ''),
+          createdBy: String(createdBy || ''),
+          notes: String(notes || ''),
+          created: String(created || new Date().toISOString()),
+          lastModified: String(lastModified || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error(`Error fetching school notes for ${schoolId}:`, error);
+      return [];
+    }
   }
 
   async createSchoolNote(note: InsertSchoolNote): Promise<SchoolNote> {
@@ -754,8 +907,36 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getGrantsBySchoolId(schoolId: string): Promise<Grant[]> {
-    const allGrants = await this.getGrants();
-    return allGrants.filter(grant => grant.schoolId === schoolId);
+    try {
+      // Query the "Grants" table filtered by school
+      const records = await base("Grants").select({
+        filterByFormula: `{School} = '${schoolId}'`
+      }).all();
+      
+      return records.map(record => {
+        const school = record.fields["School"];
+        const amount = record.fields["Amount"];
+        const issuedDate = record.fields["Issued date"];
+        const issuedBy = record.fields["Issued by"];
+        const status = record.fields["Status"];
+        const created = record.fields["Created"];
+        const lastModified = record.fields["Last Modified"];
+        
+        return {
+          id: record.id,
+          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
+          amount: Number(amount || 0),
+          issuedDate: String(issuedDate || ''),
+          issuedBy: String(issuedBy || ''),
+          status: String(status || ''),
+          created: String(created || new Date().toISOString()),
+          lastModified: String(lastModified || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error(`Error fetching grants for ${schoolId}:`, error);
+      return [];
+    }
   }
 
   async createGrant(grant: InsertGrant): Promise<Grant> {
@@ -823,8 +1004,34 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getLoansBySchoolId(schoolId: string): Promise<Loan[]> {
-    const allLoans = await this.getLoans();
-    return allLoans.filter(loan => loan.schoolId === schoolId);
+    try {
+      // Query the "Loans" table filtered by school
+      const records = await base("Loans").select({
+        filterByFormula: `{School} = '${schoolId}'`
+      }).all();
+      
+      return records.map(record => {
+        const school = record.fields["School"];
+        const amount = record.fields["Amount"];
+        const status = record.fields["Status"];
+        const interestRate = record.fields["Interest rate"];
+        const created = record.fields["Created"];
+        const lastModified = record.fields["Last Modified"];
+        
+        return {
+          id: record.id,
+          schoolId: Array.isArray(school) ? String(school[0] || '') : String(school || ''),
+          amount: Number(amount || 0),
+          status: String(status || ''),
+          interestRate: Number(interestRate || 0),
+          created: String(created || new Date().toISOString()),
+          lastModified: String(lastModified || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error(`Error fetching loans for ${schoolId}:`, error);
+      return [];
+    }
   }
 
   async createLoan(loan: InsertLoan): Promise<Loan> {
