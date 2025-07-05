@@ -1094,7 +1094,6 @@ export default function SchoolDetail() {
     };
 
     const options = getAddNewOptions();
-    console.log("Setting addNewOptions for tab:", activeTab, "options:", options);
     setAddNewOptions(options);
   }, [activeTab, setAddNewOptions]);
 
@@ -2120,7 +2119,7 @@ export default function SchoolDetail() {
                                         type="number"
                                         value={newGrant.amount}
                                         onChange={(e) => setNewGrant({...newGrant, amount: parseFloat(e.target.value) || 0})}
-                                        placeholder="Amount"
+                                        placeholder="Grant amount"
                                         className="h-8"
                                       />
                                     </TableCell>
@@ -2226,7 +2225,7 @@ export default function SchoolDetail() {
                                         type="number"
                                         value={newLoan.amount}
                                         onChange={(e) => setNewLoan({...newLoan, amount: parseFloat(e.target.value) || 0})}
-                                        placeholder="Amount"
+                                        placeholder="Loan amount"
                                         className="h-8"
                                       />
                                     </TableCell>
