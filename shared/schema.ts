@@ -314,6 +314,18 @@ export interface Loan {
   lastModified?: string;
 }
 
+export interface EmailAddress {
+  id: string; // Airtable record ID
+  educatorId?: string;
+  email?: string;
+  type?: string;
+  isPrimary?: boolean;
+  status?: string;
+  notes?: string;
+  created?: string;
+  lastModified?: string;
+}
+
 // Zod schemas for validation
 export const educatorSchema = z.object({
   fullName: z.string().optional(),
@@ -556,6 +568,15 @@ export const membershipFeeUpdateSchema = z.object({
   notes: z.string().optional(),
 });
 
+export const emailAddressSchema = z.object({
+  educatorId: z.string().optional(),
+  email: z.string().email("Invalid email format").optional(),
+  type: z.string().optional(),
+  isPrimary: z.boolean().optional(),
+  status: z.string().optional(),
+  notes: z.string().optional(),
+});
+
 export interface MembershipFeeByYear {
   id: string;
   schoolId: string;
@@ -591,6 +612,7 @@ export type InsertGrant = z.infer<typeof grantSchema>;
 export type InsertLoan = z.infer<typeof loanSchema>;
 export type InsertMembershipFeeByYear = z.infer<typeof membershipFeeByYearSchema>;
 export type InsertMembershipFeeUpdate = z.infer<typeof membershipFeeUpdateSchema>;
+export type InsertEmailAddress = z.infer<typeof emailAddressSchema>;
 
 // Legacy types for backward compatibility
 export type Teacher = Educator;

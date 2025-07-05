@@ -11,6 +11,7 @@ import type {
   Loan,
   MembershipFeeByYear,
   MembershipFeeUpdate,
+  EmailAddress,
   InsertEducator, 
   InsertSchool, 
   InsertEducatorSchoolAssociation,
@@ -22,6 +23,7 @@ import type {
   InsertLoan,
   InsertMembershipFeeByYear,
   InsertMembershipFeeUpdate,
+  InsertEmailAddress,
   Teacher,
   TeacherSchoolAssociation,
   InsertTeacher,
@@ -115,6 +117,14 @@ export interface IStorage {
   createMembershipFeeUpdate(update: InsertMembershipFeeUpdate): Promise<MembershipFeeUpdate>;
   updateMembershipFeeUpdate(id: string, update: Partial<InsertMembershipFeeUpdate>): Promise<MembershipFeeUpdate | undefined>;
   deleteMembershipFeeUpdate(id: string): Promise<boolean>;
+
+  // Email address operations
+  getEmailAddresses(): Promise<EmailAddress[]>;
+  getEmailAddress(id: string): Promise<EmailAddress | undefined>;
+  getEmailAddressesByEducatorId(educatorId: string): Promise<EmailAddress[]>;
+  createEmailAddress(emailAddress: InsertEmailAddress): Promise<EmailAddress>;
+  updateEmailAddress(id: string, emailAddress: Partial<InsertEmailAddress>): Promise<EmailAddress | undefined>;
+  deleteEmailAddress(id: string): Promise<boolean>;
 
   // Legacy methods for backward compatibility
   getTeachers(): Promise<Teacher[]>;
@@ -1143,6 +1153,88 @@ export class SimpleAirtableStorage implements IStorage {
   async deleteLoan(id: string): Promise<boolean> {
     // Mock implementation - in reality this would delete from Airtable
     return true;
+  }
+
+  // Email address operations
+  async getEmailAddresses(): Promise<EmailAddress[]> {
+    try {
+      const records = await base('Email Addresses').select().all();
+      return records.map(record => this.transformEmailAddressRecord(record));
+    } catch (error) {
+      console.warn('Warning: Unable to fetch Email Addresses table - table may not exist or may require permissions');
+      return [];
+    }
+  }
+
+  async getEmailAddress(id: string): Promise<EmailAddress | undefined> {
+    try {
+      const record = await base('Email Addresses').find(id);
+      return this.transformEmailAddressRecord(record);
+    } catch (error) {
+      console.warn(`Warning: Unable to fetch email address ${id}:`, error);
+      return undefined;
+    }
+  }
+
+  async getEmailAddressesByEducatorId(educatorId: string): Promise<EmailAddress[]> {
+    try {
+      const records = await base('Email Addresses').select({
+        filterByFormula: `{Educator} = '${educatorId}'`
+      }).all();
+      return records.map(record => this.transformEmailAddressRecord(record));
+    } catch (error) {
+      console.warn(`Warning: Unable to fetch email addresses for educator ${educatorId}:`, error);
+      return [];
+    }
+  }
+
+  async createEmailAddress(emailAddress: InsertEmailAddress): Promise<EmailAddress> {
+    const newEmailAddress: EmailAddress = {
+      id: `temp_${Date.now()}`,
+      educatorId: emailAddress.educatorId,
+      email: emailAddress.email,
+      type: emailAddress.type,
+      isPrimary: emailAddress.isPrimary,
+      status: emailAddress.status,
+      notes: emailAddress.notes,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+
+    // Mock implementation - in reality this would create in Airtable
+    return newEmailAddress;
+  }
+
+  async updateEmailAddress(id: string, emailAddress: Partial<InsertEmailAddress>): Promise<EmailAddress | undefined> {
+    // Mock implementation - in reality this would update in Airtable
+    const existing = await this.getEmailAddress(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...emailAddress,
+      lastModified: new Date().toISOString(),
+    };
+  }
+
+  async deleteEmailAddress(id: string): Promise<boolean> {
+    // Mock implementation - in reality this would delete from Airtable
+    return true;
+  }
+
+  private transformEmailAddressRecord(record: any): EmailAddress {
+    const fields = record.fields;
+    return {
+      id: record.id,
+      educatorId: fields["Educator"]?.[0] || undefined,
+      email: fields["Email"] || fields["Email Address"] || undefined,
+      type: fields["Type"] || undefined,
+      isPrimary: fields["Primary"] === true || fields["Is Primary"] === true,
+      status: fields["Status"] || undefined,
+      notes: fields["Notes"] || undefined,
+      created: fields["Created"] || record.get('Created'),
+      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+    };
   }
 }
 

@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { type Teacher } from "@shared/schema";
 import { getStatusColor } from "@/lib/utils";
+import { EmailAddressesTable } from "@/components/email-addresses-table";
 
 
 export default function TeacherDetail() {
@@ -166,16 +167,11 @@ export default function TeacherDetail() {
                         <p><span className="text-slate-600">Primary Phone:</span> {teacher.primaryPhone || '-'}</p>
                         <p><span className="text-slate-600">Secondary Phone:</span> {teacher.secondaryPhone || '-'}</p>
                         <p><span className="text-slate-600">Home Address:</span> {teacher.homeAddress || '-'}</p>
-                        <p><span className="text-slate-600">Target City:</span> {teacher.targetCity || '-'}</p>
                       </div>
                     </div>
                     <div className="space-y-4">
-                      <h4 className="font-medium text-slate-900">Partner Information</h4>
-                      <div className="space-y-2 text-sm">
-                        <p><span className="text-slate-600">Assigned Partner:</span> {teacher.assignedPartner ? (Array.isArray(teacher.assignedPartner) ? teacher.assignedPartner.join(', ') : teacher.assignedPartner) : '-'}</p>
-                        <p><span className="text-slate-600">Partner Email:</span> {teacher.assignedPartnerEmail ? (Array.isArray(teacher.assignedPartnerEmail) ? teacher.assignedPartnerEmail.join(', ') : teacher.assignedPartnerEmail) : '-'}</p>
-                        <p><span className="text-slate-600">Also a Partner:</span> {teacher.alsoAPartner ? 'Yes' : 'No'}</p>
-                      </div>
+                      <h4 className="font-medium text-slate-900">Email Addresses</h4>
+                      <EmailAddressesTable educatorId={teacher.id} />
                     </div>
                   </div>
                 </div>

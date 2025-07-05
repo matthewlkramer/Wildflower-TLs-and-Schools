@@ -606,6 +606,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Email Address routes
+  app.get("/api/email-addresses", async (req, res) => {
+    try {
+      const emailAddresses = await storage.getEmailAddresses();
+      res.json(emailAddresses);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch email addresses" });
+    }
+  });
+
+  app.get("/api/email-addresses/educator/:educatorId", async (req, res) => {
+    try {
+      const educatorId = req.params.educatorId;
+      const emailAddresses = await storage.getEmailAddressesByEducatorId(educatorId);
+      res.json(emailAddresses);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch email addresses for educator" });
+    }
+  });
+
+  app.get("/api/email-addresses/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const emailAddress = await storage.getEmailAddress(id);
+      if (!emailAddress) {
+        return res.status(404).json({ message: "Email address not found" });
+      }
+      res.json(emailAddress);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch email address" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
