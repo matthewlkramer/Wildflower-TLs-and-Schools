@@ -29,8 +29,18 @@ const PageTitleContext = createContext<{
   setPageTitle: () => {},
 });
 
+// Create a context for Add New functionality
+const AddNewContext = createContext<{
+  addNewOptions: Array<{ label: string; onClick: () => void; }>;
+  setAddNewOptions: (options: Array<{ label: string; onClick: () => void; }>) => void;
+}>({
+  addNewOptions: [],
+  setAddNewOptions: () => {},
+});
+
 export const useSearch = () => useContext(SearchContext);
 export const usePageTitle = () => useContext(PageTitleContext);
+export const useAddNew = () => useContext(AddNewContext);
 
 function Router() {
   return (
@@ -49,6 +59,7 @@ function AppContent() {
   const [location] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [pageTitle, setPageTitle] = useState("");
+  const [addNewOptions, setAddNewOptions] = useState<Array<{ label: string; onClick: () => void; }>>([]);
 
   // Reset search when navigating between pages
   const isTeachersActive = location === "/" || location === "/teachers" || location.startsWith("/teacher/");
@@ -57,15 +68,17 @@ function AppContent() {
   return (
     <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>
       <PageTitleContext.Provider value={{ pageTitle, setPageTitle }}>
-        <div className="min-h-screen bg-slate-50">
-          <Header 
-            searchTerm={searchTerm} 
-            onSearchChange={setSearchTerm}
-            pageTitle={pageTitle}
-          />
-          <Router />
-          <Toaster />
-        </div>
+        <AddNewContext.Provider value={{ addNewOptions, setAddNewOptions }}>
+          <div className="min-h-screen bg-slate-50">
+            <Header 
+              searchTerm={searchTerm} 
+              onSearchChange={setSearchTerm}
+              addNewOptions={addNewOptions}
+            />
+            <Router />
+            <Toaster />
+          </div>
+        </AddNewContext.Provider>
       </PageTitleContext.Provider>
     </SearchContext.Provider>
   );

@@ -26,7 +26,7 @@ import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssoci
 import { getInitials, getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import Header from "@/components/header";
+import { useAddNew } from "@/App";
 
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
 
@@ -1002,6 +1002,7 @@ function LoanRow({
 
 export default function SchoolDetail() {
   const { id } = useParams<{ id: string }>();
+  const { setAddNewOptions } = useAddNew();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activeTab, setActiveTab] = useState("summary");
@@ -1062,33 +1063,38 @@ export default function SchoolDetail() {
     status: "",
     interestRate: 0,
   });
+
   const { toast } = useToast();
 
-  // Generate Add New options based on active tab
-  const getAddNewOptions = () => {
-    switch (activeTab) {
-      case "tls":
-        return [
-          { label: "Create New Educator", onClick: () => setIsCreatingTeacher(true) },
-          { label: "Associate Existing Educator", onClick: () => setIsAssociatingTeacher(true) }
-        ];
-      case "locations":
-        return [{ label: "Add Location", onClick: () => setIsCreatingLocation(true) }];
-      case "governance":
-        return [{ label: "Add Document", onClick: () => setIsCreatingDocument(true) }];
-      case "guides":
-        return [{ label: "Add Guide Assignment", onClick: () => setIsCreatingGuideAssignment(true) }];
-      case "notes":
-        return [{ label: "Add Note", onClick: () => setIsCreatingNote(true) }];
-      case "grants":
-        return [
-          { label: "Add Grant", onClick: () => setIsCreatingGrant(true) },
-          { label: "Add Loan", onClick: () => setIsCreatingLoan(true) }
-        ];
-      default:
-        return [];
-    }
-  };
+  // Update Add New options when active tab changes
+  useEffect(() => {
+    const getAddNewOptions = () => {
+      switch (activeTab) {
+        case "tls":
+          return [
+            { label: "Create New Educator", onClick: () => setIsCreatingTeacher(true) },
+            { label: "Associate Existing Educator", onClick: () => setIsAssociatingTeacher(true) }
+          ];
+        case "locations":
+          return [{ label: "Add Location", onClick: () => setIsCreatingLocation(true) }];
+        case "governance":
+          return [{ label: "Add Document", onClick: () => setIsCreatingDocument(true) }];
+        case "guides":
+          return [{ label: "Add Guide Assignment", onClick: () => setIsCreatingGuideAssignment(true) }];
+        case "notes":
+          return [{ label: "Add Note", onClick: () => setIsCreatingNote(true) }];
+        case "grants":
+          return [
+            { label: "Add Grant", onClick: () => setIsCreatingGrant(true) },
+            { label: "Add Loan", onClick: () => setIsCreatingLoan(true) }
+          ];
+        default:
+          return [];
+      }
+    };
+
+    setAddNewOptions(getAddNewOptions());
+  }, [activeTab, setAddNewOptions]);
 
 
   const { data: school, isLoading } = useQuery<School>({
@@ -1504,9 +1510,6 @@ export default function SchoolDetail() {
 
   return (
     <>
-      <Header 
-        addNewOptions={getAddNewOptions()}
-      />
       <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
         <Card>
           <CardContent className="p-0">
