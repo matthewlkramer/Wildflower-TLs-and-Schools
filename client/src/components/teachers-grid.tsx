@@ -176,21 +176,21 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
     },
     {
       headerName: "Current School",
-      field: "currentlyActiveSchool",
+      field: "activeSchool",
       filter: 'agTextColumnFilter',
       minWidth: 200,
       valueGetter: (params) => {
-        const school = params.data?.currentlyActiveSchool;
+        const school = params.data?.activeSchool;
         return Array.isArray(school) ? school.join(', ') : (school || '');
       }
     },
     {
       headerName: "Stage/Status",
-      field: "startupStageForActiveSchool",
+      field: "activeSchoolStageStatus",
       filter: 'agTextColumnFilter',
       minWidth: 180,
       cellRenderer: ({ data }: { data: Educator }) => (
-        <BadgeRenderer value={data.startupStageForActiveSchool || []} field="stageStatus" />
+        <BadgeRenderer value={data.activeSchoolStageStatus || []} field="stageStatus" />
       )
     },
     {

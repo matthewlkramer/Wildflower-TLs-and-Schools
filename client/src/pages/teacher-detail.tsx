@@ -112,8 +112,8 @@ export default function TeacherDetail() {
                       <h4 className="font-medium text-slate-900 mb-2">School Connection</h4>
                       <div className="space-y-1 text-sm">
                         <p><span className="text-slate-600">Currently Active:</span> {teacher.currentlyActiveAtSchool ? 'Yes' : 'No'}</p>
-                        <p><span className="text-slate-600">Current School:</span> {teacher.currentlyActiveSchool ? (Array.isArray(teacher.currentlyActiveSchool) ? teacher.currentlyActiveSchool.join(', ') : teacher.currentlyActiveSchool) : '-'}</p>
-                        <div><span className="text-slate-600">Stage/Status:</span> <Badge className={getStatusColor(teacher.startupStageForActiveSchool ? (Array.isArray(teacher.startupStageForActiveSchool) ? teacher.startupStageForActiveSchool[0] : teacher.startupStageForActiveSchool) : '')}>{teacher.startupStageForActiveSchool ? (Array.isArray(teacher.startupStageForActiveSchool) ? teacher.startupStageForActiveSchool.join(', ') : teacher.startupStageForActiveSchool) : '-'}</Badge></div>
+                        <p><span className="text-slate-600">Current School:</span> {teacher.activeSchool ? (Array.isArray(teacher.activeSchool) ? teacher.activeSchool.join(', ') : teacher.activeSchool) : '-'}</p>
+                        <div><span className="text-slate-600">Stage/Status:</span> <Badge className={getStatusColor(teacher.activeSchoolStageStatus ? (Array.isArray(teacher.activeSchoolStageStatus) ? teacher.activeSchoolStageStatus[0] : teacher.activeSchoolStageStatus) : '')}>{teacher.activeSchoolStageStatus ? (Array.isArray(teacher.activeSchoolStageStatus) ? teacher.activeSchoolStageStatus.join(', ') : teacher.activeSchoolStageStatus) : '-'}</Badge></div>
                       </div>
                     </div>
                   </div>
@@ -177,8 +177,8 @@ export default function TeacherDetail() {
                   <h4 className="font-medium text-slate-900">School Associations</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2 text-sm">
-                      <p><span className="text-slate-600">All Schools:</span> {teacher.allSchools ? (Array.isArray(teacher.allSchools) ? teacher.allSchools.join(', ') : teacher.allSchools) : '-'}</p>
-                      <p><span className="text-slate-600">School Statuses:</span> {teacher.schoolStatuses ? (Array.isArray(teacher.schoolStatuses) ? teacher.schoolStatuses.join(', ') : teacher.schoolStatuses) : '-'}</p>
+                      <p><span className="text-slate-600">All Schools:</span> {teacher.activeSchool ? (Array.isArray(teacher.activeSchool) ? teacher.activeSchool.join(', ') : teacher.activeSchool) : '-'}</p>
+                      <p><span className="text-slate-600">School Statuses:</span> {teacher.activeSchoolStageStatus ? (Array.isArray(teacher.activeSchoolStageStatus) ? teacher.activeSchoolStageStatus.join(', ') : teacher.activeSchoolStageStatus) : '-'}</p>
                       <p><span className="text-slate-600">On School Board:</span> {teacher.onSchoolBoard || '-'}</p>
                       <p><span className="text-slate-600">Ever a TL in Open School:</span> {teacher.everATLInAnOpenSchool ? 'Yes' : 'No'}</p>
                     </div>

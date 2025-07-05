@@ -22,8 +22,8 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
   const [deleteTeacherId, setDeleteTeacherId] = useState<string | null>(null);
   const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({
     fullName: [],
-    currentlyActiveSchool: [],
-    startupStageForActiveSchool: [],
+    activeSchool: [],
+    activeSchoolStageStatus: [],
     currentRole: [],
     montessoriCertified: [],
     raceEthnicity: [],
@@ -137,10 +137,10 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
                 <div className="flex items-center justify-between">
                   <span>Current School</span>
                   <ColumnFilter
-                    column="currentlyActiveSchool"
+                    column="activeSchool"
                     data={teachers}
-                    fieldKey="currentlyActiveSchool"
-                    filterValues={columnFilters.currentlyActiveSchool}
+                    fieldKey="activeSchool"
+                    filterValues={columnFilters.activeSchool}
                     onFilterChange={handleFilterChange}
                     isMultiValue={true}
                   />
@@ -150,10 +150,10 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
                 <div className="flex items-center justify-between">
                   <span>School Stage Status</span>
                   <ColumnFilter
-                    column="startupStageForActiveSchool"
+                    column="activeSchoolStageStatus"
                     data={teachers}
-                    fieldKey="startupStageForActiveSchool"
-                    filterValues={columnFilters.startupStageForActiveSchool}
+                    fieldKey="activeSchoolStageStatus"
+                    filterValues={columnFilters.activeSchoolStageStatus}
                     onFilterChange={handleFilterChange}
                     isMultiValue={true}
                   />
@@ -248,14 +248,14 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
                 {/* Current School */}
                 <ResizableTableCell>
                   <div className="text-sm text-slate-900">
-                    {teacher.currentlyActiveSchool?.join(', ') || 'No current school'}
+                    {teacher.activeSchool?.join(', ') || 'No current school'}
                   </div>
                 </ResizableTableCell>
                 
                 {/* School Stage Status */}
                 <ResizableTableCell>
                   <div className="text-sm text-slate-900">
-                    {teacher.startupStageForActiveSchool?.join(', ') || 'Not specified'}
+                    {teacher.activeSchoolStageStatus?.join(', ') || 'Not specified'}
                   </div>
                 </ResizableTableCell>
                 

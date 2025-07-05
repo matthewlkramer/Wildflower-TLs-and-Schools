@@ -30,14 +30,8 @@ export interface Educator {
   householdIncome?: string;
   incomeBackground?: string;
   individualType?: string;
-  onboardingExperience?: string;
-  currentlyActiveAtSchool?: boolean;
-  allSchools?: string[];
-  currentlyActiveSchool?: string[];
-  schoolStatuses?: string[];
   activeSchool?: string[];
   activeSchoolStageStatus?: string[];
-  startupStageForActiveSchool?: string[];
   targetCity?: string;
   targetState?: string;
   targetGeoCombined?: string;
@@ -339,12 +333,6 @@ export const educatorSchema = z.object({
   householdIncome: z.string().optional(),
   incomeBackground: z.string().optional(),
   individualType: z.string().optional(),
-  onboardingExperience: z.string().optional(),
-  currentlyActiveAtSchool: z.boolean().optional(),
-  allSchools: z.array(z.string()).optional(),
-  currentlyActiveSchool: z.array(z.string()).optional(),
-  schoolStatuses: z.array(z.string()).optional(),
-  startupStageForActiveSchool: z.array(z.string()).optional(),
   targetCity: z.string().optional(),
   firstContactWFSchoolEmploymentStatus: z.string().optional(),
   firstContactNotesOnPreWildflowerEmployment: z.string().optional(),
