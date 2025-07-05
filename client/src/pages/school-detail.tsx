@@ -1093,7 +1093,9 @@ export default function SchoolDetail() {
       }
     };
 
-    setAddNewOptions(getAddNewOptions());
+    const options = getAddNewOptions();
+    console.log("Setting addNewOptions for tab:", activeTab, "options:", options);
+    setAddNewOptions(options);
   }, [activeTab, setAddNewOptions]);
 
 

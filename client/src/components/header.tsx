@@ -90,7 +90,10 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                   </div>
                 )}
 
-                {addNewOptions && addNewOptions.length > 1 ? (
+                {(() => {
+                  console.log("Header addNewOptions:", addNewOptions, "length:", addNewOptions?.length);
+                  return addNewOptions && addNewOptions.length > 1;
+                })() ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button 
