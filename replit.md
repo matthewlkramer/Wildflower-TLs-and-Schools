@@ -117,6 +117,7 @@ Changelog:
 - July 05, 2025. Implemented Membership Fees tab with three-column layout: Membership Fee by Year table, Membership Fee Updates table with school year filtering, and Calculated Fields section
 - July 05, 2025. Reorganized school detail tabs by moving Contact Information and Legal Entity sections from Summary tab to Details tab for better information architecture
 - July 05, 2025. Enhanced Summary tab with Google Maps integration using latitude/longitude coordinates, current physical address display, Current Guide(s) field, SSJ Stage badges, risk factors and watchlist information, conditional SSJ Projected Open date for visioning/planning/startup stages, and conditional left network date/reason fields for schools that have exited the network
+- July 05, 2025. Updated Teacher demographics tab to remove name fields, add conditional "other" fields (gender other, race/ethnicity other, pronouns other) that only display when respective field is set to "other", and moved educational attainment field to demographics section
 ```
 
 ## User Preferences
