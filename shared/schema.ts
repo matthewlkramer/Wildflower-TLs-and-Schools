@@ -11,6 +11,9 @@ export interface Educator {
   primaryPhone?: string;
   secondaryPhone?: string;
   homeAddress?: string;
+
+
+  // Demographics
   pronouns?: string;
   pronounsOther?: string;
   gender?: string;
@@ -21,17 +24,22 @@ export interface Educator {
   primaryLanguage?: string[];
   otherLanguages?: string[];
   educationalAttainment?: string;
-  montessoriCertified?: boolean;
-  montessoriLeadGuideTrainings?: string[];
-  currentRole?: string[];
-  discoveryStatus?: string;
-  assignedPartner?: string[];
-  assignedPartnerEmail?: string[];
   householdIncome?: string;
   incomeBackground?: string;
   individualType?: string;
+  
+  montessoriCertified?: boolean;
+  montessoriLeadGuideTrainings?: string[];
+
+  discoveryStatus?: string;
+  assignedPartner?: string[];
+  assignedPartnerEmail?: string[];
+  
   activeSchool?: string[];
+  currentRole?: string[];
   activeSchoolStageStatus?: string[];
+
+  
   targetCity?: string;
   targetState?: string;
   targetGeoCombined?: string;
@@ -42,6 +50,8 @@ export interface Educator {
   firstContactGovernance?: string;
   firstContactAges?: string[];
   firstContactInterests?: string;
+
+  
   opsGuideMeetingPrefTime?: string;
   opsGuideSpecificsChecklist?: string[];
   opsGuideReqPertinentInfo?: string[];

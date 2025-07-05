@@ -50,18 +50,18 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
               <WildflowerLogo className="h-10 w-auto" />
             </div>
             
-            {/* Right side content - can push off screen on mobile */}
-            <div className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6 ml-auto min-w-0">
-              {/* Navigation - hide links on small screens */}
-              <nav className="hidden sm:flex space-x-4 lg:space-x-8">
-                <Link href="/teachers" className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors ${
+            {/* Right side content - allow horizontal overflow on mobile */}
+            <div className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6 ml-auto overflow-x-auto">
+              {/* Navigation - always visible, compact on mobile */}
+              <nav className="flex space-x-3 sm:space-x-4 lg:space-x-8 flex-shrink-0">
+                <Link href="/teachers" className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   isTeachersActive
                     ? "text-wildflower-blue border-wildflower-blue"
                     : "text-slate-500 hover:text-slate-700 border-transparent"
                 }`}>
                   Teachers
                 </Link>
-                <Link href="/schools" className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors ${
+                <Link href="/schools" className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   isSchoolsActive
                     ? "text-wildflower-blue border-wildflower-blue"
                     : "text-slate-500 hover:text-slate-700 border-transparent"
@@ -71,7 +71,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
               </nav>
               
               {/* Search and Actions */}
-              <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
+              <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
                 {onSearchChange && (
                   <div className="relative">
                     <Input
