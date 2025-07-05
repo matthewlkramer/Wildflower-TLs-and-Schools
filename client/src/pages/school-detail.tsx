@@ -1674,6 +1674,36 @@ export default function SchoolDetail() {
                       </div>
                     </div>
 
+
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="details" className="mt-0">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-slate-900">School Information</h4>
+                        <div className="space-y-2 text-sm">
+                          <p><span className="text-slate-600">Full Name:</span> {school.fullName || '-'}</p>
+                          <p><span className="text-slate-600">Website:</span> {school.website || '-'}</p>
+                          <p><span className="text-slate-600">Phone:</span> {school.phone || '-'}</p>
+                          <p><span className="text-slate-600">Email:</span> {school.email || '-'}</p>
+                          <p><span className="text-slate-600">Ages Served:</span> {school.agesServed?.join(', ') || '-'}</p>
+                          <p><span className="text-slate-600">Grades:</span> {school.grades?.join(', ') || '-'}</p>
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-slate-900">Operations</h4>
+                        <div className="space-y-2 text-sm">
+                          <p><span className="text-slate-600">Open Date:</span> {school.openDate || '-'}</p>
+                          <p><span className="text-slate-600">Target Open Date:</span> {school.targetOpenDate || '-'}</p>
+                          <p><span className="text-slate-600">Current Enrollment:</span> {school.currentEnrollment || '-'}</p>
+                          <p><span className="text-slate-600">Enrollment Cap:</span> {school.enrollmentCap || '-'}</p>
+                          <p><span className="text-slate-600">Tuition Range:</span> {school.tuitionRange || '-'}</p>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Contact Information Section */}
                     <div>
                       <h3 className="text-lg font-medium text-slate-900 mb-4">Contact Information</h3>
@@ -1724,34 +1754,6 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-sm font-medium text-slate-600">Nonprofit Status</label>
                           <p className="text-sm text-slate-900">-</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="details" className="mt-0">
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <h4 className="font-medium text-slate-900">School Information</h4>
-                        <div className="space-y-2 text-sm">
-                          <p><span className="text-slate-600">Full Name:</span> {school.fullName || '-'}</p>
-                          <p><span className="text-slate-600">Website:</span> {school.website || '-'}</p>
-                          <p><span className="text-slate-600">Phone:</span> {school.phone || '-'}</p>
-                          <p><span className="text-slate-600">Email:</span> {school.email || '-'}</p>
-                          <p><span className="text-slate-600">Ages Served:</span> {school.agesServed?.join(', ') || '-'}</p>
-                          <p><span className="text-slate-600">Grades:</span> {school.grades?.join(', ') || '-'}</p>
-                        </div>
-                      </div>
-                      <div className="space-y-4">
-                        <h4 className="font-medium text-slate-900">Operations</h4>
-                        <div className="space-y-2 text-sm">
-                          <p><span className="text-slate-600">Open Date:</span> {school.openDate || '-'}</p>
-                          <p><span className="text-slate-600">Target Open Date:</span> {school.targetOpenDate || '-'}</p>
-                          <p><span className="text-slate-600">Current Enrollment:</span> {school.currentEnrollment || '-'}</p>
-                          <p><span className="text-slate-600">Enrollment Cap:</span> {school.enrollmentCap || '-'}</p>
-                          <p><span className="text-slate-600">Tuition Range:</span> {school.tuitionRange || '-'}</p>
                         </div>
                       </div>
                     </div>

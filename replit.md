@@ -112,6 +112,10 @@ Changelog:
 - July 04, 2025. Fixed comprehensive schema and TypeScript errors by adding all missing properties to School and Educator interfaces, including SSJ data fields, systems fields, and additional contact information
 - July 04, 2025. Corrected checkbox field types from string to boolean for currentPhysicalAddress and currentMailingAddress properties
 - July 04, 2025. Migrated from "Teacher" to "Educator" terminology throughout the application for consistency with Wildflower Schools naming conventions, including component names, API endpoints, and form schemas while maintaining backward compatibility
+- July 05, 2025. Implemented Notes/Actions tab with two-column layout: School Notes table on left, Action Steps placeholder on right, matching Grants/Loans design pattern
+- July 05, 2025. Created separate Systems tab and moved all systems-related fields from Support tab to new dedicated Systems tab for better organization
+- July 05, 2025. Implemented Membership Fees tab with three-column layout: Membership Fee by Year table, Membership Fee Updates table with school year filtering, and Calculated Fields section
+- July 05, 2025. Reorganized school detail tabs by moving Contact Information and Legal Entity sections from Summary tab to Details tab for better information architecture
 ```
 
 ## User Preferences
