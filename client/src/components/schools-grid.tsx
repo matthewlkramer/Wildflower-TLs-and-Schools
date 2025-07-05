@@ -153,6 +153,13 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       filter: "agTextColumnFilter",
     },
     {
+      field: "membershipStatus",
+      headerName: "Membership Status",
+      width: 160,
+      cellRenderer: MembershipStatusCellRenderer,
+      filter: "agTextColumnFilter",
+    },
+    {
       field: "currentTLs",
       headerName: "Current TLs",
       width: 120,

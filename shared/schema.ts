@@ -30,8 +30,14 @@ export interface Educator {
   householdIncome?: string;
   incomeBackground?: string;
   individualType?: string;
+  onboardingExperience?: string;
+  currentlyActiveAtSchool?: boolean;
+  allSchools?: string[];
+  currentlyActiveSchool?: string[];
+  schoolStatuses?: string[];
   activeSchool?: string[];
   activeSchoolStageStatus?: string[];
+  startupStageForActiveSchool?: string[];
   targetCity?: string;
   targetState?: string;
   targetGeoCombined?: string;
