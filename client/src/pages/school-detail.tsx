@@ -1082,7 +1082,10 @@ export default function SchoolDetail() {
         case "guides":
           return [{ label: "Add Guide Assignment", onClick: () => setIsCreatingGuideAssignment(true) }];
         case "notes":
-          return [{ label: "Add Note", onClick: () => setIsCreatingNote(true) }];
+          return [
+            { label: "Add Note", onClick: () => setIsCreatingNote(true) },
+            { label: "Add Action Step", onClick: () => console.log("Add Action Step - to be implemented") }
+          ];
         case "grants":
           return [
             { label: "Add Grant", onClick: () => setIsCreatingGrant(true) },
@@ -1165,6 +1168,16 @@ export default function SchoolDetail() {
     queryFn: async () => {
       const response = await fetch(`/api/loans/school/${id}`, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch loans");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
+  const { data: schoolNotes, isLoading: notesLoading } = useQuery<SchoolNote[]>({
+    queryKey: [`/api/school-notes/school/${id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/school-notes/school/${id}`, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch school notes");
       return response.json();
     },
     enabled: !!id,
@@ -2313,9 +2326,128 @@ export default function SchoolDetail() {
                 </TabsContent>
 
                 <TabsContent value="notes" className="mt-0">
-                  <div className="space-y-4">
-                    <div className="text-center py-8 text-slate-500">
-                      Notes and action items will be displayed here
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* School Notes Table */}
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-slate-900">School Notes</h4>
+                        {notesLoading ? (
+                          <div className="space-y-3">
+                            <Skeleton className="h-8 w-full" />
+                            <Skeleton className="h-8 w-full" />
+                            <Skeleton className="h-8 w-full" />
+                          </div>
+                        ) : schoolNotes && schoolNotes.length > 0 || isCreatingNote ? (
+                          <div className="border rounded-lg">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Date</TableHead>
+                                  <TableHead>Created By</TableHead>
+                                  <TableHead>Notes</TableHead>
+                                  <TableHead className="w-[100px]">Actions</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {isCreatingNote && (
+                                  <TableRow>
+                                    <TableCell>
+                                      <Input
+                                        type="date"
+                                        value={newNote.dateCreated}
+                                        onChange={(e) => setNewNote({...newNote, dateCreated: e.target.value})}
+                                        className="h-8"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <Input
+                                        value={newNote.createdBy}
+                                        onChange={(e) => setNewNote({...newNote, createdBy: e.target.value})}
+                                        placeholder="Created by"
+                                        className="h-8"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <Input
+                                        value={newNote.notes}
+                                        onChange={(e) => setNewNote({...newNote, notes: e.target.value})}
+                                        placeholder="Note content"
+                                        className="h-8"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="flex gap-1">
+                                        <Button
+                                          size="sm"
+                                          onClick={() => {/* note creation mutation */}}
+                                          className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+                                        >
+                                          Save
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => {
+                                            setIsCreatingNote(false);
+                                            setNewNote({ dateCreated: "", createdBy: "", notes: "" });
+                                          }}
+                                          className="h-8 px-2"
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    </TableCell>
+                                  </TableRow>
+                                )}
+                                {schoolNotes?.map((note) => (
+                                  <TableRow key={note.id}>
+                                    <TableCell>{note.dateCreated || '-'}</TableCell>
+                                    <TableCell>{note.createdBy || '-'}</TableCell>
+                                    <TableCell>{note.notes || '-'}</TableCell>
+                                    <TableCell>
+                                      <div className="flex gap-1">
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => setEditingNoteId(note.id)}
+                                          className="h-8 w-8 p-0"
+                                        >
+                                          <Edit className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => {
+                                            setDeletingNoteId(note.id);
+                                            setNoteDeleteModalOpen(true);
+                                          }}
+                                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 text-slate-500">
+                            <p>No notes found for this school.</p>
+                            <p className="text-sm mt-2">Use the "Add Note" button above to create notes.</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action Steps Table */}
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-slate-900">Action Steps</h4>
+                        <div className="text-center py-8 text-slate-500">
+                          <p>Action steps will be displayed here.</p>
+                          <p className="text-sm mt-2">Future implementation for action items.</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </TabsContent>
