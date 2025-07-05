@@ -2092,10 +2092,305 @@ export default function SchoolDetail() {
                 </TabsContent>
 
                 <TabsContent value="support" className="mt-0">
-                  <div className="space-y-4">
-                    <h4 className="font-medium text-slate-900">Support & Resources</h4>
-                    <div className="text-center py-8 text-slate-500">
-                      Support and resource information will be displayed here
+                  <div className="space-y-6">
+                    {/* SSJ/OSS Data Section */}
+                    <div>
+                      <h4 className="font-medium text-slate-900 mb-4">SSJ/OSS Data</h4>
+                      
+                      {/* Stage & Timeline */}
+                      <div className="mb-6">
+                        <h5 className="text-sm font-medium text-slate-700 mb-3">Stage & Timeline</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">SSJ Stage</label>
+                            <p className="text-sm text-slate-900">{school.ssjStage || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">SSJ Tool</label>
+                            <p className="text-sm text-slate-900">{school.ssjTool || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Original Projected Open Date</label>
+                            <p className="text-sm text-slate-900">{school.ssjOriginalProjectedOpenDate || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Projected Open School Year</label>
+                            <p className="text-sm text-slate-900">{school.ssjProjOpenSchoolYear || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">SSJ Projected Open</label>
+                            <p className="text-sm text-slate-900">{school.ssjProjectedOpen || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Entered Visioning Date</label>
+                            <p className="text-sm text-slate-900">{school.enteredVisioningDate || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Entered Planning Date</label>
+                            <p className="text-sm text-slate-900">{school.enteredPlanningDate || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Entered Startup Date</label>
+                            <p className="text-sm text-slate-900">{school.enteredStartupDate || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Operations & Readiness */}
+                      <div className="mb-6">
+                        <h5 className="text-sm font-medium text-slate-700 mb-3">Operations & Readiness</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Has ETL Partner</label>
+                            <p className="text-sm text-slate-900">{school.ssjHasETLPartner || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Ops Guide Track</label>
+                            <p className="text-sm text-slate-900">{school.ssjOpsGuideTrack ? (Array.isArray(school.ssjOpsGuideTrack) ? school.ssjOpsGuideTrack.join(', ') : school.ssjOpsGuideTrack) : '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Readiness Rating</label>
+                            <p className="text-sm text-slate-900">{school.ssjReadinessRating || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Budget Ready</label>
+                            <p className="text-sm text-slate-900">{school.ssjBudgetReady || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Enrollment On Track</label>
+                            <p className="text-sm text-slate-900">{school.ssjEnrollmentOnTrack || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Cohort Status</label>
+                            <p className="text-sm text-slate-900">{school.ssjCohortStatus || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Board Development</label>
+                            <p className="text-sm text-slate-900">{school.ssjBoardDevelopment || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Name Reserved</label>
+                            <p className="text-sm text-slate-900">{school.ssjNameReserved || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Next Big Decision</label>
+                            <p className="text-sm text-slate-900">{school.ssjNextBigDecision || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Facility & Building */}
+                      <div className="mb-6">
+                        <h5 className="text-sm font-medium text-slate-700 mb-3">Facility & Building</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">SSJ Facility</label>
+                            <p className="text-sm text-slate-900">{school.ssjFacility || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">B4G Status</label>
+                            <p className="text-sm text-slate-900">{school.ssjB4GStatus || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Date Shared with N4G</label>
+                            <p className="text-sm text-slate-900">{school.ssjDateSharedWithN4G || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Building4Good Firm</label>
+                            <p className="text-sm text-slate-900">{school.building4GoodFirm || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Funding */}
+                      <div className="mb-6">
+                        <h5 className="text-sm font-medium text-slate-700 mb-3">Funding</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Funding Gap</label>
+                            <p className="text-sm text-slate-900">{school.ssjFundingGap || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Amount Raised</label>
+                            <p className="text-sm text-slate-900">{school.ssjAmountRaised || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Loan Approved Amount</label>
+                            <p className="text-sm text-slate-900">{school.ssjLoanApprovedAmount || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Loan Eligibility</label>
+                            <p className="text-sm text-slate-900">{school.ssjLoanEligibility || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Viable Funding Path</label>
+                            <p className="text-sm text-slate-900">{school.ssjViableFundingPath || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Total Startup Funding Required</label>
+                            <p className="text-sm text-slate-900">{school.ssjTotalStartupFundingReq || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Fundraising Narrative</label>
+                            <p className="text-sm text-slate-900">{school.ssjFundraisingNarrative || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Planning for WF Funding</label>
+                            <p className="text-sm text-slate-900">{school.ssjPlanningForWFFunding || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Albums & Cohorts */}
+                      <div className="mb-6">
+                        <h5 className="text-sm font-medium text-slate-700 mb-3">Albums & Cohorts</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Planning Album</label>
+                            <p className="text-sm text-slate-900">{school.planningAlbum || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Visioning Album</label>
+                            <p className="text-sm text-slate-900">{school.visioningAlbum || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Visioning Album Complete</label>
+                            <p className="text-sm text-slate-900">{school.visioningAlbumComplete ? 'Yes' : 'No'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Cohorts</label>
+                            <p className="text-sm text-slate-900">{school.cohorts ? (Array.isArray(school.cohorts) ? school.cohorts.join(', ') : school.cohorts) : '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Risk & Partners */}
+                      <div className="mb-6">
+                        <h5 className="text-sm font-medium text-slate-700 mb-3">Risk Factors & Partners</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Risk Factors</label>
+                            <p className="text-sm text-slate-900">{school.riskFactors ? (Array.isArray(school.riskFactors) ? school.riskFactors.join(', ') : school.riskFactors) : '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Watchlist</label>
+                            <p className="text-sm text-slate-900">{school.watchlist ? (Array.isArray(school.watchlist) ? school.watchlist.join(', ') : school.watchlist) : '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Active Assigned Partner Email</label>
+                            <p className="text-sm text-slate-900">{school.activeAssignedPartnerEmail || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Active Assigned Partner Override</label>
+                            <p className="text-sm text-slate-900">{school.activeAssignedPartnerOverride || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Active Assigned Partner Short Name</label>
+                            <p className="text-sm text-slate-900">{school.activeAssignedPartnerShortName || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Systems Section */}
+                    <div>
+                      <h4 className="font-medium text-slate-900 mb-4">Systems</h4>
+                      
+                      {/* Communication & Admin */}
+                      <div className="mb-6">
+                        <h5 className="text-sm font-medium text-slate-700 mb-3">Communication & Admin</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Google Voice</label>
+                            <p className="text-sm text-slate-900">{school.googleVoice || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Budget Utility</label>
+                            <p className="text-sm text-slate-900">{school.budgetUtility || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Admissions System</label>
+                            <p className="text-sm text-slate-900">{school.admissionsSystem || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Google Workspace Path</label>
+                            <p className="text-sm text-slate-900">{school.googleWorkspacePath || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Budget Link</label>
+                            <p className="text-sm text-slate-900">{school.budgetLink || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Educational Systems */}
+                      <div className="mb-6">
+                        <h5 className="text-sm font-medium text-slate-700 mb-3">Educational Systems</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Transparent Classroom</label>
+                            <p className="text-sm text-slate-900">{school.transparentClassroom || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">TC Admissions</label>
+                            <p className="text-sm text-slate-900">{school.tcAdmissions || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">TC Recordkeeping</label>
+                            <p className="text-sm text-slate-900">{school.tcRecordkeeping || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Business & Finance */}
+                      <div className="mb-6">
+                        <h5 className="text-sm font-medium text-slate-700 mb-3">Business & Finance</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">QBO</label>
+                            <p className="text-sm text-slate-900">{school.qbo || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Gusto</label>
+                            <p className="text-sm text-slate-900">{school.gusto || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Business Insurance</label>
+                            <p className="text-sm text-slate-900">{school.businessInsurance || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">BillCom Account</label>
+                            <p className="text-sm text-slate-900">{school.billComAccount || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Bookkeeper</label>
+                            <p className="text-sm text-slate-900">{school.bookkeeper || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Branding & Web */}
+                      <div className="mb-6">
+                        <h5 className="text-sm font-medium text-slate-700 mb-3">Branding & Web</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Website Tool</label>
+                            <p className="text-sm text-slate-900">{school.websiteTool || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Logo Designer</label>
+                            <p className="text-sm text-slate-900">{school.logoDesigner || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Name Selection Proposal</label>
+                            <p className="text-sm text-slate-900">{school.nameSelectionProposal || '-'}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Trademark Filed</label>
+                            <p className="text-sm text-slate-900">{school.trademarkFiled || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </TabsContent>
