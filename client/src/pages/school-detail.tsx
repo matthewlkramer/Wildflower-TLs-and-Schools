@@ -2104,7 +2104,7 @@ export default function SchoolDetail() {
                             <Table>
                               <TableHeader>
                                 <TableRow>
-                                  <TableHead>Amount</TableHead>
+                                  <TableHead>Grant Amount</TableHead>
                                   <TableHead>Issued Date</TableHead>
                                   <TableHead>Issued By</TableHead>
                                   <TableHead>Status</TableHead>
@@ -2211,7 +2211,7 @@ export default function SchoolDetail() {
                             <Table>
                               <TableHeader>
                                 <TableRow>
-                                  <TableHead>Amount</TableHead>
+                                  <TableHead>Loan Amount</TableHead>
                                   <TableHead>Status</TableHead>
                                   <TableHead>Interest Rate</TableHead>
                                   <TableHead className="w-[100px]">Actions</TableHead>
