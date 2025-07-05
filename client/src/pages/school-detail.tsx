@@ -26,6 +26,7 @@ import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssoci
 import { getInitials, getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import Header from "@/components/header";
 
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
 
@@ -1003,10 +1004,14 @@ export default function SchoolDetail() {
   const { id } = useParams<{ id: string }>();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("summary");
   const [editingLocationId, setEditingLocationId] = useState<string | null>(null);
   const [deletingLocationId, setDeletingLocationId] = useState<string | null>(null);
   const [locationDeleteModalOpen, setLocationDeleteModalOpen] = useState(false);
   const [isCreatingLocation, setIsCreatingLocation] = useState(false);
+  const [isCreatingTeacher, setIsCreatingTeacher] = useState(false);
+  const [isAssociatingTeacher, setIsAssociatingTeacher] = useState(false);
+  const [isCreatingGuideAssignment, setIsCreatingGuideAssignment] = useState(false);
   const [editingAssociationId, setEditingAssociationId] = useState<string | null>(null);
   const [deletingAssociationId, setDeletingAssociationId] = useState<string | null>(null);
   const [associationDeleteModalOpen, setAssociationDeleteModalOpen] = useState(false);
@@ -1058,6 +1063,32 @@ export default function SchoolDetail() {
     interestRate: 0,
   });
   const { toast } = useToast();
+
+  // Generate Add New options based on active tab
+  const getAddNewOptions = () => {
+    switch (activeTab) {
+      case "tls":
+        return [
+          { label: "Create New Educator", onClick: () => setIsCreatingTeacher(true) },
+          { label: "Associate Existing Educator", onClick: () => setIsAssociatingTeacher(true) }
+        ];
+      case "locations":
+        return [{ label: "Add Location", onClick: () => setIsCreatingLocation(true) }];
+      case "governance":
+        return [{ label: "Add Document", onClick: () => setIsCreatingDocument(true) }];
+      case "guides":
+        return [{ label: "Add Guide Assignment", onClick: () => setIsCreatingGuideAssignment(true) }];
+      case "notes":
+        return [{ label: "Add Note", onClick: () => setIsCreatingNote(true) }];
+      case "grants":
+        return [
+          { label: "Add Grant", onClick: () => setIsCreatingGrant(true) },
+          { label: "Add Loan", onClick: () => setIsCreatingLoan(true) }
+        ];
+      default:
+        return [];
+    }
+  };
 
 
   const { data: school, isLoading } = useQuery<School>({
@@ -1473,10 +1504,13 @@ export default function SchoolDetail() {
 
   return (
     <>
+      <Header 
+        addNewOptions={getAddNewOptions()}
+      />
       <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
         <Card>
           <CardContent className="p-0">
-            <Tabs defaultValue="summary" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="border-b border-slate-200 overflow-x-auto">
                 <div className="flex items-center justify-between">
                   <h1 className="text-2xl font-bold text-wildflower-blue px-3 py-3 flex-shrink-0">
@@ -1706,19 +1740,6 @@ export default function SchoolDetail() {
 
                 <TabsContent value="tls" className="mt-0">
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-slate-900">Teachers</h4>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="bg-wildflower-blue hover:bg-wildflower-blue/90">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create New Educator
-                        </Button>
-                        <Button size="sm" variant="outline" className="border-wildflower-blue text-wildflower-blue hover:bg-wildflower-blue/10">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create Stint for Existing Educator
-                        </Button>
-                      </div>
-                    </div>
                     
                     {associationsLoading ? (
                       <div className="space-y-3">
@@ -1774,17 +1795,6 @@ export default function SchoolDetail() {
 
                 <TabsContent value="locations" className="mt-0">
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-slate-900">Locations</h4>
-                      <Button 
-                        size="sm" 
-                        className="bg-wildflower-blue hover:bg-wildflower-blue/90"
-                        onClick={() => setIsCreatingLocation(true)}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Location
-                      </Button>
-                    </div>
                     
                     {locationsLoading ? (
                       <div className="space-y-3">
@@ -1916,17 +1926,6 @@ export default function SchoolDetail() {
 
                 <TabsContent value="governance" className="mt-0">
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-slate-900">Governance Documents</h4>
-                      <Button 
-                        size="sm" 
-                        className="bg-wildflower-blue hover:bg-wildflower-blue/90"
-                        onClick={() => setIsCreatingDocument(true)}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Document
-                      </Button>
-                    </div>
                     
                     {documentsLoading ? (
                       <div className="space-y-3">
@@ -2027,13 +2026,6 @@ export default function SchoolDetail() {
 
                 <TabsContent value="guides" className="mt-0">
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-slate-900">Guides & Staff</h4>
-                      <Button size="sm" className="bg-wildflower-blue hover:bg-wildflower-blue/90">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Assign Guide
-                      </Button>
-                    </div>
                     
                     {guidesLoading ? (
                       <div className="space-y-3">
@@ -2096,17 +2088,6 @@ export default function SchoolDetail() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* Grants Table */}
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-slate-900">Grants</h4>
-                          <Button 
-                            size="sm" 
-                            className="bg-wildflower-blue hover:bg-wildflower-blue/90"
-                            onClick={() => setIsCreatingGrant(true)}
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add Grant
-                          </Button>
-                        </div>
                         
                         {grantsLoading ? (
                           <div className="space-y-3">
@@ -2214,17 +2195,6 @@ export default function SchoolDetail() {
 
                       {/* Loans Table */}
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-slate-900">Loans</h4>
-                          <Button 
-                            size="sm" 
-                            className="bg-wildflower-blue hover:bg-wildflower-blue/90"
-                            onClick={() => setIsCreatingLoan(true)}
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add Loan
-                          </Button>
-                        </div>
                         
                         {loansLoading ? (
                           <div className="space-y-3">
@@ -2340,7 +2310,6 @@ export default function SchoolDetail() {
 
                 <TabsContent value="notes" className="mt-0">
                   <div className="space-y-4">
-                    <h4 className="font-medium text-slate-900">Notes & Actions</h4>
                     <div className="text-center py-8 text-slate-500">
                       Notes and action items will be displayed here
                     </div>

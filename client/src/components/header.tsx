@@ -1,7 +1,8 @@
 import { Link, useLocation } from "wouter";
-import { Plus, User, Search } from "lucide-react";
+import { Plus, User, Search, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import AddEducatorModal from "./add-teacher-modal";
 import AddSchoolModal from "./add-school-modal";
@@ -13,9 +14,11 @@ interface HeaderProps {
   searchPlaceholder?: string;
   showFilters?: boolean;
   onToggleFilters?: () => void;
+  onAddNew?: () => void;
+  addNewOptions?: Array<{ label: string; onClick: () => void; }>;
 }
 
-export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder, showFilters = false, onToggleFilters }: HeaderProps) {
+export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder, showFilters = false, onToggleFilters, onAddNew, addNewOptions }: HeaderProps) {
   const [location] = useLocation();
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -24,7 +27,9 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
 
   const handleAddNew = () => {
-    if (isTeachersActive) {
+    if (onAddNew) {
+      onAddNew();
+    } else if (isTeachersActive) {
       setShowAddEducatorModal(true);
     } else if (isSchoolsActive) {
       setShowAddSchoolModal(true);
@@ -85,14 +90,36 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                   </div>
                 )}
 
-                <Button 
-                  onClick={handleAddNew}
-                  className="bg-wildflower-blue hover:bg-blue-700 text-white flex-shrink-0"
-                  size="sm"
-                >
-                  <Plus className="h-4 w-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Add New</span>
-                </Button>
+                {addNewOptions && addNewOptions.length > 0 ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        className="bg-wildflower-blue hover:bg-blue-700 text-white flex-shrink-0"
+                        size="sm"
+                      >
+                        <Plus className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Add New</span>
+                        <ChevronDown className="h-4 w-4 ml-1" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {addNewOptions.map((option, index) => (
+                        <DropdownMenuItem key={index} onClick={option.onClick}>
+                          {option.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button 
+                    onClick={handleAddNew}
+                    className="bg-wildflower-blue hover:bg-blue-700 text-white flex-shrink-0"
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Add New</span>
+                  </Button>
+                )}
                 <div className="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center flex-shrink-0">
                   <User className="h-4 w-4 text-slate-600" />
                 </div>
