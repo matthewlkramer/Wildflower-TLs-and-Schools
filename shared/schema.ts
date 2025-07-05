@@ -533,6 +533,52 @@ export const loanSchema = z.object({
   interestRate: z.number().optional(),
 });
 
+export const membershipFeeByYearSchema = z.object({
+  schoolId: z.string().min(1, "School ID is required"),
+  schoolYear: z.string().min(1, "School year is required"),
+  feeAmount: z.number().optional(),
+  status: z.string().optional(),
+  dueDate: z.string().optional(),
+  datePaid: z.string().optional(),
+  paymentMethod: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export const membershipFeeUpdateSchema = z.object({
+  schoolId: z.string().min(1, "School ID is required"),
+  schoolYear: z.string().optional(),
+  updateDate: z.string().optional(),
+  updatedBy: z.string().optional(),
+  updateType: z.string().optional(),
+  previousValue: z.string().optional(),
+  newValue: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export interface MembershipFeeByYear {
+  id: string;
+  schoolId: string;
+  schoolYear: string;
+  feeAmount?: number;
+  status?: string;
+  dueDate?: string;
+  datePaid?: string;
+  paymentMethod?: string;
+  notes?: string;
+}
+
+export interface MembershipFeeUpdate {
+  id: string;
+  schoolId: string;
+  schoolYear?: string;
+  updateDate?: string;
+  updatedBy?: string;
+  updateType?: string;
+  previousValue?: string;
+  newValue?: string;
+  notes?: string;
+}
+
 export type InsertEducator = z.infer<typeof educatorSchema>;
 export type InsertSchool = z.infer<typeof schoolSchema>;
 export type InsertEducatorSchoolAssociation = z.infer<typeof educatorSchoolAssociationSchema>;
@@ -542,6 +588,8 @@ export type InsertGovernanceDocument = z.infer<typeof governanceDocumentSchema>;
 export type InsertSchoolNote = z.infer<typeof schoolNoteSchema>;
 export type InsertGrant = z.infer<typeof grantSchema>;
 export type InsertLoan = z.infer<typeof loanSchema>;
+export type InsertMembershipFeeByYear = z.infer<typeof membershipFeeByYearSchema>;
+export type InsertMembershipFeeUpdate = z.infer<typeof membershipFeeUpdateSchema>;
 
 // Legacy types for backward compatibility
 export type Teacher = Educator;

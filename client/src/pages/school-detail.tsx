@@ -2615,12 +2615,111 @@ export default function SchoolDetail() {
                 </TabsContent>
 
                 <TabsContent value="membership" className="mt-0">
-                  <div className="space-y-4">
-                    <h4 className="font-medium text-slate-900">Membership Fees</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2 text-sm">
-                        <p><span className="text-slate-600">Membership Fee Status:</span> {school.membershipFeeStatus || '-'}</p>
-                        <p><span className="text-slate-600">Membership Fee Amount:</span> {school.membershipFeeAmount ? `$${school.membershipFeeAmount}` : '-'}</p>
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Column 1: Membership Fee by Year Table */}
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-slate-900">Membership Fee by Year</h4>
+                        <div className="border rounded-lg">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>School Year</TableHead>
+                                <TableHead>Fee Amount</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Due Date</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {/* Placeholder data - will be replaced with real data */}
+                              <TableRow 
+                                className="cursor-pointer hover:bg-slate-50"
+                                onClick={() => console.log("Row selected")}
+                              >
+                                <TableCell>2024-2025</TableCell>
+                                <TableCell>$5,000</TableCell>
+                                <TableCell>
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Paid
+                                  </span>
+                                </TableCell>
+                                <TableCell>2024-08-31</TableCell>
+                              </TableRow>
+                              <TableRow 
+                                className="cursor-pointer hover:bg-slate-50"
+                                onClick={() => console.log("Row selected")}
+                              >
+                                <TableCell>2023-2024</TableCell>
+                                <TableCell>$4,800</TableCell>
+                                <TableCell>
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Paid
+                                  </span>
+                                </TableCell>
+                                <TableCell>2023-08-31</TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+
+                      {/* Column 2: Membership Fee Updates Table */}
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-slate-900">Membership Fee Updates</h4>
+                        <div className="border rounded-lg">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Update Date</TableHead>
+                                <TableHead>Updated By</TableHead>
+                                <TableHead>Update Type</TableHead>
+                                <TableHead>Notes</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {/* Placeholder data - will be filtered based on selected year */}
+                              <TableRow>
+                                <TableCell>2024-06-15</TableCell>
+                                <TableCell>Admin User</TableCell>
+                                <TableCell>Fee Adjustment</TableCell>
+                                <TableCell>Annual fee increase</TableCell>
+                              </TableRow>
+                              <TableRow>
+                                <TableCell>2024-03-10</TableCell>
+                                <TableCell>Finance Team</TableCell>
+                                <TableCell>Payment Received</TableCell>
+                                <TableCell>Full payment processed</TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+
+                      {/* Column 3: Calculated Fields */}
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-slate-900">Calculated Fields</h4>
+                        <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Total Fees Paid</label>
+                            <p className="text-lg font-semibold text-slate-900">$9,800</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Outstanding Balance</label>
+                            <p className="text-lg font-semibold text-slate-900">$0</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Average Annual Fee</label>
+                            <p className="text-lg font-semibold text-slate-900">$4,900</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Payment History</label>
+                            <p className="text-sm text-slate-900">2 years on record</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Next Due Date</label>
+                            <p className="text-sm text-slate-900">2025-08-31</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

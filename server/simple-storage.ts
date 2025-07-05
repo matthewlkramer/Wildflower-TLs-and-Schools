@@ -9,6 +9,8 @@ import type {
   SchoolNote,
   Grant,
   Loan,
+  MembershipFeeByYear,
+  MembershipFeeUpdate,
   InsertEducator, 
   InsertSchool, 
   InsertEducatorSchoolAssociation,
@@ -18,6 +20,8 @@ import type {
   InsertSchoolNote,
   InsertGrant,
   InsertLoan,
+  InsertMembershipFeeByYear,
+  InsertMembershipFeeUpdate,
   Teacher,
   TeacherSchoolAssociation,
   InsertTeacher,
@@ -94,6 +98,23 @@ export interface IStorage {
   createLoan(loan: InsertLoan): Promise<Loan>;
   updateLoan(id: string, loan: Partial<InsertLoan>): Promise<Loan | undefined>;
   deleteLoan(id: string): Promise<boolean>;
+
+  // Membership fee by year operations
+  getMembershipFeesByYear(): Promise<MembershipFeeByYear[]>;
+  getMembershipFeeByYear(id: string): Promise<MembershipFeeByYear | undefined>;
+  getMembershipFeesBySchoolId(schoolId: string): Promise<MembershipFeeByYear[]>;
+  createMembershipFeeByYear(fee: InsertMembershipFeeByYear): Promise<MembershipFeeByYear>;
+  updateMembershipFeeByYear(id: string, fee: Partial<InsertMembershipFeeByYear>): Promise<MembershipFeeByYear | undefined>;
+  deleteMembershipFeeByYear(id: string): Promise<boolean>;
+
+  // Membership fee update operations
+  getMembershipFeeUpdates(): Promise<MembershipFeeUpdate[]>;
+  getMembershipFeeUpdate(id: string): Promise<MembershipFeeUpdate | undefined>;
+  getMembershipFeeUpdatesBySchoolId(schoolId: string): Promise<MembershipFeeUpdate[]>;
+  getMembershipFeeUpdatesBySchoolIdAndYear(schoolId: string, schoolYear: string): Promise<MembershipFeeUpdate[]>;
+  createMembershipFeeUpdate(update: InsertMembershipFeeUpdate): Promise<MembershipFeeUpdate>;
+  updateMembershipFeeUpdate(id: string, update: Partial<InsertMembershipFeeUpdate>): Promise<MembershipFeeUpdate | undefined>;
+  deleteMembershipFeeUpdate(id: string): Promise<boolean>;
 
   // Legacy methods for backward compatibility
   getTeachers(): Promise<Teacher[]>;
