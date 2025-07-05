@@ -29,6 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAddNew } from "@/App";
 
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
+import { GoogleMap } from "@/components/google-map";
 
 // TeacherAssociationRow component for inline editing
 function TeacherAssociationRow({ 
@@ -1597,6 +1598,35 @@ export default function SchoolDetail() {
                           )}
                         </div>
                       </div>
+
+                      {/* Location Section with Google Map */}
+                      <div className="mb-6">
+                        <h3 className="text-lg font-medium text-slate-900 mb-4">Location</h3>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          <div>
+                            <GoogleMap 
+                              latitude={school.activeLatitude} 
+                              longitude={school.activeLongitude} 
+                              schoolName={school.name} 
+                            />
+                          </div>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="text-sm font-medium text-slate-600">Current Physical Address</label>
+                              <p className="text-sm text-slate-900">{school.activePhysicalAddress || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600">City, State</label>
+                              <p className="text-sm text-slate-900">
+                                {school.activeLocationCity && school.activeLocationState 
+                                  ? `${school.activeLocationCity}, ${school.activeLocationState}` 
+                                  : '-'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="space-y-3">
                           <div>
@@ -1610,6 +1640,13 @@ export default function SchoolDetail() {
                             <label className="text-sm font-medium text-slate-600">School Open Date</label>
                             <p className="text-sm text-slate-900">{school.openDate || '-'}</p>
                           </div>
+                          {/* Conditional SSJ Projected Open Date */}
+                          {school.ssjStage && ['visioning', 'planning', 'startup'].includes(school.ssjStage.toLowerCase()) && (
+                            <div>
+                              <label className="text-sm font-medium text-slate-600">SSJ Projected Open Date</label>
+                              <p className="text-sm text-slate-900">{school.ssjProjectedOpen || '-'}</p>
+                            </div>
+                          )}
                         </div>
                         <div className="space-y-3">
                           <div>
@@ -1618,12 +1655,18 @@ export default function SchoolDetail() {
                           </div>
                           <div>
                             <label className="text-sm font-medium text-slate-600">Founders</label>
-                            <p className="text-sm text-slate-900">-</p>
+                            <p className="text-sm text-slate-900">{school.founders?.join(', ') || '-'}</p>
                           </div>
                           <div>
                             <label className="text-sm font-medium text-slate-600">School Status</label>
                             <div className="mt-1">
                               <Badge className={getStatusColor(school.status || '')}>{school.status || '-'}</Badge>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">SSJ Stage</label>
+                            <div className="mt-1">
+                              <Badge className={getStatusColor(school.ssjStage || '')}>{school.ssjStage || '-'}</Badge>
                             </div>
                           </div>
                         </div>
@@ -1644,9 +1687,51 @@ export default function SchoolDetail() {
                             </p>
                           </div>
                           <div>
+                            <label className="text-sm font-medium text-slate-600">Current Guide(s)</label>
+                            <p className="text-sm text-slate-900">
+                              {school.currentGuides && Array.isArray(school.currentGuides) && school.currentGuides.length > 0 
+                                ? school.currentGuides.join(', ')
+                                : '-'
+                              }
+                            </p>
+                          </div>
+                          <div>
                             <label className="text-sm font-medium text-slate-600">Membership Status</label>
                             <p className="text-sm text-slate-900">{school.membershipFeeStatus || '-'}</p>
                           </div>
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Risk Factors</label>
+                            <p className="text-sm text-slate-900">
+                              {school.riskFactors && Array.isArray(school.riskFactors) && school.riskFactors.length > 0 
+                                ? school.riskFactors.join(', ')
+                                : '-'
+                              }
+                            </p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-600">Watchlist</label>
+                            <p className="text-sm text-slate-900">
+                              {school.watchlist && Array.isArray(school.watchlist) && school.watchlist.length > 0 
+                                ? school.watchlist.join(', ')
+                                : '-'
+                              }
+                            </p>
+                          </div>
+                          {/* Conditional Left Network Information */}
+                          {school.leftNetworkDate && (
+                            <>
+                              <div>
+                                <label className="text-sm font-medium text-slate-600">Left Network Date</label>
+                                <p className="text-sm text-slate-900">{school.leftNetworkDate}</p>
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium text-slate-600">Left Network Reason</label>
+                                <p className="text-sm text-slate-900">{school.leftNetworkReason || '-'}</p>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>

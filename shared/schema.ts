@@ -80,6 +80,7 @@ export interface School {
   membershipStatus?: string;
   founders?: string[];
   currentTLs?: string[];
+  currentGuides?: string[];
   narrative?: string;
   institutionalPartner?: string;
   about?: string;
