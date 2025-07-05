@@ -1555,6 +1555,9 @@ export default function SchoolDetail() {
                   <TabsTrigger value="support" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
                     Support
                   </TabsTrigger>
+                  <TabsTrigger value="systems" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
+                    Systems
+                  </TabsTrigger>
                   <TabsTrigger value="grants" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
                     Grants/Loans
                   </TabsTrigger>
@@ -2292,103 +2295,106 @@ export default function SchoolDetail() {
                       </div>
                     </div>
 
-                    {/* Systems Section */}
-                    <div>
-                      <h4 className="font-medium text-slate-900 mb-4">Systems</h4>
-                      
-                      {/* Communication & Admin */}
-                      <div className="mb-6">
-                        <h5 className="text-sm font-medium text-slate-700 mb-3">Communication & Admin</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Google Voice</label>
-                            <p className="text-sm text-slate-900">{school.googleVoice || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Budget Utility</label>
-                            <p className="text-sm text-slate-900">{school.budgetUtility || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Admissions System</label>
-                            <p className="text-sm text-slate-900">{school.admissionsSystem || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Google Workspace Path</label>
-                            <p className="text-sm text-slate-900">{school.googleWorkspacePath || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Budget Link</label>
-                            <p className="text-sm text-slate-900">{school.budgetLink || '-'}</p>
-                          </div>
+
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="systems" className="mt-0">
+                  <div className="space-y-6">
+                    <h4 className="font-medium text-slate-900 mb-4">Systems</h4>
+                    
+                    {/* Communication & Admin */}
+                    <div className="mb-6">
+                      <h5 className="text-sm font-medium text-slate-700 mb-3">Communication & Admin</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Google Voice</label>
+                          <p className="text-sm text-slate-900">{school.googleVoice || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Budget Utility</label>
+                          <p className="text-sm text-slate-900">{school.budgetUtility || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Admissions System</label>
+                          <p className="text-sm text-slate-900">{school.admissionsSystem || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Google Workspace Path</label>
+                          <p className="text-sm text-slate-900">{school.googleWorkspacePath || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Budget Link</label>
+                          <p className="text-sm text-slate-900">{school.budgetLink || '-'}</p>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Educational Systems */}
-                      <div className="mb-6">
-                        <h5 className="text-sm font-medium text-slate-700 mb-3">Educational Systems</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Transparent Classroom</label>
-                            <p className="text-sm text-slate-900">{school.transparentClassroom || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">TC Admissions</label>
-                            <p className="text-sm text-slate-900">{school.tcAdmissions || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">TC Recordkeeping</label>
-                            <p className="text-sm text-slate-900">{school.tcRecordkeeping || '-'}</p>
-                          </div>
+                    {/* Educational Systems */}
+                    <div className="mb-6">
+                      <h5 className="text-sm font-medium text-slate-700 mb-3">Educational Systems</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Transparent Classroom</label>
+                          <p className="text-sm text-slate-900">{school.transparentClassroom || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">TC Admissions</label>
+                          <p className="text-sm text-slate-900">{school.tcAdmissions || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">TC Recordkeeping</label>
+                          <p className="text-sm text-slate-900">{school.tcRecordkeeping || '-'}</p>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Business & Finance */}
-                      <div className="mb-6">
-                        <h5 className="text-sm font-medium text-slate-700 mb-3">Business & Finance</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">QBO</label>
-                            <p className="text-sm text-slate-900">{school.qbo || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Gusto</label>
-                            <p className="text-sm text-slate-900">{school.gusto || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Business Insurance</label>
-                            <p className="text-sm text-slate-900">{school.businessInsurance || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">BillCom Account</label>
-                            <p className="text-sm text-slate-900">{school.billComAccount || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Bookkeeper</label>
-                            <p className="text-sm text-slate-900">{school.bookkeeper || '-'}</p>
-                          </div>
+                    {/* Business & Finance */}
+                    <div className="mb-6">
+                      <h5 className="text-sm font-medium text-slate-700 mb-3">Business & Finance</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">QBO</label>
+                          <p className="text-sm text-slate-900">{school.qbo || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Gusto</label>
+                          <p className="text-sm text-slate-900">{school.gusto || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Business Insurance</label>
+                          <p className="text-sm text-slate-900">{school.businessInsurance || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">BillCom Account</label>
+                          <p className="text-sm text-slate-900">{school.billComAccount || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Bookkeeper</label>
+                          <p className="text-sm text-slate-900">{school.bookkeeper || '-'}</p>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Branding & Web */}
-                      <div className="mb-6">
-                        <h5 className="text-sm font-medium text-slate-700 mb-3">Branding & Web</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Website Tool</label>
-                            <p className="text-sm text-slate-900">{school.websiteTool || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Logo Designer</label>
-                            <p className="text-sm text-slate-900">{school.logoDesigner || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Name Selection Proposal</label>
-                            <p className="text-sm text-slate-900">{school.nameSelectionProposal || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Trademark Filed</label>
-                            <p className="text-sm text-slate-900">{school.trademarkFiled || '-'}</p>
-                          </div>
+                    {/* Branding & Web */}
+                    <div className="mb-6">
+                      <h5 className="text-sm font-medium text-slate-700 mb-3">Branding & Web</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Website Tool</label>
+                          <p className="text-sm text-slate-900">{school.websiteTool || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Logo Designer</label>
+                          <p className="text-sm text-slate-900">{school.logoDesigner || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Name Selection Proposal</label>
+                          <p className="text-sm text-slate-900">{school.nameSelectionProposal || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Trademark Filed</label>
+                          <p className="text-sm text-slate-900">{school.trademarkFiled || '-'}</p>
                         </div>
                       </div>
                     </div>
