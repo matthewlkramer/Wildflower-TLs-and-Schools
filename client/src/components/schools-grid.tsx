@@ -192,13 +192,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       cellRenderer: StatusBadgeCellRenderer,
       filter: "agTextColumnFilter",
     },
-    {
-      field: "membershipFeeStatus",
-      headerName: "Membership Status",
-      width: 160,
-      cellRenderer: StatusBadgeCellRenderer,
-      filter: "agTextColumnFilter",
-    },
+
     {
       field: "actions",
       headerName: "Actions",
