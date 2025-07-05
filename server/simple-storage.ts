@@ -140,6 +140,7 @@ export class SimpleAirtableStorage implements IStorage {
       householdIncome: fields["Household Income"] || undefined,
       incomeBackground: fields["Income Background"] || undefined,
       individualType: fields["Individual Type"] || undefined,
+      activeSchool: fields["Currently Active School"] || undefined,
       activeSchoolStageStatus: fields["Stage_Status for Active School"] || undefined,
       firstContactRelocate: fields['First Contact - Willingness to Relocate'] || '',
       firstContactGovernance: fields['First Contact - Initial Interest in Governance Model'] || '',
