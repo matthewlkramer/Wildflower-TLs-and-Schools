@@ -90,7 +90,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                   </div>
                 )}
 
-                {addNewOptions && addNewOptions.length > 0 ? (
+                {addNewOptions && addNewOptions.length > 1 ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button 
@@ -110,6 +110,15 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
+                ) : addNewOptions && addNewOptions.length === 1 ? (
+                  <Button 
+                    onClick={addNewOptions[0].onClick}
+                    className="bg-wildflower-blue hover:bg-blue-700 text-white flex-shrink-0"
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">{addNewOptions[0].label}</span>
+                  </Button>
                 ) : (
                   <Button 
                     onClick={handleAddNew}
