@@ -11,7 +11,7 @@ import { Link } from "wouter";
 import { Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { type Teacher } from "@shared/schema";
+import { type Educator } from "@shared/schema";
 import { getStatusColor } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
 
 interface TeachersGridProps {
-  teachers: Teacher[];
+  teachers: Educator[];
   isLoading: boolean;
 }
 
@@ -87,7 +87,7 @@ const PillRenderer = ({ value }: { value: string | string[] }) => {
 };
 
 // Action buttons renderer
-const ActionRenderer = ({ data: teacher }: { data: Teacher }) => {
+const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
   const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
@@ -96,14 +96,14 @@ const ActionRenderer = ({ data: teacher }: { data: Teacher }) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
       toast({
-        title: "Teacher deleted",
-        description: "The teacher has been successfully deleted.",
+        title: "Educator deleted",
+        description: "The educator has been successfully deleted.",
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to delete teacher. Please try again.",
+        description: "Failed to delete educator. Please try again.",
         variant: "destructive",
       });
     },
@@ -134,7 +134,7 @@ const ActionRenderer = ({ data: teacher }: { data: Teacher }) => {
           deleteMutation.mutate(teacher.id);
           setShowDeleteModal(false);
         }}
-        title="Delete Teacher"
+        title="Delete Educator"
         description={`Are you sure you want to delete ${teacher.fullName}? This action cannot be undone.`}
         isLoading={deleteMutation.isPending}
       />
@@ -168,7 +168,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "fullName",
       filter: 'agTextColumnFilter',
       minWidth: 200,
-      cellRenderer: ({ data: teacher }: { data: Teacher }) => (
+      cellRenderer: ({ data: teacher }: { data: Educator }) => (
         <Link href={`/teacher/${teacher.id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
           {teacher.fullName}
         </Link>
@@ -189,7 +189,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "startupStageForActiveSchool",
       filter: 'agTextColumnFilter',
       minWidth: 180,
-      cellRenderer: ({ data }: { data: Teacher }) => (
+      cellRenderer: ({ data }: { data: Educator }) => (
         <BadgeRenderer value={data.startupStageForActiveSchool || []} field="stageStatus" />
       )
     },
@@ -198,7 +198,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "currentRole",
       filter: 'agTextColumnFilter',
       minWidth: 150,
-      cellRenderer: ({ data }: { data: Teacher }) => (
+      cellRenderer: ({ data }: { data: Educator }) => (
         <PillRenderer value={data.currentRole || ''} />
       )
     },
@@ -207,7 +207,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "montessoriCertified",
       filter: 'agTextColumnFilter',
       minWidth: 160,
-      cellRenderer: ({ data }: { data: Teacher }) => (
+      cellRenderer: ({ data }: { data: Educator }) => (
         <BadgeRenderer value={String(data.montessoriCertified || 'No')} field="montessoriCertified" />
       )
     },
@@ -216,7 +216,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "raceEthnicity",
       filter: 'agTextColumnFilter',
       minWidth: 140,
-      cellRenderer: ({ data }: { data: Teacher }) => (
+      cellRenderer: ({ data }: { data: Educator }) => (
         <PillRenderer value={data.raceEthnicity || []} />
       )
     },
@@ -225,7 +225,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "discoveryStatus",
       filter: 'agTextColumnFilter',
       minWidth: 140,
-      cellRenderer: ({ data }: { data: Teacher }) => (
+      cellRenderer: ({ data }: { data: Educator }) => (
         <BadgeRenderer value={data.discoveryStatus || ''} field="discoveryStatus" />
       )
     },
@@ -234,7 +234,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "individualType",
       filter: 'agTextColumnFilter',
       minWidth: 120,
-      cellRenderer: ({ data }: { data: Teacher }) => (
+      cellRenderer: ({ data }: { data: Educator }) => (
         <PillRenderer value={data.individualType || ''} />
       )
     },
