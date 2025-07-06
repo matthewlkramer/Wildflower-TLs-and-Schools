@@ -1601,7 +1601,6 @@ export default function SchoolDetail() {
 
                       {/* Location Section with Google Map */}
                       <div className="mb-6">
-                        <h3 className="text-lg font-medium text-slate-900 mb-4">Location</h3>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                           <div>
                             <GoogleMap 
@@ -1615,14 +1614,6 @@ export default function SchoolDetail() {
                             <div>
                               <label className="text-sm font-medium text-slate-600">Current Physical Address</label>
                               <p className="text-sm text-slate-900">{school.activePhysicalAddress || '-'}</p>
-                            </div>
-                            <div>
-                              <label className="text-sm font-medium text-slate-600">City, State</label>
-                              <p className="text-sm text-slate-900">
-                                {school.activeLocationCity && school.activeLocationState 
-                                  ? `${school.activeLocationCity}, ${school.activeLocationState}` 
-                                  : '-'}
-                              </p>
                             </div>
                           </div>
                         </div>
@@ -1737,26 +1728,27 @@ export default function SchoolDetail() {
                       </div>
                     </div>
 
-                    {/* School Information Section */}
-                    <div>
-                      <h3 className="text-lg font-medium text-slate-900 mb-4">School Information</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Program Focus</label>
-                          <p className="text-sm text-slate-900">-</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Max Capacity</label>
-                          <p className="text-sm text-slate-900">{school.enrollmentCap || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Number of Classrooms</label>
-                          <p className="text-sm text-slate-900">-</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Public Funding</label>
-                          <p className="text-sm text-slate-900">{school.publicFunding ? 'Yes' : 'No'}</p>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      <div>
+                        <label className="text-sm font-medium text-slate-600">Program Focus</label>
+                        <p className="text-sm text-slate-900">-</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-slate-600">Max Capacity</label>
+                        <p className="text-sm text-slate-900">{school.enrollmentCap || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-slate-600">Number of Classrooms</label>
+                        <p className="text-sm text-slate-900">-</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-slate-600">Public Funding Sources</label>
+                        <p className="text-sm text-slate-900">
+                          {school.publicFundingSources && Array.isArray(school.publicFundingSources) && school.publicFundingSources.length > 0 
+                            ? school.publicFundingSources.join(', ')
+                            : '-'
+                          }
+                        </p>
                       </div>
                     </div>
 
