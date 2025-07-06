@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./simple-storage";
+import { cache } from "./cache";
 import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -721,6 +722,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(notes);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch educator notes for educator" });
+    }
+  });
+
+  // Cache statistics endpoint for monitoring
+  app.get("/api/cache/stats", async (req, res) => {
+    try {
+      const stats = cache.getStats();
+      res.json({
+        ...stats,
+        ttl: "5 minutes",
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get cache statistics" });
     }
   });
 

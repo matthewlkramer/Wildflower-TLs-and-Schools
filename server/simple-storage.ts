@@ -1,4 +1,5 @@
 import { base } from "./airtable-schema";
+import { cache } from "./cache";
 import type { 
   Educator, 
   School, 
@@ -353,9 +354,23 @@ export class SimpleAirtableStorage implements IStorage {
 
   // Educator operations
   async getEducators(): Promise<Educator[]> {
+    // Check cache first
+    const cacheKey = 'educators:all';
+    const cached = cache.get<Educator[]>(cacheKey);
+    if (cached) {
+      console.log('[Cache Hit] Educators');
+      return cached;
+    }
+
     try {
       const records = await base("Educators").select().all();
-      return records.map(record => this.transformEducatorRecord(record));
+      const educators = records.map(record => this.transformEducatorRecord(record));
+      
+      // Cache the results
+      cache.set(cacheKey, educators);
+      console.log('[Cache Miss] Educators - fetched from Airtable');
+      
+      return educators;
     } catch (error) {
       console.error("Error fetching educators from Airtable:", error);
       throw error;
@@ -430,9 +445,23 @@ export class SimpleAirtableStorage implements IStorage {
 
   // School operations
   async getSchools(): Promise<School[]> {
+    // Check cache first
+    const cacheKey = 'schools:all';
+    const cached = cache.get<School[]>(cacheKey);
+    if (cached) {
+      console.log('[Cache Hit] Schools');
+      return cached;
+    }
+
     try {
       const records = await base("Schools").select().all();
-      return records.map(record => this.transformSchoolRecord(record));
+      const schools = records.map(record => this.transformSchoolRecord(record));
+      
+      // Cache the results
+      cache.set(cacheKey, schools);
+      console.log('[Cache Miss] Schools - fetched from Airtable');
+      
+      return schools;
     } catch (error) {
       console.error("Error fetching schools from Airtable:", error);
       throw error;
