@@ -1729,10 +1729,14 @@ export default function SchoolDetail() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       <div>
                         <label className="text-sm font-medium text-slate-600">Max Capacity</label>
                         <p className="text-sm text-slate-900">{school.enrollmentCap || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-slate-600">Number of Classrooms</label>
+                        <p className="text-sm text-slate-900">{school.numberOfClassrooms || '-'}</p>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-slate-600">Public Funding Sources</label>
