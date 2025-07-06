@@ -80,6 +80,7 @@ export interface School {
   id: string; // Airtable record ID
   name: string;
   shortName?: string;
+  fullName?: string;
   priorNames?: string;
   logo?: string;
   programFocus?: string;
@@ -96,18 +97,26 @@ export interface School {
   about?: string;
   aboutSpanish?: string;
   agesServed?: string[];
+  grades?: string[];
   governanceModel?: string;
   status?: string;
   stageStatus?: string;  
   openDate?: string;
+  targetOpenDate?: string;
   enrollmentCap?: number;
+  currentEnrollment?: number;
+  tuitionRange?: string;
   numberClassrooms?: number;
+  numberOfClassrooms?: string;
   publicFundingSources?: string[];
   flexibleTuition?: string;
   activePodMember?: string;
 
   // Location
   address?: string; // Legacy field for compatibility
+  city?: string;
+  state?: string;
+  zipCode?: string;
   activePhysicalAddress?: string;
   currentPhysicalAddress?: boolean; // Added for Airtable checkbox field
   currentMailingAddress?: boolean; // Added for Airtable checkbox field
@@ -213,6 +222,8 @@ export interface School {
   googleWorkspacePath?: string;
   budgetLink?: string;
   bookkeeper?: string;
+  lgbtqia?: boolean;
+  excludeFromEmailLogging?: any;
 
   lastModified?: string;
   createdTime?: string;
@@ -451,6 +462,15 @@ export const schoolSchema = z.object({
   longitude: z.number().optional(),
   timezone: z.string().optional(),
   currentTLs: z.union([z.string(), z.number()]).optional(),
+  currentGuides: z.array(z.string()).optional(),
+  programFocus: z.string().optional(),
+  numberOfClassrooms: z.string().optional(),
+  leftNetworkDate: z.string().optional(),
+  leftNetworkReason: z.string().optional(),
+  publicFundingSources: z.array(z.string()).optional(),
+  activePhysicalAddress: z.string().optional(),
+  activeLatitude: z.number().optional(),
+  activeLongitude: z.number().optional(),
   // SSJ/OSS Data
   ssjStage: z.string().optional(),
   ssjTargetCity: z.string().optional(),
@@ -674,6 +694,43 @@ export interface EventAttendance {
   notes?: string;
   created?: string;
   lastModified?: string;
+}
+
+// Grant interface
+export interface Grant {
+  id: string; // Airtable record ID
+  schoolId: string;
+  amount?: number;
+  issuedDate?: string;
+  issuedBy?: string;
+  status?: string;
+}
+
+// Loan interface
+export interface Loan {
+  id: string; // Airtable record ID
+  schoolId: string;
+  amount?: number;
+  status?: string;
+  interestRate?: number;
+}
+
+// School Note interface
+export interface SchoolNote {
+  id: string; // Airtable record ID
+  schoolId: string;
+  dateCreated?: string;
+  createdBy?: string;
+  notes?: string;
+}
+
+// Governance Document interface
+export interface GovernanceDocument {
+  id: string; // Airtable record ID
+  schoolId: string;
+  docType?: string;
+  doc?: string;
+  dateEntered?: string;
 }
 
 export const ssjFilloutFormSchema = z.object({

@@ -1728,7 +1728,7 @@ export default function SchoolDetail() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                       <div>
                         <label className="text-sm font-medium text-slate-600">Program Focus</label>
-                        <p className="text-sm text-slate-900">-</p>
+                        <p className="text-sm text-slate-900">{school.programFocus || '-'}</p>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-slate-600">Max Capacity</label>
@@ -1736,7 +1736,7 @@ export default function SchoolDetail() {
                       </div>
                       <div>
                         <label className="text-sm font-medium text-slate-600">Number of Classrooms</label>
-                        <p className="text-sm text-slate-900">-</p>
+                        <p className="text-sm text-slate-900">{school.numberOfClassrooms || '-'}</p>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-slate-600">Public Funding Sources</label>
