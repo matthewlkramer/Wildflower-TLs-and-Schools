@@ -11,6 +11,9 @@ import { getStatusColor } from "@/lib/utils";
 import { EmailAddressesTable } from "@/components/email-addresses-table";
 import { EducatorSchoolAssociationsTable } from "@/components/educator-school-associations-table";
 import { SSJFilloutFormsTable } from "@/components/ssj-fillout-forms-table";
+import { MontessoriCertificationsTable } from "@/components/montessori-certifications-table";
+import { EventAttendanceTable } from "@/components/event-attendance-table";
+import { EducatorNotesTable } from "@/components/educator-notes-table";
 
 
 export default function TeacherDetail() {
@@ -261,31 +264,22 @@ export default function TeacherDetail() {
 
               <TabsContent value="certs" className="mt-0">
                 <div className="space-y-4">
-                  <h4 className="font-medium text-slate-900">Certifications & Training</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2 text-sm">
-                      <p><span className="text-slate-600">Certifier:</span> {teacher.certifier ? (Array.isArray(teacher.certifier) ? teacher.certifier.join(', ') : teacher.certifier) : '-'}</p>
-                      <p><span className="text-slate-600">Montessori Lead Guide Trainings:</span> {teacher.montessoriLeadGuideTrainings ? (Array.isArray(teacher.montessoriLeadGuideTrainings) ? teacher.montessoriLeadGuideTrainings.join(', ') : teacher.montessoriLeadGuideTrainings) : '-'}</p>
-                    </div>
-                  </div>
+                  <h4 className="font-medium text-slate-900">Montessori Certifications</h4>
+                  <MontessoriCertificationsTable educatorId={teacher.id} />
                 </div>
               </TabsContent>
 
               <TabsContent value="events" className="mt-0">
                 <div className="space-y-4">
-                  <h4 className="font-medium text-slate-900">Events & Activities</h4>
-                  <div className="text-center py-8 text-slate-500">
-                    Event information will be displayed here
-                  </div>
+                  <h4 className="font-medium text-slate-900">Event Attendance</h4>
+                  <EventAttendanceTable educatorId={teacher.id} />
                 </div>
               </TabsContent>
 
               <TabsContent value="notes" className="mt-0">
                 <div className="space-y-4">
-                  <h4 className="font-medium text-slate-900">Notes & Actions</h4>
-                  <div className="text-center py-8 text-slate-500">
-                    Notes and action items will be displayed here
-                  </div>
+                  <h4 className="font-medium text-slate-900">Educator Notes</h4>
+                  <EducatorNotesTable educatorId={teacher.id} />
                 </div>
               </TabsContent>
 

@@ -121,6 +121,7 @@ Changelog:
 - July 05, 2025. Implemented Email Addresses table in Teacher Contact Info tab with full AG Grid integration and Airtable backend support
 - July 06, 2025. Fixed all subtable filtering to use correct Airtable field names: {school_id} for school-related tables and {educator_id} for educator-related tables - email addresses functionality now working correctly
 - July 06, 2025. Implemented comprehensive early cultivation data tracking in Teacher detail Cultivation tab with 12 key data points including computed most recent fillout form date, geographic interest, SendGrid tracking, follow-up management, and organized layout with proper Airtable field mappings
+- July 06, 2025. Converted all static teacher tabs to dynamic filtered tables: Certs tab now shows MontessoriCertificationsTable, Events tab shows EventAttendanceTable, and Notes tab shows EducatorNotesTable - all filtered by educator_id following consistent AG Grid pattern
 ```
 
 ## User Preferences

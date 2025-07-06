@@ -636,6 +636,38 @@ export interface SSJFilloutForm {
   lastModified?: string;
 }
 
+// Montessori Certifications
+export interface MontessoriCertification {
+  id: string; // Airtable record ID
+  educatorId?: string;
+  certificationLevel?: string;
+  certificationStatus?: string;
+  certifier?: string;
+  trainingProgram?: string;
+  dateReceived?: string;
+  expirationDate?: string;
+  certificationNumber?: string;
+  notes?: string;
+  created?: string;
+  lastModified?: string;
+}
+
+// Event Attendance
+export interface EventAttendance {
+  id: string; // Airtable record ID
+  educatorId?: string;
+  eventName?: string;
+  eventType?: string;
+  eventDate?: string;
+  attendanceStatus?: string;
+  registrationDate?: string;
+  completionStatus?: string;
+  certificateIssued?: boolean;
+  notes?: string;
+  created?: string;
+  lastModified?: string;
+}
+
 export const ssjFilloutFormSchema = z.object({
   educatorId: z.string().optional(),
   formName: z.string().optional(),
@@ -644,6 +676,30 @@ export const ssjFilloutFormSchema = z.object({
   status: z.string().optional(),
   submissionId: z.string().optional(),
   responseData: z.any().optional(),
+  notes: z.string().optional(),
+});
+
+export const montessoriCertificationSchema = z.object({
+  educatorId: z.string().optional(),
+  certificationLevel: z.string().optional(),
+  certificationStatus: z.string().optional(),
+  certifier: z.string().optional(),
+  trainingProgram: z.string().optional(),
+  dateReceived: z.string().optional(),
+  expirationDate: z.string().optional(),
+  certificationNumber: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export const eventAttendanceSchema = z.object({
+  educatorId: z.string().optional(),
+  eventName: z.string().optional(),
+  eventType: z.string().optional(),
+  eventDate: z.string().optional(),
+  attendanceStatus: z.string().optional(),
+  registrationDate: z.string().optional(),
+  completionStatus: z.string().optional(),
+  certificateIssued: z.boolean().optional(),
   notes: z.string().optional(),
 });
 
@@ -660,6 +716,8 @@ export type InsertMembershipFeeByYear = z.infer<typeof membershipFeeByYearSchema
 export type InsertMembershipFeeUpdate = z.infer<typeof membershipFeeUpdateSchema>;
 export type InsertEmailAddress = z.infer<typeof emailAddressSchema>;
 export type InsertSSJFilloutForm = z.infer<typeof ssjFilloutFormSchema>;
+export type InsertMontessoriCertification = z.infer<typeof montessoriCertificationSchema>;
+export type InsertEventAttendance = z.infer<typeof eventAttendanceSchema>;
 
 // Legacy types for backward compatibility
 export type Teacher = Educator;
