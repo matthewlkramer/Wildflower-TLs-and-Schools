@@ -9,6 +9,8 @@ import { Link } from "wouter";
 import { type Teacher } from "@shared/schema";
 import { getStatusColor } from "@/lib/utils";
 import { EmailAddressesTable } from "@/components/email-addresses-table";
+import { EducatorSchoolAssociationsTable } from "@/components/educator-school-associations-table";
+import { SSJFilloutFormsTable } from "@/components/ssj-fillout-forms-table";
 
 
 export default function TeacherDetail() {
@@ -68,6 +70,9 @@ export default function TeacherDetail() {
                 </TabsTrigger>
                 <TabsTrigger value="schools" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
                   Schools
+                </TabsTrigger>
+                <TabsTrigger value="online-forms" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
+                  Online Forms
                 </TabsTrigger>
                 <TabsTrigger value="cultivation" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
                   Early Cultivation
@@ -173,15 +178,13 @@ export default function TeacherDetail() {
 
               <TabsContent value="schools" className="mt-0">
                 <div className="space-y-4">
-                  <h4 className="font-medium text-slate-900">School Associations</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2 text-sm">
-                      <p><span className="text-slate-600">All Schools:</span> {teacher.activeSchool ? (Array.isArray(teacher.activeSchool) ? teacher.activeSchool.join(', ') : teacher.activeSchool) : '-'}</p>
-                      <p><span className="text-slate-600">School Statuses:</span> {teacher.activeSchoolStageStatus ? (Array.isArray(teacher.activeSchoolStageStatus) ? teacher.activeSchoolStageStatus.join(', ') : teacher.activeSchoolStageStatus) : '-'}</p>
-                      <p><span className="text-slate-600">On School Board:</span> {teacher.onSchoolBoard || '-'}</p>
-                      <p><span className="text-slate-600">Ever a TL in Open School:</span> {teacher.everATLInAnOpenSchool ? 'Yes' : 'No'}</p>
-                    </div>
-                  </div>
+                  <EducatorSchoolAssociationsTable educatorId={teacher.id} />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="online-forms" className="mt-0">
+                <div className="space-y-4">
+                  <SSJFilloutFormsTable educatorId={teacher.id} />
                 </div>
               </TabsContent>
 

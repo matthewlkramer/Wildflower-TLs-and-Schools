@@ -224,6 +224,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/educator-school-associations", async (req, res) => {
+    try {
+      const associations = await storage.getEducatorSchoolAssociations();
+      res.json(associations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch educator school associations" });
+    }
+  });
+
+  app.get("/api/educator-school-associations/educator/:educatorId", async (req, res) => {
+    try {
+      const educatorId = req.params.educatorId;
+      const associations = await storage.getEducatorAssociations(educatorId);
+      res.json(associations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch educator associations" });
+    }
+  });
+
   app.post("/api/teacher-school-associations", async (req, res) => {
     try {
       const associationData = educatorSchoolAssociationSchema.parse(req.body);
@@ -636,6 +655,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(emailAddress);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch email address" });
+    }
+  });
+
+  // SSJ Fillout Forms routes
+  app.get("/api/ssj-fillout-forms", async (req, res) => {
+    try {
+      const forms = await storage.getSSJFilloutForms();
+      res.json(forms);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch SSJ fillout forms" });
+    }
+  });
+
+  app.get("/api/ssj-fillout-forms/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const form = await storage.getSSJFilloutForm(id);
+      if (!form) {
+        return res.status(404).json({ message: "SSJ fillout form not found" });
+      }
+      res.json(form);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch SSJ fillout form" });
+    }
+  });
+
+  app.get("/api/ssj-fillout-forms/educator/:educatorId", async (req, res) => {
+    try {
+      const educatorId = req.params.educatorId;
+      const forms = await storage.getSSJFilloutFormsByEducatorId(educatorId);
+      res.json(forms);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch SSJ fillout forms for educator" });
     }
   });
 

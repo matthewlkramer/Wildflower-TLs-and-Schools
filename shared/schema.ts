@@ -601,6 +601,32 @@ export interface MembershipFeeUpdate {
   notes?: string;
 }
 
+// SSJ Fillout Forms
+export interface SSJFilloutForm {
+  id: string; // Airtable record ID
+  educatorId?: string;
+  formName?: string;
+  formType?: string;
+  dateSubmitted?: string;
+  status?: string;
+  submissionId?: string;
+  responseData?: any;
+  notes?: string;
+  created?: string;
+  lastModified?: string;
+}
+
+export const ssjFilloutFormSchema = z.object({
+  educatorId: z.string().optional(),
+  formName: z.string().optional(),
+  formType: z.string().optional(),
+  dateSubmitted: z.string().optional(),
+  status: z.string().optional(),
+  submissionId: z.string().optional(),
+  responseData: z.any().optional(),
+  notes: z.string().optional(),
+});
+
 export type InsertEducator = z.infer<typeof educatorSchema>;
 export type InsertSchool = z.infer<typeof schoolSchema>;
 export type InsertEducatorSchoolAssociation = z.infer<typeof educatorSchoolAssociationSchema>;
@@ -613,6 +639,7 @@ export type InsertLoan = z.infer<typeof loanSchema>;
 export type InsertMembershipFeeByYear = z.infer<typeof membershipFeeByYearSchema>;
 export type InsertMembershipFeeUpdate = z.infer<typeof membershipFeeUpdateSchema>;
 export type InsertEmailAddress = z.infer<typeof emailAddressSchema>;
+export type InsertSSJFilloutForm = z.infer<typeof ssjFilloutFormSchema>;
 
 // Legacy types for backward compatibility
 export type Teacher = Educator;

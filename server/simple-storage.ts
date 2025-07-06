@@ -24,6 +24,8 @@ import type {
   InsertMembershipFeeByYear,
   InsertMembershipFeeUpdate,
   InsertEmailAddress,
+  SSJFilloutForm,
+  InsertSSJFilloutForm,
   Teacher,
   TeacherSchoolAssociation,
   InsertTeacher,
@@ -125,6 +127,14 @@ export interface IStorage {
   createEmailAddress(emailAddress: InsertEmailAddress): Promise<EmailAddress>;
   updateEmailAddress(id: string, emailAddress: Partial<InsertEmailAddress>): Promise<EmailAddress | undefined>;
   deleteEmailAddress(id: string): Promise<boolean>;
+
+  // SSJ Fillout Forms operations
+  getSSJFilloutForms(): Promise<SSJFilloutForm[]>;
+  getSSJFilloutForm(id: string): Promise<SSJFilloutForm | undefined>;
+  getSSJFilloutFormsByEducatorId(educatorId: string): Promise<SSJFilloutForm[]>;
+  createSSJFilloutForm(form: InsertSSJFilloutForm): Promise<SSJFilloutForm>;
+  updateSSJFilloutForm(id: string, form: Partial<InsertSSJFilloutForm>): Promise<SSJFilloutForm | undefined>;
+  deleteSSJFilloutForm(id: string): Promise<boolean>;
 
   // Legacy methods for backward compatibility
   getTeachers(): Promise<Teacher[]>;
@@ -1222,6 +1232,86 @@ export class SimpleAirtableStorage implements IStorage {
   async deleteEmailAddress(id: string): Promise<boolean> {
     // Mock implementation - in reality this would delete from Airtable
     return true;
+  }
+
+  // SSJ Fillout Forms operations
+  async getSSJFilloutForms(): Promise<SSJFilloutForm[]> {
+    try {
+      const records = await base('SSJ Fillout Forms').select().all();
+      return records.map(record => this.transformSSJFilloutFormRecord(record));
+    } catch (error) {
+      console.warn('Warning: Unable to fetch SSJ fillout forms:', error);
+      return [];
+    }
+  }
+
+  async getSSJFilloutForm(id: string): Promise<SSJFilloutForm | undefined> {
+    const forms = await this.getSSJFilloutForms();
+    return forms.find(form => form.id === id);
+  }
+
+  async getSSJFilloutFormsByEducatorId(educatorId: string): Promise<SSJFilloutForm[]> {
+    try {
+      const records = await base('SSJ Fillout Forms').select({
+        filterByFormula: `{educator_id} = '${educatorId}'`
+      }).all();
+      
+      return records.map(record => this.transformSSJFilloutFormRecord(record));
+    } catch (error) {
+      console.warn(`Warning: Unable to fetch SSJ fillout forms for educator ${educatorId}:`, error);
+      return [];
+    }
+  }
+
+  async createSSJFilloutForm(form: InsertSSJFilloutForm): Promise<SSJFilloutForm> {
+    const newForm: SSJFilloutForm = {
+      id: `ssj_${Date.now()}`,
+      educatorId: form.educatorId,
+      formName: form.formName,
+      formType: form.formType,
+      dateSubmitted: form.dateSubmitted,
+      status: form.status,
+      submissionId: form.submissionId,
+      responseData: form.responseData,
+      notes: form.notes,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+    return newForm;
+  }
+
+  async updateSSJFilloutForm(id: string, form: Partial<InsertSSJFilloutForm>): Promise<SSJFilloutForm | undefined> {
+    // Mock implementation - in reality this would update in Airtable
+    const existing = await this.getSSJFilloutForm(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...form,
+      lastModified: new Date().toISOString(),
+    };
+  }
+
+  async deleteSSJFilloutForm(id: string): Promise<boolean> {
+    // Mock implementation - in reality this would delete from Airtable
+    return true;
+  }
+
+  private transformSSJFilloutFormRecord(record: any): SSJFilloutForm {
+    const fields = record.fields;
+    return {
+      id: record.id,
+      educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
+      formName: fields["Form Name"] || undefined,
+      formType: fields["Form Type"] || undefined,
+      dateSubmitted: fields["Date Submitted"] || undefined,
+      status: fields["Status"] || undefined,
+      submissionId: fields["Submission ID"] || undefined,
+      responseData: fields["Response Data"] || undefined,
+      notes: fields["Notes"] || undefined,
+      created: fields["Created"] || record.get('Created'),
+      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+    };
   }
 
   private transformEmailAddressRecord(record: any): EmailAddress {
