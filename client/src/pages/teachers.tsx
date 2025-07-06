@@ -8,7 +8,7 @@ export default function Teachers() {
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
 
-  const filteredTeachers = teachers?.filter((teacher: Teacher) => {
+  const filteredTeachers = (teachers || []).filter((teacher: Teacher) => {
     const matchesSearch = (teacher.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (teacher.primaryPhone || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (teacher.currentRole?.join(' ') || '').toLowerCase().includes(searchTerm.toLowerCase());

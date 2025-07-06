@@ -725,6 +725,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generic subtable route for dynamic table access
+  app.get("/api/subtable/:tableName", async (req, res) => {
+    try {
+      const tableName = req.params.tableName;
+      const queryParams = req.query;
+      
+      // Route to specific implementation based on table name
+      switch (tableName) {
+        case "Montessori Certs":
+        case "Montessori%20Certs":
+          if (queryParams.educator_id) {
+            const certifications = await storage.getMontessoriCertificationsByEducatorId(queryParams.educator_id as string);
+            return res.json(certifications);
+          }
+          break;
+        case "Event Attendance":
+          if (queryParams.educator_id) {
+            const attendance = await storage.getEventAttendancesByEducatorId(queryParams.educator_id as string);
+            return res.json(attendance);
+          }
+          break;
+        case "Educator Notes":
+          if (queryParams.educator_id) {
+            const notes = await storage.getEducatorNotesByEducatorId(queryParams.educator_id as string);
+            return res.json(notes);
+          }
+          break;
+        case "Email Addresses":
+          if (queryParams.educator_id) {
+            const emails = await storage.getEmailAddressesByEducatorId(queryParams.educator_id as string);
+            return res.json(emails);
+          }
+          break;
+        case "SSJ Fillout Forms":
+          if (queryParams.educator_id) {
+            const forms = await storage.getSSJFilloutFormsByEducatorId(queryParams.educator_id as string);
+            return res.json(forms);
+          }
+          break;
+        case "Governance docs":
+        case "Governance documents":
+          if (queryParams.school_id) {
+            const docs = await storage.getGovernanceDocumentsBySchoolId(queryParams.school_id as string);
+            return res.json(docs);
+          }
+          break;
+        case "Guides Assignments":
+          if (queryParams.school_id) {
+            const assignments = await storage.getGuideAssignmentsBySchoolId(queryParams.school_id as string);
+            return res.json(assignments);
+          }
+          break;
+        case "School Notes":
+          if (queryParams.school_id) {
+            const notes = await storage.getSchoolNotesBySchoolId(queryParams.school_id as string);
+            return res.json(notes);
+          }
+          break;
+        default:
+          return res.status(404).json({ message: `Table '${tableName}' not supported` });
+      }
+      
+      res.status(400).json({ message: "Missing required filter parameter" });
+    } catch (error) {
+      console.error(`Error fetching subtable ${req.params.tableName}:`, error);
+      res.status(500).json({ message: `Failed to fetch ${req.params.tableName}` });
+    }
+  });
+
   // Cache statistics endpoint for monitoring
   app.get("/api/cache/stats", async (req, res) => {
     try {

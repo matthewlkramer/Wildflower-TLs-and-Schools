@@ -7,9 +7,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { insertSchoolSchema } from "@shared/schema";
+import { Textarea } from "@/components/ui/textarea";
+import { schoolSchema } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+
+const addSchoolSchema = schoolSchema.pick({
+  name: true,
+  shortName: true,
+  agesServed: true,
+  governanceModel: true,
+  about: true,
+  phone: true,
+  email: true,
+  website: true,
+  membershipStatus: true,
+  ssjTargetCity: true,
+  ssjTargetState: true
+}).extend({
+  name: z.string().min(1, "School name is required"),
+  ssjTargetCity: z.string().optional(),
+  ssjTargetState: z.string().optional()
+});
 
 interface AddSchoolModalProps {
   open: boolean;
@@ -20,18 +40,19 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
   const { toast } = useToast();
 
   const form = useForm({
-    resolver: zodResolver(insertSchoolSchema),
+    resolver: zodResolver(addSchoolSchema),
     defaultValues: {
       name: "",
-      address: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      type: "Elementary",
-      established: 2020,
-      status: "Active",
+      shortName: "",
+      agesServed: [],
+      governanceModel: "",
+      about: "",
       phone: "",
       email: "",
+      website: "",
+      membershipStatus: "",
+      ssjTargetCity: "",
+      ssjTargetState: ""
     },
   });
 
@@ -63,69 +84,21 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New School</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>School Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter school name" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>School Type</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Elementary">Elementary</SelectItem>
-                      <SelectItem value="Middle School">Middle School</SelectItem>
-                      <SelectItem value="High School">High School</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter address" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="city"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City</FormLabel>
+                    <FormLabel>School Name *</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter city" />
+                      <Input {...field} placeholder="Enter school name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -133,70 +106,157 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
               />
               <FormField
                 control={form.control}
-                name="state"
+                name="shortName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>State</FormLabel>
+                    <FormLabel>Short Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter state" />
+                      <Input {...field} placeholder="Enter short name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="governanceModel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Governance Model</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select governance model" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Independent">Independent</SelectItem>
+                        <SelectItem value="Charter">Charter</SelectItem>
+                        <SelectItem value="Public">Public</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="membershipStatus"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Membership Status</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select membership status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Member">Member</SelectItem>
+                        <SelectItem value="Prospective">Prospective</SelectItem>
+                        <SelectItem value="Former">Former</SelectItem>
+                        <SelectItem value="Partner">Partner</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="ssjTargetCity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Target City</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter target city" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="ssjTargetState"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Target State</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter target state" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="tel" placeholder="Enter phone number" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="email" placeholder="Enter email address" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="website"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Website</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="url" placeholder="Enter website URL" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="zipCode"
+              name="about"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>ZIP Code</FormLabel>
+                  <FormLabel>About</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter ZIP code" />
+                    <Textarea 
+                      {...field} 
+                      placeholder="Enter description about the school"
+                      className="min-h-[100px]"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="established"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Established Year</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="number" placeholder="Enter year" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="tel" placeholder="Enter phone number" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="email" placeholder="Enter email address" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <div className="flex justify-end space-x-3 pt-4">
               <Button
                 type="button"
@@ -207,7 +267,7 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
               </Button>
               <Button
                 type="submit"
-                className="bg-wildflower-blue hover:bg-blue-700"
+                className="bg-wildflower-green hover:bg-green-700"
                 disabled={createSchoolMutation.isPending}
               >
                 {createSchoolMutation.isPending ? "Creating..." : "Add School"}

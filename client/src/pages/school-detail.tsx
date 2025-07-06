@@ -1607,7 +1607,8 @@ export default function SchoolDetail() {
                             <GoogleMap 
                               latitude={school.activeLatitude} 
                               longitude={school.activeLongitude} 
-                              schoolName={school.name} 
+                              schoolName={school.name}
+                              fallbackAddress={school.activePhysicalAddress}
                             />
                           </div>
                           <div className="space-y-4">

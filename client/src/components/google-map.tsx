@@ -5,6 +5,7 @@ interface GoogleMapProps {
   latitude?: number;
   longitude?: number;
   schoolName?: string;
+  fallbackAddress?: string;
 }
 
 interface MapComponentProps {
@@ -44,7 +45,7 @@ const MapComponent = ({ center, zoom, schoolName }: MapComponentProps) => {
   return <div ref={ref} className="w-full h-64 rounded-lg" />;
 };
 
-const render = (status: Status) => {
+const render = (status: Status, latitude?: number, longitude?: number, schoolName?: string) => {
   switch (status) {
     case Status.LOADING:
       return <div className="w-full h-64 rounded-lg bg-slate-100 flex items-center justify-center">
@@ -55,16 +56,26 @@ const render = (status: Status) => {
         <p className="text-slate-500">Error loading map</p>
       </div>;
     case Status.SUCCESS:
-      return <MapComponent center={{ lat: 0, lng: 0 }} zoom={15} />;
+      return <MapComponent center={{ lat: latitude || 0, lng: longitude || 0 }} zoom={15} schoolName={schoolName} />;
   }
 };
 
-export function GoogleMap({ latitude, longitude, schoolName }: GoogleMapProps) {
-  // If no coordinates are provided, don't render the map
+export function GoogleMap({ latitude, longitude, schoolName, fallbackAddress }: GoogleMapProps) {
+  // If no coordinates are provided but we have an address, show a message about using address
   if (!latitude || !longitude) {
+    if (fallbackAddress) {
+      return (
+        <div className="w-full h-64 rounded-lg bg-slate-100 flex items-center justify-center">
+          <div className="text-center p-4">
+            <p className="text-slate-600 mb-2">Map coordinates not available</p>
+            <p className="text-sm text-slate-500">Location: {fallbackAddress}</p>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="w-full h-64 rounded-lg bg-slate-100 flex items-center justify-center">
-        <p className="text-slate-500">Location coordinates not available</p>
+        <p className="text-slate-500">Location information not available</p>
       </div>
     );
   }
@@ -74,7 +85,7 @@ export function GoogleMap({ latitude, longitude, schoolName }: GoogleMapProps) {
   return (
     <Wrapper 
       apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""} 
-      render={render}
+      render={(status) => render(status, latitude, longitude, schoolName)}
       libraries={["marker"]}
     >
       <MapComponent center={center} zoom={15} schoolName={schoolName} />

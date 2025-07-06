@@ -136,6 +136,10 @@ Changelog:
 - July 06, 2025. Implemented server-side caching system to optimize performance: added 5-minute TTL cache for educators and schools data, reducing Airtable API calls from ~6000ms to ~50ms for cached requests, created cache monitoring endpoint at /api/cache/stats for performance tracking
 - July 06, 2025. Major refactoring for code maintainability: created shared/constants.ts for centralized constants, shared/utils.ts for common utility functions, client/src/utils/ag-grid-utils.ts for reusable AG Grid configurations, client/src/hooks/use-api-query.ts for consistent data fetching patterns, server/error-handler.ts for centralized error handling
 - July 06, 2025. Comprehensive TypeScript error resolution: fixed missing interface implementation by adding all MembershipFeeUpdate methods, resolved property mapping errors for Grant, MontessoriCertification, EventAttendance, and MembershipFeeByYear interfaces, fixed client-side type issues in teachers.tsx and schools.tsx, removed invalid properties from object transformations to ensure type safety
+- July 06, 2025. Fixed Montessori certifications loading issue by creating missing subtable route in server/routes.ts to handle generic table queries with proper filtering parameters
+- July 06, 2025. Resolved Google Maps and current physical address display issues by adding missing field mappings (activeLatitude, activeLongitude, activePhysicalAddress) to school transformation and implementing fallback address display when coordinates unavailable
+- July 06, 2025. Created comprehensive "Add New" forms throughout application: implemented AddSchoolModal with validation and integrated into schools page with Add School button, leveraging existing AddEducatorModal for complete CRUD functionality
+- July 06, 2025. Provided 22 comprehensive UI improvement suggestions covering navigation, data presentation, forms, visual hierarchy, mobile responsiveness, and performance optimizations for enhanced user experience
 ```
 
 ## User Preferences
