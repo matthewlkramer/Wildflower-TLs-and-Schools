@@ -133,15 +133,12 @@ export default function TeacherDetail() {
                         <p><span className="text-slate-600">Name:</span> {teacher.fullName}</p>
                         <p><span className="text-slate-600">Current Role:</span> {teacher.currentRole ? (Array.isArray(teacher.currentRole) ? teacher.currentRole.join(', ') : teacher.currentRole) : '-'}</p>
                         <div><span className="text-slate-600">Discovery Status:</span> <Badge className={getStatusColor(teacher.discoveryStatus || '')}>{teacher.discoveryStatus || '-'}</Badge></div>
-                        <p><span className="text-slate-600">Individual Type:</span> {teacher.individualType || '-'}</p>
                       </div>
                     </div>
                     <div className="bg-slate-50 rounded-lg p-4">
                       <h4 className="font-medium text-slate-900 mb-2">Education & Certs</h4>
                       <div className="space-y-1 text-sm">
-                        <p><span className="text-slate-600">Educational Attainment:</span> {teacher.educationalAttainment || '-'}</p>
                         <div><span className="text-slate-600">Montessori Certified:</span> <Badge className={teacher.montessoriCertified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>{teacher.montessoriCertified ? 'Yes' : 'No'}</Badge></div>
-                        <p><span className="text-slate-600">Certification Levels:</span> {teacher.certificationLevels ? (Array.isArray(teacher.certificationLevels) ? teacher.certificationLevels.join(', ') : teacher.certificationLevels) : '-'}</p>
                       </div>
                     </div>
                     <div className="bg-slate-50 rounded-lg p-4">
@@ -170,7 +167,6 @@ export default function TeacherDetail() {
                       {teacher.gender?.toLowerCase() === 'other' && (
                         <p><span className="text-slate-600">Gender (Other):</span> {teacher.genderOther || '-'}</p>
                       )}
-                      <p><span className="text-slate-600">Educational Attainment:</span> {teacher.educationalAttainment || '-'}</p>
                       <p><span className="text-slate-600">Race/Ethnicity:</span> {teacher.raceEthnicity ? (Array.isArray(teacher.raceEthnicity) ? teacher.raceEthnicity.join(', ') : teacher.raceEthnicity) : '-'}</p>
                       {/* Conditional Race/Ethnicity Other */}
                       {teacher.raceEthnicity && (Array.isArray(teacher.raceEthnicity) ? teacher.raceEthnicity.some(re => re.toLowerCase().includes('other')) : teacher.raceEthnicity.toLowerCase().includes('other')) && (
@@ -182,6 +178,7 @@ export default function TeacherDetail() {
                       <p><span className="text-slate-600">Other Languages:</span> {teacher.otherLanguages ? (Array.isArray(teacher.otherLanguages) ? teacher.otherLanguages.join(', ') : teacher.otherLanguages) : '-'}</p>
                       <p><span className="text-slate-600">Household Income:</span> {teacher.householdIncome || '-'}</p>
                       <p><span className="text-slate-600">Income Background:</span> {teacher.incomeBackground || '-'}</p>
+                      <p><span className="text-slate-600">Educational Attainment:</span> {teacher.educationalAttainment || '-'}</p>
                     </div>
                   </div>
                 </div>
