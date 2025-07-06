@@ -559,8 +559,32 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getEducatorAssociations(educatorId: string): Promise<EducatorSchoolAssociation[]> {
-    const allAssociations = await this.getEducatorSchoolAssociations();
-    return allAssociations.filter(assoc => assoc.educatorId === educatorId);
+    try {
+      // Query the "Educators x Schools" table filtered by educator_id field
+      const records = await base("Educators x Schools").select({
+        filterByFormula: `{educator_id} = '${educatorId}'`
+      }).all();
+      
+      // Get all schools to map school IDs to short names
+      const schools = await this.getSchools();
+      const schoolMap = new Map(schools.map(school => [school.id, school.shortName || school.name]));
+      
+      return records.map(record => ({
+        id: record.id,
+        educatorId: Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || ''),
+        schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
+        schoolShortName: schoolMap.get(Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || '')) || '',
+        role: record.fields["Roles"] ? [String(record.fields["Roles"])] : [], // Changed to array
+        startDate: String(record.fields["Start Date"] || ''),
+        endDate: String(record.fields["End Date"] || ''),
+        isActive: record.fields["Currently Active"] === true || record.fields["Currently Active"] === "true",
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Created"] || new Date().toISOString()),
+      }));
+    } catch (error) {
+      console.error(`Error fetching educator associations for ${educatorId}:`, error);
+      return [];
+    }
   }
 
   async getSchoolAssociations(schoolId: string): Promise<EducatorSchoolAssociation[]> {
@@ -570,10 +594,15 @@ export class SimpleAirtableStorage implements IStorage {
         filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
+      // Get all schools to map school IDs to short names
+      const schools = await this.getSchools();
+      const schoolMap = new Map(schools.map(school => [school.id, school.shortName || school.name]));
+      
       return records.map(record => ({
         id: record.id,
         educatorId: Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || ''),
         schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
+        schoolShortName: schoolMap.get(Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || '')) || '',
         role: record.fields["Roles"] ? [String(record.fields["Roles"])] : [], // Changed to array
         startDate: String(record.fields["Start Date"] || ''),
         endDate: String(record.fields["End Date"] || ''),

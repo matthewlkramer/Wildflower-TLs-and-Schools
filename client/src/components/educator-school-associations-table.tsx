@@ -22,7 +22,7 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
   const columnDefs: ColDef<EducatorSchoolAssociation>[] = [
     {
       headerName: "School",
-      field: "schoolId",
+      field: "schoolShortName",
       flex: 2,
       filter: "agTextColumnFilter",
     },
