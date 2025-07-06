@@ -1690,7 +1690,7 @@ export default function SchoolDetail() {
                           </div>
                           <div>
                             <label className="text-sm font-medium text-slate-600">Membership Status</label>
-                            <p className="text-sm text-slate-900">{school.membershipFeeStatus || '-'}</p>
+                            <p className="text-sm text-slate-900">{school.membershipStatus || '-'}</p>
                           </div>
                         </div>
                         <div className="space-y-3">
