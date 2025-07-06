@@ -249,6 +249,8 @@ export class SimpleAirtableStorage implements IStorage {
   // Helper method to transform Airtable record to School
   private transformSchoolRecord(record: any): School {
     const fields = record.fields;
+    
+
     return {
       id: record.id,
       name: fields["Name"] || fields["School Name"] || "",
@@ -292,7 +294,7 @@ export class SimpleAirtableStorage implements IStorage {
       governanceModel: fields["Governance Model"] || undefined,
       status: fields["Stage_Status"] || undefined,
       stageStatus: fields["Stage_Status"] || undefined,
-      openDate: fields["Open Date"] || undefined,
+      openDate: fields["Open Date"] || fields["SSJ - Original Projected Open Date"] || fields["Entered Startup Date"] || undefined,
       enrollmentCap: fields["Enrollment at Full Capacity"] || undefined,
       lastModified: fields["Last Modified"] || undefined,
       currentTLs: fields["Current TLs"] || undefined,

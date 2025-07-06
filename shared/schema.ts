@@ -224,6 +224,13 @@ export interface School {
   bookkeeper?: string;
   lgbtqia?: boolean;
   excludeFromEmailLogging?: any;
+  targetGeo?: string;
+  targetIntl?: string;
+  assignedPartnerEmail?: string;
+  assignedPartnerOverride?: string;
+  assignedPartnerShortName?: string;
+  selfReflection?: string;
+  inactiveFlag?: string;
 
   lastModified?: string;
   createdTime?: string;

@@ -1725,28 +1725,29 @@ export default function SchoolDetail() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <div>
-                        <label className="text-sm font-medium text-slate-600">Program Focus</label>
-                        <p className="text-sm text-slate-900">{school.programFocus || '-'}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-slate-600">Max Capacity</label>
-                        <p className="text-sm text-slate-900">{school.enrollmentCap || '-'}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-slate-600">Number of Classrooms</label>
-                        <p className="text-sm text-slate-900">{school.numberOfClassrooms || '-'}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-slate-600">Public Funding Sources</label>
-                        <p className="text-sm text-slate-900">
-                          {school.publicFundingSources && Array.isArray(school.publicFundingSources) && school.publicFundingSources.length > 0 
-                            ? school.publicFundingSources.join(', ')
-                            : '-'
-                          }
-                        </p>
-                      </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {school.enrollmentCap && (
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Max Capacity</label>
+                          <p className="text-sm text-slate-900">{school.enrollmentCap}</p>
+                        </div>
+                      )}
+                      {school.publicFundingSources && Array.isArray(school.publicFundingSources) && school.publicFundingSources.length > 0 && (
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Public Funding Sources</label>
+                          <p className="text-sm text-slate-900">
+                            {school.publicFundingSources.join(', ')}
+                          </p>
+                        </div>
+                      )}
+                      {school.agesServed && Array.isArray(school.agesServed) && school.agesServed.length > 0 && (
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Ages Served</label>
+                          <p className="text-sm text-slate-900">
+                            {school.agesServed.join(', ')}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
 
