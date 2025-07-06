@@ -1180,18 +1180,38 @@ export class SimpleAirtableStorage implements IStorage {
   async getEmailAddressesByEducatorId(educatorId: string): Promise<EmailAddress[]> {
     // Try different possible table names for email addresses
     const possibleTableNames = ['Email Addresses', 'Email addresses', 'Emails', 'Email Address', 'Email'];
+    // Try different possible field names for educator relationship
+    const possibleFieldNames = ['Educator', 'Teachers', 'Individual', 'Person', 'Teacher', 'Educators'];
     
     for (const tableName of possibleTableNames) {
+      for (const fieldName of possibleFieldNames) {
+        try {
+          console.log(`Trying table: ${tableName}, field: ${fieldName} for educator: ${educatorId}`);
+          const records = await base(tableName).select({
+            filterByFormula: `{${fieldName}} = '${educatorId}'`
+          }).all();
+          
+          if (records.length > 0) {
+            console.log(`Found ${records.length} email addresses using field: ${fieldName}`);
+            return records.map(record => this.transformEmailAddressRecord(record));
+          }
+        } catch (error) {
+          continue; // Try next field name
+        }
+      }
+      
+      // If no field names worked, try getting all records from this table to see the structure
       try {
-        const records = await base(tableName).select({
-          filterByFormula: `{Educator} = '${educatorId}'`
+        console.log(`Getting sample records from table: ${tableName} to analyze structure`);
+        const allRecords = await base(tableName).select({
+          maxRecords: 3
         }).all();
         
-        if (records.length > 0) {
-          return records.map(record => this.transformEmailAddressRecord(record));
+        if (allRecords.length > 0) {
+          console.log(`Sample fields in ${tableName}:`, Object.keys(allRecords[0].fields));
         }
         
-        // If we get here, the table exists but has no data for this educator
+        // Table exists, return empty array
         return [];
       } catch (error) {
         continue; // Try next table name
