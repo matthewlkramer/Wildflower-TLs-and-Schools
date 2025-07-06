@@ -288,31 +288,7 @@ export interface EducatorNote {
   lastModified?: string;
 }
 
-export interface MontessoriCertification {
-  id: string; // Airtable record ID
-  educatorId: string;
-  certificationLevel?: string;
-  certificationOrganization?: string;
-  dateIssued?: string;
-  expirationDate?: string;
-  status?: string;
-  notes?: string;
-  created?: string;
-  lastModified?: string;
-}
-
-export interface EventAttendance {
-  id: string; // Airtable record ID
-  educatorId: string;
-  eventName?: string;
-  eventDate?: string;
-  eventType?: string;
-  attendanceStatus?: string;
-  role?: string;
-  notes?: string;
-  created?: string;
-  lastModified?: string;
-}
+// Note: MontessoriCertification and EventAttendance interfaces are defined later in the file to avoid duplicates
 
 export interface Grant {
   id: string; // Airtable record ID

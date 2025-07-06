@@ -8,10 +8,9 @@ export default function Schools() {
 
   const { data: schools, isLoading, prefetchSchool } = useCachedSchools();
 
-  const filteredSchools = schools?.filter(school => {
+  const filteredSchools = schools?.filter((school: School) => {
     const matchesSearch = (school.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (school.city || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (school.schoolType || '').toLowerCase().includes(searchTerm.toLowerCase());
+                         (school.status || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     return matchesSearch;
   });
@@ -22,7 +21,6 @@ export default function Schools() {
         <SchoolsGrid 
           schools={filteredSchools || []} 
           isLoading={isLoading}
-          onRowHover={prefetchSchool}
         />
       </div>
     </main>

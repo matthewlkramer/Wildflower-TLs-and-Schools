@@ -1,5 +1,6 @@
 import { base } from "./airtable-schema";
 import { cache } from "./cache";
+import { handleError } from "./error-handler";
 import type { 
   Educator, 
   School, 
@@ -272,7 +273,6 @@ export class SimpleAirtableStorage implements IStorage {
       priorNames: fields['Prior Names'] || '',
       narrative: fields['Narrative'] || '',
       institutionalPartner: fields['Institutional partner'] || null,
-      opened: fields['Opened'] || null,
       membershipStatus: fields['Membership Status'] || '',
       founders: fields['Founders'] || [],
       membershipAgreementDate: fields['Membership Agreement date'] || '',
@@ -281,16 +281,11 @@ export class SimpleAirtableStorage implements IStorage {
       about: fields['About'] || '',
       aboutSpanish: fields['About Spanish'] || '',
       agesServed: fields["Ages served"] || undefined,
-      schoolType: fields["School Type"] || fields["Type"] || undefined,
       governanceModel: fields["Governance Model"] || undefined,
       status: fields["Stage_Status"] || undefined,
       stageStatus: fields["Stage_Status"] || undefined,
       openDate: fields["Open Date"] || undefined,
-      targetOpenDate: fields["Target Open Date"] || undefined,
       enrollmentCap: fields["Enrollment at Full Capacity"] || undefined,
-      publicFunding: fields["Public funding sources"] || false,
-      latitude: fields["Latitude"] || undefined,
-      longitude: fields["Longitude"] || undefined,
       timezone: fields["Timezone"] || undefined,
       created: fields["Created"] || undefined,
       lastModified: fields["Last Modified"] || undefined,
@@ -372,7 +367,8 @@ export class SimpleAirtableStorage implements IStorage {
       
       return educators;
     } catch (error) {
-      console.error("Error fetching educators from Airtable:", error);
+      const errorInfo = handleError(error);
+      console.error("Error fetching educators from Airtable:", errorInfo.message);
       throw error;
     }
   }
@@ -562,9 +558,9 @@ export class SimpleAirtableStorage implements IStorage {
         educatorId: Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || ''),
         schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
         role: record.fields["Roles"] ? [String(record.fields["Roles"])] : [], // Changed to array
-        startDate: record.fields["Start Date"] || '',
-        endDate: record.fields["End Date"] || '',
-        isActive: record.fields["Currently Active"],
+        startDate: String(record.fields["Start Date"] || ''),
+        endDate: String(record.fields["End Date"] || ''),
+        isActive: record.fields["Currently Active"] === true || record.fields["Currently Active"] === "true",
         created: String(record.fields["Created"] || new Date().toISOString()),
         lastModified: String(record.fields["Created"] || new Date().toISOString()),
       }));
@@ -909,10 +905,11 @@ export class SimpleAirtableStorage implements IStorage {
         };
       });
     } catch (error) {
-      if (error.error === 'NOT_AUTHORIZED' || error.statusCode === 403) {
+      const errorInfo = handleError(error);
+      if (errorInfo.statusCode === 403) {
         console.warn(`Access denied to "Governance docs" table. This table may not exist in your Airtable base or the API key may not have permission to access it.`);
       } else {
-        console.error(`Error fetching governance documents for ${schoolId}:`, error);
+        console.error(`Error fetching governance documents for ${schoolId}:`, errorInfo.message);
       }
       return [];
     }
@@ -961,7 +958,6 @@ export class SimpleAirtableStorage implements IStorage {
         dateCreated: '2024-01-15',
         createdBy: 'Jane Smith',
         notes: 'Initial school assessment completed. Strong community support noted.',
-        created: new Date().toISOString(),
         lastModified: new Date().toISOString(),
       },
       {
@@ -970,7 +966,6 @@ export class SimpleAirtableStorage implements IStorage {
         dateCreated: '2024-03-20',
         createdBy: 'John Doe',
         notes: 'Follow-up meeting scheduled with board members. Need to review enrollment projections.',
-        created: new Date().toISOString(),
         lastModified: new Date().toISOString(),
       }
     ];
@@ -1020,7 +1015,6 @@ export class SimpleAirtableStorage implements IStorage {
       dateCreated: note.dateCreated,
       createdBy: note.createdBy,
       notes: note.notes,
-      created: new Date().toISOString(),
       lastModified: new Date().toISOString(),
     };
     return newNote;
@@ -1054,7 +1048,6 @@ export class SimpleAirtableStorage implements IStorage {
         schoolId: schools[0]?.id || 'mock_school_1',
         amount: 50000,
         issuedDate: '2023-07-01',
-        issuedBy: 'Education Foundation',
         status: 'Active',
         created: new Date().toISOString(),
         lastModified: new Date().toISOString(),
@@ -1064,7 +1057,6 @@ export class SimpleAirtableStorage implements IStorage {
         schoolId: schools[0]?.id || 'mock_school_1',
         amount: 25000,
         issuedDate: '2024-01-15',
-        issuedBy: 'Local Community Fund',
         status: 'Pending',
         created: new Date().toISOString(),
         lastModified: new Date().toISOString(),
@@ -1116,7 +1108,6 @@ export class SimpleAirtableStorage implements IStorage {
       schoolId: grant.schoolId,
       amount: grant.amount,
       issuedDate: grant.issuedDate,
-      issuedBy: grant.issuedBy,
       status: grant.status,
       created: new Date().toISOString(),
       lastModified: new Date().toISOString(),
@@ -1439,10 +1430,7 @@ export class SimpleAirtableStorage implements IStorage {
       id: `cert_${Date.now()}`,
       educatorId: certification.educatorId,
       certificationLevel: certification.certificationLevel,
-      certificationOrganization: certification.certificationOrganization,
-      dateIssued: certification.dateIssued,
       expirationDate: certification.expirationDate,
-      status: certification.status,
       notes: certification.notes,
       created: new Date().toISOString(),
       lastModified: new Date().toISOString(),
@@ -1471,10 +1459,7 @@ export class SimpleAirtableStorage implements IStorage {
       id: record.id,
       educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
       certificationLevel: fields["Certification Level"] || undefined,
-      certificationOrganization: fields["Certification Organization"] || fields["Organization"] || undefined,
-      dateIssued: fields["Date Issued"] || undefined,
       expirationDate: fields["Expiration Date"] || undefined,
-      status: fields["Status"] || undefined,
       notes: fields["Notes"] || undefined,
       created: fields["Created"] || record.get('Created'),
       lastModified: fields["Last Modified"] || record.get('Last Modified'),
@@ -1525,7 +1510,6 @@ export class SimpleAirtableStorage implements IStorage {
       eventDate: attendance.eventDate,
       eventType: attendance.eventType,
       attendanceStatus: attendance.attendanceStatus,
-      role: attendance.role,
       notes: attendance.notes,
       created: new Date().toISOString(),
       lastModified: new Date().toISOString(),
@@ -1557,7 +1541,6 @@ export class SimpleAirtableStorage implements IStorage {
       eventDate: fields["Event Date"] || fields["Date"] || undefined,
       eventType: fields["Event Type"] || fields["Type"] || undefined,
       attendanceStatus: fields["Attendance Status"] || fields["Status"] || undefined,
-      role: fields["Role"] || undefined,
       notes: fields["Notes"] || undefined,
       created: fields["Created"] || record.get('Created'),
       lastModified: fields["Last Modified"] || record.get('Last Modified'),
@@ -1684,11 +1667,100 @@ export class SimpleAirtableStorage implements IStorage {
       id: record.id,
       schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
       schoolYear: fields["School Year"] || undefined,
-      membershipFee: fields["Membership Fee"] || undefined,
-      dateUpdated: fields["Date Updated"] || undefined,
       notes: fields["Notes"] || undefined,
-      created: fields["Created"] || record.get('Created'),
-      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+    };
+  }
+
+  // Membership fee update operations implementation
+  async getMembershipFeeUpdates(): Promise<MembershipFeeUpdate[]> {
+    try {
+      const table = base('Membership Fee Updates');
+      const records = await table.select().all();
+      return records.map(record => this.transformMembershipFeeUpdateRecord(record));
+    } catch (error) {
+      console.error('Error fetching membership fee updates:', error);
+      return [];
+    }
+  }
+
+  async getMembershipFeeUpdate(id: string): Promise<MembershipFeeUpdate | undefined> {
+    try {
+      const table = base('Membership Fee Updates');
+      const record = await table.find(id);
+      return this.transformMembershipFeeUpdateRecord(record);
+    } catch (error) {
+      console.error('Error fetching membership fee update:', error);
+      return undefined;
+    }
+  }
+
+  async getMembershipFeeUpdatesBySchoolId(schoolId: string): Promise<MembershipFeeUpdate[]> {
+    try {
+      const table = base('Membership Fee Updates');
+      const records = await table.select({
+        filterByFormula: `{school_id} = "${schoolId}"`
+      }).all();
+      return records.map(record => this.transformMembershipFeeUpdateRecord(record));
+    } catch (error) {
+      console.error('Error fetching membership fee updates by school ID:', error);
+      return [];
+    }
+  }
+
+  async getMembershipFeeUpdatesBySchoolIdAndYear(schoolId: string, schoolYear: string): Promise<MembershipFeeUpdate[]> {
+    try {
+      const table = base('Membership Fee Updates');
+      const records = await table.select({
+        filterByFormula: `AND({school_id} = "${schoolId}", {School Year} = "${schoolYear}")`
+      }).all();
+      return records.map(record => this.transformMembershipFeeUpdateRecord(record));
+    } catch (error) {
+      console.error('Error fetching membership fee updates by school ID and year:', error);
+      return [];
+    }
+  }
+
+  async createMembershipFeeUpdate(update: InsertMembershipFeeUpdate): Promise<MembershipFeeUpdate> {
+    const newUpdate: MembershipFeeUpdate = {
+      id: `fee_update_${Date.now()}`,
+      schoolId: update.schoolId,
+      schoolYear: update.schoolYear,
+      updateDate: update.updateDate,
+      updateType: update.updateType,
+      previousValue: update.previousValue,
+      newValue: update.newValue,
+      updatedBy: update.updatedBy,
+      notes: update.notes,
+    };
+    return newUpdate;
+  }
+
+  async updateMembershipFeeUpdate(id: string, update: Partial<InsertMembershipFeeUpdate>): Promise<MembershipFeeUpdate | undefined> {
+    const existing = await this.getMembershipFeeUpdate(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...update,
+    };
+  }
+
+  async deleteMembershipFeeUpdate(id: string): Promise<boolean> {
+    return true;
+  }
+
+  private transformMembershipFeeUpdateRecord(record: any): MembershipFeeUpdate {
+    const fields = record.fields;
+    return {
+      id: record.id,
+      schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
+      schoolYear: fields["School Year"] || undefined,
+      updateDate: fields["Update Date"] || undefined,
+      updateType: fields["Update Type"] || undefined,
+      previousValue: fields["Previous Value"] || undefined,
+      newValue: fields["New Value"] || undefined,
+      updatedBy: fields["Updated By"] || undefined,
+      notes: fields["Notes"] || undefined,
     };
   }
 }

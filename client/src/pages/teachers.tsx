@@ -8,7 +8,7 @@ export default function Teachers() {
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
 
-  const filteredTeachers = teachers?.filter(teacher => {
+  const filteredTeachers = teachers?.filter((teacher: Teacher) => {
     const matchesSearch = (teacher.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (teacher.primaryPhone || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (teacher.currentRole?.join(' ') || '').toLowerCase().includes(searchTerm.toLowerCase());
@@ -22,7 +22,6 @@ export default function Teachers() {
         <TeachersGrid 
           teachers={filteredTeachers || []} 
           isLoading={isLoading}
-          onRowHover={prefetchEducator}
         />
       </div>
     </main>

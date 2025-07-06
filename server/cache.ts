@@ -53,13 +53,13 @@ class Cache {
     let validEntries = 0;
     let expiredEntries = 0;
 
-    for (const [key, entry] of this.cache.entries()) {
+    Array.from(this.cache.values()).forEach((entry) => {
       if (now - entry.timestamp > entry.ttl) {
         expiredEntries++;
       } else {
         validEntries++;
       }
-    }
+    });
 
     return {
       totalEntries: this.cache.size,
