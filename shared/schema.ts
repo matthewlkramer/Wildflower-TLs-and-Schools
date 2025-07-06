@@ -279,6 +279,35 @@ export interface EducatorNote {
   dateCreated?: string;
   createdBy?: string;
   notes?: string;
+  category?: string;
+  priority?: string;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface MontessoriCertification {
+  id: string; // Airtable record ID
+  educatorId: string;
+  certificationLevel?: string;
+  certificationOrganization?: string;
+  dateIssued?: string;
+  expirationDate?: string;
+  status?: string;
+  notes?: string;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface EventAttendance {
+  id: string; // Airtable record ID
+  educatorId: string;
+  eventName?: string;
+  eventDate?: string;
+  eventType?: string;
+  attendanceStatus?: string;
+  role?: string;
+  notes?: string;
+  created?: string;
   lastModified?: string;
 }
 
@@ -703,6 +732,15 @@ export const eventAttendanceSchema = z.object({
   notes: z.string().optional(),
 });
 
+export const educatorNoteSchema = z.object({
+  educatorId: z.string().optional(),
+  dateCreated: z.string().optional(),
+  createdBy: z.string().optional(),
+  notes: z.string().optional(),
+  category: z.string().optional(),
+  priority: z.string().optional(),
+});
+
 export type InsertEducator = z.infer<typeof educatorSchema>;
 export type InsertSchool = z.infer<typeof schoolSchema>;
 export type InsertEducatorSchoolAssociation = z.infer<typeof educatorSchoolAssociationSchema>;
@@ -718,6 +756,7 @@ export type InsertEmailAddress = z.infer<typeof emailAddressSchema>;
 export type InsertSSJFilloutForm = z.infer<typeof ssjFilloutFormSchema>;
 export type InsertMontessoriCertification = z.infer<typeof montessoriCertificationSchema>;
 export type InsertEventAttendance = z.infer<typeof eventAttendanceSchema>;
+export type InsertEducatorNote = z.infer<typeof educatorNoteSchema>;
 
 // Legacy types for backward compatibility
 export type Teacher = Educator;

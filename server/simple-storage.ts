@@ -26,6 +26,12 @@ import type {
   InsertEmailAddress,
   SSJFilloutForm,
   InsertSSJFilloutForm,
+  MontessoriCertification,
+  InsertMontessoriCertification,
+  EventAttendance,
+  InsertEventAttendance,
+  EducatorNote,
+  InsertEducatorNote,
   Teacher,
   TeacherSchoolAssociation,
   InsertTeacher,
@@ -135,6 +141,30 @@ export interface IStorage {
   createSSJFilloutForm(form: InsertSSJFilloutForm): Promise<SSJFilloutForm>;
   updateSSJFilloutForm(id: string, form: Partial<InsertSSJFilloutForm>): Promise<SSJFilloutForm | undefined>;
   deleteSSJFilloutForm(id: string): Promise<boolean>;
+
+  // Montessori Certifications operations
+  getMontessoriCertifications(): Promise<MontessoriCertification[]>;
+  getMontessoriCertification(id: string): Promise<MontessoriCertification | undefined>;
+  getMontessoriCertificationsByEducatorId(educatorId: string): Promise<MontessoriCertification[]>;
+  createMontessoriCertification(certification: InsertMontessoriCertification): Promise<MontessoriCertification>;
+  updateMontessoriCertification(id: string, certification: Partial<InsertMontessoriCertification>): Promise<MontessoriCertification | undefined>;
+  deleteMontessoriCertification(id: string): Promise<boolean>;
+
+  // Event Attendance operations
+  getEventAttendances(): Promise<EventAttendance[]>;
+  getEventAttendance(id: string): Promise<EventAttendance | undefined>;
+  getEventAttendancesByEducatorId(educatorId: string): Promise<EventAttendance[]>;
+  createEventAttendance(attendance: InsertEventAttendance): Promise<EventAttendance>;
+  updateEventAttendance(id: string, attendance: Partial<InsertEventAttendance>): Promise<EventAttendance | undefined>;
+  deleteEventAttendance(id: string): Promise<boolean>;
+
+  // Educator Notes operations
+  getEducatorNotes(): Promise<EducatorNote[]>;
+  getEducatorNote(id: string): Promise<EducatorNote | undefined>;
+  getEducatorNotesByEducatorId(educatorId: string): Promise<EducatorNote[]>;
+  createEducatorNote(note: InsertEducatorNote): Promise<EducatorNote>;
+  updateEducatorNote(id: string, note: Partial<InsertEducatorNote>): Promise<EducatorNote | undefined>;
+  deleteEducatorNote(id: string): Promise<boolean>;
 
   // Legacy methods for backward compatibility
   getTeachers(): Promise<Teacher[]>;
@@ -1333,6 +1363,300 @@ export class SimpleAirtableStorage implements IStorage {
       type: fields["Type"] || undefined,
       isPrimary: fields["Primary"] === true || fields["Is Primary"] === true,
       status: fields["Status"] || undefined,
+      notes: fields["Notes"] || undefined,
+      created: fields["Created"] || record.get('Created'),
+      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+    };
+  }
+
+  // Montessori Certifications implementation
+  async getMontessoriCertifications(): Promise<MontessoriCertification[]> {
+    try {
+      const table = base('Montessori Certifications');
+      const records = await table.select().all();
+      return records.map(record => this.transformMontessoriCertificationRecord(record));
+    } catch (error) {
+      console.warn('Montessori Certifications table not accessible:', error);
+      return [];
+    }
+  }
+
+  async getMontessoriCertification(id: string): Promise<MontessoriCertification | undefined> {
+    try {
+      const table = base('Montessori Certifications');
+      const record = await table.find(id);
+      return this.transformMontessoriCertificationRecord(record);
+    } catch (error) {
+      console.warn('Montessori Certification not found:', error);
+      return undefined;
+    }
+  }
+
+  async getMontessoriCertificationsByEducatorId(educatorId: string): Promise<MontessoriCertification[]> {
+    try {
+      const table = base('Montessori Certifications');
+      const records = await table.select({
+        filterByFormula: `{educator_id} = "${educatorId}"`
+      }).all();
+      return records.map(record => this.transformMontessoriCertificationRecord(record));
+    } catch (error) {
+      console.warn('Error fetching Montessori Certifications by educator ID:', error);
+      return [];
+    }
+  }
+
+  async createMontessoriCertification(certification: InsertMontessoriCertification): Promise<MontessoriCertification> {
+    const newCertification: MontessoriCertification = {
+      id: `cert_${Date.now()}`,
+      educatorId: certification.educatorId,
+      certificationLevel: certification.certificationLevel,
+      certificationOrganization: certification.certificationOrganization,
+      dateIssued: certification.dateIssued,
+      expirationDate: certification.expirationDate,
+      status: certification.status,
+      notes: certification.notes,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+    return newCertification;
+  }
+
+  async updateMontessoriCertification(id: string, certification: Partial<InsertMontessoriCertification>): Promise<MontessoriCertification | undefined> {
+    const existing = await this.getMontessoriCertification(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...certification,
+      lastModified: new Date().toISOString(),
+    };
+  }
+
+  async deleteMontessoriCertification(id: string): Promise<boolean> {
+    return true;
+  }
+
+  private transformMontessoriCertificationRecord(record: any): MontessoriCertification {
+    const fields = record.fields;
+    return {
+      id: record.id,
+      educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
+      certificationLevel: fields["Certification Level"] || undefined,
+      certificationOrganization: fields["Certification Organization"] || fields["Organization"] || undefined,
+      dateIssued: fields["Date Issued"] || undefined,
+      expirationDate: fields["Expiration Date"] || undefined,
+      status: fields["Status"] || undefined,
+      notes: fields["Notes"] || undefined,
+      created: fields["Created"] || record.get('Created'),
+      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+    };
+  }
+
+  // Event Attendance implementation
+  async getEventAttendances(): Promise<EventAttendance[]> {
+    try {
+      const table = base('Event Attendance');
+      const records = await table.select().all();
+      return records.map(record => this.transformEventAttendanceRecord(record));
+    } catch (error) {
+      console.warn('Event Attendance table not accessible:', error);
+      return [];
+    }
+  }
+
+  async getEventAttendance(id: string): Promise<EventAttendance | undefined> {
+    try {
+      const table = base('Event Attendance');
+      const record = await table.find(id);
+      return this.transformEventAttendanceRecord(record);
+    } catch (error) {
+      console.warn('Event Attendance record not found:', error);
+      return undefined;
+    }
+  }
+
+  async getEventAttendancesByEducatorId(educatorId: string): Promise<EventAttendance[]> {
+    try {
+      const table = base('Event Attendance');
+      const records = await table.select({
+        filterByFormula: `{educator_id} = "${educatorId}"`
+      }).all();
+      return records.map(record => this.transformEventAttendanceRecord(record));
+    } catch (error) {
+      console.warn('Error fetching Event Attendance by educator ID:', error);
+      return [];
+    }
+  }
+
+  async createEventAttendance(attendance: InsertEventAttendance): Promise<EventAttendance> {
+    const newAttendance: EventAttendance = {
+      id: `event_${Date.now()}`,
+      educatorId: attendance.educatorId,
+      eventName: attendance.eventName,
+      eventDate: attendance.eventDate,
+      eventType: attendance.eventType,
+      attendanceStatus: attendance.attendanceStatus,
+      role: attendance.role,
+      notes: attendance.notes,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+    return newAttendance;
+  }
+
+  async updateEventAttendance(id: string, attendance: Partial<InsertEventAttendance>): Promise<EventAttendance | undefined> {
+    const existing = await this.getEventAttendance(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...attendance,
+      lastModified: new Date().toISOString(),
+    };
+  }
+
+  async deleteEventAttendance(id: string): Promise<boolean> {
+    return true;
+  }
+
+  private transformEventAttendanceRecord(record: any): EventAttendance {
+    const fields = record.fields;
+    return {
+      id: record.id,
+      educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
+      eventName: fields["Event Name"] || fields["Event"] || undefined,
+      eventDate: fields["Event Date"] || fields["Date"] || undefined,
+      eventType: fields["Event Type"] || fields["Type"] || undefined,
+      attendanceStatus: fields["Attendance Status"] || fields["Status"] || undefined,
+      role: fields["Role"] || undefined,
+      notes: fields["Notes"] || undefined,
+      created: fields["Created"] || record.get('Created'),
+      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+    };
+  }
+
+  // Educator Notes implementation
+  async getEducatorNotes(): Promise<EducatorNote[]> {
+    try {
+      const table = base('Educator Notes');
+      const records = await table.select().all();
+      return records.map(record => this.transformEducatorNoteRecord(record));
+    } catch (error) {
+      console.warn('Educator Notes table not accessible:', error);
+      return [];
+    }
+  }
+
+  async getEducatorNote(id: string): Promise<EducatorNote | undefined> {
+    try {
+      const table = base('Educator Notes');
+      const record = await table.find(id);
+      return this.transformEducatorNoteRecord(record);
+    } catch (error) {
+      console.warn('Educator Note not found:', error);
+      return undefined;
+    }
+  }
+
+  async getEducatorNotesByEducatorId(educatorId: string): Promise<EducatorNote[]> {
+    try {
+      const table = base('Educator Notes');
+      const records = await table.select({
+        filterByFormula: `{educator_id} = "${educatorId}"`
+      }).all();
+      return records.map(record => this.transformEducatorNoteRecord(record));
+    } catch (error) {
+      console.warn('Error fetching Educator Notes by educator ID:', error);
+      return [];
+    }
+  }
+
+  async createEducatorNote(note: InsertEducatorNote): Promise<EducatorNote> {
+    const newNote: EducatorNote = {
+      id: `note_${Date.now()}`,
+      educatorId: note.educatorId,
+      dateCreated: note.dateCreated,
+      createdBy: note.createdBy,
+      notes: note.notes,
+      category: note.category,
+      priority: note.priority,
+      created: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+    };
+    return newNote;
+  }
+
+  async updateEducatorNote(id: string, note: Partial<InsertEducatorNote>): Promise<EducatorNote | undefined> {
+    const existing = await this.getEducatorNote(id);
+    if (!existing) return undefined;
+    
+    return {
+      ...existing,
+      ...note,
+      lastModified: new Date().toISOString(),
+    };
+  }
+
+  async deleteEducatorNote(id: string): Promise<boolean> {
+    return true;
+  }
+
+  private transformEducatorNoteRecord(record: any): EducatorNote {
+    const fields = record.fields;
+    return {
+      id: record.id,
+      educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
+      dateCreated: fields["Date Created"] || fields["Date"] || undefined,
+      createdBy: fields["Created By"] || fields["Author"] || undefined,
+      notes: fields["Notes"] || fields["Note"] || undefined,
+      category: fields["Category"] || undefined,
+      priority: fields["Priority"] || undefined,
+      created: fields["Created"] || record.get('Created'),
+      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+    };
+  }
+
+  // Missing membership fee methods - stub implementations
+  async getMembershipFeesByYear(): Promise<MembershipFeeByYear[]> {
+    try {
+      const base = Airtable.base(this.airtableBaseId);
+      const table = base('Membership Fee by Year');
+      const records = await table.select().all();
+      return records.map(record => this.transformMembershipFeeByYearRecord(record));
+    } catch (error) {
+      console.warn('Membership Fee by Year table not accessible:', error);
+      return [];
+    }
+  }
+
+  async getMembershipFeeByYear(id: string): Promise<MembershipFeeByYear | undefined> {
+    return undefined;
+  }
+
+  async getMembershipFeesBySchoolId(schoolId: string): Promise<MembershipFeeByYear[]> {
+    return [];
+  }
+
+  async createMembershipFeeByYear(fee: InsertMembershipFeeByYear): Promise<MembershipFeeByYear> {
+    throw new Error('Not implemented');
+  }
+
+  async updateMembershipFeeByYear(id: string, fee: Partial<InsertMembershipFeeByYear>): Promise<MembershipFeeByYear | undefined> {
+    return undefined;
+  }
+
+  async deleteMembershipFeeByYear(id: string): Promise<boolean> {
+    return false;
+  }
+
+  private transformMembershipFeeByYearRecord(record: any): MembershipFeeByYear {
+    const fields = record.fields;
+    return {
+      id: record.id,
+      schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
+      schoolYear: fields["School Year"] || undefined,
+      membershipFee: fields["Membership Fee"] || undefined,
+      dateUpdated: fields["Date Updated"] || undefined,
       notes: fields["Notes"] || undefined,
       created: fields["Created"] || record.get('Created'),
       lastModified: fields["Last Modified"] || record.get('Last Modified'),

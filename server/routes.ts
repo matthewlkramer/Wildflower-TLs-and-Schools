@@ -691,6 +691,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Montessori Certifications routes
+  app.get("/api/montessori-certifications/educator/:educatorId", async (req, res) => {
+    try {
+      const educatorId = req.params.educatorId;
+      const certifications = await storage.getMontessoriCertificationsByEducatorId(educatorId);
+      res.json(certifications);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch Montessori certifications for educator" });
+    }
+  });
+
+  // Event Attendance routes
+  app.get("/api/event-attendance/educator/:educatorId", async (req, res) => {
+    try {
+      const educatorId = req.params.educatorId;
+      const attendance = await storage.getEventAttendancesByEducatorId(educatorId);
+      res.json(attendance);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch event attendance for educator" });
+    }
+  });
+
+  // Educator Notes routes
+  app.get("/api/educator-notes/educator/:educatorId", async (req, res) => {
+    try {
+      const educatorId = req.params.educatorId;
+      const notes = await storage.getEducatorNotesByEducatorId(educatorId);
+      res.json(notes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch educator notes for educator" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
