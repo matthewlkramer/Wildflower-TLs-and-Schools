@@ -1372,29 +1372,29 @@ export class SimpleAirtableStorage implements IStorage {
   // Montessori Certifications implementation
   async getMontessoriCertifications(): Promise<MontessoriCertification[]> {
     try {
-      const table = base('Montessori Certifications');
+      const table = base('Montessori Certs');
       const records = await table.select().all();
       return records.map(record => this.transformMontessoriCertificationRecord(record));
     } catch (error) {
-      console.warn('Montessori Certifications table not accessible:', error);
+      console.warn('Montessori Certs table not accessible:', error);
       return [];
     }
   }
 
   async getMontessoriCertification(id: string): Promise<MontessoriCertification | undefined> {
     try {
-      const table = base('Montessori Certifications');
+      const table = base('Montessori Certs');
       const record = await table.find(id);
       return this.transformMontessoriCertificationRecord(record);
     } catch (error) {
-      console.warn('Montessori Certification not found:', error);
+      console.warn('Montessori Cert not found:', error);
       return undefined;
     }
   }
 
   async getMontessoriCertificationsByEducatorId(educatorId: string): Promise<MontessoriCertification[]> {
     try {
-      const table = base('Montessori Certifications');
+      const table = base('Montessori Certs');
       const records = await table.select({
         filterByFormula: `{educator_id} = "${educatorId}"`
       }).all();
@@ -1455,29 +1455,29 @@ export class SimpleAirtableStorage implements IStorage {
   // Event Attendance implementation
   async getEventAttendances(): Promise<EventAttendance[]> {
     try {
-      const table = base('Event Attendance');
+      const table = base('Event attendance');
       const records = await table.select().all();
       return records.map(record => this.transformEventAttendanceRecord(record));
     } catch (error) {
-      console.warn('Event Attendance table not accessible:', error);
+      console.warn('Event attendance table not accessible:', error);
       return [];
     }
   }
 
   async getEventAttendance(id: string): Promise<EventAttendance | undefined> {
     try {
-      const table = base('Event Attendance');
+      const table = base('Event attendance');
       const record = await table.find(id);
       return this.transformEventAttendanceRecord(record);
     } catch (error) {
-      console.warn('Event Attendance record not found:', error);
+      console.warn('Event attendance record not found:', error);
       return undefined;
     }
   }
 
   async getEventAttendancesByEducatorId(educatorId: string): Promise<EventAttendance[]> {
     try {
-      const table = base('Event Attendance');
+      const table = base('Event attendance');
       const records = await table.select({
         filterByFormula: `{educator_id} = "${educatorId}"`
       }).all();
@@ -1538,29 +1538,29 @@ export class SimpleAirtableStorage implements IStorage {
   // Educator Notes implementation
   async getEducatorNotes(): Promise<EducatorNote[]> {
     try {
-      const table = base('Educator Notes');
+      const table = base('Educator notes');
       const records = await table.select().all();
       return records.map(record => this.transformEducatorNoteRecord(record));
     } catch (error) {
-      console.warn('Educator Notes table not accessible:', error);
+      console.warn('Educator notes table not accessible:', error);
       return [];
     }
   }
 
   async getEducatorNote(id: string): Promise<EducatorNote | undefined> {
     try {
-      const table = base('Educator Notes');
+      const table = base('Educator notes');
       const record = await table.find(id);
       return this.transformEducatorNoteRecord(record);
     } catch (error) {
-      console.warn('Educator Note not found:', error);
+      console.warn('Educator note not found:', error);
       return undefined;
     }
   }
 
   async getEducatorNotesByEducatorId(educatorId: string): Promise<EducatorNote[]> {
     try {
-      const table = base('Educator Notes');
+      const table = base('Educator notes');
       const records = await table.select({
         filterByFormula: `{educator_id} = "${educatorId}"`
       }).all();
