@@ -1622,9 +1622,6 @@ export default function SchoolDetail() {
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="space-y-3">
                           <div>
-                            <p className="text-sm text-wildflower-blue font-medium">{school.name || '-'}</p>
-                          </div>
-                          <div>
                             <label className="text-sm font-medium text-slate-600">Governance Model</label>
                             <p className="text-sm text-slate-900">{school.governanceModel || '-'}</p>
                           </div>
