@@ -1228,7 +1228,7 @@ export class SimpleAirtableStorage implements IStorage {
     const fields = record.fields;
     return {
       id: record.id,
-      educatorId: fields["Educator"]?.[0] || undefined,
+      educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
       email: fields["Email"] || fields["Email Address"] || undefined,
       type: fields["Type"] || undefined,
       isPrimary: fields["Primary"] === true || fields["Is Primary"] === true,

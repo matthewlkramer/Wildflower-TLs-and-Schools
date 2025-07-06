@@ -119,7 +119,7 @@ Changelog:
 - July 05, 2025. Enhanced Summary tab with Google Maps integration using latitude/longitude coordinates, current physical address display, Current Guide(s) field, SSJ Stage badges, risk factors and watchlist information, conditional SSJ Projected Open date for visioning/planning/startup stages, and conditional left network date/reason fields for schools that have exited the network
 - July 05, 2025. Updated Teacher demographics tab to remove name fields, add conditional "other" fields (gender other, race/ethnicity other, pronouns other) that only display when respective field is set to "other", and moved educational attainment field to demographics section
 - July 05, 2025. Implemented Email Addresses table in Teacher Contact Info tab with full AG Grid integration and Airtable backend support
-- July 05, 2025. Updated all subtable filtering to use standardized field names: {schoolId} for school-related tables and {Educator} for educator-related tables
+- July 06, 2025. Fixed all subtable filtering to use correct Airtable field names: {school_id} for school-related tables and {educator_id} for educator-related tables - email addresses functionality now working correctly
 ```
 
 ## User Preferences
