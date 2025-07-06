@@ -93,8 +93,8 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
           rowData={associations}
           columnDefs={columnDefs}
           animateRows={true}
-          rowSelection={{ mode: "singleRow" }}
-          suppressRowClickSelection={false}
+          rowSelection="none"
+          suppressRowClickSelection={true}
           domLayout="autoHeight"
           headerHeight={40}
           rowHeight={35}
