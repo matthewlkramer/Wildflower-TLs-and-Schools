@@ -107,7 +107,10 @@ export interface School {
   activePodMember?: string;
 
   // Location
+  address?: string; // Legacy field for compatibility
   activePhysicalAddress?: string;
+  currentPhysicalAddress?: boolean; // Added for Airtable checkbox field
+  currentMailingAddress?: boolean; // Added for Airtable checkbox field
   activeLocationCity?: string;
   activeLocationState?: string;
   locality?: string;

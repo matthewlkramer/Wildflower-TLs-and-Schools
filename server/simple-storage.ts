@@ -257,8 +257,8 @@ export class SimpleAirtableStorage implements IStorage {
       currentMailingAddress: fields['Current Mailing Address?'] === true,
       activeLocationCity: fields['Current Physical Address - City'],
       activeLocationState: fields['Current Physical Address - State'],
-      targetCity: fields['SSJ - Target City'] || null,
-      targetState: fields['SSJ - Target State'] || null,
+      ssjTargetCity: fields['SSJ - Target City'] || null,
+      ssjTargetState: fields['SSJ - Target State'] || null,
       locality: (fields['Current Physical Address - City']
         ? `${fields['Current Physical Address - City']}${fields['Current Physical Address - State'] ? ', ' + fields['Current Physical Address - State'] : ''}`
         : fields['SSJ - Target City']
@@ -531,7 +531,7 @@ export class SimpleAirtableStorage implements IStorage {
           id: record.id,
           educatorId: Array.isArray(educatorId) ? String(educatorId[0] || '') : String(educatorId || ''),
           schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
-          role: String(roles || ''),
+          role: roles ? [String(roles)] : [], // Changed to array to match interface
           startDate: '', // Not available in this table
           endDate: '', // Not available in this table
           isActive: true, // Assume active if record exists
@@ -561,7 +561,7 @@ export class SimpleAirtableStorage implements IStorage {
         id: record.id,
         educatorId: Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || ''),
         schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
-        role: String(record.fields["Roles"] || ''),
+        role: record.fields["Roles"] ? [String(record.fields["Roles"])] : [], // Changed to array
         startDate: record.fields["Start Date"] || '',
         endDate: record.fields["End Date"] || '',
         isActive: record.fields["Currently Active"],

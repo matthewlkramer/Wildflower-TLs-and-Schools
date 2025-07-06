@@ -13,6 +13,7 @@ This is a full-stack web application for managing teachers and schools in the Wi
 - **Styling**: Tailwind CSS with shadcn/ui component library
 - **Form Handling**: React Hook Form with Zod validation
 - **Build Tool**: Vite
+- **Data Tables**: AG Grid Community Edition with custom utilities
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js
@@ -21,6 +22,15 @@ This is a full-stack web application for managing teachers and schools in the Wi
 - **Database Provider**: Neon Database (serverless PostgreSQL)
 - **Session Management**: PostgreSQL sessions with connect-pg-simple
 - **Development**: In-memory storage implementation for development/testing
+- **Caching**: Server-side in-memory cache with 5-minute TTL
+- **Error Handling**: Centralized error handling with custom error classes
+
+### Code Organization (Refactored)
+- **Shared Constants**: `shared/constants.ts` - Centralized constants for tables, colors, errors
+- **Shared Utilities**: `shared/utils.ts` - Common utility functions
+- **AG Grid Utilities**: `client/src/utils/ag-grid-utils.ts` - Reusable grid configurations
+- **API Hooks**: `client/src/hooks/use-api-query.ts` - Consistent data fetching patterns
+- **Error Handler**: `server/error-handler.ts` - Centralized error handling
 
 ### Database Schema
 - **teachers**: Teacher profiles with personal and professional information
@@ -124,6 +134,7 @@ Changelog:
 - July 06, 2025. Converted all static teacher tabs to dynamic filtered tables: Certs tab now shows MontessoriCertificationsTable, Events tab shows EventAttendanceTable, and Notes tab shows EducatorNotesTable - all filtered by educator_id following consistent AG Grid pattern
 - July 06, 2025. Successfully implemented dynamic data tables for teacher detail tabs: Notes tab and Events tab now working with real Airtable data, Certs tab has Airtable permission restrictions on "Montessori Certs" table that need to be resolved at the database access level
 - July 06, 2025. Implemented server-side caching system to optimize performance: added 5-minute TTL cache for educators and schools data, reducing Airtable API calls from ~6000ms to ~50ms for cached requests, created cache monitoring endpoint at /api/cache/stats for performance tracking
+- July 06, 2025. Major refactoring for code maintainability: created shared/constants.ts for centralized constants, shared/utils.ts for common utility functions, client/src/utils/ag-grid-utils.ts for reusable AG Grid configurations, client/src/hooks/use-api-query.ts for consistent data fetching patterns, server/error-handler.ts for centralized error handling
 ```
 
 ## User Preferences
