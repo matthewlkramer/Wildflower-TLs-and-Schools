@@ -143,6 +143,7 @@ export class SimpleAirtableStorage implements IStorage {
   // Helper method to transform Airtable record to Educator
   private transformEducatorRecord(record: any): Educator {
     const fields = record.fields;
+    
     return {
       id: record.id,
       fullName: fields["Full Name"] || "",
@@ -150,8 +151,8 @@ export class SimpleAirtableStorage implements IStorage {
       nickname: fields["Nickname"] || undefined,
       middleName: fields["Middle Name"] || undefined,
       lastName: fields["Last Name"] || undefined,
-      primaryPhone: fields["Primary phone"] || undefined,
-      secondaryPhone: fields["Secondary phone"] || undefined,
+      primaryPhone: fields["Primary phone"] || fields["Primary Phone"] || fields["Phone"] || undefined,
+      secondaryPhone: fields["Secondary phone"] || fields["Secondary Phone"] || fields["Phone 2"] || undefined,
       homeAddress: fields["Home Address"] || undefined,
       pronouns: fields["Pronouns"] || undefined,
       pronounsOther: fields["Pronouns - Other"] || undefined,
@@ -1177,15 +1178,28 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getEmailAddressesByEducatorId(educatorId: string): Promise<EmailAddress[]> {
-    try {
-      const records = await base('Email Addresses').select({
-        filterByFormula: `{Educator} = '${educatorId}'`
-      }).all();
-      return records.map(record => this.transformEmailAddressRecord(record));
-    } catch (error) {
-      console.warn(`Warning: Unable to fetch email addresses for educator ${educatorId}:`, error);
-      return [];
+    // Try different possible table names for email addresses
+    const possibleTableNames = ['Email Addresses', 'Email addresses', 'Emails', 'Email Address', 'Email'];
+    
+    for (const tableName of possibleTableNames) {
+      try {
+        const records = await base(tableName).select({
+          filterByFormula: `{Educator} = '${educatorId}'`
+        }).all();
+        
+        if (records.length > 0) {
+          return records.map(record => this.transformEmailAddressRecord(record));
+        }
+        
+        // If we get here, the table exists but has no data for this educator
+        return [];
+      } catch (error) {
+        continue; // Try next table name
+      }
     }
+    
+    console.warn(`Warning: No accessible email addresses table found for educator ${educatorId}`);
+    return [];
   }
 
   async createEmailAddress(emailAddress: InsertEmailAddress): Promise<EmailAddress> {
