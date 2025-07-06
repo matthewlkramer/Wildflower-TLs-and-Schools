@@ -124,35 +124,29 @@ export default function TeacherDetail() {
               <TabsContent value="demographics" className="mt-0">
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-slate-900">Personal Information</h4>
-                      <div className="space-y-2 text-sm">
-                        <p><span className="text-slate-600">Pronouns:</span> {teacher.pronouns || '-'}</p>
-                        {/* Conditional Pronouns Other */}
-                        {teacher.pronouns?.toLowerCase() === 'other' && (
-                          <p><span className="text-slate-600">Pronouns (Other):</span> {teacher.pronounsOther || '-'}</p>
-                        )}
-                        <p><span className="text-slate-600">Gender:</span> {teacher.gender || '-'}</p>
-                        {/* Conditional Gender Other */}
-                        {teacher.gender?.toLowerCase() === 'other' && (
-                          <p><span className="text-slate-600">Gender (Other):</span> {teacher.genderOther || '-'}</p>
-                        )}
-                        <p><span className="text-slate-600">Educational Attainment:</span> {teacher.educationalAttainment || '-'}</p>
-                      </div>
+                    <div className="space-y-2 text-sm">
+                      <p><span className="text-slate-600">Pronouns:</span> {teacher.pronouns || '-'}</p>
+                      {/* Conditional Pronouns Other */}
+                      {teacher.pronouns?.toLowerCase() === 'other' && (
+                        <p><span className="text-slate-600">Pronouns (Other):</span> {teacher.pronounsOther || '-'}</p>
+                      )}
+                      <p><span className="text-slate-600">Gender:</span> {teacher.gender || '-'}</p>
+                      {/* Conditional Gender Other */}
+                      {teacher.gender?.toLowerCase() === 'other' && (
+                        <p><span className="text-slate-600">Gender (Other):</span> {teacher.genderOther || '-'}</p>
+                      )}
+                      <p><span className="text-slate-600">Educational Attainment:</span> {teacher.educationalAttainment || '-'}</p>
+                      <p><span className="text-slate-600">Race/Ethnicity:</span> {teacher.raceEthnicity ? (Array.isArray(teacher.raceEthnicity) ? teacher.raceEthnicity.join(', ') : teacher.raceEthnicity) : '-'}</p>
+                      {/* Conditional Race/Ethnicity Other */}
+                      {teacher.raceEthnicity && (Array.isArray(teacher.raceEthnicity) ? teacher.raceEthnicity.some(re => re.toLowerCase().includes('other')) : teacher.raceEthnicity.toLowerCase().includes('other')) && (
+                        <p><span className="text-slate-600">Race/Ethnicity (Other):</span> {teacher.raceEthnicityOther || '-'}</p>
+                      )}
                     </div>
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-slate-900">Demographics</h4>
-                      <div className="space-y-2 text-sm">
-                        <p><span className="text-slate-600">Race/Ethnicity:</span> {teacher.raceEthnicity ? (Array.isArray(teacher.raceEthnicity) ? teacher.raceEthnicity.join(', ') : teacher.raceEthnicity) : '-'}</p>
-                        {/* Conditional Race/Ethnicity Other */}
-                        {teacher.raceEthnicity && (Array.isArray(teacher.raceEthnicity) ? teacher.raceEthnicity.some(re => re.toLowerCase().includes('other')) : teacher.raceEthnicity.toLowerCase().includes('other')) && (
-                          <p><span className="text-slate-600">Race/Ethnicity (Other):</span> {teacher.raceEthnicityOther || '-'}</p>
-                        )}
-                        <p><span className="text-slate-600">Primary Language:</span> {teacher.primaryLanguage ? (Array.isArray(teacher.primaryLanguage) ? teacher.primaryLanguage.join(', ') : teacher.primaryLanguage) : '-'}</p>
-                        <p><span className="text-slate-600">Other Languages:</span> {teacher.otherLanguages ? (Array.isArray(teacher.otherLanguages) ? teacher.otherLanguages.join(', ') : teacher.otherLanguages) : '-'}</p>
-                        <p><span className="text-slate-600">Household Income:</span> {teacher.householdIncome || '-'}</p>
-                        <p><span className="text-slate-600">Income Background:</span> {teacher.incomeBackground || '-'}</p>
-                      </div>
+                    <div className="space-y-2 text-sm">
+                      <p><span className="text-slate-600">Primary Language:</span> {teacher.primaryLanguage ? (Array.isArray(teacher.primaryLanguage) ? teacher.primaryLanguage.join(', ') : teacher.primaryLanguage) : '-'}</p>
+                      <p><span className="text-slate-600">Other Languages:</span> {teacher.otherLanguages ? (Array.isArray(teacher.otherLanguages) ? teacher.otherLanguages.join(', ') : teacher.otherLanguages) : '-'}</p>
+                      <p><span className="text-slate-600">Household Income:</span> {teacher.householdIncome || '-'}</p>
+                      <p><span className="text-slate-600">Income Background:</span> {teacher.incomeBackground || '-'}</p>
                     </div>
                   </div>
                 </div>
