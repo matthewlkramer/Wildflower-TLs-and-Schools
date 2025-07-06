@@ -24,71 +24,33 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
     {
       headerName: "Event Name",
       field: "eventName",
-      flex: 2,
-      filter: "agTextColumnFilter",
-    },
-    {
-      headerName: "Event Type",
-      field: "eventType",
-      flex: 1.2,
+      flex: 3,
       filter: "agTextColumnFilter",
     },
     {
       headerName: "Event Date",
       field: "eventDate",
-      flex: 1,
+      flex: 2,
       filter: "agTextColumnFilter",
     },
     {
-      headerName: "Registration Date",
-      field: "registrationDate",
-      flex: 1,
-      filter: "agTextColumnFilter",
-    },
-    {
-      headerName: "Attendance Status",
+      headerName: "Attended",
       field: "attendanceStatus",
-      flex: 1.2,
-      filter: "agTextColumnFilter",
-      cellRenderer: (params: any) => {
-        if (!params.value) return '';
-        const status = params.value.toLowerCase();
-        let variant = 'secondary';
-        if (status === 'attended') variant = 'default';
-        else if (status === 'registered') variant = 'outline';
-        else if (status === 'cancelled' || status === 'no-show') variant = 'destructive';
-        
-        return <Badge variant={variant as any}>{params.value}</Badge>;
-      },
-    },
-    {
-      headerName: "Completion Status",
-      field: "completionStatus",
-      flex: 1.2,
-      filter: "agTextColumnFilter",
-      cellRenderer: (params: any) => {
-        if (!params.value) return '';
-        const status = params.value.toLowerCase();
-        let variant = 'secondary';
-        if (status === 'completed') variant = 'default';
-        else if (status === 'in-progress') variant = 'outline';
-        else if (status === 'not-started') variant = 'secondary';
-        
-        return <Badge variant={variant as any}>{params.value}</Badge>;
-      },
-    },
-    {
-      headerName: "Certificate",
-      field: "certificateIssued",
       flex: 1,
-      filter: "agTextColumnFilter",
+      filter: false,
+      sortable: false,
       cellRenderer: (params: any) => {
-        if (params.value === true) {
-          return <Badge variant="default">Issued</Badge>;
-        } else if (params.value === false) {
-          return <Badge variant="secondary">Not Issued</Badge>;
-        }
-        return '';
+        const attended = params.value?.toLowerCase() === 'attended';
+        return (
+          <div className="flex justify-center">
+            <input 
+              type="checkbox" 
+              checked={attended} 
+              readOnly 
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            />
+          </div>
+        );
       },
     },
   ];
