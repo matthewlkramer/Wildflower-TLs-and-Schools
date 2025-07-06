@@ -264,8 +264,8 @@ export class SimpleAirtableStorage implements IStorage {
             : fields['Current Physical Address']),
       activeLocationCity: fields['Current Physical Address - City'],
       activeLocationState: fields['Current Physical Address - State'],
-      activeLatitude: fields['Latitude'] ? parseFloat(fields['Latitude']) : undefined,
-      activeLongitude: fields['Longitude'] ? parseFloat(fields['Longitude']) : undefined,
+      activeLatitude: fields['activeLatitude'] ? parseFloat(fields['activeLatitude']) : undefined,
+      activeLongitude: fields['activeLongitude'] ? parseFloat(fields['activeLongitude']) : undefined,
       ssjTargetCity: fields['SSJ - Target City'] || null,
       ssjTargetState: fields['SSJ - Target State'] || null,
       locality: (fields['Current Physical Address - City']
