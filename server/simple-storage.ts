@@ -768,7 +768,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       // Try to query the "Guides Assignments" table filtered by schoolId
       const records = await base("Guides Assignments").select({
-        filterByFormula: `{schoolId} = '${schoolId}'`
+        filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
@@ -875,7 +875,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       // Try to query the "Governance docs" table filtered by schoolId
       const records = await base("Governance docs").select({
-        filterByFormula: `{schoolId} = '${schoolId}'`
+        filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
@@ -983,7 +983,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       // Query the "Action steps" table filtered by schoolId
       const records = await base("Action steps").select({
-        filterByFormula: `{schoolId} = '${schoolId}'`
+        filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
@@ -1076,7 +1076,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       // Query the "Grants" table filtered by schoolId
       const records = await base("Grants").select({
-        filterByFormula: `{schoolId} = '${schoolId}'`
+        filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
@@ -1171,7 +1171,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       // Query the "Loans" table filtered by schoolId
       const records = await base("Loans").select({
-        filterByFormula: `{schoolId} = '${schoolId}'`
+        filterByFormula: `{school_id} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
