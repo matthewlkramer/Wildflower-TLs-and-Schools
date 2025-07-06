@@ -568,9 +568,9 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getLocationsBySchoolId(schoolId: string): Promise<Location[]> {
     try {
-      // Query the "Locations" table filtered by school_id
+      // Query the "Locations" table filtered by schoolId
       const records = await base("Locations").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+        filterByFormula: `{schoolId} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
@@ -688,9 +688,9 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getGuideAssignmentsBySchoolId(schoolId: string): Promise<GuideAssignment[]> {
     try {
-      // Try to query the "Guides Assignments" table filtered by school_id
+      // Try to query the "Guides Assignments" table filtered by schoolId
       const records = await base("Guides Assignments").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+        filterByFormula: `{schoolId} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
@@ -795,9 +795,9 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getGovernanceDocumentsBySchoolId(schoolId: string): Promise<GovernanceDocument[]> {
     try {
-      // Try to query the "Governance docs" table filtered by school_id
+      // Try to query the "Governance docs" table filtered by schoolId
       const records = await base("Governance docs").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+        filterByFormula: `{schoolId} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
@@ -904,9 +904,9 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getSchoolNotesBySchoolId(schoolId: string): Promise<SchoolNote[]> {
     try {
-      // Query the "Action steps" table filtered by school_id
+      // Query the "Action steps" table filtered by schoolId
       const records = await base("Action steps").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+        filterByFormula: `{schoolId} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
@@ -1000,9 +1000,9 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getGrantsBySchoolId(schoolId: string): Promise<Grant[]> {
     try {
-      // Query the "Grants" table filtered by school_id
+      // Query the "Grants" table filtered by schoolId
       const records = await base("Grants").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+        filterByFormula: `{schoolId} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
@@ -1096,9 +1096,9 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getLoansBySchoolId(schoolId: string): Promise<Loan[]> {
     try {
-      // Query the "Loans" table filtered by school_id
+      // Query the "Loans" table filtered by schoolId
       const records = await base("Loans").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+        filterByFormula: `{schoolId} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
@@ -1180,7 +1180,7 @@ export class SimpleAirtableStorage implements IStorage {
   async getEmailAddressesByEducatorId(educatorId: string): Promise<EmailAddress[]> {
     try {
       const records = await base('Email Addresses').select({
-        filterByFormula: `{educatorId} = '${educatorId}'`
+        filterByFormula: `{Educator} = '${educatorId}'`
       }).all();
       
       return records.map(record => this.transformEmailAddressRecord(record));
