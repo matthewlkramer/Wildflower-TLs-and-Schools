@@ -45,12 +45,6 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
       flex: 1,
       filter: "agTextColumnFilter",
     },
-    {
-      headerName: "Notes",
-      field: "notes",
-      flex: 2,
-      filter: "agTextColumnFilter",
-    },
   ];
 
   if (isLoading) {
