@@ -51,6 +51,16 @@ export interface Educator {
   firstContactAges?: string[];
   firstContactInterests?: string;
 
+  // Early Cultivation Data
+  source?: string;
+  sendgridTemplateSelected?: string;
+  sendgridSendDate?: string;
+  routedTo?: string;
+  assignedPartnerOverride?: string;
+  personalEmailSent?: boolean;
+  personalEmailSentDate?: string;
+  personResponsibleForFollowUp?: string;
+  oneOnOneSchedulingStatus?: string;
   
   opsGuideMeetingPrefTime?: string;
   opsGuideSpecificsChecklist?: string[];
@@ -360,6 +370,16 @@ export const educatorSchema = z.object({
   firstContactWFSchoolEmploymentStatus: z.string().optional(),
   firstContactNotesOnPreWildflowerEmployment: z.string().optional(),
   firstContactInitialInterestInGovernanceModel: z.array(z.string()).optional(),
+  // Early Cultivation Data
+  source: z.string().optional(),
+  sendgridTemplateSelected: z.string().optional(),
+  sendgridSendDate: z.string().optional(),
+  routedTo: z.string().optional(),
+  assignedPartnerOverride: z.string().optional(),
+  personalEmailSent: z.boolean().optional(),
+  personalEmailSentDate: z.string().optional(),
+  personResponsibleForFollowUp: z.string().optional(),
+  oneOnOneSchedulingStatus: z.string().optional(),
   activeHolaspirit: z.boolean().optional(),
   holaspiritMemberID: z.string().optional(),
   tcUserID: z.string().optional(),
