@@ -1178,48 +1178,16 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getEmailAddressesByEducatorId(educatorId: string): Promise<EmailAddress[]> {
-    // Try different possible table names for email addresses
-    const possibleTableNames = ['Email Addresses', 'Email addresses', 'Emails', 'Email Address', 'Email'];
-    // Try different possible field names for educator relationship
-    const possibleFieldNames = ['Educator', 'Teachers', 'Individual', 'Person', 'Teacher', 'Educators'];
-    
-    for (const tableName of possibleTableNames) {
-      for (const fieldName of possibleFieldNames) {
-        try {
-          console.log(`Trying table: ${tableName}, field: ${fieldName} for educator: ${educatorId}`);
-          const records = await base(tableName).select({
-            filterByFormula: `{${fieldName}} = '${educatorId}'`
-          }).all();
-          
-          if (records.length > 0) {
-            console.log(`Found ${records.length} email addresses using field: ${fieldName}`);
-            return records.map(record => this.transformEmailAddressRecord(record));
-          }
-        } catch (error) {
-          continue; // Try next field name
-        }
-      }
+    try {
+      const records = await base('Email Addresses').select({
+        filterByFormula: `{educatorId} = '${educatorId}'`
+      }).all();
       
-      // If no field names worked, try getting all records from this table to see the structure
-      try {
-        console.log(`Getting sample records from table: ${tableName} to analyze structure`);
-        const allRecords = await base(tableName).select({
-          maxRecords: 3
-        }).all();
-        
-        if (allRecords.length > 0) {
-          console.log(`Sample fields in ${tableName}:`, Object.keys(allRecords[0].fields));
-        }
-        
-        // Table exists, return empty array
-        return [];
-      } catch (error) {
-        continue; // Try next table name
-      }
+      return records.map(record => this.transformEmailAddressRecord(record));
+    } catch (error) {
+      console.warn(`Warning: Unable to fetch email addresses for educator ${educatorId}:`, error);
+      return [];
     }
-    
-    console.warn(`Warning: No accessible email addresses table found for educator ${educatorId}`);
-    return [];
   }
 
   async createEmailAddress(emailAddress: InsertEmailAddress): Promise<EmailAddress> {
