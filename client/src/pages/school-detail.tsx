@@ -1759,7 +1759,7 @@ export default function SchoolDetail() {
                     {/* Legal Entity Section */}
                     <div>
                       <h3 className="text-lg font-medium text-slate-900 mb-4">Legal Entity</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div>
                           <label className="text-sm font-medium text-slate-600">EIN</label>
                           <p className="text-sm text-slate-900">-</p>
@@ -1769,12 +1769,20 @@ export default function SchoolDetail() {
                           <p className="text-sm text-slate-900">{school.fullName || '-'}</p>
                         </div>
                         <div>
+                          <label className="text-sm font-medium text-slate-600">Legal Structure</label>
+                          <p className="text-sm text-slate-900">{school.legalStructure || '-'}</p>
+                        </div>
+                        <div>
                           <label className="text-sm font-medium text-slate-600">Incorporation Date</label>
                           <p className="text-sm text-slate-900">-</p>
                         </div>
                         <div>
                           <label className="text-sm font-medium text-slate-600">Nonprofit Status</label>
                           <p className="text-sm text-slate-900">-</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-600">Current FY End</label>
+                          <p className="text-sm text-slate-900">{school.currentFYEnd || '-'}</p>
                         </div>
                       </div>
                     </div>
