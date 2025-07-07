@@ -632,8 +632,8 @@ function GovernanceDocumentRow({
   }
 
   return (
-    <TableRow>
-      <TableCell>
+    <TableRow className="h-8">
+      <TableCell className="py-1">
         {document.docUrl ? (
           <a 
             href={document.docUrl} 
@@ -647,8 +647,8 @@ function GovernanceDocumentRow({
           document.docType || '-'
         )}
       </TableCell>
-      <TableCell>{document.dateEntered || '-'}</TableCell>
-      <TableCell>
+      <TableCell className="py-1">{document.dateEntered || '-'}</TableCell>
+      <TableCell className="py-1">
         <div className="flex gap-1">
           <Button
             size="sm"

@@ -1836,11 +1836,26 @@ export class SimpleAirtableStorage implements IStorage {
 
   private transformSchoolNoteRecord(record: any): SchoolNote {
     const fields = record.fields;
+    
+    // Handle Created by field - it might be a linked record
+    let createdBy = undefined;
+    const createdByField = fields["Created by"] || fields["Author"] || fields["Created By"];
+    if (Array.isArray(createdByField) && createdByField.length > 0) {
+      // If it's a linked record array, get the name from the first item
+      createdBy = createdByField[0]?.name || String(createdByField[0] || '');
+    } else if (typeof createdByField === 'object' && createdByField?.name) {
+      // If it's an object with name property
+      createdBy = createdByField.name;
+    } else if (createdByField) {
+      // If it's a direct string value
+      createdBy = String(createdByField);
+    }
+    
     return {
       id: record.id,
       schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
       dateCreated: fields["Date created"] || undefined,
-      createdBy: fields["Created by"]?.name || fields["Created by"] || undefined,
+      createdBy: createdBy,
       notes: fields["Notes"] || undefined,
       isPrivate: fields["Is Private"] || false,
     };
