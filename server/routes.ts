@@ -794,6 +794,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Membership Fee by Year routes
+  app.get("/api/membership-fees-by-year", async (req, res) => {
+    try {
+      const fees = await storage.getMembershipFeesByYear();
+      res.json(fees);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch membership fees by year" });
+    }
+  });
+
+  app.get("/api/membership-fees-by-year/school/:schoolId", async (req, res) => {
+    try {
+      const schoolId = req.params.schoolId;
+      const fees = await storage.getMembershipFeesBySchoolId(schoolId);
+      res.json(fees);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch membership fees for school" });
+    }
+  });
+
+  app.get("/api/membership-fees-by-year/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const fee = await storage.getMembershipFeeByYear(id);
+      if (!fee) {
+        return res.status(404).json({ message: "Membership fee not found" });
+      }
+      res.json(fee);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch membership fee" });
+    }
+  });
+
+  // Membership Fee Updates routes
+  app.get("/api/membership-fee-updates", async (req, res) => {
+    try {
+      const updates = await storage.getMembershipFeeUpdates();
+      res.json(updates);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch membership fee updates" });
+    }
+  });
+
+  app.get("/api/membership-fee-updates/school/:schoolId", async (req, res) => {
+    try {
+      const schoolId = req.params.schoolId;
+      const { schoolYear } = req.query;
+      
+      if (schoolYear) {
+        const updates = await storage.getMembershipFeeUpdatesBySchoolIdAndYear(schoolId, schoolYear as string);
+        res.json(updates);
+      } else {
+        const updates = await storage.getMembershipFeeUpdatesBySchoolId(schoolId);
+        res.json(updates);
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch membership fee updates for school" });
+    }
+  });
+
+  app.get("/api/membership-fee-updates/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const update = await storage.getMembershipFeeUpdate(id);
+      if (!update) {
+        return res.status(404).json({ message: "Membership fee update not found" });
+      }
+      res.json(update);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch membership fee update" });
+    }
+  });
+
   // Cache statistics endpoint for monitoring
   app.get("/api/cache/stats", async (req, res) => {
     try {

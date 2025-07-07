@@ -22,7 +22,7 @@ import {
 import { School2, User } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
-import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation, type Location, type GuideAssignment, type GovernanceDocument, type SchoolNote, type Grant, type Loan } from "@shared/schema";
+import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation, type Location, type GuideAssignment, type GovernanceDocument, type SchoolNote, type Grant, type Loan, type MembershipFeeByYear, type MembershipFeeUpdate } from "@shared/schema";
 import { getInitials, getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -1251,6 +1251,27 @@ export default function SchoolDetail() {
     queryFn: async () => {
       const response = await fetch(`/api/school-notes/school/${id}`, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch school notes");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
+  // Membership Fees data
+  const { data: membershipFeesByYear, isLoading: feesLoading } = useQuery<MembershipFeeByYear[]>({
+    queryKey: [`/api/membership-fees-by-year/school/${id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/membership-fees-by-year/school/${id}`, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch membership fees");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
+  const { data: membershipFeeUpdates, isLoading: updatesLoading } = useQuery<MembershipFeeUpdate[]>({
+    queryKey: [`/api/membership-fee-updates/school/${id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/membership-fee-updates/school/${id}`, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch membership fee updates");
       return response.json();
     },
     enabled: !!id,
@@ -3001,33 +3022,44 @@ export default function SchoolDetail() {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {/* Placeholder data - will be replaced with real data */}
-                              <TableRow 
-                                className="cursor-pointer hover:bg-slate-50"
-                                onClick={() => console.log("Row selected")}
-                              >
-                                <TableCell>2024-2025</TableCell>
-                                <TableCell>$5,000</TableCell>
-                                <TableCell>
-                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Paid
-                                  </span>
-                                </TableCell>
-                                <TableCell>2024-08-31</TableCell>
-                              </TableRow>
-                              <TableRow 
-                                className="cursor-pointer hover:bg-slate-50"
-                                onClick={() => console.log("Row selected")}
-                              >
-                                <TableCell>2023-2024</TableCell>
-                                <TableCell>$4,800</TableCell>
-                                <TableCell>
-                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Paid
-                                  </span>
-                                </TableCell>
-                                <TableCell>2023-08-31</TableCell>
-                              </TableRow>
+                              {feesLoading ? (
+                                <TableRow>
+                                  <TableCell colSpan={4} className="text-center">
+                                    Loading membership fees...
+                                  </TableCell>
+                                </TableRow>
+                              ) : membershipFeesByYear && membershipFeesByYear.length > 0 ? (
+                                membershipFeesByYear.map((fee) => (
+                                  <TableRow 
+                                    key={fee.id}
+                                    className="cursor-pointer hover:bg-slate-50"
+                                    onClick={() => console.log("Row selected", fee)}
+                                  >
+                                    <TableCell>{fee.schoolYear || '-'}</TableCell>
+                                    <TableCell>{fee.feeAmount ? `$${fee.feeAmount.toLocaleString()}` : '-'}</TableCell>
+                                    <TableCell>
+                                      {fee.status && (
+                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                          fee.status.toLowerCase() === 'paid' 
+                                            ? 'bg-green-100 text-green-800' 
+                                            : fee.status.toLowerCase() === 'overdue'
+                                            ? 'bg-red-100 text-red-800'
+                                            : 'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                          {fee.status}
+                                        </span>
+                                      )}
+                                    </TableCell>
+                                    <TableCell>{fee.dueDate || '-'}</TableCell>
+                                  </TableRow>
+                                ))
+                              ) : (
+                                <TableRow>
+                                  <TableCell colSpan={4} className="text-center text-gray-500">
+                                    No membership fees found
+                                  </TableCell>
+                                </TableRow>
+                              )}
                             </TableBody>
                           </Table>
                         </div>
@@ -3047,19 +3079,28 @@ export default function SchoolDetail() {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {/* Placeholder data - will be filtered based on selected year */}
-                              <TableRow>
-                                <TableCell>2024-06-15</TableCell>
-                                <TableCell>Admin User</TableCell>
-                                <TableCell>Fee Adjustment</TableCell>
-                                <TableCell>Annual fee increase</TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell>2024-03-10</TableCell>
-                                <TableCell>Finance Team</TableCell>
-                                <TableCell>Payment Received</TableCell>
-                                <TableCell>Full payment processed</TableCell>
-                              </TableRow>
+                              {updatesLoading ? (
+                                <TableRow>
+                                  <TableCell colSpan={4} className="text-center">
+                                    Loading membership fee updates...
+                                  </TableCell>
+                                </TableRow>
+                              ) : membershipFeeUpdates && membershipFeeUpdates.length > 0 ? (
+                                membershipFeeUpdates.map((update) => (
+                                  <TableRow key={update.id}>
+                                    <TableCell>{update.updateDate || '-'}</TableCell>
+                                    <TableCell>{update.updatedBy || '-'}</TableCell>
+                                    <TableCell>{update.updateType || '-'}</TableCell>
+                                    <TableCell>{update.notes || '-'}</TableCell>
+                                  </TableRow>
+                                ))
+                              ) : (
+                                <TableRow>
+                                  <TableCell colSpan={4} className="text-center text-gray-500">
+                                    No membership fee updates found
+                                  </TableCell>
+                                </TableRow>
+                              )}
                             </TableBody>
                           </Table>
                         </div>
