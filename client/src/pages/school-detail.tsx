@@ -571,8 +571,6 @@ function GovernanceDocumentRow({
 }) {
   const [editData, setEditData] = useState({
     docType: document.docType || "",
-    doc: document.doc || "",
-    docUrl: document.docUrl || "",
     dateEntered: document.dateEntered || "",
   });
 
@@ -580,8 +578,6 @@ function GovernanceDocumentRow({
     if (isEditing) {
       setEditData({
         docType: document.docType || "",
-        doc: document.doc || "",
-        docUrl: document.docUrl || "",
         dateEntered: document.dateEntered || "",
       });
     }
@@ -599,14 +595,6 @@ function GovernanceDocumentRow({
             value={editData.docType}
             onChange={(e) => setEditData({...editData, docType: e.target.value})}
             placeholder="Document Type"
-            className="h-8"
-          />
-        </TableCell>
-        <TableCell>
-          <Input
-            value={editData.doc}
-            onChange={(e) => setEditData({...editData, doc: e.target.value})}
-            placeholder="Document"
             className="h-8"
           />
         </TableCell>
@@ -645,33 +633,23 @@ function GovernanceDocumentRow({
 
   return (
     <TableRow>
-      <TableCell>{document.docType || '-'}</TableCell>
       <TableCell>
-        {document.doc && document.docUrl ? (
+        {document.docUrl ? (
           <a 
             href={document.docUrl} 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
           >
-            {document.doc}
+            {document.docType || '-'}
           </a>
         ) : (
-          document.doc || '-'
+          document.docType || '-'
         )}
       </TableCell>
       <TableCell>{document.dateEntered || '-'}</TableCell>
       <TableCell>
         <div className="flex gap-1">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => document.docUrl && window.open(document.docUrl, '_blank')}
-            className="h-8 w-8 p-0"
-            disabled={!document.docUrl}
-          >
-            <ExternalLink className="h-4 w-4" />
-          </Button>
           <Button
             size="sm"
             variant="outline"
@@ -714,14 +692,12 @@ function Tax990Row({
 }) {
   const [editData, setEditData] = useState({
     year: tax990.year || "",
-    attachment: tax990.attachment || "",
   });
 
   useEffect(() => {
     if (isEditing) {
       setEditData({
         year: tax990.year || "",
-        attachment: tax990.attachment || "",
       });
     }
   }, [isEditing, tax990]);
@@ -738,14 +714,6 @@ function Tax990Row({
             value={editData.year}
             onChange={(e) => setEditData({...editData, year: e.target.value})}
             placeholder="Year"
-            className="h-8"
-          />
-        </TableCell>
-        <TableCell>
-          <Input
-            value={editData.attachment}
-            onChange={(e) => setEditData({...editData, attachment: e.target.value})}
-            placeholder="Attachment"
             className="h-8"
           />
         </TableCell>
@@ -776,8 +744,20 @@ function Tax990Row({
 
   return (
     <TableRow className="h-8">
-      <TableCell className="py-1 text-sm">{tax990.year || '-'}</TableCell>
-      <TableCell className="py-1 text-sm">{tax990.attachment || '-'}</TableCell>
+      <TableCell className="py-1 text-sm">
+        {tax990.attachmentUrl ? (
+          <a 
+            href={tax990.attachmentUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
+          >
+            {tax990.year || '-'}
+          </a>
+        ) : (
+          tax990.year || '-'
+        )}
+      </TableCell>
       <TableCell className="py-1">
         <div className="flex gap-1">
           <Button
@@ -795,15 +775,6 @@ function Tax990Row({
             className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
           >
             <Trash2 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => tax990.attachmentUrl && window.open(tax990.attachmentUrl, '_blank')}
-            className="h-6 px-2"
-            disabled={!tax990.attachmentUrl}
-          >
-            <ExternalLink className="w-3 h-3" />
           </Button>
         </div>
       </TableCell>
@@ -2652,9 +2623,8 @@ export default function SchoolDetail() {
                               <TableHeader>
                                 <TableRow className="h-8">
                                   <TableHead className="h-8 py-1">Document Type</TableHead>
-                                  <TableHead className="h-8 py-1">Document</TableHead>
                                   <TableHead className="h-8 py-1">Date</TableHead>
-                                  <TableHead className="h-8 py-1 w-20">Actions</TableHead>
+                                  <TableHead className="h-8 py-1 w-16">Actions</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -2665,14 +2635,6 @@ export default function SchoolDetail() {
                                         value={newDocument.docType}
                                         onChange={(e) => setNewDocument({...newDocument, docType: e.target.value})}
                                         placeholder="Document Type"
-                                        className="h-7 text-sm"
-                                      />
-                                    </TableCell>
-                                    <TableCell className="py-1">
-                                      <Input
-                                        value={newDocument.doc}
-                                        onChange={(e) => setNewDocument({...newDocument, doc: e.target.value})}
-                                        placeholder="Document"
                                         className="h-7 text-sm"
                                       />
                                     </TableCell>
@@ -2735,7 +2697,7 @@ export default function SchoolDetail() {
                                   ))
                                 ) : (
                                   <TableRow className="h-8">
-                                    <TableCell colSpan={4} className="text-center text-gray-500 py-4 text-sm">
+                                    <TableCell colSpan={3} className="text-center text-gray-500 py-4 text-sm">
                                       No governance documents found
                                     </TableCell>
                                   </TableRow>
@@ -2766,14 +2728,13 @@ export default function SchoolDetail() {
                           <TableHeader>
                             <TableRow className="h-8">
                               <TableHead className="h-8 py-1">Year</TableHead>
-                              <TableHead className="h-8 py-1">Attachment</TableHead>
                               <TableHead className="h-8 py-1 w-16">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {tax990sLoading ? (
                               <TableRow className="h-8">
-                                <TableCell colSpan={3} className="text-center py-2">
+                                <TableCell colSpan={2} className="text-center py-2">
                                   Loading 990s...
                                 </TableCell>
                               </TableRow>
@@ -2802,7 +2763,7 @@ export default function SchoolDetail() {
                               ))
                             ) : (
                               <TableRow className="h-8">
-                                <TableCell colSpan={3} className="text-center text-gray-500 py-4 text-sm">
+                                <TableCell colSpan={2} className="text-center text-gray-500 py-4 text-sm">
                                   No 990s found
                                 </TableCell>
                               </TableRow>
