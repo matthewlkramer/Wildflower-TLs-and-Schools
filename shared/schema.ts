@@ -224,6 +224,7 @@ export interface EducatorSchoolAssociation {
   id: string;
   educatorId: string;
   schoolId: string;
+  schoolShortName?: string;
   role?: string[];
   status?: string;
   startDate?: string;

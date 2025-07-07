@@ -567,6 +567,7 @@ export class SimpleAirtableStorage implements IStorage {
         schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
         schoolShortName: schoolMap.get(Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || '')) || '',
         role: record.fields["Roles"] ? [String(record.fields["Roles"])] : [], // Changed to array
+        status: String(record.fields["Stage_Status"] || ''),
         startDate: String(record.fields["Start Date"] || ''),
         endDate: String(record.fields["End Date"] || ''),
         isActive: record.fields["Currently Active"] === true || record.fields["Currently Active"] === "true",
@@ -596,6 +597,7 @@ export class SimpleAirtableStorage implements IStorage {
         schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
         schoolShortName: schoolMap.get(Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || '')) || '',
         role: record.fields["Roles"] ? [String(record.fields["Roles"])] : [], // Changed to array
+        status: String(record.fields["Stage_Status"] || ''),
         startDate: String(record.fields["Start Date"] || ''),
         endDate: String(record.fields["End Date"] || ''),
         isActive: record.fields["Currently Active"] === true || record.fields["Currently Active"] === "true",
