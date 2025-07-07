@@ -284,6 +284,7 @@ export interface SchoolNote {
   dateCreated?: string;
   createdBy?: string;
   notes?: string;
+  headline?: string;
   lastModified?: string;
 }
 

@@ -11,6 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { 
   Table,
   TableBody,
@@ -1250,6 +1252,7 @@ export default function SchoolDetail() {
     createdBy: "",
     notes: "",
   });
+  const [selectedNote, setSelectedNote] = useState<SchoolNote | null>(null);
   const [newGrant, setNewGrant] = useState({
     amount: 0,
     issuedDate: "",
@@ -3849,9 +3852,9 @@ export default function SchoolDetail() {
                               <TableHeader>
                                 <TableRow>
                                   <TableHead className="w-[15%]">Date</TableHead>
-                                  <TableHead className="w-[20%]">Created By</TableHead>
-                                  <TableHead className="w-[45%]">Notes</TableHead>
-                                  <TableHead className="w-[20%]">Actions</TableHead>
+                                  <TableHead className="w-[15%]">Created By</TableHead>
+                                  <TableHead className="w-[45%]">Headline</TableHead>
+                                  <TableHead className="w-[25%]">Actions</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -3910,12 +3913,25 @@ export default function SchoolDetail() {
                                     <TableCell className="py-1 text-sm">{note.dateCreated || '-'}</TableCell>
                                     <TableCell className="py-1 text-sm">{note.createdBy || '-'}</TableCell>
                                     <TableCell className="py-1 max-w-0">
-                                      <span className="text-sm block truncate pr-2" title={note.notes || '-'}>
-                                        {note.notes || '-'}
-                                      </span>
+                                      <button 
+                                        className="text-sm block truncate pr-2 text-left hover:text-blue-600 hover:underline cursor-pointer w-full" 
+                                        title={note.headline || note.notes || '-'}
+                                        onClick={() => setSelectedNote(note)}
+                                      >
+                                        {note.headline || note.notes || '-'}
+                                      </button>
                                     </TableCell>
                                     <TableCell className="py-1">
                                       <div className="flex gap-1">
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="h-6 w-6 p-0"
+                                          onClick={() => setSelectedNote(note)}
+                                          title="Open note"
+                                        >
+                                          <ExternalLink className="h-3 w-3" />
+                                        </Button>
                                         <Button
                                           size="sm"
                                           variant="outline"
@@ -4153,6 +4169,62 @@ export default function SchoolDetail() {
         description="Are you sure you want to delete this 990 record? This action cannot be undone."
         isLoading={deleteTax990Mutation.isPending}
       />
+
+      {/* Note View Modal */}
+      {selectedNote && (
+        <Dialog open={!!selectedNote} onOpenChange={() => setSelectedNote(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Note Details</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">Date Created</Label>
+                  <p className="text-sm text-slate-900">{selectedNote.dateCreated || '-'}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">Created By</Label>
+                  <p className="text-sm text-slate-900">{selectedNote.createdBy || '-'}</p>
+                </div>
+              </div>
+              {selectedNote.headline && (
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">Headline</Label>
+                  <p className="text-sm text-slate-900">{selectedNote.headline}</p>
+                </div>
+              )}
+              <div>
+                <Label className="text-sm font-medium text-slate-600">Full Note</Label>
+                <div className="p-3 bg-slate-50 rounded-md border">
+                  <p className="text-sm text-slate-900 whitespace-pre-wrap">{selectedNote.notes || '-'}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">Record ID</Label>
+                  <p className="text-xs text-slate-500 font-mono">{selectedNote.id}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">Last Modified</Label>
+                  <p className="text-xs text-slate-500">{selectedNote.lastModified || '-'}</p>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setSelectedNote(null)}>
+                Close
+              </Button>
+              <Button onClick={() => {
+                setSelectedNote(null);
+                setEditingNoteId(selectedNote.id);
+              }}>
+                Edit Note
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }

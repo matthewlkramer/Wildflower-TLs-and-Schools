@@ -1921,7 +1921,8 @@ export class SimpleAirtableStorage implements IStorage {
       dateCreated: fields["Date created"] || undefined,
       createdBy: fields["Partner Short Name"] || undefined,
       notes: fields["Notes"] || undefined,
-      isPrivate: false,
+      headline: fields["Headline (Notes)"] || undefined,
+      lastModified: fields["Last Modified"] || undefined,
     };
   }
 
