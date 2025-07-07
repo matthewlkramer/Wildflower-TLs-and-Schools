@@ -89,8 +89,16 @@ const render = (status: Status, latitude?: number, longitude?: number, schoolNam
         <p className="text-slate-500">Loading map...</p>
       </div>;
     case Status.FAILURE:
-      return <div className="w-full h-64 rounded-lg bg-slate-100 flex items-center justify-center">
-        <p className="text-slate-500">Error loading map</p>
+      return <div className="w-full h-64 rounded-lg bg-red-50 border-2 border-red-200 flex items-center justify-center">
+        <div className="text-center p-6">
+          <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.232 15.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <p className="text-red-600 font-medium">Google Maps API Error</p>
+          <p className="text-red-600 text-sm mt-1">Check API key and enabled services</p>
+        </div>
       </div>;
     case Status.SUCCESS:
       return <MapComponent center={{ lat: latitude || 0, lng: longitude || 0 }} zoom={15} schoolName={schoolName} />;
@@ -104,8 +112,16 @@ const renderAddressMap = (status: Status, address: string, schoolName?: string) 
         <p className="text-slate-500">Loading map...</p>
       </div>;
     case Status.FAILURE:
-      return <div className="w-full h-64 rounded-lg bg-slate-100 flex items-center justify-center">
-        <p className="text-slate-500">Error loading map</p>
+      return <div className="w-full h-64 rounded-lg bg-red-50 border-2 border-red-200 flex items-center justify-center">
+        <div className="text-center p-6">
+          <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.232 15.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <p className="text-red-600 font-medium">Google Maps API Error</p>
+          <p className="text-red-600 text-sm mt-1">Check API key and enabled services</p>
+        </div>
       </div>;
     case Status.SUCCESS:
       return <MapComponent zoom={15} schoolName={schoolName} address={address} />;
@@ -118,12 +134,31 @@ export function GoogleMap({ latitude, longitude, schoolName, fallbackAddress }: 
     ? (Array.isArray(fallbackAddress) ? fallbackAddress.join(', ') : fallbackAddress)
     : undefined;
   
+  // Check if API key is available
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  
+  if (!apiKey) {
+    return (
+      <div className="w-full h-64 rounded-lg bg-red-50 border-2 border-red-200 flex items-center justify-center">
+        <div className="text-center p-6">
+          <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.232 15.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <p className="text-red-600 font-medium">Google Maps API Key Missing</p>
+          <p className="text-red-600 text-sm mt-1">Add VITE_GOOGLE_MAPS_API_KEY to your secrets</p>
+        </div>
+      </div>
+    );
+  }
+  
   // If we have coordinates, use them
   if (latitude && longitude) {
     const center = { lat: latitude, lng: longitude };
     return (
       <Wrapper 
-        apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""} 
+        apiKey={apiKey} 
         render={(status) => render(status, latitude, longitude, schoolName)}
         libraries={["marker"]}
       >
@@ -136,7 +171,7 @@ export function GoogleMap({ latitude, longitude, schoolName, fallbackAddress }: 
   if (addressText) {
     return (
       <Wrapper 
-        apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""} 
+        apiKey={apiKey} 
         render={(status) => renderAddressMap(status, addressText, schoolName)}
         libraries={["marker"]}
       >
