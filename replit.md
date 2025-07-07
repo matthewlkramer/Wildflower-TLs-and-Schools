@@ -166,6 +166,7 @@ Changelog:
 - July 07, 2025. Standardized governance documents table layout: matched row heights (h-8) and padding (py-1) with 990s table for consistent visual design across both tables in the governance tab
 - July 07, 2025. Fixed school notes table displaying IDs instead of names: successfully mapped to "Partner Short Name" field in Airtable, removed debugging code, cleaned up field transformation to properly display creator names instead of record IDs
 - July 07, 2025. Implemented live Action Steps table: replaced placeholder with fully functional table displaying real Airtable data including item descriptions, assignees, due dates, and status badges with smart sorting (incomplete items first, then by due date)
+- July 07, 2025. Fixed membership fees data source: updated to use correct Airtable table "Membership fee school x year" instead of "Membership Fee overview", added proper field mappings for fee amount, status, and due date
 ```
 
 ## User Preferences

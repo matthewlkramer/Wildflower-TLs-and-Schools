@@ -1688,12 +1688,11 @@ export class SimpleAirtableStorage implements IStorage {
   // Missing membership fee methods - stub implementations
   async getMembershipFeesByYear(): Promise<MembershipFeeByYear[]> {
     try {
-      const base = Airtable.base(this.airtableBaseId);
-      const table = base('Membership Fee overview');
+      const table = base('Membership fee school x year');
       const records = await table.select().all();
       return records.map(record => this.transformMembershipFeeByYearRecord(record));
     } catch (error) {
-      console.warn('Membership Fee by Year table not accessible:', error);
+      console.warn('Membership fee school x year table not accessible:', error);
       return [];
     }
   }
@@ -1703,7 +1702,16 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getMembershipFeesBySchoolId(schoolId: string): Promise<MembershipFeeByYear[]> {
-    return [];
+    try {
+      const table = base('Membership fee school x year');
+      const records = await table.select({
+        filterByFormula: `{school_id} = "${schoolId}"`
+      }).all();
+      return records.map(record => this.transformMembershipFeeByYearRecord(record));
+    } catch (error) {
+      console.error('Error fetching membership fees by school ID:', error);
+      return [];
+    }
   }
 
   async createMembershipFeeByYear(fee: InsertMembershipFeeByYear): Promise<MembershipFeeByYear> {
@@ -1720,10 +1728,17 @@ export class SimpleAirtableStorage implements IStorage {
 
   private transformMembershipFeeByYearRecord(record: any): MembershipFeeByYear {
     const fields = record.fields;
+    
+    // Debug log to see available fields
+    console.log('Membership fee school x year fields:', Object.keys(fields));
+    
     return {
       id: record.id,
       schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
-      schoolYear: fields["School Year"] || undefined,
+      schoolYear: fields["School Year"] || fields["school_year"] || undefined,
+      feeAmount: fields["Fee Amount"] || fields["amount"] || fields["Amount"] || undefined,
+      status: fields["Status"] || undefined,
+      dueDate: fields["Due Date"] || fields["due_date"] || undefined,
       notes: fields["Notes"] || undefined,
     };
   }
