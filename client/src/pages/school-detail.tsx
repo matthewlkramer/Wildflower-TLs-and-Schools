@@ -2,7 +2,7 @@ import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Edit, Trash2, Plus, X, ExternalLink, UserMinus, Calendar } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Plus, X, ExternalLink, UserMinus, Calendar, School2, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { School2, User } from "lucide-react";
+
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation, type Location, type GuideAssignment, type GovernanceDocument, type SchoolNote, type Grant, type Loan, type MembershipFeeByYear, type MembershipFeeUpdate, type ActionStep, type Tax990 } from "@shared/schema";
@@ -664,6 +664,15 @@ function GovernanceDocumentRow({
       <TableCell>
         <div className="flex gap-1">
           <Button
+            variant="outline"
+            size="sm"
+            onClick={() => document.docUrl && window.open(document.docUrl, '_blank')}
+            className="h-8 w-8 p-0"
+            disabled={!document.docUrl}
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Button>
+          <Button
             size="sm"
             variant="outline"
             onClick={onEdit}
@@ -678,6 +687,123 @@ function GovernanceDocumentRow({
             className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
           >
             <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+// Tax990Row component for inline editing
+function Tax990Row({ 
+  tax990, 
+  isEditing, 
+  onEdit, 
+  onSave, 
+  onCancel, 
+  onDelete, 
+  isSaving 
+}: {
+  tax990: Tax990;
+  isEditing: boolean;
+  onEdit: () => void;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+  onDelete: () => void;
+  isSaving: boolean;
+}) {
+  const [editData, setEditData] = useState({
+    year: tax990.year || "",
+    attachment: tax990.attachment || "",
+  });
+
+  useEffect(() => {
+    if (isEditing) {
+      setEditData({
+        year: tax990.year || "",
+        attachment: tax990.attachment || "",
+      });
+    }
+  }, [isEditing, tax990]);
+
+  const handleSave = () => {
+    onSave(editData);
+  };
+
+  if (isEditing) {
+    return (
+      <TableRow className="h-8">
+        <TableCell>
+          <Input
+            value={editData.year}
+            onChange={(e) => setEditData({...editData, year: e.target.value})}
+            placeholder="Year"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={editData.attachment}
+            onChange={(e) => setEditData({...editData, attachment: e.target.value})}
+            placeholder="Attachment"
+            className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+            >
+              Save
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSaving}
+              className="h-8 px-2"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  return (
+    <TableRow className="h-8">
+      <TableCell className="py-1 text-sm">{tax990.year || '-'}</TableCell>
+      <TableCell className="py-1 text-sm">{tax990.attachment || '-'}</TableCell>
+      <TableCell className="py-1">
+        <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onEdit}
+            className="h-8 w-8 p-0"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onDelete}
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => tax990.attachmentUrl && window.open(tax990.attachmentUrl, '_blank')}
+            className="h-6 px-2"
+            disabled={!tax990.attachmentUrl}
+          >
+            <ExternalLink className="w-3 h-3" />
           </Button>
         </div>
       </TableCell>
@@ -1105,6 +1231,11 @@ export default function SchoolDetail() {
   const [editingDocumentId, setEditingDocumentId] = useState<string | null>(null);
   const [deletingDocumentId, setDeletingDocumentId] = useState<string | null>(null);
   const [documentDeleteModalOpen, setDocumentDeleteModalOpen] = useState(false);
+  
+  // Tax 990s state
+  const [editingTax990Id, setEditingTax990Id] = useState<string | null>(null);
+  const [deletingTax990Id, setDeletingTax990Id] = useState<string | null>(null);
+  const [tax990DeleteModalOpen, setTax990DeleteModalOpen] = useState(false);
   const [isCreatingDocument, setIsCreatingDocument] = useState(false);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
@@ -1615,6 +1746,50 @@ export default function SchoolDetail() {
       toast({
         title: "Error",
         description: "Failed to delete governance document",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Tax 990s mutations
+  const updateTax990Mutation = useMutation({
+    mutationFn: async ({ tax990Id, data }: { tax990Id: string; data: any }) => {
+      return await apiRequest("PATCH", `/api/tax-990s/${tax990Id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/tax-990s/school/${id}`] });
+      setEditingTax990Id(null);
+      toast({
+        title: "Success",
+        description: "990 updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update 990",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteTax990Mutation = useMutation({
+    mutationFn: async (tax990Id: string) => {
+      return await apiRequest("DELETE", `/api/tax-990s/${tax990Id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/tax-990s/school/${id}`] });
+      setTax990DeleteModalOpen(false);
+      setDeletingTax990Id(null);
+      toast({
+        title: "Success",
+        description: "990 deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete 990",
         variant: "destructive",
       });
     },
@@ -2536,7 +2711,14 @@ export default function SchoolDetail() {
                                   </TableRow>
                                 )}
                                 {governanceDocuments && governanceDocuments.length > 0 ? (
-                                  governanceDocuments.map((document) => (
+                                  governanceDocuments
+                                    .sort((a, b) => {
+                                      // Sort by document type alphabetically
+                                      const typeA = (a.docType || '').toLowerCase();
+                                      const typeB = (b.docType || '').toLowerCase();
+                                      return typeA.localeCompare(typeB);
+                                    })
+                                    .map((document) => (
                                     <GovernanceDocumentRow
                                       key={document.id}
                                       document={document}
@@ -2596,24 +2778,27 @@ export default function SchoolDetail() {
                                 </TableCell>
                               </TableRow>
                             ) : tax990s && tax990s.length > 0 ? (
-                              tax990s.map((tax990) => (
-                                <TableRow key={tax990.id} className="h-8">
-                                  <TableCell className="py-1 text-sm">{tax990.year || '-'}</TableCell>
-                                  <TableCell className="py-1 text-sm">{tax990.attachment || '-'}</TableCell>
-                                  <TableCell className="py-1">
-                                    <div className="flex gap-1">
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => tax990.attachmentUrl && window.open(tax990.attachmentUrl, '_blank')}
-                                        className="h-6 px-2"
-                                        disabled={!tax990.attachmentUrl}
-                                      >
-                                        <ExternalLink className="w-3 h-3" />
-                                      </Button>
-                                    </div>
-                                  </TableCell>
-                                </TableRow>
+                              tax990s
+                                .sort((a, b) => {
+                                  // Sort by year descending (most recent first)
+                                  const yearA = parseInt(a.year || '0');
+                                  const yearB = parseInt(b.year || '0');
+                                  return yearB - yearA;
+                                })
+                                .map((tax990) => (
+                                <Tax990Row
+                                  key={tax990.id}
+                                  tax990={tax990}
+                                  isEditing={editingTax990Id === tax990.id}
+                                  onEdit={() => setEditingTax990Id(tax990.id)}
+                                  onSave={(data) => updateTax990Mutation.mutate({ tax990Id: tax990.id, data })}
+                                  onCancel={() => setEditingTax990Id(null)}
+                                  onDelete={() => {
+                                    setDeletingTax990Id(tax990.id);
+                                    setTax990DeleteModalOpen(true);
+                                  }}
+                                  isSaving={updateTax990Mutation.isPending}
+                                />
                               ))
                             ) : (
                               <TableRow className="h-8">
@@ -3536,6 +3721,19 @@ export default function SchoolDetail() {
         title="Delete Governance Document"
         description="Are you sure you want to delete this governance document? This action cannot be undone."
         isLoading={deleteGovernanceDocumentMutation.isPending}
+      />
+
+      <DeleteConfirmationModal
+        open={tax990DeleteModalOpen}
+        onOpenChange={setTax990DeleteModalOpen}
+        onConfirm={() => {
+          if (deletingTax990Id) {
+            deleteTax990Mutation.mutate(deletingTax990Id);
+          }
+        }}
+        title="Delete 990"
+        description="Are you sure you want to delete this 990 record? This action cannot be undone."
+        isLoading={deleteTax990Mutation.isPending}
       />
     </>
   );

@@ -1840,7 +1840,7 @@ export class SimpleAirtableStorage implements IStorage {
       id: record.id,
       schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
       dateCreated: fields["Date created"] || undefined,
-      createdBy: fields["Created by"] || undefined,
+      createdBy: fields["Created by"]?.name || fields["Created by"] || undefined,
       notes: fields["Notes"] || undefined,
       isPrivate: fields["Is Private"] || false,
     };
@@ -1866,12 +1866,7 @@ export class SimpleAirtableStorage implements IStorage {
     const year = fields["990 Reporting Year"];
     const pdfField = fields["PDF"];
     
-    console.log('Debug year field:', { 
-      recordId: record.id, 
-      yearRaw: fields["990 Reporting Year"], 
-      yearValue: year,
-      yearType: typeof year
-    });
+
     
     let attachment = "";
     let attachmentUrl = "";

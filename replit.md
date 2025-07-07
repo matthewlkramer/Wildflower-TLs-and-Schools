@@ -156,6 +156,10 @@ Changelog:
 - July 07, 2025. Fixed membership fees API integration by updating table name from "Membership Fee by Year" to "Membership Fee overview" in Airtable configuration
 - July 07, 2025. Fixed membership fee updates API filtering by correcting field name from {school_id} to {Schools} for proper Airtable data retrieval
 - July 07, 2025. Resolved JSX syntax errors in school detail page by removing duplicate content sections and ensuring proper component structure
+- July 07, 2025. Fixed school notes table showing IDs instead of names by correcting createdBy field mapping to extract .name property from Airtable records
+- July 07, 2025. Implemented comprehensive inline editing for 990s table: created Tax990Row component with edit/delete actions, added API routes (PATCH/DELETE), and integrated delete confirmation modal
+- July 07, 2025. Enhanced governance documents table with open action: added external link button to open documents in new tab, completing the open/edit/delete action pattern
+- July 07, 2025. Standardized table actions across governance and financial tabs: 990s table sorted by year descending with edit/delete, governance docs sorted alphabetically by type with open/edit/delete
 ```
 
 ## User Preferences

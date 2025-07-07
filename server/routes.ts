@@ -422,6 +422,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/tax-990s/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      const tax990 = await storage.updateTax990(id, updates);
+      if (!tax990) {
+        return res.status(404).json({ message: "Tax 990 not found" });
+      }
+      res.json(tax990);
+    } catch (error) {
+      console.error("Error updating tax 990:", error);
+      res.status(500).json({ message: "Failed to update tax 990" });
+    }
+  });
+
+  app.delete("/api/tax-990s/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteTax990(id);
+      if (!success) {
+        return res.status(404).json({ message: "Tax 990 not found" });
+      }
+      res.json({ message: "Tax 990 deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting tax 990:", error);
+      res.status(500).json({ message: "Failed to delete tax 990" });
+    }
+  });
+
   app.post("/api/governance-documents", async (req, res) => {
     try {
       const { governanceDocumentSchema } = await import("@shared/schema");
