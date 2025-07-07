@@ -298,7 +298,7 @@ export class SimpleAirtableStorage implements IStorage {
       governanceModel: fields["Governance Model"] || undefined,
       status: fields["Stage_Status"] || undefined,
       stageStatus: fields["Stage_Status"] || undefined,
-      openDate: fields["Open Date"] || fields["SSJ - Original Projected Open Date"] || fields["Entered Startup Date"] || undefined,
+      openDate: fields["Opened"] || fields["Open Date"] || fields["SSJ - Original Projected Open Date"] || fields["Entered Startup Date"] || undefined,
       enrollmentCap: fields["Enrollment at Full Capacity"] || undefined,
       lastModified: fields["Last Modified"] || undefined,
       currentTLs: fields["Current TLs"] || undefined,
