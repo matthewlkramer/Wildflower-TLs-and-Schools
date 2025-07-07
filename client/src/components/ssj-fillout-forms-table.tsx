@@ -22,12 +22,6 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
 
   const columnDefs: ColDef<SSJFilloutForm>[] = [
     {
-      headerName: "Form Name",
-      field: "formName",
-      flex: 2,
-      filter: "agTextColumnFilter",
-    },
-    {
       headerName: "Form Type",
       field: "formType",
       flex: 1,
@@ -38,16 +32,19 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
       field: "dateSubmitted",
       flex: 1,
       filter: "agTextColumnFilter",
+      valueFormatter: (params) => {
+        if (!params.value) return '';
+        try {
+          const date = new Date(params.value);
+          return date.toLocaleDateString();
+        } catch {
+          return params.value;
+        }
+      },
     },
     {
       headerName: "Status",
       field: "status",
-      flex: 1,
-      filter: "agTextColumnFilter",
-    },
-    {
-      headerName: "Submission ID",
-      field: "submissionId",
       flex: 1,
       filter: "agTextColumnFilter",
     },

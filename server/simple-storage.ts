@@ -222,15 +222,15 @@ export class SimpleAirtableStorage implements IStorage {
       firstContactWFSchoolEmploymentStatus: fields['First Contact - WF School Employment Status'] || '',
       firstContactAges: fields['First Contact - initial interest in ages'] || [],
       firstContactInterests: fields['First Contact - Initial Interests'] || '',
-      // Early Cultivation Data
+      // Early Cultivation Data - Updated field mappings based on SSJ form data
       source: fields['Source'] || undefined,
-      sendgridTemplateSelected: fields['SendGrid Template Selected'] || undefined,
-      sendgridSendDate: fields['SendGrid Send Date'] || undefined,
+      sendgridTemplateSelected: fields['SendGrid template id'] || fields['SendGrid Template Selected'] || undefined,
+      sendgridSendDate: fields['SendGrid sent date'] || fields['SendGrid Send Date'] || undefined,
       routedTo: fields['Routed To'] || undefined,
       assignedPartnerOverride: fields['Assigned Partner Override'] || undefined,
-      personalEmailSent: fields['Personal Email Sent'] === true,
+      personalEmailSent: fields['Email sent by Initial Outreacher?'] === 'Yes' || fields['Personal Email Sent'] === true,
       personalEmailSentDate: fields['Personal Email Sent Date'] || undefined,
-      personResponsibleForFollowUp: fields['Person Responsible for Follow Up'] || undefined,
+      personResponsibleForFollowUp: fields['Person responsible for follow up'] || fields['Person Responsible for Follow Up'] || undefined,
       oneOnOneSchedulingStatus: fields['One on One Scheduling Status'] || undefined,
       opsGuideMeetingPrefTime: fields['Ops Guide Meeting Preferrence Time'] || '',
       opsGuideSpecificsChecklist: fields['Ops Guide Specifics Checklist'] || [],
@@ -1488,12 +1488,7 @@ export class SimpleAirtableStorage implements IStorage {
   private transformSSJFilloutFormRecord(record: any): SSJFilloutForm {
     const fields = record.fields;
     
-    // Debug: Let's log all available fields to understand the structure
-    if (Object.keys(fields).length > 2) {
-      console.log('=== SSJ FILLOUT FORM DEBUG ===');
-      console.log('Available fields:', Object.keys(fields));
-      console.log('Sample field values:', fields);
-    }
+
     
     return {
       id: record.id,
@@ -1513,12 +1508,7 @@ export class SimpleAirtableStorage implements IStorage {
   private transformEmailAddressRecord(record: any): EmailAddress {
     const fields = record.fields;
     
-    // Debug: Let's log all available fields to understand the structure
-    if (Object.keys(fields).length > 2) {
-      console.log('=== EMAIL ADDRESS DEBUG ===');
-      console.log('Available fields:', Object.keys(fields));
-      console.log('Sample field values:', fields);
-    }
+
     
     return {
       id: record.id,
@@ -1600,12 +1590,7 @@ export class SimpleAirtableStorage implements IStorage {
   private transformMontessoriCertificationRecord(record: any): MontessoriCertification {
     const fields = record.fields;
     
-    // Debug: Let's log all available fields to understand the structure
-    if (Object.keys(fields).length > 2) {
-      console.log('=== MONTESSORI CERTIFICATION DEBUG ===');
-      console.log('Available fields:', Object.keys(fields));
-      console.log('Sample field values:', fields);
-    }
+
     
     return {
       id: record.id,
