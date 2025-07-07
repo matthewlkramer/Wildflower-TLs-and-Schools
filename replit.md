@@ -150,6 +150,12 @@ Changelog:
 - July 07, 2025. Enhanced Google Maps flower markers to prioritize logoFlowerOnly field when available, with fallback to original logo field for custom school branding on map markers
 - July 07, 2025. Updated school summary logo display to prioritize logoMainSquare field for better square format display in summary section, maintaining fallback chain for compatibility
 - July 07, 2025. Updated logo fallback logic per user preferences: Google Maps now uses logoFlowerOnly → logoMainSquare → logo; School summary now uses logoMainRectangle → logoMainSquare → logo for optimal display formats
+- July 07, 2025. Added Program Details section to school details tab with program focus, school calendar, school schedule, ages served, number of classrooms, and enrollment capacity fields
+- July 07, 2025. Added governance model field to Legal Entity section in school details tab
+- July 07, 2025. Enhanced Support tab with improved visual design: created Overview cards with gradient backgrounds, organized sections for Timeline & Milestones, Facility & Infrastructure, Funding & Financial Planning, and Albums & Cohorts with proper icons and structured layouts
+- July 07, 2025. Fixed membership fees API integration by updating table name from "Membership Fee by Year" to "Membership Fee overview" in Airtable configuration
+- July 07, 2025. Fixed membership fee updates API filtering by correcting field name from {school_id} to {Schools} for proper Airtable data retrieval
+- July 07, 2025. Resolved JSX syntax errors in school detail page by removing duplicate content sections and ensuring proper component structure
 ```
 
 ## User Preferences

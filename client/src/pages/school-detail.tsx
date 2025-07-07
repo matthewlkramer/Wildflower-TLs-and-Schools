@@ -1990,6 +1990,49 @@ export default function SchoolDetail() {
                 <TabsContent value="details" className="mt-0">
                   <div className="space-y-6">
 
+                    {/* Program Details Section */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4">Program Details</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Program Focus</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.programFocus || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">School Calendar</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.schoolCalendar || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">School Schedule</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.schoolSchedule || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Ages Served</label>
+                          <div className="mt-1">
+                            {school.agesServed && school.agesServed.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {school.agesServed.map((age, idx) => (
+                                  <Badge key={idx} variant="secondary" className="text-xs">
+                                    {age}
+                                  </Badge>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-slate-400">-</p>
+                            )}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Number of Classrooms</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.numberOfClassrooms || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Enrollment Capacity</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.enrollmentCap || '-'}</p>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Legal Entity Section */}
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
                       <h3 className="text-lg font-semibold text-slate-900 mb-4">Legal Entity</h3>
@@ -2017,6 +2060,10 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Current FY End</label>
                           <p className="text-sm text-slate-900 mt-1">{school.currentFYEnd || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Governance Model</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.governanceModel || '-'}</p>
                         </div>
                       </div>
                       {/* Group Exemption Fields - Always show */}
@@ -2453,206 +2500,178 @@ export default function SchoolDetail() {
 
                 <TabsContent value="support" className="mt-0">
                   <div className="space-y-6">
-                    {/* SSJ/OSS Data Section */}
-                    <div>
-                      <h4 className="font-medium text-slate-900 mb-4">SSJ/OSS Data</h4>
-                      
-                      {/* Stage & Timeline */}
-                      <div className="mb-6">
-                        <h5 className="text-sm font-medium text-slate-700 mb-3">Stage & Timeline</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">SSJ Stage</label>
-                            <p className="text-sm text-slate-900">{school.ssjStage || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">SSJ Tool</label>
-                            <p className="text-sm text-slate-900">{school.ssjTool || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Original Projected Open Date</label>
-                            <p className="text-sm text-slate-900">{school.ssjOriginalProjectedOpenDate || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Projected Open School Year</label>
-                            <p className="text-sm text-slate-900">{school.ssjProjOpenSchoolYear || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">SSJ Projected Open</label>
-                            <p className="text-sm text-slate-900">{school.ssjProjectedOpen || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Entered Visioning Date</label>
-                            <p className="text-sm text-slate-900">{school.enteredVisioningDate || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Entered Planning Date</label>
-                            <p className="text-sm text-slate-900">{school.enteredPlanningDate || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Entered Startup Date</label>
-                            <p className="text-sm text-slate-900">{school.enteredStartupDate || '-'}</p>
-                          </div>
+                    {/* School Support Journey Overview */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        School Support Journey Overview
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+                          <label className="text-xs font-medium text-blue-600 uppercase tracking-wider">SSJ Tool</label>
+                          <p className="text-sm font-semibold text-blue-900 mt-1">{school.ssjTool || 'Not specified'}</p>
                         </div>
-                      </div>
-
-                      {/* Operations & Readiness */}
-                      <div className="mb-6">
-                        <h5 className="text-sm font-medium text-slate-700 mb-3">Operations & Readiness</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Has ETL Partner</label>
-                            <p className="text-sm text-slate-900">{school.ssjHasETLPartner || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Ops Guide Track</label>
-                            <p className="text-sm text-slate-900">{school.ssjOpsGuideTrack ? (Array.isArray(school.ssjOpsGuideTrack) ? school.ssjOpsGuideTrack.join(', ') : school.ssjOpsGuideTrack) : '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Readiness Rating</label>
-                            <p className="text-sm text-slate-900">{school.ssjReadinessRating || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Budget Ready</label>
-                            <p className="text-sm text-slate-900">{school.ssjBudgetReady || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Enrollment On Track</label>
-                            <p className="text-sm text-slate-900">{school.ssjEnrollmentOnTrack || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Cohort Status</label>
-                            <p className="text-sm text-slate-900">{school.ssjCohortStatus || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Board Development</label>
-                            <p className="text-sm text-slate-900">{school.ssjBoardDevelopment || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Name Reserved</label>
-                            <p className="text-sm text-slate-900">{school.ssjNameReserved || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Next Big Decision</label>
-                            <p className="text-sm text-slate-900">{school.ssjNextBigDecision || '-'}</p>
-                          </div>
+                        <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+                          <label className="text-xs font-medium text-green-600 uppercase tracking-wider">Stage</label>
+                          <p className="text-sm font-semibold text-green-900 mt-1">{school.ssjStage || 'Not specified'}</p>
                         </div>
-                      </div>
-
-                      {/* Facility & Building */}
-                      <div className="mb-6">
-                        <h5 className="text-sm font-medium text-slate-700 mb-3">Facility & Building</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">SSJ Facility</label>
-                            <p className="text-sm text-slate-900">{school.ssjFacility || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">B4G Status</label>
-                            <p className="text-sm text-slate-900">{school.ssjB4GStatus || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Date Shared with N4G</label>
-                            <p className="text-sm text-slate-900">{school.ssjDateSharedWithN4G || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Building4Good Firm</label>
-                            <p className="text-sm text-slate-900">{school.building4GoodFirm || '-'}</p>
-                          </div>
+                        <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
+                          <label className="text-xs font-medium text-purple-600 uppercase tracking-wider">Ops Guide Track</label>
+                          <p className="text-sm font-semibold text-purple-900 mt-1">
+                            {school.ssjOpsGuideTrack && school.ssjOpsGuideTrack.length > 0 
+                              ? school.ssjOpsGuideTrack.join(', ') 
+                              : 'Not specified'
+                            }
+                          </p>
                         </div>
-                      </div>
-
-                      {/* Funding */}
-                      <div className="mb-6">
-                        <h5 className="text-sm font-medium text-slate-700 mb-3">Funding</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Funding Gap</label>
-                            <p className="text-sm text-slate-900">{school.ssjFundingGap || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Amount Raised</label>
-                            <p className="text-sm text-slate-900">{school.ssjAmountRaised || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Loan Approved Amount</label>
-                            <p className="text-sm text-slate-900">{school.ssjLoanApprovedAmount || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Loan Eligibility</label>
-                            <p className="text-sm text-slate-900">{school.ssjLoanEligibility || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Viable Funding Path</label>
-                            <p className="text-sm text-slate-900">{school.ssjViableFundingPath || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Total Startup Funding Required</label>
-                            <p className="text-sm text-slate-900">{school.ssjTotalStartupFundingReq || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Fundraising Narrative</label>
-                            <p className="text-sm text-slate-900">{school.ssjFundraisingNarrative || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Planning for WF Funding</label>
-                            <p className="text-sm text-slate-900">{school.ssjPlanningForWFFunding || '-'}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Albums & Cohorts */}
-                      <div className="mb-6">
-                        <h5 className="text-sm font-medium text-slate-700 mb-3">Albums & Cohorts</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Planning Album</label>
-                            <p className="text-sm text-slate-900">{school.planningAlbum || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Visioning Album</label>
-                            <p className="text-sm text-slate-900">{school.visioningAlbum || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Visioning Album Complete</label>
-                            <p className="text-sm text-slate-900">{school.visioningAlbumComplete ? 'Yes' : 'No'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Cohorts</label>
-                            <p className="text-sm text-slate-900">{school.cohorts ? (Array.isArray(school.cohorts) ? school.cohorts.join(', ') : school.cohorts) : '-'}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Risk & Partners */}
-                      <div className="mb-6">
-                        <h5 className="text-sm font-medium text-slate-700 mb-3">Risk Factors & Partners</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Risk Factors</label>
-                            <p className="text-sm text-slate-900">{school.riskFactors ? (Array.isArray(school.riskFactors) ? school.riskFactors.join(', ') : school.riskFactors) : '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Watchlist</label>
-                            <p className="text-sm text-slate-900">{school.watchlist ? (Array.isArray(school.watchlist) ? school.watchlist.join(', ') : school.watchlist) : '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Active Assigned Partner Email</label>
-                            <p className="text-sm text-slate-900">{school.activeAssignedPartnerEmail || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Active Assigned Partner Override</label>
-                            <p className="text-sm text-slate-900">{school.activeAssignedPartnerOverride || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Active Assigned Partner Short Name</label>
-                            <p className="text-sm text-slate-900">{school.activeAssignedPartnerShortName || '-'}</p>
-                          </div>
+                        <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
+                          <label className="text-xs font-medium text-orange-600 uppercase tracking-wider">Readiness Rating</label>
+                          <p className="text-sm font-semibold text-orange-900 mt-1">{school.ssjReadinessRating || 'Not specified'}</p>
                         </div>
                       </div>
                     </div>
 
+                    {/* Timeline & Milestones */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Timeline & Milestones
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Original Projected Open Date</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjOriginalProjectedOpenDate || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Projected Open School Year</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjProjOpenSchoolYear || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Projected Open Date</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjProjectedOpen || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Entered Visioning Date</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.enteredVisioningDate || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Entered Planning Date</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.enteredPlanningDate || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Entered Startup Date</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.enteredStartupDate || '-'}</p>
+                        </div>
+                      </div>
+                    </div>
 
+                    {/* Facility & Infrastructure */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        Facility & Infrastructure
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">SSJ Facility</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjFacility || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">B4G Status</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjB4GStatus || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Date Shared with N4G</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjDateSharedWithN4G || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Building4Good Firm</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.building4GoodFirm || '-'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Funding & Financial */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Funding & Financial Planning
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Funding Gap</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjFundingGap || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Amount Raised</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjAmountRaised || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Loan Approved Amount</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjLoanApprovedAmount || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Loan Eligibility</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjLoanEligibility || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Viable Funding Path</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjViableFundingPath || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Startup Funding Required</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjTotalStartupFundingReq || '-'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Albums & Cohorts */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        Albums & Cohorts
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Planning Album</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.planningAlbum || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Visioning Album</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.visioningAlbum || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Visioning Album Complete</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.visioningAlbumComplete ? 'Yes' : 'No'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Cohorts</label>
+                          <div className="mt-1">
+                            {school.cohorts && school.cohorts.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {school.cohorts.map((cohort, idx) => (
+                                  <Badge key={idx} variant="outline" className="text-xs">
+                                    {cohort}
+                                  </Badge>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-slate-400">-</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </TabsContent>
 

@@ -1688,7 +1688,7 @@ export class SimpleAirtableStorage implements IStorage {
   async getMembershipFeesByYear(): Promise<MembershipFeeByYear[]> {
     try {
       const base = Airtable.base(this.airtableBaseId);
-      const table = base('Membership Fee by Year');
+      const table = base('Membership Fee overview');
       const records = await table.select().all();
       return records.map(record => this.transformMembershipFeeByYearRecord(record));
     } catch (error) {
@@ -1754,7 +1754,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Membership Fee Updates');
       const records = await table.select({
-        filterByFormula: `{school_id} = "${schoolId}"`
+        filterByFormula: `{Schools} = "${schoolId}"`
       }).all();
       return records.map(record => this.transformMembershipFeeUpdateRecord(record));
     } catch (error) {
@@ -1767,7 +1767,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Membership Fee Updates');
       const records = await table.select({
-        filterByFormula: `AND({school_id} = "${schoolId}", {School Year} = "${schoolYear}")`
+        filterByFormula: `AND({Schools} = "${schoolId}", {School Year} = "${schoolYear}")`
       }).all();
       return records.map(record => this.transformMembershipFeeUpdateRecord(record));
     } catch (error) {
@@ -1809,7 +1809,7 @@ export class SimpleAirtableStorage implements IStorage {
     const fields = record.fields;
     return {
       id: record.id,
-      schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
+      schoolId: Array.isArray(fields["Schools"]) ? fields["Schools"][0] : fields["Schools"] || undefined,
       schoolYear: fields["School Year"] || undefined,
       updateDate: fields["Update Date"] || undefined,
       updateType: fields["Update Type"] || undefined,
