@@ -128,6 +128,15 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                     <Plus className="h-4 w-4 sm:mr-2" />
                     <span className="hidden sm:inline">{addNewOptions[0].label}</span>
                   </Button>
+                ) : addNewOptions && addNewOptions.length === 0 ? (
+                  <Button 
+                    disabled
+                    className="bg-gray-400 text-gray-600 flex-shrink-0 cursor-not-allowed"
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Add New</span>
+                  </Button>
                 ) : (
                   <Button 
                     onClick={handleAddNew}

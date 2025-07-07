@@ -1285,6 +1285,13 @@ export default function SchoolDetail() {
             { label: "Add Grant", onClick: () => setIsCreatingGrant(true) },
             { label: "Add Loan", onClick: () => setIsCreatingLoan(true) }
           ];
+        case "membership":
+          return []; // No add functionality on this tab
+        case "summary":
+        case "details":
+        case "support":
+        case "systems":
+          return []; // These tabs have no add functionality
         default:
           return [];
       }
