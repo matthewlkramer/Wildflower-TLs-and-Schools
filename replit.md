@@ -149,6 +149,7 @@ Changelog:
 - July 07, 2025. Added four new logo fields to School schema: logoMainSquare, logoFlowerOnly, logoMainRectangle, logoUrl - mapped from new Airtable attachment fields "Logo - main square", "Logo - flower only", "Logo - main rectangle", and "Logo URL"
 - July 07, 2025. Enhanced Google Maps flower markers to prioritize logoFlowerOnly field when available, with fallback to original logo field for custom school branding on map markers
 - July 07, 2025. Updated school summary logo display to prioritize logoMainSquare field for better square format display in summary section, maintaining fallback chain for compatibility
+- July 07, 2025. Updated logo fallback logic per user preferences: Google Maps now uses logoFlowerOnly → logoMainSquare → logo; School summary now uses logoMainRectangle → logoMainSquare → logo for optimal display formats
 ```
 
 ## User Preferences
