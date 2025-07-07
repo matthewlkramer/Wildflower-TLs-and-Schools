@@ -2,7 +2,7 @@ import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Edit, Trash2, Plus, X, ExternalLink, UserMinus, Calendar, School2, User, Edit2, Eye, Check } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Plus, X, ExternalLink, UserMinus, Calendar, School2, User, Edit2, Eye, Check, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -1253,6 +1253,7 @@ export default function SchoolDetail() {
     notes: "",
   });
   const [selectedNote, setSelectedNote] = useState<SchoolNote | null>(null);
+  const [selectedActionStep, setSelectedActionStep] = useState<ActionStep | null>(null);
   const [newGrant, setNewGrant] = useState({
     amount: 0,
     issuedDate: "",
@@ -3990,11 +3991,11 @@ export default function SchoolDetail() {
                             <Table className="table-fixed w-full">
                               <TableHeader>
                                 <TableRow>
-                                  <TableHead className="w-[40%]">Action item</TableHead>
+                                  <TableHead className="w-[35%]">Action item</TableHead>
                                   <TableHead className="w-[15%]">Assignee</TableHead>
                                   <TableHead className="w-[15%]">Due Date</TableHead>
                                   <TableHead className="w-[15%]">Status</TableHead>
-                                  <TableHead className="w-[15%]">Actions</TableHead>
+                                  <TableHead className="w-[20%]">Actions</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -4036,6 +4037,15 @@ export default function SchoolDetail() {
                                           size="sm"
                                           variant="outline"
                                           className="h-6 w-6 p-0"
+                                          onClick={() => setSelectedActionStep(step)}
+                                          title="Open action item details"
+                                        >
+                                          <ExternalLink className="h-3 w-3" />
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="h-6 w-6 p-0"
                                           onClick={() => {/* Edit action step */}}
                                           title="Edit action item"
                                         >
@@ -4046,14 +4056,13 @@ export default function SchoolDetail() {
                                           variant="outline"
                                           className={`h-6 w-6 p-0 ${
                                             step.isCompleted 
-                                              ? 'bg-gray-100 text-gray-600' 
+                                              ? 'bg-orange-50 text-orange-700 hover:bg-orange-100' 
                                               : 'bg-green-50 text-green-700 hover:bg-green-100'
                                           }`}
-                                          onClick={() => {/* Mark complete */}}
-                                          disabled={step.isCompleted}
-                                          title={step.isCompleted ? "Already completed" : "Mark as complete"}
+                                          onClick={() => {/* Toggle complete status */}}
+                                          title={step.isCompleted ? "Mark as incomplete" : "Mark as complete"}
                                         >
-                                          <Check className="h-3 w-3" />
+                                          {step.isCompleted ? <RotateCcw className="h-3 w-3" /> : <Check className="h-3 w-3" />}
                                         </Button>
                                         <Button
                                           size="sm"
@@ -4220,6 +4229,76 @@ export default function SchoolDetail() {
                 setEditingNoteId(selectedNote.id);
               }}>
                 Edit Note
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Action Step View Modal */}
+      {selectedActionStep && (
+        <Dialog open={!!selectedActionStep} onOpenChange={() => setSelectedActionStep(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Action Step Details</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">Assignee</Label>
+                  <p className="text-sm text-slate-900">{selectedActionStep.assignee || '-'}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">Status</Label>
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                    selectedActionStep.isCompleted 
+                      ? 'bg-green-100 text-green-800' 
+                      : selectedActionStep.status === 'In Progress'
+                      ? 'bg-blue-100 text-blue-800'
+                      : selectedActionStep.status === 'Overdue'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {selectedActionStep.status || 'Pending'}
+                  </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">Assigned Date</Label>
+                  <p className="text-sm text-slate-900">{selectedActionStep.assignedDate ? new Date(selectedActionStep.assignedDate).toLocaleDateString() : '-'}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">Due Date</Label>
+                  <p className="text-sm text-slate-900">{selectedActionStep.dueDate ? new Date(selectedActionStep.dueDate).toLocaleDateString() : '-'}</p>
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-slate-600">Action Item Description</Label>
+                <div className="p-3 bg-slate-50 rounded-md border">
+                  <p className="text-sm text-slate-900 whitespace-pre-wrap">{selectedActionStep.item || '-'}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">Record ID</Label>
+                  <p className="text-xs text-slate-500 font-mono">{selectedActionStep.id}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">School ID</Label>
+                  <p className="text-xs text-slate-500 font-mono">{selectedActionStep.schoolId}</p>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setSelectedActionStep(null)}>
+                Close
+              </Button>
+              <Button onClick={() => {
+                setSelectedActionStep(null);
+                // Could add edit functionality here
+              }}>
+                Edit Action Step
               </Button>
             </DialogFooter>
           </DialogContent>

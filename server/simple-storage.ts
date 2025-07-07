@@ -1780,9 +1780,12 @@ export class SimpleAirtableStorage implements IStorage {
   async getMembershipFeesBySchoolId(schoolId: string): Promise<MembershipFeeByYear[]> {
     try {
       const table = base('Membership fee school x year');
+      
+      // Use the correct field name "School" based on debug output
       const records = await table.select({
-        filterByFormula: `{school_id} = "${schoolId}"`
+        filterByFormula: `FIND("${schoolId}", ARRAYJOIN({School})) > 0`
       }).all();
+      
       return records.map(record => this.transformMembershipFeeByYearRecord(record));
     } catch (error) {
       console.error('Error fetching membership fees by school ID:', error);
@@ -1805,16 +1808,13 @@ export class SimpleAirtableStorage implements IStorage {
   private transformMembershipFeeByYearRecord(record: any): MembershipFeeByYear {
     const fields = record.fields;
     
-    // Debug log to see available fields
-    console.log('Membership fee school x year fields:', Object.keys(fields));
-    
     return {
       id: record.id,
-      schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
-      schoolYear: fields["School Year"] || fields["school_year"] || undefined,
-      feeAmount: fields["Fee Amount"] || fields["amount"] || fields["Amount"] || undefined,
-      status: fields["Status"] || undefined,
-      dueDate: fields["Due Date"] || fields["due_date"] || undefined,
+      schoolId: Array.isArray(fields["School"]) ? fields["School"][0] : fields["School"] || undefined,
+      schoolYear: fields["School year"] || undefined,
+      feeAmount: fields["Initial fee"] || fields["Revised amount"] || undefined,
+      status: fields["Current exemption status"] || undefined,
+      dueDate: fields["End date (from School year)"] || undefined,
       notes: fields["Notes"] || undefined,
     };
   }
@@ -1844,10 +1844,23 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getMembershipFeeUpdatesBySchoolId(schoolId: string): Promise<MembershipFeeUpdate[]> {
     try {
+      // First get all membership fee records for this school
+      const membershipFees = await this.getMembershipFeesBySchoolId(schoolId);
+      const feeRecordIds = membershipFees.map(fee => fee.id);
+      
+      if (feeRecordIds.length === 0) {
+        return [];
+      }
+      
+      // Then get updates that reference these fee records
       const table = base('Membership Fee Updates');
-      const records = await table.select({
-        filterByFormula: `{schools} = "${schoolId}"`
-      }).all();
+      const allRecords = await table.select().all();
+      
+      const records = allRecords.filter(record => {
+        const feeRecord = record.fields["Fee Record"];
+        return Array.isArray(feeRecord) && feeRecord.some(id => feeRecordIds.includes(id));
+      });
+      
       return records.map(record => this.transformMembershipFeeUpdateRecord(record));
     } catch (error) {
       console.error('Error fetching membership fee updates by school ID:', error);
@@ -1901,42 +1914,32 @@ export class SimpleAirtableStorage implements IStorage {
     const fields = record.fields;
     return {
       id: record.id,
-      schoolId: Array.isArray(fields["schools"]) ? fields["schools"][0] : fields["schools"] || undefined,
-      schoolYear: fields["School Year"] || undefined,
-      updateDate: fields["Update Date"] || undefined,
-      updateType: fields["Update Type"] || undefined,
-      previousValue: fields["Previous Value"] || undefined,
-      newValue: fields["New Value"] || undefined,
-      updatedBy: fields["Updated By"] || undefined,
-      notes: fields["Notes"] || undefined,
+      schoolId: undefined, // This table doesn't directly link to schools
+      schoolYear: undefined,
+      updateDate: fields["Date"] || undefined,
+      updateType: fields["Update type"] || undefined,
+      previousValue: undefined,
+      newValue: fields["New percent"] || undefined,
+      updatedBy: undefined,
+      notes: undefined,
     };
   }
 
   private transformSchoolNoteRecord(record: any): SchoolNote {
     const fields = record.fields;
     
-    // Extract headline properly - Airtable sometimes returns complex objects
+    // Extract headline properly - Airtable returns objects with structure { state: 'generated', value: 'text', isStale: false }
     let headline = fields["Headline (Notes)"];
-    console.log('=== HEADLINE DEBUG ===');
-    console.log('Raw headline:', headline);
-    console.log('Type:', typeof headline);
-    console.log('Is Array:', Array.isArray(headline));
-    
     if (headline && typeof headline === 'object') {
       // If it's an array, take the first element
       if (Array.isArray(headline)) {
         headline = headline[0];
-        console.log('After array extraction:', headline);
       }
-      // If it's still an object, try to extract text property or convert to string
+      // If it's still an object, extract the value property (common for generated Airtable fields)
       if (typeof headline === 'object') {
-        console.log('Object keys:', Object.keys(headline));
-        headline = headline.text || headline.value || JSON.stringify(headline);
-        console.log('After object extraction:', headline);
+        headline = headline.value || headline.text || JSON.stringify(headline);
       }
     }
-    console.log('Final headline:', headline);
-    console.log('=== END HEADLINE DEBUG ===');
     
     return {
       id: record.id,
