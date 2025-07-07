@@ -166,7 +166,7 @@ function TeacherAssociationRow({
         )}
       </TableCell>
       <TableCell>
-        {association.role ? (
+        {association.role && typeof association.role === 'string' ? (
           <div className="flex flex-wrap gap-1">
             {association.role.split(',').map((role, index) => (
               <Badge key={index} variant="secondary" className="text-xs">
