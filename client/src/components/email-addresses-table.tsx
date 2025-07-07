@@ -4,14 +4,7 @@ import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
 import type { EmailAddress } from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Edit3, Trash2, UserCheck, UserX } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Edit3, Trash2, UserCheck, UserX } from "lucide-react";
 
 interface EmailAddressesTableProps {
   educatorId: string;
@@ -54,47 +47,46 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     if (!emailAddress) return null;
 
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
+      <div className="flex items-center gap-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-6 p-0 hover:bg-blue-50"
+          onClick={() => handleEdit(emailAddress)}
+          title="Edit email address"
+        >
+          <Edit3 className="h-3 w-3 text-blue-600" />
+        </Button>
+        {!emailAddress.isPrimary && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 hover:bg-green-50"
+            onClick={() => handleMakePrimary(emailAddress)}
+            title="Make primary"
+          >
+            <UserCheck className="h-3 w-3 text-green-600" />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={() => handleEdit(emailAddress)}
-            className="cursor-pointer"
-          >
-            <Edit3 className="mr-2 h-4 w-4" />
-            Edit
-          </DropdownMenuItem>
-          {!emailAddress.isPrimary && (
-            <DropdownMenuItem
-              onClick={() => handleMakePrimary(emailAddress)}
-              className="cursor-pointer"
-            >
-              <UserCheck className="mr-2 h-4 w-4" />
-              Make Primary
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuItem
-            onClick={() => handleInactivate(emailAddress)}
-            className="cursor-pointer"
-          >
-            <UserX className="mr-2 h-4 w-4" />
-            Inactivate
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => handleDelete(emailAddress)}
-            className="cursor-pointer text-red-600"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+        )}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-6 p-0 hover:bg-yellow-50"
+          onClick={() => handleInactivate(emailAddress)}
+          title="Inactivate email address"
+        >
+          <UserX className="h-3 w-3 text-yellow-600" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-6 p-0 hover:bg-red-50"
+          onClick={() => handleDelete(emailAddress)}
+          title="Delete email address"
+        >
+          <Trash2 className="h-3 w-3 text-red-600" />
+        </Button>
+      </div>
     );
   };
 
@@ -127,7 +119,7 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     {
       headerName: "Actions",
       field: "actions",
-      width: 80,
+      width: 140,
       cellRenderer: ActionsCellRenderer,
       sortable: false,
       filter: false,

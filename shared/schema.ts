@@ -639,6 +639,7 @@ export interface MembershipFeeUpdate {
   previousValue?: string;
   newValue?: string;
   notes?: string;
+  attachment?: string;
 }
 
 // SSJ Fillout Forms

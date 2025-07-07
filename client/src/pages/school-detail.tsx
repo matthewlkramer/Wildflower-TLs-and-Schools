@@ -3781,16 +3781,15 @@ export default function SchoolDetail() {
                           <Table>
                             <TableHeader>
                               <TableRow>
-                                <TableHead>Update Date</TableHead>
-                                <TableHead>Updated By</TableHead>
+                                <TableHead>Date</TableHead>
                                 <TableHead>Update Type</TableHead>
-                                <TableHead>Notes</TableHead>
+                                <TableHead>Attachment</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
                               {updatesLoading ? (
                                 <TableRow>
-                                  <TableCell colSpan={4} className="text-center">
+                                  <TableCell colSpan={3} className="text-center">
                                     Loading membership fee updates...
                                   </TableCell>
                                 </TableRow>
@@ -3798,14 +3797,24 @@ export default function SchoolDetail() {
                                 membershipFeeUpdates.map((update) => (
                                   <TableRow key={update.id}>
                                     <TableCell>{update.updateDate || '-'}</TableCell>
-                                    <TableCell>{update.updatedBy || '-'}</TableCell>
                                     <TableCell>{update.updateType || '-'}</TableCell>
-                                    <TableCell>{update.notes || '-'}</TableCell>
+                                    <TableCell>
+                                      {update.attachment ? (
+                                        <a 
+                                          href={update.attachment} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="text-blue-600 hover:text-blue-800 underline"
+                                        >
+                                          View Attachment
+                                        </a>
+                                      ) : '-'}
+                                    </TableCell>
                                   </TableRow>
                                 ))
                               ) : (
                                 <TableRow>
-                                  <TableCell colSpan={4} className="text-center text-gray-500">
+                                  <TableCell colSpan={3} className="text-center text-gray-500">
                                     No membership fee updates found
                                   </TableCell>
                                 </TableRow>
