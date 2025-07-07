@@ -1498,30 +1498,38 @@ export class SimpleAirtableStorage implements IStorage {
     return {
       id: record.id,
       educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
-      formName: fields["Form Name"] || fields["Form"] || fields["Name"] || fields["form_name"] || 'Unknown Form',
-      formType: fields["Form Type"] || fields["Type"] || fields["form_type"] || 'Unknown Type',
-      dateSubmitted: fields["Date Submitted"] || fields["Submitted"] || fields["Date"] || fields["date_submitted"] || undefined,
-      status: fields["Status"] || fields["status"] || 'Unknown',
-      submissionId: fields["Submission ID"] || fields["ID"] || fields["submission_id"] || undefined,
-      responseData: fields["Response Data"] || fields["Data"] || fields["response_data"] || undefined,
+      formName: fields["SSJ FIllout Form key"] || fields["Form Name"] || fields["Full Name"] || 'Unknown Form',
+      formType: fields["Form version"] || fields["Contact Type"] || fields["Form Type"] || 'Contact Form',
+      dateSubmitted: fields["Entry Date"] || fields["SendGrid sent date"] || fields["Date Submitted"] || undefined,
+      status: fields["Status of Processing Montessori Certs"] || fields["Contact Type standardized"] || fields["Status"] || 'Processing',
+      submissionId: fields["ssj_fillout_form_id"] || fields["Submission ID"] || undefined,
+      responseData: fields["Message"] || fields["Response Data"] || undefined,
       notes: fields["Notes"] || fields["notes"] || undefined,
-      created: fields["Created"] || fields["Created time"] || new Date().toISOString(),
+      created: fields["Entry Date"] || fields["Created time"] || new Date().toISOString(),
       lastModified: fields["Last Modified"] || fields["Last modified time"] || new Date().toISOString(),
     };
   }
 
   private transformEmailAddressRecord(record: any): EmailAddress {
     const fields = record.fields;
+    
+    // Debug: Let's log all available fields to understand the structure
+    if (Object.keys(fields).length > 2) {
+      console.log('=== EMAIL ADDRESS DEBUG ===');
+      console.log('Available fields:', Object.keys(fields));
+      console.log('Sample field values:', fields);
+    }
+    
     return {
       id: record.id,
       educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
-      email: fields["Email"] || fields["Email Address"] || undefined,
-      type: fields["Type"] || undefined,
-      isPrimary: fields["Primary"] === true || fields["Is Primary"] === true,
-      status: fields["Status"] || undefined,
+      email: fields["Email"] || fields["Email Address"] || fields["email"] || undefined,
+      type: fields["Type"] || fields["Email Type"] || fields["type"] || fields["Category"] || 'Personal',
+      isPrimary: fields["Primary"] === true || fields["Primary"] === "true" || fields["Is Primary"] === true,
+      status: fields["Status"] || fields["Active"] || fields["status"] || 'Active',
       notes: fields["Notes"] || undefined,
-      created: fields["Created"] || record.get('Created'),
-      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+      created: fields["Created"] || fields["Created time"] || undefined,
+      lastModified: fields["Last Modified"] || fields["Last modified time"] || undefined,
     };
   }
 
@@ -1591,19 +1599,27 @@ export class SimpleAirtableStorage implements IStorage {
 
   private transformMontessoriCertificationRecord(record: any): MontessoriCertification {
     const fields = record.fields;
+    
+    // Debug: Let's log all available fields to understand the structure
+    if (Object.keys(fields).length > 2) {
+      console.log('=== MONTESSORI CERTIFICATION DEBUG ===');
+      console.log('Available fields:', Object.keys(fields));
+      console.log('Sample field values:', fields);
+    }
+    
     return {
       id: record.id,
       educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
-      certificationLevel: fields["Certification Level"] || undefined,
-      certificationStatus: fields["Status"] || fields["Certification Status"] || undefined,
-      certifier: fields["Certifier"] || undefined,
-      trainingProgram: fields["Training Program"] || undefined,
-      dateReceived: fields["Date Received"] || fields["Date received"] || undefined,
-      expirationDate: fields["Expiration Date"] || undefined,
-      certificationNumber: fields["Certification Number"] || fields["Cert Number"] || undefined,
-      notes: fields["Notes"] || undefined,
-      created: fields["Created"] || record.get('Created'),
-      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+      certificationLevel: fields["Certification Level"] || fields["Level"] || fields["certification_level"] || undefined,
+      certificationStatus: fields["Status"] || fields["Certification Status"] || fields["certification_status"] || undefined,
+      certifier: fields["Certifier"] || fields["Certification Body"] || fields["certifier"] || undefined,
+      trainingProgram: fields["Training Program"] || fields["Program"] || fields["training_program"] || undefined,
+      dateReceived: fields["Date Received"] || fields["Date received"] || fields["date_received"] || undefined,
+      expirationDate: fields["Expiration Date"] || fields["expiration_date"] || undefined,
+      certificationNumber: fields["Certification Number"] || fields["Cert Number"] || fields["certification_number"] || undefined,
+      notes: fields["Notes"] || fields["notes"] || undefined,
+      created: fields["Created"] || fields["Created time"] || undefined,
+      lastModified: fields["Last Modified"] || fields["Last modified time"] || undefined,
     };
   }
 
