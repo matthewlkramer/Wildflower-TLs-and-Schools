@@ -3,12 +3,19 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
 import type { SSJFilloutForm } from "@shared/schema";
+import { useState } from "react";
+import { ExternalLink } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface SSJFilloutFormsTableProps {
   educatorId: string;
 }
 
 export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) {
+  const [selectedForm, setSelectedForm] = useState<SSJFilloutForm | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
   const { data: forms = [], isLoading } = useQuery<SSJFilloutForm[]>({
     queryKey: ["/api/ssj-fillout-forms/educator", educatorId],
     queryFn: async () => {
@@ -19,6 +26,11 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
       return response.json();
     },
   });
+
+  const handleOpenForm = (form: SSJFilloutForm) => {
+    setSelectedForm(form);
+    setIsViewModalOpen(true);
+  };
 
   const columnDefs: ColDef<SSJFilloutForm>[] = [
     {
@@ -48,6 +60,29 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
       flex: 1,
       filter: "agTextColumnFilter",
     },
+    {
+      headerName: "Actions",
+      field: "actions",
+      width: 100,
+      cellRenderer: (params: any) => {
+        const form = params.data;
+        return (
+          <div className="flex items-center justify-center h-full">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleOpenForm(form)}
+              className="h-6 w-6 p-0"
+              title="Open form details"
+            >
+              <ExternalLink className="h-3 w-3" />
+            </Button>
+          </div>
+        );
+      },
+      sortable: false,
+      filter: false,
+    },
   ];
 
   if (isLoading) {
@@ -71,26 +106,95 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
   }
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200">
-      <div style={{ height: "400px", width: "100%" }}>
-        <AgGridReact
-          theme={themeMaterial}
-          rowData={forms}
-          columnDefs={columnDefs}
-          animateRows={true}
-          rowSelection="none"
-          suppressRowClickSelection={true}
-          domLayout="autoHeight"
-          headerHeight={40}
-          rowHeight={30}
+    <>
+      <div className="bg-white rounded-lg border border-slate-200">
+        <div style={{ height: "400px", width: "100%" }}>
+          <AgGridReact
+            theme={themeMaterial}
+            rowData={forms}
+            columnDefs={columnDefs}
+            animateRows={true}
+            rowSelection="none"
+            suppressRowClickSelection={true}
+            domLayout="autoHeight"
+            headerHeight={40}
+            rowHeight={30}
 
-          defaultColDef={{
-            sortable: true,
-            resizable: true,
-            filter: true,
-          }}
-        />
+            defaultColDef={{
+              sortable: true,
+              resizable: true,
+              filter: true,
+            }}
+          />
+        </div>
       </div>
-    </div>
+
+      {/* View Form Modal */}
+      <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>SSJ Fillout Form Details</DialogTitle>
+          </DialogHeader>
+          {selectedForm && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Form Type</label>
+                  <p className="text-sm mt-1">{selectedForm.formType || '-'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Date Submitted</label>
+                  <p className="text-sm mt-1">
+                    {selectedForm.dateSubmitted ? new Date(selectedForm.dateSubmitted).toLocaleDateString() : '-'}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Status</label>
+                  <p className="text-sm mt-1">{selectedForm.status || '-'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Submission ID</label>
+                  <p className="text-sm mt-1">{selectedForm.submissionId || '-'}</p>
+                </div>
+              </div>
+              
+              {selectedForm.responseData && (
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Response Data</label>
+                  <p className="text-sm mt-1 whitespace-pre-wrap">{selectedForm.responseData}</p>
+                </div>
+              )}
+              
+              {selectedForm.notes && (
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Notes</label>
+                  <p className="text-sm mt-1 whitespace-pre-wrap">{selectedForm.notes}</p>
+                </div>
+              )}
+              
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Created</label>
+                  <p className="text-sm mt-1 text-slate-500">
+                    {selectedForm.created ? new Date(selectedForm.created).toLocaleString() : '-'}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-600">Last Modified</label>
+                  <p className="text-sm mt-1 text-slate-500">
+                    {selectedForm.lastModified ? new Date(selectedForm.lastModified).toLocaleString() : '-'}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="pt-2 border-t border-slate-200">
+                <label className="text-sm font-medium text-slate-600">Record ID</label>
+                <p className="text-xs mt-1 text-slate-400 font-mono">{selectedForm.id}</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
