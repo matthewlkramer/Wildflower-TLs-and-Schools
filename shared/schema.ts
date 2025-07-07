@@ -234,6 +234,7 @@ export interface EducatorSchoolAssociation {
   schoolShortName?: string;
   role?: string[];
   status?: string;
+  stageStatus?: string;
   startDate?: string;
   endDate?: string;
   isActive?: boolean;

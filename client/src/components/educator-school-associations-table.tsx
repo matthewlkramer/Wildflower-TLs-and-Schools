@@ -1,8 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
-import type { ColDef } from "ag-grid-community";
+import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
 import type { EducatorSchoolAssociation } from "@shared/schema";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ExternalLink, Edit3, UserMinus, Trash2 } from "lucide-react";
+import { getStatusColor } from "@/lib/utils";
 
 interface EducatorSchoolAssociationsTableProps {
   educatorId: string;
@@ -20,25 +24,140 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
     },
   });
 
+  const handleOpen = (association: EducatorSchoolAssociation) => {
+    console.log("Open association:", association);
+    // TODO: Navigate to school detail page
+  };
+
+  const handleEdit = (association: EducatorSchoolAssociation) => {
+    console.log("Edit association:", association);
+    // TODO: Implement inline edit functionality
+  };
+
+  const handleEndStint = (association: EducatorSchoolAssociation) => {
+    console.log("End stint:", association);
+    // TODO: Implement end stint functionality
+  };
+
+  const handleDelete = (association: EducatorSchoolAssociation) => {
+    console.log("Delete association:", association);
+    // TODO: Implement delete functionality
+  };
+
+  const RolesCellRenderer = (params: ICellRendererParams<EducatorSchoolAssociation>) => {
+    const roles = params.value;
+    if (!roles) return '-';
+    
+    const roleArray = Array.isArray(roles) ? roles : [roles];
+    return (
+      <div className="flex flex-wrap gap-1">
+        {roleArray.map((role, index) => (
+          <Badge key={index} variant="secondary" className="text-xs">
+            {role}
+          </Badge>
+        ))}
+      </div>
+    );
+  };
+
+  const ActiveCellRenderer = (params: ICellRendererParams<EducatorSchoolAssociation>) => {
+    const isActive = params.value;
+    return (
+      <Badge 
+        className={isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
+      >
+        {isActive ? 'Active' : 'Inactive'}
+      </Badge>
+    );
+  };
+
+  const StageStatusCellRenderer = (params: ICellRendererParams<EducatorSchoolAssociation>) => {
+    const stageStatus = params.value;
+    if (!stageStatus) return '-';
+    
+    return (
+      <Badge className={getStatusColor(stageStatus)}>
+        {stageStatus}
+      </Badge>
+    );
+  };
+
+  const ActionsCellRenderer = (params: ICellRendererParams<EducatorSchoolAssociation>) => {
+    const association = params.data;
+    if (!association) return null;
+
+    return (
+      <div className="flex items-center gap-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-6 p-0 hover:bg-blue-50"
+          onClick={() => handleOpen(association)}
+          title="Open school detail"
+        >
+          <ExternalLink className="h-3 w-3 text-blue-600" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-6 p-0 hover:bg-green-50"
+          onClick={() => handleEdit(association)}
+          title="Edit association"
+        >
+          <Edit3 className="h-3 w-3 text-green-600" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-6 p-0 hover:bg-yellow-50"
+          onClick={() => handleEndStint(association)}
+          title="End stint"
+        >
+          <UserMinus className="h-3 w-3 text-yellow-600" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-6 p-0 hover:bg-red-50"
+          onClick={() => handleDelete(association)}
+          title="Delete association"
+        >
+          <Trash2 className="h-3 w-3 text-red-600" />
+        </Button>
+      </div>
+    );
+  };
+
+  const SchoolCellRenderer = (params: ICellRendererParams<EducatorSchoolAssociation>) => {
+    const association = params.data;
+    const schoolName = params.value;
+    if (!association || !schoolName) return '-';
+
+    return (
+      <button
+        className="text-blue-600 hover:text-blue-800 hover:underline text-left"
+        onClick={() => window.open(`/school-detail/${association.schoolId}`, '_blank')}
+        title="Open school detail page"
+      >
+        {schoolName}
+      </button>
+    );
+  };
+
   const columnDefs: ColDef<EducatorSchoolAssociation>[] = [
     {
       headerName: "School",
       field: "schoolShortName",
       flex: 2,
       filter: "agTextColumnFilter",
+      cellRenderer: SchoolCellRenderer,
     },
     {
-      headerName: "Role",
+      headerName: "Role(s)",
       field: "role",
       flex: 2,
       filter: "agTextColumnFilter",
-      cellRenderer: (params: any) => {
-        const roles = params.value;
-        if (Array.isArray(roles)) {
-          return roles.join(', ');
-        }
-        return roles || '-';
-      }
+      cellRenderer: RolesCellRenderer,
     },
     {
       headerName: "Start Date",
@@ -56,14 +175,25 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
       headerName: "Active",
       field: "isActive",
       flex: 1,
-      cellRenderer: (params: any) => params.value ? "Yes" : "No",
+      cellRenderer: ActiveCellRenderer,
       filter: "agTextColumnFilter",
     },
     {
-      headerName: "Status",
-      field: "status",
+      headerName: "Stage/Status",
+      field: "stageStatus",
       flex: 1,
+      cellRenderer: StageStatusCellRenderer,
       filter: "agTextColumnFilter",
+    },
+    {
+      headerName: "Actions",
+      field: "actions",
+      width: 160,
+      cellRenderer: ActionsCellRenderer,
+      sortable: false,
+      filter: false,
+      resizable: false,
+      suppressMenu: true,
     },
   ];
 

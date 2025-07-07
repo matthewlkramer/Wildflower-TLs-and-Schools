@@ -1487,18 +1487,26 @@ export class SimpleAirtableStorage implements IStorage {
 
   private transformSSJFilloutFormRecord(record: any): SSJFilloutForm {
     const fields = record.fields;
+    
+    // Debug: Let's log all available fields to understand the structure
+    if (Object.keys(fields).length > 2) {
+      console.log('=== SSJ FILLOUT FORM DEBUG ===');
+      console.log('Available fields:', Object.keys(fields));
+      console.log('Sample field values:', fields);
+    }
+    
     return {
       id: record.id,
       educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
-      formName: fields["Form Name"] || undefined,
-      formType: fields["Form Type"] || undefined,
-      dateSubmitted: fields["Date Submitted"] || undefined,
-      status: fields["Status"] || undefined,
-      submissionId: fields["Submission ID"] || undefined,
-      responseData: fields["Response Data"] || undefined,
-      notes: fields["Notes"] || undefined,
-      created: fields["Created"] || record.get('Created'),
-      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+      formName: fields["Form Name"] || fields["Form"] || fields["Name"] || fields["form_name"] || 'Unknown Form',
+      formType: fields["Form Type"] || fields["Type"] || fields["form_type"] || 'Unknown Type',
+      dateSubmitted: fields["Date Submitted"] || fields["Submitted"] || fields["Date"] || fields["date_submitted"] || undefined,
+      status: fields["Status"] || fields["status"] || 'Unknown',
+      submissionId: fields["Submission ID"] || fields["ID"] || fields["submission_id"] || undefined,
+      responseData: fields["Response Data"] || fields["Data"] || fields["response_data"] || undefined,
+      notes: fields["Notes"] || fields["notes"] || undefined,
+      created: fields["Created"] || fields["Created time"] || new Date().toISOString(),
+      lastModified: fields["Last Modified"] || fields["Last modified time"] || new Date().toISOString(),
     };
   }
 
