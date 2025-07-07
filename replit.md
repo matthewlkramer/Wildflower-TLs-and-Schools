@@ -146,6 +146,9 @@ Changelog:
 - July 07, 2025. Implemented AG Grid v34 Material Design theme across all data tables: migrated from legacy CSS themes to new Theming API using themeMaterial, removed old CSS imports and theme wrapper classes, achieved consistent Material Design v2 styling throughout application
 - July 07, 2025. Optimized table layout and spacing: reduced row heights from 35px to 30px (40px for notes tables), vertically centered all badges and pills in grid cells, removed redundant "Add School" button from schools page for cleaner interface
 - July 07, 2025. Enhanced data table visual consistency: applied Material theme to all 8 AG Grid components (teachers, schools, associations, certifications, events, notes, emails, forms), improved content alignment and spacing for better readability
+- July 07, 2025. Added four new logo fields to School schema: logoMainSquare, logoFlowerOnly, logoMainRectangle, logoUrl - mapped from new Airtable attachment fields "Logo - main square", "Logo - flower only", "Logo - main rectangle", and "Logo URL"
+- July 07, 2025. Enhanced Google Maps flower markers to prioritize logoFlowerOnly field when available, with fallback to original logo field for custom school branding on map markers
+- July 07, 2025. Updated school summary logo display to prioritize logoMainSquare field for better square format display in summary section, maintaining fallback chain for compatibility
 ```
 
 ## User Preferences

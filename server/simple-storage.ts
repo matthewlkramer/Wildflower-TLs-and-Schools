@@ -256,6 +256,10 @@ export class SimpleAirtableStorage implements IStorage {
       name: fields["Name"] || fields["School Name"] || "",
       shortName: fields["Short Name"] || undefined,
       logo: fields["Logo"]?.[0]?.url || undefined,
+      logoMainSquare: fields["Logo - main square"]?.[0]?.url || undefined,
+      logoFlowerOnly: fields["Logo - flower only"]?.[0]?.url || undefined,
+      logoMainRectangle: fields["Logo - main rectangle"]?.[0]?.url || undefined,
+      logoUrl: fields["Logo URL"] || undefined,
       currentPhysicalAddress: fields['Current Physical Address?'] === true,
       currentMailingAddress: fields['Current Mailing Address?'] === true,
       activePhysicalAddress: Array.isArray(fields['Current Physical Address - Address']) 

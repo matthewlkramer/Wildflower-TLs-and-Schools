@@ -64,7 +64,7 @@ const MapComponent = ({ center, zoom, schoolName, shortName, currentAddress, add
           fullscreenControl: false,
         });
         
-        // Create custom marker with flower icon
+        // Create custom marker with flower icon - prioritize flower-only logo
         const icon = createFlowerIcon(schoolLogo || logoImage);
         const marker = new window.google.maps.Marker({
           position: center,

@@ -1582,9 +1582,9 @@ export default function SchoolDetail() {
                     <div>
                       <div className="flex items-center mb-4">
                         <div className="w-16 h-16 bg-slate-100 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center mr-4">
-                          {school.logo ? (
+                          {(school.logoMainSquare || school.logo) ? (
                             <img 
-                              src={school.logo} 
+                              src={school.logoMainSquare || school.logo} 
                               alt={`${school.name} logo`}
                               className="w-full h-full object-cover rounded-lg"
                             />
@@ -1609,7 +1609,7 @@ export default function SchoolDetail() {
                               schoolName={school.name}
                               shortName={school.shortName}
                               fallbackAddress={school.activePhysicalAddress}
-                              schoolLogo={school.logo}
+                              schoolLogo={school.logoFlowerOnly || school.logo}
                             />
                           </div>
                           <div className="space-y-4">

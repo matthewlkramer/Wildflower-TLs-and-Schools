@@ -82,6 +82,10 @@ export interface School {
   shortName?: string;
   priorNames?: string;
   logo?: string;
+  logoMainSquare?: string;
+  logoFlowerOnly?: string;
+  logoMainRectangle?: string;
+  logoUrl?: string;
   programFocus?: string;
   schoolCalendar?: string;
   schoolSchedule?: string;
