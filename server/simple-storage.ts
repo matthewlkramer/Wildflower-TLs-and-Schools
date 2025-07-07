@@ -929,14 +929,16 @@ export class SimpleAirtableStorage implements IStorage {
         const dateEntered = record.fields["Date"];
         const created = record.fields["Created"];
         
-        // Handle Document PDF attachment field - extract filename 
+        // Handle Document PDF attachment field - extract filename and URL
         const documentPDFField = record.fields["Document PDF"];
         let doc = "";
+        let docUrl = "";
         if (Array.isArray(documentPDFField) && documentPDFField.length > 0) {
           try {
             const attachment = documentPDFField[0];
-            // Access filename property directly
+            // Access filename and URL properties directly
             doc = attachment?.filename || "Document";
+            docUrl = attachment?.url || "";
           } catch (e) {
             doc = "Document";
           }
@@ -947,6 +949,7 @@ export class SimpleAirtableStorage implements IStorage {
           schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
           docType: String(docType || ''),
           doc: String(doc),
+          docUrl: String(docUrl),
           dateEntered: String(dateEntered || ''),
           created: String(created || new Date().toISOString()),
           lastModified: String(created || new Date().toISOString()),

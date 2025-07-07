@@ -572,6 +572,7 @@ function GovernanceDocumentRow({
   const [editData, setEditData] = useState({
     docType: document.docType || "",
     doc: document.doc || "",
+    docUrl: document.docUrl || "",
     dateEntered: document.dateEntered || "",
   });
 
@@ -580,6 +581,7 @@ function GovernanceDocumentRow({
       setEditData({
         docType: document.docType || "",
         doc: document.doc || "",
+        docUrl: document.docUrl || "",
         dateEntered: document.dateEntered || "",
       });
     }
@@ -644,7 +646,20 @@ function GovernanceDocumentRow({
   return (
     <TableRow>
       <TableCell>{document.docType || '-'}</TableCell>
-      <TableCell>{document.doc || '-'}</TableCell>
+      <TableCell>
+        {document.doc && document.docUrl ? (
+          <a 
+            href={document.docUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
+          >
+            {document.doc}
+          </a>
+        ) : (
+          document.doc || '-'
+        )}
+      </TableCell>
       <TableCell>{document.dateEntered || '-'}</TableCell>
       <TableCell>
         <div className="flex gap-1">
@@ -901,6 +916,14 @@ function GrantRow({
           <Button
             size="sm"
             variant="outline"
+            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700"
+            title="Open"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
             onClick={onEdit}
             className="h-8 w-8 p-0"
           >
@@ -1020,6 +1043,14 @@ function LoanRow({
       <TableCell>{loan.interestRate ? `${loan.interestRate}%` : '-'}</TableCell>
       <TableCell>
         <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700"
+            title="Open"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Button>
           <Button
             size="sm"
             variant="outline"
@@ -2363,7 +2394,7 @@ export default function SchoolDetail() {
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Guide Short Name</TableHead>
+                              <TableHead>Name</TableHead>
                               <TableHead>Type</TableHead>
                               <TableHead>Start Date</TableHead>
                               <TableHead>End Date</TableHead>
@@ -2605,101 +2636,135 @@ export default function SchoolDetail() {
                 </TabsContent>
 
                 <TabsContent value="systems" className="mt-0">
-                  <div className="space-y-6">
-                    <h4 className="font-medium text-slate-900 mb-4">Systems</h4>
-                    
-                    {/* Communication & Admin */}
-                    <div className="mb-6">
-                      <h5 className="text-sm font-medium text-slate-700 mb-3">Communication & Admin</h5>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Google Voice</label>
-                          <p className="text-sm text-slate-900">{school.googleVoice || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Budget Utility</label>
-                          <p className="text-sm text-slate-900">{school.budgetUtility || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Admissions System</label>
-                          <p className="text-sm text-slate-900">{school.admissionsSystem || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Google Workspace Path</label>
-                          <p className="text-sm text-slate-900">{school.googleWorkspacePath || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Budget Link</label>
-                          <p className="text-sm text-slate-900">{school.budgetLink || '-'}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Educational Systems */}
-                    <div className="mb-6">
-                      <h5 className="text-sm font-medium text-slate-700 mb-3">Educational Systems</h5>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Transparent Classroom</label>
-                          <p className="text-sm text-slate-900">{school.transparentClassroom || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">TC Admissions</label>
-                          <p className="text-sm text-slate-900">{school.tcAdmissions || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">TC Recordkeeping</label>
-                          <p className="text-sm text-slate-900">{school.tcRecordkeeping || '-'}</p>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Communication & Admin Card */}
+                    <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
+                      <div className="p-6">
+                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                          <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                          Communication & Admin
+                        </h3>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 gap-4">
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Google Voice</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.googleVoice || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Budget Utility</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.budgetUtility || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Admissions System</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.admissionsSystem || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Google Workspace Path</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.googleWorkspacePath || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Budget Link</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.budgetLink || '-'}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Business & Finance */}
-                    <div className="mb-6">
-                      <h5 className="text-sm font-medium text-slate-700 mb-3">Business & Finance</h5>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">QBO</label>
-                          <p className="text-sm text-slate-900">{school.qbo || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Gusto</label>
-                          <p className="text-sm text-slate-900">{school.gusto || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Business Insurance</label>
-                          <p className="text-sm text-slate-900">{school.businessInsurance || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">BillCom Account</label>
-                          <p className="text-sm text-slate-900">{school.billComAccount || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Bookkeeper</label>
-                          <p className="text-sm text-slate-900">{school.bookkeeper || '-'}</p>
+                    {/* Educational Systems Card */}
+                    <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
+                      <div className="p-6">
+                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                          <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                          </svg>
+                          Educational Systems
+                        </h3>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 gap-4">
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Transparent Classroom</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.transparentClassroom || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">TC Admissions</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.tcAdmissions || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">TC Recordkeeping</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.tcRecordkeeping || '-'}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Branding & Web */}
-                    <div className="mb-6">
-                      <h5 className="text-sm font-medium text-slate-700 mb-3">Branding & Web</h5>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Website Tool</label>
-                          <p className="text-sm text-slate-900">{school.websiteTool || '-'}</p>
+                    {/* Business & Finance Card */}
+                    <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
+                      <div className="p-6">
+                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                          <svg className="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Business & Finance
+                        </h3>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 gap-4">
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">QBO</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.qbo || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Gusto</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.gusto || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Business Insurance</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.businessInsurance || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">BillCom Account</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.billComAccount || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Bookkeeper</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.bookkeeper || '-'}</p>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Logo Designer</label>
-                          <p className="text-sm text-slate-900">{school.logoDesigner || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Name Selection Proposal</label>
-                          <p className="text-sm text-slate-900">{school.nameSelectionProposal || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-slate-600">Trademark Filed</label>
-                          <p className="text-sm text-slate-900">{school.trademarkFiled || '-'}</p>
+                      </div>
+                    </div>
+
+                    {/* Branding & Web Card */}
+                    <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
+                      <div className="p-6">
+                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                          <svg className="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                          </svg>
+                          Branding & Web
+                        </h3>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 gap-4">
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Website Tool</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.websiteTool || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Logo Designer</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.logoDesigner || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Name Selection Proposal</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.nameSelectionProposal || '-'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-slate-600 block mb-1">Trademark Filed</label>
+                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.trademarkFiled || '-'}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>

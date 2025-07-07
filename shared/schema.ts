@@ -272,6 +272,7 @@ export interface GovernanceDocument {
   schoolId: string;
   docType?: string;
   doc?: string;
+  docUrl?: string;
   dateEntered?: string;
   created?: string;
   lastModified?: string;
