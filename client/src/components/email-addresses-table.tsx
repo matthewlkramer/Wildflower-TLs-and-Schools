@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
+import { themeMaterial } from "ag-grid-community";
 import type { EmailAddress } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Edit3, Trash2, UserCheck, UserX } from "lucide-react";
@@ -157,8 +158,9 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
 
   return (
     <div className="bg-white rounded-lg border border-slate-200">
-      <div className="ag-theme-alpine" style={{ height: "300px", width: "100%" }}>
+      <div style={{ height: "300px", width: "100%" }}>
         <AgGridReact
+          theme={themeMaterial}
           rowData={emailAddresses}
           columnDefs={columnDefs}
           animateRows={true}
@@ -166,7 +168,7 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
           suppressRowClickSelection={true}
           domLayout="autoHeight"
           headerHeight={40}
-          rowHeight={35}
+          rowHeight={30}
 
           defaultColDef={{
             sortable: true,

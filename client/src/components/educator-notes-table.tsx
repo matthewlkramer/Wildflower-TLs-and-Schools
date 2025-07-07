@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
+import { themeMaterial } from "ag-grid-community";
 import type { EducatorNote } from "@shared/schema";
 
 interface EducatorNotesTableProps {
@@ -65,8 +66,9 @@ export function EducatorNotesTable({ educatorId }: EducatorNotesTableProps) {
 
   return (
     <div className="bg-white rounded-lg border border-slate-200">
-      <div className="ag-theme-alpine" style={{ height: "400px", width: "100%" }}>
+      <div style={{ height: "400px", width: "100%" }}>
         <AgGridReact
+          theme={themeMaterial}
           rowData={notes}
           columnDefs={columnDefs}
           animateRows={true}
@@ -74,7 +76,7 @@ export function EducatorNotesTable({ educatorId }: EducatorNotesTableProps) {
           suppressRowClickSelection={true}
           domLayout="autoHeight"
           headerHeight={40}
-          rowHeight={50}
+          rowHeight={40}
 
           defaultColDef={{
             sortable: true,

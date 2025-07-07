@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
+import { themeMaterial } from "ag-grid-community";
 import type { SSJFilloutForm } from "@shared/schema";
 
 interface SSJFilloutFormsTableProps {
@@ -74,8 +75,9 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
 
   return (
     <div className="bg-white rounded-lg border border-slate-200">
-      <div className="ag-theme-alpine" style={{ height: "400px", width: "100%" }}>
+      <div style={{ height: "400px", width: "100%" }}>
         <AgGridReact
+          theme={themeMaterial}
           rowData={forms}
           columnDefs={columnDefs}
           animateRows={true}
@@ -83,7 +85,7 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
           suppressRowClickSelection={true}
           domLayout="autoHeight"
           headerHeight={40}
-          rowHeight={35}
+          rowHeight={30}
 
           defaultColDef={{
             sortable: true,

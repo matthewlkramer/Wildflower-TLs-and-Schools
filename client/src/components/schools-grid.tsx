@@ -1,9 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { ColDef, GridReadyEvent, GridApi } from "ag-grid-community";
+import { ColDef, GridReadyEvent, GridApi, themeMaterial } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -257,8 +255,9 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
 
   return (
     <div className="w-full min-h-[280px]" style={{ height: getGridHeight() }}>
-      <div className="ag-theme-alpine h-full">
+      <div className="h-full">
         <AgGridReact
+          theme={themeMaterial}
           rowData={schools}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
@@ -267,6 +266,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
           rowSelection="multiple"
           suppressRowClickSelection={true}
           enableBrowserTooltips={true}
+          rowHeight={30}
 
         />
       </div>
