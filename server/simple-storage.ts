@@ -1861,13 +1861,37 @@ export class SimpleAirtableStorage implements IStorage {
 
   private transformTax990Record(record: any): Tax990 {
     const fields = record.fields;
-    const attachment = fields["Attachment"];
+    
+    // Use correct field names from Airtable
+    const year = fields["990 Reporting Year"];
+    const pdfField = fields["PDF"];
+    
+    console.log('Debug year field:', { 
+      recordId: record.id, 
+      yearRaw: fields["990 Reporting Year"], 
+      yearValue: year,
+      yearType: typeof year
+    });
+    
+    let attachment = "";
+    let attachmentUrl = "";
+    
+    if (Array.isArray(pdfField) && pdfField.length > 0) {
+      try {
+        const attachmentObj = pdfField[0];
+        attachment = attachmentObj.filename || "";
+        attachmentUrl = attachmentObj.url || "";
+      } catch (error) {
+        console.warn('Error processing 990 PDF attachment:', error);
+      }
+    }
+    
     return {
       id: record.id,
       schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
-      year: fields["Year"] || undefined,
-      attachment: Array.isArray(attachment) && attachment.length > 0 ? attachment[0].filename : undefined,
-      attachmentUrl: Array.isArray(attachment) && attachment.length > 0 ? attachment[0].url : undefined,
+      year: year,
+      attachment: attachment || undefined,
+      attachmentUrl: attachmentUrl || undefined,
     };
   }
 }
