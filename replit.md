@@ -165,6 +165,7 @@ Changelog:
 - July 07, 2025. Improved Add New button behavior: grayed out button on summary, details, support, systems, and membership tabs where no creation functionality exists, providing clearer visual feedback for user interface state
 - July 07, 2025. Standardized governance documents table layout: matched row heights (h-8) and padding (py-1) with 990s table for consistent visual design across both tables in the governance tab
 - July 07, 2025. Fixed school notes table displaying IDs instead of names: successfully mapped to "Partner Short Name" field in Airtable, removed debugging code, cleaned up field transformation to properly display creator names instead of record IDs
+- July 07, 2025. Implemented live Action Steps table: replaced placeholder with fully functional table displaying real Airtable data including item descriptions, assignees, due dates, and status badges with smart sorting (incomplete items first, then by due date)
 ```
 
 ## User Preferences

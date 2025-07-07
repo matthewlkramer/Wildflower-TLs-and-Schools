@@ -3640,10 +3640,71 @@ export default function SchoolDetail() {
 
                       {/* Action Steps Table */}
                       <div className="space-y-4">
-                        <div className="text-center py-8 text-slate-500">
-                          <p>Action steps will be displayed here.</p>
-                          <p className="text-sm mt-2">Future implementation for action items.</p>
-                        </div>
+                        <h4 className="font-medium text-slate-900">Action Steps</h4>
+                        {actionStepsLoading ? (
+                          <div className="space-y-3">
+                            <Skeleton className="h-8 w-full" />
+                            <Skeleton className="h-8 w-full" />
+                            <Skeleton className="h-8 w-full" />
+                          </div>
+                        ) : actionSteps && actionSteps.length > 0 ? (
+                          <div className="border rounded-lg">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Item</TableHead>
+                                  <TableHead>Assignee</TableHead>
+                                  <TableHead>Due Date</TableHead>
+                                  <TableHead>Status</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {actionSteps
+                                  .sort((a, b) => {
+                                    // Sort by status (incomplete first) then by due date
+                                    if (a.isCompleted !== b.isCompleted) {
+                                      return a.isCompleted ? 1 : -1;
+                                    }
+                                    return (a.dueDate || '').localeCompare(b.dueDate || '');
+                                  })
+                                  .map((step) => (
+                                  <TableRow key={step.id} className="h-8">
+                                    <TableCell className="py-1">
+                                      <div className="flex items-center gap-2">
+                                        <div className={`w-2 h-2 rounded-full ${
+                                          step.isCompleted ? 'bg-green-500' : 'bg-orange-500'
+                                        }`} />
+                                        {step.item || '-'}
+                                      </div>
+                                    </TableCell>
+                                    <TableCell className="py-1">{step.assignee || '-'}</TableCell>
+                                    <TableCell className="py-1">
+                                      {step.dueDate ? new Date(step.dueDate).toLocaleDateString() : '-'}
+                                    </TableCell>
+                                    <TableCell className="py-1">
+                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                        step.isCompleted 
+                                          ? 'bg-green-100 text-green-800' 
+                                          : step.status === 'In Progress'
+                                          ? 'bg-blue-100 text-blue-800'
+                                          : step.status === 'Overdue'
+                                          ? 'bg-red-100 text-red-800'
+                                          : 'bg-gray-100 text-gray-800'
+                                      }`}>
+                                        {step.status || 'Pending'}
+                                      </span>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 text-slate-500">
+                            <p>No action steps found for this school.</p>
+                            <p className="text-sm mt-2">Action items will appear here when assigned.</p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
