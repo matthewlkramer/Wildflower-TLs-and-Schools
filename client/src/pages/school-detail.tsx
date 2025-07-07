@@ -166,13 +166,25 @@ function TeacherAssociationRow({
         )}
       </TableCell>
       <TableCell>
-        {association.role && typeof association.role === 'string' ? (
+        {association.role ? (
           <div className="flex flex-wrap gap-1">
-            {association.role.split(',').map((role, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
-                {role.trim()}
+            {Array.isArray(association.role) ? (
+              association.role.map((role, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  {role}
+                </Badge>
+              ))
+            ) : typeof association.role === 'string' ? (
+              association.role.split(',').map((role, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  {role.trim()}
+                </Badge>
+              ))
+            ) : (
+              <Badge variant="secondary" className="text-xs">
+                {String(association.role)}
               </Badge>
-            ))}
+            )}
           </div>
         ) : (
           '-'
