@@ -144,6 +144,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
         suppressAndOrCondition: true,
       },
       valueGetter: (params) => params.data.shortName || params.data.name,
+      sort: 'asc',
     },
     {
       field: "status",

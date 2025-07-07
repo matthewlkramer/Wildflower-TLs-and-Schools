@@ -171,6 +171,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
           {teacher.fullName}
         </Link>
       ),
+      sort: 'asc',
     },
     {
       headerName: "Current School",
