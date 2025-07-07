@@ -148,6 +148,8 @@ export interface School {
   currentFYEnd?: string;
   nonprofitStatus?: string;
   groupExemptionStatus?: string;
+  groupExemptionDateGranted?: string;
+  groupExemptionDateWithdrawn?: string;
   dateReceivedGroupExemption?: string;
   dateWithdrawnGroupExemption?: string;
   
@@ -470,6 +472,9 @@ export const schoolSchema = z.object({
   riskFactors: z.array(z.string()).optional(),
   watchlist: z.array(z.string()).optional(),
   errors: z.array(z.string()).optional(),
+  groupExemptionStatus: z.string().optional(),
+  groupExemptionDateGranted: z.string().optional(),
+  groupExemptionDateWithdrawn: z.string().optional(),
   ssjBoardDevelopment: z.string().optional(),
   enteredVisioningDate: z.string().optional(),
   enteredPlanningDate: z.string().optional(),
