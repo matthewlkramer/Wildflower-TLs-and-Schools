@@ -1610,11 +1610,6 @@ export default function SchoolDetail() {
                                   {school.status}
                                 </Badge>
                               )}
-                              {school.ssjStage && (
-                                <Badge className={`${getStatusColor(school.ssjStage)} text-xs px-3 py-1`}>
-                                  SSJ: {school.ssjStage}
-                                </Badge>
-                              )}
                             </div>
                           </div>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
@@ -1656,9 +1651,16 @@ export default function SchoolDetail() {
                           <CardTitle className="text-lg">Support</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                          {/* Emerging status fields (Planning, Startup, Visioning) */}
+                          {/* Support Type Indicator */}
                           {school.status && ['planning', 'startup', 'visioning'].includes(school.status.toLowerCase()) && (
                             <>
+                              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+                                SSJ (Startup School Journey) Information
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-700 mb-1">SSJ Stage</h4>
+                                <p className="text-base text-gray-900">{school.ssjStage || school.status || 'Not specified'}</p>
+                              </div>
                               <div>
                                 <h4 className="text-sm font-medium text-gray-700 mb-1">Current Guides</h4>
                                 <p className="text-base text-gray-900">
@@ -1681,6 +1683,9 @@ export default function SchoolDetail() {
                             school.status.toLowerCase() === 'permanently closed'
                           ) && (
                             <>
+                              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+                                Closed School Information
+                              </div>
                               <div>
                                 <h4 className="text-sm font-medium text-gray-700 mb-1">Left Network Date</h4>
                                 <p className="text-base text-gray-900">{school.leftNetworkDate || 'Not specified'}</p>
@@ -1694,9 +1699,14 @@ export default function SchoolDetail() {
                           
                           {/* Open or Year 1 status - blank for now */}
                           {school.status && ['open', 'year 1'].includes(school.status.toLowerCase()) && (
-                            <div className="text-center py-4">
-                              <p className="text-sm text-gray-400">No support information to display</p>
-                            </div>
+                            <>
+                              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+                                Open School Information
+                              </div>
+                              <div className="text-center py-4">
+                                <p className="text-sm text-gray-400">No support information to display</p>
+                              </div>
+                            </>
                           )}
                           
                           {/* No status */}
