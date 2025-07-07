@@ -317,6 +317,7 @@ export class SimpleAirtableStorage implements IStorage {
       ssjProjectedOpen: fields['SSJ - Projected Open'] || '',
       riskFactors: fields['Risk Factors'] || [],
       watchlist: fields['Watchlist'] || [],
+      errors: fields['Errors'] || [],
       ssjBoardDevelopment: fields['SSJ - Board development'] || '',
       enteredVisioningDate: fields['Entered Visioning Date'] || '',
       enteredPlanningDate: fields['Entered Planning Date'] || '',

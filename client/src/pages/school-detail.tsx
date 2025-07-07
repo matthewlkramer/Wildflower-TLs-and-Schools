@@ -1865,6 +1865,20 @@ export default function SchoolDetail() {
                               <p className="text-sm text-gray-400 mt-1">None</p>
                             )}
                           </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Errors</p>
+                            {school.errors && school.errors.length > 0 ? (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {school.errors.map((error, idx) => (
+                                  <Badge key={idx} variant="destructive" className="text-xs">
+                                    {error}
+                                  </Badge>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-gray-400 mt-1">None</p>
+                            )}
+                          </div>
                           {school.leftNetworkDate && (
                             <div className="border-t pt-3">
                               <p className="text-xs text-red-600 uppercase tracking-wider">Left Network</p>

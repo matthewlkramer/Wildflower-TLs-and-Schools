@@ -195,6 +195,7 @@ export interface School {
 
   riskFactors?: string[];
   watchlist?: string[];
+  errors?: string[];
   activeAssignedPartnerEmail?: string;
   activeAssignedPartnerOverride?: string;
   activeAssignedPartnerShortName?: string;
@@ -468,6 +469,7 @@ export const schoolSchema = z.object({
   ssjProjectedOpen: z.string().optional(),
   riskFactors: z.array(z.string()).optional(),
   watchlist: z.array(z.string()).optional(),
+  errors: z.array(z.string()).optional(),
   ssjBoardDevelopment: z.string().optional(),
   enteredVisioningDate: z.string().optional(),
   enteredPlanningDate: z.string().optional(),
