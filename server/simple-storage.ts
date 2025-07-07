@@ -1781,12 +1781,27 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Membership fee school x year');
       
-      // Filter using the School field which contains the school IDs
-      const records = await table.select({
-        filterByFormula: `FIND("${schoolId}", ARRAYJOIN({School})) > 0`
-      }).all();
+      // Try Airtable formula filtering first
+      try {
+        const records = await table.select({
+          filterByFormula: `FIND("${schoolId}", ARRAYJOIN({School})) > 0`
+        }).all();
+        
+        if (records.length > 0) {
+          return records.map(record => this.transformMembershipFeeByYearRecord(record));
+        }
+      } catch (formulaError) {
+        console.log('Airtable formula filtering failed, falling back to manual filtering');
+      }
       
-      return records.map(record => this.transformMembershipFeeByYearRecord(record));
+      // Fallback to manual filtering if formula doesn't work
+      const allRecords = await table.select().all();
+      const matchingRecords = allRecords.filter(record => {
+        const school = record.fields["School"];
+        return Array.isArray(school) && school.includes(schoolId);
+      });
+      
+      return matchingRecords.map(record => this.transformMembershipFeeByYearRecord(record));
     } catch (error) {
       console.error('Error fetching membership fees by school ID:', error);
       return [];
