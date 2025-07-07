@@ -2,7 +2,7 @@ import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Edit, Trash2, Plus, X, ExternalLink, UserMinus, Calendar, School2, User } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Plus, X, ExternalLink, UserMinus, Calendar, School2, User, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -1190,6 +1190,13 @@ export default function SchoolDetail() {
   // Edit states for different sections
   const [editingSupport, setEditingSupport] = useState(false);
   const [editingSystems, setEditingSystems] = useState(false);
+  const [editingSystemsComm, setEditingSystemsComm] = useState(false);
+  const [editingSystemsFinance, setEditingSystemsFinance] = useState(false);
+  const [editingSystemsBranding, setEditingSystemsBranding] = useState(false);
+  const [editingSupportOverview, setEditingSupportOverview] = useState(false);
+  const [editingSupportTimeline, setEditingSupportTimeline] = useState(false);
+  const [editingSupportFacility, setEditingSupportFacility] = useState(false);
+  const [editingSupportFunding, setEditingSupportFunding] = useState(false);
   const [editingDetailsProgram, setEditingDetailsProgram] = useState(false);
   const [editingDetailsLegal, setEditingDetailsLegal] = useState(false);
   const [editingDetailsContact, setEditingDetailsContact] = useState(false);
@@ -1862,6 +1869,13 @@ export default function SchoolDetail() {
   const handleCancelEdit = () => {
     setEditingSupport(false);
     setEditingSystems(false);
+    setEditingSystemsComm(false);
+    setEditingSystemsFinance(false);
+    setEditingSystemsBranding(false);
+    setEditingSupportOverview(false);
+    setEditingSupportTimeline(false);
+    setEditingSupportFacility(false);
+    setEditingSupportFunding(false);
     setEditingDetailsProgram(false);
     setEditingDetailsLegal(false);
     setEditingDetailsContact(false);
@@ -3049,33 +3063,114 @@ export default function SchoolDetail() {
                     {/* Communication & Admin Card */}
                     <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
                       <div className="p-6">
-                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                          <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                          </svg>
-                          Communication & Admin
+                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center justify-between">
+                          <div className="flex items-center">
+                            <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            Communication & Admin
+                          </div>
+                          {!editingSystemsComm ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingSystemsComm(true);
+                                setEditFormData({
+                                  googleVoice: school.googleVoice || '',
+                                  budgetUtility: school.budgetUtility || '',
+                                  admissionsSystem: school.admissionsSystem || '',
+                                  transparentClassroom: school.transparentClassroom || '',
+                                  tcAdmissions: school.tcAdmissions || '',
+                                  tcRecordkeeping: school.tcRecordkeeping || ''
+                                });
+                              }}
+                              className="text-xs"
+                            >
+                              <Edit2 className="h-3 w-3 mr-1" />
+                              Edit
+                            </Button>
+                          ) : (
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={handleSaveSection}
+                                className="bg-green-600 hover:bg-green-700 text-white text-xs"
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={handleCancelEdit}
+                                className="text-xs"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          )}
                         </h3>
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 gap-4">
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Google Voice</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.googleVoice || '-'}</p>
+                              {editingSystemsComm ? (
+                                <Input
+                                  value={editFormData.googleVoice || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, googleVoice: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.googleVoice || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Budget Utility</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.budgetUtility || '-'}</p>
+                              {editingSystemsComm ? (
+                                <Input
+                                  value={editFormData.budgetUtility || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, budgetUtility: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.budgetUtility || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Admissions System</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.admissionsSystem || '-'}</p>
+                              {editingSystemsComm ? (
+                                <Input
+                                  value={editFormData.admissionsSystem || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, admissionsSystem: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.admissionsSystem || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Google Workspace Path</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.googleWorkspacePath || '-'}</p>
+                              {editingSystemsComm ? (
+                                <Input
+                                  value={editFormData.googleWorkspacePath || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, googleWorkspacePath: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.googleWorkspacePath || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Budget Link</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.budgetLink || '-'}</p>
+                              {editingSystemsComm ? (
+                                <Input
+                                  value={editFormData.budgetLink || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, budgetLink: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.budgetLink || '-'}</p>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -3085,25 +3180,87 @@ export default function SchoolDetail() {
                     {/* Educational Systems Card */}
                     <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
                       <div className="p-6">
-                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                          <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                          </svg>
-                          Educational Systems
+                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center justify-between">
+                          <div className="flex items-center">
+                            <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            Educational Systems
+                          </div>
+                          {!editingSystemsFinance ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingSystemsFinance(true);
+                                setEditFormData({
+                                  transparentClassroom: school.transparentClassroom || '',
+                                  tcAdmissions: school.tcAdmissions || '',
+                                  tcRecordkeeping: school.tcRecordkeeping || ''
+                                });
+                              }}
+                              className="text-xs"
+                            >
+                              <Edit2 className="h-3 w-3 mr-1" />
+                              Edit
+                            </Button>
+                          ) : (
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={handleSaveSection}
+                                className="bg-green-600 hover:bg-green-700 text-white text-xs"
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={handleCancelEdit}
+                                className="text-xs"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          )}
                         </h3>
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 gap-4">
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Transparent Classroom</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.transparentClassroom || '-'}</p>
+                              {editingSystemsFinance ? (
+                                <Input
+                                  value={editFormData.transparentClassroom || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, transparentClassroom: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.transparentClassroom || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">TC Admissions</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.tcAdmissions || '-'}</p>
+                              {editingSystemsFinance ? (
+                                <Input
+                                  value={editFormData.tcAdmissions || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, tcAdmissions: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.tcAdmissions || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">TC Recordkeeping</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.tcRecordkeeping || '-'}</p>
+                              {editingSystemsFinance ? (
+                                <Input
+                                  value={editFormData.tcRecordkeeping || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, tcRecordkeeping: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.tcRecordkeeping || '-'}</p>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -3113,33 +3270,113 @@ export default function SchoolDetail() {
                     {/* Business & Finance Card */}
                     <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
                       <div className="p-6">
-                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                          <svg className="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          Business & Finance
+                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center justify-between">
+                          <div className="flex items-center">
+                            <svg className="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Business & Finance
+                          </div>
+                          {!editingSystemsFinance ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingSystemsFinance(true);
+                                setEditFormData({
+                                  qbo: school.qbo || '',
+                                  gusto: school.gusto || '',
+                                  businessInsurance: school.businessInsurance || '',
+                                  billComAccount: school.billComAccount || '',
+                                  bookkeeper: school.bookkeeper || ''
+                                });
+                              }}
+                              className="text-xs"
+                            >
+                              <Edit2 className="h-3 w-3 mr-1" />
+                              Edit
+                            </Button>
+                          ) : (
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={handleSaveSection}
+                                className="bg-green-600 hover:bg-green-700 text-white text-xs"
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={handleCancelEdit}
+                                className="text-xs"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          )}
                         </h3>
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 gap-4">
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">QBO</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.qbo || '-'}</p>
+                              {editingSystemsFinance ? (
+                                <Input
+                                  value={editFormData.qbo || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, qbo: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.qbo || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Gusto</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.gusto || '-'}</p>
+                              {editingSystemsFinance ? (
+                                <Input
+                                  value={editFormData.gusto || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, gusto: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.gusto || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Business Insurance</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.businessInsurance || '-'}</p>
+                              {editingSystemsFinance ? (
+                                <Input
+                                  value={editFormData.businessInsurance || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, businessInsurance: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.businessInsurance || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">BillCom Account</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.billComAccount || '-'}</p>
+                              {editingSystemsFinance ? (
+                                <Input
+                                  value={editFormData.billComAccount || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, billComAccount: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.billComAccount || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Bookkeeper</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.bookkeeper || '-'}</p>
+                              {editingSystemsFinance ? (
+                                <Input
+                                  value={editFormData.bookkeeper || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, bookkeeper: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.bookkeeper || '-'}</p>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -3149,29 +3386,100 @@ export default function SchoolDetail() {
                     {/* Branding & Web Card */}
                     <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
                       <div className="p-6">
-                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                          <svg className="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
-                          </svg>
-                          Branding & Web
+                        <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center justify-between">
+                          <div className="flex items-center">
+                            <svg className="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                            </svg>
+                            Branding & Web
+                          </div>
+                          {!editingSystemsBranding ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingSystemsBranding(true);
+                                setEditFormData({
+                                  websiteTool: school.websiteTool || '',
+                                  logoDesigner: school.logoDesigner || '',
+                                  nameSelectionProposal: school.nameSelectionProposal || '',
+                                  trademarkFiled: school.trademarkFiled || ''
+                                });
+                              }}
+                              className="text-xs"
+                            >
+                              <Edit2 className="h-3 w-3 mr-1" />
+                              Edit
+                            </Button>
+                          ) : (
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={handleSaveSection}
+                                className="bg-green-600 hover:bg-green-700 text-white text-xs"
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={handleCancelEdit}
+                                className="text-xs"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          )}
                         </h3>
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 gap-4">
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Website Tool</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.websiteTool || '-'}</p>
+                              {editingSystemsBranding ? (
+                                <Input
+                                  value={editFormData.websiteTool || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, websiteTool: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.websiteTool || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Logo Designer</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.logoDesigner || '-'}</p>
+                              {editingSystemsBranding ? (
+                                <Input
+                                  value={editFormData.logoDesigner || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, logoDesigner: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.logoDesigner || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Name Selection Proposal</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.nameSelectionProposal || '-'}</p>
+                              {editingSystemsBranding ? (
+                                <Input
+                                  value={editFormData.nameSelectionProposal || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, nameSelectionProposal: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.nameSelectionProposal || '-'}</p>
+                              )}
                             </div>
                             <div>
                               <label className="text-sm font-medium text-slate-600 block mb-1">Trademark Filed</label>
-                              <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.trademarkFiled || '-'}</p>
+                              {editingSystemsBranding ? (
+                                <Input
+                                  value={editFormData.trademarkFiled || ''}
+                                  onChange={(e) => setEditFormData({...editFormData, trademarkFiled: e.target.value})}
+                                  className="text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.trademarkFiled || '-'}</p>
+                              )}
                             </div>
                           </div>
                         </div>
