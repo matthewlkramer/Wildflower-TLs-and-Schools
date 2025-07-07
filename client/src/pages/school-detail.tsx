@@ -3844,14 +3844,14 @@ export default function SchoolDetail() {
                             <Skeleton className="h-8 w-full" />
                           </div>
                         ) : schoolNotes && schoolNotes.length > 0 || isCreatingNote ? (
-                          <div className="border rounded-lg">
-                            <Table>
+                          <div className="border rounded-lg overflow-hidden">
+                            <Table className="table-fixed w-full">
                               <TableHeader>
                                 <TableRow>
-                                  <TableHead>Date</TableHead>
-                                  <TableHead>Created By</TableHead>
-                                  <TableHead>Notes</TableHead>
-                                  <TableHead className="w-[120px]">Actions</TableHead>
+                                  <TableHead className="w-[15%]">Date</TableHead>
+                                  <TableHead className="w-[20%]">Created By</TableHead>
+                                  <TableHead className="w-[45%]">Notes</TableHead>
+                                  <TableHead className="w-[20%]">Actions</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -3907,10 +3907,14 @@ export default function SchoolDetail() {
                                 )}
                                 {schoolNotes?.map((note) => (
                                   <TableRow key={note.id}>
-                                    <TableCell>{note.dateCreated || '-'}</TableCell>
-                                    <TableCell>{note.createdBy || '-'}</TableCell>
-                                    <TableCell>{note.notes || '-'}</TableCell>
-                                    <TableCell>
+                                    <TableCell className="py-1 text-sm">{note.dateCreated || '-'}</TableCell>
+                                    <TableCell className="py-1 text-sm">{note.createdBy || '-'}</TableCell>
+                                    <TableCell className="py-1 max-w-0">
+                                      <span className="text-sm block truncate pr-2" title={note.notes || '-'}>
+                                        {note.notes || '-'}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell className="py-1">
                                       <div className="flex gap-1">
                                         <Button
                                           size="sm"
