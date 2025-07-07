@@ -22,7 +22,7 @@ import {
 import { School2, User } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
-import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation, type Location, type GuideAssignment, type GovernanceDocument, type SchoolNote, type Grant, type Loan, type MembershipFeeByYear, type MembershipFeeUpdate } from "@shared/schema";
+import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation, type Location, type GuideAssignment, type GovernanceDocument, type SchoolNote, type Grant, type Loan, type MembershipFeeByYear, type MembershipFeeUpdate, type ActionStep, type Tax990 } from "@shared/schema";
 import { getInitials, getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -1089,6 +1089,16 @@ export default function SchoolDetail() {
   const [editingAssociationId, setEditingAssociationId] = useState<string | null>(null);
   const [deletingAssociationId, setDeletingAssociationId] = useState<string | null>(null);
   const [associationDeleteModalOpen, setAssociationDeleteModalOpen] = useState(false);
+  
+  // Edit states for different sections
+  const [editingSupport, setEditingSupport] = useState(false);
+  const [editingSystems, setEditingSystems] = useState(false);
+  const [editingDetailsProgram, setEditingDetailsProgram] = useState(false);
+  const [editingDetailsLegal, setEditingDetailsLegal] = useState(false);
+  const [editingDetailsContact, setEditingDetailsContact] = useState(false);
+  
+  // Form data for editing
+  const [editFormData, setEditFormData] = useState<any>({});
   const [editingGuideId, setEditingGuideId] = useState<string | null>(null);
   const [deletingGuideId, setDeletingGuideId] = useState<string | null>(null);
   const [guideDeleteModalOpen, setGuideDeleteModalOpen] = useState(false);
@@ -1272,6 +1282,30 @@ export default function SchoolDetail() {
     queryFn: async () => {
       const response = await fetch(`/api/membership-fee-updates/school/${id}`, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch membership fee updates");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
+  const { data: actionSteps, isLoading: actionStepsLoading } = useQuery<ActionStep[]>({
+    queryKey: [`/api/action-steps/school/${id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/action-steps/school/${id}`, { 
+        credentials: "include" 
+      });
+      if (!response.ok) throw new Error("Failed to fetch action steps");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
+  const { data: tax990s, isLoading: tax990sLoading } = useQuery<Tax990[]>({
+    queryKey: [`/api/tax-990s/school/${id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/tax-990s/school/${id}`, { 
+        credentials: "include" 
+      });
+      if (!response.ok) throw new Error("Failed to fetch 990s");
       return response.json();
     },
     enabled: !!id,
@@ -1595,6 +1629,83 @@ export default function SchoolDetail() {
     setShowDeleteModal(false);
   };
 
+  // Helper function to handle section editing
+  const handleEditSection = (section: string) => {
+    if (!school) return;
+    
+    switch (section) {
+      case 'program':
+        setEditingDetailsProgram(true);
+        setEditFormData({
+          programFocus: school.programFocus || '',
+          schoolCalendar: school.schoolCalendar || '',
+          schoolSchedule: school.schoolSchedule || '',
+          agesServed: school.agesServed || [],
+          numberOfClassrooms: school.numberOfClassrooms || '',
+          enrollmentCap: school.enrollmentCap || ''
+        });
+        break;
+      case 'legal':
+        setEditingDetailsLegal(true);
+        setEditFormData({
+          legalStructure: school.legalStructure || '',
+          currentFYEnd: school.currentFYEnd || '',
+          governanceModel: school.governanceModel || '',
+          groupExemptionStatus: school.groupExemptionStatus || '',
+          groupExemptionDateGranted: school.groupExemptionDateGranted || '',
+          groupExemptionDateWithdrawn: school.groupExemptionDateWithdrawn || ''
+        });
+        break;
+      case 'contact':
+        setEditingDetailsContact(true);
+        setEditFormData({
+          primaryContactName: school.primaryContactName || '',
+          primaryContactEmail: school.primaryContactEmail || '',
+          primaryContactPhone: school.primaryContactPhone || '',
+          website: school.website || '',
+          facebook: school.facebook || '',
+          instagram: school.instagram || ''
+        });
+        break;
+      case 'support':
+        setEditingSupport(true);
+        setEditFormData({
+          ssjTool: school.ssjTool || '',
+          ssjStage: school.ssjStage || '',
+          ssjOpsGuideTrack: school.ssjOpsGuideTrack || [],
+          ssjReadinessRating: school.ssjReadinessRating || '',
+          ssjOriginalProjectedOpenDate: school.ssjOriginalProjectedOpenDate || '',
+          ssjProjOpenSchoolYear: school.ssjProjOpenSchoolYear || '',
+          ssjProjectedOpen: school.ssjProjectedOpen || ''
+        });
+        break;
+      case 'systems':
+        setEditingSystems(true);
+        setEditFormData({
+          googleVoice: school.googleVoice || '',
+          googleEmail: school.googleEmail || '',
+          googleDrive: school.googleDrive || '',
+          quickBooks: school.quickBooks || '',
+          mailchimp: school.mailchimp || '',
+          website: school.website || ''
+        });
+        break;
+    }
+  };
+
+  const handleSaveSection = () => {
+    updateSchoolMutation.mutate(editFormData);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSupport(false);
+    setEditingSystems(false);
+    setEditingDetailsProgram(false);
+    setEditingDetailsLegal(false);
+    setEditingDetailsContact(false);
+    setEditFormData({});
+  };
+
   if (isLoading) {
     return (
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -1641,7 +1752,7 @@ export default function SchoolDetail() {
                     Locations
                   </TabsTrigger>
                   <TabsTrigger value="governance" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
-                    Governance
+                    Docs
                   </TabsTrigger>
                   <TabsTrigger value="guides" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
                     Guides
@@ -2349,102 +2460,172 @@ export default function SchoolDetail() {
                 </TabsContent>
 
                 <TabsContent value="governance" className="mt-0">
-                  <div className="space-y-4">
-                    
-                    {documentsLoading ? (
-                      <div className="space-y-3">
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-8 w-full" />
-                      </div>
-                    ) : governanceDocuments && governanceDocuments.length > 0 ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Governance Documents - Left Column */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-slate-900">Governance Documents</h4>
+                      {documentsLoading ? (
+                        <div className="space-y-3">
+                          <Skeleton className="h-8 w-full" />
+                          <Skeleton className="h-8 w-full" />
+                          <Skeleton className="h-8 w-full" />
+                        </div>
+                      ) : (
+                        <>
+                          <div className="border rounded-lg">
+                            <Table>
+                              <TableHeader>
+                                <TableRow className="h-8">
+                                  <TableHead className="h-8 py-1">Document Type</TableHead>
+                                  <TableHead className="h-8 py-1">Document</TableHead>
+                                  <TableHead className="h-8 py-1">Date</TableHead>
+                                  <TableHead className="h-8 py-1 w-20">Actions</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {isCreatingDocument && (
+                                  <TableRow className="h-8">
+                                    <TableCell className="py-1">
+                                      <Input
+                                        value={newDocument.docType}
+                                        onChange={(e) => setNewDocument({...newDocument, docType: e.target.value})}
+                                        placeholder="Document Type"
+                                        className="h-7 text-sm"
+                                      />
+                                    </TableCell>
+                                    <TableCell className="py-1">
+                                      <Input
+                                        value={newDocument.doc}
+                                        onChange={(e) => setNewDocument({...newDocument, doc: e.target.value})}
+                                        placeholder="Document"
+                                        className="h-7 text-sm"
+                                      />
+                                    </TableCell>
+                                    <TableCell className="py-1">
+                                      <Input
+                                        type="date"
+                                        value={newDocument.dateEntered}
+                                        onChange={(e) => setNewDocument({...newDocument, dateEntered: e.target.value})}
+                                        className="h-7 text-sm"
+                                      />
+                                    </TableCell>
+                                    <TableCell className="py-1">
+                                      <div className="flex gap-1">
+                                        <Button
+                                          size="sm"
+                                          onClick={() => createGovernanceDocumentMutation.mutate(newDocument)}
+                                          disabled={createGovernanceDocumentMutation.isPending}
+                                          className="h-6 px-2 bg-green-600 hover:bg-green-700 text-white text-xs"
+                                        >
+                                          Save
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => {
+                                            setIsCreatingDocument(false);
+                                            setNewDocument({ docType: "", doc: "", dateEntered: "" });
+                                          }}
+                                          disabled={createGovernanceDocumentMutation.isPending}
+                                          className="h-6 px-2 text-xs"
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    </TableCell>
+                                  </TableRow>
+                                )}
+                                {governanceDocuments && governanceDocuments.length > 0 ? (
+                                  governanceDocuments.map((document) => (
+                                    <GovernanceDocumentRow
+                                      key={document.id}
+                                      document={document}
+                                      isEditing={editingDocumentId === document.id}
+                                      onEdit={() => setEditingDocumentId(document.id)}
+                                      onSave={(data) => updateGovernanceDocumentMutation.mutate({ documentId: document.id, data })}
+                                      onCancel={() => setEditingDocumentId(null)}
+                                      onDelete={() => {
+                                        setDeletingDocumentId(document.id);
+                                        setDocumentDeleteModalOpen(true);
+                                      }}
+                                      isSaving={updateGovernanceDocumentMutation.isPending}
+                                    />
+                                  ))
+                                ) : (
+                                  <TableRow className="h-8">
+                                    <TableCell colSpan={4} className="text-center text-gray-500 py-4 text-sm">
+                                      No governance documents found
+                                    </TableCell>
+                                  </TableRow>
+                                )}
+                              </TableBody>
+                            </Table>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              onClick={() => setIsCreatingDocument(true)}
+                              disabled={isCreatingDocument}
+                              size="sm"
+                              className="bg-wildflower-blue hover:bg-wildflower-blue/90"
+                            >
+                              <Plus className="w-4 h-4 mr-2" />
+                              Add Document
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* 990s - Right Column */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-slate-900">990s</h4>
                       <div className="border rounded-lg">
                         <Table>
                           <TableHeader>
-                            <TableRow>
-                              <TableHead>Document Type</TableHead>
-                              <TableHead>Document</TableHead>
-                              <TableHead>Date Entered</TableHead>
-                              <TableHead className="w-[120px]">Actions</TableHead>
+                            <TableRow className="h-8">
+                              <TableHead className="h-8 py-1">Year</TableHead>
+                              <TableHead className="h-8 py-1">Attachment</TableHead>
+                              <TableHead className="h-8 py-1 w-16">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {isCreatingDocument && (
-                              <TableRow>
-                                <TableCell>
-                                  <Input
-                                    value={newDocument.docType}
-                                    onChange={(e) => setNewDocument({...newDocument, docType: e.target.value})}
-                                    placeholder="Document Type"
-                                    className="h-8"
-                                  />
+                            {tax990sLoading ? (
+                              <TableRow className="h-8">
+                                <TableCell colSpan={3} className="text-center py-2">
+                                  Loading 990s...
                                 </TableCell>
-                                <TableCell>
-                                  <Input
-                                    value={newDocument.doc}
-                                    onChange={(e) => setNewDocument({...newDocument, doc: e.target.value})}
-                                    placeholder="Document"
-                                    className="h-8"
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <Input
-                                    type="date"
-                                    value={newDocument.dateEntered}
-                                    onChange={(e) => setNewDocument({...newDocument, dateEntered: e.target.value})}
-                                    className="h-8"
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <div className="flex gap-1">
-                                    <Button
-                                      size="sm"
-                                      onClick={() => createGovernanceDocumentMutation.mutate(newDocument)}
-                                      disabled={createGovernanceDocumentMutation.isPending}
-                                      className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
-                                    >
-                                      Save
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => {
-                                        setIsCreatingDocument(false);
-                                        setNewDocument({ docType: "", doc: "", dateEntered: "" });
-                                      }}
-                                      disabled={createGovernanceDocumentMutation.isPending}
-                                      className="h-8 px-2"
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </div>
+                              </TableRow>
+                            ) : tax990s && tax990s.length > 0 ? (
+                              tax990s.map((tax990) => (
+                                <TableRow key={tax990.id} className="h-8">
+                                  <TableCell className="py-1 text-sm">{tax990.year || '-'}</TableCell>
+                                  <TableCell className="py-1 text-sm">{tax990.attachment || '-'}</TableCell>
+                                  <TableCell className="py-1">
+                                    <div className="flex gap-1">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => tax990.attachmentUrl && window.open(tax990.attachmentUrl, '_blank')}
+                                        className="h-6 px-2"
+                                        disabled={!tax990.attachmentUrl}
+                                      >
+                                        <ExternalLink className="w-3 h-3" />
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            ) : (
+                              <TableRow className="h-8">
+                                <TableCell colSpan={3} className="text-center text-gray-500 py-4 text-sm">
+                                  No 990s found
                                 </TableCell>
                               </TableRow>
                             )}
-                            {governanceDocuments.map((document) => (
-                              <GovernanceDocumentRow
-                                key={document.id}
-                                document={document}
-                                isEditing={editingDocumentId === document.id}
-                                onEdit={() => setEditingDocumentId(document.id)}
-                                onSave={(data) => updateGovernanceDocumentMutation.mutate({ documentId: document.id, data })}
-                                onCancel={() => setEditingDocumentId(null)}
-                                onDelete={() => {
-                                  setDeletingDocumentId(document.id);
-                                  setDocumentDeleteModalOpen(true);
-                                }}
-                                isSaving={updateGovernanceDocumentMutation.isPending}
-                              />
-                            ))}
                           </TableBody>
                         </Table>
                       </div>
-                    ) : (
-                      <div className="text-center py-8 text-slate-500">
-                        <p>No governance documents found for this school.</p>
-                        <p className="text-sm mt-2">Use the "Add Document" button above to create governance documents.</p>
-                      </div>
-                    )}
+                    </div>
                   </div>
                 </TabsContent>
 

@@ -411,6 +411,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/tax-990s/school/:schoolId", async (req, res) => {
+    try {
+      const schoolId = req.params.schoolId;
+      const tax990s = await storage.getTax990sBySchoolId(schoolId);
+      res.json(tax990s);
+    } catch (error) {
+      console.error('Error fetching 990s:', error);
+      res.status(500).json({ error: 'Failed to fetch 990s' });
+    }
+  });
+
   app.post("/api/governance-documents", async (req, res) => {
     try {
       const { governanceDocumentSchema } = await import("@shared/schema");

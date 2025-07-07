@@ -1029,6 +1029,19 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getSchoolNotesBySchoolId(schoolId: string): Promise<SchoolNote[]> {
     try {
+      const table = base('School Notes');
+      const records = await table.select({
+        filterByFormula: `{school_id} = "${schoolId}"`
+      }).all();
+      return records.map(record => this.transformSchoolNoteRecord(record));
+    } catch (error) {
+      console.error('Error fetching school notes by school ID:', error);
+      return [];
+    }
+  }
+
+  async getActionStepsBySchoolId(schoolId: string): Promise<ActionStep[]> {
+    try {
       // Query the "Action steps" table filtered by schoolId
       const records = await base("Action steps").select({
         filterByFormula: `{school_id} = '${schoolId}'`
@@ -1045,15 +1058,16 @@ export class SimpleAirtableStorage implements IStorage {
         return {
           id: record.id,
           schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
-          dateCreated: String(assignedDate || ''),
-          createdBy: String(assignee || ''),
-          notes: String(item || ''),
-          created: String(assignedDate || new Date().toISOString()),
-          lastModified: String(dueDate || new Date().toISOString()),
+          assignedDate: String(assignedDate || ''),
+          assignee: String(assignee || ''),
+          item: String(item || ''),
+          status: String(status || ''),
+          dueDate: String(dueDate || ''),
+          isCompleted: status === 'Completed' || status === 'Done',
         };
       });
     } catch (error) {
-      console.error(`Error fetching school notes for ${schoolId}:`, error);
+      console.error(`Error fetching action steps for ${schoolId}:`, error);
       return [];
     }
   }
@@ -1754,7 +1768,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Membership Fee Updates');
       const records = await table.select({
-        filterByFormula: `{Schools} = "${schoolId}"`
+        filterByFormula: `{schools} = "${schoolId}"`
       }).all();
       return records.map(record => this.transformMembershipFeeUpdateRecord(record));
     } catch (error) {
@@ -1767,7 +1781,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Membership Fee Updates');
       const records = await table.select({
-        filterByFormula: `AND({Schools} = "${schoolId}", {School Year} = "${schoolYear}")`
+        filterByFormula: `AND({schools} = "${schoolId}", {School Year} = "${schoolYear}")`
       }).all();
       return records.map(record => this.transformMembershipFeeUpdateRecord(record));
     } catch (error) {
@@ -1809,7 +1823,7 @@ export class SimpleAirtableStorage implements IStorage {
     const fields = record.fields;
     return {
       id: record.id,
-      schoolId: Array.isArray(fields["Schools"]) ? fields["Schools"][0] : fields["Schools"] || undefined,
+      schoolId: Array.isArray(fields["schools"]) ? fields["schools"][0] : fields["schools"] || undefined,
       schoolYear: fields["School Year"] || undefined,
       updateDate: fields["Update Date"] || undefined,
       updateType: fields["Update Type"] || undefined,
@@ -1817,6 +1831,43 @@ export class SimpleAirtableStorage implements IStorage {
       newValue: fields["New Value"] || undefined,
       updatedBy: fields["Updated By"] || undefined,
       notes: fields["Notes"] || undefined,
+    };
+  }
+
+  private transformSchoolNoteRecord(record: any): SchoolNote {
+    const fields = record.fields;
+    return {
+      id: record.id,
+      schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
+      dateCreated: fields["Date created"] || undefined,
+      createdBy: fields["Created by"] || undefined,
+      notes: fields["Notes"] || undefined,
+      isPrivate: fields["Is Private"] || false,
+    };
+  }
+
+  async getTax990sBySchoolId(schoolId: string): Promise<Tax990[]> {
+    try {
+      const table = base('990s');
+      const records = await table.select({
+        filterByFormula: `{school_id} = "${schoolId}"`
+      }).all();
+      return records.map(record => this.transformTax990Record(record));
+    } catch (error) {
+      console.error('Error fetching 990s by school ID:', error);
+      return [];
+    }
+  }
+
+  private transformTax990Record(record: any): Tax990 {
+    const fields = record.fields;
+    const attachment = fields["Attachment"];
+    return {
+      id: record.id,
+      schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
+      year: fields["Year"] || undefined,
+      attachment: Array.isArray(attachment) && attachment.length > 0 ? attachment[0].filename : undefined,
+      attachmentUrl: Array.isArray(attachment) && attachment.length > 0 ? attachment[0].url : undefined,
     };
   }
 }

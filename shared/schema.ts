@@ -712,6 +712,28 @@ export interface SchoolNote {
   dateCreated?: string;
   createdBy?: string;
   notes?: string;
+  isPrivate?: boolean;
+}
+
+// Action Step interface
+export interface ActionStep {
+  id: string; // Airtable record ID
+  schoolId: string;
+  assignedDate?: string;
+  assignee?: string;
+  item?: string;
+  status?: string;
+  dueDate?: string;
+  isCompleted?: boolean;
+}
+
+// 990s interface
+export interface Tax990 {
+  id: string; // Airtable record ID
+  schoolId: string;
+  year?: string;
+  attachment?: string;
+  attachmentUrl?: string;
 }
 
 // Governance Document interface
@@ -774,6 +796,27 @@ export type InsertLocation = z.infer<typeof locationSchema>;
 export type InsertGuideAssignment = z.infer<typeof guideAssignmentSchema>;
 export type InsertGovernanceDocument = z.infer<typeof governanceDocumentSchema>;
 export type InsertSchoolNote = z.infer<typeof schoolNoteSchema>;
+
+// Action Step Schema
+export const actionStepSchema = z.object({
+  schoolId: z.string(),
+  assignedDate: z.string().optional(),
+  assignee: z.string().optional(),
+  item: z.string().optional(),
+  status: z.string().optional(),
+  dueDate: z.string().optional(),
+  isCompleted: z.boolean().optional(),
+});
+
+export const tax990Schema = z.object({
+  schoolId: z.string(),
+  year: z.string().optional(),
+  attachment: z.string().optional(),
+  attachmentUrl: z.string().optional(),
+});
+
+export type InsertActionStep = z.infer<typeof actionStepSchema>;
+export type InsertTax990 = z.infer<typeof tax990Schema>;
 export type InsertGrant = z.infer<typeof grantSchema>;
 export type InsertLoan = z.infer<typeof loanSchema>;
 export type InsertMembershipFeeByYear = z.infer<typeof membershipFeeByYearSchema>;
