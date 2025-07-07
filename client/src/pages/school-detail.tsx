@@ -2,7 +2,7 @@ import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Edit, Trash2, Plus, X } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Plus, X, ExternalLink, UserMinus, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -165,7 +165,15 @@ function TeacherAssociationRow({
           association.educatorId
         )}
       </TableCell>
-      <TableCell>{association.role || '-'}</TableCell>
+      <TableCell>
+        {association.role ? (
+          <Badge variant="secondary" className="text-xs">
+            {association.role}
+          </Badge>
+        ) : (
+          '-'
+        )}
+      </TableCell>
       <TableCell>{association.startDate || '-'}</TableCell>
       <TableCell>{association.endDate || '-'}</TableCell>
       <TableCell>
@@ -189,18 +197,33 @@ function TeacherAssociationRow({
           <Button
             size="sm"
             variant="outline"
-            className="h-8 px-2 text-orange-600 hover:text-orange-700"
-            onClick={onEndStint}
+            className="h-8 w-8 p-0"
+            onClick={() => {
+              if (teacher) {
+                window.open(`/teachers/${teacher.id}`, '_blank');
+              }
+            }}
+            disabled={!teacher}
           >
-            End Stint
+            <ExternalLink className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
             variant="outline"
-            className="h-8 px-2 text-red-600 hover:text-red-700"
-            onClick={onDelete}
+            className="h-8 w-8 p-0 text-orange-600 hover:text-orange-700"
+            onClick={onEndStint}
+            title="End employment"
           >
-            Delete Stint
+            <UserMinus className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+            onClick={onDelete}
+            title="Delete stint"
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </TableCell>
@@ -2036,8 +2059,8 @@ export default function SchoolDetail() {
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Teacher Full Name</TableHead>
-                              <TableHead>Role</TableHead>
+                              <TableHead>Name</TableHead>
+                              <TableHead>Role(s)</TableHead>
                               <TableHead>Start Date</TableHead>
                               <TableHead>End Date</TableHead>
                               <TableHead>Currently Active</TableHead>
