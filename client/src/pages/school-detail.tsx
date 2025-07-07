@@ -1607,7 +1607,9 @@ export default function SchoolDetail() {
                               latitude={school.activeLatitude} 
                               longitude={school.activeLongitude} 
                               schoolName={school.name}
+                              shortName={school.shortName}
                               fallbackAddress={school.activePhysicalAddress}
+                              schoolLogo={school.logo}
                             />
                           </div>
                           <div className="space-y-4">

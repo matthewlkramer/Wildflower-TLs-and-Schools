@@ -1,23 +1,56 @@
 import React from "react";
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
+import logoImage from "@assets/WF Logo main_1751647532999.jpeg";
 
 interface GoogleMapProps {
   latitude?: number;
   longitude?: number;
   schoolName?: string;
+  shortName?: string;
   fallbackAddress?: string;
+  schoolLogo?: string;
 }
 
 interface MapComponentProps {
   center?: google.maps.LatLngLiteral;
   zoom: number;
   schoolName?: string;
+  shortName?: string;
+  currentAddress?: string;
   address?: string;
+  schoolLogo?: string;
 }
 
-const MapComponent = ({ center, zoom, schoolName, address }: MapComponentProps) => {
+const MapComponent = ({ center, zoom, schoolName, shortName, currentAddress, address, schoolLogo }: MapComponentProps) => {
   const ref = React.useRef<HTMLDivElement>(null);
   const [map, setMap] = React.useState<google.maps.Map>();
+
+  // Create custom flower icon
+  const createFlowerIcon = React.useCallback((logoUrl: string) => {
+    return {
+      url: logoUrl,
+      scaledSize: new window.google.maps.Size(40, 40),
+      anchor: new window.google.maps.Point(20, 20),
+      origin: new window.google.maps.Point(0, 0),
+    };
+  }, []);
+
+  // Create info window content
+  const createInfoWindowContent = React.useCallback(() => {
+    const displayName = shortName || schoolName || "School";
+    const displayAddress = currentAddress || address || "";
+    
+    return `
+      <div style="padding: 8px; min-width: 200px; font-family: ui-sans-serif, system-ui, sans-serif;">
+        <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px; color: #1f2937;">
+          ${displayName}
+        </div>
+        ${displayAddress ? `<div style="font-size: 12px; color: #6b7280; line-height: 1.4;">
+          ${displayAddress}
+        </div>` : ''}
+      </div>
+    `;
+  }, [schoolName, shortName, currentAddress, address]);
 
   React.useEffect(() => {
     if (ref.current && !map) {
@@ -26,13 +59,31 @@ const MapComponent = ({ center, zoom, schoolName, address }: MapComponentProps) 
         const newMap = new window.google.maps.Map(ref.current, {
           center,
           zoom,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
         });
         
-        // Add marker for the school
-        new window.google.maps.Marker({
+        // Create custom marker with flower icon
+        const icon = createFlowerIcon(schoolLogo || logoImage);
+        const marker = new window.google.maps.Marker({
           position: center,
           map: newMap,
           title: schoolName || "School Location",
+          icon: icon,
+        });
+
+        // Create info window
+        const infoWindow = new window.google.maps.InfoWindow({
+          content: createInfoWindowContent(),
+        });
+
+        // Open info window by default
+        infoWindow.open(newMap, marker);
+
+        // Add click listener to marker
+        marker.addListener('click', () => {
+          infoWindow.open(newMap, marker);
         });
         
         setMap(newMap);
@@ -46,12 +97,31 @@ const MapComponent = ({ center, zoom, schoolName, address }: MapComponentProps) 
             const newMap = new window.google.maps.Map(ref.current, {
               center: location,
               zoom,
+              mapTypeControl: false,
+              streetViewControl: false,
+              fullscreenControl: false,
             });
 
-            new window.google.maps.Marker({
+            // Create custom marker with flower icon
+            const icon = createFlowerIcon(schoolLogo || logoImage);
+            const marker = new window.google.maps.Marker({
               position: location,
               map: newMap,
               title: schoolName || "School Location",
+              icon: icon,
+            });
+
+            // Create info window
+            const infoWindow = new window.google.maps.InfoWindow({
+              content: createInfoWindowContent(),
+            });
+
+            // Open info window by default
+            infoWindow.open(newMap, marker);
+
+            // Add click listener to marker
+            marker.addListener('click', () => {
+              infoWindow.open(newMap, marker);
             });
             
             setMap(newMap);
@@ -71,7 +141,7 @@ const MapComponent = ({ center, zoom, schoolName, address }: MapComponentProps) 
         });
       }
     }
-  }, [ref, map, center, zoom, schoolName, address]);
+  }, [ref, map, center, zoom, schoolName, shortName, currentAddress, address, schoolLogo, createFlowerIcon, createInfoWindowContent]);
 
   React.useEffect(() => {
     if (map && center) {
@@ -82,7 +152,7 @@ const MapComponent = ({ center, zoom, schoolName, address }: MapComponentProps) 
   return <div ref={ref} className="w-full h-64 rounded-lg" />;
 };
 
-const render = (status: Status, latitude?: number, longitude?: number, schoolName?: string) => {
+const render = (status: Status, props: any) => {
   switch (status) {
     case Status.LOADING:
       return <div className="w-full h-64 rounded-lg bg-slate-100 flex items-center justify-center">
@@ -101,11 +171,11 @@ const render = (status: Status, latitude?: number, longitude?: number, schoolNam
         </div>
       </div>;
     case Status.SUCCESS:
-      return <MapComponent center={{ lat: latitude || 0, lng: longitude || 0 }} zoom={15} schoolName={schoolName} />;
+      return <MapComponent {...props} />;
   }
 };
 
-const renderAddressMap = (status: Status, address: string, schoolName?: string) => {
+const renderAddressMap = (status: Status, props: any) => {
   switch (status) {
     case Status.LOADING:
       return <div className="w-full h-64 rounded-lg bg-slate-100 flex items-center justify-center">
@@ -124,11 +194,11 @@ const renderAddressMap = (status: Status, address: string, schoolName?: string) 
         </div>
       </div>;
     case Status.SUCCESS:
-      return <MapComponent zoom={15} schoolName={schoolName} address={address} />;
+      return <MapComponent {...props} />;
   }
 };
 
-export function GoogleMap({ latitude, longitude, schoolName, fallbackAddress }: GoogleMapProps) {
+export function GoogleMap({ latitude, longitude, schoolName, shortName, fallbackAddress, schoolLogo }: GoogleMapProps) {
   // Handle both string and array formats for addresses
   const addressText = fallbackAddress 
     ? (Array.isArray(fallbackAddress) ? fallbackAddress.join(', ') : fallbackAddress)
@@ -156,26 +226,44 @@ export function GoogleMap({ latitude, longitude, schoolName, fallbackAddress }: 
   // If we have coordinates, use them
   if (latitude && longitude) {
     const center = { lat: latitude, lng: longitude };
+    const mapProps = { 
+      center, 
+      zoom: 15, 
+      schoolName, 
+      shortName, 
+      currentAddress: addressText, 
+      schoolLogo 
+    };
+    
     return (
       <Wrapper 
         apiKey={apiKey} 
-        render={(status) => render(status, latitude, longitude, schoolName)}
+        render={(status) => render(status, mapProps)}
         libraries={["marker"]}
       >
-        <MapComponent center={center} zoom={15} schoolName={schoolName} />
+        <MapComponent {...mapProps} />
       </Wrapper>
     );
   }
   
   // If we have an address but no coordinates, try to show map using address
   if (addressText) {
+    const mapProps = { 
+      zoom: 15, 
+      schoolName, 
+      shortName, 
+      address: addressText, 
+      currentAddress: addressText, 
+      schoolLogo 
+    };
+    
     return (
       <Wrapper 
         apiKey={apiKey} 
-        render={(status) => renderAddressMap(status, addressText, schoolName)}
+        render={(status) => renderAddressMap(status, mapProps)}
         libraries={["marker"]}
       >
-        <MapComponent zoom={15} schoolName={schoolName} address={addressText} />
+        <MapComponent {...mapProps} />
       </Wrapper>
     );
   }
