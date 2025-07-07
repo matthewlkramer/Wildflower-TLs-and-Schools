@@ -626,6 +626,7 @@ export interface MembershipFeeByYear {
   datePaid?: string;
   paymentMethod?: string;
   notes?: string;
+  likelihoodOfPaying?: number;
 }
 
 export interface MembershipFeeUpdate {

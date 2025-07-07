@@ -3717,8 +3717,8 @@ export default function SchoolDetail() {
                               <TableRow>
                                 <TableHead>School Year</TableHead>
                                 <TableHead>Fee Amount</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Due Date</TableHead>
+                                <TableHead>Exempt?</TableHead>
+                                <TableHead>Likelihood of paying</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -3740,17 +3740,26 @@ export default function SchoolDetail() {
                                     <TableCell>
                                       {fee.status && (
                                         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                          fee.status.toLowerCase() === 'paid' 
-                                            ? 'bg-green-100 text-green-800' 
-                                            : fee.status.toLowerCase() === 'overdue'
-                                            ? 'bg-red-100 text-red-800'
-                                            : 'bg-yellow-100 text-yellow-800'
+                                          fee.status.toLowerCase().includes('exempt') 
+                                            ? fee.status.toLowerCase().includes('non-exempt')
+                                              ? 'bg-red-100 text-red-800'
+                                              : 'bg-green-100 text-green-800'
+                                            : 'bg-gray-100 text-gray-800'
                                         }`}>
                                           {fee.status}
                                         </span>
                                       )}
                                     </TableCell>
-                                    <TableCell>{fee.dueDate || '-'}</TableCell>
+                                    <TableCell>
+                                      {fee.likelihoodOfPaying ? (
+                                        <span className="text-slate-900">
+                                          {typeof fee.likelihoodOfPaying === 'number' 
+                                            ? `${(fee.likelihoodOfPaying * 100).toFixed(0)}%`
+                                            : fee.likelihoodOfPaying
+                                          }
+                                        </span>
+                                      ) : '-'}
+                                    </TableCell>
                                   </TableRow>
                                 ))
                               ) : (

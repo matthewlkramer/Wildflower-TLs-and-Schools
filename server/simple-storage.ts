@@ -1832,6 +1832,7 @@ export class SimpleAirtableStorage implements IStorage {
       status: fields["Current exemption status"] || undefined,
       dueDate: fields["End date (from School year)"] || undefined,
       notes: fields["Notes"] || undefined,
+      likelihoodOfPaying: fields["Likelihood of paying"] || undefined,
     };
   }
 
