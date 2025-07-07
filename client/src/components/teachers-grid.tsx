@@ -53,7 +53,7 @@ const BadgeRenderer = ({ value, field }: { value: string | string[]; field?: str
   };
   
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="flex flex-wrap gap-1 items-center h-full">
       {values.map((val, index) => (
         <Badge 
           key={index}
@@ -73,7 +73,7 @@ const PillRenderer = ({ value }: { value: string | string[] }) => {
   
   const values = Array.isArray(value) ? value : [value];
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="flex flex-wrap gap-1 items-center h-full">
       {values.map((val, index) => (
         <span 
           key={index}
@@ -295,7 +295,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
           suppressRowClickSelection={false}
           animateRows={true}
           pagination={false}
-          theme="legacy"
+
         />
       </div>
     </div>

@@ -167,7 +167,7 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
           domLayout="autoHeight"
           headerHeight={40}
           rowHeight={35}
-          theme="legacy"
+
           defaultColDef={{
             sortable: true,
             resizable: true,

@@ -39,9 +39,11 @@ const StatusBadgeCellRenderer = (params: any) => {
   if (!value) return <span></span>;
   
   return (
-    <Badge className={getStatusColor(value)}>
-      {value}
-    </Badge>
+    <div className="flex items-center h-full">
+      <Badge className={getStatusColor(value)}>
+        {value}
+      </Badge>
+    </div>
   );
 };
 
@@ -50,9 +52,11 @@ const MembershipStatusCellRenderer = (params: any) => {
   if (!value) return <span></span>;
   
   return (
-    <Badge variant={value === 'Active' ? "default" : "secondary"}>
-      {value}
-    </Badge>
+    <div className="flex items-center h-full">
+      <Badge variant={value === 'Active' ? "default" : "secondary"}>
+        {value}
+      </Badge>
+    </div>
   );
 };
 
@@ -63,7 +67,7 @@ const MultiValueCellRenderer = (params: any) => {
   }
   
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="flex flex-wrap gap-1 items-center h-full">
       {values.map((value: string, index: number) => (
         <Badge key={index} variant="outline" className="text-xs">
           {value}
@@ -189,7 +193,18 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       field: "governanceModel",
       headerName: "Governance Model",
       width: 160,
-      cellRenderer: StatusBadgeCellRenderer,
+      cellRenderer: (params: any) => {
+        const value = params.value;
+        if (!value) return <span></span>;
+        
+        return (
+          <div className="flex items-center h-full">
+            <Badge className={getStatusColor(value)}>
+              {value}
+            </Badge>
+          </div>
+        );
+      },
       filter: "agTextColumnFilter",
     },
 
@@ -252,7 +267,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
           rowSelection="multiple"
           suppressRowClickSelection={true}
           enableBrowserTooltips={true}
-          theme="legacy"
+
         />
       </div>
     </div>
