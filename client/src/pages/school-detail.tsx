@@ -3917,6 +3917,7 @@ export default function SchoolDetail() {
                                           variant="outline"
                                           className="h-6 w-6 p-0"
                                           onClick={() => setEditingNoteId(note.id)}
+                                          title="Edit note"
                                         >
                                           <Edit className="h-3 w-3" />
                                         </Button>
@@ -3925,6 +3926,7 @@ export default function SchoolDetail() {
                                           variant="outline"
                                           className="h-6 w-6 p-0 bg-yellow-50 text-yellow-700 hover:bg-yellow-100"
                                           onClick={() => {/* Mark private */}}
+                                          title="Mark as private"
                                         >
                                           <Eye className="h-3 w-3" />
                                         </Button>
@@ -3936,6 +3938,7 @@ export default function SchoolDetail() {
                                             setDeletingNoteId(note.id);
                                             setNoteDeleteModalOpen(true);
                                           }}
+                                          title="Delete note"
                                         >
                                           <Trash2 className="h-3 w-3" />
                                         </Button>
@@ -3963,15 +3966,15 @@ export default function SchoolDetail() {
                             <Skeleton className="h-8 w-full" />
                           </div>
                         ) : actionSteps && actionSteps.length > 0 ? (
-                          <div className="border rounded-lg">
-                            <Table>
+                          <div className="border rounded-lg overflow-hidden">
+                            <Table className="table-fixed w-full">
                               <TableHeader>
                                 <TableRow>
-                                  <TableHead>Action item</TableHead>
-                                  <TableHead>Assignee</TableHead>
-                                  <TableHead>Due Date</TableHead>
-                                  <TableHead>Status</TableHead>
-                                  <TableHead className="w-[120px]">Actions</TableHead>
+                                  <TableHead className="w-[40%]">Action item</TableHead>
+                                  <TableHead className="w-[15%]">Assignee</TableHead>
+                                  <TableHead className="w-[15%]">Due Date</TableHead>
+                                  <TableHead className="w-[15%]">Status</TableHead>
+                                  <TableHead className="w-[15%]">Actions</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -3985,15 +3988,17 @@ export default function SchoolDetail() {
                                   })
                                   .map((step) => (
                                   <TableRow key={step.id} className="h-8">
-                                    <TableCell className="py-1">
-                                      <span className="text-sm">{step.item || '-'}</span>
+                                    <TableCell className="py-1 max-w-0">
+                                      <span className="text-sm block truncate pr-2" title={step.item || '-'}>
+                                        {step.item || '-'}
+                                      </span>
                                     </TableCell>
-                                    <TableCell className="py-1">{step.assignee || '-'}</TableCell>
-                                    <TableCell className="py-1">
-                                      {step.dueDate ? new Date(step.dueDate).toLocaleDateString() : '-'}
+                                    <TableCell className="py-1 text-sm">{step.assignee || '-'}</TableCell>
+                                    <TableCell className="py-1 text-sm">
+                                      {step.dueDate ? new Date(step.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '-'}
                                     </TableCell>
                                     <TableCell className="py-1">
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                      <span className={`inline-flex items-center px-1 py-1 rounded-full text-xs font-medium ${
                                         step.isCompleted 
                                           ? 'bg-green-100 text-green-800' 
                                           : step.status === 'In Progress'
@@ -4012,6 +4017,7 @@ export default function SchoolDetail() {
                                           variant="outline"
                                           className="h-6 w-6 p-0"
                                           onClick={() => {/* Edit action step */}}
+                                          title="Edit action item"
                                         >
                                           <Edit className="h-3 w-3" />
                                         </Button>
@@ -4025,6 +4031,7 @@ export default function SchoolDetail() {
                                           }`}
                                           onClick={() => {/* Mark complete */}}
                                           disabled={step.isCompleted}
+                                          title={step.isCompleted ? "Already completed" : "Mark as complete"}
                                         >
                                           <Check className="h-3 w-3" />
                                         </Button>
@@ -4033,6 +4040,7 @@ export default function SchoolDetail() {
                                           variant="outline"
                                           className="h-6 w-6 p-0 text-red-600 hover:bg-red-50"
                                           onClick={() => {/* Delete action step */}}
+                                          title="Delete action item"
                                         >
                                           <Trash2 className="h-3 w-3" />
                                         </Button>
