@@ -261,21 +261,18 @@ export default function TeacherDetail() {
 
               <TabsContent value="certs" className="mt-0">
                 <div className="space-y-4">
-                  <h4 className="font-medium text-slate-900">Montessori Certifications</h4>
                   <MontessoriCertificationsTable educatorId={teacher.id} />
                 </div>
               </TabsContent>
 
               <TabsContent value="events" className="mt-0">
                 <div className="space-y-4">
-                  <h4 className="font-medium text-slate-900">Event Attendance</h4>
                   <EventAttendanceTable educatorId={teacher.id} />
                 </div>
               </TabsContent>
 
               <TabsContent value="notes" className="mt-0">
                 <div className="space-y-4">
-                  <h4 className="font-medium text-slate-900">Educator Notes</h4>
                   <EducatorNotesTable educatorId={teacher.id} />
                 </div>
               </TabsContent>
