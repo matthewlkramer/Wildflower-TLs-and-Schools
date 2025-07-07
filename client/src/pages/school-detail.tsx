@@ -169,11 +169,13 @@ function TeacherAssociationRow({
         {association.role ? (
           <div className="flex flex-wrap gap-1">
             {Array.isArray(association.role) ? (
-              association.role.map((role, index) => (
-                <Badge key={index} variant="secondary" className="text-xs">
-                  {role}
-                </Badge>
-              ))
+              association.role.flatMap((roleString, arrayIndex) => 
+                roleString.split(',').map((role, roleIndex) => (
+                  <Badge key={`${arrayIndex}-${roleIndex}`} variant="secondary" className="text-xs">
+                    {role.trim()}
+                  </Badge>
+                ))
+              )
             ) : typeof association.role === 'string' ? (
               association.role.split(',').map((role, index) => (
                 <Badge key={index} variant="secondary" className="text-xs">
@@ -228,7 +230,7 @@ function TeacherAssociationRow({
             variant="outline"
             className="h-8 w-8 p-0 text-orange-600 hover:text-orange-700"
             onClick={onEndStint}
-            title="End employment"
+            title="End stint"
           >
             <UserMinus className="h-4 w-4" />
           </Button>
