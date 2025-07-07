@@ -6,7 +6,7 @@ import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 import { Link } from "wouter";
-import { Edit, Trash2 } from "lucide-react";
+import { ExternalLink, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type Educator } from "@shared/schema";
@@ -112,7 +112,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
       <div className="flex items-center gap-1">
         <Button variant="ghost" size="sm" className="h-7 w-7 p-0" asChild>
           <Link href={`/teacher/${teacher.id}`}>
-            <Edit className="h-3 w-3" />
+            <ExternalLink className="h-3 w-3" />
           </Link>
         </Button>
         <Button 
@@ -162,7 +162,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
 
   const columnDefs: ColDef[] = useMemo(() => [
     {
-      headerName: "Full Name",
+      headerName: "Educator Name",
       field: "fullName",
       filter: 'agTextColumnFilter',
       minWidth: 200,

@@ -6,7 +6,7 @@ import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 import { Link } from "wouter";
-import { Edit, Trash2 } from "lucide-react";
+import { ExternalLink, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type School } from "@shared/schema";
@@ -24,10 +24,8 @@ interface SchoolsGridProps {
 const SchoolNameCellRenderer = (params: any) => {
   const school = params.data;
   return (
-    <Link href={`/school/${school.id}`}>
-      <div className="flex items-center cursor-pointer hover:bg-slate-50 p-1 rounded">
-        <div className="font-medium text-slate-900">{school.shortName || school.name}</div>
-      </div>
+    <Link href={`/school/${school.id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+      {school.shortName || school.name}
     </Link>
   );
 };
@@ -97,7 +95,7 @@ const ActionsCellRenderer = (params: any) => {
     <div className="flex space-x-1">
       <Link href={`/school/${school.id}`}>
         <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-          <Edit className="h-3 w-3" />
+          <ExternalLink className="h-3 w-3" />
         </Button>
       </Link>
       <Button 
@@ -137,7 +135,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
   const columnDefs: ColDef[] = [
     {
       field: "name",
-      headerName: "Name",
+      headerName: "School Name",
       width: 200,
       cellRenderer: SchoolNameCellRenderer,
       filter: "agTextColumnFilter",
