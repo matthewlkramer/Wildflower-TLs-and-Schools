@@ -1595,7 +1595,7 @@ export class SimpleAirtableStorage implements IStorage {
     return {
       id: record.id,
       educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
-      certificationLevel: fields["Certification Level"] || fields["Level"] || fields["certification_level"] || undefined,
+      certificationLevel: fields["Certification Level"] || fields["Level"] || fields["certification_level"] || 'DEBUG: Missing Level',
       certificationStatus: fields["Status"] || fields["Certification Status"] || fields["certification_status"] || undefined,
       certifier: fields["Certifier"] || fields["Certification Body"] || fields["certifier"] || undefined,
       trainingProgram: fields["Training Program"] || fields["Program"] || fields["training_program"] || undefined,
