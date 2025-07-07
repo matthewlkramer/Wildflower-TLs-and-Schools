@@ -82,7 +82,7 @@ function TeacherAssociationRow({
               href={`/teachers/${teacher.id}`}
               className="text-wildflower-blue hover:underline"
             >
-              {teacher.fullName}
+              {teacher.fullName || teacher.firstName + ' ' + teacher.lastName}
             </Link>
           ) : (
             association.educatorId
@@ -1644,7 +1644,7 @@ export default function SchoolDetail() {
                           </div>
                           <div>
                             <label className="text-sm font-medium text-slate-600">Full Name</label>
-                            <p className="text-sm text-slate-900">{school.fullName || '-'}</p>
+                            <p className="text-sm text-slate-900">{school.name || '-'}</p>
                           </div>
                           <div>
                             <label className="text-sm font-medium text-slate-600">Founders</label>
@@ -1766,7 +1766,7 @@ export default function SchoolDetail() {
                         </div>
                         <div>
                           <label className="text-sm font-medium text-slate-600">Legal Name</label>
-                          <p className="text-sm text-slate-900">{school.fullName || '-'}</p>
+                          <p className="text-sm text-slate-900">{school.name || '-'}</p>
                         </div>
                         <div>
                           <label className="text-sm font-medium text-slate-600">Legal Structure</label>

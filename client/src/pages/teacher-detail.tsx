@@ -86,7 +86,7 @@ export default function TeacherDetail() {
             <div className="border-b border-slate-200 overflow-x-auto">
               <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-slate-900 px-3 py-3 flex-shrink-0">
-                  {teacher.fullName}
+                  {teacher.fullName || teacher.firstName + ' ' + teacher.lastName}
                 </h1>
                 <TabsList className="flex bg-transparent h-auto p-0 w-max">
                 <TabsTrigger value="summary" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">

@@ -80,7 +80,6 @@ export interface School {
   id: string; // Airtable record ID
   name: string;
   shortName?: string;
-  fullName?: string;
   priorNames?: string;
   logo?: string;
   programFocus?: string;
@@ -97,26 +96,18 @@ export interface School {
   about?: string;
   aboutSpanish?: string;
   agesServed?: string[];
-  grades?: string[];
   governanceModel?: string;
   status?: string;
   stageStatus?: string;  
   openDate?: string;
-  targetOpenDate?: string;
   enrollmentCap?: number;
   currentEnrollment?: number;
-  tuitionRange?: string;
-  numberClassrooms?: number;
   numberOfClassrooms?: string;
   publicFundingSources?: string[];
   flexibleTuition?: string;
   activePodMember?: string;
 
   // Location
-  address?: string; // Legacy field for compatibility
-  city?: string;
-  state?: string;
-  zipCode?: string;
   activePhysicalAddress?: string;
   currentPhysicalAddress?: boolean; // Added for Airtable checkbox field
   currentMailingAddress?: boolean; // Added for Airtable checkbox field
@@ -222,13 +213,6 @@ export interface School {
   googleWorkspacePath?: string;
   budgetLink?: string;
   bookkeeper?: string;
-  lgbtqia?: boolean;
-  excludeFromEmailLogging?: any;
-  targetGeo?: string;
-  targetIntl?: string;
-  assignedPartnerEmail?: string;
-  assignedPartnerOverride?: string;
-  assignedPartnerShortName?: string;
   selfReflection?: string;
   inactiveFlag?: string;
 
@@ -417,13 +401,8 @@ export const educatorSchema = z.object({
 export const schoolSchema = z.object({
   name: z.string().min(1, "School name is required"),
   shortName: z.string().optional(),
-  fullName: z.string().optional(),
   priorNames: z.string().optional(),
   logo: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
   currentPhysicalAddress: z.boolean().optional(),
   currentMailingAddress: z.boolean().optional(),
   activeLocationCity: z.string().optional(),
@@ -447,17 +426,14 @@ export const schoolSchema = z.object({
   agreementVersion: z.string().optional(),
   about: z.string().optional(),
   aboutSpanish: z.string().optional(),
-  grades: z.array(z.string()).optional(),
   agesServed: z.array(z.string()).optional(),
   schoolType: z.string().optional(),
   governanceModel: z.string().optional(),
   status: z.string().optional(),
   stageStatus: z.string().optional(),
   openDate: z.string().optional(),
-  targetOpenDate: z.string().optional(),
   enrollmentCap: z.number().optional(),
   currentEnrollment: z.number().optional(),
-  tuitionRange: z.string().optional(),
   membershipFeeStatus: z.string().optional(),
   membershipFeeAmount: z.number().optional(),
   publicFunding: z.boolean().optional(),
@@ -519,13 +495,6 @@ export const schoolSchema = z.object({
   googleWorkspacePath: z.string().optional(),
   budgetLink: z.string().optional(),
   bookkeeper: z.string().optional(),
-  lgbtqia: z.boolean().optional(),
-  excludeFromEmailLogging: z.any().optional(),
-  targetGeo: z.string().optional(),
-  targetIntl: z.string().optional(),
-  assignedPartnerEmail: z.string().optional(),
-  assignedPartnerOverride: z.string().optional(),
-  assignedPartnerShortName: z.string().optional(),
   selfReflection: z.string().optional(),
   firstContactRelocate: z.string().optional(),
   firstContactGovernance: z.string().optional(),
