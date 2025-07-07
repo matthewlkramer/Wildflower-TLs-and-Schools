@@ -1648,15 +1648,25 @@ export default function SchoolDetail() {
                       </Card>
                       <Card className="shadow-sm">
                         <CardHeader>
-                          <CardTitle className="text-lg">Support</CardTitle>
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-lg">Support</CardTitle>
+                            <div className="flex gap-2 text-sm">
+                              <span className={school.status && ['planning', 'startup', 'visioning'].includes(school.status.toLowerCase()) ? 'font-bold text-gray-900' : 'text-gray-400'}>
+                                SSJ
+                              </span>
+                              <span className={school.status && ['open', 'year 1'].includes(school.status.toLowerCase()) ? 'font-bold text-gray-900' : 'text-gray-400'}>
+                                Open
+                              </span>
+                              <span className={school.status && ['disaffiliated', 'permanently closed'].includes(school.status.toLowerCase()) ? 'font-bold text-gray-900' : 'text-gray-400'}>
+                                Closed
+                              </span>
+                            </div>
+                          </div>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                          {/* Support Type Indicator */}
+                          {/* SSJ status fields */}
                           {school.status && ['planning', 'startup', 'visioning'].includes(school.status.toLowerCase()) && (
                             <>
-                              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">
-                                SSJ (Startup School Journey) Information
-                              </div>
                               <div>
                                 <h4 className="text-sm font-medium text-gray-700 mb-1">SSJ Stage</h4>
                                 <p className="text-base text-gray-900">{school.ssjStage || school.status || 'Not specified'}</p>
@@ -1683,9 +1693,6 @@ export default function SchoolDetail() {
                             school.status.toLowerCase() === 'permanently closed'
                           ) && (
                             <>
-                              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">
-                                Closed School Information
-                              </div>
                               <div>
                                 <h4 className="text-sm font-medium text-gray-700 mb-1">Left Network Date</h4>
                                 <p className="text-base text-gray-900">{school.leftNetworkDate || 'Not specified'}</p>
@@ -1699,14 +1706,9 @@ export default function SchoolDetail() {
                           
                           {/* Open or Year 1 status - blank for now */}
                           {school.status && ['open', 'year 1'].includes(school.status.toLowerCase()) && (
-                            <>
-                              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">
-                                Open School Information
-                              </div>
-                              <div className="text-center py-4">
-                                <p className="text-sm text-gray-400">No support information to display</p>
-                              </div>
-                            </>
+                            <div className="text-center py-4">
+                              <p className="text-sm text-gray-400">No support information to display</p>
+                            </div>
                           )}
                           
                           {/* No status */}
