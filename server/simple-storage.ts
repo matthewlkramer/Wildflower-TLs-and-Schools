@@ -1031,7 +1031,9 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('School Notes');
       const records = await table.select({
-        filterByFormula: `{school_id} = "${schoolId}"`
+        filterByFormula: `{school_id} = "${schoolId}"`,
+        // Expand linked records to get name information
+        fields: ['Date created', 'Created by', 'Notes', 'Is Private', 'school_id']
       }).all();
       return records.map(record => this.transformSchoolNoteRecord(record));
     } catch (error) {
@@ -1840,15 +1842,25 @@ export class SimpleAirtableStorage implements IStorage {
     // Handle Created by field - it might be a linked record
     let createdBy = undefined;
     const createdByField = fields["Created by"] || fields["Author"] || fields["Created By"];
+    
+    // Check if we have the record ID and need to look up the name
     if (Array.isArray(createdByField) && createdByField.length > 0) {
       // If it's a linked record array, get the name from the first item
       createdBy = createdByField[0]?.name || String(createdByField[0] || '');
+      // If it's still an ID, show "User" instead
+      if (typeof createdBy === 'string' && createdBy.startsWith('rec')) {
+        createdBy = 'User';
+      }
     } else if (typeof createdByField === 'object' && createdByField?.name) {
       // If it's an object with name property
       createdBy = createdByField.name;
     } else if (createdByField) {
-      // If it's a direct string value
+      // If it's a direct string value (likely an ID)
       createdBy = String(createdByField);
+      // For now, if it looks like an ID, show "User" instead of the ID
+      if (createdByField.startsWith('rec')) {
+        createdBy = 'User';
+      }
     }
     
     return {
