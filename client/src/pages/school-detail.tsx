@@ -1630,6 +1630,12 @@ export default function SchoolDetail() {
                               <p className="text-sm font-medium text-gray-900 mt-1">{school.membershipStatus || 'Not specified'}</p>
                             </div>
                           </div>
+                          {school.about && (
+                            <div className="mt-4 pt-4 border-t border-gray-200">
+                              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">About</p>
+                              <p className="text-sm text-gray-700 leading-relaxed">{school.about}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1811,6 +1817,10 @@ export default function SchoolDetail() {
                           <div>
                             <p className="text-xs text-gray-500 uppercase tracking-wider">Number of Classrooms</p>
                             <p className="text-sm font-medium text-gray-900 mt-1">{school.numberOfClassrooms || 'Not specified'}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Program Focus</p>
+                            <p className="text-sm font-medium text-gray-900 mt-1">{school.programFocus || 'Not specified'}</p>
                           </div>
 
                         </CardContent>
