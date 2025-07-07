@@ -1781,10 +1781,30 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Membership fee school x year');
       
+      // Debug: Get all records to see what school IDs exist
+      const allRecords = await table.select().all();
+      console.log(`=== MEMBERSHIP FEES SCHOOL DEBUG for ${schoolId} ===`);
+      console.log(`Total membership fee records: ${allRecords.length}`);
+      const schoolIds = new Set();
+      allRecords.forEach((record, index) => {
+        const school = record.fields["School"];
+        if (Array.isArray(school)) {
+          school.forEach(id => schoolIds.add(id));
+        }
+        if (index < 5) { // Log first 5 records
+          console.log(`Record ${index + 1}: School=${JSON.stringify(school)}`);
+        }
+      });
+      console.log('Unique school IDs in membership fees:', Array.from(schoolIds));
+      console.log('Looking for school ID:', schoolId);
+      console.log('=== END MEMBERSHIP FEES SCHOOL DEBUG ===');
+      
       // Use the correct field name "School" based on debug output
       const records = await table.select({
         filterByFormula: `FIND("${schoolId}", ARRAYJOIN({School})) > 0`
       }).all();
+      
+      console.log(`Found ${records.length} membership fee records for school ${schoolId}`);
       
       return records.map(record => this.transformMembershipFeeByYearRecord(record));
     } catch (error) {
