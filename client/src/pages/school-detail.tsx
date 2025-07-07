@@ -1577,181 +1577,223 @@ export default function SchoolDetail() {
 
               <div className="p-6">
                 <TabsContent value="summary" className="mt-0">
-                  <div className="space-y-8">
-                    {/* Basic School Information */}
-                    <div>
-                      <div className="flex items-center mb-4">
-                        <div className="w-16 h-16 bg-slate-100 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center mr-4">
-                          {(school.logoMainRectangle || school.logoMainSquare || school.logo) ? (
-                            <img 
-                              src={school.logoMainRectangle || school.logoMainSquare || school.logo} 
-                              alt={`${school.name} logo`}
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          ) : (
-                            <div className="text-center">
-                              <svg className="w-6 h-6 mx-auto text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                              <p className="text-xs text-slate-400 mt-1">Logo</p>
+                  <div className="space-y-6">
+                    {/* Header Section with Logo and Key Info */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 shadow-sm">
+                      <div className="flex items-start gap-6">
+                        <div className="flex-shrink-0">
+                          <div className="w-24 h-24 bg-white rounded-2xl shadow-md overflow-hidden flex items-center justify-center">
+                            {(school.logoMainRectangle || school.logoMainSquare || school.logo) ? (
+                              <img 
+                                src={school.logoMainRectangle || school.logoMainSquare || school.logo} 
+                                alt={`${school.name} logo`}
+                                className="w-full h-full object-contain p-2"
+                              />
+                            ) : (
+                              <div className="text-center">
+                                <svg className="w-10 h-10 mx-auto text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h2 className="text-2xl font-semibold text-gray-900">{school.name}</h2>
+                              <p className="text-lg text-gray-600 mt-1">{school.shortName}</p>
                             </div>
-                          )}
+                            <div className="flex gap-2">
+                              {school.status && (
+                                <Badge className={`${getStatusColor(school.status)} text-xs px-3 py-1`}>
+                                  {school.status}
+                                </Badge>
+                              )}
+                              {school.ssjStage && (
+                                <Badge className={`${getStatusColor(school.ssjStage)} text-xs px-3 py-1`}>
+                                  SSJ: {school.ssjStage}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wider">Governance</p>
+                              <p className="text-sm font-medium text-gray-900 mt-1">{school.governanceModel || 'Not specified'}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wider">Ages Served</p>
+                              <p className="text-sm font-medium text-gray-900 mt-1">{school.agesServed?.join(', ') || 'Not specified'}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wider">Open Date</p>
+                              <p className="text-sm font-medium text-gray-900 mt-1">{school.openDate || 'Not yet open'}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wider">Membership</p>
+                              <p className="text-sm font-medium text-gray-900 mt-1">{school.membershipStatus || 'Not specified'}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Location Section with Google Map */}
-                      <div className="mb-6">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Location Section with Map */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <Card className="overflow-hidden shadow-sm">
+                        <GoogleMap 
+                          latitude={school.activeLatitude} 
+                          longitude={school.activeLongitude} 
+                          schoolName={school.name}
+                          shortName={school.shortName}
+                          fallbackAddress={school.activePhysicalAddress}
+                          schoolLogo={school.logoFlowerOnly || school.logoMainSquare || school.logo}
+                        />
+                      </Card>
+                      <Card className="shadow-sm">
+                        <CardHeader>
+                          <CardTitle className="text-lg">Location Details</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
                           <div>
-                            <GoogleMap 
-                              latitude={school.activeLatitude} 
-                              longitude={school.activeLongitude} 
-                              schoolName={school.name}
-                              shortName={school.shortName}
-                              fallbackAddress={school.activePhysicalAddress}
-                              schoolLogo={school.logoFlowerOnly || school.logoMainSquare || school.logo}
-                            />
+                            <h4 className="text-sm font-medium text-gray-700 mb-1">Current Physical Address</h4>
+                            <p className="text-base text-gray-900">{school.activePhysicalAddress || 'No address available'}</p>
                           </div>
-                          <div className="space-y-4">
+                          {school.locality && (
                             <div>
-                              <label className="text-sm font-medium text-slate-600">Current Physical Address</label>
-                              <p className="text-sm text-slate-900">{school.activePhysicalAddress || '-'}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="space-y-3">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Governance Model</label>
-                            <p className="text-sm text-slate-900">{school.governanceModel || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">School Open Date</label>
-                            <p className="text-sm text-slate-900">{school.openDate || '-'}</p>
-                          </div>
-                          {/* Conditional SSJ Projected Open Date */}
-                          {school.ssjStage && ['visioning', 'planning', 'startup'].includes(school.ssjStage.toLowerCase()) && (
-                            <div>
-                              <label className="text-sm font-medium text-slate-600">SSJ Projected Open Date</label>
-                              <p className="text-sm text-slate-900">{school.ssjProjectedOpen || '-'}</p>
+                              <h4 className="text-sm font-medium text-gray-700 mb-1">Locality</h4>
+                              <p className="text-base text-gray-900">{school.locality}</p>
                             </div>
                           )}
-                        </div>
-                        <div className="space-y-3">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Short Name</label>
-                            <p className="text-sm text-slate-900">{school.shortName || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Full Name</label>
-                            <p className="text-sm text-slate-900">{school.name || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Founders</label>
-                            <p className="text-sm text-slate-900">{school.founders?.join(', ') || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">School Status</label>
-                            <div className="mt-1">
-                              <Badge className={getStatusColor(school.status || '')}>{school.status || '-'}</Badge>
+                          {(school.publicFundingSources && school.publicFundingSources.length > 0) && (
+                            <div>
+                              <h4 className="text-sm font-medium text-gray-700 mb-1">Public Funding Sources</h4>
+                              <div className="flex flex-wrap gap-2 mt-2">
+                                {school.publicFundingSources.map((source, idx) => (
+                                  <Badge key={idx} variant="secondary" className="text-xs">
+                                    {source}
+                                  </Badge>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">SSJ Stage</label>
-                            <div className="mt-1">
-                              <Badge className={getStatusColor(school.ssjStage || '')}>{school.ssjStage || '-'}</Badge>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Key Information Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {/* Leadership Card */}
+                      <Card className="shadow-sm">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <User className="w-4 h-4 text-blue-600" />
+                            Leadership
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          {school.founders && school.founders.length > 0 && (
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wider">Founders</p>
+                              <p className="text-sm font-medium text-gray-900 mt-1">{school.founders.join(', ')}</p>
                             </div>
-                          </div>
-                        </div>
-                        <div className="space-y-3">
+                          )}
+                          {school.currentTLs && (
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wider">Current TLs</p>
+                              <p className="text-sm font-medium text-gray-900 mt-1">
+                                {typeof school.currentTLs === 'string' 
+                                  ? school.currentTLs
+                                  : school.currentTLs && Array.isArray(school.currentTLs) && school.currentTLs.length > 0 
+                                    ? school.currentTLs.join(', ')
+                                    : 'None assigned'
+                                }
+                              </p>
+                            </div>
+                          )}
+                          {school.currentGuides && school.currentGuides.length > 0 && (
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wider">Current Guides</p>
+                              <p className="text-sm font-medium text-gray-900 mt-1">{school.currentGuides.join(', ')}</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      {/* School Details Card */}
+                      <Card className="shadow-sm">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <School2 className="w-4 h-4 text-green-600" />
+                            School Details
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
                           <div>
-                            <label className="text-sm font-medium text-slate-600">Ages Served</label>
-                            <p className="text-sm text-slate-900">{school.agesServed?.join(', ') || '-'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Current TLs</label>
-                            <p className="text-sm text-slate-900">
-                              {typeof school.currentTLs === 'string' 
-                                ? school.currentTLs
-                                : school.currentTLs && Array.isArray(school.currentTLs) && school.currentTLs.length > 0 
-                                  ? school.currentTLs.join(', ')
-                                  : '-'
-                              }
-                            </p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Current Guide(s)</label>
-                            <p className="text-sm text-slate-900">
-                              {school.currentGuides && Array.isArray(school.currentGuides) && school.currentGuides.length > 0 
-                                ? school.currentGuides.join(', ')
-                                : '-'
-                              }
-                            </p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Membership Status</label>
-                            <p className="text-sm text-slate-900">{school.membershipStatus || '-'}</p>
-                          </div>
-                        </div>
-                        <div className="space-y-3">
-                          <div>
-                            <label className="text-sm font-medium text-slate-600">Risk Factors</label>
-                            <p className="text-sm text-slate-900">
-                              {school.riskFactors && Array.isArray(school.riskFactors) && school.riskFactors.length > 0 
-                                ? school.riskFactors.join(', ')
-                                : '-'
-                              }
-                            </p>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Enrollment Capacity</p>
+                            <p className="text-sm font-medium text-gray-900 mt-1">{school.enrollmentCap || 'Not set'}</p>
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-slate-600">Watchlist</label>
-                            <p className="text-sm text-slate-900">
-                              {school.watchlist && Array.isArray(school.watchlist) && school.watchlist.length > 0 
-                                ? school.watchlist.join(', ')
-                                : '-'
-                              }
-                            </p>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Number of Classrooms</p>
+                            <p className="text-sm font-medium text-gray-900 mt-1">{school.numberOfClassrooms || 'Not specified'}</p>
                           </div>
-                          {/* Conditional Left Network Information */}
+                          {school.ssjStage && ['visioning', 'planning', 'startup'].includes(school.ssjStage.toLowerCase()) && school.ssjProjectedOpen && (
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wider">SSJ Projected Open</p>
+                              <p className="text-sm font-medium text-gray-900 mt-1">{school.ssjProjectedOpen}</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      {/* Status & Monitoring Card */}
+                      <Card className="shadow-sm">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Status & Monitoring
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          {school.riskFactors && school.riskFactors.length > 0 && (
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wider">Risk Factors</p>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {school.riskFactors.map((factor, idx) => (
+                                  <Badge key={idx} variant="destructive" className="text-xs">
+                                    {factor}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {school.watchlist && school.watchlist.length > 0 && (
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase tracking-wider">Watchlist</p>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {school.watchlist.map((item, idx) => (
+                                  <Badge key={idx} variant="outline" className="text-xs border-orange-300 text-orange-700">
+                                    {item}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                           {school.leftNetworkDate && (
-                            <>
-                              <div>
-                                <label className="text-sm font-medium text-slate-600">Left Network Date</label>
-                                <p className="text-sm text-slate-900">{school.leftNetworkDate}</p>
-                              </div>
-                              <div>
-                                <label className="text-sm font-medium text-slate-600">Left Network Reason</label>
-                                <p className="text-sm text-slate-900">{school.leftNetworkReason || '-'}</p>
-                              </div>
-                            </>
+                            <div className="border-t pt-3">
+                              <p className="text-xs text-red-600 uppercase tracking-wider">Left Network</p>
+                              <p className="text-sm font-medium text-gray-900 mt-1">{school.leftNetworkDate}</p>
+                              {school.leftNetworkReason && (
+                                <p className="text-xs text-gray-600 mt-1">Reason: {school.leftNetworkReason}</p>
+                              )}
+                            </div>
                           )}
-                        </div>
-                      </div>
+                        </CardContent>
+                      </Card>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      <div>
-                        <label className="text-sm font-medium text-slate-600">Max Capacity</label>
-                        <p className="text-sm text-slate-900">{school.enrollmentCap || '-'}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-slate-600">Number of Classrooms</label>
-                        <p className="text-sm text-slate-900">{school.numberOfClassrooms || '-'}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-slate-600">Public Funding Sources</label>
-                        <p className="text-sm text-slate-900">
-                          {school.publicFundingSources && Array.isArray(school.publicFundingSources) && school.publicFundingSources.length > 0 
-                            ? school.publicFundingSources.join(', ')
-                            : '-'
-                          }
-                        </p>
-                      </div>
-                    </div>
-
-
                   </div>
                 </TabsContent>
 
