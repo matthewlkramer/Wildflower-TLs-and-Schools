@@ -3851,7 +3851,7 @@ export default function SchoolDetail() {
                                   <TableHead>Date</TableHead>
                                   <TableHead>Created By</TableHead>
                                   <TableHead>Notes</TableHead>
-                                  <TableHead className="w-[100px]">Actions</TableHead>
+                                  <TableHead className="w-[180px]">Actions</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -3915,21 +3915,29 @@ export default function SchoolDetail() {
                                         <Button
                                           size="sm"
                                           variant="outline"
+                                          className="h-6 px-2 text-xs"
                                           onClick={() => setEditingNoteId(note.id)}
-                                          className="h-8 w-8 p-0"
                                         >
-                                          <Edit className="h-4 w-4" />
+                                          Edit
                                         </Button>
                                         <Button
                                           size="sm"
                                           variant="outline"
+                                          className="h-6 px-2 text-xs bg-yellow-50 text-yellow-700 hover:bg-yellow-100"
+                                          onClick={() => {/* Mark private */}}
+                                        >
+                                          Private
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="h-6 px-2 text-xs text-red-600 hover:bg-red-50"
                                           onClick={() => {
                                             setDeletingNoteId(note.id);
                                             setNoteDeleteModalOpen(true);
                                           }}
-                                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
                                         >
-                                          <Trash2 className="h-4 w-4" />
+                                          Delete
                                         </Button>
                                       </div>
                                     </TableCell>
@@ -3948,7 +3956,6 @@ export default function SchoolDetail() {
 
                       {/* Action Steps Table */}
                       <div className="space-y-4">
-                        <h4 className="font-medium text-slate-900">Action Steps</h4>
                         {actionStepsLoading ? (
                           <div className="space-y-3">
                             <Skeleton className="h-8 w-full" />
@@ -3960,10 +3967,11 @@ export default function SchoolDetail() {
                             <Table>
                               <TableHeader>
                                 <TableRow>
-                                  <TableHead>Item</TableHead>
+                                  <TableHead>Action item</TableHead>
                                   <TableHead>Assignee</TableHead>
                                   <TableHead>Due Date</TableHead>
                                   <TableHead>Status</TableHead>
+                                  <TableHead className="w-[200px]">Actions</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -3978,12 +3986,7 @@ export default function SchoolDetail() {
                                   .map((step) => (
                                   <TableRow key={step.id} className="h-8">
                                     <TableCell className="py-1">
-                                      <div className="flex items-center gap-2">
-                                        <div className={`w-2 h-2 rounded-full ${
-                                          step.isCompleted ? 'bg-green-500' : 'bg-orange-500'
-                                        }`} />
-                                        {step.item || '-'}
-                                      </div>
+                                      <span className="text-sm">{step.item || '-'}</span>
                                     </TableCell>
                                     <TableCell className="py-1">{step.assignee || '-'}</TableCell>
                                     <TableCell className="py-1">
@@ -4001,6 +4004,39 @@ export default function SchoolDetail() {
                                       }`}>
                                         {step.status || 'Pending'}
                                       </span>
+                                    </TableCell>
+                                    <TableCell className="py-1">
+                                      <div className="flex gap-1">
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="h-6 px-2 text-xs"
+                                          onClick={() => {/* Edit action step */}}
+                                        >
+                                          Edit
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className={`h-6 px-2 text-xs ${
+                                            step.isCompleted 
+                                              ? 'bg-gray-100 text-gray-600' 
+                                              : 'bg-green-50 text-green-700 hover:bg-green-100'
+                                          }`}
+                                          onClick={() => {/* Mark complete */}}
+                                          disabled={step.isCompleted}
+                                        >
+                                          {step.isCompleted ? 'Done' : 'Complete'}
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="h-6 px-2 text-xs text-red-600 hover:bg-red-50"
+                                          onClick={() => {/* Delete action step */}}
+                                        >
+                                          Delete
+                                        </Button>
+                                      </div>
                                     </TableCell>
                                   </TableRow>
                                 ))}
