@@ -1781,30 +1781,10 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Membership fee school x year');
       
-      // Debug: Get all records to see what school IDs exist
-      const allRecords = await table.select().all();
-      console.log(`=== MEMBERSHIP FEES SCHOOL DEBUG for ${schoolId} ===`);
-      console.log(`Total membership fee records: ${allRecords.length}`);
-      const schoolIds = new Set();
-      allRecords.forEach((record, index) => {
-        const school = record.fields["School"];
-        if (Array.isArray(school)) {
-          school.forEach(id => schoolIds.add(id));
-        }
-        if (index < 5) { // Log first 5 records
-          console.log(`Record ${index + 1}: School=${JSON.stringify(school)}`);
-        }
-      });
-      console.log('Unique school IDs in membership fees:', Array.from(schoolIds));
-      console.log('Looking for school ID:', schoolId);
-      console.log('=== END MEMBERSHIP FEES SCHOOL DEBUG ===');
-      
-      // Use the correct field name "School" based on debug output
+      // Filter using the School field which contains the school IDs
       const records = await table.select({
         filterByFormula: `FIND("${schoolId}", ARRAYJOIN({School})) > 0`
       }).all();
-      
-      console.log(`Found ${records.length} membership fee records for school ${schoolId}`);
       
       return records.map(record => this.transformMembershipFeeByYearRecord(record));
     } catch (error) {
@@ -1830,7 +1810,8 @@ export class SimpleAirtableStorage implements IStorage {
     
     return {
       id: record.id,
-      schoolId: Array.isArray(fields["School"]) ? fields["School"][0] : fields["School"] || undefined,
+      schoolId: Array.isArray(fields["school_id (from School)"]) ? fields["school_id (from School)"][0] : 
+                Array.isArray(fields["School"]) ? fields["School"][0] : fields["School"] || undefined,
       schoolYear: fields["School year"] || undefined,
       feeAmount: fields["Initial fee"] || fields["Revised amount"] || undefined,
       status: fields["Current exemption status"] || undefined,
