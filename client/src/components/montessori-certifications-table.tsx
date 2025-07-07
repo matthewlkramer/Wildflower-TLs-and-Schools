@@ -22,45 +22,21 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
 
   const columnDefs: ColDef<MontessoriCertification>[] = [
     {
-      headerName: "Certification Level",
-      field: "certificationLevel",
-      flex: 1.5,
-      filter: "agTextColumnFilter",
-    },
-    {
-      headerName: "Status",
-      field: "certificationStatus",
-      flex: 1,
-      filter: "agTextColumnFilter",
-    },
-    {
-      headerName: "Certifier",
-      field: "certifier",
-      flex: 1.5,
-      filter: "agTextColumnFilter",
-    },
-    {
-      headerName: "Training Program",
-      field: "trainingProgram",
-      flex: 1.5,
-      filter: "agTextColumnFilter",
-    },
-    {
-      headerName: "Date Received",
+      headerName: "Year Certified",
       field: "dateReceived",
       flex: 1,
       filter: "agTextColumnFilter",
     },
     {
-      headerName: "Expiration Date",
-      field: "expirationDate",
+      headerName: "Abbreviation",
+      field: "certifier",
       flex: 1,
       filter: "agTextColumnFilter",
     },
     {
-      headerName: "Certification Number",
-      field: "certificationNumber",
-      flex: 1.2,
+      headerName: "Level",
+      field: "certificationLevel",
+      flex: 1,
       filter: "agTextColumnFilter",
     },
   ];
