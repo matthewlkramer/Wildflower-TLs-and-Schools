@@ -186,8 +186,8 @@ export default function TeacherDetail() {
 
               <TabsContent value="contact" className="mt-0">
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-4 md:col-span-1">
                       <h4 className="font-medium text-slate-900">Contact Information</h4>
                       <div className="space-y-2 text-sm">
                         <p><span className="text-slate-600">Primary Phone:</span> {teacher.primaryPhone || '-'}</p>
@@ -195,7 +195,7 @@ export default function TeacherDetail() {
                         <p><span className="text-slate-600">Home Address:</span> {teacher.homeAddress || '-'}</p>
                       </div>
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-4 md:col-span-2">
                       <h4 className="font-medium text-slate-900">Email Addresses</h4>
                       <EmailAddressesTable educatorId={teacher.id} />
                     </div>
