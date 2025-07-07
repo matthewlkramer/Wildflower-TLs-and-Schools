@@ -540,6 +540,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Action Steps routes
+  app.get("/api/action-steps/school/:schoolId", async (req, res) => {
+    try {
+      const schoolId = req.params.schoolId;
+      const actionSteps = await storage.getActionStepsBySchoolId(schoolId);
+      res.json(actionSteps);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch action steps" });
+    }
+  });
+
   // Grant routes
   app.get("/api/grants/school/:schoolId", async (req, res) => {
     try {

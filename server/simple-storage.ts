@@ -1028,14 +1028,50 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getActionStepsBySchoolId(schoolId: string): Promise<ActionStep[]> {
+    console.log(`=== ACTION STEPS DEBUG for school ${schoolId} ===`);
+    
     try {
-      // Query the "Action steps" table filtered by schoolId
-      const records = await base("Action steps").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+      // First, let's check all records to see what fields are available
+      const allRecords = await base("Action steps").select({
+        maxRecords: 3
       }).all();
       
+      console.log(`Total action steps records checked: ${allRecords.length}`);
+      if (allRecords.length > 0) {
+        console.log('Action step fields available:', Object.keys(allRecords[0].fields));
+        console.log('Sample action step data:', allRecords[0].fields);
+        
+        // Check school linkage in first record
+        const sampleSchoolField = allRecords[0].fields["Schools"] || allRecords[0].fields["school_id"] || allRecords[0].fields["School"];
+        console.log('Sample school linkage field:', sampleSchoolField);
+      } else {
+        console.log('NO ACTION STEPS FOUND IN TABLE AT ALL');
+        return [];
+      }
+      
+      // Try the most likely field name first (Schools - linked field)
+      let records = [];
+      
+      try {
+        console.log(`Trying Schools field filter for ${schoolId}`);
+        records = await base("Action steps").select({
+          filterByFormula: `{Schools} = '${schoolId}'`
+        }).all();
+        console.log(`Found ${records.length} records using Schools field`);
+        
+        if (records.length === 0) {
+          // Alternative: try FIND function for linked records
+          records = await base("Action steps").select({
+            filterByFormula: `FIND('${schoolId}', {Schools} & '')`
+          }).all();
+          console.log(`Found ${records.length} records using FIND with Schools field`);
+        }
+      } catch (fieldError) {
+        console.log('Schools field filter failed:', fieldError);
+      }
+      
       return records.map(record => {
-        const schoolId = record.fields["school_id"];
+        const schoolIdField = record.fields["Schools"] || record.fields["school_id"] || record.fields["School"];
         const assignedDate = record.fields["Assigned date"];
         const assignee = record.fields["Assignee Short Name"];
         const item = record.fields["Item"];
@@ -1044,7 +1080,7 @@ export class SimpleAirtableStorage implements IStorage {
         
         return {
           id: record.id,
-          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+          schoolId: Array.isArray(schoolIdField) ? String(schoolIdField[0] || '') : String(schoolIdField || ''),
           assignedDate: String(assignedDate || ''),
           assignee: String(assignee || ''),
           item: String(item || ''),
@@ -1054,7 +1090,7 @@ export class SimpleAirtableStorage implements IStorage {
         };
       });
     } catch (error) {
-      console.error(`Error fetching action steps for ${schoolId}:`, error);
+      console.error(`ERROR in action steps for ${schoolId}:`, error);
       return [];
     }
   }
