@@ -1639,8 +1639,8 @@ export default function SchoolDetail() {
                       </div>
                     </div>
 
-                    {/* Location Section with Map */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Map, Support, and Contact Info Section */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                       <Card className="overflow-hidden shadow-sm">
                         <GoogleMap 
                           latitude={school.activeLatitude} 
@@ -1653,31 +1653,97 @@ export default function SchoolDetail() {
                       </Card>
                       <Card className="shadow-sm">
                         <CardHeader>
-                          <CardTitle className="text-lg">Location Details</CardTitle>
+                          <CardTitle className="text-lg">Support</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {/* Emerging status fields (Planning, Startup, Visioning) */}
+                          {school.status && ['planning', 'startup', 'visioning'].includes(school.status.toLowerCase()) && (
+                            <>
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-700 mb-1">Current Guides</h4>
+                                <p className="text-base text-gray-900">
+                                  {school.currentGuides && school.currentGuides.length > 0 
+                                    ? school.currentGuides.join(', ')
+                                    : 'None assigned'
+                                  }
+                                </p>
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-700 mb-1">SSJ Projected Open</h4>
+                                <p className="text-base text-gray-900">{school.ssjProjectedOpen || 'Not specified'}</p>
+                              </div>
+                            </>
+                          )}
+                          
+                          {/* Closed/Disaffiliated status fields */}
+                          {school.status && (
+                            school.status.toLowerCase() === 'disaffiliated' || 
+                            school.status.toLowerCase() === 'permanently closed'
+                          ) && (
+                            <>
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-700 mb-1">Left Network Date</h4>
+                                <p className="text-base text-gray-900">{school.leftNetworkDate || 'Not specified'}</p>
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-700 mb-1">Left Network Reason</h4>
+                                <p className="text-base text-gray-900">{school.leftNetworkReason || 'Not specified'}</p>
+                              </div>
+                            </>
+                          )}
+                          
+                          {/* Open or Year 1 status - blank for now */}
+                          {school.status && ['open', 'year 1'].includes(school.status.toLowerCase()) && (
+                            <div className="text-center py-4">
+                              <p className="text-sm text-gray-400">No support information to display</p>
+                            </div>
+                          )}
+                          
+                          {/* No status */}
+                          {!school.status && (
+                            <div className="text-center py-4">
+                              <p className="text-sm text-gray-400">No support information to display</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                      
+                      {/* Contact Info Card */}
+                      <Card className="shadow-sm">
+                        <CardHeader>
+                          <CardTitle className="text-lg">Contact Info</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                           <div>
-                            <h4 className="text-sm font-medium text-gray-700 mb-1">Current Physical Address</h4>
-                            <p className="text-base text-gray-900">{school.activePhysicalAddress || 'No address available'}</p>
+                            <h4 className="text-sm font-medium text-gray-700 mb-1">Email</h4>
+                            {school.email ? (
+                              <a href={`mailto:${school.email}`} className="text-base text-blue-600 hover:underline">
+                                {school.email}
+                              </a>
+                            ) : (
+                              <p className="text-base text-gray-400">Not specified</p>
+                            )}
                           </div>
-                          {school.locality && (
-                            <div>
-                              <h4 className="text-sm font-medium text-gray-700 mb-1">Locality</h4>
-                              <p className="text-base text-gray-900">{school.locality}</p>
-                            </div>
-                          )}
-                          {(school.publicFundingSources && school.publicFundingSources.length > 0) && (
-                            <div>
-                              <h4 className="text-sm font-medium text-gray-700 mb-1">Public Funding Sources</h4>
-                              <div className="flex flex-wrap gap-2 mt-2">
-                                {school.publicFundingSources.map((source, idx) => (
-                                  <Badge key={idx} variant="secondary" className="text-xs">
-                                    {source}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-700 mb-1">Phone</h4>
+                            {school.phone ? (
+                              <a href={`tel:${school.phone}`} className="text-base text-blue-600 hover:underline">
+                                {school.phone}
+                              </a>
+                            ) : (
+                              <p className="text-base text-gray-400">Not specified</p>
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-700 mb-1">Website</h4>
+                            {school.website ? (
+                              <a href={school.website} target="_blank" rel="noopener noreferrer" className="text-base text-blue-600 hover:underline">
+                                {school.website}
+                              </a>
+                            ) : (
+                              <p className="text-base text-gray-400">Not specified</p>
+                            )}
+                          </div>
                         </CardContent>
                       </Card>
                     </div>
@@ -1713,15 +1779,7 @@ export default function SchoolDetail() {
                               }
                             </p>
                           </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Current Guides</p>
-                            <p className="text-sm font-medium text-gray-900 mt-1">
-                              {school.currentGuides && school.currentGuides.length > 0 
-                                ? school.currentGuides.join(', ')
-                                : 'None assigned'
-                              }
-                            </p>
-                          </div>
+
                         </CardContent>
                       </Card>
 
@@ -1742,15 +1800,7 @@ export default function SchoolDetail() {
                             <p className="text-xs text-gray-500 uppercase tracking-wider">Number of Classrooms</p>
                             <p className="text-sm font-medium text-gray-900 mt-1">{school.numberOfClassrooms || 'Not specified'}</p>
                           </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">SSJ Projected Open</p>
-                            <p className="text-sm font-medium text-gray-900 mt-1">
-                              {school.ssjStage && ['visioning', 'planning', 'startup'].includes(school.ssjStage.toLowerCase()) && school.ssjProjectedOpen 
-                                ? school.ssjProjectedOpen 
-                                : 'N/A'
-                              }
-                            </p>
-                          </div>
+
                         </CardContent>
                       </Card>
 
