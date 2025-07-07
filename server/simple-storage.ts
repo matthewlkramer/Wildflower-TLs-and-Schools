@@ -1033,42 +1033,82 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       // First, let's check all records to see what fields are available
       const allRecords = await base("Action steps").select({
-        maxRecords: 3
+        maxRecords: 10
       }).all();
       
       console.log(`Total action steps records checked: ${allRecords.length}`);
       if (allRecords.length > 0) {
         console.log('Action step fields available:', Object.keys(allRecords[0].fields));
-        console.log('Sample action step data:', allRecords[0].fields);
         
-        // Check school linkage in first record
-        const sampleSchoolField = allRecords[0].fields["Schools"] || allRecords[0].fields["school_id"] || allRecords[0].fields["School"];
-        console.log('Sample school linkage field:', sampleSchoolField);
+        // Debug all records to see which schools they belong to
+        allRecords.forEach((record, index) => {
+          const schools = record.fields["Schools"];
+          const schoolShortName = record.fields["School Short Name"];
+          const item = record.fields["Item"];
+          console.log(`Record ${index + 1}: Schools=${JSON.stringify(schools)}, Short Name=${JSON.stringify(schoolShortName)}, Item="${String(item).substring(0, 50)}..."`);
+        });
       } else {
         console.log('NO ACTION STEPS FOUND IN TABLE AT ALL');
         return [];
       }
       
-      // Try the most likely field name first (Schools - linked field)
+      // Try multiple filtering approaches with better debugging
       let records = [];
       
       try {
-        console.log(`Trying Schools field filter for ${schoolId}`);
+        // 1. Direct Schools field match
+        console.log(`Trying direct Schools field filter for ${schoolId}`);
         records = await base("Action steps").select({
           filterByFormula: `{Schools} = '${schoolId}'`
         }).all();
-        console.log(`Found ${records.length} records using Schools field`);
+        console.log(`Found ${records.length} records using direct Schools field`);
         
+        // 2. FIND function on Schools field (for linked records)
         if (records.length === 0) {
-          // Alternative: try FIND function for linked records
+          console.log(`Trying FIND function for ${schoolId}`);
           records = await base("Action steps").select({
-            filterByFormula: `FIND('${schoolId}', {Schools} & '')`
+            filterByFormula: `FIND('${schoolId}', ARRAYJOIN({Schools})) > 0`
           }).all();
           console.log(`Found ${records.length} records using FIND with Schools field`);
         }
+        
+        // 3. Check school_id field as fallback
+        if (records.length === 0) {
+          console.log(`Trying school_id field filter for ${schoolId}`);
+          records = await base("Action steps").select({
+            filterByFormula: `FIND('${schoolId}', ARRAYJOIN({school_id})) > 0`
+          }).all();
+          console.log(`Found ${records.length} records using school_id field`);
+        }
+        
+        // 4. Get all records and manually check their school associations
+        if (records.length === 0) {
+          console.log(`Getting all action steps to manually check school associations`);
+          const allActionSteps = await base("Action steps").select().all();
+          console.log(`Total action steps in database: ${allActionSteps.length}`);
+          
+          records = allActionSteps.filter(record => {
+            const schools = record.fields["Schools"];
+            const schoolIds = record.fields["school_id"];
+            
+            // Check if this record is associated with our school
+            if (Array.isArray(schools) && schools.includes(schoolId)) {
+              return true;
+            }
+            if (Array.isArray(schoolIds) && schoolIds.includes(schoolId)) {
+              return true;
+            }
+            return false;
+          });
+          
+          console.log(`Found ${records.length} records after manual filtering`);
+        }
+        
       } catch (fieldError) {
-        console.log('Schools field filter failed:', fieldError);
+        console.log('Action steps filtering failed:', fieldError);
       }
+      
+      console.log(`Final result: ${records.length} action steps found for school ${schoolId}`);
       
       return records.map(record => {
         const schoolIdField = record.fields["Schools"] || record.fields["school_id"] || record.fields["School"];
