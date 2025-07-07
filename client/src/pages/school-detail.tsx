@@ -2,7 +2,7 @@ import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Edit, Trash2, Plus, X, ExternalLink, UserMinus, Calendar, School2, User, Edit2 } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Plus, X, ExternalLink, UserMinus, Calendar, School2, User, Edit2, Eye, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -3851,7 +3851,7 @@ export default function SchoolDetail() {
                                   <TableHead>Date</TableHead>
                                   <TableHead>Created By</TableHead>
                                   <TableHead>Notes</TableHead>
-                                  <TableHead className="w-[180px]">Actions</TableHead>
+                                  <TableHead className="w-[120px]">Actions</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -3915,29 +3915,29 @@ export default function SchoolDetail() {
                                         <Button
                                           size="sm"
                                           variant="outline"
-                                          className="h-6 px-2 text-xs"
+                                          className="h-6 w-6 p-0"
                                           onClick={() => setEditingNoteId(note.id)}
                                         >
-                                          Edit
+                                          <Edit className="h-3 w-3" />
                                         </Button>
                                         <Button
                                           size="sm"
                                           variant="outline"
-                                          className="h-6 px-2 text-xs bg-yellow-50 text-yellow-700 hover:bg-yellow-100"
+                                          className="h-6 w-6 p-0 bg-yellow-50 text-yellow-700 hover:bg-yellow-100"
                                           onClick={() => {/* Mark private */}}
                                         >
-                                          Private
+                                          <Eye className="h-3 w-3" />
                                         </Button>
                                         <Button
                                           size="sm"
                                           variant="outline"
-                                          className="h-6 px-2 text-xs text-red-600 hover:bg-red-50"
+                                          className="h-6 w-6 p-0 text-red-600 hover:bg-red-50"
                                           onClick={() => {
                                             setDeletingNoteId(note.id);
                                             setNoteDeleteModalOpen(true);
                                           }}
                                         >
-                                          Delete
+                                          <Trash2 className="h-3 w-3" />
                                         </Button>
                                       </div>
                                     </TableCell>
@@ -3971,7 +3971,7 @@ export default function SchoolDetail() {
                                   <TableHead>Assignee</TableHead>
                                   <TableHead>Due Date</TableHead>
                                   <TableHead>Status</TableHead>
-                                  <TableHead className="w-[200px]">Actions</TableHead>
+                                  <TableHead className="w-[120px]">Actions</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -4010,15 +4010,15 @@ export default function SchoolDetail() {
                                         <Button
                                           size="sm"
                                           variant="outline"
-                                          className="h-6 px-2 text-xs"
+                                          className="h-6 w-6 p-0"
                                           onClick={() => {/* Edit action step */}}
                                         >
-                                          Edit
+                                          <Edit className="h-3 w-3" />
                                         </Button>
                                         <Button
                                           size="sm"
                                           variant="outline"
-                                          className={`h-6 px-2 text-xs ${
+                                          className={`h-6 w-6 p-0 ${
                                             step.isCompleted 
                                               ? 'bg-gray-100 text-gray-600' 
                                               : 'bg-green-50 text-green-700 hover:bg-green-100'
@@ -4026,15 +4026,15 @@ export default function SchoolDetail() {
                                           onClick={() => {/* Mark complete */}}
                                           disabled={step.isCompleted}
                                         >
-                                          {step.isCompleted ? 'Done' : 'Complete'}
+                                          <Check className="h-3 w-3" />
                                         </Button>
                                         <Button
                                           size="sm"
                                           variant="outline"
-                                          className="h-6 px-2 text-xs text-red-600 hover:bg-red-50"
+                                          className="h-6 w-6 p-0 text-red-600 hover:bg-red-50"
                                           onClick={() => {/* Delete action step */}}
                                         >
-                                          Delete
+                                          <Trash2 className="h-3 w-3" />
                                         </Button>
                                       </div>
                                     </TableCell>
