@@ -164,7 +164,7 @@ Changelog:
 - July 07, 2025. Enhanced multi-table tabs with improved Add New functionality: governance tab now has dropdown for "Add Governance Document" or "Add 990", updated column headers ("Governance documents", "990 year"), removed redundant subheaders and bottom Add button for cleaner interface
 - July 07, 2025. Improved Add New button behavior: grayed out button on summary, details, support, systems, and membership tabs where no creation functionality exists, providing clearer visual feedback for user interface state
 - July 07, 2025. Standardized governance documents table layout: matched row heights (h-8) and padding (py-1) with 990s table for consistent visual design across both tables in the governance tab
-- July 07, 2025. Fixed school notes table displaying IDs instead of names: updated field mapping to use "Partner short name" field instead of "Created by" field, removed non-existent "Is Private" field from Airtable query to resolve API errors
+- July 07, 2025. Fixed school notes table displaying IDs instead of names: successfully mapped to "Partner Short Name" field in Airtable, removed debugging code, cleaned up field transformation to properly display creator names instead of record IDs
 ```
 
 ## User Preferences

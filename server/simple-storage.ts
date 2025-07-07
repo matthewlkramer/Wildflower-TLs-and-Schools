@@ -1001,40 +1001,11 @@ export class SimpleAirtableStorage implements IStorage {
   async getSchoolNotes(): Promise<SchoolNote[]> {
     try {
       const table = base('School Notes');
-      const records = await table.select({
-        maxRecords: 3 // Just get a few records to see the structure
-      }).all();
-      
-      console.log('Sample School Notes records:', records.map(r => ({ 
-        id: r.id, 
-        fields: Object.keys(r.fields),
-        fieldValues: r.fields 
-      })));
-      
+      const records = await table.select().all();
       return records.map(record => this.transformSchoolNoteRecord(record));
     } catch (error) {
       console.error('Error fetching school notes:', error);
-      const schools = await this.getSchools();
-      if (schools.length === 0) return [];
-      
-      return [
-        {
-          id: 'note_1',
-          schoolId: schools[0]?.id || 'mock_school_1',
-          dateCreated: '2024-01-15',
-          createdBy: 'Jane Smith',
-          notes: 'Initial school assessment completed. Strong community support noted.',
-          lastModified: new Date().toISOString(),
-        },
-        {
-          id: 'note_2',
-          schoolId: schools[0]?.id || 'mock_school_1',
-          dateCreated: '2024-03-20',
-          createdBy: 'John Doe',
-          notes: 'Follow-up meeting scheduled with board members. Need to review enrollment projections.',
-          lastModified: new Date().toISOString(),
-        }
-      ];
+      return [];
     }
   }
 
@@ -1853,25 +1824,13 @@ export class SimpleAirtableStorage implements IStorage {
   private transformSchoolNoteRecord(record: any): SchoolNote {
     const fields = record.fields;
     
-    // Debug log to see what fields are available
-    console.log('Available fields in School Notes:', Object.keys(fields));
-    
-    // Try different possible field names for the creator
-    const createdBy = fields["Partner short name"] || 
-                     fields["Partner Short Name"] || 
-                     fields["Partner"] || 
-                     fields["Author"] || 
-                     fields["Created by"] || 
-                     fields["Creator"] || 
-                     "Unknown";
-    
     return {
       id: record.id,
       schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
-      dateCreated: fields["Date created"] || fields["Date Created"] || undefined,
-      createdBy: createdBy,
+      dateCreated: fields["Date created"] || undefined,
+      createdBy: fields["Partner Short Name"] || undefined,
       notes: fields["Notes"] || undefined,
-      isPrivate: false, // Default to false since field doesn't exist in Airtable
+      isPrivate: false,
     };
   }
 
