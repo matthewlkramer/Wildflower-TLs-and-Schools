@@ -295,6 +295,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
           suppressRowClickSelection={false}
           animateRows={true}
           pagination={false}
+          theme="legacy"
         />
       </div>
     </div>

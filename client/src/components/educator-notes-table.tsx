@@ -75,6 +75,7 @@ export function EducatorNotesTable({ educatorId }: EducatorNotesTableProps) {
           domLayout="autoHeight"
           headerHeight={40}
           rowHeight={50}
+          theme="legacy"
           defaultColDef={{
             sortable: true,
             resizable: true,

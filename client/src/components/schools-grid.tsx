@@ -252,6 +252,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
           rowSelection="multiple"
           suppressRowClickSelection={true}
           enableBrowserTooltips={true}
+          theme="legacy"
         />
       </div>
     </div>
