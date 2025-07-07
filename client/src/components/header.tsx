@@ -25,6 +25,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
 
   const isTeachersActive = location === "/" || location === "/teachers" || location.startsWith("/teacher/");
   const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
+  const isChartersActive = location === "/charters" || location.startsWith("/charter/");
 
   const handleAddNew = () => {
     if (onAddNew) {
@@ -40,6 +41,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
     if (searchPlaceholder) return searchPlaceholder;
     if (isTeachersActive) return "Search teachers...";
     if (isSchoolsActive) return "Search schools...";
+    if (isChartersActive) return "Search charters...";
     return "Search...";
   };
 
@@ -58,20 +60,27 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
             {/* Right side content - allow horizontal overflow on mobile */}
             <div className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6 ml-auto overflow-x-auto">
               {/* Navigation - always visible, compact on mobile */}
-              <nav className="flex space-x-3 sm:space-x-4 lg:space-x-8 flex-shrink-0">
-                <Link href="/teachers" className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+              <nav className="flex items-center space-x-3 sm:space-x-4 lg:space-x-8 flex-shrink-0">
+                <Link href="/teachers" className={`px-2 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
                   isTeachersActive
-                    ? "text-wildflower-blue border-wildflower-blue"
-                    : "text-slate-500 hover:text-slate-700 border-transparent"
+                    ? "text-wildflower-blue"
+                    : "text-slate-500 hover:text-slate-700"
                 }`}>
                   Teachers
                 </Link>
-                <Link href="/schools" className={`px-1 pb-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                <Link href="/schools" className={`px-2 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
                   isSchoolsActive
-                    ? "text-wildflower-blue border-wildflower-blue"
-                    : "text-slate-500 hover:text-slate-700 border-transparent"
+                    ? "text-wildflower-blue"
+                    : "text-slate-500 hover:text-slate-700"
                 }`}>
                   Schools
+                </Link>
+                <Link href="/charters" className={`px-2 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
+                  isChartersActive
+                    ? "text-wildflower-blue"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}>
+                  Charters
                 </Link>
               </nav>
               
