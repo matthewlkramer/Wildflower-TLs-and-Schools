@@ -1693,31 +1693,35 @@ export default function SchoolDetail() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                          {school.founders && school.founders.length > 0 && (
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase tracking-wider">Founders</p>
-                              <p className="text-sm font-medium text-gray-900 mt-1">{school.founders.join(', ')}</p>
-                            </div>
-                          )}
-                          {school.currentTLs && (
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase tracking-wider">Current TLs</p>
-                              <p className="text-sm font-medium text-gray-900 mt-1">
-                                {typeof school.currentTLs === 'string' 
-                                  ? school.currentTLs
-                                  : school.currentTLs && Array.isArray(school.currentTLs) && school.currentTLs.length > 0 
-                                    ? school.currentTLs.join(', ')
-                                    : 'None assigned'
-                                }
-                              </p>
-                            </div>
-                          )}
-                          {school.currentGuides && school.currentGuides.length > 0 && (
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase tracking-wider">Current Guides</p>
-                              <p className="text-sm font-medium text-gray-900 mt-1">{school.currentGuides.join(', ')}</p>
-                            </div>
-                          )}
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Founders</p>
+                            <p className="text-sm font-medium text-gray-900 mt-1">
+                              {school.founders && school.founders.length > 0 
+                                ? school.founders.join(', ')
+                                : 'Not specified'
+                              }
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Current TLs</p>
+                            <p className="text-sm font-medium text-gray-900 mt-1">
+                              {typeof school.currentTLs === 'string' 
+                                ? school.currentTLs
+                                : school.currentTLs && Array.isArray(school.currentTLs) && school.currentTLs.length > 0 
+                                  ? school.currentTLs.join(', ')
+                                  : 'None assigned'
+                              }
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Current Guides</p>
+                            <p className="text-sm font-medium text-gray-900 mt-1">
+                              {school.currentGuides && school.currentGuides.length > 0 
+                                ? school.currentGuides.join(', ')
+                                : 'None assigned'
+                              }
+                            </p>
+                          </div>
                         </CardContent>
                       </Card>
 
@@ -1738,12 +1742,15 @@ export default function SchoolDetail() {
                             <p className="text-xs text-gray-500 uppercase tracking-wider">Number of Classrooms</p>
                             <p className="text-sm font-medium text-gray-900 mt-1">{school.numberOfClassrooms || 'Not specified'}</p>
                           </div>
-                          {school.ssjStage && ['visioning', 'planning', 'startup'].includes(school.ssjStage.toLowerCase()) && school.ssjProjectedOpen && (
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase tracking-wider">SSJ Projected Open</p>
-                              <p className="text-sm font-medium text-gray-900 mt-1">{school.ssjProjectedOpen}</p>
-                            </div>
-                          )}
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">SSJ Projected Open</p>
+                            <p className="text-sm font-medium text-gray-900 mt-1">
+                              {school.ssjStage && ['visioning', 'planning', 'startup'].includes(school.ssjStage.toLowerCase()) && school.ssjProjectedOpen 
+                                ? school.ssjProjectedOpen 
+                                : 'N/A'
+                              }
+                            </p>
+                          </div>
                         </CardContent>
                       </Card>
 
@@ -1758,9 +1765,9 @@ export default function SchoolDetail() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                          {school.riskFactors && school.riskFactors.length > 0 && (
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase tracking-wider">Risk Factors</p>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Risk Factors</p>
+                            {school.riskFactors && school.riskFactors.length > 0 ? (
                               <div className="flex flex-wrap gap-1 mt-1">
                                 {school.riskFactors.map((factor, idx) => (
                                   <Badge key={idx} variant="destructive" className="text-xs">
@@ -1768,11 +1775,13 @@ export default function SchoolDetail() {
                                   </Badge>
                                 ))}
                               </div>
-                            </div>
-                          )}
-                          {school.watchlist && school.watchlist.length > 0 && (
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase tracking-wider">Watchlist</p>
+                            ) : (
+                              <p className="text-sm text-gray-400 mt-1">None</p>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Watchlist</p>
+                            {school.watchlist && school.watchlist.length > 0 ? (
                               <div className="flex flex-wrap gap-1 mt-1">
                                 {school.watchlist.map((item, idx) => (
                                   <Badge key={idx} variant="outline" className="text-xs border-orange-300 text-orange-700">
@@ -1780,8 +1789,10 @@ export default function SchoolDetail() {
                                   </Badge>
                                 ))}
                               </div>
-                            </div>
-                          )}
+                            ) : (
+                              <p className="text-sm text-gray-400 mt-1">None</p>
+                            )}
+                          </div>
                           {school.leftNetworkDate && (
                             <div className="border-t pt-3">
                               <p className="text-xs text-red-600 uppercase tracking-wider">Left Network</p>
