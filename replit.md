@@ -161,6 +161,7 @@ Changelog:
 - July 07, 2025. Enhanced governance documents table with open action: added external link button to open documents in new tab, completing the open/edit/delete action pattern
 - July 07, 2025. Standardized table actions across governance and financial tabs: 990s table sorted by year descending with edit/delete, governance docs sorted alphabetically by type with open/edit/delete
 - July 07, 2025. Redesigned governance documents and 990s tables for better UX: removed document name columns, made document type and year fields clickable links to open attachments directly, simplified table structure with cleaner inline editing experience
+- July 07, 2025. Enhanced multi-table tabs with improved Add New functionality: governance tab now has dropdown for "Add Governance Document" or "Add 990", updated column headers ("Governance documents", "990 year"), removed redundant subheaders and bottom Add button for cleaner interface
 ```
 
 ## User Preferences

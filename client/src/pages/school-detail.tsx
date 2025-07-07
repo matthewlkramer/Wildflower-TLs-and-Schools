@@ -1208,6 +1208,7 @@ export default function SchoolDetail() {
   const [deletingTax990Id, setDeletingTax990Id] = useState<string | null>(null);
   const [tax990DeleteModalOpen, setTax990DeleteModalOpen] = useState(false);
   const [isCreatingDocument, setIsCreatingDocument] = useState(false);
+  const [isCreating990, setIsCreating990] = useState(false);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
   const [noteDeleteModalOpen, setNoteDeleteModalOpen] = useState(false);
@@ -1231,6 +1232,11 @@ export default function SchoolDetail() {
     docType: "",
     doc: "",
     dateEntered: "",
+  });
+  const [new990, setNew990] = useState({
+    year: "",
+    attachment: "",
+    attachmentUrl: "",
   });
   const [newNote, setNewNote] = useState({
     dateCreated: "",
@@ -1263,7 +1269,10 @@ export default function SchoolDetail() {
         case "locations":
           return [{ label: "Add Location", onClick: () => setIsCreatingLocation(true) }];
         case "governance":
-          return [{ label: "Add Document", onClick: () => setIsCreatingDocument(true) }];
+          return [
+            { label: "Add Governance Document", onClick: () => setIsCreatingDocument(true) },
+            { label: "Add 990", onClick: () => setIsCreating990(true) }
+          ];
         case "guides":
           return [{ label: "Add Guide Assignment", onClick: () => setIsCreatingGuideAssignment(true) }];
         case "notes":
@@ -2609,7 +2618,6 @@ export default function SchoolDetail() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Governance Documents - Left Column */}
                     <div className="space-y-4">
-                      <h4 className="font-medium text-slate-900">Governance Documents</h4>
                       {documentsLoading ? (
                         <div className="space-y-3">
                           <Skeleton className="h-8 w-full" />
@@ -2622,7 +2630,7 @@ export default function SchoolDetail() {
                             <Table>
                               <TableHeader>
                                 <TableRow className="h-8">
-                                  <TableHead className="h-8 py-1">Document Type</TableHead>
+                                  <TableHead className="h-8 py-1">Governance documents</TableHead>
                                   <TableHead className="h-8 py-1">Date</TableHead>
                                   <TableHead className="h-8 py-1 w-16">Actions</TableHead>
                                 </TableRow>
@@ -2705,33 +2713,60 @@ export default function SchoolDetail() {
                               </TableBody>
                             </Table>
                           </div>
-                          <div className="flex gap-2">
-                            <Button 
-                              onClick={() => setIsCreatingDocument(true)}
-                              disabled={isCreatingDocument}
-                              size="sm"
-                              className="bg-wildflower-blue hover:bg-wildflower-blue/90"
-                            >
-                              <Plus className="w-4 h-4 mr-2" />
-                              Add Document
-                            </Button>
-                          </div>
                         </>
                       )}
                     </div>
 
                     {/* 990s - Right Column */}
                     <div className="space-y-4">
-                      <h4 className="font-medium text-slate-900">990s</h4>
                       <div className="border rounded-lg">
                         <Table>
                           <TableHeader>
                             <TableRow className="h-8">
-                              <TableHead className="h-8 py-1">Year</TableHead>
+                              <TableHead className="h-8 py-1">990 year</TableHead>
                               <TableHead className="h-8 py-1 w-16">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
+                            {isCreating990 && (
+                              <TableRow className="h-8">
+                                <TableCell className="py-1">
+                                  <Input
+                                    value={new990.year}
+                                    onChange={(e) => setNew990({...new990, year: e.target.value})}
+                                    placeholder="Year"
+                                    className="h-7 text-sm"
+                                  />
+                                </TableCell>
+                                <TableCell className="py-1">
+                                  <div className="flex gap-1">
+                                    <Button
+                                      size="sm"
+                                      onClick={() => {
+                                        // TODO: Implement create 990 API call
+                                        console.log("Creating 990:", new990);
+                                        setIsCreating990(false);
+                                        setNew990({ year: "", attachment: "", attachmentUrl: "" });
+                                      }}
+                                      className="h-7 px-2 bg-green-600 hover:bg-green-700 text-white"
+                                    >
+                                      Save
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        setIsCreating990(false);
+                                        setNew990({ year: "", attachment: "", attachmentUrl: "" });
+                                      }}
+                                      className="h-7 px-2"
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            )}
                             {tax990sLoading ? (
                               <TableRow className="h-8">
                                 <TableCell colSpan={2} className="text-center py-2">
@@ -2761,7 +2796,7 @@ export default function SchoolDetail() {
                                   isSaving={updateTax990Mutation.isPending}
                                 />
                               ))
-                            ) : (
+                            ) : isCreating990 ? null : (
                               <TableRow className="h-8">
                                 <TableCell colSpan={2} className="text-center text-gray-500 py-4 text-sm">
                                   No 990s found
@@ -3487,7 +3522,6 @@ export default function SchoolDetail() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* School Notes Table */}
                       <div className="space-y-4">
-                        <h4 className="font-medium text-slate-900">School Notes</h4>
                         {notesLoading ? (
                           <div className="space-y-3">
                             <Skeleton className="h-8 w-full" />
@@ -3599,7 +3633,6 @@ export default function SchoolDetail() {
 
                       {/* Action Steps Table */}
                       <div className="space-y-4">
-                        <h4 className="font-medium text-slate-900">Action Steps</h4>
                         <div className="text-center py-8 text-slate-500">
                           <p>Action steps will be displayed here.</p>
                           <p className="text-sm mt-2">Future implementation for action items.</p>
