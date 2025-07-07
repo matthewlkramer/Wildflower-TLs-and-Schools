@@ -1628,7 +1628,7 @@ export default function SchoolDetail() {
                             </div>
                             <div>
                               <p className="text-xs text-gray-500 uppercase tracking-wider">Open Date</p>
-                              <p className="text-sm font-medium text-gray-900 mt-1">{school.openDate || 'Not yet open'}</p>
+                              <p className="text-sm font-medium text-gray-900 mt-1">{school.openDate || 'Not specified'}</p>
                             </div>
                             <div>
                               <p className="text-xs text-gray-500 uppercase tracking-wider">Membership</p>
