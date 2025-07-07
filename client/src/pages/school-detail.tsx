@@ -3910,15 +3910,15 @@ export default function SchoolDetail() {
                                 )}
                                 {schoolNotes?.map((note) => (
                                   <TableRow key={note.id}>
-                                    <TableCell className="py-1 text-sm">{note.dateCreated || '-'}</TableCell>
-                                    <TableCell className="py-1 text-sm">{note.createdBy || '-'}</TableCell>
+                                    <TableCell className="py-1 text-sm">{String(note.dateCreated || '-')}</TableCell>
+                                    <TableCell className="py-1 text-sm">{String(note.createdBy || '-')}</TableCell>
                                     <TableCell className="py-1 max-w-0">
                                       <button 
                                         className="text-sm block truncate pr-2 text-left hover:text-blue-600 hover:underline cursor-pointer w-full" 
-                                        title={note.headline || note.notes || '-'}
+                                        title={String(note.headline || note.notes || '-')}
                                         onClick={() => setSelectedNote(note)}
                                       >
-                                        {note.headline || note.notes || '-'}
+                                        {String(note.headline || note.notes || '-')}
                                       </button>
                                     </TableCell>
                                     <TableCell className="py-1">

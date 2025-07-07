@@ -1915,13 +1915,36 @@ export class SimpleAirtableStorage implements IStorage {
   private transformSchoolNoteRecord(record: any): SchoolNote {
     const fields = record.fields;
     
+    // Extract headline properly - Airtable sometimes returns complex objects
+    let headline = fields["Headline (Notes)"];
+    console.log('=== HEADLINE DEBUG ===');
+    console.log('Raw headline:', headline);
+    console.log('Type:', typeof headline);
+    console.log('Is Array:', Array.isArray(headline));
+    
+    if (headline && typeof headline === 'object') {
+      // If it's an array, take the first element
+      if (Array.isArray(headline)) {
+        headline = headline[0];
+        console.log('After array extraction:', headline);
+      }
+      // If it's still an object, try to extract text property or convert to string
+      if (typeof headline === 'object') {
+        console.log('Object keys:', Object.keys(headline));
+        headline = headline.text || headline.value || JSON.stringify(headline);
+        console.log('After object extraction:', headline);
+      }
+    }
+    console.log('Final headline:', headline);
+    console.log('=== END HEADLINE DEBUG ===');
+    
     return {
       id: record.id,
       schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
       dateCreated: fields["Date created"] || undefined,
       createdBy: fields["Partner Short Name"] || undefined,
       notes: fields["Notes"] || undefined,
-      headline: fields["Headline (Notes)"] || undefined,
+      headline: headline || undefined,
       lastModified: fields["Last Modified"] || undefined,
     };
   }
