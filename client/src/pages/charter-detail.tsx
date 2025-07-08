@@ -55,36 +55,26 @@ export default function CharterDetail() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="bg-white border-b border-slate-200">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">
-                {charter.shortName || charter.fullName}
-              </h1>
-              {charter.shortName && charter.fullName && (
-                <p className="text-slate-600 mt-1">{charter.fullName}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="summary" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11 overflow-x-auto">
-            <TabsTrigger value="summary" className="text-xs sm:text-sm whitespace-nowrap">Summary</TabsTrigger>
-            <TabsTrigger value="startup" className="text-xs sm:text-sm whitespace-nowrap">Startup Process</TabsTrigger>
-            <TabsTrigger value="sites" className="text-xs sm:text-sm whitespace-nowrap">Sites</TabsTrigger>
-            <TabsTrigger value="staff" className="text-xs sm:text-sm whitespace-nowrap">Staff/Roles</TabsTrigger>
-            <TabsTrigger value="applications" className="text-xs sm:text-sm whitespace-nowrap">Application(s)</TabsTrigger>
-            <TabsTrigger value="contract" className="text-xs sm:text-sm whitespace-nowrap">Contract</TabsTrigger>
-            <TabsTrigger value="authorizer" className="text-xs sm:text-sm whitespace-nowrap">Authorizer</TabsTrigger>
-            <TabsTrigger value="reports" className="text-xs sm:text-sm whitespace-nowrap">Reports</TabsTrigger>
-            <TabsTrigger value="assessments" className="text-xs sm:text-sm whitespace-nowrap">Assessments</TabsTrigger>
-            <TabsTrigger value="notes" className="text-xs sm:text-sm whitespace-nowrap">Notes/Actions</TabsTrigger>
-            <TabsTrigger value="emails" className="text-xs sm:text-sm whitespace-nowrap">Emails/Meetings</TabsTrigger>
-          </TabsList>
+          <div className="flex items-center gap-4 mb-6">
+            <h1 className="text-2xl font-bold text-slate-900">
+              {charter.shortName || charter.fullName}
+            </h1>
+            <TabsList className="flex-1 grid grid-cols-6 lg:grid-cols-11 overflow-x-auto">
+              <TabsTrigger value="summary" className="text-xs sm:text-sm whitespace-nowrap">Summary</TabsTrigger>
+              <TabsTrigger value="startup" className="text-xs sm:text-sm whitespace-nowrap">Startup Process</TabsTrigger>
+              <TabsTrigger value="sites" className="text-xs sm:text-sm whitespace-nowrap">Sites</TabsTrigger>
+              <TabsTrigger value="staff" className="text-xs sm:text-sm whitespace-nowrap">Staff/Roles</TabsTrigger>
+              <TabsTrigger value="applications" className="text-xs sm:text-sm whitespace-nowrap">Application(s)</TabsTrigger>
+              <TabsTrigger value="contract" className="text-xs sm:text-sm whitespace-nowrap">Contract</TabsTrigger>
+              <TabsTrigger value="authorizer" className="text-xs sm:text-sm whitespace-nowrap">Authorizer</TabsTrigger>
+              <TabsTrigger value="reports" className="text-xs sm:text-sm whitespace-nowrap">Reports</TabsTrigger>
+              <TabsTrigger value="assessments" className="text-xs sm:text-sm whitespace-nowrap">Assessments</TabsTrigger>
+              <TabsTrigger value="notes" className="text-xs sm:text-sm whitespace-nowrap">Notes/Actions</TabsTrigger>
+              <TabsTrigger value="emails" className="text-xs sm:text-sm whitespace-nowrap">Emails/Meetings</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="summary" className="space-y-6">
             <div className="bg-white rounded-lg border border-slate-200 p-6">
