@@ -16,25 +16,36 @@ export function getInitials(name: string): string {
 
 export function getStatusColor(status: string): string {
   switch (status.toLowerCase()) {
-    // Red pills for closed/disaffiliated statuses
+    // Red pills for closed/disaffiliated statuses and denied
     case "permanently closed":
     case "disaffiliated":
     case "disaffiliating":
+    case "denied":
       return "bg-red-100 text-red-800";
     
+    // Pink for paused
+    case "paused":
+      return "bg-pink-100 text-pink-800";
+    
+    // Yellow for awaiting start of cohort
+    case "awaiting start of cohort":
+      return "bg-yellow-100 text-yellow-800";
+    
     // Green gradient from light to dark for progression stages
-    case "visioning":
+    case "application submitted":
       return "bg-green-50 text-green-600"; // Lightest green
-    case "planning":
+    case "approved - year 0":
+      return "bg-green-100 text-green-700"; // Light green
+    case "visioning":
       return "bg-green-100 text-green-700";
+    case "planning":
+      return "bg-green-200 text-green-800";
     case "startup":
       return "bg-green-200 text-green-800";
     case "open":
       return "bg-green-300 text-green-900"; // Darkest green
     
     // Other statuses
-    case "paused":
-      return "bg-yellow-100 text-yellow-800";
     case "year 1":
     case "year 2":
     case "year 3":

@@ -121,8 +121,8 @@ export default function Charters() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg border border-slate-200 p-8">
+      <main className="px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full bg-white rounded-lg border border-slate-200 p-8">
           <div className="animate-pulse space-y-4">
             <div className="h-4 bg-slate-200 rounded w-1/4"></div>
             <div className="h-4 bg-slate-200 rounded"></div>
@@ -130,13 +130,13 @@ export default function Charters() {
             <div className="h-4 bg-slate-200 rounded w-1/2"></div>
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="bg-white rounded-lg border border-slate-200">
+    <main className="px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full bg-white rounded-lg border border-slate-200">
         <div style={{ height: "calc(100vh - 200px)", width: "100%" }}>
           <AgGridReact
             theme={themeMaterial}
@@ -156,6 +156,6 @@ export default function Charters() {
           />
         </div>
       </div>
-    </div>
+    </main>
   );
 }
