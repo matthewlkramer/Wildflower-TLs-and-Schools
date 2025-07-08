@@ -44,6 +44,7 @@ import type {
 export interface IStorage {
   // Charter operations
   getCharters(): Promise<Charter[]>;
+  getCharter(id: string): Promise<Charter | undefined>;
 
   // Educator operations
   getEducators(): Promise<Educator[]>;
@@ -224,6 +225,16 @@ export class SimpleAirtableStorage implements IStorage {
       const errorInfo = handleError(error);
       console.error("Error fetching charters from Airtable:", errorInfo.message);
       throw error;
+    }
+  }
+
+  async getCharter(id: string): Promise<Charter | undefined> {
+    try {
+      const record = await base("Charters").find(id);
+      return this.transformCharterRecord(record);
+    } catch (error) {
+      console.error(`Error fetching charter ${id} from Airtable:`, error);
+      return undefined;
     }
   }
 

@@ -82,6 +82,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/charters/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const charter = await storage.getCharter(id);
+      if (!charter) {
+        return res.status(404).json({ message: "Charter not found" });
+      }
+      res.json(charter);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter" });
+    }
+  });
+
   // Teacher routes (legacy compatibility)
   app.get("/api/teachers", async (req, res) => {
     try {

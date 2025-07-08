@@ -10,6 +10,7 @@ import Schools from "@/pages/schools";
 import Charters from "@/pages/charters";
 import TeacherDetail from "@/pages/teacher-detail";
 import SchoolDetail from "@/pages/school-detail";
+import CharterDetail from "@/pages/charter-detail";
 import NotFound from "@/pages/not-found";
 
 // Create a context for search functionality
@@ -48,6 +49,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Charters} />
       <Route path="/charters" component={Charters} />
+      <Route path="/charter/:id" component={CharterDetail} />
       <Route path="/teachers" component={Teachers} />
       <Route path="/schools" component={Schools} />
       <Route path="/teacher/:id" component={TeacherDetail} />

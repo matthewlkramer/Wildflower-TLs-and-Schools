@@ -5,11 +5,13 @@ import { themeMaterial } from "ag-grid-community";
 import type { Charter } from "@shared/schema";
 import { useSearch, usePageTitle, useAddNew } from "@/App";
 import { useEffect, useMemo } from "react";
+import { useLocation } from "wouter";
 
 export default function Charters() {
   const { searchTerm } = useSearch();
   const { setPageTitle } = usePageTitle();
   const { setAddNewOptions } = useAddNew();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     setPageTitle("Charters");
@@ -44,6 +46,16 @@ export default function Charters() {
       field: "shortName",
       width: 150,
       filter: "agTextColumnFilter",
+      cellRenderer: (params: any) => {
+        return (
+          <button
+            onClick={() => setLocation(`/charter/${params.data.id}`)}
+            className="text-left hover:text-wildflower-blue hover:underline w-full h-full"
+          >
+            {params.value || ""}
+          </button>
+        );
+      },
     },
     {
       headerName: "Full Name",
