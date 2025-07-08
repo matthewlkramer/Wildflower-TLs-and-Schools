@@ -2216,7 +2216,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getCharterNotesByCharterId(charterId: string): Promise<CharterNote[]> {
     try {
-      const records = await base("Charter notes").select({
+      const records = await base("School notes").select({
         filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
@@ -2239,7 +2239,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getCharterActionStepsByCharterId(charterId: string): Promise<CharterActionStep[]> {
     try {
-      const records = await base("Charter action steps").select({
+      const records = await base("Action steps").select({
         filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
