@@ -184,7 +184,11 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
 
         // Get current role(s) - join with commas if multiple
         const roles = data.currentRole;
-        const roleText = Array.isArray(roles) ? roles.join(', ') : (roles || '');
+        let roleText = Array.isArray(roles) ? roles.join(', ') : (roles || '');
+        
+        // Replace role abbreviations
+        roleText = roleText.replace(/\bEmerging Teacher Leader\b/g, 'ETL');
+        roleText = roleText.replace(/\bTeacher Leader\b/g, 'TL');
 
         // Get school name
         const school = data.activeSchool;
