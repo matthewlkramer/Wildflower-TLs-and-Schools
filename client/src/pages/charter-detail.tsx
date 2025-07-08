@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import type { Charter } from "@shared/schema";
 import { usePageTitle, useAddNew } from "@/App";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getStatusColor } from "@/lib/utils";
 
 export default function CharterDetail() {
   const { id } = useParams<{ id: string }>();
@@ -69,7 +70,7 @@ export default function CharterDetail() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="summary" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11 overflow-x-auto">
             <TabsTrigger value="summary" className="text-xs sm:text-sm whitespace-nowrap">Summary</TabsTrigger>
@@ -124,7 +125,13 @@ export default function CharterDetail() {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-1">Status</h3>
-                  <p className="text-sm text-slate-900">{charter.status || "Not specified"}</p>
+                  {charter.status ? (
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(charter.status)}`}>
+                      {charter.status}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-slate-500">Not specified</span>
+                  )}
                 </div>
               </div>
             </div>

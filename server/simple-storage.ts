@@ -184,6 +184,19 @@ export interface IStorage {
   getTeacherAssociations(teacherId: string): Promise<TeacherSchoolAssociation[]>;
   createTeacherSchoolAssociation(association: InsertTeacherSchoolAssociation): Promise<TeacherSchoolAssociation>;
   deleteTeacherSchoolAssociation(id: string): Promise<boolean>;
+
+  // Charter-related operations
+  getSchoolsByCharterId(charterId: string): Promise<School[]>;
+  getCharterRolesByCharterId(charterId: string): Promise<CharterRole[]>;
+  getCharterApplicationsByCharterId(charterId: string): Promise<CharterApplication[]>;
+  getCharterAuthorizerContactsByCharterId(charterId: string): Promise<CharterAuthorizerContact[]>;
+  getReportSubmissionsByCharterId(charterId: string): Promise<ReportSubmission[]>;
+  getAssessmentDataByCharterId(charterId: string): Promise<AssessmentData[]>;
+  getCharterNotesByCharterId(charterId: string): Promise<CharterNote[]>;
+  getCharterActionStepsByCharterId(charterId: string): Promise<CharterActionStep[]>;
+  getCharterGovernanceDocumentsByCharterId(charterId: string): Promise<CharterGovernanceDocument[]>;
+  getCharter990sByCharterId(charterId: string): Promise<Charter990[]>;
+  getEducatorSchoolAssociationsByCharterId(charterId: string): Promise<EducatorSchoolAssociation[]>;
 }
 
 export class SimpleAirtableStorage implements IStorage {
@@ -2078,6 +2091,269 @@ export class SimpleAirtableStorage implements IStorage {
       attachment: attachment || undefined,
       attachmentUrl: attachmentUrl || undefined,
     };
+  }
+  
+  // Charter-related operations
+  async getSchoolsByCharterId(charterId: string): Promise<School[]> {
+    try {
+      const schools = await this.getSchools();
+      return schools.filter(school => school.charterId === charterId);
+    } catch (error) {
+      console.error('Error fetching schools by charter ID:', error);
+      return [];
+    }
+  }
+
+  async getCharterRolesByCharterId(charterId: string): Promise<CharterRole[]> {
+    try {
+      const records = await base("Charter roles").select({
+        filterByFormula: `{charter_id} = '${charterId}'`
+      }).all();
+      
+      return records.map(record => ({
+        id: record.id,
+        charterId: String(record.fields["charter_id"] || ''),
+        role: String(record.fields["Role"] || ''),
+        name: String(record.fields["Name"] || ''),
+        currentlyActive: Boolean(record.fields["Currently Active"]),
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+      }));
+    } catch (error) {
+      console.error('Error fetching charter roles:', error);
+      return [];
+    }
+  }
+
+  async getCharterApplicationsByCharterId(charterId: string): Promise<CharterApplication[]> {
+    try {
+      const records = await base("Charter applications").select({
+        filterByFormula: `{charter_id} = '${charterId}'`
+      }).all();
+      
+      return records.map(record => ({
+        id: record.id,
+        charterId: String(record.fields["charter_id"] || ''),
+        applicationName: String(record.fields["Application Name"] || ''),
+        targetOpen: String(record.fields["Target Open"] || ''),
+        status: String(record.fields["Status"] || ''),
+        submissionDate: String(record.fields["Submission Date"] || ''),
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+      }));
+    } catch (error) {
+      console.error('Error fetching charter applications:', error);
+      return [];
+    }
+  }
+
+  async getCharterAuthorizerContactsByCharterId(charterId: string): Promise<CharterAuthorizerContact[]> {
+    try {
+      const records = await base("Charter authorizers and contacts").select({
+        filterByFormula: `{charter_id} = '${charterId}'`
+      }).all();
+      
+      return records.map(record => ({
+        id: record.id,
+        charterId: String(record.fields["charter_id"] || ''),
+        name: String(record.fields["Name"] || ''),
+        organization: String(record.fields["Organization"] || ''),
+        email: String(record.fields["Email"] || ''),
+        phone: String(record.fields["Phone"] || ''),
+        role: String(record.fields["Role"] || ''),
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+      }));
+    } catch (error) {
+      console.error('Error fetching charter authorizer contacts:', error);
+      return [];
+    }
+  }
+
+  async getReportSubmissionsByCharterId(charterId: string): Promise<ReportSubmission[]> {
+    try {
+      const records = await base("Reports and submissions").select({
+        filterByFormula: `{charter_id} = '${charterId}'`
+      }).all();
+      
+      return records.map(record => ({
+        id: record.id,
+        charterId: String(record.fields["charter_id"] || ''),
+        reportType: String(record.fields["Report Type"] || ''),
+        dueDate: String(record.fields["Due Date"] || ''),
+        submissionDate: String(record.fields["Submission Date"] || ''),
+        status: String(record.fields["Status"] || ''),
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+      }));
+    } catch (error) {
+      console.error('Error fetching report submissions:', error);
+      return [];
+    }
+  }
+
+  async getAssessmentDataByCharterId(charterId: string): Promise<AssessmentData[]> {
+    try {
+      const records = await base("Assessments and data").select({
+        filterByFormula: `{charter_id} = '${charterId}'`
+      }).all();
+      
+      return records.map(record => ({
+        id: record.id,
+        charterId: String(record.fields["charter_id"] || ''),
+        assessmentType: String(record.fields["Assessment Type"] || ''),
+        testDate: String(record.fields["Test Date"] || ''),
+        results: String(record.fields["Results"] || ''),
+        grade: String(record.fields["Grade"] || ''),
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+      }));
+    } catch (error) {
+      console.error('Error fetching assessment data:', error);
+      return [];
+    }
+  }
+
+  async getCharterNotesByCharterId(charterId: string): Promise<CharterNote[]> {
+    try {
+      const records = await base("Charter notes").select({
+        filterByFormula: `{charter_id} = '${charterId}'`
+      }).all();
+      
+      return records.map(record => ({
+        id: record.id,
+        charterId: String(record.fields["charter_id"] || ''),
+        headline: String(record.fields["Headline (Notes)"] || ''),
+        notes: String(record.fields["Notes"] || ''),
+        createdBy: String(record.fields["Created By"] || ''),
+        dateEntered: String(record.fields["Date Entered"] || ''),
+        private: Boolean(record.fields["Private"]),
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+      }));
+    } catch (error) {
+      console.error('Error fetching charter notes:', error);
+      return [];
+    }
+  }
+
+  async getCharterActionStepsByCharterId(charterId: string): Promise<CharterActionStep[]> {
+    try {
+      const records = await base("Charter action steps").select({
+        filterByFormula: `{charter_id} = '${charterId}'`
+      }).all();
+      
+      return records.map(record => ({
+        id: record.id,
+        charterId: String(record.fields["charter_id"] || ''),
+        description: String(record.fields["Description"] || ''),
+        assignee: String(record.fields["Assignee"] || ''),
+        dueDate: String(record.fields["Due Date"] || ''),
+        status: String(record.fields["Status"] || ''),
+        complete: Boolean(record.fields["Complete"]),
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+      }));
+    } catch (error) {
+      console.error('Error fetching charter action steps:', error);
+      return [];
+    }
+  }
+
+  async getCharterGovernanceDocumentsByCharterId(charterId: string): Promise<CharterGovernanceDocument[]> {
+    try {
+      const records = await base("Charter governance docs").select({
+        filterByFormula: `{charter_id} = '${charterId}'`
+      }).all();
+      
+      return records.map(record => {
+        const documentPDFField = record.fields["Document PDF"];
+        let doc = "";
+        let docUrl = "";
+        if (Array.isArray(documentPDFField) && documentPDFField.length > 0) {
+          try {
+            const attachment = documentPDFField[0];
+            doc = attachment?.filename || "Document";
+            docUrl = attachment?.url || "";
+          } catch (e) {
+            doc = "Document";
+          }
+        }
+        
+        return {
+          id: record.id,
+          charterId: String(record.fields["charter_id"] || ''),
+          docType: String(record.fields["Document type"] || ''),
+          doc: String(doc),
+          docUrl: String(docUrl),
+          dateEntered: String(record.fields["Date"] || ''),
+          created: String(record.fields["Created"] || new Date().toISOString()),
+          lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching charter governance documents:', error);
+      return [];
+    }
+  }
+
+  async getCharter990sByCharterId(charterId: string): Promise<Charter990[]> {
+    try {
+      const records = await base("Charter 990s").select({
+        filterByFormula: `{charter_id} = '${charterId}'`
+      }).all();
+      
+      return records.map(record => {
+        const documentPDFField = record.fields["Document PDF"];
+        let docUrl = "";
+        if (Array.isArray(documentPDFField) && documentPDFField.length > 0) {
+          try {
+            const attachment = documentPDFField[0];
+            docUrl = attachment?.url || "";
+          } catch (e) {
+            docUrl = "";
+          }
+        }
+        
+        return {
+          id: record.id,
+          charterId: String(record.fields["charter_id"] || ''),
+          year: String(record.fields["Year"] || ''),
+          docUrl: String(docUrl),
+          dateEntered: String(record.fields["Date Entered"] || ''),
+          created: String(record.fields["Created"] || new Date().toISOString()),
+          lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching charter 990s:', error);
+      return [];
+    }
+  }
+
+  async getEducatorSchoolAssociationsByCharterId(charterId: string): Promise<EducatorSchoolAssociation[]> {
+    try {
+      const records = await base("Educator x School").select({
+        filterByFormula: `{charter_id} = '${charterId}'`
+      }).all();
+      
+      return records.map(record => ({
+        id: record.id,
+        educatorId: String(record.fields["educator_id"] || ''),
+        schoolId: String(record.fields["school_id"] || ''),
+        educatorName: String(record.fields["Educator Name"] || ''),
+        schoolName: String(record.fields["School Name"] || ''),
+        role: String(record.fields["Role"] || ''),
+        startDate: String(record.fields["Start Date"] || ''),
+        endDate: String(record.fields["End Date"] || ''),
+        active: Boolean(record.fields["Active"]),
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+      }));
+    } catch (error) {
+      console.error('Error fetching educator school associations by charter ID:', error);
+      return [];
+    }
   }
 }
 

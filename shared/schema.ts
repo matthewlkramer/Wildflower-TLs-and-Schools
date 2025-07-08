@@ -14,6 +14,106 @@ export interface Charter {
   lastModified?: string;
 }
 
+export interface CharterRole {
+  id: string;
+  charterId: string;
+  role?: string;
+  name?: string;
+  currentlyActive?: boolean;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface CharterApplication {
+  id: string;
+  charterId: string;
+  applicationName?: string;
+  targetOpen?: string;
+  status?: string;
+  submissionDate?: string;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface CharterAuthorizerContact {
+  id: string;
+  charterId: string;
+  name?: string;
+  organization?: string;
+  email?: string;
+  phone?: string;
+  role?: string;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface ReportSubmission {
+  id: string;
+  charterId: string;
+  reportType?: string;
+  dueDate?: string;
+  submissionDate?: string;
+  status?: string;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface AssessmentData {
+  id: string;
+  charterId: string;
+  assessmentType?: string;
+  testDate?: string;
+  results?: string;
+  grade?: string;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface CharterNote {
+  id: string;
+  charterId: string;
+  headline?: string;
+  notes?: string;
+  createdBy?: string;
+  dateEntered?: string;
+  private?: boolean;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface CharterActionStep {
+  id: string;
+  charterId: string;
+  description?: string;
+  assignee?: string;
+  dueDate?: string;
+  status?: string;
+  complete?: boolean;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface CharterGovernanceDocument {
+  id: string;
+  charterId: string;
+  docType?: string;
+  doc?: string;
+  docUrl?: string;
+  dateEntered?: string;
+  created?: string;
+  lastModified?: string;
+}
+
+export interface Charter990 {
+  id: string;
+  charterId: string;
+  year?: string;
+  docUrl?: string;
+  dateEntered?: string;
+  created?: string;
+  lastModified?: string;
+}
+
 export interface Educator {
   id: string; // Airtable record ID
   fullName?: string;

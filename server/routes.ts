@@ -955,6 +955,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Charter-related routes
+  
+  // Schools filtered by charter
+  app.get("/api/schools/charter/:charterId", async (req, res) => {
+    try {
+      const charterId = req.params.charterId;
+      const schools = await storage.getSchoolsByCharterId(charterId);
+      res.json(schools);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter schools" });
+    }
+  });
+
+  // Charter roles
+  app.get("/api/charter-roles/charter/:charterId", async (req, res) => {
+    try {
+      const charterId = req.params.charterId;
+      const roles = await storage.getCharterRolesByCharterId(charterId);
+      res.json(roles);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter roles" });
+    }
+  });
+
+  // Charter applications
+  app.get("/api/charter-applications/charter/:charterId", async (req, res) => {
+    try {
+      const charterId = req.params.charterId;
+      const applications = await storage.getCharterApplicationsByCharterId(charterId);
+      res.json(applications);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter applications" });
+    }
+  });
+
+  // Charter authorizer contacts
+  app.get("/api/charter-authorizer-contacts/charter/:charterId", async (req, res) => {
+    try {
+      const charterId = req.params.charterId;
+      const contacts = await storage.getCharterAuthorizerContactsByCharterId(charterId);
+      res.json(contacts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter authorizer contacts" });
+    }
+  });
+
+  // Charter reports
+  app.get("/api/report-submissions/charter/:charterId", async (req, res) => {
+    try {
+      const charterId = req.params.charterId;
+      const reports = await storage.getReportSubmissionsByCharterId(charterId);
+      res.json(reports);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter reports" });
+    }
+  });
+
+  // Charter assessments
+  app.get("/api/assessment-data/charter/:charterId", async (req, res) => {
+    try {
+      const charterId = req.params.charterId;
+      const assessments = await storage.getAssessmentDataByCharterId(charterId);
+      res.json(assessments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter assessments" });
+    }
+  });
+
+  // Charter notes
+  app.get("/api/charter-notes/charter/:charterId", async (req, res) => {
+    try {
+      const charterId = req.params.charterId;
+      const notes = await storage.getCharterNotesByCharterId(charterId);
+      res.json(notes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter notes" });
+    }
+  });
+
+  // Charter action steps
+  app.get("/api/charter-action-steps/charter/:charterId", async (req, res) => {
+    try {
+      const charterId = req.params.charterId;
+      const actionSteps = await storage.getCharterActionStepsByCharterId(charterId);
+      res.json(actionSteps);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter action steps" });
+    }
+  });
+
+  // Charter governance documents
+  app.get("/api/charter-governance-documents/charter/:charterId", async (req, res) => {
+    try {
+      const charterId = req.params.charterId;
+      const documents = await storage.getCharterGovernanceDocumentsByCharterId(charterId);
+      res.json(documents);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter governance documents" });
+    }
+  });
+
+  // Charter 990s
+  app.get("/api/charter-990s/charter/:charterId", async (req, res) => {
+    try {
+      const charterId = req.params.charterId;
+      const tax990s = await storage.getCharter990sByCharterId(charterId);
+      res.json(tax990s);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter 990s" });
+    }
+  });
+
+  // Charter educator associations
+  app.get("/api/educator-school-associations/charter/:charterId", async (req, res) => {
+    try {
+      const charterId = req.params.charterId;
+      const associations = await storage.getEducatorSchoolAssociationsByCharterId(charterId);
+      res.json(associations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charter educator associations" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

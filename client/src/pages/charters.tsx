@@ -6,6 +6,7 @@ import type { Charter } from "@shared/schema";
 import { useSearch, usePageTitle, useAddNew } from "@/App";
 import { useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
+import { getStatusColor } from "@/lib/utils";
 
 export default function Charters() {
   const { searchTerm } = useSearch();
@@ -104,6 +105,17 @@ export default function Charters() {
       field: "status",
       width: 150,
       filter: "agTextColumnFilter",
+      cellRenderer: (params: any) => {
+        const status = params.value;
+        if (!status) {
+          return <span className="text-slate-500">Not specified</span>;
+        }
+        return (
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+            {status}
+          </span>
+        );
+      },
     },
   ];
 
