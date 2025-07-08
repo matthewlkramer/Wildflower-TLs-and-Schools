@@ -174,32 +174,40 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       sort: 'asc',
     },
     {
-      headerName: "Current School",
-      field: "activeSchool",
+      headerName: "Current role/school",
+      field: "currentRoleSchool",
       filter: 'agTextColumnFilter',
-      minWidth: 200,
+      minWidth: 300,
       valueGetter: (params) => {
-        const school = params.data?.activeSchool;
-        return Array.isArray(school) ? school.join(', ') : (school || '');
+        const data = params.data;
+        if (!data) return '';
+
+        // Get current role(s) - join with commas if multiple
+        const roles = data.currentRole;
+        const roleText = Array.isArray(roles) ? roles.join(', ') : (roles || '');
+
+        // Get school name
+        const school = data.activeSchool;
+        const schoolText = Array.isArray(school) ? school.join(', ') : (school || '');
+
+        // Get stage/status
+        const status = data.activeSchoolStageStatus;
+        const statusText = Array.isArray(status) ? status.join(', ') : (status || '');
+
+        // Combine into format: "Role(s) at School (Status)"
+        let result = '';
+        if (roleText) {
+          result = roleText;
+        }
+        if (schoolText) {
+          result += (result ? ' at ' : '') + schoolText;
+        }
+        if (statusText) {
+          result += ` (${statusText})`;
+        }
+
+        return result || '';
       }
-    },
-    {
-      headerName: "Stage/Status",
-      field: "activeSchoolStageStatus",
-      filter: 'agTextColumnFilter',
-      minWidth: 180,
-      cellRenderer: ({ data }: { data: Educator }) => (
-        <BadgeRenderer value={data.activeSchoolStageStatus || []} field="stageStatus" />
-      )
-    },
-    {
-      headerName: "Current Role",
-      field: "currentRole",
-      filter: 'agTextColumnFilter',
-      minWidth: 150,
-      cellRenderer: ({ data }: { data: Educator }) => (
-        <PillRenderer value={data.currentRole || ''} />
-      )
     },
     {
       headerName: "Montessori Certified",
