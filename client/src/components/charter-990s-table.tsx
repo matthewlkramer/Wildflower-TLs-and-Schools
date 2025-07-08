@@ -3,8 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
 import type { Charter990 } from "@shared/schema";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit3, Trash2 } from "lucide-react";
+import { Edit, ExternalLink, Trash2 } from "lucide-react";
 
 interface Charter990sTableProps {
   charterId: string;
@@ -20,6 +19,7 @@ export function Charter990sTable({ charterId }: Charter990sTableProps) {
       if (!response.ok) throw new Error("Failed to fetch charter 990s");
       return response.json();
     },
+    enabled: !!charterId,
   });
 
   const handleOpen = (tax990: Charter990) => {
@@ -38,23 +38,29 @@ export function Charter990sTable({ charterId }: Charter990sTableProps) {
 
   const columnDefs: ColDef<Charter990>[] = [
     {
-      headerName: "990 year",
+      headerName: "990 Year",
       field: "year",
-      flex: 1,
-      minWidth: 150,
+      width: 120,
       filter: "agTextColumnFilter",
-      cellRenderer: (params: any) => (
-        <button
-          onClick={() => handleOpen(params.data)}
-          className="text-blue-600 hover:text-blue-800 hover:underline text-left w-full"
-          disabled={!params.data.docUrl}
-        >
-          {params.value}
-        </button>
-      ),
+      cellRenderer: (params: any) => {
+        const tax990 = params.data;
+        const year = params.value || "Unknown Year";
+        if (tax990.docUrl) {
+          return (
+            <button
+              onClick={() => handleOpen(tax990)}
+              className="text-blue-600 hover:text-blue-800 hover:underline font-medium text-left flex items-center gap-1"
+            >
+              {year}
+              <ExternalLink className="h-3 w-3" />
+            </button>
+          );
+        }
+        return <span>{year}</span>;
+      },
     },
     {
-      headerName: "Date",
+      headerName: "Date Entered",
       field: "dateEntered",
       width: 120,
       filter: "agTextColumnFilter",
@@ -62,57 +68,76 @@ export function Charter990sTable({ charterId }: Charter990sTableProps) {
     {
       headerName: "Actions",
       field: "actions",
-      width: 80,
+      width: 100,
       sortable: false,
       filter: false,
-      cellRenderer: (params: any) => (
-        <div className="flex items-center gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleOpen(params.data)}
-            className="h-6 w-6 p-0"
-            title="Open 990 document"
-            disabled={!params.data.docUrl}
-          >
-            <ExternalLink className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleEdit(params.data)}
-            className="h-6 w-6 p-0"
-            title="Edit 990"
-          >
-            <Edit3 className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleDelete(params.data)}
-            className="h-6 w-6 p-0"
-            title="Delete 990"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      ),
+      cellRenderer: (params: any) => {
+        const tax990 = params.data;
+        return (
+          <div className="flex items-center gap-2">
+            {tax990.docUrl && (
+              <button
+                onClick={() => handleOpen(tax990)}
+                className="text-blue-600 hover:text-blue-800"
+                title="Open 990"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </button>
+            )}
+            <button
+              onClick={() => handleEdit(tax990)}
+              className="text-blue-600 hover:text-blue-800"
+              title="Edit 990"
+            >
+              <Edit className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleDelete(tax990)}
+              className="text-red-600 hover:text-red-800"
+              title="Delete 990"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
+  // Sort 990s by year descending (most recent first)
+  const sorted990s = [...tax990s].sort((a, b) => {
+    const yearA = parseInt(a.year || "0");
+    const yearB = parseInt(b.year || "0");
+    return yearB - yearA;
+  });
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+        <div className="h-4 bg-slate-200 rounded"></div>
+        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-96 w-full">
+    <div style={{ height: "400px", width: "100%" }}>
       <AgGridReact
-        rowData={tax990s}
-        columnDefs={columnDefs}
         theme={themeMaterial}
-        loading={isLoading}
-        rowHeight={30}
+        rowData={sorted990s}
+        columnDefs={columnDefs}
+        animateRows={true}
+        rowSelection="none"
         suppressRowClickSelection={true}
-        pagination={false}
         domLayout="normal"
-        suppressHorizontalScroll={false}
-        className="ag-theme-material"
+        headerHeight={40}
+        rowHeight={30}
+        defaultColDef={{
+          sortable: true,
+          resizable: true,
+          filter: true,
+        }}
       />
     </div>
   );

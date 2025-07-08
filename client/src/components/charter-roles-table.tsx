@@ -3,9 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
 import type { CharterRole } from "@shared/schema";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit3, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 
 interface CharterRolesTableProps {
   charterId: string;
@@ -21,11 +19,8 @@ export function CharterRolesTable({ charterId }: CharterRolesTableProps) {
       if (!response.ok) throw new Error("Failed to fetch charter roles");
       return response.json();
     },
+    enabled: !!charterId,
   });
-
-  const handleOpen = (role: CharterRole) => {
-    console.log("Open role:", role);
-  };
 
   const handleEdit = (role: CharterRole) => {
     console.log("Edit role:", role);
@@ -39,31 +34,28 @@ export function CharterRolesTable({ charterId }: CharterRolesTableProps) {
     {
       headerName: "Role",
       field: "role",
-      flex: 1,
-      minWidth: 150,
+      width: 150,
       filter: "agTextColumnFilter",
     },
     {
       headerName: "Name",
       field: "name",
-      flex: 1,
-      minWidth: 150,
+      width: 180,
       filter: "agTextColumnFilter",
     },
     {
-      headerName: "Active",
+      headerName: "Currently Active",
       field: "currentlyActive",
-      width: 100,
+      width: 120,
       filter: "agTextColumnFilter",
       cellRenderer: (params: any) => {
         const active = params.value;
         return (
-          <Badge 
-            className={`${active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'} text-xs`}
-            variant="secondary"
-          >
-            {active ? "Active" : "Inactive"}
-          </Badge>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+            active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+          }`}>
+            {active ? 'Active' : 'Inactive'}
+          </span>
         );
       },
     },
@@ -73,53 +65,57 @@ export function CharterRolesTable({ charterId }: CharterRolesTableProps) {
       width: 100,
       sortable: false,
       filter: false,
-      cellRenderer: (params: any) => (
-        <div className="flex items-center gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleOpen(params.data)}
-            className="h-6 w-6 p-0"
-            title="Open role details"
-          >
-            <ExternalLink className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleEdit(params.data)}
-            className="h-6 w-6 p-0"
-            title="Edit role"
-          >
-            <Edit3 className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleDelete(params.data)}
-            className="h-6 w-6 p-0"
-            title="Delete role"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      ),
+      cellRenderer: (params: any) => {
+        const role = params.data;
+        return (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleEdit(role)}
+              className="text-blue-600 hover:text-blue-800"
+              title="Edit role"
+            >
+              <Edit className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleDelete(role)}
+              className="text-red-600 hover:text-red-800"
+              title="Delete role"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+        <div className="h-4 bg-slate-200 rounded"></div>
+        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-96 w-full">
+    <div style={{ height: "400px", width: "100%" }}>
       <AgGridReact
+        theme={themeMaterial}
         rowData={roles}
         columnDefs={columnDefs}
-        theme={themeMaterial}
-        loading={isLoading}
-        rowHeight={30}
+        animateRows={true}
+        rowSelection="none"
         suppressRowClickSelection={true}
-        pagination={false}
         domLayout="normal"
-        suppressHorizontalScroll={false}
-        className="ag-theme-material"
+        headerHeight={40}
+        rowHeight={30}
+        defaultColDef={{
+          sortable: true,
+          resizable: true,
+          filter: true,
+        }}
       />
     </div>
   );

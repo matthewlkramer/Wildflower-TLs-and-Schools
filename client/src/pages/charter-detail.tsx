@@ -5,6 +5,17 @@ import type { Charter } from "@shared/schema";
 import { usePageTitle, useAddNew } from "@/App";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getStatusColor } from "@/lib/utils";
+import { CharterSchoolsTable } from "@/components/charter-schools-table";
+import { CharterRolesTable } from "@/components/charter-roles-table";
+import { CharterEducatorAssociationsTable } from "@/components/charter-educator-associations-table";
+import { CharterApplicationsSelector } from "@/components/charter-applications-selector";
+import { CharterAuthorizerContactsTable } from "@/components/charter-authorizer-contacts-table";
+import { CharterReportsTable } from "@/components/charter-reports-table";
+import { CharterAssessmentsTable } from "@/components/charter-assessments-table";
+import { CharterGovernanceDocumentsTable } from "@/components/charter-governance-documents-table";
+import { Charter990sTable } from "@/components/charter-990s-table";
+import { CharterNotesTable } from "@/components/charter-notes-table";
+import { CharterActionStepsTable } from "@/components/charter-action-steps-table";
 
 export default function CharterDetail() {
   const { id } = useParams<{ id: string }>();
@@ -61,7 +72,7 @@ export default function CharterDetail() {
             <h1 className="text-2xl font-bold text-slate-900">
               {charter.shortName || charter.fullName}
             </h1>
-            <TabsList className="flex-1 grid grid-cols-6 lg:grid-cols-11 overflow-x-auto">
+            <TabsList className="flex-1 grid grid-cols-6 lg:grid-cols-12 overflow-x-auto">
               <TabsTrigger value="summary" className="text-xs sm:text-sm whitespace-nowrap">Summary</TabsTrigger>
               <TabsTrigger value="startup" className="text-xs sm:text-sm whitespace-nowrap">Startup Process</TabsTrigger>
               <TabsTrigger value="sites" className="text-xs sm:text-sm whitespace-nowrap">Sites</TabsTrigger>
@@ -71,6 +82,7 @@ export default function CharterDetail() {
               <TabsTrigger value="authorizer" className="text-xs sm:text-sm whitespace-nowrap">Authorizer</TabsTrigger>
               <TabsTrigger value="reports" className="text-xs sm:text-sm whitespace-nowrap">Reports</TabsTrigger>
               <TabsTrigger value="assessments" className="text-xs sm:text-sm whitespace-nowrap">Assessments</TabsTrigger>
+              <TabsTrigger value="docs" className="text-xs sm:text-sm whitespace-nowrap">Docs</TabsTrigger>
               <TabsTrigger value="notes" className="text-xs sm:text-sm whitespace-nowrap">Notes/Actions</TabsTrigger>
               <TabsTrigger value="emails" className="text-xs sm:text-sm whitespace-nowrap">Emails/Meetings</TabsTrigger>
             </TabsList>
@@ -137,22 +149,25 @@ export default function CharterDetail() {
           <TabsContent value="sites" className="space-y-6">
             <div className="bg-white rounded-lg border border-slate-200 p-6">
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Sites</h2>
-              <p className="text-sm text-slate-500">Sites information will be displayed here.</p>
+              <CharterSchoolsTable charterId={id!} />
             </div>
           </TabsContent>
 
           <TabsContent value="staff" className="space-y-6">
-            <div className="bg-white rounded-lg border border-slate-200 p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Staff & Roles</h2>
-              <p className="text-sm text-slate-500">Staff and roles information will be displayed here.</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h2 className="text-lg font-semibold text-slate-900 mb-4">Educators x Schools</h2>
+                <CharterEducatorAssociationsTable charterId={id!} />
+              </div>
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h2 className="text-lg font-semibold text-slate-900 mb-4">Charter Roles</h2>
+                <CharterRolesTable charterId={id!} />
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="applications" className="space-y-6">
-            <div className="bg-white rounded-lg border border-slate-200 p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Application(s)</h2>
-              <p className="text-sm text-slate-500">Applications information will be displayed here.</p>
-            </div>
+            <CharterApplicationsSelector charterId={id!} />
           </TabsContent>
 
           <TabsContent value="contract" className="space-y-6">
@@ -164,29 +179,48 @@ export default function CharterDetail() {
 
           <TabsContent value="authorizer" className="space-y-6">
             <div className="bg-white rounded-lg border border-slate-200 p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Authorizer</h2>
-              <p className="text-sm text-slate-500">Authorizer information will be displayed here.</p>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">Contacts</h2>
+              <CharterAuthorizerContactsTable charterId={id!} />
             </div>
           </TabsContent>
 
           <TabsContent value="reports" className="space-y-6">
             <div className="bg-white rounded-lg border border-slate-200 p-6">
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Reports</h2>
-              <p className="text-sm text-slate-500">Reports information will be displayed here.</p>
+              <CharterReportsTable charterId={id!} />
             </div>
           </TabsContent>
 
           <TabsContent value="assessments" className="space-y-6">
             <div className="bg-white rounded-lg border border-slate-200 p-6">
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Assessments</h2>
-              <p className="text-sm text-slate-500">Assessments information will be displayed here.</p>
+              <CharterAssessmentsTable charterId={id!} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="docs" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h2 className="text-lg font-semibold text-slate-900 mb-4">Governance Documents</h2>
+                <CharterGovernanceDocumentsTable charterId={id!} />
+              </div>
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h2 className="text-lg font-semibold text-slate-900 mb-4">990s</h2>
+                <Charter990sTable charterId={id!} />
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="notes" className="space-y-6">
-            <div className="bg-white rounded-lg border border-slate-200 p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Notes & Action Steps</h2>
-              <p className="text-sm text-slate-500">Notes and action steps will be displayed here.</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h2 className="text-lg font-semibold text-slate-900 mb-4">Notes</h2>
+                <CharterNotesTable charterId={id!} />
+              </div>
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h2 className="text-lg font-semibold text-slate-900 mb-4">Action Steps</h2>
+                <CharterActionStepsTable charterId={id!} />
+              </div>
             </div>
           </TabsContent>
 

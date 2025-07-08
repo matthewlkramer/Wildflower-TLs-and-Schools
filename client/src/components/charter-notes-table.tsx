@@ -3,15 +3,18 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
 import type { CharterNote } from "@shared/schema";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit3, Eye, EyeOff, Trash2 } from "lucide-react";
+import { Edit, ExternalLink, Eye, Lock, Unlock, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface CharterNotesTableProps {
   charterId: string;
 }
 
 export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
+  const [selectedNote, setSelectedNote] = useState<CharterNote | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { data: notes = [], isLoading } = useQuery<CharterNote[]>({
     queryKey: ["/api/charter-notes/charter", charterId],
     queryFn: async () => {
@@ -21,10 +24,12 @@ export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
       if (!response.ok) throw new Error("Failed to fetch charter notes");
       return response.json();
     },
+    enabled: !!charterId,
   });
 
   const handleOpen = (note: CharterNote) => {
-    console.log("Open note:", note);
+    setSelectedNote(note);
+    setIsModalOpen(true);
   };
 
   const handleEdit = (note: CharterNote) => {
@@ -43,27 +48,30 @@ export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
     {
       headerName: "Headline",
       field: "headline",
-      flex: 1,
-      minWidth: 200,
+      width: 300,
       filter: "agTextColumnFilter",
-      cellRenderer: (params: any) => (
-        <button
-          onClick={() => handleOpen(params.data)}
-          className="text-blue-600 hover:text-blue-800 hover:underline text-left w-full truncate"
-          title={params.value}
-        >
-          {params.value}
-        </button>
-      ),
+      cellRenderer: (params: any) => {
+        const note = params.data;
+        const headline = params.value || "Untitled Note";
+        return (
+          <button
+            onClick={() => handleOpen(note)}
+            className="text-blue-600 hover:text-blue-800 hover:underline font-medium text-left truncate w-full"
+            title={headline}
+          >
+            {headline}
+          </button>
+        );
+      },
     },
     {
       headerName: "Created By",
       field: "createdBy",
-      width: 120,
+      width: 150,
       filter: "agTextColumnFilter",
     },
     {
-      headerName: "Date",
+      headerName: "Date Entered",
       field: "dateEntered",
       width: 120,
       filter: "agTextColumnFilter",
@@ -73,78 +81,136 @@ export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
       field: "private",
       width: 80,
       filter: "agTextColumnFilter",
-      cellRenderer: (params: any) => (
-        <Badge 
-          className={`${params.value ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'} text-xs`}
-          variant="secondary"
-        >
-          {params.value ? "Private" : "Public"}
-        </Badge>
-      ),
+      cellRenderer: (params: any) => {
+        const isPrivate = params.value;
+        return (
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+            isPrivate ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+          }`}>
+            {isPrivate ? 'Private' : 'Public'}
+          </span>
+        );
+      },
     },
     {
       headerName: "Actions",
       field: "actions",
-      width: 120,
+      width: 150,
       sortable: false,
       filter: false,
-      cellRenderer: (params: any) => (
-        <div className="flex items-center gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleOpen(params.data)}
-            className="h-6 w-6 p-0"
-            title="Open note details"
-          >
-            <ExternalLink className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleEdit(params.data)}
-            className="h-6 w-6 p-0"
-            title="Edit note"
-          >
-            <Edit3 className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleTogglePrivate(params.data)}
-            className="h-6 w-6 p-0"
-            title={params.data.private ? "Make public" : "Make private"}
-          >
-            {params.data.private ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleDelete(params.data)}
-            className="h-6 w-6 p-0"
-            title="Delete note"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      ),
+      cellRenderer: (params: any) => {
+        const note = params.data;
+        return (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleOpen(note)}
+              className="text-blue-600 hover:text-blue-800"
+              title="Open note"
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleEdit(note)}
+              className="text-blue-600 hover:text-blue-800"
+              title="Edit note"
+            >
+              <Edit className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleTogglePrivate(note)}
+              className="text-yellow-600 hover:text-yellow-800"
+              title={note.private ? "Make public" : "Make private"}
+            >
+              {note.private ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={() => handleDelete(note)}
+              className="text-red-600 hover:text-red-800"
+              title="Delete note"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+        <div className="h-4 bg-slate-200 rounded"></div>
+        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-96 w-full">
-      <AgGridReact
-        rowData={notes}
-        columnDefs={columnDefs}
-        theme={themeMaterial}
-        loading={isLoading}
-        rowHeight={40}
-        suppressRowClickSelection={true}
-        pagination={false}
-        domLayout="normal"
-        suppressHorizontalScroll={false}
-        className="ag-theme-material"
-      />
-    </div>
+    <>
+      <div style={{ height: "400px", width: "100%" }}>
+        <AgGridReact
+          theme={themeMaterial}
+          rowData={notes}
+          columnDefs={columnDefs}
+          animateRows={true}
+          rowSelection="none"
+          suppressRowClickSelection={true}
+          domLayout="normal"
+          headerHeight={40}
+          rowHeight={35}
+          defaultColDef={{
+            sortable: true,
+            resizable: true,
+            filter: true,
+          }}
+        />
+      </div>
+
+      {/* Note Detail Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Charter Note Details</DialogTitle>
+          </DialogHeader>
+          {selectedNote && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-medium text-slate-500 mb-1">Headline</h3>
+                <p className="text-sm text-slate-900">{selectedNote.headline || "Untitled Note"}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-slate-500 mb-1">Full Notes</h3>
+                <div className="text-sm text-slate-900 whitespace-pre-wrap bg-slate-50 p-3 rounded border">
+                  {selectedNote.notes || "No content"}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium text-slate-500 mb-1">Created By</h3>
+                  <p className="text-sm text-slate-900">{selectedNote.createdBy || "Unknown"}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-slate-500 mb-1">Date Entered</h3>
+                  <p className="text-sm text-slate-900">{selectedNote.dateEntered || "Unknown"}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-slate-500 mb-1">Private</h3>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    selectedNote.private ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                  }`}>
+                    {selectedNote.private ? 'Private' : 'Public'}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-slate-500 mb-1">Record ID</h3>
+                  <p className="text-sm text-slate-900 font-mono">{selectedNote.id}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

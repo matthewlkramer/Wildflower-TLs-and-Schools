@@ -3,16 +3,16 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
 import type { EducatorSchoolAssociation } from "@shared/schema";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit3, UserMinus, Trash2 } from "lucide-react";
-import { getStatusColor } from "@/lib/utils";
+import { Edit, Trash2, UserMinus } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface CharterEducatorAssociationsTableProps {
   charterId: string;
 }
 
 export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorAssociationsTableProps) {
+  const [, setLocation] = useLocation();
+
   const { data: associations = [], isLoading } = useQuery<EducatorSchoolAssociation[]>({
     queryKey: ["/api/educator-school-associations/charter", charterId],
     queryFn: async () => {
@@ -22,11 +22,8 @@ export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorA
       if (!response.ok) throw new Error("Failed to fetch charter educator associations");
       return response.json();
     },
+    enabled: !!charterId,
   });
-
-  const handleOpen = (association: EducatorSchoolAssociation) => {
-    console.log("Open association:", association);
-  };
 
   const handleEdit = (association: EducatorSchoolAssociation) => {
     console.log("Edit association:", association);
@@ -44,49 +41,68 @@ export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorA
     {
       headerName: "Educator",
       field: "educatorName",
-      flex: 1,
-      minWidth: 150,
+      width: 180,
       filter: "agTextColumnFilter",
+      cellRenderer: (params: any) => {
+        const association = params.data;
+        return (
+          <button
+            onClick={() => setLocation(`/educators/${association.educatorId}`)}
+            className="text-blue-600 hover:text-blue-800 hover:underline font-medium text-left"
+          >
+            {params.value}
+          </button>
+        );
+      },
     },
     {
       headerName: "School",
       field: "schoolName",
-      flex: 1,
-      minWidth: 150,
+      width: 180,
       filter: "agTextColumnFilter",
+      cellRenderer: (params: any) => {
+        const association = params.data;
+        return (
+          <button
+            onClick={() => setLocation(`/schools/${association.schoolId}`)}
+            className="text-blue-600 hover:text-blue-800 hover:underline font-medium text-left"
+          >
+            {params.value}
+          </button>
+        );
+      },
     },
     {
       headerName: "Role",
       field: "role",
-      width: 120,
+      width: 150,
       filter: "agTextColumnFilter",
     },
     {
       headerName: "Start Date",
       field: "startDate",
-      width: 100,
+      width: 120,
       filter: "agTextColumnFilter",
     },
     {
       headerName: "End Date",
       field: "endDate",
-      width: 100,
+      width: 120,
       filter: "agTextColumnFilter",
     },
     {
       headerName: "Active",
       field: "active",
-      width: 80,
+      width: 100,
       filter: "agTextColumnFilter",
       cellRenderer: (params: any) => {
         const active = params.value;
         return (
-          <Badge 
-            className={`${active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'} text-xs`}
-            variant="secondary"
-          >
-            {active ? "Active" : "Inactive"}
-          </Badge>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+            active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+          }`}>
+            {active ? 'Active' : 'Inactive'}
+          </span>
         );
       },
     },
@@ -96,62 +112,64 @@ export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorA
       width: 120,
       sortable: false,
       filter: false,
-      cellRenderer: (params: any) => (
-        <div className="flex items-center gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleOpen(params.data)}
-            className="h-6 w-6 p-0"
-            title="Open association details"
-          >
-            <ExternalLink className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleEdit(params.data)}
-            className="h-6 w-6 p-0"
-            title="Edit association"
-          >
-            <Edit3 className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleEndStint(params.data)}
-            className="h-6 w-6 p-0"
-            title="End stint"
-          >
-            <UserMinus className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleDelete(params.data)}
-            className="h-6 w-6 p-0"
-            title="Delete association"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      ),
+      cellRenderer: (params: any) => {
+        const association = params.data;
+        return (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleEdit(association)}
+              className="text-blue-600 hover:text-blue-800"
+              title="Edit association"
+            >
+              <Edit className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleEndStint(association)}
+              className="text-yellow-600 hover:text-yellow-800"
+              title="End stint"
+            >
+              <UserMinus className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleDelete(association)}
+              className="text-red-600 hover:text-red-800"
+              title="Delete association"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+        <div className="h-4 bg-slate-200 rounded"></div>
+        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-96 w-full">
+    <div style={{ height: "400px", width: "100%" }}>
       <AgGridReact
+        theme={themeMaterial}
         rowData={associations}
         columnDefs={columnDefs}
-        theme={themeMaterial}
-        loading={isLoading}
-        rowHeight={30}
+        animateRows={true}
+        rowSelection="none"
         suppressRowClickSelection={true}
-        pagination={false}
         domLayout="normal"
-        suppressHorizontalScroll={false}
-        className="ag-theme-material"
+        headerHeight={40}
+        rowHeight={30}
+        defaultColDef={{
+          sortable: true,
+          resizable: true,
+          filter: true,
+        }}
       />
     </div>
   );

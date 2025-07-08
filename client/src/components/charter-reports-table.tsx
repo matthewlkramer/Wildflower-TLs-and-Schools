@@ -3,9 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
 import type { ReportSubmission } from "@shared/schema";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit3, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { getStatusColor } from "@/lib/utils";
 
 interface CharterReportsTableProps {
@@ -22,11 +20,8 @@ export function CharterReportsTable({ charterId }: CharterReportsTableProps) {
       if (!response.ok) throw new Error("Failed to fetch charter reports");
       return response.json();
     },
+    enabled: !!charterId,
   });
-
-  const handleOpen = (report: ReportSubmission) => {
-    console.log("Open report:", report);
-  };
 
   const handleEdit = (report: ReportSubmission) => {
     console.log("Edit report:", report);
@@ -40,8 +35,7 @@ export function CharterReportsTable({ charterId }: CharterReportsTableProps) {
     {
       headerName: "Report Type",
       field: "reportType",
-      flex: 1,
-      minWidth: 150,
+      width: 200,
       filter: "agTextColumnFilter",
     },
     {
@@ -53,7 +47,7 @@ export function CharterReportsTable({ charterId }: CharterReportsTableProps) {
     {
       headerName: "Submission Date",
       field: "submissionDate",
-      width: 130,
+      width: 140,
       filter: "agTextColumnFilter",
     },
     {
@@ -63,15 +57,11 @@ export function CharterReportsTable({ charterId }: CharterReportsTableProps) {
       filter: "agTextColumnFilter",
       cellRenderer: (params: any) => {
         const status = params.value;
-        if (!status) return "";
-        const color = getStatusColor(status);
+        if (!status) return <span className="text-slate-500">Not specified</span>;
         return (
-          <Badge 
-            className={`${color} text-xs`}
-            variant="secondary"
-          >
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
             {status}
-          </Badge>
+          </span>
         );
       },
     },
@@ -81,53 +71,57 @@ export function CharterReportsTable({ charterId }: CharterReportsTableProps) {
       width: 100,
       sortable: false,
       filter: false,
-      cellRenderer: (params: any) => (
-        <div className="flex items-center gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleOpen(params.data)}
-            className="h-6 w-6 p-0"
-            title="Open report details"
-          >
-            <ExternalLink className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleEdit(params.data)}
-            className="h-6 w-6 p-0"
-            title="Edit report"
-          >
-            <Edit3 className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleDelete(params.data)}
-            className="h-6 w-6 p-0"
-            title="Delete report"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      ),
+      cellRenderer: (params: any) => {
+        const report = params.data;
+        return (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleEdit(report)}
+              className="text-blue-600 hover:text-blue-800"
+              title="Edit report"
+            >
+              <Edit className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleDelete(report)}
+              className="text-red-600 hover:text-red-800"
+              title="Delete report"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+        <div className="h-4 bg-slate-200 rounded"></div>
+        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-96 w-full">
+    <div style={{ height: "400px", width: "100%" }}>
       <AgGridReact
+        theme={themeMaterial}
         rowData={reports}
         columnDefs={columnDefs}
-        theme={themeMaterial}
-        loading={isLoading}
-        rowHeight={30}
+        animateRows={true}
+        rowSelection="none"
         suppressRowClickSelection={true}
-        pagination={false}
         domLayout="normal"
-        suppressHorizontalScroll={false}
-        className="ag-theme-material"
+        headerHeight={40}
+        rowHeight={30}
+        defaultColDef={{
+          sortable: true,
+          resizable: true,
+          filter: true,
+        }}
       />
     </div>
   );

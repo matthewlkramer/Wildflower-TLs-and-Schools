@@ -3,8 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
 import type { CharterAuthorizerContact } from "@shared/schema";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit3, Trash2 } from "lucide-react";
+import { Edit, Trash2, Mail, Phone } from "lucide-react";
 
 interface CharterAuthorizerContactsTableProps {
   charterId: string;
@@ -20,11 +19,8 @@ export function CharterAuthorizerContactsTable({ charterId }: CharterAuthorizerC
       if (!response.ok) throw new Error("Failed to fetch charter authorizer contacts");
       return response.json();
     },
+    enabled: !!charterId,
   });
-
-  const handleOpen = (contact: CharterAuthorizerContact) => {
-    console.log("Open contact:", contact);
-  };
 
   const handleEdit = (contact: CharterAuthorizerContact) => {
     console.log("Edit contact:", contact);
@@ -38,36 +34,58 @@ export function CharterAuthorizerContactsTable({ charterId }: CharterAuthorizerC
     {
       headerName: "Name",
       field: "name",
-      flex: 1,
-      minWidth: 150,
+      width: 180,
       filter: "agTextColumnFilter",
     },
     {
       headerName: "Organization",
       field: "organization",
-      flex: 1,
-      minWidth: 150,
+      width: 200,
       filter: "agTextColumnFilter",
     },
     {
       headerName: "Role",
       field: "role",
-      flex: 1,
-      minWidth: 120,
+      width: 150,
       filter: "agTextColumnFilter",
     },
     {
       headerName: "Email",
       field: "email",
-      flex: 1,
-      minWidth: 180,
+      width: 200,
       filter: "agTextColumnFilter",
+      cellRenderer: (params: any) => {
+        const email = params.value;
+        if (!email) return <span className="text-slate-500">Not provided</span>;
+        return (
+          <a
+            href={`mailto:${email}`}
+            className="text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1"
+          >
+            <Mail className="h-3 w-3" />
+            {email}
+          </a>
+        );
+      },
     },
     {
       headerName: "Phone",
       field: "phone",
-      width: 120,
+      width: 150,
       filter: "agTextColumnFilter",
+      cellRenderer: (params: any) => {
+        const phone = params.value;
+        if (!phone) return <span className="text-slate-500">Not provided</span>;
+        return (
+          <a
+            href={`tel:${phone}`}
+            className="text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1"
+          >
+            <Phone className="h-3 w-3" />
+            {phone}
+          </a>
+        );
+      },
     },
     {
       headerName: "Actions",
@@ -75,53 +93,57 @@ export function CharterAuthorizerContactsTable({ charterId }: CharterAuthorizerC
       width: 100,
       sortable: false,
       filter: false,
-      cellRenderer: (params: any) => (
-        <div className="flex items-center gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleOpen(params.data)}
-            className="h-6 w-6 p-0"
-            title="Open contact details"
-          >
-            <ExternalLink className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleEdit(params.data)}
-            className="h-6 w-6 p-0"
-            title="Edit contact"
-          >
-            <Edit3 className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleDelete(params.data)}
-            className="h-6 w-6 p-0"
-            title="Delete contact"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      ),
+      cellRenderer: (params: any) => {
+        const contact = params.data;
+        return (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleEdit(contact)}
+              className="text-blue-600 hover:text-blue-800"
+              title="Edit contact"
+            >
+              <Edit className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleDelete(contact)}
+              className="text-red-600 hover:text-red-800"
+              title="Delete contact"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+        <div className="h-4 bg-slate-200 rounded"></div>
+        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-96 w-full">
+    <div style={{ height: "400px", width: "100%" }}>
       <AgGridReact
+        theme={themeMaterial}
         rowData={contacts}
         columnDefs={columnDefs}
-        theme={themeMaterial}
-        loading={isLoading}
-        rowHeight={30}
+        animateRows={true}
+        rowSelection="none"
         suppressRowClickSelection={true}
-        pagination={false}
         domLayout="normal"
-        suppressHorizontalScroll={false}
-        className="ag-theme-material"
+        headerHeight={40}
+        rowHeight={30}
+        defaultColDef={{
+          sortable: true,
+          resizable: true,
+          filter: true,
+        }}
       />
     </div>
   );

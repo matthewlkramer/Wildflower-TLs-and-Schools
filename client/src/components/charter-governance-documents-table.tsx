@@ -3,8 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
 import type { CharterGovernanceDocument } from "@shared/schema";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit3, Trash2 } from "lucide-react";
+import { Edit, ExternalLink, Trash2 } from "lucide-react";
 
 interface CharterGovernanceDocumentsTableProps {
   charterId: string;
@@ -20,6 +19,7 @@ export function CharterGovernanceDocumentsTable({ charterId }: CharterGovernance
       if (!response.ok) throw new Error("Failed to fetch charter governance documents");
       return response.json();
     },
+    enabled: !!charterId,
   });
 
   const handleOpen = (document: CharterGovernanceDocument) => {
@@ -38,20 +38,26 @@ export function CharterGovernanceDocumentsTable({ charterId }: CharterGovernance
 
   const columnDefs: ColDef<CharterGovernanceDocument>[] = [
     {
-      headerName: "Governance documents",
+      headerName: "Document Type",
       field: "docType",
-      flex: 1,
-      minWidth: 200,
+      width: 200,
       filter: "agTextColumnFilter",
-      cellRenderer: (params: any) => (
-        <button
-          onClick={() => handleOpen(params.data)}
-          className="text-blue-600 hover:text-blue-800 hover:underline text-left w-full"
-          disabled={!params.data.docUrl}
-        >
-          {params.value}
-        </button>
-      ),
+      cellRenderer: (params: any) => {
+        const document = params.data;
+        const docType = params.value || "Document";
+        if (document.docUrl) {
+          return (
+            <button
+              onClick={() => handleOpen(document)}
+              className="text-blue-600 hover:text-blue-800 hover:underline font-medium text-left flex items-center gap-1"
+            >
+              {docType}
+              <ExternalLink className="h-3 w-3" />
+            </button>
+          );
+        }
+        return <span>{docType}</span>;
+      },
     },
     {
       headerName: "Date",
@@ -62,57 +68,74 @@ export function CharterGovernanceDocumentsTable({ charterId }: CharterGovernance
     {
       headerName: "Actions",
       field: "actions",
-      width: 80,
+      width: 100,
       sortable: false,
       filter: false,
-      cellRenderer: (params: any) => (
-        <div className="flex items-center gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleOpen(params.data)}
-            className="h-6 w-6 p-0"
-            title="Open document"
-            disabled={!params.data.docUrl}
-          >
-            <ExternalLink className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleEdit(params.data)}
-            className="h-6 w-6 p-0"
-            title="Edit document"
-          >
-            <Edit3 className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => handleDelete(params.data)}
-            className="h-6 w-6 p-0"
-            title="Delete document"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      ),
+      cellRenderer: (params: any) => {
+        const document = params.data;
+        return (
+          <div className="flex items-center gap-2">
+            {document.docUrl && (
+              <button
+                onClick={() => handleOpen(document)}
+                className="text-blue-600 hover:text-blue-800"
+                title="Open document"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </button>
+            )}
+            <button
+              onClick={() => handleEdit(document)}
+              className="text-blue-600 hover:text-blue-800"
+              title="Edit document"
+            >
+              <Edit className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleDelete(document)}
+              className="text-red-600 hover:text-red-800"
+              title="Delete document"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
+  // Sort documents alphabetically by type
+  const sortedDocuments = [...documents].sort((a, b) => {
+    return (a.docType || "").localeCompare(b.docType || "");
+  });
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+        <div className="h-4 bg-slate-200 rounded"></div>
+        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-96 w-full">
+    <div style={{ height: "400px", width: "100%" }}>
       <AgGridReact
-        rowData={documents}
-        columnDefs={columnDefs}
         theme={themeMaterial}
-        loading={isLoading}
-        rowHeight={30}
+        rowData={sortedDocuments}
+        columnDefs={columnDefs}
+        animateRows={true}
+        rowSelection="none"
         suppressRowClickSelection={true}
-        pagination={false}
         domLayout="normal"
-        suppressHorizontalScroll={false}
-        className="ag-theme-material"
+        headerHeight={40}
+        rowHeight={30}
+        defaultColDef={{
+          sortable: true,
+          resizable: true,
+          filter: true,
+        }}
       />
     </div>
   );
