@@ -174,6 +174,7 @@ Changelog:
 - July 07, 2025. Fixed Airtable headline field object parsing: resolved "[object Object]" display issue by properly extracting value property from Airtable's generated field objects with structure {state, value, isStale}, headlines now display correctly as text strings
 - July 07, 2025. Enhanced Action Steps table with comprehensive functionality: added open icon for viewing full action step details in modal, implemented toggle complete/incomplete status with appropriate icons (checkmark for incomplete items, rotate icon for completed items), created detailed action step view modal showing all fields including description, dates, status, and record metadata
 - July 07, 2025. Fixed membership fees loading issue: corrected Airtable filtering to use proper "School" field array search instead of non-existent "school_id" or "Schools" fields, updated field mappings to use correct Airtable field names ("Initial fee", "Revised amount", "Current exemption status", etc.), implemented fallback manual filtering when Airtable FIND formula fails, successfully loading membership fee records for schools
+- July 08, 2025. Updated Montessori certifications table: corrected Airtable field mappings to use "Year Certified", "Abbreviation", and "Level" fields, reordered columns to show Year Certified, Level, Abbreviation, added Actions column with open, edit (inline), and delete functionality with hover tooltips
 ```
 
 ## User Preferences
