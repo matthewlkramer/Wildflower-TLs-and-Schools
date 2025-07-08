@@ -48,13 +48,13 @@ export const useAddNew = () => useContext(AddNewContext);
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Charters} />
+      <Route path="/" component={Teachers} />
+      <Route path="/teachers" component={Teachers} />
+      <Route path="/teacher/:id" component={TeacherDetail} />
+      <Route path="/schools" component={Schools} />
+      <Route path="/school/:id" component={SchoolDetail} />
       <Route path="/charters" component={Charters} />
       <Route path="/charter/:id" component={CharterDetail} />
-      <Route path="/teachers" component={Teachers} />
-      <Route path="/schools" component={Schools} />
-      <Route path="/teacher/:id" component={TeacherDetail} />
-      <Route path="/school/:id" component={SchoolDetail} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -67,9 +67,9 @@ function AppContent() {
   const [addNewOptions, setAddNewOptions] = useState<Array<{ label: string; onClick: () => void; }>>([]);
 
   // Reset search when navigating between pages
-  const isChartersActive = location === "/" || location === "/charters";
-  const isTeachersActive = location === "/teachers" || location.startsWith("/teacher/");
+  const isTeachersActive = location === "/" || location === "/teachers" || location.startsWith("/teacher/");
   const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
+  const isChartersActive = location === "/charters" || location.startsWith("/charter/");
 
   return (
     <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>

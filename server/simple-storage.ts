@@ -2107,12 +2107,12 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharterRolesByCharterId(charterId: string): Promise<CharterRole[]> {
     try {
       const records = await base("Charter roles").select({
-        filterByFormula: `FIND('${charterId}', ARRAYJOIN({Charter})) > 0`
+        filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: Array.isArray(record.fields["Charter"]) ? String(record.fields["Charter"][0] || '') : String(record.fields["Charter"] || ''),
+        charterId: String(record.fields["charter_id"] || ''),
         role: String(record.fields["Role"] || ''),
         name: String(record.fields["Name"] || ''),
         currentlyActive: Boolean(record.fields["Currently Active"]),
@@ -2128,12 +2128,12 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharterApplicationsByCharterId(charterId: string): Promise<CharterApplication[]> {
     try {
       const records = await base("Charter applications").select({
-        filterByFormula: `FIND('${charterId}', ARRAYJOIN({Charter})) > 0`
+        filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: Array.isArray(record.fields["Charter"]) ? String(record.fields["Charter"][0] || '') : String(record.fields["Charter"] || ''),
+        charterId: String(record.fields["charter_id"] || ''),
         applicationName: String(record.fields["Application Name"] || ''),
         targetOpen: String(record.fields["Target Open"] || ''),
         status: String(record.fields["Status"] || ''),
@@ -2150,12 +2150,12 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharterAuthorizerContactsByCharterId(charterId: string): Promise<CharterAuthorizerContact[]> {
     try {
       const records = await base("Charter authorizers and contacts").select({
-        filterByFormula: `FIND('${charterId}', ARRAYJOIN({Charter})) > 0`
+        filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: Array.isArray(record.fields["Charter"]) ? String(record.fields["Charter"][0] || '') : String(record.fields["Charter"] || ''),
+        charterId: String(record.fields["charter_id"] || ''),
         name: String(record.fields["Name"] || ''),
         organization: String(record.fields["Organization"] || ''),
         email: String(record.fields["Email"] || ''),
@@ -2173,12 +2173,12 @@ export class SimpleAirtableStorage implements IStorage {
   async getReportSubmissionsByCharterId(charterId: string): Promise<ReportSubmission[]> {
     try {
       const records = await base("Reports and submissions").select({
-        filterByFormula: `FIND('${charterId}', ARRAYJOIN({Charter})) > 0`
+        filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: Array.isArray(record.fields["Charter"]) ? String(record.fields["Charter"][0] || '') : String(record.fields["Charter"] || ''),
+        charterId: String(record.fields["charter_id"] || ''),
         reportType: String(record.fields["Report Type"] || ''),
         dueDate: String(record.fields["Due Date"] || ''),
         submissionDate: String(record.fields["Submission Date"] || ''),
@@ -2195,12 +2195,12 @@ export class SimpleAirtableStorage implements IStorage {
   async getAssessmentDataByCharterId(charterId: string): Promise<AssessmentData[]> {
     try {
       const records = await base("Assessments and data").select({
-        filterByFormula: `FIND('${charterId}', ARRAYJOIN({Charter})) > 0`
+        filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: Array.isArray(record.fields["Charter"]) ? String(record.fields["Charter"][0] || '') : String(record.fields["Charter"] || ''),
+        charterId: String(record.fields["charter_id"] || ''),
         assessmentType: String(record.fields["Assessment Type"] || ''),
         testDate: String(record.fields["Test Date"] || ''),
         results: String(record.fields["Results"] || ''),
@@ -2217,12 +2217,12 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharterNotesByCharterId(charterId: string): Promise<CharterNote[]> {
     try {
       const records = await base("Charter notes").select({
-        filterByFormula: `FIND('${charterId}', ARRAYJOIN({Charter})) > 0`
+        filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: Array.isArray(record.fields["Charter"]) ? String(record.fields["Charter"][0] || '') : String(record.fields["Charter"] || ''),
+        charterId: String(record.fields["charter_id"] || ''),
         headline: String(record.fields["Headline (Notes)"] || ''),
         notes: String(record.fields["Notes"] || ''),
         createdBy: String(record.fields["Created By"] || ''),
@@ -2240,12 +2240,12 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharterActionStepsByCharterId(charterId: string): Promise<CharterActionStep[]> {
     try {
       const records = await base("Charter action steps").select({
-        filterByFormula: `FIND('${charterId}', ARRAYJOIN({Charter})) > 0`
+        filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: Array.isArray(record.fields["Charter"]) ? String(record.fields["Charter"][0] || '') : String(record.fields["Charter"] || ''),
+        charterId: String(record.fields["charter_id"] || ''),
         description: String(record.fields["Description"] || ''),
         assignee: String(record.fields["Assignee"] || ''),
         dueDate: String(record.fields["Due Date"] || ''),
@@ -2263,7 +2263,7 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharterGovernanceDocumentsByCharterId(charterId: string): Promise<CharterGovernanceDocument[]> {
     try {
       const records = await base("Charter governance docs").select({
-        filterByFormula: `FIND('${charterId}', ARRAYJOIN({Charter})) > 0`
+        filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
       return records.map(record => {
@@ -2282,7 +2282,7 @@ export class SimpleAirtableStorage implements IStorage {
         
         return {
           id: record.id,
-          charterId: Array.isArray(record.fields["Charter"]) ? String(record.fields["Charter"][0] || '') : String(record.fields["Charter"] || ''),
+          charterId: String(record.fields["charter_id"] || ''),
           docType: String(record.fields["Document type"] || ''),
           doc: String(doc),
           docUrl: String(docUrl),
@@ -2300,7 +2300,7 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharter990sByCharterId(charterId: string): Promise<Charter990[]> {
     try {
       const records = await base("Charter 990s").select({
-        filterByFormula: `FIND('${charterId}', ARRAYJOIN({Charter})) > 0`
+        filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
       return records.map(record => {
@@ -2317,7 +2317,7 @@ export class SimpleAirtableStorage implements IStorage {
         
         return {
           id: record.id,
-          charterId: Array.isArray(record.fields["Charter"]) ? String(record.fields["Charter"][0] || '') : String(record.fields["Charter"] || ''),
+          charterId: String(record.fields["charter_id"] || ''),
           year: String(record.fields["Year"] || ''),
           docUrl: String(docUrl),
           dateEntered: String(record.fields["Date Entered"] || ''),
@@ -2334,7 +2334,7 @@ export class SimpleAirtableStorage implements IStorage {
   async getEducatorSchoolAssociationsByCharterId(charterId: string): Promise<EducatorSchoolAssociation[]> {
     try {
       const records = await base("Educator x School").select({
-        filterByFormula: `FIND('${charterId}', ARRAYJOIN({Charter})) > 0`
+        filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
