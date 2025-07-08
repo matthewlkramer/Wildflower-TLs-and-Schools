@@ -78,45 +78,45 @@ function AnimatedMascot({ animation, size = 80 }: MascotProps) {
         width={size}
         height={size}
         viewBox="0 0 100 100"
-        className="drop-shadow-lg"
+        className="drop-shadow-sm"
       >
-        {/* Flower petals */}
+        {/* Flower petals - natural wildflower colors */}
         <g className="origin-center">
-          <circle cx="50" cy="30" r="12" fill="#FF6B6B" opacity="0.9" />
-          <circle cx="70" cy="50" r="12" fill="#4ECDC4" opacity="0.9" />
-          <circle cx="50" cy="70" r="12" fill="#45B7D1" opacity="0.9" />
-          <circle cx="30" cy="50" r="12" fill="#96CEB4" opacity="0.9" />
-          <circle cx="35" cy="35" r="10" fill="#FFEAA7" opacity="0.8" />
-          <circle cx="65" cy="35" r="10" fill="#DDA0DD" opacity="0.8" />
-          <circle cx="65" cy="65" r="10" fill="#F0A3A3" opacity="0.8" />
-          <circle cx="35" cy="65" r="10" fill="#A8E6CF" opacity="0.8" />
+          {/* Main petals */}
+          <ellipse cx="50" cy="30" rx="8" ry="14" fill="#E8D5E8" opacity="0.9" />
+          <ellipse cx="70" cy="42" rx="8" ry="14" fill="#F0E6D6" opacity="0.9" transform="rotate(45 70 42)" />
+          <ellipse cx="58" cy="70" rx="8" ry="14" fill="#E8D5E8" opacity="0.9" transform="rotate(90 58 70)" />
+          <ellipse cx="30" cy="58" rx="8" ry="14" fill="#F0E6D6" opacity="0.9" transform="rotate(135 30 58)" />
+          <ellipse cx="42" cy="30" rx="8" ry="14" fill="#F5F0E8" opacity="0.9" transform="rotate(-45 42 30)" />
         </g>
         
-        {/* Center face */}
-        <circle cx="50" cy="50" r="16" fill="#FFD93D" stroke="#F39C12" strokeWidth="2" />
+        {/* Inner petals */}
+        <g className="origin-center">
+          <ellipse cx="50" cy="38" rx="5" ry="9" fill="#D4B8D4" opacity="0.8" />
+          <ellipse cx="62" cy="50" rx="5" ry="9" fill="#E6D2B8" opacity="0.8" transform="rotate(45 62 50)" />
+          <ellipse cx="50" cy="62" rx="5" ry="9" fill="#D4B8D4" opacity="0.8" transform="rotate(90 50 62)" />
+          <ellipse cx="38" cy="50" rx="5" ry="9" fill="#E6D2B8" opacity="0.8" transform="rotate(135 38 50)" />
+        </g>
         
-        {/* Eyes */}
-        <circle cx="45" cy="46" r="2" fill="#2C3E50" />
-        <circle cx="55" cy="46" r="2" fill="#2C3E50" />
+        {/* Center */}
+        <circle cx="50" cy="50" r="12" fill="#F7E98E" stroke="#E6D063" strokeWidth="1.5" />
         
-        {/* Smile */}
-        <path
-          d="M 42 52 Q 50 58 58 52"
-          stroke="#2C3E50"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-        />
+        {/* Center details - small dots instead of face */}
+        <circle cx="47" cy="48" r="1" fill="#C9A961" opacity="0.6" />
+        <circle cx="53" cy="48" r="1" fill="#C9A961" opacity="0.6" />
+        <circle cx="50" cy="52" r="0.8" fill="#C9A961" opacity="0.5" />
+        <circle cx="46" cy="51" r="0.5" fill="#C9A961" opacity="0.4" />
+        <circle cx="54" cy="51" r="0.5" fill="#C9A961" opacity="0.4" />
         
-        {/* Sparkles */}
-        <circle cx="25" cy="25" r="1.5" fill="#FFD93D" opacity="0.7">
-          <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite" />
+        {/* Subtle highlights */}
+        <circle cx="28" cy="28" r="1" fill="#F5F0E8" opacity="0.6">
+          <animate attributeName="opacity" values="0.4;0.8;0.4" dur="3s" repeatCount="indefinite" />
         </circle>
-        <circle cx="75" cy="25" r="1" fill="#FF6B6B" opacity="0.6">
-          <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite" />
+        <circle cx="72" cy="30" r="0.8" fill="#E8D5E8" opacity="0.5">
+          <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2.5s" repeatCount="indefinite" />
         </circle>
-        <circle cx="80" cy="75" r="1.5" fill="#4ECDC4" opacity="0.8">
-          <animate attributeName="opacity" values="0.8;1;0.8" dur="1.8s" repeatCount="indefinite" />
+        <circle cx="75" cy="72" r="1" fill="#F0E6D6" opacity="0.6">
+          <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.8s" repeatCount="indefinite" />
         </circle>
       </svg>
     </div>
