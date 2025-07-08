@@ -1,6 +1,17 @@
 import { z } from "zod";
 
 // Airtable-based schema for Wildflower Schools
+// Charter interface for Charters table
+export interface Charter {
+  id: string; // Airtable record ID
+  shortName?: string;
+  fullName?: string;
+  city?: string;
+  status?: string;
+  created?: string;
+  lastModified?: string;
+}
+
 export interface Educator {
   id: string; // Airtable record ID
   fullName?: string;

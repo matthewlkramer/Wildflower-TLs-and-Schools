@@ -72,6 +72,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Charter routes
+  app.get("/api/charters", async (req, res) => {
+    try {
+      const charters = await storage.getCharters();
+      res.json(charters);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch charters" });
+    }
+  });
+
   // Teacher routes (legacy compatibility)
   app.get("/api/teachers", async (req, res) => {
     try {

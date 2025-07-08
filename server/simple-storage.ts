@@ -2,6 +2,7 @@ import { base } from "./airtable-schema";
 import { cache } from "./cache";
 import { handleError } from "./error-handler";
 import type { 
+  Charter,
   Educator, 
   School, 
   EducatorSchoolAssociation, 
@@ -41,6 +42,9 @@ import type {
 } from "@shared/schema";
 
 export interface IStorage {
+  // Charter operations
+  getCharters(): Promise<Charter[]>;
+
   // Educator operations
   getEducators(): Promise<Educator[]>;
   getEducator(id: string): Promise<Educator | undefined>;
@@ -182,6 +186,47 @@ export interface IStorage {
 }
 
 export class SimpleAirtableStorage implements IStorage {
+  // Helper method to transform Airtable record to Charter
+  private transformCharterRecord(record: any): Charter {
+    const fields = record.fields;
+    
+    return {
+      id: record.id,
+      shortName: fields["Short Name"] || fields["Shortname"] || undefined,
+      fullName: fields["Full Name"] || fields["Name"] || undefined,
+      city: fields["City"] || undefined,
+      status: fields["Status"] || undefined,
+      created: fields["Created"] || fields["Created time"] || undefined,
+      lastModified: fields["Last Modified"] || fields["Last modified"] || undefined,
+    };
+  }
+
+  // Charter operations
+  async getCharters(): Promise<Charter[]> {
+    // Check cache first
+    const cacheKey = 'charters:all';
+    const cached = cache.get<Charter[]>(cacheKey);
+    if (cached) {
+      console.log('[Cache Hit] Charters');
+      return cached;
+    }
+
+    try {
+      const records = await base("Charters").select().all();
+      const charters = records.map(record => this.transformCharterRecord(record));
+      
+      // Cache the results
+      cache.set(cacheKey, charters);
+      console.log('[Cache Miss] Charters - fetched from Airtable');
+      
+      return charters;
+    } catch (error) {
+      const errorInfo = handleError(error);
+      console.error("Error fetching charters from Airtable:", errorInfo.message);
+      throw error;
+    }
+  }
+
   // Helper method to transform Airtable record to Educator
   private transformEducatorRecord(record: any): Educator {
     const fields = record.fields;
