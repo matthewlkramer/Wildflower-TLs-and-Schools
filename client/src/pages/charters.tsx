@@ -80,6 +80,24 @@ export default function Charters() {
       field: "initialTargetAges",
       width: 150,
       filter: "agTextColumnFilter",
+      cellRenderer: (params: any) => {
+        const ages = params.value;
+        if (!ages || ages.length === 0) {
+          return <span className="text-slate-500">Not specified</span>;
+        }
+        return (
+          <div className="flex flex-wrap gap-1">
+            {ages.map((age: string, index: number) => (
+              <span
+                key={index}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+              >
+                {age}
+              </span>
+            ))}
+          </div>
+        );
+      },
     },
     {
       headerName: "Status",

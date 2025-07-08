@@ -107,7 +107,20 @@ export default function CharterDetail() {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-1">Initial Target Ages</h3>
-                  <p className="text-sm text-slate-900">{charter.initialTargetAges || "Not specified"}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {charter.initialTargetAges && charter.initialTargetAges.length > 0 ? (
+                      charter.initialTargetAges.map((age, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                        >
+                          {age}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-slate-500">Not specified</span>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-1">Status</h3>
