@@ -194,7 +194,7 @@ export class SimpleAirtableStorage implements IStorage {
     return {
       id: record.id,
       shortName: fields["Short Name"] || fields["Shortname"] || undefined,
-      fullName: fields["fullname"] || fields["Full Name"] || fields["Name"] || undefined,
+      fullName: fields["Full name"] || fields["fullname"] || fields["Full Name"] || fields["Name"] || undefined,
       initialTargetCommunity: fields["Initial target community"] || undefined,
       projectedOpen: fields["Projected open"] || undefined,
       initialTargetAges: fields["Initial target ages"] || undefined,
