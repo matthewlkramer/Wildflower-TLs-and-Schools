@@ -61,6 +61,12 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
+        wildflower: {
+          blue: "#4A90E2",
+          green: "#7ED321",
+          orange: "#F5A623",
+          red: "#D0021B",
+        },
       },
       keyframes: {
         "accordion-down": {

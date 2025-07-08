@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState, createContext, useContext } from "react";
 import Header from "@/components/header";
+import { TourLauncher } from "@/components/interactive-tour";
 import Teachers from "@/pages/teachers";
 import Schools from "@/pages/schools";
 import Charters from "@/pages/charters";
@@ -81,6 +82,7 @@ function AppContent() {
               addNewOptions={addNewOptions}
             />
             <Router />
+            <TourLauncher />
             <Toaster />
           </div>
         </AddNewContext.Provider>
