@@ -6,7 +6,9 @@ export interface Charter {
   id: string; // Airtable record ID
   shortName?: string;
   fullName?: string;
-  city?: string;
+  initialTargetCommunity?: string;
+  projectedOpen?: string;
+  initialTargetAges?: string;
   status?: string;
   created?: string;
   lastModified?: string;

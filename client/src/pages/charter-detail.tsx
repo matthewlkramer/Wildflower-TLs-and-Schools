@@ -71,8 +71,9 @@ export default function CharterDetail() {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="summary" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10 overflow-x-auto">
+          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11 overflow-x-auto">
             <TabsTrigger value="summary" className="text-xs sm:text-sm whitespace-nowrap">Summary</TabsTrigger>
+            <TabsTrigger value="startup" className="text-xs sm:text-sm whitespace-nowrap">Startup Process</TabsTrigger>
             <TabsTrigger value="sites" className="text-xs sm:text-sm whitespace-nowrap">Sites</TabsTrigger>
             <TabsTrigger value="staff" className="text-xs sm:text-sm whitespace-nowrap">Staff/Roles</TabsTrigger>
             <TabsTrigger value="applications" className="text-xs sm:text-sm whitespace-nowrap">Application(s)</TabsTrigger>
@@ -97,14 +98,29 @@ export default function CharterDetail() {
                   <p className="text-sm text-slate-900">{charter.fullName || "Not specified"}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-slate-500 mb-1">City</h3>
-                  <p className="text-sm text-slate-900">{charter.city || "Not specified"}</p>
+                  <h3 className="text-sm font-medium text-slate-500 mb-1">Initial Target Community</h3>
+                  <p className="text-sm text-slate-900">{charter.initialTargetCommunity || "Not specified"}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-slate-500 mb-1">Projected Open</h3>
+                  <p className="text-sm text-slate-900">{charter.projectedOpen || "Not specified"}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-slate-500 mb-1">Initial Target Ages</h3>
+                  <p className="text-sm text-slate-900">{charter.initialTargetAges || "Not specified"}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-1">Status</h3>
                   <p className="text-sm text-slate-900">{charter.status || "Not specified"}</p>
                 </div>
               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="startup" className="space-y-6">
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">Startup Process</h2>
+              <p className="text-sm text-slate-500">Startup process information will be displayed here.</p>
             </div>
           </TabsContent>
 

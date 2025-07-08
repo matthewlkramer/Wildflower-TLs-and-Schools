@@ -50,7 +50,7 @@ export default function Charters() {
         return (
           <button
             onClick={() => setLocation(`/charter/${params.data.id}`)}
-            className="text-left hover:text-wildflower-blue hover:underline w-full h-full"
+            className="text-left hover:text-blue-600 hover:underline w-full h-full"
           >
             {params.value || ""}
           </button>
@@ -64,8 +64,20 @@ export default function Charters() {
       filter: "agTextColumnFilter",
     },
     {
-      headerName: "City",
-      field: "city",
+      headerName: "Initial Target Community",
+      field: "initialTargetCommunity",
+      width: 200,
+      filter: "agTextColumnFilter",
+    },
+    {
+      headerName: "Projected Open",
+      field: "projectedOpen",
+      width: 150,
+      filter: "agTextColumnFilter",
+    },
+    {
+      headerName: "Initial Target Ages",
+      field: "initialTargetAges",
       width: 150,
       filter: "agTextColumnFilter",
     },
