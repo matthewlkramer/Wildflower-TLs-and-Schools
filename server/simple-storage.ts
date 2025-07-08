@@ -2194,7 +2194,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getAssessmentDataByCharterId(charterId: string): Promise<AssessmentData[]> {
     try {
-      const records = await base("Assessments and data").select({
+      const records = await base("Assessments data").select({
         filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
@@ -2262,7 +2262,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getCharterGovernanceDocumentsByCharterId(charterId: string): Promise<CharterGovernanceDocument[]> {
     try {
-      const records = await base("Charter governance docs").select({
+      const records = await base("Governance docs").select({
         filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
@@ -2299,7 +2299,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getCharter990sByCharterId(charterId: string): Promise<Charter990[]> {
     try {
-      const records = await base("Charter 990s").select({
+      const records = await base("990s").select({
         filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
@@ -2333,7 +2333,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getEducatorSchoolAssociationsByCharterId(charterId: string): Promise<EducatorSchoolAssociation[]> {
     try {
-      const records = await base("Educator x School").select({
+      const records = await base("Educators x Schools").select({
         filterByFormula: `{charter_id} = '${charterId}'`
       }).all();
       
