@@ -22,13 +22,9 @@ const addSchoolSchema = schoolSchema.pick({
   phone: true,
   email: true,
   website: true,
-  membershipStatus: true,
-  ssjTargetCity: true,
-  ssjTargetState: true
+  membershipStatus: true
 }).extend({
-  name: z.string().min(1, "School name is required"),
-  ssjTargetCity: z.string().optional(),
-  ssjTargetState: z.string().optional()
+  name: z.string().min(1, "School name is required")
 });
 
 interface AddSchoolModalProps {
@@ -50,9 +46,7 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
       phone: "",
       email: "",
       website: "",
-      membershipStatus: "",
-      ssjTargetCity: "",
-      ssjTargetState: ""
+      membershipStatus: ""
     },
   });
 
@@ -170,34 +164,7 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="ssjTargetCity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Target City</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter target city" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="ssjTargetState"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Target State</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter target state" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
