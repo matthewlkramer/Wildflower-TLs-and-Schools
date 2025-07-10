@@ -1,0 +1,107 @@
+Console.js:61 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Mt.forEach.n.<computed> @ Console.js:61
+(anonymous) @ @radix-ui_react-dialog.js?v=4cc1b710:337
+commitHookEffectListMount @ chunk-276SZO74.js?v=4cc1b710:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=4cc1b710:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=4cc1b710:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=4cc1b710:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=4cc1b710:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=4cc1b710:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=4cc1b710:19447
+commitRootImpl @ chunk-276SZO74.js?v=4cc1b710:19416
+commitRoot @ chunk-276SZO74.js?v=4cc1b710:19277
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=4cc1b710:18895
+flushSyncCallbacks @ chunk-276SZO74.js?v=4cc1b710:9119
+(anonymous) @ chunk-276SZO74.js?v=4cc1b710:18627Understand this warning
+test-mode-api.ts:11  POST https://6dc94338-b6d5-4ffe-97c9-b97640f8e815-00-11m8y2ytfko6u.riker.replit.dev/api/schools 500 (Internal Server Error)
+window.fetch @ Network.js:219
+fetch @ test-mode-api.ts:11
+apiRequest @ queryClient.ts:15
+mutationFn @ add-school-modal.tsx:61
+fn @ @tanstack_react-query.js?v=4cc1b710:1189
+run @ @tanstack_react-query.js?v=4cc1b710:494
+start @ @tanstack_react-query.js?v=4cc1b710:536
+execute @ @tanstack_react-query.js?v=4cc1b710:1225
+await in execute
+mutate @ @tanstack_react-query.js?v=4cc1b710:2630
+(anonymous) @ @tanstack_react-query.js?v=4cc1b710:3295
+onSubmit @ add-school-modal.tsx:84
+(anonymous) @ chunk-YGCRICWC.js?v=4cc1b710:1465
+await in (anonymous)
+callCallback2 @ chunk-276SZO74.js?v=4cc1b710:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=4cc1b710:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=4cc1b710:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=4cc1b710:3736
+executeDispatch @ chunk-276SZO74.js?v=4cc1b710:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=4cc1b710:7034
+processDispatchQueue @ chunk-276SZO74.js?v=4cc1b710:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=4cc1b710:7051
+(anonymous) @ chunk-276SZO74.js?v=4cc1b710:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=4cc1b710:18913
+batchedUpdates @ chunk-276SZO74.js?v=4cc1b710:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=4cc1b710:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=4cc1b710:5478
+dispatchEvent @ chunk-276SZO74.js?v=4cc1b710:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=4cc1b710:5449Understand this error
+Console.js:61 School creation error: Error: 500: {"message":"Failed to create school"}
+    at throwIfResNotOk (queryClient.ts:6:11)
+    at async apiRequest (queryClient.ts:22:3)
+    at async Object.mutationFn (add-school-modal.tsx:61:14)
+Mt.forEach.n.<computed> @ Console.js:61
+onError @ add-school-modal.tsx:73
+execute @ @tanstack_react-query.js?v=4cc1b710:1254
+await in execute
+mutate @ @tanstack_react-query.js?v=4cc1b710:2630
+(anonymous) @ @tanstack_react-query.js?v=4cc1b710:3295
+onSubmit @ add-school-modal.tsx:84
+(anonymous) @ chunk-YGCRICWC.js?v=4cc1b710:1465
+await in (anonymous)
+callCallback2 @ chunk-276SZO74.js?v=4cc1b710:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=4cc1b710:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=4cc1b710:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=4cc1b710:3736
+executeDispatch @ chunk-276SZO74.js?v=4cc1b710:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=4cc1b710:7034
+processDispatchQueue @ chunk-276SZO74.js?v=4cc1b710:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=4cc1b710:7051
+(anonymous) @ chunk-276SZO74.js?v=4cc1b710:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=4cc1b710:18913
+batchedUpdates @ chunk-276SZO74.js?v=4cc1b710:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=4cc1b710:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=4cc1b710:5478
+dispatchEvent @ chunk-276SZO74.js?v=4cc1b710:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=4cc1b710:5449Understand this error
+test-mode-api.ts:11  POST https://6dc94338-b6d5-4ffe-97c9-b97640f8e815-00-11m8y2ytfko6u.riker.replit.dev/api/schools 500 (Internal Server Error)
+window.fetch @ Network.js:219
+fetch @ test-mode-api.ts:11
+apiRequest @ queryClient.ts:15
+mutationFn @ add-school-modal.tsx:61
+fn @ @tanstack_react-query.js?v=4cc1b710:1189
+run @ @tanstack_react-query.js?v=4cc1b710:494
+start @ @tanstack_react-query.js?v=4cc1b710:536
+execute @ @tanstack_react-query.js?v=4cc1b710:1225
+await in execute
+mutate @ @tanstack_react-query.js?v=4cc1b710:2630
+(anonymous) @ @tanstack_react-query.js?v=4cc1b710:3295
+onSubmit @ add-school-modal.tsx:84
+(anonymous) @ chunk-YGCRICWC.js?v=4cc1b710:1465
+await in (anonymous)
+callCallback2 @ chunk-276SZO74.js?v=4cc1b710:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=4cc1b710:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=4cc1b710:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=4cc1b710:3736
+executeDispatch @ chunk-276SZO74.js?v=4cc1b710:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=4cc1b710:7034
+processDispatchQueue @ chunk-276SZO74.js?v=4cc1b710:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=4cc1b710:7051
+(anonymous) @ chunk-276SZO74.js?v=4cc1b710:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=4cc1b710:18913
+batchedUpdates @ chunk-276SZO74.js?v=4cc1b710:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=4cc1b710:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=4cc1b710:5478
+dispatchEvent @ chunk-276SZO74.js?v=4cc1b710:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=4cc1b710:5449Understand this error
+Console.js:61 School creation error: Error: 500: {"message":"Failed to create school"}
+    at throwIfResNotOk (queryClient.ts:6:11)
+    at async apiRequest (queryClient.ts:22:3)
+    at async Object.mutationFn (add-school-modal.tsx:61:14)

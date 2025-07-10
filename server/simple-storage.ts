@@ -592,8 +592,9 @@ export class SimpleAirtableStorage implements IStorage {
       if (school.email) createFields["School Email"] = school.email;
       if (school.website) createFields["Website"] = school.website;
       if (school.membershipStatus) createFields["Membership Status"] = school.membershipStatus;
-      if (school.ssjTargetCity) createFields["SSJ Target City"] = school.ssjTargetCity;
-      if (school.ssjTargetState) createFields["SSJ Target State"] = school.ssjTargetState;
+      // TODO: Add SSJ Target City/State fields with correct Airtable field names
+      // if (school.ssjTargetCity) createFields["SSJ Target City"] = school.ssjTargetCity;
+      // if (school.ssjTargetState) createFields["SSJ Target State"] = school.ssjTargetState;
       
       console.log("DEBUGGING: Sending fields to Airtable:", JSON.stringify(createFields, null, 2));
       const record = await base("Schools").create(createFields);
