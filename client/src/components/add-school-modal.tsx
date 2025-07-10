@@ -152,10 +152,9 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Member">Member</SelectItem>
-                        <SelectItem value="Prospective">Prospective</SelectItem>
-                        <SelectItem value="Former">Former</SelectItem>
-                        <SelectItem value="Partner">Partner</SelectItem>
+                        <SelectItem value="Member school">Member school</SelectItem>
+                        <SelectItem value="Affiliated non-member">Affiliated non-member</SelectItem>
+                        <SelectItem value="Membership terminated">Membership terminated</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
