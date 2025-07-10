@@ -113,8 +113,6 @@ const ActionsCellRenderer = (params: any) => {
 };
 
 export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
-  console.log('SchoolsGrid: received', schools?.length, 'schools');
-  console.log('SchoolsGrid: test schools', schools?.filter(s => (s.name || '').toLowerCase().includes('test')));
   const { toast } = useToast();
   const [viewportHeight, setViewportHeight] = useState<number>(0);
 
@@ -293,10 +291,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
             params.api.sizeColumnsToFit();
           }}
           animateRows={true}
-          rowSelection={{
-            mode: 'multiRow',
-            enableClickSelection: false
-          }}
+          rowSelection={false}
           enableBrowserTooltips={true}
           rowHeight={30}
         />

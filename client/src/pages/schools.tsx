@@ -30,9 +30,6 @@ export default function Schools() {
     };
   }, [setAddNewOptions]);
 
-  console.log('All schools loaded:', schools?.length);
-  console.log('Test schools found:', schools?.filter(s => (s.name || '').toLowerCase().includes('test')));
-
   const filteredSchools = (schools || []).filter((school: School) => {
     const searchTermLower = searchTerm.toLowerCase();
     const matchesSearch = (school.name || '').toLowerCase().includes(searchTermLower) ||

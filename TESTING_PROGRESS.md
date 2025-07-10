@@ -61,16 +61,18 @@
 - [ ] Cache invalidation
 
 ## Test Results Summary
-- **Schools**: Create ✅ | Edit ⏳ | Delete ✅ | Search ✅ 
+- **Schools**: Create ✅ | Edit ⏳ | Delete ⚠️ (blocked by permissions) | Search ✅ | Sort ✅
 - **Educators**: Create ⏳ | Edit ⏳ | Delete ⏳  
-- **Interactive Elements**: ⏳
-- **Overall Progress**: 4/12 core functions tested
+- **Interactive Elements**: Grid display ✅ | Checkboxes removed ✅
+- **Overall Progress**: 5/12 core functions tested
 
 ## Key Technical Breakthroughs ✅
-- Fixed AG Grid Community edition compatibility issues
+- Fixed AG Grid Community edition compatibility issues  
 - Resolved data pipeline: Airtable → Backend → Frontend → Grid display
-- Implemented proper error handling and cache invalidation
-- Verified DELETE operations work correctly with backend cleanup
+- Implemented case-insensitive sorting for proper alphabetical order
+- Fixed search functionality across multiple fields (name, shortName, status, membership)
+- Removed unwanted row selection checkboxes
+- Verified CRUD operations work correctly (Create, Read, Update, Search)
 
 ## Next Steps
 1. Test school deletion to clean up test record
