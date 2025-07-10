@@ -113,6 +113,8 @@ const ActionsCellRenderer = (params: any) => {
 };
 
 export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
+  console.log('SchoolsGrid: received', schools?.length, 'schools');
+  console.log('SchoolsGrid: test schools', schools?.filter(s => (s.name || '').toLowerCase().includes('test')));
   const { toast } = useToast();
   const [viewportHeight, setViewportHeight] = useState<number>(0);
 
@@ -167,6 +169,12 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       cellRenderer: CurrentTLsCellRenderer,
       sortable: false,
       filter: false,
+      valueFormatter: (params) => {
+        if (Array.isArray(params.value)) {
+          return params.value.join(', ');
+        }
+        return params.value || '';
+      },
     },
     {
       field: "agesServed",
@@ -174,7 +182,12 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       width: 140,
       cellRenderer: MultiValueCellRenderer,
       filter: "agTextColumnFilter",
-
+      valueFormatter: (params) => {
+        if (Array.isArray(params.value)) {
+          return params.value.join(', ');
+        }
+        return params.value || '';
+      },
     },
     {
       field: "governanceModel",
@@ -265,8 +278,10 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
             params.api.sizeColumnsToFit();
           }}
           animateRows={true}
-          rowSelection="multiple"
-          suppressRowClickSelection={true}
+          rowSelection={{
+            mode: 'multiRow',
+            enableClickSelection: false
+          }}
           enableBrowserTooltips={true}
           rowHeight={30}
         />
