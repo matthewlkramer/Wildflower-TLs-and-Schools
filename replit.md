@@ -186,6 +186,7 @@ Changelog:
 - July 10, 2025. Removed eyeball/open action button from notes table for cleaner interface - headlines remain clickable to open note details
 - July 10, 2025. Enhanced school detail view with UI improvements: removed startup badge from upper right area, fixed open date field mapping to use "Opened" Airtable field instead of "SSJ Projected Open", enhanced Timeline & Milestones card with Open Date field display, split Albums & Cohorts section into separate cards for better organization, added membership status field to Program Details section for comprehensive school information management
 - July 10, 2025. Cleaned up school details form: removed school calendar and school schedule fields from Program Details section at user request, simplifying the details tab layout
+- July 10, 2025. Fixed school creation functionality: resolved Airtable field mapping issues by correcting "Email" → "School Email", "Phone" → "School Phone", updated membership status dropdown to use actual Airtable values ("Member school", "Affiliated non-member", "Membership terminated"), temporarily removed problematic SSJ Target City/State fields, successfully tested school creation with real backend integration
 ```
 
 ## User Preferences
