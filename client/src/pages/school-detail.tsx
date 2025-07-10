@@ -2012,7 +2012,7 @@ export default function SchoolDetail() {
                     Guides
                   </TabsTrigger>
                   <TabsTrigger value="support" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
-                    Support
+                    SSJ
                   </TabsTrigger>
                   <TabsTrigger value="systems" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
                     Systems
@@ -3044,8 +3044,16 @@ export default function SchoolDetail() {
                           <p className="text-sm text-slate-900 mt-1">{school.visioningAlbum || '-'}</p>
                         </div>
                         <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Visioning Album Complete</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.visioningAlbumComplete ? 'Yes' : 'No'}</p>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Stage</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.ssjStage || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Ops Guide Track</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.opsGuideTrack || '-'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Readiness Rating</label>
+                          <p className="text-sm text-slate-900 mt-1">{school.readinessRating || '-'}</p>
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Cohorts</label>
