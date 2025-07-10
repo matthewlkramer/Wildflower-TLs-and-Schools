@@ -37,6 +37,7 @@ import { GoogleMap } from "@/components/google-map";
 function TeacherAssociationRow({ 
   association, 
   teacher,
+  school,
   isEditing, 
   onEdit, 
   onSave, 
@@ -47,6 +48,7 @@ function TeacherAssociationRow({
 }: {
   association: TeacherSchoolAssociation;
   teacher?: Teacher;
+  school: School;
   isEditing: boolean;
   onEdit: () => void;
   onSave: (data: any) => void;
@@ -96,6 +98,22 @@ function TeacherAssociationRow({
             onChange={(e) => setEditData(prev => ({ ...prev, role: e.target.value }))}
             placeholder="Role"
             className="h-8"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={association.role?.toString().includes('Founder') ? 'true' : 'false'}
+            disabled
+            placeholder="Founder"
+            className="h-8 bg-gray-50"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={school.email || ''}
+            disabled
+            placeholder="Email"
+            className="h-8 bg-gray-50"
           />
         </TableCell>
         <TableCell>
@@ -172,27 +190,55 @@ function TeacherAssociationRow({
           <div className="flex flex-wrap gap-1">
             {Array.isArray(association.role) ? (
               association.role.flatMap((roleString, arrayIndex) => 
-                roleString.split(',').map((role, roleIndex) => (
-                  <Badge key={`${arrayIndex}-${roleIndex}`} variant="secondary" className="text-xs">
-                    {role.trim()}
-                  </Badge>
-                ))
+                roleString.split(',').map((role, roleIndex) => {
+                  const trimmedRole = role.trim();
+                  // Filter out Founder role from display
+                  if (trimmedRole === 'Founder') return null;
+                  return (
+                    <Badge key={`${arrayIndex}-${roleIndex}`} variant="secondary" className="text-xs">
+                      {trimmedRole}
+                    </Badge>
+                  );
+                }).filter(Boolean)
               )
             ) : typeof association.role === 'string' ? (
-              association.role.split(',').map((role, index) => (
-                <Badge key={index} variant="secondary" className="text-xs">
-                  {role.trim()}
-                </Badge>
-              ))
+              association.role.split(',').map((role, index) => {
+                const trimmedRole = role.trim();
+                // Filter out Founder role from display
+                if (trimmedRole === 'Founder') return null;
+                return (
+                  <Badge key={index} variant="secondary" className="text-xs">
+                    {trimmedRole}
+                  </Badge>
+                );
+              }).filter(Boolean)
             ) : (
-              <Badge variant="secondary" className="text-xs">
-                {String(association.role)}
-              </Badge>
+              // Handle non-string roles, but still check if it's Founder
+              String(association.role) !== 'Founder' ? (
+                <Badge variant="secondary" className="text-xs">
+                  {String(association.role)}
+                </Badge>
+              ) : null
             )}
           </div>
         ) : (
           '-'
         )}
+      </TableCell>
+      <TableCell>
+        {/* Check if roles include Founder */}
+        {association.role ? (
+          Array.isArray(association.role) 
+            ? association.role.some(roleStr => roleStr.includes('Founder')) 
+              ? 'true' 
+              : 'false'
+            : association.role.toString().includes('Founder') 
+              ? 'true' 
+              : 'false'
+        ) : 'false'}
+      </TableCell>
+      <TableCell>
+        {school.email || '-'}
       </TableCell>
       <TableCell>{association.startDate || '-'}</TableCell>
       <TableCell>{association.endDate || '-'}</TableCell>
@@ -2468,6 +2514,8 @@ export default function SchoolDetail() {
                             <TableRow>
                               <TableHead>Name</TableHead>
                               <TableHead>Role(s)</TableHead>
+                              <TableHead>Founder</TableHead>
+                              <TableHead>Email</TableHead>
                               <TableHead>Start Date</TableHead>
                               <TableHead>End Date</TableHead>
                               <TableHead>Currently Active</TableHead>
@@ -2482,6 +2530,7 @@ export default function SchoolDetail() {
                                   key={association.id}
                                   association={association}
                                   teacher={teacher}
+                                  school={school}
                                   isEditing={editingAssociationId === association.id}
                                   onEdit={() => setEditingAssociationId(association.id)}
                                   onSave={(data) => updateAssociationMutation.mutate({ associationId: association.id, data })}
