@@ -146,6 +146,11 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
         suppressAndOrCondition: true,
       },
       valueGetter: (params) => params.data.shortName || params.data.name,
+      comparator: (valueA: string, valueB: string) => {
+        const a = (valueA || '').toLowerCase();
+        const b = (valueB || '').toLowerCase();
+        return a.localeCompare(b);
+      },
       sort: 'asc',
     },
     {
@@ -154,6 +159,11 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       width: 140,
       cellRenderer: StatusBadgeCellRenderer,
       filter: "agTextColumnFilter",
+      comparator: (valueA: string, valueB: string) => {
+        const a = (valueA || '').toLowerCase();
+        const b = (valueB || '').toLowerCase();
+        return a.localeCompare(b);
+      },
     },
     {
       field: "membershipStatus",
@@ -161,6 +171,11 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       width: 160,
       cellRenderer: MembershipStatusCellRenderer,
       filter: "agTextColumnFilter",
+      comparator: (valueA: string, valueB: string) => {
+        const a = (valueA || '').toLowerCase();
+        const b = (valueB || '').toLowerCase();
+        return a.localeCompare(b);
+      },
     },
     {
       field: "currentTLs",

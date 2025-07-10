@@ -232,6 +232,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!success) {
         return res.status(404).json({ message: "School not found" });
       }
+      
+      // Invalidate cache after successful deletion
+      cache.invalidate('schools:all');
+      
       res.json({ message: "School deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete school" });
