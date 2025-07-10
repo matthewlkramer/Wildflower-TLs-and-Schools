@@ -27,6 +27,9 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const { showOnlyMyRecords, setShowOnlyMyRecords } = useUserFilter();
 
+  // Debug logging
+  console.log('Header component: addNewOptions =', addNewOptions);
+
   const isDashboardActive = location === "/" || location === "/dashboard";
   const isTeachersActive = location === "/teachers" || location.startsWith("/teacher/");
   const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
