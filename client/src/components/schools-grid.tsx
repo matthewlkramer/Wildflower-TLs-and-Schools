@@ -173,18 +173,8 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       headerName: "Ages Served",
       width: 140,
       cellRenderer: MultiValueCellRenderer,
-      filter: "agSetColumnFilter",
-      filterParams: {
-        values: () => {
-          const allValues = new Set<string>();
-          schools.forEach(school => {
-            if (school.agesServed) {
-              school.agesServed.forEach(age => allValues.add(age));
-            }
-          });
-          return Array.from(allValues);
-        }
-      },
+      filter: "agTextColumnFilter",
+
     },
     {
       field: "governanceModel",
@@ -252,21 +242,33 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
     );
   }
 
+  if (!schools || schools.length === 0) {
+    return (
+      <div className="w-full min-h-[280px]" style={{ height: getGridHeight() }}>
+        <div className="ag-theme-alpine h-full">
+          <div className="flex items-center justify-center h-full">
+            <div className="text-slate-500">No schools found</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full min-h-[280px]" style={{ height: getGridHeight() }}>
-      <div className="h-full">
+      <div className="ag-theme-material h-full">
         <AgGridReact
-          theme={themeMaterial}
           rowData={schools}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          onGridReady={onGridReady}
+          onGridReady={(params) => {
+            params.api.sizeColumnsToFit();
+          }}
           animateRows={true}
           rowSelection="multiple"
           suppressRowClickSelection={true}
           enableBrowserTooltips={true}
           rowHeight={30}
-
         />
       </div>
     </div>
