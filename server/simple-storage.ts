@@ -554,15 +554,10 @@ export class SimpleAirtableStorage implements IStorage {
 
     try {
       const records = await base("Schools").select().all();
-      console.log(`Processing ${records.length} school records from Airtable`);
       
-      const schools = records.map((record, index) => {
+      const schools = records.map(record => {
         try {
-          const transformed = this.transformSchoolRecord(record);
-          if (record.fields["Name"]?.includes("test")) {
-            console.log(`Test school ${index}: ${record.id} - ${record.fields["Name"]} -> transformed successfully`);
-          }
-          return transformed;
+          return this.transformSchoolRecord(record);
         } catch (error) {
           console.error(`Error transforming school ${record.id} (${record.fields["Name"]}):`, error);
           // Return a minimal school object to prevent dropping

@@ -30,11 +30,6 @@ export default function Schools() {
     };
   }, [setAddNewOptions]);
 
-  // Debug: log the raw data
-  console.log('Raw schools data:', schools?.length, 'schools loaded');
-  console.log('Search term:', searchTerm);
-  console.log('Schools with "test":', schools?.filter(s => (s.name || '').toLowerCase().includes('test')));
-
   const filteredSchools = (schools || []).filter((school: School) => {
     const searchTermLower = searchTerm.toLowerCase();
     const matchesSearch = (school.name || '').toLowerCase().includes(searchTermLower) ||
