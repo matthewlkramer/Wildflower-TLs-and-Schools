@@ -101,18 +101,26 @@ function TeacherAssociationRow({
           />
         </TableCell>
         <TableCell>
-          <Input
-            value={association.role?.toString().includes('Founder') ? 'true' : 'false'}
-            disabled
-            placeholder="Founder"
-            className="h-8 bg-gray-50"
-          />
+          <Badge 
+            variant={association.role?.toString().includes('Founder') ? "default" : "secondary"}
+            className={association.role?.toString().includes('Founder') ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+          >
+            {association.role?.toString().includes('Founder') ? 'Yes' : 'No'}
+          </Badge>
         </TableCell>
         <TableCell>
           <Input
             value={school.email || ''}
             disabled
             placeholder="Email"
+            className="h-8 bg-gray-50"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={school.phone || ''}
+            disabled
+            placeholder="Phone"
             className="h-8 bg-gray-50"
           />
         </TableCell>
@@ -226,19 +234,39 @@ function TeacherAssociationRow({
         )}
       </TableCell>
       <TableCell>
-        {/* Check if roles include Founder */}
-        {association.role ? (
-          Array.isArray(association.role) 
-            ? association.role.some(roleStr => roleStr.includes('Founder')) 
-              ? 'true' 
-              : 'false'
-            : association.role.toString().includes('Founder') 
-              ? 'true' 
-              : 'false'
-        ) : 'false'}
+        {/* Check if roles include Founder and display as badge */}
+        <Badge 
+          variant={
+            association.role ? (
+              Array.isArray(association.role) 
+                ? association.role.some(roleStr => roleStr.includes('Founder'))
+                : association.role.toString().includes('Founder')
+            ) ? "default" : "secondary" : "secondary"
+          }
+          className={
+            association.role ? (
+              Array.isArray(association.role) 
+                ? association.role.some(roleStr => roleStr.includes('Founder'))
+                : association.role.toString().includes('Founder')
+            ) ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800" : "bg-gray-100 text-gray-800"
+          }
+        >
+          {association.role ? (
+            Array.isArray(association.role) 
+              ? association.role.some(roleStr => roleStr.includes('Founder')) 
+                ? 'Yes' 
+                : 'No'
+              : association.role.toString().includes('Founder') 
+                ? 'Yes' 
+                : 'No'
+          ) : 'No'}
+        </Badge>
       </TableCell>
       <TableCell>
         {school.email || '-'}
+      </TableCell>
+      <TableCell>
+        {school.phone || '-'}
       </TableCell>
       <TableCell>{association.startDate || '-'}</TableCell>
       <TableCell>{association.endDate || '-'}</TableCell>
@@ -2516,6 +2544,7 @@ export default function SchoolDetail() {
                               <TableHead>Role(s)</TableHead>
                               <TableHead>Founder</TableHead>
                               <TableHead>Email</TableHead>
+                              <TableHead>Phone</TableHead>
                               <TableHead>Start Date</TableHead>
                               <TableHead>End Date</TableHead>
                               <TableHead>Currently Active</TableHead>
@@ -2935,38 +2964,7 @@ export default function SchoolDetail() {
 
                 <TabsContent value="support" className="mt-0">
                   <div className="space-y-6">
-                    {/* School Support Journey Overview */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        School Support Journey Overview
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
-                          <label className="text-xs font-medium text-blue-600 uppercase tracking-wider">SSJ Tool</label>
-                          <p className="text-sm font-semibold text-blue-900 mt-1">{school.ssjTool || 'Not specified'}</p>
-                        </div>
-                        <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-                          <label className="text-xs font-medium text-green-600 uppercase tracking-wider">Stage</label>
-                          <p className="text-sm font-semibold text-green-900 mt-1">{school.ssjStage || 'Not specified'}</p>
-                        </div>
-                        <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
-                          <label className="text-xs font-medium text-purple-600 uppercase tracking-wider">Ops Guide Track</label>
-                          <p className="text-sm font-semibold text-purple-900 mt-1">
-                            {school.ssjOpsGuideTrack && school.ssjOpsGuideTrack.length > 0 
-                              ? school.ssjOpsGuideTrack.join(', ') 
-                              : 'Not specified'
-                            }
-                          </p>
-                        </div>
-                        <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
-                          <label className="text-xs font-medium text-orange-600 uppercase tracking-wider">Readiness Rating</label>
-                          <p className="text-sm font-semibold text-orange-900 mt-1">{school.ssjReadinessRating || 'Not specified'}</p>
-                        </div>
-                      </div>
-                    </div>
+                    {/* Timeline & Milestones */}
 
                     {/* Timeline & Milestones */}
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -3004,33 +3002,7 @@ export default function SchoolDetail() {
                       </div>
                     </div>
 
-                    {/* Facility & Infrastructure */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                        Facility & Infrastructure
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">SSJ Facility</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjFacility || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">B4G Status</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjB4GStatus || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Date Shared with N4G</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjDateSharedWithN4G || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Building4Good Firm</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.building4GoodFirm || '-'}</p>
-                        </div>
-                      </div>
-                    </div>
+                    
 
                     {/* Funding & Financial */}
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -3040,30 +3012,16 @@ export default function SchoolDetail() {
                         </svg>
                         Funding & Financial Planning
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 gap-4">
                         <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Funding Gap</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjFundingGap || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Amount Raised</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjAmountRaised || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Loan Approved Amount</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjLoanApprovedAmount || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Loan Eligibility</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjLoanEligibility || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Viable Funding Path</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjViableFundingPath || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Startup Funding Required</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjTotalStartupFundingReq || '-'}</p>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Budget Link</label>
+                          {school.budgetLink ? (
+                            <a href={school.budgetLink} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline mt-1 block">
+                              {school.budgetLink}
+                            </a>
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">-</p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -3212,18 +3170,7 @@ export default function SchoolDetail() {
                                 <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.googleWorkspacePath || '-'}</p>
                               )}
                             </div>
-                            <div>
-                              <label className="text-sm font-medium text-slate-600 block mb-1">Budget Link</label>
-                              {editingSystemsComm ? (
-                                <Input
-                                  value={editFormData.budgetLink || ''}
-                                  onChange={(e) => setEditFormData({...editFormData, budgetLink: e.target.value})}
-                                  className="text-sm"
-                                />
-                              ) : (
-                                <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{school.budgetLink || '-'}</p>
-                              )}
-                            </div>
+
                           </div>
                         </div>
                       </div>
