@@ -69,10 +69,12 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
       form.reset();
       onOpenChange(false);
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("School creation error:", error);
+      const errorMessage = error?.message || error?.response?.data?.message || "Failed to create school";
       toast({
         title: "Error",
-        description: "Failed to create school",
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -231,7 +233,7 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
                   <FormItem>
                     <FormLabel>Website</FormLabel>
                     <FormControl>
-                      <Input {...field} type="url" placeholder="Enter website URL" />
+                      <Input {...field} type="text" placeholder="Enter website (e.g., example.com)" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

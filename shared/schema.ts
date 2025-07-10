@@ -537,7 +537,7 @@ export const schoolSchema = z.object({
   targetCommunity: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().email("Invalid email format").optional().or(z.literal("")),
-  website: z.string().url("Invalid URL format").optional().or(z.literal("")),
+  website: z.string().optional().or(z.literal("")),
   instagram: z.string().optional(),
   facebook: z.string().optional(),
   narrative: z.string().optional(),
