@@ -588,8 +588,8 @@ export class SimpleAirtableStorage implements IStorage {
       if (school.agesServed && school.agesServed.length > 0) createFields["Ages Served"] = school.agesServed;
       if (school.governanceModel) createFields["Governance Model"] = school.governanceModel;
       if (school.about) createFields["About"] = school.about;
-      if (school.phone) createFields["Phone"] = school.phone;
-      if (school.email) createFields["Email"] = school.email;
+      if (school.phone) createFields["Shool Phone"] = school.phone;
+      if (school.email) createFields["School Email"] = school.email;
       if (school.website) createFields["Website"] = school.website;
       if (school.membershipStatus) createFields["Membership Status"] = school.membershipStatus;
       if (school.ssjTargetCity) createFields["SSJ Target City"] = school.ssjTargetCity;
