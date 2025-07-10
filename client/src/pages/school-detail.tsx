@@ -2385,7 +2385,7 @@ export default function SchoolDetail() {
                       <div className="mb-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Email</label>
+                            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">General School Email</label>
                             <p className="text-sm text-slate-900 mt-1">{school.email || '-'}</p>
                           </div>
                           <div>
