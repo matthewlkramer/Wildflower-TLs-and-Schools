@@ -32,8 +32,10 @@ export function useCachedSchools() {
   
   const query = useQuery({
     queryKey: ["/api/schools"],
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
+    staleTime: 0, // Force fresh data every time
+    gcTime: 0, // Don't cache
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   // Prefetch school details when hovering over a row
