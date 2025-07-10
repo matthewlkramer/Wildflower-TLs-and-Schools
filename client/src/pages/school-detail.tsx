@@ -2383,7 +2383,6 @@ export default function SchoolDetail() {
                       
                       {/* Primary Contact */}
                       <div className="mb-6">
-                        <h4 className="text-sm font-medium text-slate-700 mb-3">Primary Contact</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Email</label>
