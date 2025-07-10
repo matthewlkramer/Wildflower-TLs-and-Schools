@@ -3,10 +3,12 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
 import { UserFilterProvider } from "@/contexts/user-filter-context";
+import { TestModeToggle } from "@/components/TestModeToggle";
+import { setupTestModeApi } from "@/lib/test-mode-api";
 import Dashboard from "@/pages/dashboard";
 import Teachers from "@/pages/teachers";
 import Schools from "@/pages/schools";
@@ -80,6 +82,7 @@ function AppContent() {
       <PageTitleContext.Provider value={{ pageTitle, setPageTitle }}>
         <AddNewContext.Provider value={{ addNewOptions, setAddNewOptions }}>
           <div className="min-h-screen bg-slate-50">
+            <TestModeToggle />
             <Header 
               searchTerm={searchTerm} 
               onSearchChange={setSearchTerm}
@@ -96,6 +99,12 @@ function AppContent() {
 }
 
 function App() {
+  useEffect(() => {
+    // Set up test mode API wrapper
+    const cleanup = setupTestModeApi();
+    return cleanup;
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
