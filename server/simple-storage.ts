@@ -554,11 +554,41 @@ export class SimpleAirtableStorage implements IStorage {
 
     try {
       const records = await base("Schools").select().all();
-      const schools = records.map(record => this.transformSchoolRecord(record));
+      console.log(`Processing ${records.length} school records from Airtable`);
+      
+      const schools = records.map((record, index) => {
+        try {
+          const transformed = this.transformSchoolRecord(record);
+          if (record.fields["Name"]?.includes("test")) {
+            console.log(`Test school ${index}: ${record.id} - ${record.fields["Name"]} -> transformed successfully`);
+          }
+          return transformed;
+        } catch (error) {
+          console.error(`Error transforming school ${record.id} (${record.fields["Name"]}):`, error);
+          // Return a minimal school object to prevent dropping
+          return {
+            id: record.id,
+            name: record.fields["Name"] || "Unknown",
+            shortName: record.fields["Short Name"] || undefined,
+            locality: "",
+            membershipStatus: "",
+            status: "",
+            stageStatus: "",
+            currentTLs: [],
+            currentGuides: [],
+            publicFundingSources: [],
+            riskFactors: [],
+            watchlist: [],
+            errors: [],
+            cohorts: [],
+            founders: [],
+          } as School;
+        }
+      });
       
       // Cache the results
       cache.set(cacheKey, schools);
-      console.log('[Cache Miss] Schools - fetched from Airtable');
+      console.log(`[Cache Miss] Schools - fetched ${schools.length} schools from Airtable`);
       
       return schools;
     } catch (error) {
@@ -597,6 +627,9 @@ export class SimpleAirtableStorage implements IStorage {
       // if (school.ssjTargetState) createFields["SSJ Target State"] = school.ssjTargetState;
       
       const record = await base("Schools").create(createFields);
+      
+      // Invalidate cache immediately after creation
+      cache.invalidate('schools:all');
       
       return this.transformSchoolRecord(record);
     } catch (error) {

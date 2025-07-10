@@ -54,10 +54,18 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
     mutationFn: async (data: any) => {
       return await apiRequest("POST", "/api/schools", data);
     },
-    onSuccess: () => {
-      // Force immediate cache refresh
+    onSuccess: async () => {
+      // Clear server-side cache first
+      try {
+        await fetch('/api/cache/clear', { method: 'POST' });
+      } catch (e) {
+        console.log('Cache clear failed:', e);
+      }
+      
+      // Force immediate cache refresh on frontend
       queryClient.invalidateQueries({ queryKey: ["/api/schools"] });
-      queryClient.refetchQueries({ queryKey: ["/api/schools"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/schools"] });
+      
       toast({
         title: "Success",
         description: "School created successfully",
