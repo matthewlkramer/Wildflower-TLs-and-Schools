@@ -1,11 +1,14 @@
 import { getTestMode } from '@/components/TestModeToggle';
 
+// Store the original fetch function
+let originalFetch: typeof fetch;
+
 // Test mode API wrapper that simulates operations without actually calling the server
 export const testModeApiWrapper = {
   async fetch(url: string, options?: RequestInit): Promise<Response> {
     if (!getTestMode()) {
-      // Normal mode - make real API call
-      return fetch(url, options);
+      // Normal mode - make real API call using original fetch
+      return originalFetch(url, options);
     }
 
     // Test mode - simulate responses
@@ -16,7 +19,7 @@ export const testModeApiWrapper = {
 
     if (method === 'GET') {
       // For GET requests, make the real call to show existing data
-      return fetch(url, options);
+      return originalFetch(url, options);
     }
 
     // For POST, PUT, PATCH, DELETE - simulate success responses
@@ -91,8 +94,8 @@ function getSimulatedData(url: string) {
 
 // Override global fetch in test mode
 export function setupTestModeApi() {
-  // Store original fetch
-  const originalFetch = window.fetch;
+  // Store original fetch globally so wrapper can use it
+  originalFetch = window.fetch;
   
   // Override with test mode wrapper
   window.fetch = testModeApiWrapper.fetch;
