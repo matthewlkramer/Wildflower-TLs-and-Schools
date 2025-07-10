@@ -27,10 +27,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const { showOnlyMyRecords, setShowOnlyMyRecords } = useUserFilter();
 
-  // Debug logging
-  console.log('Header component: addNewOptions =', addNewOptions);
-  console.log('Header component: addNewOptions length =', addNewOptions?.length);
-  console.log('Header component: first option has onClick =', addNewOptions?.[0]?.onClick ? 'YES' : 'NO');
+
 
   const isDashboardActive = location === "/" || location === "/dashboard";
   const isTeachersActive = location === "/teachers" || location.startsWith("/teacher/");

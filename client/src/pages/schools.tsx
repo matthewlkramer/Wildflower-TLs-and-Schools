@@ -18,16 +18,12 @@ export default function Schools() {
 
   // Set up Add New button in header
   useEffect(() => {
-    console.log('Schools component: Setting up Add New options');
     setAddNewOptions([
       { label: "Add School", onClick: () => setAddSchoolModalOpen(true) }
     ]);
 
     // Cleanup - remove options when component unmounts
-    return () => {
-      console.log('Schools component: Cleaning up Add New options');
-      setAddNewOptions([]);
-    };
+    return () => setAddNewOptions([]);
   }, [setAddNewOptions]);
 
   const filteredSchools = (schools || []).filter((school: School) => {
