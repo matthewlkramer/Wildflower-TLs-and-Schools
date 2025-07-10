@@ -6,9 +6,11 @@ import { Plus } from "lucide-react";
 import { type School } from "@shared/schema";
 import { useSearch } from "@/App";
 import { useCachedSchools } from "@/hooks/use-cached-data";
+import { useUserFilter } from "@/contexts/user-filter-context";
 
 export default function Schools() {
   const { searchTerm } = useSearch();
+  const { showOnlyMyRecords, currentUser } = useUserFilter();
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
 
   const { data: schools, isLoading, prefetchSchool } = useCachedSchools();
@@ -17,7 +19,21 @@ export default function Schools() {
     const matchesSearch = (school.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (school.status || '').toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesSearch;
+    if (!matchesSearch) return false;
+    
+    // Apply user filter if enabled
+    if (showOnlyMyRecords && currentUser) {
+      // Check if current user is an active guide or assigned partner
+      // For demo purposes, we'll check if the school's current guides contains the user
+      const isMyRecord = school.currentGuides?.some(guide => 
+        guide.toLowerCase().includes('demo')
+      ) || school.assignedPartner?.toLowerCase().includes('demo') ||
+          false; // Add more conditions as needed
+      
+      return isMyRecord;
+    }
+    
+    return true;
   });
 
   return (

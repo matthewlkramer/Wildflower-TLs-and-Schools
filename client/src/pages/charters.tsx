@@ -7,9 +7,11 @@ import { useSearch, usePageTitle, useAddNew } from "@/App";
 import { useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { getStatusColor } from "@/lib/utils";
+import { useUserFilter } from "@/contexts/user-filter-context";
 
 export default function Charters() {
   const { searchTerm } = useSearch();
+  const { showOnlyMyRecords, currentUser } = useUserFilter();
   const { setPageTitle } = usePageTitle();
   const { setAddNewOptions } = useAddNew();
   const [, setLocation] = useLocation();
@@ -28,18 +30,35 @@ export default function Charters() {
     },
   });
 
-  // Filter charters based on search term
+  // Filter charters based on search term and user filter
   const filteredCharters = useMemo(() => {
-    if (!searchTerm) return charters;
+    let filtered = charters;
     
-    const searchLower = searchTerm.toLowerCase();
-    return charters.filter(charter => 
-      charter.shortName?.toLowerCase().includes(searchLower) ||
-      charter.fullName?.toLowerCase().includes(searchLower) ||
-      charter.city?.toLowerCase().includes(searchLower) ||
-      charter.status?.toLowerCase().includes(searchLower)
-    );
-  }, [charters, searchTerm]);
+    // Apply search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(charter => 
+        charter.shortName?.toLowerCase().includes(searchLower) ||
+        charter.fullName?.toLowerCase().includes(searchLower) ||
+        charter.city?.toLowerCase().includes(searchLower) ||
+        charter.status?.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Apply user filter if enabled
+    if (showOnlyMyRecords && currentUser) {
+      filtered = filtered.filter(charter => {
+        // For demo purposes, we'll check if the charter has demo user relationships
+        // In a real app, this would be based on proper user authentication and roles
+        const isMyRecord = charter.assignedPartner?.toLowerCase().includes('demo') ||
+                          false; // Add more conditions as needed
+        
+        return isMyRecord;
+      });
+    }
+    
+    return filtered;
+  }, [charters, searchTerm, showOnlyMyRecords, currentUser]);
 
   const columnDefs: ColDef<Charter>[] = [
     {

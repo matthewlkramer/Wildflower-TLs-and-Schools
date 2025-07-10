@@ -3,10 +3,13 @@ import { Plus, User, Search, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import AddEducatorModal from "./add-teacher-modal";
 import AddSchoolModal from "./add-school-modal";
 import { WildflowerLogo } from "./wildflower-logo";
+import { useUserFilter } from "@/contexts/user-filter-context";
 
 interface HeaderProps {
   searchTerm?: string;
@@ -22,6 +25,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const [location] = useLocation();
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
+  const { showOnlyMyRecords, setShowOnlyMyRecords } = useUserFilter();
 
   const isTeachersActive = location === "/" || location === "/teachers" || location.startsWith("/teacher/");
   const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
@@ -147,6 +151,20 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                     <span className="hidden sm:inline">Add New</span>
                   </Button>
                 )}
+                
+                {/* User Filter Toggle */}
+                <div className="flex items-center space-x-2 flex-shrink-0">
+                  <Switch
+                    id="user-filter"
+                    checked={showOnlyMyRecords}
+                    onCheckedChange={setShowOnlyMyRecords}
+                    className="data-[state=checked]:bg-wildflower-blue"
+                  />
+                  <Label htmlFor="user-filter" className="text-xs text-slate-600 whitespace-nowrap cursor-pointer">
+                    My records
+                  </Label>
+                </div>
+                
                 <div className="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center flex-shrink-0">
                   <User className="h-4 w-4 text-slate-600" />
                 </div>

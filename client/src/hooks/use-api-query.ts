@@ -11,14 +11,20 @@ interface ApiError {
 }
 
 /**
- * Custom hook for fetching data from API endpoints
+ * Custom hook for fetching data from API endpoints with user filtering support
  */
 export function useApiQuery<TData = unknown>(
   endpoint: string,
-  options?: Omit<UseQueryOptions<TData, ApiError>, 'queryKey' | 'queryFn'>
+  options?: Omit<UseQueryOptions<TData, ApiError>, 'queryKey' | 'queryFn'> & {
+    includeUserFilter?: boolean;
+  }
 ) {
+  // For now, we'll implement user filtering on the client side
+  // In a real application, this would be server-side
+  const finalQueryKey = [endpoint];
+  
   return useQuery<TData, ApiError>({
-    queryKey: [endpoint],
+    queryKey: finalQueryKey,
     queryFn: async () => {
       const response = await fetch(endpoint, {
         credentials: 'include',

@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState, createContext, useContext } from "react";
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
+import { UserFilterProvider } from "@/contexts/user-filter-context";
 import Teachers from "@/pages/teachers";
 import Schools from "@/pages/schools";
 import Charters from "@/pages/charters";
@@ -95,7 +96,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AppContent />
+        <UserFilterProvider>
+          <AppContent />
+        </UserFilterProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

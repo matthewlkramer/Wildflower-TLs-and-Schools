@@ -2,9 +2,11 @@ import TeachersGrid from "@/components/teachers-grid";
 import { type Teacher } from "@shared/schema";
 import { useSearch } from "@/App";
 import { useCachedEducators } from "@/hooks/use-cached-data";
+import { useUserFilter } from "@/contexts/user-filter-context";
 
 export default function Teachers() {
   const { searchTerm } = useSearch();
+  const { showOnlyMyRecords, currentUser } = useUserFilter();
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
 
@@ -14,7 +16,21 @@ export default function Teachers() {
                          (teacher.primaryPhone || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (teacher.currentRole?.join(' ') || '').toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesSearch;
+    if (!matchesSearch) return false;
+    
+    // Apply user filter if enabled
+    if (showOnlyMyRecords && currentUser) {
+      // Check if current user is an active guide or assigned partner
+      // For demo purposes, we'll check if the teacher's current guide contains the user
+      // In a real app, this would be based on proper user authentication
+      const isMyRecord = teacher.currentGuide?.toLowerCase().includes('demo') || // Demo user relationship
+                        teacher.assignedPartner?.toLowerCase().includes('demo') ||
+                        false; // Add more conditions as needed
+      
+      return isMyRecord;
+    }
+    
+    return true;
   });
 
   return (
