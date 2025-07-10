@@ -2401,8 +2401,6 @@ export default function SchoolDetail() {
                             setIsEditingDetails(true);
                             setEditedDetails({
                               programFocus: school?.programFocus || '',
-                              schoolCalendar: school?.schoolCalendar || '',
-                              schoolSchedule: school?.schoolSchedule || '',
                               agesServed: school?.agesServed || [],
                               numberOfClassrooms: school?.numberOfClassrooms || '',
                               enrollmentCap: school?.enrollmentCap || '',
@@ -2444,32 +2442,6 @@ export default function SchoolDetail() {
                             />
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.programFocus || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">School Calendar</label>
-                          {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
-                              value={editedDetails?.schoolCalendar || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, schoolCalendar: e.target.value })}
-                            />
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.schoolCalendar || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">School Schedule</label>
-                          {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
-                              value={editedDetails?.schoolSchedule || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, schoolSchedule: e.target.value })}
-                            />
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.schoolSchedule || '-'}</p>
                           )}
                         </div>
                         <div>
