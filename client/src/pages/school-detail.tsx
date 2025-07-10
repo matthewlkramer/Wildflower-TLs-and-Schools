@@ -2379,7 +2379,7 @@ export default function SchoolDetail() {
 
                     {/* Contact Information & Communications Section */}
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4">Contact Information & Communications</h3>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4">School Contact Information & Communications</h3>
                       
                       {/* Primary Contact */}
                       <div className="mb-6">
@@ -4121,7 +4121,6 @@ export default function SchoolDetail() {
           </CardContent>
         </Card>
       </main>
-
       <DeleteConfirmationModal
         open={showDeleteModal}
         onOpenChange={setShowDeleteModal}
@@ -4130,7 +4129,6 @@ export default function SchoolDetail() {
         description="Are you sure you want to delete this school? This action cannot be undone."
         isLoading={deleteSchoolMutation.isPending}
       />
-
       <DeleteConfirmationModal
         open={locationDeleteModalOpen}
         onOpenChange={setLocationDeleteModalOpen}
@@ -4143,7 +4141,6 @@ export default function SchoolDetail() {
         description="Are you sure you want to delete this location? This action cannot be undone."
         isLoading={deleteLocationMutation.isPending}
       />
-
       <DeleteConfirmationModal
         open={associationDeleteModalOpen}
         onOpenChange={setAssociationDeleteModalOpen}
@@ -4156,7 +4153,6 @@ export default function SchoolDetail() {
         description="Are you sure you want to delete this teacher stint? This action cannot be undone."
         isLoading={deleteAssociationMutation.isPending}
       />
-
       <DeleteConfirmationModal
         open={guideDeleteModalOpen}
         onOpenChange={setGuideDeleteModalOpen}
@@ -4169,7 +4165,6 @@ export default function SchoolDetail() {
         description="Are you sure you want to delete this guide assignment? This action cannot be undone."
         isLoading={deleteGuideAssignmentMutation.isPending}
       />
-
       <DeleteConfirmationModal
         open={documentDeleteModalOpen}
         onOpenChange={setDocumentDeleteModalOpen}
@@ -4182,7 +4177,6 @@ export default function SchoolDetail() {
         description="Are you sure you want to delete this governance document? This action cannot be undone."
         isLoading={deleteGovernanceDocumentMutation.isPending}
       />
-
       <DeleteConfirmationModal
         open={tax990DeleteModalOpen}
         onOpenChange={setTax990DeleteModalOpen}
@@ -4195,7 +4189,6 @@ export default function SchoolDetail() {
         description="Are you sure you want to delete this 990 record? This action cannot be undone."
         isLoading={deleteTax990Mutation.isPending}
       />
-
       {/* Note View Modal */}
       {selectedNote && (
         <Dialog open={!!selectedNote} onOpenChange={() => setSelectedNote(null)}>
@@ -4251,7 +4244,6 @@ export default function SchoolDetail() {
           </DialogContent>
         </Dialog>
       )}
-
       {/* Action Step View Modal */}
       {selectedActionStep && (
         <Dialog open={!!selectedActionStep} onOpenChange={() => setSelectedActionStep(null)}>
