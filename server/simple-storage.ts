@@ -365,7 +365,7 @@ export class SimpleAirtableStorage implements IStorage {
         : fields['SSJ - Target City']
           ? `${fields['SSJ - Target City']}${fields['SSJ - Target State'] ? ', ' + fields['SSJ - Target State'] : ''}`
           : ''),
-      phone: fields["Shool Phone"] || undefined,
+      phone: fields["School Phone"] || undefined,
       email: fields["School Email"] || undefined,
       website: fields["Website"] || undefined,
       instagram: fields["Instagram"] || undefined,
@@ -588,7 +588,7 @@ export class SimpleAirtableStorage implements IStorage {
       if (school.agesServed && school.agesServed.length > 0) createFields["Ages Served"] = school.agesServed;
       if (school.governanceModel) createFields["Governance Model"] = school.governanceModel;
       if (school.about) createFields["About"] = school.about;
-      if (school.phone) createFields["Shool Phone"] = school.phone;
+      if (school.phone) createFields["School Phone"] = school.phone;
       if (school.email) createFields["School Email"] = school.email;
       if (school.website) createFields["Website"] = school.website;
       if (school.membershipStatus) createFields["Membership Status"] = school.membershipStatus;
