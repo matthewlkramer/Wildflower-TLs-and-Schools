@@ -222,11 +222,9 @@ function TeacherAssociationRow({
               }).filter(Boolean)
             ) : (
               // Handle non-string roles, but still check if it's Founder
-              String(association.role) !== 'Founder' ? (
-                <Badge variant="secondary" className="text-xs">
-                  {String(association.role)}
-                </Badge>
-              ) : null
+              (String(association.role) !== 'Founder' ? (<Badge variant="secondary" className="text-xs">
+                {String(association.role)}
+              </Badge>) : null)
             )}
           </div>
         ) : (
@@ -2210,7 +2208,7 @@ export default function SchoolDetail() {
                       {/* Contact Info Card */}
                       <Card className="shadow-sm">
                         <CardHeader>
-                          <CardTitle className="text-lg">Contact Info</CardTitle>
+                          <CardTitle className="text-lg">School General Contact Info</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                           <div>
