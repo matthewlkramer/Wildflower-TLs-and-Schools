@@ -31,8 +31,11 @@ export default function Schools() {
   }, [setAddNewOptions]);
 
   const filteredSchools = (schools || []).filter((school: School) => {
-    const matchesSearch = (school.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (school.status || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const searchTermLower = searchTerm.toLowerCase();
+    const matchesSearch = (school.name || '').toLowerCase().includes(searchTermLower) ||
+                         (school.shortName || '').toLowerCase().includes(searchTermLower) ||
+                         (school.status || '').toLowerCase().includes(searchTermLower) ||
+                         (school.membershipStatus || '').toLowerCase().includes(searchTermLower);
     
     if (!matchesSearch) return false;
     

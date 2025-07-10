@@ -963,7 +963,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Cache statistics endpoint for monitoring
+  // Cache management endpoints
   app.get("/api/cache/stats", async (req, res) => {
     try {
       const stats = cache.getStats();
@@ -974,6 +974,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to get cache statistics" });
+    }
+  });
+
+  app.post("/api/cache/clear", async (req, res) => {
+    try {
+      cache.invalidate();
+      res.json({ message: "Cache cleared successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to clear cache" });
     }
   });
 
