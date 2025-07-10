@@ -1339,6 +1339,8 @@ export default function SchoolDetail() {
     status: "",
     interestRate: 0,
   });
+  const [isEditingDetails, setIsEditingDetails] = useState(false);
+  const [editedDetails, setEditedDetails] = useState<any>(null);
 
   const { toast } = useToast();
 
@@ -1547,6 +1549,29 @@ export default function SchoolDetail() {
       toast({
         title: "Error",
         description: "Failed to update school",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateSchoolDetailsMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest("PUT", `/api/schools/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/schools"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/schools", id] });
+      setIsEditingDetails(false);
+      setEditedDetails(null);
+      toast({
+        title: "Success",
+        description: "School details updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update school details",
         variant: "destructive",
       });
     },
@@ -2352,6 +2377,65 @@ export default function SchoolDetail() {
 
                 <TabsContent value="details" className="mt-0">
                   <div className="space-y-6">
+                    {/* Edit Button for Details Tab */}
+                    <div className="flex justify-end gap-2">
+                      {isEditingDetails ? (
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              updateSchoolDetailsMutation.mutate(editedDetails);
+                            }}
+                            disabled={updateSchoolDetailsMutation.isPending}
+                          >
+                            Save Changes
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setIsEditingDetails(false);
+                              setEditedDetails(null);
+                            }}
+                            disabled={updateSchoolDetailsMutation.isPending}
+                          >
+                            Cancel
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setIsEditingDetails(true);
+                            setEditedDetails({
+                              programFocus: school?.programFocus || '',
+                              schoolCalendar: school?.schoolCalendar || '',
+                              schoolSchedule: school?.schoolSchedule || '',
+                              agesServed: school?.agesServed || [],
+                              numberOfClassrooms: school?.numberOfClassrooms || '',
+                              enrollmentCap: school?.enrollmentCap || '',
+                              legalStructure: school?.legalStructure || '',
+                              currentFYEnd: school?.currentFYEnd || '',
+                              governanceModel: school?.governanceModel || '',
+                              groupExemptionStatus: school?.groupExemptionStatus || '',
+                              groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
+                              groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
+                              businessInsurance: school?.businessInsurance || '',
+                              billComAccount: school?.billComAccount || '',
+                              email: school?.email || '',
+                              phone: school?.phone || '',
+                              website: school?.website || '',
+                              instagram: school?.instagram || '',
+                              facebook: school?.facebook || '',
+                            });
+                          }}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit Details
+                        </Button>
+                      )}
+                    </div>
 
                     {/* Program Details Section */}
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -2359,39 +2443,97 @@ export default function SchoolDetail() {
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Program Focus</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.programFocus || '-'}</p>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.programFocus || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, programFocus: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.programFocus || '-'}</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">School Calendar</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.schoolCalendar || '-'}</p>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.schoolCalendar || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, schoolCalendar: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.schoolCalendar || '-'}</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">School Schedule</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.schoolSchedule || '-'}</p>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.schoolSchedule || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, schoolSchedule: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.schoolSchedule || '-'}</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Ages Served</label>
-                          <div className="mt-1">
-                            {school.agesServed && school.agesServed.length > 0 ? (
-                              <div className="flex flex-wrap gap-1">
-                                {school.agesServed.map((age, idx) => (
-                                  <Badge key={idx} variant="secondary" className="text-xs">
-                                    {age}
-                                  </Badge>
-                                ))}
-                              </div>
-                            ) : (
-                              <p className="text-sm text-slate-400">-</p>
-                            )}
-                          </div>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.agesServed ? editedDetails.agesServed.join(', ') : ''}
+                              onChange={(e) => setEditedDetails({ 
+                                ...editedDetails, 
+                                agesServed: e.target.value.split(',').map(s => s.trim()).filter(s => s) 
+                              })}
+                              placeholder="e.g., 3-6, 6-9"
+                            />
+                          ) : (
+                            <div className="mt-1">
+                              {school.agesServed && school.agesServed.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {school.agesServed.map((age, idx) => (
+                                    <Badge key={idx} variant="secondary" className="text-xs">
+                                      {age}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-sm text-slate-400">-</p>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Number of Classrooms</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.numberOfClassrooms || '-'}</p>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.numberOfClassrooms || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, numberOfClassrooms: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.numberOfClassrooms || '-'}</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Enrollment Capacity</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.enrollmentCap || '-'}</p>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.enrollmentCap || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, enrollmentCap: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.enrollmentCap || '-'}</p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -2410,7 +2552,16 @@ export default function SchoolDetail() {
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Legal Structure</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.legalStructure || '-'}</p>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.legalStructure || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, legalStructure: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.legalStructure || '-'}</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Incorporation Date</label>
@@ -2422,11 +2573,29 @@ export default function SchoolDetail() {
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Current FY End</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.currentFYEnd || '-'}</p>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.currentFYEnd || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, currentFYEnd: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.currentFYEnd || '-'}</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Governance Model</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.governanceModel || '-'}</p>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.governanceModel || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, governanceModel: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.governanceModel || '-'}</p>
+                          )}
                         </div>
                       </div>
                       {/* Group Exemption Fields - Always show */}
@@ -2435,15 +2604,42 @@ export default function SchoolDetail() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           <div>
                             <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Group Exemption Status</label>
-                            <p className="text-sm text-slate-900 mt-1">{school.groupExemptionStatus || '-'}</p>
+                            {isEditingDetails ? (
+                              <Input
+                                type="text"
+                                className="mt-1"
+                                value={editedDetails?.groupExemptionStatus || ''}
+                                onChange={(e) => setEditedDetails({ ...editedDetails, groupExemptionStatus: e.target.value })}
+                              />
+                            ) : (
+                              <p className="text-sm text-slate-900 mt-1">{school.groupExemptionStatus || '-'}</p>
+                            )}
                           </div>
                           <div>
                             <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Date Granted</label>
-                            <p className="text-sm text-slate-900 mt-1">{school.groupExemptionDateGranted || '-'}</p>
+                            {isEditingDetails ? (
+                              <Input
+                                type="date"
+                                className="mt-1"
+                                value={editedDetails?.groupExemptionDateGranted || ''}
+                                onChange={(e) => setEditedDetails({ ...editedDetails, groupExemptionDateGranted: e.target.value })}
+                              />
+                            ) : (
+                              <p className="text-sm text-slate-900 mt-1">{school.groupExemptionDateGranted || '-'}</p>
+                            )}
                           </div>
                           <div>
                             <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Date Withdrawn</label>
-                            <p className="text-sm text-slate-900 mt-1">{school.groupExemptionDateWithdrawn || '-'}</p>
+                            {isEditingDetails ? (
+                              <Input
+                                type="date"
+                                className="mt-1"
+                                value={editedDetails?.groupExemptionDateWithdrawn || ''}
+                                onChange={(e) => setEditedDetails({ ...editedDetails, groupExemptionDateWithdrawn: e.target.value })}
+                              />
+                            ) : (
+                              <p className="text-sm text-slate-900 mt-1">{school.groupExemptionDateWithdrawn || '-'}</p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -2455,11 +2651,29 @@ export default function SchoolDetail() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Business Insurance</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.businessInsurance || '-'}</p>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.businessInsurance || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, businessInsurance: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.businessInsurance || '-'}</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">BillCom Account</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.billComAccount || '-'}</p>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.billComAccount || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, billComAccount: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.billComAccount || '-'}</p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -2473,11 +2687,29 @@ export default function SchoolDetail() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">General School Email</label>
-                            <p className="text-sm text-slate-900 mt-1">{school.email || '-'}</p>
+                            {isEditingDetails ? (
+                              <Input
+                                type="email"
+                                className="mt-1"
+                                value={editedDetails?.email || ''}
+                                onChange={(e) => setEditedDetails({ ...editedDetails, email: e.target.value })}
+                              />
+                            ) : (
+                              <p className="text-sm text-slate-900 mt-1">{school.email || '-'}</p>
+                            )}
                           </div>
                           <div>
                             <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Phone</label>
-                            <p className="text-sm text-slate-900 mt-1">{school.phone || '-'}</p>
+                            {isEditingDetails ? (
+                              <Input
+                                type="tel"
+                                className="mt-1"
+                                value={editedDetails?.phone || ''}
+                                onChange={(e) => setEditedDetails({ ...editedDetails, phone: e.target.value })}
+                              />
+                            ) : (
+                              <p className="text-sm text-slate-900 mt-1">{school.phone || '-'}</p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -2493,12 +2725,22 @@ export default function SchoolDetail() {
                               </svg>
                               Website
                             </label>
-                            {school.website ? (
-                              <a href={school.website} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline block mt-1">
-                                {school.website}
-                              </a>
+                            {isEditingDetails ? (
+                              <Input
+                                type="url"
+                                className="mt-1"
+                                value={editedDetails?.website || ''}
+                                onChange={(e) => setEditedDetails({ ...editedDetails, website: e.target.value })}
+                                placeholder="https://example.com"
+                              />
                             ) : (
-                              <p className="text-sm text-slate-400 mt-1">-</p>
+                              school.website ? (
+                                <a href={school.website} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline block mt-1">
+                                  {school.website}
+                                </a>
+                              ) : (
+                                <p className="text-sm text-slate-400 mt-1">-</p>
+                              )
                             )}
                           </div>
                           <div>
@@ -2508,13 +2750,23 @@ export default function SchoolDetail() {
                               </svg>
                               Facebook
                             </label>
-                            {school.facebook ? (
-                              <a href={school.facebook.startsWith('http') ? school.facebook : `https://facebook.com/${school.facebook}`} 
-                                 target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline block mt-1">
-                                {school.facebook}
-                              </a>
+                            {isEditingDetails ? (
+                              <Input
+                                type="text"
+                                className="mt-1"
+                                value={editedDetails?.facebook || ''}
+                                onChange={(e) => setEditedDetails({ ...editedDetails, facebook: e.target.value })}
+                                placeholder="facebook.com/yourpage"
+                              />
                             ) : (
-                              <p className="text-sm text-slate-400 mt-1">-</p>
+                              school.facebook ? (
+                                <a href={school.facebook.startsWith('http') ? school.facebook : `https://facebook.com/${school.facebook}`} 
+                                   target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline block mt-1">
+                                  {school.facebook}
+                                </a>
+                              ) : (
+                                <p className="text-sm text-slate-400 mt-1">-</p>
+                              )
                             )}
                           </div>
                           <div>
@@ -2524,13 +2776,23 @@ export default function SchoolDetail() {
                               </svg>
                               Instagram
                             </label>
-                            {school.instagram ? (
-                              <a href={school.instagram.startsWith('http') ? school.instagram : `https://instagram.com/${school.instagram}`} 
-                                 target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline block mt-1">
-                                {school.instagram}
-                              </a>
+                            {isEditingDetails ? (
+                              <Input
+                                type="text"
+                                className="mt-1"
+                                value={editedDetails?.instagram || ''}
+                                onChange={(e) => setEditedDetails({ ...editedDetails, instagram: e.target.value })}
+                                placeholder="@yourhandle"
+                              />
                             ) : (
-                              <p className="text-sm text-slate-400 mt-1">-</p>
+                              school.instagram ? (
+                                <a href={school.instagram.startsWith('http') ? school.instagram : `https://instagram.com/${school.instagram}`} 
+                                   target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline block mt-1">
+                                  {school.instagram}
+                                </a>
+                              ) : (
+                                <p className="text-sm text-slate-400 mt-1">-</p>
+                              )
                             )}
                           </div>
                         </div>

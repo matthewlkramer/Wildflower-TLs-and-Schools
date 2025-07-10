@@ -944,6 +944,100 @@ export type InsertMontessoriCertification = z.infer<typeof montessoriCertificati
 export type InsertEventAttendance = z.infer<typeof eventAttendanceSchema>;
 export type InsertEducatorNote = z.infer<typeof educatorNoteSchema>;
 
+// Charter-related types
+export interface CharterRole {
+  id: string;
+  charterId: string;
+  role: string;
+  name: string;
+  currentlyActive: boolean;
+  created: string;
+  lastModified: string;
+}
+
+export interface CharterApplication {
+  id: string;
+  charterId: string;
+  applicationName: string;
+  targetOpen: string;
+  status: string;
+  submissionDate: string;
+  created: string;
+  lastModified: string;
+}
+
+export interface CharterAuthorizerContact {
+  id: string;
+  charterId: string;
+  name: string;
+  role: string;
+  email: string;
+  phone: string;
+  created: string;
+  lastModified: string;
+}
+
+export interface ReportSubmission {
+  id: string;
+  charterId: string;
+  reportName: string;
+  submissionDate: string;
+  status: string;
+  created: string;
+  lastModified: string;
+}
+
+export interface AssessmentData {
+  id: string;
+  charterId: string;
+  assessmentName: string;
+  assessmentDate: string;
+  score: string;
+  created: string;
+  lastModified: string;
+}
+
+export interface CharterNote {
+  id: string;
+  charterId: string;
+  dateCreated: string;
+  createdBy: string;
+  notes: string;
+  created: string;
+  lastModified: string;
+}
+
+export interface CharterActionStep {
+  id: string;
+  charterId: string;
+  description: string;
+  assignee: string;
+  dueDate: string;
+  status: string;
+  complete: boolean;
+  created: string;
+  lastModified: string;
+}
+
+export interface CharterGovernanceDocument {
+  id: string;
+  charterId: string;
+  documentType: string;
+  date: string;
+  attachment: string;
+  created: string;
+  lastModified: string;
+}
+
+export interface Charter990 {
+  id: string;
+  charterId: string;
+  year: string;
+  attachment: string;
+  created: string;
+  lastModified: string;
+}
+
 // Legacy types for backward compatibility
 export type Teacher = Educator;
 export type InsertTeacher = InsertEducator;

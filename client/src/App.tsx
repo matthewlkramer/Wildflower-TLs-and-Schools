@@ -7,6 +7,7 @@ import { useState, createContext, useContext } from "react";
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
 import { UserFilterProvider } from "@/contexts/user-filter-context";
+import Dashboard from "@/pages/dashboard";
 import Teachers from "@/pages/teachers";
 import Schools from "@/pages/schools";
 import Charters from "@/pages/charters";
@@ -49,7 +50,8 @@ export const useAddNew = () => useContext(AddNewContext);
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Teachers} />
+      <Route path="/" component={Dashboard} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/teachers" component={Teachers} />
       <Route path="/teacher/:id" component={TeacherDetail} />
       <Route path="/schools" component={Schools} />
@@ -68,7 +70,8 @@ function AppContent() {
   const [addNewOptions, setAddNewOptions] = useState<Array<{ label: string; onClick: () => void; }>>([]);
 
   // Reset search when navigating between pages
-  const isTeachersActive = location === "/" || location === "/teachers" || location.startsWith("/teacher/");
+  const isDashboardActive = location === "/" || location === "/dashboard";
+  const isTeachersActive = location === "/teachers" || location.startsWith("/teacher/");
   const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
   const isChartersActive = location === "/charters" || location.startsWith("/charter/");
 

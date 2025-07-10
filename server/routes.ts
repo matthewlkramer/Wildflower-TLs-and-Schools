@@ -171,6 +171,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User-specific schools for dashboard
+  app.get("/api/schools/user/:userId", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const schools = await storage.getSchoolsByUserId(userId);
+      res.json(schools);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user schools" });
+    }
+  });
+
   app.get("/api/schools/:id", async (req, res) => {
     try {
       const id = req.params.id;
@@ -571,6 +582,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(actionSteps);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch action steps" });
+    }
+  });
+
+  // User-specific action steps for dashboard
+  app.get("/api/action-steps/user/:userId", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const actionSteps = await storage.getActionStepsByUserId(userId);
+      res.json(actionSteps);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user action steps" });
     }
   });
 

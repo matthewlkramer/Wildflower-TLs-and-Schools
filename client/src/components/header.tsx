@@ -27,7 +27,8 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const { showOnlyMyRecords, setShowOnlyMyRecords } = useUserFilter();
 
-  const isTeachersActive = location === "/" || location === "/teachers" || location.startsWith("/teacher/");
+  const isDashboardActive = location === "/" || location === "/dashboard";
+  const isTeachersActive = location === "/teachers" || location.startsWith("/teacher/");
   const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
   const isChartersActive = location === "/charters" || location.startsWith("/charter/");
 
@@ -65,6 +66,13 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
             <div className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6 ml-auto overflow-x-auto">
               {/* Navigation - always visible, compact on mobile */}
               <nav className="flex items-center space-x-3 sm:space-x-4 lg:space-x-8 flex-shrink-0">
+                <Link href="/dashboard" className={`px-2 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
+                  isDashboardActive
+                    ? "text-wildflower-blue"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}>
+                  Dashboard
+                </Link>
                 <Link href="/teachers" className={`px-2 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
                   isTeachersActive
                     ? "text-wildflower-blue"

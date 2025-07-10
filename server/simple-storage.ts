@@ -15,6 +15,16 @@ import type {
   MembershipFeeByYear,
   MembershipFeeUpdate,
   EmailAddress,
+  ActionStep,
+  CharterRole,
+  CharterApplication,
+  CharterAuthorizerContact,
+  ReportSubmission,
+  AssessmentData,
+  CharterNote,
+  CharterActionStep,
+  CharterGovernanceDocument,
+  Charter990,
   InsertEducator, 
   InsertSchool, 
   InsertEducatorSchoolAssociation,
@@ -172,6 +182,11 @@ export interface IStorage {
   createEducatorNote(note: InsertEducatorNote): Promise<EducatorNote>;
   updateEducatorNote(id: string, note: Partial<InsertEducatorNote>): Promise<EducatorNote | undefined>;
   deleteEducatorNote(id: string): Promise<boolean>;
+
+  // Action Step operations
+  getActionStepsBySchoolId(schoolId: string): Promise<ActionStep[]>;
+  getActionStepsByUserId(userId: string): Promise<ActionStep[]>;
+  getSchoolsByUserId(userId: string): Promise<School[]>;
 
   // Legacy methods for backward compatibility
   getTeachers(): Promise<Teacher[]>;
@@ -1202,6 +1217,87 @@ export class SimpleAirtableStorage implements IStorage {
       });
     } catch (error) {
       console.error(`ERROR in action steps for ${schoolId}:`, error);
+      return [];
+    }
+  }
+
+  // User-specific action steps for dashboard
+  async getActionStepsByUserId(userId: string): Promise<ActionStep[]> {
+    try {
+      // Get all action steps and filter by assignee
+      const allActionSteps = await base("Action steps").select().all();
+      
+      // Filter records where the user is the assignee
+      const userActionSteps = allActionSteps.filter(record => {
+        const assigneeField = record.fields["Assignee"];
+        const assigneeShortName = record.fields["Assignee Short Name"];
+        
+        // Check if user ID matches in either assignee field
+        if (Array.isArray(assigneeField) && assigneeField.includes(userId)) {
+          return true;
+        }
+        if (assigneeShortName === userId) {
+          return true;
+        }
+        return false;
+      });
+      
+      return userActionSteps.map(record => {
+        const schoolIdField = record.fields["Schools"] || record.fields["school_id"] || record.fields["School"];
+        const assignedDate = record.fields["Assigned date"];
+        const assignee = record.fields["Assignee Short Name"];
+        const item = record.fields["Item"];
+        const status = record.fields["Status"];
+        const dueDate = record.fields["Due date"];
+        
+        return {
+          id: record.id,
+          schoolId: Array.isArray(schoolIdField) ? String(schoolIdField[0] || '') : String(schoolIdField || ''),
+          assignedDate: String(assignedDate || ''),
+          assignee: String(assignee || ''),
+          item: String(item || ''),
+          status: String(status || ''),
+          dueDate: String(dueDate || ''),
+          isCompleted: status === 'Completed' || status === 'Done',
+        };
+      });
+    } catch (error) {
+      console.error(`ERROR in action steps for user ${userId}:`, error);
+      return [];
+    }
+  }
+
+  // User-specific schools for dashboard
+  async getSchoolsByUserId(userId: string): Promise<School[]> {
+    try {
+      // Get all guide assignments to find schools where user is an active guide
+      const guideAssignments = await base("Guides Assignments").select({
+        filterByFormula: `AND({Guide} = '${userId}', {Active} = TRUE())`
+      }).all();
+      
+      // Extract school IDs from guide assignments
+      const schoolIds = new Set<string>();
+      guideAssignments.forEach(record => {
+        const schoolId = record.fields["School"];
+        if (Array.isArray(schoolId) && schoolId[0]) {
+          schoolIds.add(schoolId[0]);
+        } else if (schoolId) {
+          schoolIds.add(String(schoolId));
+        }
+      });
+      
+      // Also get schools where user is the assigned partner
+      const allSchools = await this.getSchools();
+      allSchools.forEach(school => {
+        if (school.assignedPartner === userId) {
+          schoolIds.add(school.id);
+        }
+      });
+      
+      // Return schools that match the collected IDs
+      return allSchools.filter(school => schoolIds.has(school.id));
+    } catch (error) {
+      console.error(`ERROR fetching schools for user ${userId}:`, error);
       return [];
     }
   }
