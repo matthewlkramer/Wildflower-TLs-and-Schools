@@ -3545,15 +3545,6 @@ export default function SchoolDetail() {
                                           size="sm"
                                           variant="outline"
                                           className="h-6 w-6 p-0"
-                                          onClick={() => setSelectedNote(note)}
-                                          title="Open note"
-                                        >
-                                          <ExternalLink className="h-3 w-3" />
-                                        </Button>
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="h-6 w-6 p-0"
                                           onClick={() => setEditingNoteId(note.id)}
                                           title="Edit note"
                                         >

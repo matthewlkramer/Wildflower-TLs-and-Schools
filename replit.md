@@ -183,6 +183,7 @@ Changelog:
 - July 08, 2025. Completed charter data integration: all charter detail page API endpoints now working correctly (charter roles, applications, authorizer contacts, report submissions, governance documents, 990s, school notes, action steps, assessment data, educator school associations), resolved all table name and field mapping issues, charter detail pages now fully functional with proper data filtering
 - July 10, 2025. Enhanced school detail Teachers table: added boolean Founder column showing true/false if educator has Founder role, filtered "Founder" from roles column display to prevent duplication, updated email column to use school's "Current Primary Email" field instead of educator emails, removed complex email fetching logic for improved performance
 - July 10, 2025. Major tab reorganization: removed Systems tab entirely, renamed Support tab to "SSJ", moved Business Insurance and BillCom Account fields from removed Systems tab to Details tab in new "Business & Financial Systems" section
+- July 10, 2025. Removed eyeball/open action button from notes table for cleaner interface - headlines remain clickable to open note details
 ```
 
 ## User Preferences
