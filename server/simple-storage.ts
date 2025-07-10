@@ -579,9 +579,23 @@ export class SimpleAirtableStorage implements IStorage {
 
   async createSchool(school: InsertSchool): Promise<School> {
     try {
-      const record = await base("Schools").create({
+      const createFields: any = {
         "Name": school.name,
-      });
+      };
+      
+      // Add optional fields if they exist
+      if (school.shortName) createFields["Short Name"] = school.shortName;
+      if (school.agesServed && school.agesServed.length > 0) createFields["Ages Served"] = school.agesServed;
+      if (school.governanceModel) createFields["Governance Model"] = school.governanceModel;
+      if (school.about) createFields["About"] = school.about;
+      if (school.phone) createFields["Phone"] = school.phone;
+      if (school.email) createFields["Email"] = school.email;
+      if (school.website) createFields["Website"] = school.website;
+      if (school.membershipStatus) createFields["Membership Status"] = school.membershipStatus;
+      if (school.ssjTargetCity) createFields["SSJ Target City"] = school.ssjTargetCity;
+      if (school.ssjTargetState) createFields["SSJ Target State"] = school.ssjTargetState;
+      
+      const record = await base("Schools").create(createFields);
       
       return this.transformSchoolRecord(record);
     } catch (error) {
