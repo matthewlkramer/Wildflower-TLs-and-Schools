@@ -14,6 +14,11 @@
 
 ## Current Testing Queue 🔄
 
+### Critical Issues Found ⚠️
+- [ ] **Data refresh bug**: New schools not appearing in table after creation
+- [ ] **Search functionality**: Search box not filtering results properly 
+- [ ] **Cache invalidation**: Frontend not refreshing after CRUD operations
+
 ### School Management
 - [ ] School deletion (clean up test record)
 - [ ] School editing functionality

@@ -55,7 +55,9 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
       return await apiRequest("POST", "/api/schools", data);
     },
     onSuccess: () => {
+      // Force immediate cache refresh
       queryClient.invalidateQueries({ queryKey: ["/api/schools"] });
+      queryClient.refetchQueries({ queryKey: ["/api/schools"] });
       toast({
         title: "Success",
         description: "School created successfully",
