@@ -184,6 +184,7 @@ Changelog:
 - July 10, 2025. Enhanced school detail Teachers table: added boolean Founder column showing true/false if educator has Founder role, filtered "Founder" from roles column display to prevent duplication, updated email column to use school's "Current Primary Email" field instead of educator emails, removed complex email fetching logic for improved performance
 - July 10, 2025. Major tab reorganization: removed Systems tab entirely, renamed Support tab to "SSJ", moved Business Insurance and BillCom Account fields from removed Systems tab to Details tab in new "Business & Financial Systems" section
 - July 10, 2025. Removed eyeball/open action button from notes table for cleaner interface - headlines remain clickable to open note details
+- July 10, 2025. Enhanced school detail view with UI improvements: removed startup badge from upper right area, fixed open date field mapping to use "Opened" Airtable field instead of "SSJ Projected Open", enhanced Timeline & Milestones card with Open Date field display, split Albums & Cohorts section into separate cards for better organization, added membership status field to Program Details section for comprehensive school information management
 ```
 
 ## User Preferences
