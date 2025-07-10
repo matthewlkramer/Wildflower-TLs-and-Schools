@@ -1,19 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SchoolsGrid from "@/components/schools-grid";
 import AddSchoolModal from "@/components/add-school-modal";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { type School } from "@shared/schema";
-import { useSearch } from "@/App";
+import { useSearch, useAddNew } from "@/App";
 import { useCachedSchools } from "@/hooks/use-cached-data";
 import { useUserFilter } from "@/contexts/user-filter-context";
 
 export default function Schools() {
   const { searchTerm } = useSearch();
   const { showOnlyMyRecords, currentUser } = useUserFilter();
+  const { setAddNewOptions } = useAddNew();
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
 
   const { data: schools, isLoading, prefetchSchool } = useCachedSchools();
+
+  // Set up Add New button in header
+  useEffect(() => {
+    setAddNewOptions([
+      { label: "Add School", onClick: () => setAddSchoolModalOpen(true) }
+    ]);
+
+    // Cleanup - remove options when component unmounts
+    return () => setAddNewOptions([]);
+  }, [setAddNewOptions]);
 
   const filteredSchools = (schools || []).filter((school: School) => {
     const matchesSearch = (school.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
