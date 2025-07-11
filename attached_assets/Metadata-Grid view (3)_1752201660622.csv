@@ -1,0 +1,1926 @@
+﻿recId,Table Name,Field Name,Field Type,Field Options
+recBtYO22GeHs1kbg,Schools,Name,singleLineText,
+recJbjYagzqvoNvuK,Schools,Prior Names,multilineText,
+recRLskEC2e5c6fTV,Schools,Opened,date,
+recqfMdlLmc4l7zYn,Schools,Logo URL,url,
+recxAfPgKApg2jkVH,Schools,Governance Model,singleSelect,"Independent, District, Charter, Exploring Charter, Community Partnership"
+recJw9xs0NIE4vCh8,Schools,Ages served,multipleSelects,"Parent-child, Infants, Toddlers, Primary, Lower Elementary, Upper Elementary, Adolescent / JH, High School"
+reccss9UF15EJmkrk,Schools,School calendar,singleSelect,"9-month, 10-month, Year-round"
+recUVDamSZoMgGY4W,Schools,School schedule,multipleSelects,"Before Care;Morning Care;Afternoon Care;After Care, Before Care, Morning Care, Afternoon Care, After Care"
+recOpN4rrwoY5aK9m,Schools,Left Network Date,date,
+recRxZw9ps7sK1ZAI,Schools,Left Network Reason,multipleSelects,"Program absorbed, Disaffiliated, Role Alignment, WF Alignment, Organizational Sustainability, Partnership, No TL Identified, No Montessori Training, Personal Reasons, Facility"
+rec7yNtFvAvREbBuo,Schools,Membership Agreement date,date,
+recKzoplu94tnMYoV,Schools,Email Domain,singleLineText,
+reckYXOS77nmPdPRW,Schools,School Phone,phoneNumber,
+recyMdPHGS6sfjH5k,Schools,Facebook,singleLineText,
+recxgsDZwUABXswNH,Schools,Instagram,singleLineText,
+rec6n43CGuJao3Uj1,Schools,Website,url,
+recOKWAOWnzppge3J,Schools,Locations,multipleRecordLinks,Locations
+recUaQLlg6ZU5jdNU,Schools,Current Mailing Address,multipleLookupValues,
+recvfKd7nAr961Fq0,Schools,Primary Contacts,multipleRecordLinks,Educators
+recjCSFXUExB0Wzdl,Schools,Charter,multipleRecordLinks,Charters
+recDALAnPmEJSvlbx,Schools,Signed Membership Agreement,multipleAttachments,
+recjPUjlK7JVPupAv,Schools,Logo,multipleAttachments,
+recoImQAvtEf2QscO,Schools,TC school ID,singleLineText,
+recDk7WrAsOaDra2b,Schools,Educators x Schools,multipleRecordLinks,Educators x Schools
+recOjmfNRzs4q4UQ2,Schools,Founders,rollup,
+rec74vZtfXT5Szv6z,Schools,Current TLs,rollup,
+rec3R9Rq3r4j7ZEYQ,Schools,Planning album,multipleAttachments,
+recz00l1LDll5Zjpo,Schools,Guide assignments,multipleRecordLinks,Guides Assignments
+recR1tVZSk7z6qogM,Schools,Business Insurance,singleSelect,"Alliant, other, other (in process w/ Alliant)"
+rectzwiH04Ffewp7T,Schools,QBO,singleSelect,"internal license - active, internal license - closed out, external license , other accounting software, Not WF - Unknown software"
+recUN7CqcHWvBhz67,Schools,Gusto,singleSelect,"yes (under WF), no, yes (independent), yes, no- local system"
+recokHc5nMjkyX3v0,Schools,TC Recordkeeping,singleSelect,yes (under WF)
+recEFi8Gfk0KOWUvF,Schools,TC Admissions,singleSelect,"yes, v1"
+recVftYH87sEEOA2w,Schools,Admissions System,singleSelect,"TC, Other, School Cues"
+recT8AK2fssuPy4cE,Schools,Transparent Classroom,singleSelect,"Internal license, External license, Other record keeping system, Internal License - removed"
+recdasNBIKFuW0DcR,Schools,Budget Utility,singleSelect,WF v4
+recLQkdCmrrEsr1Z6,Schools,Website tool,singleSelect,"external platform, wordpress original, wordpress v1, wordpress v2, Wix v1, Wix v2"
+recb17p2a8FnILO7Z,Schools,Google Voice,singleSelect,internal license
+recKHjrCbO2YEjG8D,Schools,Nonprofit status,singleSelect,"group exemption, independent, for profit, Partnership, Under Charter 501c3"
+recXzWI1d9zxy5iDo,Schools,Logo designer,singleSelect,"internal design, external design"
+reca77TagXNrrHDBF,Schools,Domain Name,singleSelect,"internal, external"
+recEnHnx4Fo7yqw9Z,Schools,On national website,singleSelect,"added, ready to add , ready to remove, removed"
+reci7ca4mmobesKqy,Schools,Membership Status,singleSelect,"Member school, Affiliated non-member, Membership terminated"
+recRQYHgEsx8osKwx,Schools,School Email,email,
+recTf0m6LrZGpeP2V,Schools,Institutional partner,singleLineText,
+recy7sxKDTCmFPxKK,Schools,Trademark filed,singleSelect,Yes
+recDIkcyHXt34tBlU,Schools,Name Selection Proposal,url,
+recUWCJbyIVIUxzMe,Schools,Loans,multipleRecordLinks,Loans
+recNtoGdPsLS5n9Gf,Schools,Grants (WF),multipleRecordLinks,Grants
+recEiUk6YcJ4eAYQS,Schools,School notes,multipleRecordLinks,School notes
+reckKvW5VnP0vV3Ui,Schools,Number of classrooms,number,
+recYe54BZ8ufOgOak,Schools,School Status,singleSelect,"Emerging, Open, Paused, Closing, Permanently Closed, Disaffiliating, Disaffiliated, Placeholder"
+rec1aXubX9tHRLNoi,Schools,Created,createdTime,
+recsJaIvJ0p96QRa8,Schools,Created By,createdBy,
+recyvweNvgb6XaECM,Schools,Last Modified,lastModifiedTime,
+reclSOsT9V12XX3y1,Schools,Last Modified By,lastModifiedBy,
+recpWXfAh5A5Rudnq,Schools,Pod,singleSelect,"Mass: Massbridge, Mass: Broadway, Mass: San Lorenzo, Mid-Atlantic: Philadelphia, Multistate 1, CA Pod, PR Pod, Under discussion, Charter Pod, OceanBay Pod, MidAtlantic Pod, Fern Pod , CO Charter Pod"
+reccNRnIVlLYZShkX,Schools,Short Name,singleLineText,
+recdQskkjuv4yFuCv,Schools,Family survey - schools,multipleRecordLinks,Family survey - school inputs
+rec1Cc04bBpMvt5Et,Schools,Family survey non-TC data 2021-22,multipleRecordLinks,Family survey non-TC data 2021-22
+recj12XbVRcVpMKaa,Schools,Enrollment at Full Capacity,number,
+recg5bQc1NUDMHXLL,Schools,school_id,formula,RECORD_ID()
+recRlP7L0Dd2FWQ4R,Schools,Google Workspace Org Unit Path,singleLineText,
+recNGfsEIRniwBGZY,Schools,Loan (from Loans - Issue Method),multipleLookupValues,
+recFHc9liUG5iR9eb,Schools,Family Survey,multipleRecordLinks,Family Survey
+recYK71hnbMs2NEqb,Schools,# of Students,multipleLookupValues,
+recsfzXj3nJbFbnCD,Schools,# of forms sent,multipleLookupValues,
+recvqjcyLlDWbOPJt,Schools,Low Income,multipleLookupValues,
+reckfQ6TxLnaBXpvf,Schools,Medium Income,multipleLookupValues,
+recybo0w58rbioX8E,Schools,FRL,multipleLookupValues,
+rech7S9foKgsZG1hX,Schools,% of Asian American students,multipleLookupValues,
+recUnX4O2d7uF3XX6,Schools,% of African American students,multipleLookupValues,
+rec67ePyu5NuSavSH,Schools,global majority,multipleLookupValues,
+recv7wzZdGhIjQgTR,Schools,Pacific Islander (from Family Survey),multipleLookupValues,
+rec8xXH0OWkAzXx3V,Schools,Native American (from Family Survey),multipleLookupValues,
+recCGPTdUDgNUceK7,Schools,White (from Family Survey),multipleLookupValues,
+rec5LR0c0jTyumOKq,Schools,Middle Eastern,multipleLookupValues,
+recRF0NoA4WRMEdPc,Schools,Latinx (from Family Survey),multipleLookupValues,
+rec95AJJRWjNw4xWl,Schools,High Income (from Family Survey),multipleLookupValues,
+recFVmiuHSuaEqCv4,Schools,Flexible Tuition Model,checkbox,
+recYpA3ytTZ85wIzF,Schools,EIN,singleLineText,
+recRVDPuhmMIuSKMJ,Schools,Guide email,multipleLookupValues,
+reckrWsm7AnlgQkzK,Schools,Primary Contact Email,multipleLookupValues,
+rectZIzP3xUnMcVAS,Schools,Agreement Version ,singleSelect,"Affiliation Agreement, Network Membership Agreement "
+recl8o3BgemIuGVeS,Schools,About,multilineText,
+recGIeXNRc2goenGu,Schools,About Spanish,multilineText,
+rectzi5kac10KH78U,Schools,Hero Image Url,url,
+rec0rNZxbgucdnfWr,Schools,Hero Image 2 Url,url,
+recS2tIUbXqOD8ArT,Schools,Narrative,richText,
+recJ35CLNckfyiStf,Schools,Platform School,multipleRecordLinks,Platform School
+recMQNlR7Qa2pnMUb,Schools,Budget Link,url,
+recf8zVR4O3vpmz5I,Schools,Bookkeeper / Accountant,singleSelect,"Staci Simon, Unknown, Josh's dad (Mr. Shanklin)"
+rec2Po3zMAfJimgin,Schools,Active Pod Member,singleSelect,"Yes, regular attendee/role holder, Somewhat, does not make all meetings, Does not attend, Not in a pod"
+recjSK3nYCtu6YOc9,Schools,Risk Factors,multipleSelects,"1 TL, TL is only admin, not teacher, Weak board, Financially unstable, Compliance concern (990, licensor, authorizor), Low enrollment, Not engaged, No risk factors!"
+recX4iyOBHiKxYYMS,Schools,Watchlist,multipleSelects,"Multiple Risk Factors, In Current Crisis, Thinking about leaving the network, In Transition, 1st Year"
+reckxt85oiuV6iHlq,Schools,Program Focus,multipleSelects,"Inclusion , Lab School, Nature Based, Dual Language, Conversion into WF"
+recL32If8nOLeJWD6,Schools,Loan payments,multipleRecordLinks,Loan payments
+rec7L02kqMDtZkHka,Schools,Loan Report Name,singleLineText,
+rec6INrZvkQB79pK0,Schools,990s,multipleRecordLinks,990s
+recJe4VCuxXFLwOYQ,Schools,Current FY end,singleSelect,"6/30, 7/31, 8/31, 12/31"
+recCQcyGkectPTGGe,Schools,Incorporation Date,date,
+recBIJRWksetqRvk2,Schools,GuideStar Listing Requested?,checkbox,
+rec4caV0nvKJWtzrj,Schools,Group exemption status,singleSelect,"Applying, Active, Issues, Withdrawn, Other - Not part of exemption"
+recLjSMh4INEGktE9,Schools,Date received group exemption,date,
+recSOe969h5FWvMbg,Schools,Legal Name,singleLineText,
+recMnwG7fV9UZSi7L,Schools,School governance documents,multipleRecordLinks,Governance docs
+recdwYAI7OrhTtPGI,Schools,Nondiscrimination Policy on Application,checkbox,
+recP4lu4QN509Tx9L,Schools,Nondiscrimination Policy on Website,checkbox,
+recPknpdaUeq6eze1,Schools,Is there a 2022 990?,count,
+recWgcx7QM82baHGg,Schools,2022 990 present?,formula,"IF({Is there a 2022 990?}=1,""YES"",""NO"")"
+rec54HF9tUq92wXNM,Schools,Date withdrawn from Group Exemption,date,
+recXYF1uRt69ANkko,Schools,School Contact Emails,multipleLookupValues,
+recbpqvXBq0JKI0zH,Schools,Race & Ethnicity (from Educator) (via Educators x Schools),multipleLookupValues,
+recizFPuErOMvcQlM,Schools,990 attachment,multipleLookupValues,
+recUOmNcRrBQEMaum,Schools,Founding Documents,multipleLookupValues,
+reccs4wFgsLFuBL8s,Schools,Lease,multipleLookupValues,
+recHZc1LwhKpFkAat,Schools,Lease End Date,multipleLookupValues,
+recIn3ZxZPo5d3rNm,Schools,Public funding sources,multipleRecordLinks,Public funding
+recQIiN8ghYaCzvJu,Schools,Action steps,multipleRecordLinks,Action steps
+rec5UWKulOIJLebmu,Schools,Membership fee records,singleLineText,
+recI3A6Adg5aw0CAB,Schools,Cumulative membership fees paid,rollup,
+recLJtBdkT9Iq0ALl,Schools,Cumulative membership fees outstanding,rollup,
+recsiJh1LN6lPsyjB,Schools,Current year fee,multipleLookupValues,
+reck6x2DABBIudIKj,Schools,QBO School Codes,multipleRecordLinks,QBO School Codes
+rec3ZdgUfu38KJ7dU,Schools,Visioning album,multipleAttachments,
+rec9ZvLLXanIZrCX0,Schools,Visioning album complete,checkbox,
+recfvZWJPBXbYptsY,Schools,Building4Good Firm & Attorney,singleLineText,
+recijYWwK5ZsVEHE6,Schools,SSJ - Building4Good Status,singleSelect,"Matched, Requested, Upcoming"
+rec2G5XDSDvV1bI2t,Schools,SSJ - SSJ Tool,singleSelect,"Google Slides , My Wildflower - Sensible Default, Charter Slides, Platform Pilot "
+recdexDtdXfRLYSAf,Schools,SSJ - Proj Open School Year,formula,"IF(
+  {SSJ - Projected Open},
+  IF(
+    MONTH({SSJ - Projected Open}) < 7,
+    YEAR({SSJ - Projected Open}),
+    YEAR({SSJ - Projected Open}) + 1
+  ),
+  {SSJ - Proj Open School Year - Backup}
+)"
+rec0zdFl42UxLMwM5,Schools,SSJ - Date shared with N4G (from SSJ Process Details),date,
+recnVfWV8rMLbDMhr,Schools,SSJ - Proj Open School Year - Backup,singleLineText,
+rec1YgzQCd0iD0Zbq,Schools,SSJ - Gap in Funding,singleLineText,
+recetL2I7OWdQkqIj,Schools,SSJ - Amount raised,singleLineText,
+recwvSFVqXdmNHY2Y,Schools,SSJ - Loan approved amt,singleLineText,
+recfSGi4v6EvGtSNo,Schools,SSJ - Loan eligibility,singleLineText,
+recmUgX6npbxv8Uil,Schools,SSJ - Total Startup Funding Needed,singleLineText,
+recYc8LSywU8NKEja,Schools,SSJ - Does the school have a viable pathway to funding?,singleSelect,"No, startup funding unlikely, Yes, full funding likely, Maybe, prospects identified but not secured"
+recpPAMpIAM1zNnCU,Schools,SSJ - Fundraising narrative,multilineText,
+receK502n2uHw10Dp,Schools,SSJ - Advice Givers (Partners),multipleRecordLinks,Partners
+recUfNyrVhLKc3H2P,Schools,SSJ - Advice Givers (TLs),multipleRecordLinks,Educators
+recOWnoJGUhirxCHr,Schools,SSJ - Is the school planning to apply for internal Wildflower funding?,singleSelect,"No, Yes, loan, Yes, loan; Yes, grant, Yes, grant, Yes, grant; Yes, loan"
+recDRKxRNFA6lQjlu,Schools,SSJ - Is the budget at a stage that will allow the ETL(s) to take their next steps?,singleSelect,"Yes, Unsure, No"
+recTzGbRh2x4yDY5p,Schools,SSJ - Is the team on track for their enrollment goals?,singleSelect,"Yes (tuition published, plan enacted, community engagement full swing), No (process unclear/unpublished, limited/no family engagement), Maybe (process is ready, no prospective students)"
+recRK18tZW70qqoRQ,Schools,SSJ - Cohort Status,singleSelect,"Switched Ops Guide Supports, Returning for Later Cohort, Transitioned to Charter Application Supports, Left Cohort"
+recxI0LETA6V7iA0S,Schools,SSJ - Facility,singleSelect,"Signed lease, Identified prospect(s), Purchased building, Unsure, Searching, intending to buy, Searching, intending to rent"
+recfd2uf46qtkJ7N7,Schools,SSJ - Board development,singleSelect,"No board, Board is forming, 1-2 mtgs, Board is developed and engaged, 3+ mtgs"
+recglqJhiGGK773h4,Schools,SSJ - Has the ETL identified a partner?,singleSelect,"Partnership established, No partner, Partnership In development "
+recGeXJoCeDzwuq8k,Schools,SSJ - Name Reserved,singleSelect,"reserved, unknown"
+rec7TMcfzlE3x6Met,Schools,SSJ - What is the next big decision or action this school is working on?,multilineText,
+recIZ3ZZbDh0Biuyb,Schools,SSJ - Readiness to Open Rating,singleSelect,"High, Low, Medium"
+recW3adNfTJpClbQ8,Schools,SSJ Stage,singleSelect,"Visioning, Planning, Startup, Complete, Year 1"
+recQneD9iEtUhbyN9,Schools,Entered Startup Date,date,
+rec5SmS1MFgcgdAwS,Schools,Entered Planning Date,date,
+recD5GNJAEBmzNCsz,Schools,Entered Visioning Date,date,
+recNJr6I5sluZjzhw,Schools,SSJ - Original Projected Open Date,date,
+rec2re9MTLSLToZO7,Schools,SSJ - Target City,singleLineText,
+reciWPO8n0nadoUev,Schools,SSJ - Ops Guide Support Track,multipleSelects,"1:1 Support, 2024-2025 Blooms Cohort, 2024-2025 Blooms Cohort, 1:1 Support, 1:1 Support, 2024-2025 Blooms Cohort, 2025 January Blooms Cohort"
+recKJxkgfs37A2QEw,Schools,SSJ - Projected Open,date,
+rec5QuYRPt1hjk1Eg,Schools,Current TLs first names,rollup,
+recaYHp9vAVtnLPGI,Schools,Count of Active Mailing Addresses,count,
+reccmFVGD2vE4MMNU,Schools,Count of Active Physical Addresses,count,
+rec2xYYEfEioYShB3,Schools,Current Physical Address,multipleLookupValues,
+recpGLMBPMreZu0l8,Schools,Errors,multipleSelects,"No mailing address, More than one active mailing address, More than one active physical address, No active TLs, Multiple active guides, Emerging with no active guide, Duplicate"
+recjutRnyWyq3Km6D,Schools,Bill.com account,singleLineText,
+recNUSg5VqZnTBLMh,Schools,Current Physical Address - City,multipleLookupValues,
+recyrUVNr4W0lg1gv,Schools,Current Physical Address - State,multipleLookupValues,
+reciEku6rf9RklBfs,Schools,SSJ - Target State,singleLineText,
+rec9rtRSasCZamdX0,Schools,Emails,multipleRecordLinks,Emails
+recWMx5QNj8mhnVwS,Schools,Board Service,multipleRecordLinks,Board Service
+recyV4vpYCbGzZ5Gy,Schools,Last Modified Trigger,formula,"IF(
+  LAST_MODIFIED_TIME(),
+  DATETIME_DIFF(NOW(), LAST_MODIFIED_TIME(), 'minutes'),
+  DATETIME_DIFF(NOW(), CREATED_TIME(), 'minutes')
+)"
+rec15GlO3LQq1lVyv,Schools,Dedupe school with,multilineText,
+recOkKVlMbyIQAtN3,Schools,Create stint for existing educator at school,formula,"CONCATENATE(""https://airtable.com/appJBT9a4f3b7hWQ2/pagQrgNxFhMOkDZzm/form?"",
+  ""prefill_School="",RECORD_ID())"
+recj8Ehz3z7K3X0Ay,Schools,Open grants link,formula,"CONCATENATE(""https://airtable.com/appJBT9a4f3b7hWQ2/pagQyANxuMy0xQpou?H3GgK=b%3AWzAsWyJCTjZqNyIsMTYsbnVsbCwiSjd3RXYiXV0&nCux5="",RECORD_ID())"
+recvZLeBzHfQtkJfq,Schools,Open school link,formula,"""https://airtable.com/appJBT9a4f3b7hWQ2/pagO78HBmjiWggic4?3gUdY=b%3AWzAsWyJpM0g1SCIsOSxbInNlbGkxbTFrcEdud2lQb1lQIiwic2VsV2xHaFo5UHZudFdhT3YiXSwidEx6SmMiXV0&PQh1B="" & RECORD_ID()"
+recH8zubhenkDhz3z,Schools,Open school interface,button,
+recsGatV9DHvf8yDS,Schools,Open grants interface,button,
+rec1ltZ7cJ8pMmjrR,Schools,Open S.S. details,formula,"""https://airtable.com/appJBT9a4f3b7hWQ2/pagw3oHrCDGsscTwQ?3gUdY=b%3AWzAsWyJpM0g1SCIsOSxbInNlbGkxbTFrcEdud2lQb1lQIiwic2VsV2xHaFo5UHZudFdhT3YiXSwidEx6SmMiXV0&PQh1B=""&RECORD_ID()"
+recDViqvtOgKhVDZY,Schools,Open SSJ details,formula,"""https://airtable.com/appJBT9a4f3b7hWQ2/pagxrE0Nai3ELMkbf/edit?3gUdY=b%3AWzAsWyJpM0g1SCIsOSxbInNlbGkxbTFrcEdud2lQb1lQIiwic2VsV2xHaFo5UHZudFdhT3YiXSwidEx6SmMiXV0&PQh1B=""&RECORD_ID()"
+recmyGvG2aIfpXJ6L,Schools,CountofActiveGuides,count,
+recbPdOyPvpP1jf6U,Schools,Meetings,multipleRecordLinks,Meetings
+receJJuvtIcwLwdmq,Schools,Membership termination steps,multipleRecordLinks,Membership termination steps
+recfV1of04BBHOC0Q,Schools,Membership termination letter,multipleAttachments,
+recTnB8IwWt56tWKx,Schools,Create termination record,formula,"CONCATENATE(
+  ""https://airtable.com/appJBT9a4f3b7hWQ2/pagFw2sI720rHXTLj/form?prefill_School="",
+  {school_id},
+  ""&prefill_Termination%20trigger%20date="",
+  DATETIME_FORMAT(TODAY(), 'YYYY-MM-DD'),
+  ""&prefill_GSuite%20shutoff%20target%20date="",
+  DATETIME_FORMAT(DATEADD(TODAY(), 21, 'days'), 'YYYY-MM-DD'),
+  ""&prefill_Shut%20off%20TC%20target%20date="",
+  DATETIME_FORMAT(TODAY(), 'YYYY-MM-DD'),
+  ""&prefill_List%20serve%20removal%20target%20date="",
+  DATETIME_FORMAT(TODAY(), 'YYYY-MM-DD'),
+  ""&prefill_Take%20down%20website%20target%20date="",
+  DATETIME_FORMAT(DATEADD(TODAY(), 21, 'days'), 'YYYY-MM-DD'),
+  ""&prefill_Take%20down%20QBO%20target%20date="",
+  DATETIME_FORMAT(DATEADD(TODAY(), 21, 'days'), 'YYYY-MM-DD'),
+  ""&prefill_Remove%20from%20Group%20Exemption%20target%20date="",
+  DATETIME_FORMAT(DATEADD(TODAY(), 21, 'days'), 'YYYY-MM-DD'),
+  ""&prefill_Remove%20from%20Gusto%20target%20date="",
+  DATETIME_FORMAT(DATEADD(TODAY(), 21, 'days'), 'YYYY-MM-DD')
+)
+"
+recR10YsT8SEjObWD,Schools,Fill in left network details,formula,"CONCATENATE(""https://airtable.com/appJBT9a4f3b7hWQ2/pagMYgs6MfU5hrxwa?J1vD3="",
+RECORD_ID(),
+""&hide_Schools=true"")
+"
+recPVPGKShVMUpmmD,Schools,Cohorts,multipleRecordLinks,Cohorts
+recgiJ0902TbunWf4,Schools,Automation notes,multilineText,
+rec2pOcGIjtFmz4zb,Charters,Charter key,formula,"IF({Short Name},{Short Name},IF({Initial target community},{Initial target community},{Non-TL roles}))"
+recMZiaEVg91AjUxk,Charters,Initial target community,singleLineText,
+recblkpGyMvwoHqs3,Charters,Application,multipleAttachments,
+recnjRYZ0Yogfavuh,Charters,Status,singleSelect,"Applying, Application Submitted - Waiting , Approved -  Year 0, Open, Paused, Awaiting start of cohort"
+recHFu4gHCrK8hiOd,Charters,Schools,multipleRecordLinks,Schools
+rechefZueabEQp6Zt,Charters,Linked Schools,multipleLookupValues,
+recijYL4OQyHoQkv3,Charters,Total Emerging Schools (from Schools),rollup,
+recmIggFMhoOkLqZa,Charters,Total Open Schools (from Schools),rollup,
+recVeiNnBrJtJTkiU,Charters,Group exemptions,singleLineText,
+reciR7NE47AKP9wKY,Charters,990s,multipleRecordLinks,990s
+recGvz7tQEfSS9Bfv,Charters,EIN,singleLineText,
+recjJVzjtuyaVjgpO,Charters,School governance documents,multipleRecordLinks,Governance docs
+recAnSNU1PKNucvZr,Charters,Nondiscrimination Policy on Website,checkbox,
+recWoVRVbEZjESfsQ,Charters,GuideStar Listing Requested?,checkbox,
+recDHru5LVVtXpR7s,Charters,School provided with 1023 recordkeeping requirements,checkbox,
+reckGUTPqq7S3sedb,Charters,Date received group exemption,date,
+rec6GckruX7Rws5aw,Charters,Group Exemption Status,singleSelect,"Active, Withdrawn, Issues"
+recYHpC6nkhJMmLPy,Charters,Incorporation Date,date,
+recyUSUSZNU85YGR0,Charters,Current FY end,singleSelect,"6/30, 12/31, 8/31, "
+recGKJOnQfkyuH1VW,Charters,Schools copy,singleLineText,
+recJnivcx2pfbqhtb,Charters,Schools copy,singleLineText,
+rec82FKSCxTqYhGsa,Charters,Full name,singleLineText,
+recZmyWo4kGPfxYHs,Locations,Location Key,formula,"{Address} & ""-"" & {Short Name}"
+rec1uHWQ6r3tdMPz0,Locations,Square feet,number,
+recqSYLzLlxIpIdQj,Locations,Max Students Licensed For,number,
+rec78Hd6zwi5U0Hui,Locations,Neighborhood,singleLineText,
+recwBZAyJAA0WqbFT,Locations,Address,richText,
+recCneHNljMsVEMvh,Locations,School,multipleRecordLinks,Schools
+recPQH5DkGQLP71Bx,Locations,Start of time at location,date,
+recm2d911S4aaer6j,Locations,End of time at location,date,
+rectSAQ6l1V9FME9H,Locations,Current mailing address?,checkbox,
+recSFCyxWcBaSI4Tt,Locations,Latitude,number,
+recwBruuC3BIFsk3j,Locations,Longitude,number,
+recPmEzYxZ3DEBNMd,Locations,location_id,formula,RECORD_ID()
+rectjcSA5pTguo9gX,Locations,City,singleLineText,
+recfrRngiivceCeJv,Locations,State,singleLineText,
+rec2nsWW89JXbhBoV,Locations,Country,singleLineText,
+recv61Uko53gWTSsf,Locations,Street,singleLineText,
+rechSy3BDHbVmL9gI,Locations,Postal code,singleLineText,
+recykc8i4ERAXaxqZ,Locations,Created,createdTime,
+reczp2uFcSXy2xC3t,Locations,Last Modified,lastModifiedTime,
+recnpQA2qvziI7alp,Locations,Geocode Automation Last Run At,dateTime,
+rec3aP3tCEsYrfv07,Locations,Location type,singleSelect,"Mailing address - no physical school, School address and mailing address, Physical address - does not receive mail"
+recejc9XEbOongMMg,Locations,School Status (from School),multipleLookupValues,
+recYu5prgSzYfWwBp,Locations,Current physical address?,checkbox,
+recDNFYwKVioL4biZ,School Locations,Question,singleLineText,
+recuNSdxjzNKUdIPj,Locations,Co-Location Type,singleSelect,"Church, Affordable Housing, Non Profit / Service Provider, Community Center, Shelter / Transitional Housing "
+recpr8yJH4npsCEhB,Locations,Co-Location Partner ,singleLineText,
+recMWQZyR4gAGvLnb,Locations,Qualified Low Income Census Tract,singleSelect,"YES, NO, Unknown"
+recA9KzYaeSz5pxmM,Locations,Lease End Date,date,
+recmn5rxRY02t7OnW,Locations,Lease,multipleAttachments,
+recw2Zky5aevXElcL,Locations,Short Name,multipleLookupValues,
+recVuT7jQTKFbP1r6,Locations,Time Zone,singleSelect,"Eastern Time (US & Canada), Central Time (US & Canada), Mountain Time (US & Canada), Pacific Time (US & Canada), Atlantic Time"
+recQDwlOYIIqdTNiD,Locations,Census Tract,singleLineText,
+rec1VBLYTuOyxY9LK,Locations,Inactive without end date; or active with end date,formula,"OR(AND(NOT(OR({Current mailing address?},{Current physical address?})),NOT({End of time at location})),AND(OR({Current mailing address?},{Current physical address?}),{End of time at location}))"
+rechiEsruCA5jLRwP,Educators,Full Name,formula,"REGEX_REPLACE({First Name} & "" "" & {Middle Name} & "" "" & {Last Name}, ""\\s+"", "" "")"
+recdfrZCRzjg0wj5v,Educators,First Name,singleLineText,
+recI9OGwPmJvuWNPV,Educators,Middle Name,singleLineText,
+rechQIXpn8QMZimWV,Educators,Last Name,singleLineText,
+recDlJ8d5h0cJm9So,Educators,Assigned Partner,multipleRecordLinks,Partners
+recvOG84leWfRBPgq,Educators,Discovery status,singleSelect,"Complete, In process, Paused"
+reccwYCpGfpwbEcdq,Educators,Source,multipleRecordLinks,Marketing source options
+recRVENkd1bhvWI3I,Educators,Source - other,multilineText,
+recgNRYbBAz7pD5ZP,Educators,Educational Attainment,singleSelect,"Graduated high school or GED, Completed graduate school, Graduated college, Some college, Some graduate school, Did not graduate high school"
+recTddyDWU65Xu9HJ,Educators,Assigned Partner Email,multipleLookupValues,
+recJ2siFE69FkvcCt,Educators,Home Address,multilineText,
+recjtQzUc3UZ3BtOY,Educators,TC User ID,singleLineText,
+recni5s0WL2H6uKa3,Educators,Educators at Schools,multipleRecordLinks,Educators x Schools
+recor6xrxesyU1del,Educators,All Schools,multipleLookupValues,
+recp3Cv8XkhqqdzLf,Educators,Currently Active School,multipleLookupValues,
+recLrBEMg3Abx81Ah,Educators,Current Role,multipleLookupValues,
+rec5cvUCZRKbYBSeZ,Educators,Created,createdTime,
+rec5wkzhQfTDOA6h5,Educators,Primary contact for,multipleRecordLinks,Schools
+recHFgivIzbqpoNku,Educators,Holaspirit memberID,singleLineText,
+rec1HIXHp0dYZ2nEy,Educators,Montessori lead guide trainings,multipleSelects,"AMI Infants and Toddlers, AMS (0-3), AMI Primary, AMS Early childhood, AMI Elementary, AMS Lower elementary, AMS Upper elementary, AMI Adolescent, AMS Lower secondary, AMS Upper secondary, Yes - type TBD"
+rechYb2hCPyI0jys2,Educators,Educator notes,multipleRecordLinks,Educator notes
+rec4i3WPvA63bmDfV,Educators,Active Holaspirit,checkbox,
+recq3mIMCLStRs76r,Educators,Also a partner,checkbox,
+recbj9qpyCtXXP7qZ,Educators,Nickname,singleLineText,
+rec3dIAEjxXSAI1Op,Educators,Montessori Certifications,multipleRecordLinks,Montessori Certs
+recXMHaqdFZX7cfux,Educators,Pronouns,singleSelect,"she/her/hers, he/him/his, other, they/them/theirs"
+recjSFDPSNPbC7iB2,Educators,LGBTQIA,singleSelect,"TRUE, FALSE"
+recAS2hd0hHL5GiAN,Educators,Gender,singleSelect,"Female, Male, Other, Gender Non-Conforming, Female/Woman, Male/Man, A not-listed or more specific gender identity"
+recNfk9vjCPARUFRR,Educators,Income Background,singleSelect,"Middle Income, Lower Income, Upper Income"
+recab7Xj5YC8BCmkP,Educators,Race & Ethnicity - Other,multilineText,
+recCqNKEWmw48Ignd,Educators,Race & Ethnicity,multipleSelects,"White, Asian, Black, Latino, Native, MENA, Pacific Islander, Other"
+rec5r5cveVdRyGCyc,Educators,Other languages,multipleSelects,"English, Spanish - EspañolSpanish, French - Français, Spanish - Español, Urdu - اُردُو, Japanese - 日本語, Mandarin - 中文, Arabic - العَرَبِيَّة, Hindi - हिन्दी, HungarianHungarian, Haitian Creole - Kreyol Ayisyen, Gujarati - ગુજરાતી, FujianFujian, Russian - русский язык, Korean - 한국어, Cantonese - Gwóngdūng wá, Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ, OtherHungarian, Portuguese - Português, Tami - தமிழ், Burmese - မြန်မာစာ, OtherYoruba"
+rec1jyhEwi2XCBKGM,Educators,Primary Language,multipleSelects,"English, French - Français, Spanish - Español, Urdu - اُردُو, Japanese - 日本語, Mandarin - 中文, Arabic - العَرَبِيَّة, Hindi - हिन्दी, Hungarian - Hungarian, Haitian Creole - Kreyol Ayisyen, Gujarati - ગુજરાતી, Fujian- Fujian, Russian - русский язык, Korean - 한국어, Cantonese - Gwóngdūng wá, Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ, Other - Hungarian, Portuguese - Português, Tami - தமிழ், Burmese - မြန်မာစာ, Other- Yoruba, A not-listed or more specific language"
+recModOKesaneazAm,Educators,Montessori Certified,rollup,
+recK3BiTDQDAGMw9Y,Educators,Notes (from Educator notes),multipleLookupValues,
+recVYHRYY51jLXcNV,Educators,Contact Email,formula,"IF({Email at active school}=BLANK(),{Primary Personal Email},{Email at active school})"
+rec0ThPeEEhI9fMcW,Educators,Last Modified,lastModifiedTime,
+recRpitLvTsBNmdgM,Educators,educator_id,formula,RECORD_ID()
+recUb5Xg7tAfNPnTI,Educators,Active School Record ID,multipleLookupValues,
+rec8vCYZqE2pW08Ro,Educators,Gender - Other,singleLineText,
+recW7UFhB0gi8Mwfe,Educators,Pronouns - Other,singleLineText,
+recrhOsGzLuz4R27d,Educators,School Statuses,multipleLookupValues,
+recfQknGHpT4dP9xv,Educators,Newsletter and Group Subscriptions,multipleRecordLinks,Mailing lists
+recpENXUlDOP7cINt,Educators,Household Income,singleSelect,"Middle Income, Lower Income, Upper Income, Prefer not to respond"
+recPnGvLT677YcCom,Educators,Active School Affiliation Status,multipleLookupValues,
+rec8KaS2JZBpLnNAK,Educators,survey - 2022 Wildflower Network Survey,checkbox,
+recOAeJeX1JSNJbwJ,Educators,Primary Personal Email,email,
+recAupDjwvLXDxIUG,Educators,Wildflowerschools.org Email,email,
+recJibLc1SvSLdPd9,Educators,Other Personal Emails,multilineText,
+recqoiw65j8WjGjS3,Educators,Events attended,multipleRecordLinks,Event attendance
+recnljYGhcyq1C8LL,Educators,Training Grants,multipleRecordLinks,Training Grants
+recnbkRPN3pHHCbal,Educators,Platform Educators & Partners,multipleRecordLinks,Platform Educators & Partners
+recY4Dj24lNzJzhYS,Educators,Onboarding Experience,singleSelect,"Standard SSJ, Onboarded by School Supports, Other"
+rec6AMmVJFvRcZwW2,Educators,On school board,singleLineText,
+recm5aBClTjH6y4jY,Educators,Individual Type,singleSelect,"Educator, Community Member"
+recxbxLoP4CHCdFjC,Educators,Certifier (from Montessori Certifications),multipleLookupValues,
+recnnmbHPgJWi8VDk,Educators,Certification Levels (from Montessori Certifications),multipleLookupValues,
+recYP5VeWNqKm4am4,Educators,School Address,multipleLookupValues,
+rec37tyx7JPjT0qY3,Educators,Created By,createdBy,
+rectBPEO01z3RrcKf,Educators,Email at active school,rollup,
+rec8EFmO5tiUz7iba,Educators,Primary phone,phoneNumber,
+recetytP72blUjbz2,Educators,Secondary phone,phoneNumber,
+reckRWwLDORNAivxP,Educators,Primary Work Email (non-WF),email,
+recSQqrGbRh48hyPS,Educators,Open educator interface,button,
+rectxBOXW2ldn79Ve,Educators,Combined emails,formula,"IF(
+  OR(
+    {column_value_fld5LH3K3nSFbD6G5},
+    {column_value_fldpnr7FEGNiMhWxz},
+    {column_value_fld5fGbXz5yOATo13},
+    {column_value_flddvkCybmu79TaEO},
+    {column_value_fldv2qwRi6ec5rtiD},
+    {column_value_fldM9IcV3FHNetx6k}
+  ),
+  TRIM(
+    REGEX_REPLACE(
+      LOWER(
+        CONCATENATE(
+          IF({column_value_fld5LH3K3nSFbD6G5}, {column_value_fld5LH3K3nSFbD6G5} & "", ""),
+          IF(AND({column_value_fldpnr7FEGNiMhWxz}, {column_value_fldpnr7FEGNiMhWxz} != {column_value_fld5LH3K3nSFbD6G5}), {column_value_fldpnr7FEGNiMhWxz} & "", ""),
+          IF(AND(
+            {column_value_fld5fGbXz5yOATo13},
+            {column_value_fld5fGbXz5yOATo13} != {column_value_fld5LH3K3nSFbD6G5},
+            {column_value_fld5fGbXz5yOATo13} != {column_value_fldpnr7FEGNiMhWxz}
+          ), {column_value_fld5fGbXz5yOATo13} & "", ""),
+          IF(AND(
+            {column_value_flddvkCybmu79TaEO},
+            {column_value_flddvkCybmu79TaEO} != {column_value_fld5LH3K3nSFbD6G5},
+            {column_value_flddvkCybmu79TaEO} != {column_value_fldpnr7FEGNiMhWxz},
+            {column_value_flddvkCybmu79TaEO} != {column_value_fld5fGbXz5yOATo13}
+          ), {column_value_flddvkCybmu79TaEO} & "", ""),
+          IF(AND(
+            {column_value_fldv2qwRi6ec5rtiD},
+            {column_value_fldv2qwRi6ec5rtiD} != {column_value_fld5LH3K3nSFbD6G5},
+            {column_value_fldv2qwRi6ec5rtiD} != {column_value_fldpnr7FEGNiMhWxz},
+            {column_value_fldv2qwRi6ec5rtiD} != {column_value_fld5fGbXz5yOATo13},
+            {column_value_fldv2qwRi6ec5rtiD} != {column_value_flddvkCybmu79TaEO}
+          ), {column_value_fldv2qwRi6ec5rtiD} & "", ""),
+          IF(AND(
+            {column_value_fldM9IcV3FHNetx6k},
+            {column_value_fldM9IcV3FHNetx6k} != {column_value_fld5LH3K3nSFbD6G5},
+            {column_value_fldM9IcV3FHNetx6k} != {column_value_fldpnr7FEGNiMhWxz},
+            {column_value_fldM9IcV3FHNetx6k} != {column_value_fld5fGbXz5yOATo13},
+            {column_value_fldM9IcV3FHNetx6k} != {column_value_flddvkCybmu79TaEO},
+            {column_value_fldM9IcV3FHNetx6k} != {column_value_fldv2qwRi6ec5rtiD}
+          ), {column_value_fldM9IcV3FHNetx6k} & "", "")
+        )
+      ),
+      "",\\s*$"", """"
+    )
+  )
+)
+"
+rectu8hmAOOi2pzBj,Educators,emails,multipleRecordLinks,Emails
+recB4ll9UBEhEdd12,Educators,Startup Stage for Active School,multipleLookupValues,
+recWDgg5raPRHPz38,Educators,Ever a TL in an open school,rollup,
+recCMp6kyXoSfiLxh,Educators,Currently Active at a School?,multipleLookupValues,
+rec5P12py1N0DDyhb,Educators,Schools,multipleRecordLinks,Schools
+rec60z64Cl9TrueRo,Educators,SSJ Fillout Forms,multipleRecordLinks,SSJ Fillout Forms
+reci6INffVNiPX2Fl,Educators,First contact - WF School employment status,singleSelect,"Never employed by a Wildflower school, Never employed by a Wildflower school, Never employed by a Wildflower school, Active Teacher Leader, Active School Staff, Active School Staff, Active School Staff, Not currently working at a Wildflower school - former TL, Not currently working at a Wildflower school - former school staff"
+recWbrh5HnMqi5CvU,Educators,Contact Form Details (from SSJ data on educators),multilineText,
+recHYT2tvyiwIoGJ9,Educators,First contact - Notes on pre-Wildflower employment,multilineText,
+recifUpKKyRanEjEq,Educators,SSJ Typeforms: Start a School (from SSJ data on educators),multipleRecordLinks,SSJ Typeforms: Start a School
+recAzgCtLgjILYGqk,Educators,Target city,singleLineText,
+recmOjHABnbL5w4wk,Educators,First contact - Initial Interest in Governance Model,multipleSelects,"Charter, Independent"
+recY9PlgJ7ZcqJSRt,Educators,First contact - Willingness to relocate,checkbox,
+recYK6Um3s9wDdHnd,Educators,First contact - initial interest in ages,multipleRecordLinks,Montessori Cert Levels
+recUoFyRjnOmS33aE,Educators,First contact - initial interests,multilineText,
+recCwq4gCqDmJPIYU,Educators,Target state,multilineText,
+recVFnppCe9vrW6sG,Educators,Target - international,singleLineText,
+recR9wfDCmDTVHY0f,Educators,Tags,multipleSelects,"Wildflower parent, TFA alum"
+rec9PJaf1WJSBAGMI,Educators,Exclude from email logging,checkbox,
+rec8uvlkxcF9miPoF,Educators,Board Service,multipleRecordLinks,Board Service
+recEjBRIzWvSR80FK,Educators,Last Modified Trigger,formula,"IF(
+  LAST_MODIFIED_TIME(),
+  DATETIME_DIFF(NOW(), LAST_MODIFIED_TIME(), 'minutes'),
+  DATETIME_DIFF(NOW(), CREATED_TIME(), 'minutes')
+)
+"
+recZUx8ruBSpTbdPc,Educators,Dedupe with,multilineText,
+recxRYDlrIvG0aCkR,Educators,Message (from SSJ Fillout Forms),multipleLookupValues,
+recgHlzL3e0mFQ9XU,Educators,Entry Date (from SSJ Fillout Forms),multipleLookupValues,
+recNyp5wMvZDIYego,Educators,Count of Get Involved Forms,count,
+rechhsOHRaJ4Ir6qd,Educators,Errors,multipleSelects,Likely duplicate
+rec1nq0z1KhaMUeex,Educators,Create stint for existing school,formula,"CONCATENATE(""https://airtable.com/appJBT9a4f3b7hWQ2/pagQrgNxFhMOkDZzm/form?"",
+  ""prefill_Educator="",RECORD_ID())"
+recLzWCHq7W14t1h8,Educators,Self-reflection,multipleAttachments,
+recv3szMIcVEmjw39,Educators,Target geo combined,formula,"IF({Target - international},{Target - international},
+  {Target city}& "" "" & {Target state})"
+recg38FA3gT1C530b,Educators,Meetings,multipleRecordLinks,Meetings
+recwlHKKtuyG4ex2Y,Educators,Cohorts,multipleLookupValues,
+recNcD6IEFEy6rATB,Educators,Assigned Partner Override (from SSJ Fillout Forms),multipleLookupValues,
+rec9i6gXY6btUXBtg,Educators,Automations,singleLineText,
+recVU5Oe1bPAr4FhM,Educators x Schools,edXschool key,formula,"CONCATENATE({First Name (from Educator)}, "" - "", IF({School Short Name},{School Short Name},{School}) , "" - "", IF({Start Date},
+  DATETIME_FORMAT({Start Date},'YYYY-MM-DD'),{educatorsXschools_id}))"
+recB1C3Fa7uFnlAsC,Educators x Schools,Educator,multipleRecordLinks,Educators
+recVnA0yPWpwG9Tdk,Educators x Schools,School,multipleRecordLinks,Schools
+reczFZChdst1rMf4L,Educators x Schools,Start Date,date,
+recH56P8RcycygOzQ,Educators x Schools,End Date,date,
+recb7bwxRKQtoaE55,Educators x Schools,Currently Active,checkbox,
+recefwQGHzR1lyTE7,Educators x Schools,Email at School,email,
+recJ5puzxmgr3GWQ2,Educators x Schools,Ages served,multipleLookupValues,
+recfLDsA3zlXMk1SH,Educators x Schools,School Status,multipleLookupValues,
+recpkCP548qH2RhHx,Educators x Schools,Educator Full Name,multipleLookupValues,
+recbCNZYTEGiMJTuW,Educators x Schools,Race & Ethnicity (from Educator),multipleLookupValues,
+recltHbE7DTjiHGYm,Educators x Schools,Income background,multipleLookupValues,
+recCHKd2kR77QykHT,Educators x Schools,Gender (from socio-economic background),multipleLookupValues,
+recFtanLiTTcbtfgz,Educators x Schools,Primary Language (from languages / socio-economic background),multipleLookupValues,
+recrB7ejWLT3ZLOXT,Educators x Schools,LGBTQIA (from Socio-economic Background) (from Educator),multipleLookupValues,
+rectyR6dya3u2w5Y3,Educators x Schools,21-22 Completed Demographic Info?,checkbox,
+reczw09QE1q9ZghgA,Educators x Schools,Montessori Certifications,multipleLookupValues,
+recc3lUWH8EVqeqh9,Educators x Schools,Montessori Certified?,multipleLookupValues,
+recdWpS7OF5UD8uDB,Educators x Schools,SSJ Stage,multipleLookupValues,
+recmBYdFV8OYCiCXZ,Educators x Schools,Loan Fund?,checkbox,
+recySHn4MSiOj4mnx,Educators x Schools,educatorsXschools_id,formula,RECORD_ID()
+recR5BmmXAWebZUvt,Educators x Schools,educator_id,multipleLookupValues,
+recQoEJUhTnPo9fmw,Educators x Schools,school_id,multipleLookupValues,
+recDM0Frkgi97rJg4,Educators x Schools,School Address,multipleLookupValues,
+rec7kOAuLdEezCtDj,Educators x Schools,TL Gift 2022,checkbox,
+rec2a05VStybTrUoj,Educators x Schools,Educator Email,multipleLookupValues,
+recHk6BrKkG7OAay1,Educators x Schools,Membership Status,multipleLookupValues,
+rechRczWG8hNp7ESX,Educators x Schools,Roles,multipleSelects,"Founder, Teacher Leader, Emerging Teacher Leader, Classroom Staff, Fellow, Other"
+recwMSoWxI3ECuLde,Educators x Schools,Loan (from Loans - Issue Method) (from School),multipleLookupValues,
+reclQjJgbjB7i93eA,Educators x Schools,Opened (from School),multipleLookupValues,
+recOGQQly1PMQAVjx,Educators x Schools,Governance Model (from School),multipleLookupValues,
+recQFOSGrBh2q5BTD,Educators x Schools,Charter (from School),multipleLookupValues,
+recYQoJFFO6qamDXi,Educators x Schools,On Connected,checkbox,
+recLdDytIUoIKyAMk,Educators x Schools,On Slack,singleSelect,"Active, Removed"
+recDKX6DpoldQVled,Educators x Schools,On Teacher Leader Google Group,singleSelect,"Active, Removed"
+recKiCwx2rbUE1xv4,Educators x Schools,Platform Educators x Schools,multipleRecordLinks,Platform Educators x Schools
+recqfDy40i7dMBEa0,Educators x Schools,On Wildflower Directory,singleSelect,"Active, Removed"
+recNIzoI7RXoDGTes,Educators x Schools,Created,createdTime,
+recSg0CsUaJQWtWgy,Educators x Schools,Entered Visioning (from School),multipleLookupValues,
+reckRLHY7TXDrPXz3,Educators x Schools,Membership Agreement date (from School),multipleLookupValues,
+recVudfj8S53jZlTb,Educators x Schools,Invited to 2024 Refresher,checkbox,
+recFhmTaKpq5Tb9nZ,Educators x Schools,Email Status,singleSelect,"Active, Suspended"
+recVtrdyr7yXHiwCY,Educators x Schools,Who initiated E/TL removal?,singleLineText,
+recvZOBzHqeEnb4Ly,Educators x Schools,On National Website,singleSelect,"Added, Removed"
+recw93VZ55oRTZC8d,Educators x Schools,GSuite Roles,singleSelect,School Admin - School Orgs
+reckoH91pkbsDbplG,Educators x Schools,Loans,multipleRecordLinks,Loans
+recy81C03RNrAPqQR,Educators x Schools,Entered Startup,multipleLookupValues,
+recmnlaGKwQtvTk7f,Educators x Schools,Entered Planning,multipleLookupValues,
+recwK2eZnxLkEbXA4,Educators x Schools,School Short Name,multipleLookupValues,
+recWl7ySiAhul1CIk,Educators x Schools,First Name (from Educator),multipleLookupValues,
+reczIrxdZzyGohwjG,Educators x Schools,Create educator record,button,
+rec3dRXl9bDWFN2pR,Educators x Schools,Open school interface,button,
+recY61uA1Gkur1vGH,Educators x Schools,Open TL interface,button,
+recuxDQaC34SHx2b8,Educators x Schools,School Cohort,multipleLookupValues,
+recKKplSpcnThGaNi,Partners,email or name,multilineText,
+rechuzS9w2w8Kt5uK,Partners,Email,email,
+recP8ceT3eVw2x2QE,Partners,Currently active,multilineText,
+recZBY1qsslQLoJ6t,Partners,Roles,multipleSelects,"Foundation Partner, Teacher Leader, Ops Guide, School Supports Partner, Finance Administrator, Regional Entrepreneur, TL, Affiliate of Charter Partner"
+recc3oSujgh8Ji1SS,Partners,Photo,multipleAttachments,
+rec1xP9D9JFrixeOU,Partners,Phone,phoneNumber,
+recWKvJAkwm7qjAhn,Partners,Home address,multilineText,
+recXB7wIDK02UZRxK,Partners,DOB,date,
+recVb9XIyjSkiQrPL,Partners,TLs,multipleRecordLinks,Educators
+recVZggdQz5OQQJik,Partners,Guide assignments,multipleRecordLinks,Guides Assignments
+recqS5y1NwzDxZmZ2,Partners,Hubs,singleLineText,
+recRo2N5WsQsH7FyO,Partners,Start Date (from Stints),singleLineText,
+rec68W2KzJriC2hxI,Partners,End Date (from Stints),singleLineText,
+recPnWbaACTLncax9,Partners,Stint type (from Stints),multipleSelects,"Full time employee, Part time eligible, Part time ineligible, Seasonal or temporary, Dedicated contractor, Other contractor, Sponsored project, Volunteer, TL contractor, Affiliate of Charter Partner"
+recKFf4RhdjSumpvS,Partners,Active stint,multipleSelects,"Full time employee, Part time eligible, Part time ineligible, Seasonal or temporary, Dedicated contractor, Other contractor, Sponsored project, Volunteer, TL contractor, Affiliate of Charter Partner"
+recGO0RKqdrN7dN23,Partners,2016-2017 (from Stints),singleLineText,
+recaP5CtMwYlZGEEs,Partners,2017-2018 (from Stints),singleLineText,
+rec0vbm0QUECtnMpZ,Partners,2018-2019 (from Stints),singleLineText,
+recKUjLuRcCYpGhMh,Partners,2019-2020 (from Stints),singleLineText,
+rec0Xfj2i6lS0kNuf,Partners,Educator notes,multipleRecordLinks,Educator notes
+recuPQnKeJISyK7xg,Partners,School notes,multipleRecordLinks,School notes
+recX5UqMJeVN3PXMc,Partners,Website bio,multilineText,
+recYtl1avxn5ZZdIf,Partners,Slack handle,singleLineText,
+recRZYSSsMAJFMtaZ,Partners,Papyrs profile,singleLineText,
+recvIs1UUFExdm9cy,Partners,Copper userID,singleLineText,
+recOLm4gZ8WcbkO05,Partners,Public website active,checkbox,
+rec8e9KHzzygmmMFh,Partners,Holaspirit member ID,singleLineText,
+rec3kJPBweVyJl9OQ,Partners,Educator Record IDs,multipleLookupValues,
+recyZgv6oUXjNSP7G,Partners,Guided School Record ID,multipleLookupValues,
+recZOcY0T01KGkOzc,Partners,Synced Record ID,multilineText,
+recwavaN1zshYTsPp,Partners,Record ID,formula,RECORD_ID()
+rec2uzlQz7KpVkvWY,Partners,Educator Log,singleLineText,
+recd7yiBy8Hvp6n7L,Partners,Personal Email,email,
+recfLrlmgvEHGbGhS,Partners,Image URL,singleLineText,
+recwsNcEOolikDioY,Partners,Action steps,multipleRecordLinks,Action steps
+recXpLwh6GvA6iohN,Partners,SSJ Process Details,singleLineText,
+recu3bikF9z9O6hFe,Partners,Schools,multipleRecordLinks,Schools
+recj7S6zbsxzWSqTv,Partners,Grants,singleLineText,
+recSxsQXu93pJvjIR,Partners,Grants 2,singleLineText,
+recEv887SwtbLZIQl,Partners,Grants 3,singleLineText,
+recwVYhuM7FLvBhhu,Partners,Grants 4,singleLineText,
+recy9v8MimrqQglPr,Partners,Lead Routing,singleLineText,
+rec0VOwbhJPlUSula,Partners,Name,singleLineText,
+rec8bqkHkZ4jdL71u,Partners,Email templates,multipleRecordLinks,Lead Routing and Templates
+rec4TZyxDqaPQEJib,Partners,Grants 5,multipleRecordLinks,Grants
+recfmkne0Nnl7vkce,Partners,Membership termination steps and dates,singleLineText,
+receJlAHevUqYQWgf,Partners,Grants 6,singleLineText,
+recJ177ka0yIyunI1,Partners,Grants 7,singleLineText,
+recIiaFfO4E4STnUX,Partners,Grants 8,singleLineText,
+recKfiRFv1LL0BQAy,Partners,Grants Advice Log,multipleRecordLinks,Grants Advice Log
+recI3u73Ux9BXjaQb,Partners,Key Value Pairs,multipleRecordLinks,Key Value Pairs
+recmlBb9XtWXrDEUI,Partners,Roadmap,multipleRecordLinks,Roadmap
+rec08RqbMYctNdDc5,Partners,Roadmap 2,multipleRecordLinks,Roadmap
+recASChtDddhNBZFq,Grants,Grant Key,formula,"IF(OR({Amount}<0,{Amount}>1000000),""OUT-OF-RANGE"",
+  IF({Amount}<1000,""$""&{Amount},""$""&MID({Amount}&"""",1,LEN({Amount}&"""")-3) &"",""& RIGHT({Amount}&"""",3)))
+
+& "" - "" & 
+
+IF({Issue Date},DATETIME_FORMAT({Issue Date},'YYYY-MM-DD'),""No Date"") 
+
+& "" - "" & 
+
+IF({School Short Name},{School Short Name},{School})"
+reclUZwg5DbGMMEvU,Grants,Amount,currency,
+recfSWGQqf9Io1Px3,Grants,Issue Date,date,
+recT3d6C3ZyRRPXkl,Grants,Funding Source,singleSelect,"Sep, TWF - MN / Walton, TWF - PR, TWF - Walton, TWF - Cambridge, RWJF, TWF - No Cal - advance, TWF - Cambridge - advance, TWF - Cambridge , TWF - MN, Walton, TWF - National, TWF - No Ma, Stranahan, Nash, TWF - No Cal - SSF, TWF - CO - Constellation, TWF - MN - PELSB, TWF - NJ - Overdeck, TWF - Mid-Atl, VELA, Individual Donor, Passthrough, COVID, Seed Fund, Scholler, DEED, DC, Flamboyan Foundation"
+reccliESl1ogMor4y,Grants,Accounting Notes,singleSelect,"OK, ?, IN QBO"
+recNFl6FoHQQ8EFtf,Grants,Notes,multilineText,
+rec6J0PqUOlkRwu7U,Grants,School,multipleRecordLinks,Schools
+recRmabkbBeKX8FEB,Grants,Grant Status,singleSelect,"Issued, Planned, Did not receive, ?, Received, X, is"
+recUYOgciwaj7H9TP,Grants,School Grant Name,singleLineText,
+recrPYKGgZbxmaY2o,Grants,School Hub,multipleLookupValues,
+recwUimOKEXlH2Jqv,Grants,Funding Hub,singleLineText,
+recwpf19XfkpAne4Q,Grants,Text for ledger entry,singleLineText,
+rec4v8x00autpMOV0,Grants,Signed Grant Agreement,multipleAttachments,
+recQX0Kd9nbeg0dg6,Grants,Proof of 501(c)3 status at time of grant,multipleAttachments,
+rec85OTbMrEUmPOBd,Grants,Guides and Entrepreneurs (from School),multipleLookupValues,
+recfDzu56MObbRNWa,Grants,GuideEntrepreneur Short Name,multipleLookupValues,
+recSH5KQrm5MZevXI,Grants,Funding purpose (for grant agreement),singleLineText,
+recpJ03Pi5FRk7hMr,Grants,Funding period (for grant agreement),singleLineText,
+recWXobLj1wHNuqZu,Grants,Unsigned Grant Agreement,multipleAttachments,
+recVxlnyjL9Ronn0h,Grants,Projected Open,multipleLookupValues,
+recFBOsNAl2MV5xwH,Grants,Automation step trigger,singleSelect,"Cannot proceed without a grant amount, Request prelim advice for $3k+, Wait for prelim advice, Pause at prelim advice, Request full advice, Wait for full advice, Pause at full advice, Objections, Proceed, Waiting for pre-reqs before proceeding, Processing, Complete"
+recNfZe9NHlBfvd58,Grants,Prelim advice request time,dateTime,
+recbOC1rhqC6YV6RI,Grants,Full advice request time,dateTime,
+recStBwwczA1jQwFH,Grants,School Contact Emails (from School),multipleLookupValues,
+recN4G6VmDPDx4XxY,Grants,Current TLs first names,multipleLookupValues,
+recxUAo94ov5Iv9zD,Grants,EIN,multipleLookupValues,
+recyznvy83MyKNVLe,Grants,Nonprofit status,multipleLookupValues,
+recfEweN5KCr7yOES,Grants,Membership Status (from School),multipleLookupValues,
+recIq3JIAA0bUnehY,Grants,TL emails,multipleLookupValues,
+recDvHW0QsETLeX5a,Grants,Legal Name of School,multipleLookupValues,
+recghRZIH98NikIXB,Grants,Current TLs,multipleLookupValues,
+recUq7JEwjediJRx8,Grants,TLs at time of grant,multilineText,
+recxfog5TnA2a0hzC,Grants,Legal Name at time of grant,singleLineText,
+recvHXL1iFfmGtxQt,Grants,TL emails at time of grant,multilineText,
+recIgxDc1keIKSkGq,Grants,EIN at time of grant,singleLineText,
+reczbySkJSBOMyCGX,Grants,Nonprofit status at time of grant,singleLineText,
+recPyJf6x2eRw3XRR,Grants,Membership status at time of grant,singleLineText,
+recPowEemImC7cX1f,Grants,Mailing address,multipleLookupValues,
+recfkxQsYBSOIfaPR,Grants,Mailing address at time of grant,multilineText,
+recgyk4j1pTyLjUTF,Grants,Ready to accept grant (501c3 + EIN),formula,"IF(
+  AND(
+    NOT(
+      OR(
+        {EIN} = BLANK(),
+        {EIN} = ""N/A""
+      )
+    ),
+    NOT(
+      OR(
+        {Nonprofit status} = BLANK(),
+        LOWER({Nonprofit status}) = ""for profit""
+      )
+    ),
+    {Membership Status (from School)} = ""Member School"",
+   OR({Nonprofit status}=""group exemption"",{Proof of 501(c)3 status at time of grant})),""✅ Complete"",
+   IF(
+     AND(
+    NOT(
+      OR(
+        {EIN} = BLANK(),
+        {EIN} = ""N/A""
+      )
+    ),
+    NOT(
+      OR(
+        {Nonprofit status} = BLANK(),
+        LOWER({Nonprofit status}) = ""for profit""
+      )
+    ),
+    {Membership Status (from School)} = ""Member School""),""🫸Awaiting determination letter"", ""❌Missing information""))"
+recfoRumXESnU62VO,Grants,Have data to issue grant letter,formula,"IF(
+  AND(
+    COUNTA(
+      {School})>0,
+    COUNTA(
+      {Current TLs})>0,
+      {TL emails},
+      {EIN},
+      {Count of Active Mailing Addresses (from School)}=1,
+      {Funding purpose (for grant agreement)}
+,
+      {Amount},
+      {Amount} >0,
+      {Funding Source},
+      {Text for ledger entry}
+  ),
+  ""✅ Complete"",
+  ""❌ Missing information""
+)"
+recPiKBgwhWwXDCYH,Grants,Advice window (1 week) closed,formula,"IF(DATETIME_DIFF(NOW(), {Full advice request time}, 'days') >= 7, ""true"", ""false"")"
+recTvDM0KCpI3KNaz,Grants,Bill.com,multipleLookupValues,
+recH7X14He7IwgqZL,Grants,Initiate grant process,button,
+rec7pymGypy3L29in,Grants,Recipient name from QBO,singleLineText,
+recpCzab7xn7W0EVM,Grants,Logo (from School),multipleLookupValues,
+rec0idbj5SrIUHwjz,Grants,School Short Name,multipleLookupValues,
+recQ1nVWmCZtgveBi,Grants,QBO #,singleLineText,
+recqQXRCctN5ikfDM,Grants,Issued by,multipleRecordLinks,Partners
+rec9lwgsJLz2RYAwo,Grants,Count of Active Mailing Addresses (from School),multipleLookupValues,
+rec8Quq1owTcWV7Z4,Grants,Label,singleSelect,"Sep, Betsy Symanietz, Sara Hernandez, Daniela Vasan, Alia Perra, Rachel Kelley-Cohen, Erika McDowell, Sunny Greenberg, Erica Cantoni"
+receVjQSoXDXDyj7b,Grants,Open grant,button,
+rec3WaxMDeFMYopRa,Grants,test,button,
+recUV0gqzKDy8CNdE,Grants,Issued by Name,multipleLookupValues,
+recZ5XiPUhbB5s4l5,Grants,Grants Advice Log,multipleRecordLinks,Grants Advice Log
+recyVCKwfjUawFANQ,Grants,Prelim Advice Status Rollup,rollup,
+rec7Iqe8QBtKAq1EJ,Grants,Full Advice Status Rollup (from Grants Advice Log),rollup,
+recmxIxq2klHtEtsV,Grants,Prelim Advice Yeses,count,
+reckClQ0g4w3KgF5d,Grants,Prelim Advice Pauses,count,
+rec5bEUmmnpxiFkPb,Grants,Full Advice Yeses,count,
+recIjjyJSVyHL9X6B,Grants,Full Advice Open Questions,count,
+rec0WOCH4q8PpWrTA,Grants,Full Advice Open Objections,count,
+recxsWg5qzmcMtkMe,Grants,Days since prelim advice request,formula,"DATETIME_DIFF({Prelim advice request time},NOW(),'days')"
+rec8BV719Oy2gwdnX,Grants,Days since full advice request,formula,"DATETIME_DIFF({Full advice request time},NOW(),'days')"
+rechXoi9Mu2GVpQ6P,Grants,Prelim Advice Yes Names,rollup,
+recrrZ3OdcHGlfUSP,Grants,Calculation,formula,RECORD_ID()
+recD2CzQerxwCw2Ed,Grants Advice Log,grant_advice_id,formula,RECORD_ID()
+recemH9tdPxtRIkuE,Grants Advice Log,Grant,multipleRecordLinks,Grants
+recnFCHkrTHJqPylm,Grants Advice Log,Advice Giver,multipleRecordLinks,Partners
+recWgw6e5jnZlF6rB,Grants Advice Log,Step,singleSelect,"Prelim, Full"
+recCuJpkLHrCJunU5,Grants Advice Log,Initial Advice,singleSelect,"Support, Question, Objection"
+rec0tpZl4iA9521D7,Grants Advice Log,Advice Given - text,multilineText,
+recheXXmHj6cVRT8W,Grants Advice Log,Advice Given - date,dateTime,
+recE9FxdDrwmJT6gu,Grants Advice Log,Question Resolved Time,dateTime,
+rec2VHq5JmL1h1G05,Grants Advice Log,Objection Cleared Time,dateTime,
+recoB8doGMhZtZoX5,Grants Advice Log,Status,formula,"IF({Initial Advice}=""Support"",""Proceed"",
+IF(AND({Initial Advice}=""Question"",{Question Resolved Time}),""Proceed"",
+IF(AND({Initial Advice}=""Question"",NOT({Question Resolved Time})),""Open Questions"",
+IF(AND({Initial Advice}=""Objection"",{Objection Cleared Time}),""Proceed"",
+IF(AND({Initial Advice}=""Objection"",NOT({Objection Cleared Time}),""Open Objections"",""Error""))))))"
+reclEbgecU1oGWMAP,Grants Advice Log,Issued by (from Grant),multipleLookupValues,
+recIo0oxA2FO5OIQo,Loans,Loan Key,formula,"{School} & "" "" & {Effective Issue Date}"
+recCONPVdKK4E5qIT,Loans,Amount Issued,currency,
+recUxsQn32Tb8Yk6G,Loans,Effective Issue Date,date,
+rec0cb1vukFLLJMKc,Loans,Maturity,date,
+recY46gA1V7AEeqoi,Loans,Interest Rate,percent,
+recedKjpEpn3UhqxB,Loans,Use of Proceeds,singleSelect,"Operations, Start-up , Renovations / Construction, Combine 2 loans, Expansion, Move, Security deposit"
+rec0Xoj5mxtJ5MIkZ,Loans,Issue Method,singleSelect,"Sep, TWF, TWF->LF II, LF II, Spring Point"
+reciTlK5O3EG4LN9I,Loans,School,multipleRecordLinks,Schools
+recbZH00CL1QkbPkW,Loans,Contact email (from Educator) (from Educators x Schools) (from School),multipleLookupValues,
+recDoTTSHenFKxhrN,Loans,Loan Contact Email 1,email,
+reckbpjrR2kxZ3u1o,Loans,Loan Contact Email 2,email,
+recavPEkn0QXF43rQ,Loans,Loan Status,singleSelect,"Interest Only Period, Principal Repayment Period, Paid Off, "
+recmY7cR3b7iEUrml,Loans,Notes,multilineText,
+rec4a4sdbbNxPjJyN,Loans,Loan paperwork,multipleAttachments,
+rec2qrnPvSwTDnVmG,Loans,Approximate Outstanding Amount,currency,
+recHpwecbjJbpJh9u,Loans,Educators x Schools,multipleRecordLinks,Educators x Schools
+recBrK6A2xcDNkmoS,Governance docs,Doc Key,formula,"IF({School},{Short Name (from School)},IF({Charter},{Charter},"""")) & "";"" & 
+TRIM(MID({Document type}, FIND(""- "", {Document type}) + 2, LEN({Document type})))& "";"" & {Date}"
+recgHxvKNxZ61Qsys,Governance docs,School,multipleRecordLinks,Schools
+recRcvFJOxKLwitUg,Governance docs,Document type,singleSelect,"Articles of Incorporation, Certificate of Incorporation, EIN Letter, Self management policy, Nepotism policy, Conflict of Interest policy, Bylaws, Document Retention Policy, Whistleblower Policy, Nondiscrimination Policy, Membership Agreement, Authorization Letter, Group Exemption Status Notification to IRS, Group Exemption Status Notification to School, Group Exemption Status Withdrawn Notification to IRS, IRS Determination Letter, Acknowledgement & Commitment"
+reczjTQ7xVgnwPjSy,Governance docs,Date,date,
+recvqOIKYrb8fJ0ja,Governance docs,Charter,multipleRecordLinks,Charters
+rectKgX2dfSfQNXHm,Governance docs,Document PDF,multipleAttachments,
+rec6NXPYkmnliL2Xz,Governance docs,Doc Link,multilineText,
+recHm4vYMh7yCnBZy,Governance docs,Doc notes,richText,
+recxQEpZdWSg32f0h,Governance docs,Publication link,multilineText,
+recCCD1zYNsG6QEFp,Governance docs,Short Name (from School),multipleLookupValues,
+recaC0ARRWTTa64Wk,Governance docs,Created,createdTime,
+recBo46zFHej9cszi,Governance docs,url-->pdf extension formula,url,
+recUEd06UlaP1PDdK,Governance docs,EIN (from School),multipleLookupValues,
+rect71ReB6r0kSBbw,990s,990 key,formula,"IF({Short Name (from School ID)},{Short Name (from School ID)},IF({Charter key},{Charter key},"""")) & "";"" & {990 Reporting Year}"
+recQ41QpDwSeTrBoq,990s,990 Reporting Year,singleLineText,
+recQ8IJ9ETsF8xVC5,990s,School,multipleRecordLinks,Schools
+recc4a1qMwU1IAfJT,990s,PDF,multipleAttachments,
+rec5oHnydo8gofI3r,990s,link,url,
+rec0vvMT2nlSfZKf8,990s,Charter key,multipleRecordLinks,Charters
+recA8dBvX7kweQiKZ,990s,EIN,multipleLookupValues,
+recyaenxmP7LpkBAL,990s,Incorporation Date (from School ID),multipleLookupValues,
+recEoGHu2vc1ag3gt,990s,Short Name (from School ID),multipleLookupValues,
+reclfV4WabuCfltvT,990s,url-->pdf extension formula,formula,"SUBSTITUTE(SUBSTITUTE({link}, ""file/d/"", ""uc?export=download&id=""), ""/view?usp=drive_link"", "" "")"
+recyT9safrvyQAQ0Z,990s,Group Exemption,multipleLookupValues,
+recRljO8TBzqxVR9s,990s,Notes,multilineText,
+rec1i622NA74Cyhlx,Loan payments,Payment key,formula,"IF({Short Name},{Short Name}&"";""&{Payment date},{School}&"";""&{Payment date})"
+recjGhFICfXqtWjFT,Loan payments,School,multipleRecordLinks,Schools
+rectHxRDir0tctVSS,Loan payments,Payment date,date,
+reco8pbJXRyY6WQSX,Loan payments,Amount,currency,
+recYgNpdlJcAF3LOG,Loan payments,Loan Report Name (from School ID),multipleLookupValues,
+rec8UXZuGdWW7NcPV,Loan payments,Short Name,multipleLookupValues,
+rec2oa0IC4mZ68vup,Events,Event Name,singleLineText,
+recwtk1kjXsInULC0,Events,Date,date,
+recFE1xo457uJcWlG,Events,Type,multipleRecordLinks,Event types
+rec0FcHDzJ2PQfcHz,Events,Attendees,multipleRecordLinks,Event attendance
+recpX6GYgDrFAIIOJ,Events,event_id,formula,RECORD_ID()
+rec179u1lUM7LKi8r,Event attendance,Event Attendance key,formula,"{Event} & ""-"" & {Event Participant}"
+rec8ju2mMaF4WYSfC,Event attendance,Time at event,number,
+recElQ80RFuWCbUwI,Event attendance,Event Participant,multipleRecordLinks,Educators
+recmELn3rDanWXO6a,Event attendance,Event,multipleRecordLinks,Events
+recwVhaNbOFjwPTyj,Event attendance,Registered,checkbox,
+recGpAoPTaYErJZOZ,Event attendance,Registration Date,date,
+recHGYrsmKXkEJKPr,Event attendance,Attended,checkbox,
+recNA71KcjVTOnZfk,Event attendance,Phone,phoneNumber,
+recxSL8veygIdU7a5,Event attendance,educator_id,multipleLookupValues,
+recAW1KY7fHgGWoM8,Event attendance,TL Stories Type,singleLineText,
+recY2z3LhXj4O1sz7,Event attendance,TL Stories Race,singleLineText,
+recW62s2EurGaBPR1,Event attendance,TL Stories School Target,singleLineText,
+reclCrxTcsjR6fLAC,Event attendance,TL Stories Q1,multilineText,
+recqf0BAIJz43yNvR,Event attendance,TL Stories Q2,multilineText,
+recce4QCfklmiaMfk,Event attendance,Income Background (from Event Participant),multipleLookupValues,
+recaUHuL1LJawYVHX,Event attendance,Household Income (from Event Participant),multipleLookupValues,
+recRdC2c4QKdiRIql,Event attendance,Race & Ethnicity (from Event Participant),multipleLookupValues,
+recsZpN5FVKL5tch2,Event attendance,Current School (from Event Participant),multipleLookupValues,
+recENT3qPKRvsvviW,Event attendance,Educators at Schools (from Event Participant),multipleLookupValues,
+reckqa7Rkvg9ieMaS,Event attendance,Assigned Partner (from Event Participant),multipleLookupValues,
+rec3Ks7xy7o7NHsRk,Event attendance,Hub (from Event Participant),multipleLookupValues,
+rec3tDvgFPkGREdcb,Event attendance,Age Classrooms Interested in Offering (from Event Participant),multipleLookupValues,
+recD0sK3jaOeEhPrT,Event attendance,School Status (from Event Participant),multipleLookupValues,
+recIBdGALFmYCp29D,Event attendance,Educator record created,multipleLookupValues,
+recrtGxkauD1mFXIb,Event attendance,Montessori Certifications (from Event Participant),multipleLookupValues,
+reczVCvfNnXCEabOP,Event attendance,Hub Name (from Event Participant),multipleLookupValues,
+rec4tOGr9Y8528o4v,Event attendance,Stage (from Event Participant),multipleLookupValues,
+rec2AZ8YciFnows2s,Event attendance,Status (from Event Participant),multipleLookupValues,
+rec2P7YMysYAtq54B,Event attendance,Stage change from visioning to planning (from Event Participant),multipleLookupValues,
+recxIrlkfLaBnh1ns,Event attendance,Stage change from Discovery to Visioning (from Event Participant),multipleLookupValues,
+recnG06CMNcVLHu8s,Event attendance,CountofLoggedPlannings (from Event Participant),multipleLookupValues,
+recSIVyIdN9DSofFl,Event attendance,CountofLoggedVisioning (from Event Participant),multipleLookupValues,
+recxbEmGwYM1vn4Z3,Event attendance,CountofLoggedDiscover (from Event Participant),multipleLookupValues,
+rec0L8LwoowB55fsu,Event attendance,When did they switch to visioning,multipleLookupValues,
+recN8nOpulSycApmd,Event attendance,Primary Contact Email,multipleLookupValues,
+recjvwW1VmgkvGWIG,Event attendance,SSJ Typeforms: Start a School (from Event Participant),multipleLookupValues,
+rec1PNsPnRnuXp5rq,Event attendance,Source (from SSJ Typeforms: Start a School) (from Event Participant),multipleLookupValues,
+recadjT1dWLXMt3su,Event attendance,needs spanish translation,checkbox,
+reciGIQM956Wnjfqe,Event attendance,Event Type,multipleLookupValues,
+recWbPbYB9LOj5pig,Event attendance,Started SSJ? (completed SSJ typeform),singleSelect,"Yes, No, N/A"
+recJP8ScOybWiMnu5,Event attendance,Marketing source,multilineText,
+recUzN2rd96yyCDyh,Event attendance,Network,multilineText,
+recugxr9DTKMEYq3y,Event attendance,Age Classrooms Interested in Offering (from Event Participant) 2,multipleLookupValues,
+recELsUDuMXI1bvpX,Event attendance,Created (from Event Participant),multipleLookupValues,
+recX13gZPUQtlF5c6,Event attendance,Income Background (from Event Participant) 2,multipleLookupValues,
+recVOiV0RrNvYeSju,Event attendance,Household Income (from Event Participant) 2,multipleLookupValues,
+rec1AVTkZyeWZEsgN,Event attendance,Race & Ethnicity (from Event Participant) 2,multipleLookupValues,
+recB5ItNaaMKsV4rE,Event attendance,Current School (from Event Participant) 2,multipleLookupValues,
+recXi93G0SFtgevK5,Event attendance,Educators at Schools (from Event Participant) 2,multipleLookupValues,
+recheMtonjjfSK0PN,Event attendance,Hub (from Event Participant) 2,multipleLookupValues,
+rec1bL9XUtyQzcA4d,Event attendance,School Status (from Event Participant) 2,multipleLookupValues,
+recjEYpqFRh3sMXlV,Event attendance,Montessori Certified (from Event Participant),multipleLookupValues,
+recrdLbDN3qbslH6D,Event attendance,Assigned Partner (from Event Participant) 2,multipleLookupValues,
+recDntsh3V43c37BZ,Event attendance,Stage (from Event Participant) 2,multipleLookupValues,
+recOajfI2VlvPqizV,Event attendance,Status (from Event Participant) 2,multipleLookupValues,
+recetjxPXmnrNh6Fv,Event attendance,Full Name (from Event Participant),multipleLookupValues,
+recSh3DdbLrBqiryV,Event attendance,First visioning (from Event Participant),multipleLookupValues,
+recPNB4PV7V1ZnWXJ,Event attendance,Field 10,singleSelect,"Montessori Guide, Parent / Guardian, Current/Emerging Wildflower Teacher Leader (have started the Visioning process), Classroom Teacher, School Administrator, Other, Wildflower Partner, Classroom Teacher, School Administrator, Montessori Guide, Current/Emerging Wildflower Teacher Leader (have started the Visioning process), Parent / Guardian"
+rec8XmI50BbDVhaop,Event attendance,Field 11,singleSelect,"For me it is just a culture., South Asian, White, queer woman, I believe in an inclusive society which everyone feels accepted without any reference to the ethnicity, culture or other things., Asian, i identify myself As Hispanic., Hispanic, African American, n/a, Black Haitian American, Black, White, I am a queer Black woman., white, queer, white, White; she/her/hers, White woman, Caucasian, black, White, cis female, gay, I am an observant Jew and have worked in Jewish Montessori for many years, Asian American, white/ Caucasian, Emerging wildflower teacher/Decended from ling line if Scottish teachers...Decade of teaching Montessori teaching"
+rec1j2q5zUF7lSL5e,Event attendance,Field 12,multilineText,
+recl3YsJfWqI3Ixm1,Event attendance,Field 13,multilineText,
+recLdiXmFajH7IpFV,Event attendance,Field 15,singleSelect,"No, Yes, N/A"
+recGJcLmw7r4nNsol,Event attendance,Field 16,multilineText,
+rec87oZXBK38Bf4Na,Event attendance,Field 17,multilineText,
+rec6ki8O02Wo28JQd,Event attendance,Field 18,checkbox,
+recdHiac59giDGWDz,Event attendance,SSJ Typeforms: Start a School,multipleRecordLinks,SSJ Typeforms: Start a School
+recaBZQLd0ZiivmuX,Event attendance,Created date,multipleLookupValues,
+rec5m4zOxSjEMYzb2,Event attendance,Entry Date (from Start a School form) (from Educators),multipleLookupValues,
+recgtk7d7gYnRZcdX,Event attendance,Created (from Event Participant) 2,multipleLookupValues,
+reclMNK167JzXtnQz,Event attendance,First visioning (from Event Participant) 2,multipleLookupValues,
+recbOJd5SQY9PGoye,Mailing lists,Subscription ID,formula,"CONCATENATE({Type}, "": "", {Name})"
+rec8Mljd3Ian3yFrS,Mailing lists,Record ID,formula,RECORD_ID()
+recY0VIzY9Zfklc1r,Mailing lists,Type,singleSelect,Google Group
+recHRmuvda2M9IZEI,Mailing lists,Name,singleLineText,
+recKh3dgtcA3DbcxZ,Mailing lists,Google Group ID,singleLineText,
+recSYuwKgeFKq4qLB,Mailing lists,Educators,multipleRecordLinks,Educators
+rec9gUYWP67LorvnO,Mailing lists,Slug,singleLineText,
+rec2yevpUeBDzUF0T,Mailing lists,Educator Log,singleLineText,
+recnpit94UEF9ukcK,Montessori Certs,Montessori Cert key,formula,"CONCATENATE({Abbreviation}, "" - "",{Year Certified},"" - "", {Educator})"
+rec8ejXjZ6cwYLo84,Montessori Certs,Year Certified,number,
+recgm2QempJMwbIPR,Montessori Certs,Certification Levels,multipleRecordLinks,Montessori Cert Levels
+recZG8uAKffmO6ldB,Montessori Certs,Certifier,multipleRecordLinks,Montessori Certifiers
+recOIhRgkzmhyC0LQ,Montessori Certs,Certifier - Other,singleLineText,
+reczQKavsSSa6IVm3,Montessori Certs,Educator,multipleRecordLinks,Educators
+recRgYHg2WKPfe7vD,Montessori Certs,Certification Status,singleSelect,"Training, Certified, Paused, Not certified"
+rec7ZQtzMpmUg37ny,Montessori Certs,montessori_cert_id,formula,RECORD_ID()
+recZTHQGhH06o1DjO,Montessori Certs,Created,createdTime,
+recgMFFQjdcoJZMrP,Montessori Certs,Abbreviation,multipleLookupValues,
+recTYdvrdBnY7Pu7E,Montessori Certs,Montessori Certifiers copy,singleLineText,
+recH6HDQdYEMyps5F,SSJ Typeforms: Start a School,Response ID,formula,{Email}
+recHXY95rn5hfhf2Z,SSJ Typeforms: Start a School,First Name,singleLineText,
+recePgvbncECZUwGZ,SSJ Typeforms: Start a School,Last Name,singleLineText,
+recZFIAXcXxzroHi4,SSJ Typeforms: Start a School,Email,email,
+recw5C3zc2g2WcbQg,SSJ Typeforms: Start a School,Is Montessori Certified,checkbox,
+recVL4VtZu6EMOyL6,SSJ Typeforms: Start a School,Montessori Certification Year,number,
+recgMFknYhXZtXyvu,SSJ Typeforms: Start a School,Montessori Certification Levels,singleLineText,
+recTUyB0JHJab0AdJ,SSJ Typeforms: Start a School,School Location: City,singleLineText,
+recz9t8EME4cwxy6o,SSJ Typeforms: Start a School,School Location: State,singleLineText,
+recIh4FzBaAC1oAUJ,SSJ Typeforms: Start a School,School Location: Country,singleLineText,
+recmdoL2CY8rW0eMU,SSJ Typeforms: Start a School,School Location: Community,singleLineText,
+rec44lR8rzQU6D0fZ,SSJ Typeforms: Start a School,Contact Location: City,singleLineText,
+rec6fWRLME4i1zyfJ,SSJ Typeforms: Start a School,Contact Location: State,singleLineText,
+recTM0Uiz6ljX5lLi,SSJ Typeforms: Start a School,Contact Location: Country,singleLineText,
+recIjDlqWg2ixNxS5,SSJ Typeforms: Start a School,Age Classrooms Interested In Offering,singleLineText,
+recoBL6LT8FCSe3qD,SSJ Typeforms: Start a School,Socio-Economic: Race & Ethnicity,singleLineText,
+recyvCB1ARV3g5ROJ,SSJ Typeforms: Start a School,Socio-Economic: Race & Ethnicity Other,singleLineText,
+recFxzh7Prz4M9IEy,SSJ Typeforms: Start a School,Socio-Economic: Gender,singleLineText,
+rechtNkeeO1tJEAEE,SSJ Typeforms: Start a School,Socio-Economic: Gender Other,singleLineText,
+recUl089yFxagM4Xq,SSJ Typeforms: Start a School,Socio-Economic: Household Income,singleLineText,
+recDS5nYdmMIeMcpx,SSJ Typeforms: Start a School,Socio-Economic: Primary Language,singleLineText,
+recYUu6D6I2bR4iti,SSJ Typeforms: Start a School,Message,singleLineText,
+recE3eqY8vfHj9TqA,SSJ Typeforms: Start a School,Receive Communications,checkbox,
+recEDXzXCqSWwOHw4,SSJ Typeforms: Start a School,Created At,createdTime,
+rec6diqMUh4P60tKC,SSJ Typeforms: Start a School,Educator,singleLineText,
+recNW1b96dD9fUrAH,SSJ Typeforms: Start a School,Record ID,formula,RECORD_ID()
+recqsIStr4ZW9jaGU,SSJ Typeforms: Start a School,Is Seeking Montessori Certification,checkbox,
+recVONFGiUbM4CMkr,SSJ Typeforms: Start a School,Equity Reflection,singleLineText,
+recj2qNqKcbCSoPGg,SSJ Typeforms: Start a School,Socio-Economic: Pronouns,singleLineText,
+recv1Dnj6yXVr5FJK,SSJ Typeforms: Start a School,Socio-Economic: Pronouns Other,singleLineText,
+recbKqhf2RF0hmdlS,SSJ Typeforms: Start a School,Socio-Economic: LGBTQIA Identifying,singleLineText,
+recwjGoB2l0cE1nHB,SSJ Typeforms: Start a School,Has Interest in Joining Another School,checkbox,
+rec5nCd1Juc4n4dWN,SSJ Typeforms: Start a School,Is Willing to Move,checkbox,
+recznyw412MwOgJoF,SSJ Typeforms: Start a School,Montessori Certification Certifier,singleLineText,
+reciI9yFmQa7TnX4s,SSJ Typeforms: Start a School,Source,singleLineText,
+rec20R9wSCizNN22e,SSJ Typeforms: Start a School,Entry Date,dateTime,
+recRiyu0h0pZHJEAr,SSJ Typeforms: Start a School,Tags,singleLineText,
+recIGy2CPX344Ozxs,SSJ Typeforms: Start a School,Initial Interest in Governance Model,singleLineText,
+recV2Sg1Tf2ZClueo,SSJ Typeforms: Start a School,Is Interested in Charter,checkbox,
+recHKm5l5MiTo7oo5,SSJ Typeforms: Start a School,Event attendance,multipleRecordLinks,Event attendance
+rec8JJzS9Onl7VdP7,SSJ Typeforms: Start a School,Record ID (from Event Participant) (from Event attendance),multipleLookupValues,
+recloYzDlekfkm0y6,SSJ Typeforms: Start a School,Time at event (from Event attendance),multipleLookupValues,
+rec6adGbxTTaXxSG7,SSJ Typeforms: Start a School,Attended (from Event attendance),multipleLookupValues,
+rechCfqtxV7T8eD9w,SSJ Typeforms: Start a School,Registered (from Event attendance),multipleLookupValues,
+rectG5o6FRnJHqoae,SSJ Typeforms: Start a School,School Location: Address,formula,"TRIM(
+    CONCATENATE(
+      IF({School Location: City}, {School Location: City}),
+      IF({School Location: State}, "" "" & {School Location: State}),
+      IF({School Location: Country}, "" "" & {School Location: Country})
+  )
+)"
+recylp7VNYWVwfRrc,SSJ Typeforms: Start a School,Contact Location: Address,formula,"TRIM(
+    CONCATENATE(
+      IF({Contact Location: City}, {Contact Location: City}),
+      IF({Contact Location: State}, "" "" & {Contact Location: State}),
+      IF({Contact Location: Country}, "" "" & {Contact Location: Country})
+  )
+)"
+recV59LGFJDXvOEqE,SSJ Typeforms: Start a School,Month,formula,"YEAR({Entry Date})&""-""&MONTH({Entry Date})"
+reck7KkrLpn8VYZXb,SSJ Typeforms: Start a School,SSJ data on educators,singleLineText,
+recz42LnI1uesGKJy,SSJ Typeforms: Start a School,Educators,multipleRecordLinks,Educators
+recku8JlT2ExCVCUh,SSJ Typeforms: Start a School,SSJ Fillout Form: Get Involved,singleLineText,
+recTeJRpcaqRR6D6S,SSJ Typeforms: Start a School,SSJ Fillout Form: Get Involved 2,singleLineText,
+recyG75vf62gdNTUv,SSJ Typeforms: Start a School,SSJ Fillout Forms,multipleRecordLinks,SSJ Fillout Forms
+recs9UXuwjiCQQur6,SSJ Fillout Forms,SSJ FIllout Form key,formula,"CONCATENATE({First Name}, "" "", {Last Name}, "" ("", DATETIME_FORMAT({Entry Date}, 'YYYY-MM-DD'), "")"")"
+recfTRNnloxXWYoRf,SSJ Fillout Forms,First Name,singleLineText,
+recQi0izrq4gNkdHM,SSJ Fillout Forms,Last Name,singleLineText,
+recpIq5AMGPUNuEtR,SSJ Fillout Forms,Is Montessori Certified,formula,"IF({Montessori Cert Q},
+  IF(OR({Montessori Cert Q}=""I have completed Montessori training"",{Montessori Cert Q}=""Trained""), ""Trained"",""Not trained""),
+  IF({Montessori Certification Certifier 1},""Trained"",""Not trained""))"
+rect5CnUF5WwNVhh0,SSJ Fillout Forms,Montessori Certification Year 1,number,
+recsqszvHVPhexaLL,SSJ Fillout Forms,Montessori Certification Level 1,multipleRecordLinks,Montessori Cert Levels
+reckEeooI71DMhyBP,SSJ Fillout Forms,City,singleLineText,
+recbnjwza2cHRB98W,SSJ Fillout Forms,State,singleLineText,
+rec8bi7TEsdx9hyvn,SSJ Fillout Forms,Country,singleLineText,
+recDbiQty2xiNHGka,SSJ Fillout Forms,Age Classrooms Interested In Offering,multipleSelects,"Infant/Toddler, Primary/Early Childhood, 6-9 Elementary, 6-12 Elementary, 9-12 Elementary, 12-15 Secondary, 15-18 Secondary"
+recBhrEh2OzLLaOw2,SSJ Fillout Forms,Socio-Economic: Race & Ethnicity,multipleSelects,"African-American, Afro-Caribbean or Black, American Indian or Alaska Native, Asian-American, Hispanic, Latino, or Spanish Origin, Middle Eastern or North African, Native Hawaiian or Other Pacific Islander, White, Other"
+recpevsaIqXa4ErFH,SSJ Fillout Forms,Socio-Economic: Race & Ethnicity Other,singleLineText,
+recFkg4iwjYYX81J1,SSJ Fillout Forms,Socio-Economic: Gender,singleSelect,"Female/Woman, Male/Man, Gender Non-Conforming, Prefer not to respond, Other"
+recxxldoBf58LJoUv,SSJ Fillout Forms,Socio-Economic: Gender Other,singleLineText,
+recDnfkPitoyl0fOL,SSJ Fillout Forms,Socio-Economic: Household Income,singleSelect,"Upper Income, Middle Income, Lower Income, Prefer not to respond"
+recpmaJ60T4fJGY9O,SSJ Fillout Forms,Primary Language,singleSelect,"English, Spanish - Español, Japanese - 日本語, Mandarin - 中文, French - Français, Urdu - اُردُو, Portugese, Burmese - မြန်မာစာ, Cantonese - Gwóngdūng wá, Portuguese - Português, Arabic - العَرَبِيَّة, Hindi - हिन्दी, A not-listed or more specific language"
+recFh7ez3kLeZOuAS,SSJ Fillout Forms,Message,singleLineText,
+recGhim11p7eVlpyb,SSJ Fillout Forms,Receive Communications,singleSelect,"Yes, No"
+rec7KiHi9mvcpi0uU,SSJ Fillout Forms,ssj_fillout_form_id,formula,RECORD_ID()
+recwKfeMPkiagSFbe,SSJ Fillout Forms,Is Seeking Montessori Certification,formula,"IF(OR({Montessori Cert Q} = ""I am currently going through Montessori training"",{Montessori Cert Q} = ""I am interested in pursuing Montessori training""),""True"",""False"")"
+recMGyV0Vj7AChTAs,SSJ Fillout Forms,Socio-Economic: Pronouns,singleSelect,"she/her/hers, he/him/his, they/them/theirs, other"
+reczPOIZIcPVbMEkv,SSJ Fillout Forms,Socio-Economic: Pronouns Other,singleLineText,
+recHLJ1WyIc61Z9kU,SSJ Fillout Forms,Montessori Certification Certifier 1,multipleRecordLinks,Montessori Certifiers
+recHcIKUQcyBSauC4,SSJ Fillout Forms,Source,singleSelect,"Advertisement, Indeed, Direct Email, Media, RCG Talent Solutions, Conference (AMI), Conference (AMS), Conference - Montessori Other, Black Wildflowers Fund, Referred by Partner Organization, I Previously Worked at a Wildflower School, Social Media, Web Search (e.g., Google, ChatGPT), Referred by a Wildflower Teacher/Partner, Family/Friend, Word of Mouth, Other, ChatGPT"
+recXgtEQHlMYjuhsJ,SSJ Fillout Forms,Entry Date,dateTime,
+recEvAWSt9hI1yE1n,SSJ Fillout Forms,Montessori Certification Certifier 2,multipleRecordLinks,Montessori Certifiers
+rec0FXRO3fZfqU2Hr,SSJ Fillout Forms,Montessori Certification Certifier 3,multipleRecordLinks,Montessori Certifiers
+recRZLQUQBn53BFTF,SSJ Fillout Forms,Montessori Certification Certifier 4,multipleRecordLinks,Montessori Certifiers
+recqBSnFRB2Iux6c4,SSJ Fillout Forms,Montessori Certification Year 2,number,
+recRPUENSgmHuZUH6,SSJ Fillout Forms,Montessori Certification Year 3,number,
+recCiDqh6JtZCktVg,SSJ Fillout Forms,Montessori Certification Year 4,number,
+recx8DD723MhNcj6D,SSJ Fillout Forms,Montessori Certification Level 4,multipleRecordLinks,Montessori Cert Levels
+reccbZuXyDnP09o78,SSJ Fillout Forms,Montessori Certification Level 3,multipleRecordLinks,Montessori Cert Levels
+rec9vKEzWMgnxWkVo,SSJ Fillout Forms,Montessori Certification Level 2,multipleRecordLinks,Montessori Cert Levels
+rec4V13X9DxxrZqRg,SSJ Fillout Forms,Educator Interests,multipleSelects,"Working at an open independent/private Wildflower school, Working at an open Wildflower public charter school site, Founding a new independent/private Wildflower school, Founding a new public charter site in an authorized Wildflower charter school, Founding a new public charter or joining a team founding a charter, Partnering with my local district to open a program, Founding or converting a lab school, Founding a homeschool program, Converting an existing education program into a Wildflower school, Leading a co-op, Other"
+recCZKBKZEtPiWO3a,SSJ Fillout Forms,Community Member Interest,singleLineText,
+recsES28RLPdSDRJC,SSJ Fillout Forms,Community Member Support Finding Teachers,checkbox,
+recwxxB39nVELxRii,SSJ Fillout Forms,Community Member Community Info,multilineText,
+recDBZ9COulKrwRE7,SSJ Fillout Forms,Community Member Self Info,multilineText,
+recKAr3DsVjg8sbPT,SSJ Fillout Forms,Primary Language Other,singleLineText,
+rectQlENOKn4bQC7d,SSJ Fillout Forms,Contact Type,singleSelect,"Community member, Educator, Property owner"
+reca5T3h1lKFc30sT,SSJ Fillout Forms,Educator Interests Other,singleLineText,
+recjegbY2NTrq3L6t,SSJ Fillout Forms,Marketing Campaign,singleLineText,
+recEYRfRjYw7p6H32,SSJ Fillout Forms,Marketing Source,singleLineText,
+recLuTNP2KDlOOvrj,SSJ Fillout Forms,Target Geography,formula,"TRIM(
+  IF(
+  {City Standardized},{City Standardized}
+   &
+  IF(
+    {State Standardized},
+    "", "" & {State Standardized},""""),
+    """"
+  ) &
+  IF(
+    AND({Country}, {Country} != ""United States""),
+    "", "" & TRIM({Country}),
+    """"
+  ),
+  BLANK()
+)"
+recmj4BCN8MW1WbqB,SSJ Fillout Forms,Month (for leads per month report),formula,"YEAR({Entry Date}) & ""-"" & MONTH({Entry Date})"
+rec9HyEW11epEJYpm,SSJ Fillout Forms,Montessori Cert Q,singleSelect,"I have completed Montessori training, I have completed a Montessori training but I need another for my target age level, I am currently going through Montessori training, I am interested in pursuing Montessori training, None of the above"
+recIHxEBHngAnueYE,SSJ Fillout Forms,Temp - M Cert Cert 1,singleLineText,
+reccLhY7obIDOaEG8,SSJ Fillout Forms,Temp - M Cert Year 1,number,
+rec8YKfWgShhfzhlK,SSJ Fillout Forms,Temp - M Cert Level 1,singleLineText,
+recNdVmBBFhjj8rLP,SSJ Fillout Forms,Temp - M Cert Cert 2,singleLineText,
+reccdgCkFwmce0C1q,SSJ Fillout Forms,Temp - M Cert Year 2,number,
+recdU0ndC4ZxhR5Rv,SSJ Fillout Forms,Temp - M Cert Level 2,singleLineText,
+recr1AlosCnfu99On,SSJ Fillout Forms,Temp - M Cert Cert 3,singleLineText,
+recPHXkKJgswJNxDr,SSJ Fillout Forms,Temp - M Cert Year 3,number,
+recG0NLA5uDgVJ3Rm,SSJ Fillout Forms,Temp - M Cert Level 3,singleLineText,
+recSsjjOmk85PKcRV,SSJ Fillout Forms,Temp - M Cert Cert 4,singleLineText,
+recswFn1Je3mXWRYs,SSJ Fillout Forms,Temp - M Cert Year 4,number,
+rec8wfRbZSvg4ajU6,SSJ Fillout Forms,Temp - M Cert Level 4,singleLineText,
+recgfFZvKUbKRNe9V,SSJ Fillout Forms,City 2,singleLineText,
+recpCXINJkuLZv85v,SSJ Fillout Forms,State 2,singleLineText,
+recb65iaoCBMr6tOb,SSJ Fillout Forms,Country 2,singleLineText,
+recxfxZWVbGA9KXCx,SSJ Fillout Forms,Source - other,singleLineText,
+recTGfRl19OaZyB8R,SSJ Fillout Forms,Educators,multipleRecordLinks,Educators
+recMTl3aUbOW5bhBt,SSJ Fillout Forms,Assigned Partner (from Educators),multipleLookupValues,
+recgIgPncGcNb8Yin,SSJ Fillout Forms,Gender standardized,formula,"IF({Socio-Economic: Gender}=""Male/Man"",""Male"",
+  IF({Socio-Economic: Gender}=""Female/Woman"", ""Female"",
+    IF({Socio-Economic: Gender}=""Gender Non-Conforming"",""Gender Non-Conforming"",
+      IF({Socio-Economic: Gender}=""Other"",""Other"",""""))))"
+recvB7JiCyXyt2ED9,SSJ Fillout Forms,Contact Type standardized,formula,"IF({Contact Type}=""An educator interested in becoming a Teacher and/or School Leader"",""Educator"",""Community Member"")"
+recalzhEYETIeZQW6,SSJ Fillout Forms,SendGrid template id,singleLineText,
+recBP5jUbMTuvS7mP,SSJ Fillout Forms,SendGrid sent date,date,
+recH6XjbLeMGyGbD1,SSJ Fillout Forms,SendGrid manual,button,
+recagu2SZ0w9BeAsQ,SSJ Fillout Forms,Routed To,singleLineText,
+recS4uniilDhrAiYW,SSJ Fillout Forms,Assigned Partner Override,singleSelect,"daniela.vasan@wildflowerschools.org, N/A, rachel.kelley-cohn@wildflowerschools.org, jeana.olszewski@wildflowerschools.org, angelica@wildflowerschools.org, Brent Locke, DUPLICATE"
+recfEFHMTpgIjKA8L,SSJ Fillout Forms,Email sent by Initial Outreacher?,singleSelect,"Yes, No, n/a"
+rec2pnDXhot2TDLAR,SSJ Fillout Forms,One on one status,singleSelect,"Prospect did not reply to outreach, Scheduling, Scheduled, Completed, Prospect did not attend, Not Interested, N/A"
+recC8xzg5uFPJwuuo,SSJ Fillout Forms,Full Name,formula,"{First Name} & "" "" & {Last Name}"
+rec5CFN5EQUaduErp,SSJ Fillout Forms,Status of Processing Montessori Certs,singleSelect,"Completed, Not Completed"
+rec1OloEueshxZSqK,SSJ Fillout Forms,State Standardized,aiText,
+receMflfJC1kdJ5EG,SSJ Fillout Forms,City Standardized,formula,"SUBSTITUTE(SUBSTITUTE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(REGEX_REPLACE(
+  SUBSTITUTE(
+    SUBSTITUTE(
+      SUBSTITUTE(
+        SUBSTITUTE(
+          SUBSTITUTE(
+            REGEX_REPLACE(
+              LOWER(TRIM(
+                REGEX_REPLACE( {City}, "" [A-Z]{2}$"", """" )))
+            ,"",$"","""")
+          ,""st "",""st. "")
+        ,""and/or"",""or"")
+      ,""-"","" "")
+    ,""("",""( "")
+  ,""/"","" / "")
+, ""^a"", ""A""), ""^b"", ""B""), ""^c"", ""C""), ""^d"", ""D""), ""^e"", ""E""), ""^f"", ""F""), ""^g"", ""G""), ""^h"", ""H""), ""^i"", ""I""), ""^j"", ""J""), ""^k"", ""K""), ""^l"", ""L""), ""^m"", ""M""), ""^n"", ""N""), ""^o"", ""O""), ""^p"", ""P""), ""^q"", ""Q""), ""^r"", ""R""), ""^s"", ""S""), ""^t"", ""T""), ""^u"", ""U""), ""^v"", ""V""), ""^w"", ""W""), ""^x"", ""X""), ""^y"", ""Y""), ""^z"", ""Z""), "" a"", "" A""), "" b"", "" B""), "" c"", "" C""), "" d"", "" D""), "" e"", "" E""), "" f"", "" F""), "" g"", "" G""), "" h"", "" H""), "" i"", "" I""), "" j"", "" J""), "" k"", "" K""), "" l"", "" L""), "" m"", "" M""), "" n"", "" N""), "" o"", "" O""), "" p"", "" P""), "" q"", "" Q""), "" r"", "" R""), "" s"", "" S""), "" t"", "" T""), "" u"", "" U""), "" v"", "" V""), "" w"", "" W""), "" x"", "" X""), "" y"", "" Y""), "" z"", "" Z"")
+        ,"" Or"","" or""),""( "",""("")"
+rec5yvdo1HCtdCFOf,SSJ Fillout Forms,Form version,singleSelect,"Get Involved, Start a School"
+recQZYuBM6ByF6HHu,SSJ Fillout Forms,Interested in charter,checkbox,
+recKxmbQBZCeL7tn5,SSJ Fillout Forms,Is Interested in Charter (from Email),multipleLookupValues,
+rec4DYYnKqFahKMlo,SSJ Fillout Forms,Socio-Economic: LGBTQIA Identifying (from Email),multipleLookupValues,
+recX4az6ZfpRAlS8u,SSJ Fillout Forms,Email,multilineText,
+recbrKZsGPTDGbzJU,SSJ Fillout Forms,Primary Personal Email (from Educators),multipleLookupValues,
+recROO8Yg163ckKNC,SSJ Fillout Forms,Link to Start a School,multipleRecordLinks,SSJ Typeforms: Start a School
+recSezEQPYzhkn5kZ,Guides Assignments,Guide Assignment key,formula,"{Partner} & "" - "" & IF({School Short Name},{School Short Name},{School})"
+recIE3xHZKV1zbesm,Guides Assignments,Partner,multipleRecordLinks,Partners
+recA3sWxO82zNehyk,Guides Assignments,School,multipleRecordLinks,Schools
+reckvCHYvP3JOGZmc,Guides Assignments,Start date,date,
+rec0ikzUVT4X70y68,Guides Assignments,End date,date,
+recCyk5ZRdrOMeUqc,Guides Assignments,Type,singleSelect,"Ops Guide, Equity Coach, Regional Entrepreneur, Open Schools Support"
+recf7SLJoPCuED6vg,Guides Assignments,Currently active,checkbox,
+recYpQO0gau3WpiPT,Guides Assignments,guide_assignment_id,formula,RECORD_ID()
+recRu4OM9xr2CJLIP,Guides Assignments,guide_id,multipleLookupValues,
+rec22NhCl8KIlMQwA,Guides Assignments,school_id,multipleLookupValues,
+rechTBP2Eytya6XzY,Guides Assignments,Guide short name,multipleLookupValues,
+rec00CSVeBlS4YQFj,Guides Assignments,School Short Name,multipleLookupValues,
+recBlIFxMqKwayNRJ,School notes,School Note Key,formula,"DATETIME_FORMAT({Date created},'YYYY-MM-DD') & ""-"" & {School} & ""-"" & {Notes}"
+recJILHGrmiQphq4T,School notes,School,multipleRecordLinks,Schools
+recxYiqisAdJJaB6G,School notes,Notes,multilineText,
+recilsjRLLQBcXFGB,School notes,Date created,date,
+rechx4gcIqdrUCHKk,School notes,Created by,multipleRecordLinks,Partners
+rec4tdSB9yVu1KEO1,School notes,Private,checkbox,
+recoQTUOGkvLAEokF,Educator notes,Educator Note Key,formula,"DATETIME_FORMAT({Date},'YYYY-DD-MM') & ""-"" & {Educator}"
+rec9o26C5MSdf0i3A,Educator notes,Educator,multipleRecordLinks,Educators
+rec9x0ahGW9pKzQa9,Educator notes,Notes,multilineText,
+rectJEeIAXkzG4ct2,Educator notes,Date,date,
+recI2Ovr9r7GjmYVO,Educator notes,Created by,multipleRecordLinks,Partners
+recyahXp1fffi975E,Educator notes,Private,checkbox,
+reczaXSqWP4NeciJL,Educator notes,Full Name (from Educator),multipleLookupValues,
+recMOroCBcpHhAJYx,Educator notes,Contact email (from Educator),multipleLookupValues,
+rectm2u1P3ymkMnBB,Family survey non-TC data 2021-22,Record ID,formula,RECORD_ID()
+recUhma013ZbOooDF,Family survey non-TC data 2021-22,school_id_at,multipleRecordLinks,Schools
+recu2aAF55CpkN3PD,Family survey non-TC data 2021-22,school_short_name_at,multipleLookupValues,
+rec8b1FrFCgyosvRr,Family survey non-TC data 2021-22,student_id_at_auto,autoNumber,
+recwzvz0nTlMrU9Zm,Family survey non-TC data 2021-22,ethnicity_list,multipleRecordLinks,Ethnicity categories
+recWlBSqnn1beWcLy,Family survey non-TC data 2021-22,student_first_name_at,singleLineText,
+recJAVslTUpqiLYWF,Family survey non-TC data 2021-22,student_last_name_at,singleLineText,
+recTsgyLuIdicVVuF,Family survey non-TC data 2021-22,language_response,singleLineText,
+recYGbz6rmArwR8Bc,Family survey non-TC data 2021-22,household_income,multipleRecordLinks,Household income categories
+rec9mnMntTHAufu6j,Family survey non-TC data 2021-22,frl,multipleRecordLinks,Boolean categories
+rec90PWMSQ7Ra14Cf,Family survey non-TC data 2021-22,nps_response,number,
+recPPtiPLP6qJP13W,Family survey non-TC data 2021-22,marketing_opt_out,multipleRecordLinks,Boolean categories
+rec3VSP6FrYri9plB,Family survey non-TC data 2021-22,feedback_response,multilineText,
+rectY2XW9YcBDqFPa,Family survey non-TC data 2021-22,Schools copy,singleLineText,
+recAIb3dZjpDOyXWf,Family survey non-TC data 2021-22,Schools copy,singleLineText,
+rechTtMXS07h2E68b,Family survey - school inputs,Record ID,formula,RECORD_ID()
+recO7LS4PAEk3vMRJ,Family survey - school inputs,Schools,multipleRecordLinks,Schools
+recWwm5p55YfchtiX,Family survey - school inputs,Include in data,checkbox,
+recjomrD7DSq8UH86,Family survey - school inputs,Include in reporting,checkbox,
+rec3vYnXmNHs5uuDf,Family survey - school inputs,Data pending,checkbox,
+recx1PtzwwW9Kj2p3,Family survey - school inputs,Report language,singleSelect,"English, Spanish"
+recEhN0xTbOwDqPgp,Family survey - school inputs,Number of students,number,
+rec47cWmbwruU8bmh,Family survey - school inputs,Number of forms sent,number,
+recb1sBMcxSZrzliP,Family survey - hub inputs,Record ID,formula,RECORD_ID()
+recGr5sc6Zrf9A6x1,Family survey - hub inputs,Hubs,singleLineText,
+recdr6uhIg6RhsrHp,Family survey - hub inputs,Include in reporting,checkbox,
+recKW8yooABVsU00i,Family survey - hub inputs,Data pending,checkbox,
+recAnmSrhgl3o5gqJ,Family survey - excluded classroom inputs,Record ID,formula,RECORD_ID()
+recrRT7JLorJWbUlT,Family survey - excluded classroom inputs,TC classroom ID,number,
+rec2KLOx5Xn2Vv4pl,Family survey - excluded classroom inputs,TC school ID,number,
+recXeSpYJ3GZEg7YR,Family survey - excluded student inputs,Record ID,formula,RECORD_ID()
+recbPM2DjonBU7qZf,Family survey - excluded student inputs,TC student ID,number,
+recFdmBulLTzrIstY,Family survey - excluded student inputs,TC school ID,number,
+recnmRhRmzEXb6BcX,Family survey - field name inputs,Record ID,formula,RECORD_ID()
+recjFXFZbmtKX6T7A,Family survey - field name inputs,Source field name,singleLineText,
+recTH8qEbVqlbOP1Q,Family survey - field name inputs,Target field name,singleLineText,
+rec3dROnmwjkpPGHm,Ethnicity categories,ethnicity_category,singleLineText,
+rec12FVByHs45qiUB,Ethnicity categories,ethnicity_display_name_english,singleLineText,
+recUg1Y3pWxGrPpOl,Ethnicity categories,ethnicity_display_name_spanish,singleLineText,
+rec7ZVk7PcUN6TAix,Ethnicity categories,Ethnicity mapping,multipleRecordLinks,Ethnicity mapping
+recW1ZzUCN2sFoOXk,Ethnicity categories,Family survey non-TC data 2021-22,multipleRecordLinks,Family survey non-TC data 2021-22
+recN1US8AjfzPsZWp,Ethnicity categories,ethnicity_response (from Ethnicity mapping),multipleLookupValues,
+reciAYFFHlbc7b9IR,Ethnicity mapping,Record ID,formula,RECORD_ID()
+recbEGzm7R4rPeUKl,Ethnicity mapping,ethnicity_response,singleLineText,
+recuCoCXAv8D66HT4,Ethnicity mapping,ethnicity_category,multipleRecordLinks,Ethnicity categories
+recrna8TGWbYyasSc,Gender categories,gender_category,singleLineText,
+rec5njFPCm2OVVW9o,Gender categories,gender_display_name_english,singleLineText,
+reccaZbPgtWX6gmhv,Gender categories,gender_display_name_spanish,singleLineText,
+recjqWcoftq3lno9o,Gender categories,Gender mapping,multipleRecordLinks,Gender mapping
+recZAMfzM89AeloU9,Gender categories,Get Involved,singleLineText,
+recRqZ1zmxQjiucPD,Gender mapping,Record ID,formula,RECORD_ID()
+recD0YbUhba0VIEhQ,Gender mapping,gender_response,singleLineText,
+recPvF1NAaRxG8XbB,Gender mapping,gender_category,multipleRecordLinks,Gender categories
+recNu4JztA7fzwgGx,Household income categories,household_income_category,singleLineText,
+recFxy4TlwdCar8Xe,Household income categories,household_income_display_name_english,singleLineText,
+rec3w4WmNkguFxBeh,Household income categories,household_income_display_name_spanish,singleLineText,
+recsqkvQE7peW02qv,Household income categories,Household income mapping,multipleRecordLinks,Household income mapping
+rec8v7TmwDZ4SZiNH,Household income categories,Family survey non-TC data 2021-22,multipleRecordLinks,Family survey non-TC data 2021-22
+rec2iDLZOKzuNyJrb,Household income mapping,Record ID,formula,RECORD_ID()
+recXBV4xRmBzrosGs,Household income mapping,household_income_response,singleLineText,
+recwkneo2N0Lt2B1B,Household income mapping,household_income_category,multipleRecordLinks,Household income categories
+rect58Q6NZCQaEjDN,NPS categories,nps_category,singleLineText,
+recefftd7nACH1QmK,NPS categories,nps_display_name_english,singleLineText,
+reckuZdCkaUyZXF43,NPS categories,nps_display_name_spanish,singleLineText,
+recUkKNNoASd7qLCt,NPS categories,NPS mapping,singleLineText,
+reco6Zmeh3bFBS9tZ,NPS mapping,Record ID,formula,RECORD_ID()
+rec7bDWYdg3biLqgl,NPS mapping,nps_response,number,
+recNsKyIy8wWTR2XL,NPS mapping,nps_category,multipleRecordLinks,NPS categories
+rec3ITITzg07x5rq0,Boolean categories,boolean_category,singleLineText,
+recnVOMiEuq3Su59J,Boolean categories,boolean_display_name_english,singleLineText,
+recNnMIes6MMBF8pL,Boolean categories,boolean_display_name_spanish,singleLineText,
+recLWxabBAzSlf73o,Boolean categories,Boolean mapping,multipleRecordLinks,Boolean mapping
+recK5AGcZiLB0Ct0H,Boolean categories,Family survey non-TC data 2021-22,multipleRecordLinks,Family survey non-TC data 2021-22
+rec78Y4zFgTR35gr6,Boolean categories,Family survey non-TC data 2021-22 (2),multipleRecordLinks,Family survey non-TC data 2021-22
+recxTuLVlbswAXsdn,Boolean mapping,Record ID,formula,RECORD_ID()
+reclouOWMm9hCCXRJ,Boolean mapping,boolean_response,singleLineText,
+recYgnDftsJVtN34f,Boolean mapping,boolean_category,multipleRecordLinks,Boolean categories
+rec2T7V4T64p9dNQ3,Field Categories,Category ID,formula,"CONCATENATE({Type}, "": "", {Slug})"
+recb2KaMAbHPFAgRf,Field Categories,Value,singleLineText,
+recgcTMSS477R6XOX,Field Categories,Type,singleSelect,"Race & Ethnicity, Gender, Household Income, Income Background As Child, Educational Attainment, Pronouns, Languages, Montessori Certification Levels, Montessori Certifiers, Montessori Certification Status, LGBTQIA, Classroom Levels"
+recPBcW6Ucwy2NtNm,Field Categories,Field Mappings,multipleRecordLinks,Field Mapping
+recbGXzdfG76wqiWM,Field Categories,Slug,singleLineText,
+reczeXhQ4sfJWZlIh,Field Categories,Record ID,formula,RECORD_ID()
+rec7YUucLWcZpGE9c,Field Categories,Field Mapping Record IDs,multipleLookupValues,
+rec4qPoCgYQpsWpSY,Field Categories,Non-Specific Category,checkbox,
+recGpwrQPJFz2ERZX,Field Mapping,Mapping ID,formula,"CONCATENATE({Response}, "" - "", {Field Categories})"
+recWBp4rhnZzLCRgH,Field Mapping,Field Categories,multipleRecordLinks,Field Categories
+recAul5gNXMDSTXdA,Field Mapping,Response,singleLineText,
+recnvYxAkKG2A8Gna,Field Mapping,Field Category Type,rollup,
+reccgInw9alHILVyv,Field Mapping,Record ID,formula,RECORD_ID()
+recGOuVkzmCLMwyP8,Field Mapping,Field Categories Record IDs,multipleLookupValues,
+recvYNniDebwTDYFf,Tags,Name,singleLineText,
+recWKOFbZHDVTVHqv,Tags,Educator,singleLineText,
+recN4bMDap8AoPes9,Tags,Educator Record ID,multipleLookupValues,
+recv8ahsX68r4Mnw5,Tags,SSJ Typeforms: Start a School,multipleRecordLinks,SSJ Typeforms: Start a School
+recSKaEzxFeMaC4P8,Tags,Record ID,formula,RECORD_ID()
+recn6lCg00Vzrra16,Tags,Educators copy,singleLineText,
+reckFtszn23Drbskm,Tags,SSJ Typeforms: Start a School copy,singleLineText,
+recjuARpyvtRQyTuo,Family Survey,Family Survey Name,formula,"{School} & ""_"" & {Survey Year}"
+recBphNi1n4ZAAqUM,Family Survey,Number of Students,number,
+recYEooa0ZIz1nDpw,Family Survey,Number of Forms Sent,number,
+recyv2LOKBEr4fTri,Family Survey,Response Rate,percent,
+recu0RPL6QvIYYZ6N,Family Survey,School,multipleRecordLinks,Schools
+recuhDMpOttezbD1f,Family Survey,Global Majority,percent,
+reccIu3NRznSRj3B2,Family Survey,African American,percent,
+recRdgaPs5gw5kkCH,Family Survey,Asian American,percent,
+recK0UKGLhP6HStpG,Family Survey,Latinx,percent,
+recyk8Usil14XrYNN,Family Survey,Middle Eastern,percent,
+recbij9ARc7VzTLvo,Family Survey,Native American,percent,
+recSomAsHreDQIAS7,Family Survey,Pacific Islander,percent,
+recpDvIQYNclbOs4f,Family Survey,White,percent,
+recdw2aerHjiXLgyu,Family Survey,FRL,percent,
+recPKKjt6VURkx9hv,Family Survey,Low Income,percent,
+rec9u1YTBnmtU0wZp,Family Survey,Medium Income,percent,
+recuIdwGWMpsqnGHG,Family Survey,High Income,percent,
+recvAlms1dXOiQQUT,Family Survey,ESL,percent,
+recEJDIoQ6hOXBSC4,Family Survey,NPS,number,
+recHUG0pthYMFjnRa,Family Survey,Survey Year,number,
+recQT04CAo66yqE8b,Family Survey,Schools copy,singleLineText,
+reciPOtm4TheZ50jP,Family Survey,Schools copy,singleLineText,
+rec5b8PCRCwG9vc90,Educator Gifts,Name,singleLineText,
+recpTzZ7mQRyZNlVK,Educator Gifts,Notes,multilineText,
+recdNwZC2xkjkk5Tz,Educator Gifts,Attachments,multipleAttachments,
+reccQ81E5LPgQgmVP,Educator Gifts,Status,singleSelect,"Todo, In progress, Done"
+recu3sHzo1FrQWcYn,School Gifts,Key,formula,"{School} & "" "" & {Gift Cycle}"
+recUKndjpTkiKDbyr,School Gifts,School,multilineText,
+recZ7pJLZat09Jmss,School Gifts,Gift Cycle,singleLineText,
+rechuxfKC2f3Uum9L,Training Grants,Training Participant + Program,formula,"{Educators}&""_""&{Training Program}"
+reciDGuuMi64jpKpw,Training Grants,Notes,multilineText,
+recoZSRWKMxsx23pi,Training Grants,Training Grant Status,singleSelect,"Planned, Issued, Cancelled"
+recP7yDQuHCEqADKi,Training Grants,Training Grant Amount,currency,
+recOkbDAkAbWjkoKJ,Training Grants,Educators,multipleRecordLinks,Educators
+rec7KDS20pCp4JaJ9,Training Grants,Hub Name (from Educators),multipleLookupValues,
+recQHIN5XytHjxsfN,Training Grants,Stage (from Educators),multipleLookupValues,
+reci8hrJCq0HXfCQB,Training Grants,Status (from Educators),multipleLookupValues,
+recjPxwBxc1eiBeth,Training Grants,Training Status,singleSelect,"Accepted, In-Progress, Complete, Withdrew, Incomplete application / did not apply"
+recAulWc3hrWZqLaU,Training Grants,Training Program,singleSelect,Rising Tide
+recKVCJ4n91O12ZsW,Training Grants,Applied?,checkbox,
+recY6Iia45ld8iz2f,Training Grants,Cohort,singleSelect,2022 Primary
+recfsQO00CxPMn7ud,Marketing assets,ID,autoNumber,
+recwfwpKWzTt21g7A,Marketing assets,School,singleLineText,
+recoDAON1Bglymmtg,Marketing assets,Type,singleSelect,"Photo, Visual asset"
+recuMjcHNnJN4jgGt,Marketing assets,Asset,multipleAttachments,
+recbXMeImb1LOHTke,Marketing assets,Schools copy,singleLineText,
+recrzRL3Vzmyqvxjq,Platform Educators & Partners,first_name,singleLineText,
+recDwDhKp1khEJPA4,Platform Educators & Partners,middle_name,singleLineText,
+recEUIWQgEq8LBMwC,Platform Educators & Partners,last_name,singleLineText,
+recAjy1vLI37xBoK2,Platform Educators & Partners,email,email,
+recy3ZNtomRXV9xAX,Platform Educators & Partners,raw_address,singleLineText,
+rec419aoQ6W47ZsO7,Platform Educators & Partners,hub,singleLineText,
+rec9OueVrzYGxXnHj,Platform Educators & Partners,pod,singleLineText,
+recIwLAHDHyodMbL6,Platform Educators & Partners,tc_user_id,singleLineText,
+recaBIekuoCtqorwf,Platform Educators & Partners,prosperworks_id,singleLineText,
+rec1DPQOl0x0EkGL3,Platform Educators & Partners,willing_to_relocate,checkbox,
+recJhJ9bYW2ZzRMm8,Platform Educators & Partners,primary_language,singleLineText,
+recWvVyRfo1AtNGFQ,Platform Educators & Partners,race_ethnicity_other,singleLineText,
+reclhgFJW240tS90C,Platform Educators & Partners,household_income,singleLineText,
+rec5KLa0TShb8pHX1,Platform Educators & Partners,income_background,singleLineText,
+recfbE7ksNbcp8IVQ,Platform Educators & Partners,gender,singleLineText,
+recjSwTNIgiJLSpTy,Platform Educators & Partners,gender_other,singleLineText,
+rec9wPZ5r14MribM3,Platform Educators & Partners,lgbtqia,checkbox,
+recW3NygbWTI3QOId,Platform Educators & Partners,pronouns,singleLineText,
+recGGnzompGPLBUNR,Platform Educators & Partners,pronouns_other,singleLineText,
+recjNV9LkAEfmmjpB,Platform Educators & Partners,original_record_id,multipleRecordLinks,Educators
+recddhbkAkJJTumJI,Platform Educators & Partners,stage,singleLineText,
+reccBbMJnYrYF1KcN,Platform Educators & Partners,montessori_certified,singleLineText,
+recisGOUDdM7UaFpA,Platform Educators & Partners,languages,singleLineText,
+reczR9JYSi2RlwaHQ,Platform Educators & Partners,race_ethnicity,singleLineText,
+recbRo2OTgMpE1jFL,Platform Educators & Partners,roles,singleLineText,
+recvoIPQbMA6GTWNK,Platform Educators & Partners,Platform Educators x Schools,multipleRecordLinks,Platform Educators x Schools
+recndCGyk8hLbkb8s,Platform Educators & Partners,phone,phoneNumber,
+recsCJ9LJCs7PJpOE,Platform Educators & Partners,montessori_certified_year,singleLineText,
+rec7QTwbWgghQMALZ,Platform School,name,singleLineText,
+recHaVN4PlqKAbD7Y,Platform School,hub,singleLineText,
+rec7b3QVjFJu74Nvj,Platform School,pod,singleLineText,
+recTUItDNxYQL8gvH,Platform School,status,singleSelect,"Paused, Placeholder, Emerging, Open, Permanently Closed, Disaffiliated, Abandoned"
+rec7xC0FfXcNu9laX,Platform School,website,url,
+recIAK3LYxv3u8U0I,Platform School,phone,phoneNumber,
+recKSsmQboMPN2tjE,Platform School,email,email,
+recQ0OCdNMhMPILB0,Platform School,email_domain,singleLineText,
+recpFi5cFNQXEbmvg,Platform School,governance_model,singleLineText,
+recQ3pTzNAJuFLeZG,Platform School,calendar,singleLineText,
+recvi7lqteGrNLT6E,Platform School,enrollment_at_full_capacity,number,
+rec9SSVtG8Nl1roMC,Platform School,facebook,url,
+recRTXLlDnN6cmQFD,Platform School,instagram,url,
+recjpAfaNALtUXDIy,Platform School,logo_url,url,
+recwb6fixrKofisFf,Platform School,time_zone,singleLineText,
+recuNS02CSZnyM9pM,Platform School,address,singleLineText,
+recP8mNvn6TTfh6uQ,Platform School,opened_on,date,
+recJiDS8wgrAMl9At,Platform School,original_record_id,multipleRecordLinks,Schools
+recNZhBbsvWsobJlR,Platform School,charter,singleLineText,
+recUsERBz5BVx9LRf,Platform School,about,multilineText,
+rectLnxfLaI7JcEOg,Platform School,about_es,multilineText,
+recTG7KuA4lIgQqOz,Platform School,hero_image_url,url,
+recuCdqB32eaTrkKH,Platform School,hero_image2_url,singleLineText,
+rec3PMVgFUCMxrFn9,Platform School,URL,url,
+recCJZqacfzIEXTRd,Platform School,affiliation_date,date,
+reckK2iB3dq2huAoT,Platform School,number_of_classrooms,number,
+rec34QjhKUweJOPOj,Platform School,Platform Educators x Schools,multipleRecordLinks,Platform Educators x Schools
+recn2IOOnuHuPhUIr,Platform School,Schools copy,singleLineText,
+recfoZXqxuJMK8Ldi,Platform School,Schools copy,singleLineText,
+recfOR1KzavrEMdQi,Platform Educators x Schools,name,singleLineText,
+recUgtSzHydvlfufZ,Platform Educators x Schools,platform_school_record_id,multipleRecordLinks,Platform School
+rec0cGM2nt3H88KMp,Platform Educators x Schools,platform_person_record_id,multipleRecordLinks,Platform Educators & Partners
+recaeyD3NrsM5bXhU,Platform Educators x Schools,start_date,date,
+recxaYNWubfmqwFSZ,Platform Educators x Schools,end_date,date,
+rec1ayaZvNoI6Wr3g,Platform Educators x Schools,original_record_id,multipleRecordLinks,Educators x Schools
+recNJv4xmlDWMD6aZ,Platform Educators x Schools,Educators x Schools copy,singleLineText,
+recpJaukdIBBx1pQ8,Platform Educators x Schools,roles,singleLineText,
+recTGrYfzJwiY5QQA,Public funding,Name,singleLineText,
+recMmZYggvyeAOYk5,Public funding,Relevant levels,multipleSelects,"Parent-child, Infants, Toddlers, Primary, Lower Elementary, Upper Elementary, Adolescent / JH, High School"
+recmPs6zQillxXsup,Public funding,Schools,multipleRecordLinks,Schools
+recefyYglK9OrPdXd,Public funding,Description,multilineText,
+rec9DmUw8Sgok1HoG,Public funding,Schools copy,singleLineText,
+recHN2ZVmNh0cFopR,Action steps,Item,multilineText,
+receQ6fvmTGT8ZrUD,Action steps,Assignee,multipleRecordLinks,Partners
+receQT1qDKHWWwCaC,Action steps,Status,singleSelect,"Incomplete, Complete"
+recohbJM0ofWSq6fY,Action steps,Assigned date,date,
+rec0MD2N03nfUVDAc,Action steps,Due date,date,
+recSRRDWb8lr0agbk,Action steps,Schools,multipleRecordLinks,Schools
+recqQ6oa6g9W6fm0e,Action steps,Completed date,date,
+rec4BrDoXJG2ilPAz,Action steps,School Status,multipleLookupValues,
+recczBXv5gbcO5GRW,Action steps,SSJ Stage,multipleLookupValues,
+rec3eQ0nI9ggLhCU1,Action steps,Assignee Short Name,multipleLookupValues,
+recler2zLgFGsl27l,Membership fee overview,Record Name,formula,"CONCATENATE({School}, "" - "",{School year})"
+recHdRbQjHo3jUskH,Membership fee overview,School year,multipleRecordLinks,School year
+recnxbZuivRgJ5vry,Membership fee overview,School,multipleRecordLinks,Schools
+recXXlmSubE2iEsQq,Membership fee overview,Status,multipleSelects,"Paid, Getting Support, Exemption, Not Yet Paid"
+recxejcy57ecERkBA,Membership fee overview,Target fee,formula,"IF({Exempt},0,IF({New school?},{New school fee amount (from School year)},{990 revenue}*{Fee level as a share of revenue (from School year)}))"
+recl6yjPOUjcH8JXY,Membership fee overview,990 revenue,currency,
+recf90U4my96uiTPg,Membership fee overview,Initial negotiated fee,currency,
+reczZ1CuSz487hM5l,Membership fee overview,Membership fee changes,multipleRecordLinks,Membership fee change log
+rec5grbn7tdrVtBtl,Membership fee overview,Initial billing schedule,multipleRecordLinks,Membership fee billing schedules
+rec4UsDZjfEyDFj5n,Membership fee overview,July Amount Due,rollup,
+recIvCTUgMQh91KH1,Membership fee overview,Reminder schedule,multipleSelects,"July, August, September, October, November, December, January, February, March, April, May, June"
+recy0LcPzZ0jUIGb9,Membership fee overview,New school?,checkbox,
+recQ3SCpvXSJjEpjf,Membership fee overview,Fee level as a share of revenue (from School year),multipleLookupValues,
+recYquNu8jEyqrdwA,Membership fee overview,New school fee amount (from School year),multipleLookupValues,
+receisoQZZpti9f2V,Membership fee overview,Fill out initial billing schedule,button,
+recm8kFcHkDIjarPm,Membership fee overview,Exempt,checkbox,
+reck8rgGtS9a8aVea,Membership fee overview,Exemption rationale,multipleSelects,
+recm1im1k2n194dQO,Membership fee overview,Amount paid,rollup,
+recwD6sv95Jj8z0zO,Membership fee overview,Amount remaining full year,formula,{Initial negotiated fee}-{Amount paid}-{Amount exempted}
+rec1Gjr8rLRWE3GLs,Membership fee overview,Amount invoiced,rollup,
+recE6Oh2807XJYv8h,Membership fee overview,Amount outstanding vs. invoiced,formula,{Amount invoiced}-{Amount paid}-{Amount exempted}
+recQflcZeC1HXHRxS,Membership fee overview,Amount exempted,rollup,
+recZ1FPHxxsSJD8H3,Membership fee overview,August Amount Due,rollup,
+recyBdyrEGJt83yTl,Membership fee overview,September Amount Due,rollup,
+recPI7jT1kMZ7FLO3,Membership fee overview,October Amount Due,rollup,
+rec78R8YUrVcGu885,Membership fee overview,November Amount Due,rollup,
+reccUrEdX1eQMYX9r,Membership fee overview,December Amount Due,rollup,
+rec2Wy7uWTydjhsXN,Membership fee overview,January Amount Due,rollup,
+recQxbvYbaLeGHPDb,Membership fee overview,February Amount Due,rollup,
+recQ4tFHrLaMOSMm0,Membership fee overview,March Amount Due,rollup,
+recLK09fMBc845caD,Membership fee overview,April Amount Due,rollup,
+recwbgi3T23c8MFXZ,Membership fee overview,May Amount Due,rollup,
+recEZA3gBGuIjcGCT,Membership fee overview,June Amount Due,rollup,
+recRqAh9mufsk9Tts,Membership fee overview,Open link,button,
+recgt35BE56y7Mc1z,Membership fee overview,Revised fee amount,formula,{July Amount Due}+{August Amount Due}+{September Amount Due}+{October Amount Due}+{November Amount Due}+{December Amount Due}+{January Amount Due}+{February Amount Due}+{March Amount Due}+{April Amount Due}+{May Amount Due}+{June Amount Due}
+recBCg8R7VA883Yuh,Membership fee overview,Membership fee - generate invoices,multipleRecordLinks,Membership fee - generate invoices
+recQxn9MWc7x4k20e,Membership fee overview,QBO School Codes (from School),multipleLookupValues,
+recRPzko2f5fgF4RL,Membership fee overview,Membership fee credits,multipleRecordLinks,Membership fee credits
+rec8uWIACcXt3x7vZ,Membership fee overview,Membership fee invoices,multipleRecordLinks,Membership fee invoices
+recZ78Sz24G1yBTpa,Membership fee change log,Change ID,formula,"CONCATENATE({School x Year},""-"",{Date of change})"
+recAt6olpDaMiSoll,Membership fee change log,School x Year,singleLineText,
+recjW5bkK021UcWvG,Membership fee change log,Reason,multilineText,
+recKzPiJ47ILLTkOt,Membership fee change log,Date of change,date,
+recdfyvUPau92EDQo,Membership fee change log,Month to change,singleSelect,"July, August, September, October, November, December, January, February, March, April, May, June"
+recgMdul9D7Vbv0j0,Membership fee change log,Old amount,currency,
+recFqMIJD2rmS8qSC,Membership fee change log,New amount,currency,
+recdWxqOkx88Ic0Vl,Membership fee change log,Type,singleSelect,"Initial, Change"
+recQTnFrdDmPGrK0V,Membership fee billing schedules,Name,singleLineText,
+recgyOzc0YTnSsLs6,Membership fee billing schedules,Months to bill,multipleSelects,"September, October, November, December, January, February, March, April, May, June, July, August"
+reczI1tYMkoVDhGbj,Membership fee billing schedules,Amount per bill,percent,
+rec4YYNAzPcvVe3Xl,Membership fee billing schedules,Membership fee records,singleLineText,
+recVRtZKPrIsDbY7Y,School year,School year,singleLineText,
+recFpfsJsUMtnmnkZ,School year,Start date,formula,"DATETIME_PARSE(CONCATENATE(""7-1-"",LEFT({School year},4)))"
+recvSHz8tsZpMYmPC,School year,End date,formula,"DATETIME_PARSE(CONCATENATE(""6-30-"",LEFT({School year},4)+1))"
+recqPjXCpo2M3WFBE,School year,New school fee amount,currency,
+reczIhNmEb9CvjKrl,School year,Fee level as a share of revenue,percent,
+recfx7bpLtYPrOcZL,School year,Membership fee records,singleLineText,
+recIolV8lt3Cl5J8G,School year,Create membership fee records for year,button,
+rec8s3pjpa8D7LivO,Membership fee credits,Payment ID,formula,"CONCATENATE({School x Year},""-"",{Amount},""-"",{Date received})"
+recfCF5GuO0gq2nOX,Membership fee credits,School x Year,singleLineText,
+recCqAAoAkKOMMJSS,Membership fee credits,Amount,currency,
+rec3S9BNfYsPYcAS9,Membership fee credits,Date received,date,
+recfHv63NoMI8ljcN,Membership fee credits,Type,singleSelect,"Payment, Exemption"
+recLP2NoTjhPcBPNc,Membership fee credits,Exemption explanation,multilineText,
+recVCDka5cIn8DR9R,Membership fee credits,Attachments,multipleAttachments,
+recgWseLgk5ld8HMZ,Membership fee credits,School text from QBO,singleLineText,
+rec72GDWOmOsMxlzQ,Membership fee credits,Year text from QBO,singleLineText,
+recUOtmP7THUq1teI,Membership fee credits,ai,singleLineText,
+recyEiiVHW37HtHPk,Membership fee credits,Customer ID from QBO,multipleRecordLinks,QBO School Codes
+recyq43vBGbpMvgiC,Membership fee credits,School Name in QBO (from Customer ID from QBO),multipleLookupValues,
+recVrVbh0M31DwPny,Membership fee credits,School x Year formula text,formula,"CONCATENATE({School Name in QBO (from Customer ID from QBO)},"" - "",{Year text from QBO})"
+rec47g27zNAu1uG5L,Membership fee invoices,Invoice ID,formula,"CONCATENATE({School x Year},""-"",{Invoice amount},""-"",{Date})"
+recaDCDkLpApYgWg5,Membership fee invoices,School x Year,singleLineText,
+recC4p6a3C2XRUEDl,Membership fee invoices,Invoice amount,currency,
+recxKnkvP9WsB8g1A,Membership fee invoices,Date,date,
+recLY3HkKxYRZboWl,Membership fee invoices,School Year from QBO,singleLineText,
+recVuKcCTly4ByOco,Membership fee invoices,School from QBO,singleLineText,
+rec2viYdUg7KB4m6V,Membership fee invoices,Customer ID from QBO,multipleRecordLinks,QBO School Codes
+recycmG260mzV0MPN,Membership fee invoices,Schools (from Customer ID from QBO),multipleLookupValues,
+recUDn41nN0xh7Ln7,Membership fee invoices,School x Year formula text,formula,"CONCATENATE({Schools (from Customer ID from QBO)},"" - "",{School Year from QBO})"
+reczwWRxhtnq54rDy,Membership fee - generate invoices,Invoice ID,formula,"CONCATENATE({School x Year},""-"",{Invoice amount},""-"",{Invoice Date})"
+recznNKzPMT4xTAMn,Membership fee - generate invoices,School x Year,singleLineText,
+reclBhZQI2IHRg7BH,Membership fee - generate invoices,Invoice amount,currency,
+reccbKpZtBCFmX71N,Membership fee - generate invoices,Invoice Date,date,
+rec1NFTZznwOVkakJ,Membership fee - generate invoices,Open URL,button,
+reco3hBY2AFYiX0ge,Membership fee - generate invoices,QBO School Codes (from School) (from School x Year),rollup,
+recviwjIxAzfaiZhA,Membership fee - generate invoices,Due date,date,
+recihp7jQZ0WuhHRi,Membership fee - generate invoices,School year (from School x Year),rollup,
+recAjnyNBg0lYoTwU,Event types,Event Category,singleLineText,
+recszlt5SP2PG3Q8U,Event types,Events,multipleRecordLinks,Events
+reczk5bKHfe4i9Hyd,QBO School Codes,Customer ID in QBO,singleLineText,
+recMg7lO0jrOLOwzF,QBO School Codes,School Name in QBO,singleLineText,
+recj8K058rnhoJK6b,QBO School Codes,Schools,multipleRecordLinks,Schools
+recsOK30gIWJxKkx9,QBO School Codes,Membership fee invoices,multipleRecordLinks,Membership fee invoices
+recTposAIlu5D2QGl,QBO School Codes,Membership fee credits,multipleRecordLinks,Membership fee credits
+recPTgFbCFFrwgFRz,Emails,email_id,formula,RECORD_ID()
+rec45kOEaliqzOieq,Emails,From,singleLineText,
+rec0JuxdpmqpnXoUJ,Emails,To,singleLineText,
+recym0cXt3SVrjFNQ,Emails,Date,dateTime,
+recJy2zTj92pZNv3n,Emails,Subject,singleLineText,
+reco0SAcXfwsakeUh,Emails,Body,richText,
+recj17oOBaZxYTSyx,Emails,Attachments,multipleAttachments,
+rectK871g1B1c62D0,Emails,Educators,multipleRecordLinks,Educators
+rec4RU6q56EzzIEXy,Emails,Gmail msg ID,singleLineText,
+reca7blBnOR4bepiX,Emails,Schools,multipleRecordLinks,Schools
+rech3pIChKjijw7rL,Emails,CC,singleLineText,
+rec5uwcv1iQ7MjyFm,Emails,Matched Emails,multilineText,
+rec9hpNjlnvpeMdzR,Emails,User,singleLineText,
+recf38TcIS5ogia7f,Emails,Created time,createdTime,
+recQheJRZVFS3hEis,Montessori Cert Levels,Name,singleLineText,
+recyDKWmq0bGx29tz,Montessori Cert Levels,Montessori Certs,multipleRecordLinks,Montessori Certs
+recg113zExWMuKfaf,Montessori Cert Levels,SSJ Fillout Form: Get Involved,multipleRecordLinks,SSJ Fillout Forms
+reco91k2WavjYmKO4,Montessori Cert Levels,SSJ Fillout Form: Get Involved 2,multipleRecordLinks,SSJ Fillout Forms
+recOk1PNG4hKdfCRn,Montessori Cert Levels,SSJ Fillout Form: Get Involved 3,multipleRecordLinks,SSJ Fillout Forms
+recL0UW9ve9JP5Yjn,Montessori Cert Levels,SSJ Fillout Form: Get Involved 4,multipleRecordLinks,SSJ Fillout Forms
+recyaRlhj9IlfRMaV,Montessori Cert Levels,Educators,singleLineText,
+recSF0z6UBOGwyE5Q,Montessori Cert Levels,Educators 2,multipleRecordLinks,Educators
+recQcb6qO2Ooctrmo,Montessori Certifiers,Name,singleLineText,
+recvSo8SyUzYmUfKm,Montessori Certifiers,SSJ Fillout Form: Get Involved,multipleRecordLinks,SSJ Fillout Forms
+recTXVG9VxkKmBrvv,Montessori Certifiers,SSJ Fillout Form: Get Involved 2,multipleRecordLinks,SSJ Fillout Forms
+recT9XBoWATQo31Y0,Montessori Certifiers,SSJ Fillout Form: Get Involved 3,multipleRecordLinks,SSJ Fillout Forms
+rec77iwe7lmvXFy43,Montessori Certifiers,SSJ Fillout Form: Get Involved 4,multipleRecordLinks,SSJ Fillout Forms
+recbO2zcWoKthJ5Ti,Montessori Certifiers,Montessori Certs,multipleRecordLinks,Montessori Certs
+recmJA3abtijlhzCG,Montessori Certifiers,Abbreviation,singleLineText,
+recJNWk59EF7EzlPI,Montessori Certifiers - old list,Name,singleLineText,
+recl5NnSUuNFpBUQD,Montessori Certifiers - old list,SSJ Fillout Form: Get Involved,singleLineText,
+rec2Jc0ztG1svL2t8,Montessori Certifiers - old list,SSJ Fillout Form: Get Involved 2,singleLineText,
+recyl70N7bhd1GTLg,Montessori Certifiers - old list,SSJ Fillout Form: Get Involved 3,singleLineText,
+recgC0Oz8WT4kZTVq,Montessori Certifiers - old list,SSJ Fillout Form: Get Involved 4,singleLineText,
+recFKNfKOCNHfRosY,Montessori Certifiers - old list,Abbreviation,singleLineText,
+recPEMmBiXb6nEHdj,Race and Ethnicity,Name,singleLineText,
+rec4BiOMTfAFeIauY,Race and Ethnicity,SSJ Fillout Form: Get Involved,singleLineText,
+recEtKTspiLVPga1p,Board Service,Name,formula,"IF({Educator},{Educator},{Community Member Name}) & "" - "" & IF({Currently Active}, ""✅"", ""❌"") & IF({Chair}, ""🪑"", """")"
+recY8TODhy9kF48VN,Board Service,School,multipleRecordLinks,Schools
+recOmaN4MlR0HmCRL,Board Service,Educator,multipleRecordLinks,Educators
+rec1qmxPnuYR8DmsJ,Board Service,Contact Email (from Educator),multipleLookupValues,
+rec2Pec5gZr4zMCmu,Board Service,Start Date,date,
+recXVIKhpKGVzFJMt,Board Service,End Date,date,
+rec4jdwQyVritJzkB,Board Service,Currently Active,checkbox,
+recI9kLzgG1j6LRUQ,Board Service,Chair,checkbox,
+recN85qEwZJwQ3lZ6,Board Service,Community Member Name,singleLineText,
+recUFBjn2SYO2cQzw,Board Service,Community Member Email,singleLineText,
+recIXeDOq6pUhUoME,Board Service,Email,formula,"IF({Contact Email (from Educator)},{Contact Email (from Educator)},{Community Member Email})"
+recNahKrecjbjPn3A,Email Sync Errors,Message ID,singleLineText,
+recGYI4XkgdrryX2U,Email Sync Errors,Subject,singleLineText,
+recnmonzNUc9pExIR,Email Sync Errors,Date,singleLineText,
+recBocAJp7sTk5z6j,Email Sync Errors,From,singleLineText,
+recO7eXQ0YtFR6kTR,Email Sync Errors,To,singleLineText,
+recryXV2f6J8U62Cu,Email Sync Errors,Error,multilineText,
+recdr3O2PziZuRLo7,Email Sync Errors,CC,singleLineText,
+rec1fGZuX0nzXuImk,Email Sync Errors,created time,createdTime,
+recvGjHD7QyUZEGWS,Email Sync Errors,User,singleLineText,
+reccIVwF15e0OZ8CK,Lead Routing and Templates,Name,singleLineText,
+rectOORJTF2khnpMi,Lead Routing and Templates,SendGrid Template ID,singleLineText,
+recXtoOrm9YfMeVqZ,Lead Routing and Templates,Language,multipleSelects,"English, Spanish"
+recitWUdkh1euKiZ9,Lead Routing and Templates,Type,multipleSelects,"Educator, Community Member"
+recjHuLt36Nk78MRb,Lead Routing and Templates,Source,singleLineText,
+recTsBVZb5joI2oxo,Lead Routing and Templates,State,singleLineText,
+recIAu13tlQWAJJHP,Lead Routing and Templates,Sender,singleLineText,
+rectlZfeoBoQAlwz9,Lead Routing and Templates,US / International,multipleSelects,"U.S., International"
+recYcXOpGW0kfSrHX,Lead Routing and Templates,Growth Lead,multipleRecordLinks,Partners
+reclzPxmeYwOZiMH4,Lead Routing and Templates,Geo-type,singleSelect,States
+recrOXqQVU01wyYtZ,States Aliases,State,singleLineText,
+recboNzIdFAWbzABS,States Aliases,Abbreviation,multilineText,
+rectkAenp034Xag7p,Meetings,Meeting key,autoNumber,
+rectKpI4Q07aSzMNb,Meetings,Educators,multipleRecordLinks,Educators
+recrU7NcbRHzVNgEg,Meetings,Schools,multipleRecordLinks,Schools
+recjUoZTMKHQYAquG,Meetings,End Time,dateTime,
+recZrIANsWzacTZ6v,Meetings,Title,singleLineText,
+reczd3ktChlqssFQx,Meetings,Matched Emails,multilineText,
+reck4XrErCfYFN5fW,Meetings,Start Time,dateTime,
+rec23uYbAXiQdiiCQ,Meetings,Description,multilineText,
+recOKo9EluEV7yYa4,Meetings,All Attendees,multilineText,
+recSmmE15LpMDtJkf,Meetings,User,singleLineText,
+rec14B41DFyTDnH5y,Membership termination steps,mem_term_step_id,formula,RECORD_ID()
+recIsekoT7AO1C9JY,Membership termination steps,Update Airtable fields,date,
+recIrp4yV74QwyNrZ,Membership termination steps,Deactivate GSuite,date,
+recDv8zmorSEsGu7H,Membership termination steps,Deactivate TC,date,
+reclpZeHgGdnmr5xS,Membership termination steps,Deactivate listservs,date,
+recoNauRfqrqHM4je,Membership termination steps,Deactivate website,date,
+reclzOqbRLNuFfDKE,Membership termination steps,Deactivate QBO,date,
+reckCnt6ZkZPTMrG4,Membership termination steps,Deactivate Slack,date,
+reccrsBWYVbS8Iy1h,Membership termination steps,Deactivate wildflowerschools.org profile,date,
+recA7bE6qFzFCXb7j,Membership termination steps,Deactivate Group Exemption,date,
+recZ9zWHjUPJMQEeb,Membership termination steps,Deactivate Gusto,date,
+reckcV8uHxijWQGGO,Membership termination steps,School,multipleRecordLinks,Schools
+recBvqs3KmsANLriw,Membership termination steps,Initial TC condition,singleSelect,
+recpaer261Vw8zJiG,Membership termination steps,Listservs,multipleSelects,"teachers-leaders, white, af-am, poc"
+recFuy0zm26moDaUk,Membership termination steps,Initial website condition,singleSelect,
+recZqAWEwPglrXbnK,Membership termination steps,Initial QBO condition,singleSelect,"In WF QBO with complete Master Admin, In WF QBO without complete Master Admin, Not in WF QBO"
+recDzE1oLOUNOc4wg,Membership termination steps,Initial Slack condition,singleSelect,"In WF Slack, Not in WF Slack"
+rec22mN6U2VBDoSP8,Membership termination steps,Initial Group Exemption condition,singleSelect,
+recsX6e8GFWjRbJH5,Membership termination steps,Initial Gusto condition,singleSelect,
+recVouwt6pYuKoEXx,Membership termination steps,Deactivate GSuite target date,date,
+recOx2f114uh3Q1qY,Membership termination steps,Deactivate TC target date,date,
+recAph45rjlzS266E,Membership termination steps,Deactivate listservs target date,date,
+recfqFvEoNEYsaYO0,Membership termination steps,Deactivate website target date,date,
+recyjM9xnNB2ZBld9,Membership termination steps,Deactivate QBO target date,date,
+recw2cMgcZgbxWutu,Membership termination steps,Deactivate Slack target date,date,
+reczZrkAizmPJ02H1,Membership termination steps,Deactivate Group Exemption target date,date,
+recNNi644b3Dhg8ks,Membership termination steps,Deactivate Gusto target date,date,
+recArBnDwyc9i4SuN,Membership termination steps,Termination trigger date,date,
+reccQA6bQVk4hFhYO,Membership termination steps,Membership termination letter (from School),multipleLookupValues,
+recxwUigLf7abCa1i,Membership termination steps,School Contact Emails (from School),multipleLookupValues,
+recPtPpllRErEFhBq,Membership termination steps,Deactivate wildflowerschools.org profile target date,date,
+recXa9E1cMTEb41Ua,Membership termination steps and dates,Step name,singleLineText,
+recWUFXumxtm58JmY,Membership termination steps and dates,Day of process,number,
+recy24CR4eqRyb9P1,Membership termination steps and dates,Responsible person at WF,email,
+recx0E4oQ6rw7BbZ0,Membership termination steps and dates,field with target date,formula,"{Step name} & "" target date"""
+recOg1pfUXvJH638H,Cohorts,Cohort Name,formula,"IF(AND({Program Type},{Start Date}),
+  {Program Type} & "" "" & DATETIME_FORMAT({Start Date},""MMM-YYYY""),""Enter Program Type and Start Date"")"
+recdFvRH2ossWWyO2,Cohorts,Program Type,singleSelect,"Blooms, Charter"
+recS0H6DIKY3y0QLN,Cohorts,Start Date,date,
+recUuljaV2VuMG4EI,Cohorts,Schools,multipleRecordLinks,Schools
+recmA1YfXlVeXwT8e,Automations,Automation Name,singleLineText,
+recUgLWGklWpcHZZ9,Automations,Description,multilineText,
+recJw3I3tSiBZrXbx,Automations,Trigger Event,singleSelect,"When a record is updated, Trigger Event, When a record is created, When a record matches conditions, At a scheduled time, When a button is clicked, When a webhook is received"
+recg8eQ23ZCcTQYAQ,Automations,Action,singleSelect,"Run a script, Action, Update record, Find records & update, Send Slack message, Send email, Create record"
+recyzbSLKAYcLjdiH,Automations,Created Date,createdTime,
+recSIPWdEcM728YQ3,Automations,Last Modified time,lastModifiedTime,
+recDepT1cAEwdoZAm,Automations,Which table,singleSelect,"Schools, Educators, School Locations, Which table, Emails, Meetings, Membership termination steps, Grants, Grants Advice Log, SSJ Fillout Forms, --, Governance docs, Metadata"
+rec1ahqbABDr7P7GZ,Automations,Which field,singleLineText,
+recp1uhK0KCEMG6lT,Automations,Script,multilineText,
+recsGBYLfIrfCbEgq,Automations,Active,checkbox,
+rec2gncppy0JIY2zA,Automations,old Script,multilineText,
+rec2h6sLqFqzXqaR6,Automations,Full Script,formula,"CONCATENATE({code header (from Link to Overall Reusable Code)},""\n\n"",{Script})"
+recWOGCu4kcGVZSQi,Automations,Link to Overall Reusable Code,multipleRecordLinks,Overall Reusable Code
+recLb2po9JlYChLqC,Automations,code header (from Link to Overall Reusable Code),multipleLookupValues,
+recm1pY4PXGzeK6SV,Reusable Code,Name,singleLineText,
+recWMisnL58aSdmLU,Reusable Code,async,checkbox,
+recpcsoMopBF36Dwo,Reusable Code,input_variables,singleLineText,
+recbiErqAVXipd4la,Reusable Code,code,multilineText,
+recct56OwmiclPDfg,Reusable Code,output,singleLineText,
+recEMAWzJ12Mnrd3h,Reusable Code,function text,formula,"CONCATENATE(IF({async},""async "",""""),""function "", {Name},""("",{input_variables},"")"","" {\n"",{code},""\n}"")"
+recZ7V61CFWL9Hmaw,Reusable Code,Overall reusable code,multipleRecordLinks,Overall Reusable Code
+recn24rCTPlOlS5Y6,Reusable Code,Group,singleSelect,"DateTime, Slack, Zapier, Geo, NullChecks, Lookup, Database, Code, SendGrid, Overall"
+recZMXa7c7zQGM4ko,Reusable Code,function call commented,formula,"CONCATENATE(""// -- "",IF({async},""async "",""""),""function "", {Name},""("",{input_variables},"")"")"
+rec1EstO1JU96CwgD,Advice Process,advice_process_blocks_id,formula,RECORD_ID()
+recgXqq2cGBeAfn3u,Advice Process,Step,singleSelect,"Preliminary, Full"
+rec50MbUBcRMphOCx,Advice Process,action_id,singleLineText,
+recqH908vS8JLSecs,Advice Process,buttonText,singleLineText,
+rechX5cUgjSl0Qgbx,Advice Process,adviceType,singleSelect,programblock
+recdg6JjTuImK3WGk,Overall Reusable Code,Name,singleLineText,
+recVOQcam770XCGfP,Overall Reusable Code,Functions,multipleRecordLinks,Reusable Code
+recv7f4GR7PAVO4aU,Overall Reusable Code,function text (from Reusable Code),rollup,
+receKLjpN462mA51U,Overall Reusable Code,Key Value Pairs,multipleRecordLinks,Key Value Pairs
+recIiksF9QUVTkXHl,Overall Reusable Code,key_value_text,rollup,
+recV1B82FnEuXdMD4,Overall Reusable Code,code header,formula,"CONCATENATE(""// HEADER START -->\n"",
+""// Copied on "", DATETIME_FORMAT(TODAY(),'MMMM D, YYYY'),""\n\n"",
+""const HEADER_COPIED_DATE = "",
+DATETIME_FORMAT(TODAY(),'YYYYMMDD'),"";\n"",
+""const lastCodeModDate = getRecordFieldSafely(await safelyGetRecord(base.getTable('Overall Reusable Code'),'"",
+RECORD_ID(),
+""'),'LastCodeMod');\n"",
+""if (HEADER_COPIED_DATE < lastCodeModDate) console.log('The code header is out of date.');\n\n"",
+""let CONFIG = {};\n\n"",
+
+""// List of functions\n\n"",
+{function_list},""\n\n"",
+
+""// Functions\n\n"",
+{function text (from Reusable Code)},
+""\n\n// <-- HEADER END\n\n"",
+""// Main script starts here\n\n"",
+""(async () => {\n"",
+""  await loadCONFIG();\n"",
+""})();"")"
+rec4VZpEN1hddofsO,Overall Reusable Code,function_list,rollup,
+rec4ZD0GTs5HEBBTX,Overall Reusable Code,Automations,multipleRecordLinks,Automations
+recfLdOZ3kfz4TqD6,Overall Reusable Code,automations scripts,rollup,
+recnk3H9VVBOrWR7s,Key Value Pairs,Key,singleLineText,
+rec2EXFErLE3rABwm,Key Value Pairs,Value,singleLineText,
+recTVNSWqLwLx1Ufo,Key Value Pairs,Description,multilineText,
+reckyAlZ0oTgldObi,Key Value Pairs,Owner,multipleRecordLinks,Partners
+recnJbmKAmvbRlOzT,Key Value Pairs,Overall Reusable Code,multipleRecordLinks,Overall Reusable Code
+recNaF6Ii4NXVvTbC,Key Value Pairs,Key-Value,formula,"CONCATENATE(""const "",{Key},"" = '"",{Value},""'\n"")"
+recSPCeCchUqyxHCB,Roadmap,Title,singleLineText,
+recVCdjhKhD3LK7pZ,Roadmap,Short description,singleLineText,
+recby4FGWWjfBi3Wg,Roadmap,Date requested,date,
+recopoGVjuoecPjzU,Roadmap,Requestor,multipleRecordLinks,Partners
+recwur4Lse26GTvI5,Roadmap,Priority,singleSelect,"Top, Medium, Low"
+recDvGLGR92rzsHx0,Roadmap,Responsible for fixing,multipleRecordLinks,Partners
+rec75CSj11DwTVPJK,Roadmap,Target fix date,date,
+reclyU5LaLbvrn9r2,Automations,Section,singleSelect,"Data Workflow/Management, Backups + Snapshots, Notifications, Grant initiation, Deduplication, Processing Get Involved Forms, Update School Errors, Buttons, Membership termination, More, Sharing with chatGPT"
+rec8h5poZv4OVRG1A,Metadata,recId,formula,RECORD_ID()
+rechCBq3hipFOQaUg,Metadata,Table ID,singleLineText,
+reckpKse40p4ptVX7,Metadata,Table Name,singleLineText,
+recnSGR4PZu2nclCH,Metadata,Field ID,singleLineText,
+recoIC5haLfZKmcpC,Metadata,Field Name,singleLineText,
+recbhSMhbA26e0o9O,Metadata,Field Description,singleLineText,
+rectPVgUw5ljpV6Sd,Metadata,Field Type,singleLineText,
+recd8MiL972jIGOip,Metadata,Field Options,multilineText,
+rec4vASjLMICHJMyV,Schools,Membership fee recs,multipleRecordLinks,Membership fee school x year
+recFa6tPx3BFfy0ew,Schools,Legal structure,singleSelect,"Independent organization, Part of a charter, Part of another organization, Multiple WF schools in a single entity"
+recVtJbFZkiWgm3yc,Schools,Charter assessments,multipleRecordLinks,Assessment data
+recIp6Aa6WF9NLDoL,Schools,Annual enrollment and demographics,multipleRecordLinks,Annual enrollment and demographics
+reck3gGrEuIi6FeZI,Schools,Active guides,multipleLookupValues,
+recXj72sakMjGm7eq,Schools,Create guide assignment,formula,"""https://airtable.com/appJBT9a4f3b7hWQ2/pagyPlSOcxnd3TA3f?prefill_School="" & {school_id}"
+recf9CyTSl3S6eXyy,Schools,Guide assignment,button,
+recsuEc0l6cOyIyJp,Charters,Short Name,singleLineText,
+recb17WhY4iOYO19A,Charters,Initial target ages link,multipleRecordLinks,Montessori Cert Levels
+recp1bzrnpNXdsPJh,Charters,Landscape analysis,multipleAttachments,
+recapNGEQPgNGoCBd,Charters,Support timeline,multipleLookupValues,
+recELLHVwQuVEmBEg,Charters,Non-TL roles,multipleRecordLinks,Charter roles
+rec2kdgJKbyXVINTE,Charters,Projected open,date,
+rec11xZtS755x9UVu,Charters,Target open (from Charter applications),multipleLookupValues,
+recI8ACLhqazA1bkR,Charters,Contact Email (from External Initiator(s)),multipleLookupValues,
+recI9AMX5pgJdFZBf,Charters,Cohorts,multipleRecordLinks,Cohorts
+rec84GAzSLLboOSsp,Charters,Current TLs (from Schools),multipleLookupValues,
+recyRqwrpXa7njjcf,Charters,Membership fee school x year,multipleRecordLinks,Membership fee school x year
+recCa2Vu2zcyi3nZC,Charters,Annual enrollment and demographics,multipleRecordLinks,Annual enrollment and demographics
+recpjp6UoPv6KsmD9,Charters,Locations,multipleRecordLinks,Locations
+recRz4yWIldZEHOVi,Charters,Partnership with WF started,date,
+recQrNNpVG0Cg35rx,Charters,Authorized,date,
+rec61uGXq5PqDrPBZ,Charters,First site opened,date,
+recfIs6GPMpxD4PdP,Charters,Website,url,
+recVLAGr8b3uOQm7N,Charters,School reports,multipleRecordLinks,Reports and submissions
+recNoWlM5zl9wCeM7,Charters,Charter assessments,multipleRecordLinks,Assessment data
+recXJOZ0FjQWDXbse,Charters,Charter authorizers and contacts,multipleRecordLinks,Charter authorizers and contacts
+rec2La62xIqXQScYT,Charters,Charter applications,multipleRecordLinks,Charter applications
+rec1X6d0u4mzJXIO7,Locations,Charter,multipleRecordLinks,Charters
+recAd45zMtUItzXYN,Educators,Ops Guide Meeting Preference Time,multipleSelects,"During the day, Evenings, Weekends"
+recNY0rhYc4e55tH0,Educators,Ops Guide Specifics Checklist,multipleSelects,"No partner, Accelerated Timeline, Career change, No Montessori training, Been in pipeline a long time, Alignment / model questions, Conversion school, BIPOC led, Team seems more vision-oriented (needs structure), Interested in charter, Reach out to growth leads for more details"
+reccczi53fy7NqraS,Educators,Ops Guide Request Pertinent Info,multilineText,
+recya1CM8cma7da8B,Educators,Ops Guide Support Type Needed,multipleSelects,"Visioning Cohort, One on one ops guiding support, Charter ops guide support for existing/authorized charters with WF"
+recwsbXFcl7fJCOgf,Educators,Ops Guide Any fundraising opportunities?,multilineText,
+recaIORMq6vQ05zGk,Educators,Race and Ethnicity,multipleRecordLinks,Race and Ethnicity
+recih41gYf7zQ74Oz,Educators,Charters,singleLineText,
+reczgNWFzjtJsM6Qv,Educators,Charter admin roles,multipleRecordLinks,Charter roles
+recPVQTMtt7tjM2GZ,Educators x Schools,Charters,singleLineText,
+rec5cMBSkNMQckmgY,Partners,Short name,singleLineText,
+recqo8kVAjPEahxa4,Grants,Primary Contact Email (from School),multipleLookupValues,
+recQ8BmgulYDdrhYu,Grants,Primary Contacts (from School),multipleLookupValues,
+recktYa4CPNtSZS2H,Grants,Current Mailing Address (from School),multipleLookupValues,
+recUSWRVtb8T1gUQc,990s,Legal structure (from School),multipleLookupValues,
+recDR0N9kV1TW3LLp,990s,AI Derived Revenue,currency,
+recIeDeSx9K7zmStu,990s,AI Derived EOY Date,aiText,
+recnDlcUid2C6Matu,990s,Membership fee school x year,multipleRecordLinks,Membership fee school x year
+recT9xMeGszjIq241,SSJ Fillout Forms,"Manual (type ""run"")",singleLineText,
+reczraroJ21KPxo8J,SSJ Fillout Forms,Initial Outreacher,singleSelect,"daniela.vasan@wildflowerschools.org, N/A, rachel.kelley-cohn@wildflowerschools.org, jeana.olszewski@wildflowerschools.org, angelica@wildflowerschools.org, Brent Locke, DUPLICATE, Lisbeth, damoe;a"
+recIsqJeapIPZ8zX8,SSJ Fillout Forms,Person responsible for follow up,singleSelect,"daniela.vasan@wildflowerschools.org, N/A, rachel.kelley-cohn@wildflowerschools.org, jeana.olszewski@wildflowerschools.org, angelica@wildflowerschools.org, Brent Locke, DUPLICATE"
+recMD1EBP210GcdEq,Montessori Cert Levels,Charters,multipleRecordLinks,Charters
+recLxRExxeCyGUc4x,Race and Ethnicity,Educators,multipleRecordLinks,Educators
+reccECuPC7Y37BNQx,Cohorts,Charters,multipleRecordLinks,Charters
+recueDKXLZ2qHxGjV,Reusable Code,Last modified time,lastModifiedTime,
+rec98HePiLH3c9xJ3,Overall Reusable Code,recId,formula,RECORD_ID()
+reccmOT9Dtr7UDmcY,Overall Reusable Code,Last reusable code modification,rollup,
+recz1U0o9ZV0AWCmA,Overall Reusable Code,LastCodeMod,formula,"DATETIME_FORMAT({Last reusable code modification},'YYYYMMDD')"
+rec7nkopQHUxgmFnV,Overall Reusable Code,Last automation modification,rollup,
+recZokbuXxjssM1XJ,Key Value Pairs,Last modified time,lastModifiedTime,
+recX7urrGqMNXBacD,Roadmap,Direction for developer,multilineText,
+recj6DqwuRqygu4oR,Roadmap,Circle,singleSelect,"Foundation Ops, School Support, Marketing and Communications, Charter, Radicle"
+recZBHpUb2MldnU4h,Roadmap,Role,singleLineText,
+rec6NMcc5vuZ6scb0,Roadmap,Status,singleSelect,"Not yet started, In progress, Paused, Complete"
+recJfmZGjRDIRB8c0,Roadmap,Completion date,date,
+rec0kC54hjzhQd6ga,Roadmap,Notes,multilineText,
+rec79Javnlvj0Tanc,School year,Table 80,multipleRecordLinks,Membership fee school x year
+rec6J6qow3MFSjgik,School year,Charter annual data,multipleRecordLinks,Annual enrollment and demographics
+recpDIxIBVHKFFyAh,School year,School reports,multipleRecordLinks,Reports and submissions
+recXE14ETmqT8rKqb,School year,Charter assessments,multipleRecordLinks,Assessment data
+recsSXqjDdMa3W5Ae,Membership fee school x year,Membership fee annual record key,formula,"CONCATENATE(IF({School},{School},{Charter} & "" Charter""),"" - "",{School year link})"
+rec8NhbaL1t9DWy2l,Membership fee school x year,School,multipleRecordLinks,Schools
+reccxw6X3wSz9Ge0B,Membership fee school x year,Charter,multipleRecordLinks,Charters
+rec6znaVMgSo40J0L,Membership fee school x year,Opened (from Schools),multipleLookupValues,
+recYSceBarqEcv4kO,Membership fee school x year,School year link,multipleRecordLinks,School year
+recpCKGii5hmhLVAf,Membership fee school x year,End date (from School year),multipleLookupValues,
+recTZt55vqtc0ZSYV,Membership fee school x year,nth year,formula,"VALUE(RIGHT({School year link},2))+2000 - YEAR({Opened (from Schools)})+IF(MONTH({Opened (from Schools)})<=6,1,0)"
+recA71OnBRd3uyTRk,Membership fee school x year,New school fee amount (from School year),multipleLookupValues,
+recM9kYU65E8nj91x,Membership fee school x year,Fee level as a share of revenue (from School year),multipleLookupValues,
+rec5zzlPc2Pd4udBD,Membership fee school x year,School history status,singleSelect,"Emerging, Open"
+recCixEstD1q64YKF,Membership fee school x year,Initial exemption status,singleSelect,"Exempt, Non-exempt"
+recZ7ViZGgQsXHxJm,Membership fee school x year,Current exemption status,rollup,
+recQrg0h0o5kCFvjm,Membership fee school x year,990,multipleRecordLinks,990s
+recc4ymsoAOWwqrcg,Membership fee school x year,990 Reporting Year (from 990),multipleLookupValues,
+recqiSrBgPcxzxcNe,Membership fee school x year,AI Derived Revenue (from 990),multipleLookupValues,
+rec8aDUNBiun71Ldg,Membership fee school x year,AI Derived EOY Date (from 990),multipleLookupValues,
+recmIJBHefVxR97sJ,Membership fee school x year,Revenue,currency,
+recHlCAS4dycthMZG,Membership fee school x year,Initial fee,formula,"IF({Initial exemption status}=""Exempt"",0,IF({School history status} = ""Emerging"",{New school fee amount (from School year)},{Fee level as a share of revenue (from School year)}*{Revenue}))"
+recP1Dht69YYk6Ji2,Membership fee school x year,Membership fee updates,multipleRecordLinks,Membership fee updates
+recNO5riBUbAKFpM8,Membership fee school x year,Likelihood of paying,rollup,
+recPmJX8pVNp6rN9F,Membership fee school x year,Revised amount,rollup,
+recmZepa29k1U3Vnu,Membership fee school x year,Payments,rollup,
+recvxYryWvFUKE6t0,Membership fee school x year,Amount receivable,formula,{Revised amount}-{Payments}
+recAKnZ3pKXSp18Yj,Membership fee school x year,Projection,formula,"MAX({Payments},ROUND({Likelihood of paying} * {Revised amount}, 2))"
+recIs6PhMNSXjlw9k,Membership fee updates,mem_fee_update_id,formula,RECORD_ID()
+recJX0Rx29mHMoQEt,Membership fee updates,Fee Record,multipleRecordLinks,Membership fee school x year
+recvy3lj0W8MPfQP2,Membership fee updates,Update type,singleSelect,"Change in fee, Payment received, Change likelihood of payment, Change in exemption status"
+recdr4cDSVrFkAY2K,Membership fee updates,Explanation,multilineText,
+rec7696uAj9QOkkND,Membership fee updates,Attachment,multipleAttachments,
+recHBSLzJP17L6nl5,Membership fee updates,Attachment link,url,
+recYMxUEqNow4wITf,Membership fee updates,Revised fee amount,currency,
+recwIdMp9HM3I2oKi,Membership fee updates,Amount paid,currency,
+rec6UcB8PijobjyJP,Membership fee updates,Date,date,
+rec1gRc5dZUSvBJEZ,Membership fee updates,New percent,singleSelect,"100%, 75%, 50%, 25%, 0%"
+recngLX2YMB8vS8u1,Membership fee updates,New exemption status,singleSelect,"Non-exempt, Exempt"
+recpzsLajoBQmR939,Marketing sources mapping,recID,formula,RECORD_ID()
+recAHTtunRuw7qeJi,Marketing sources mapping,Fillout options,singleLineText,
+rec6zzth5ndnk6BUb,Marketing sources mapping,Educators options,singleLineText,
+recgJU3pkIe8a5TQU,Marketing sources mapping,Educators other,singleLineText,
+recXNEKQzKswqPLpn,Marketing source options,Marketing Source,singleLineText,
+rec5yh9ofp6bBHbyx,Marketing source options,Educators,multipleRecordLinks,Educators
+recb4vweqGJfxYRAY,Annual enrollment and demographics,Annual data key,formula,"{School Year} & "" - "" & IF({Charter},{Charter},{School})"
+recbiL4Y7duBT3fWx,Annual enrollment and demographics,Charter,multipleRecordLinks,Charters
+recdSvHbh25NVDXIN,Annual enrollment and demographics,School,multipleRecordLinks,Schools
+recB0MFfATtZZ3Hlu,Annual enrollment and demographics,School Year,multipleRecordLinks,School year
+recGJg4bWESJciZSG,Annual enrollment and demographics,Number of enrolled students - all,number,
+recAY53pPKSCmqv36,Annual enrollment and demographics,Number of enrolled students - FRL,number,
+recHvFxk0rG6UD8IJ,Annual enrollment and demographics,Number of enrolled students - BIPOC,number,
+recGnq49ZzLKbudms,Annual enrollment and demographics,Number of enrolled students - ELL,number,
+recqngZxtNDJaXUP5,Annual enrollment and demographics,Number of enrolled students - SPED,number,
+recJT8drWk7HKt6Vw,Charter roles,Charter role key,formula,"{Name} & "" - "" & {Role}"
+recugXIr03yJo9Moa,Charter roles,Name,singleLineText,
+recbi4OCtPvRJ3rZP,Charter roles,Charter,multipleRecordLinks,Charters
+rec7dryQXK6rBPHbK,Charter roles,Charter applications,multipleRecordLinks,Charter applications
+recnl45oDljYO27YC,Charter roles,Role,multipleSelects,"Initiator, Lead admin, Board chair, Board member (non-chair)"
+recif147rcjmNeAUT,Charter roles,Start date,date,
+rec2bPNTYHVMrfkWL,Charter roles,End date,date,
+recykARICaoOK0o5g,Charter roles,Currently active,checkbox,
+recaew4B8b9D5sGHS,Charter roles,Title,singleLineText,
+recXruW8xEHaoMjJI,Charter roles,Educator record,multipleRecordLinks,Educators
+recSBJDs0V33t31sO,Charter roles,Contact Email (from Educator record),multipleLookupValues,
+recnRRoTt5QBI70Xz,Charter roles,Email,email,
+recppepEbbWU8GLXO,Charter roles,Phone,phoneNumber,
+recWDRAt0DaTo4rUW,Charter roles,Race & Ethnicity (from Educator record),multipleLookupValues,
+recDBsdxErDMnYbNd,Charter roles,Status (from Charter),multipleLookupValues,
+rec9WnXngfimF2NAl,Charter roles,Charter applications 2,singleLineText,
+rechrfjmKrDYwuAzE,Charter authorizers and contacts,Charter authorizer key,formula,"CONCATENATE({Authorizer}, "" - "", {Charter})"
+recbf7t0hfvYtJY5W,Charter authorizers and contacts,Charter,multipleRecordLinks,Charters
+recThdB4qRUbiIO4k,Charter authorizers and contacts,Authorizer,singleLineText,
+rec9HHwRSZl5lX6cU,Charter authorizers and contacts,Contact,singleLineText,
+recs7fEZHnv7ZODg4,Charter authorizers and contacts,Title,singleLineText,
+recUBsMHwUpYv8IOH,Charter authorizers and contacts,Email,email,
+recUsyRTcby40nTy4,Charter authorizers and contacts,Phone,phoneNumber,
+rec32t1Ynld0gcN4r,Charter authorizers and contacts,Currently active,checkbox,
+recitHKfdqiQ8wv7I,Reports and submissions,reports_id,formula,RECORD_ID()
+recLWfBsbAlslbqDx,Reports and submissions,Charter,multipleRecordLinks,Charters
+recyx91dnmgvmZBkj,Reports and submissions,Report type,singleSelect,"Performance data, Renewal report"
+recfRGMmOlA68C1I7,Reports and submissions,Attachments,multipleAttachments,
+rec3HPiXs3VLRrBTk,Reports and submissions,School year,multipleRecordLinks,School year
+reciERp375HiDDY1J,Assessment data,Assessment Data key,formula,"CONCATENATE({Year},"" - "",{Assessment})"
+recwSwE7Cf7T4GIJw,Assessment data,Charter,multipleRecordLinks,Charters
+rectrmQ7VCkF0KP5R,Assessment data,School,multipleRecordLinks,Schools
+rec2yuIQoPIMYnFtP,Assessment data,Year,multipleRecordLinks,School year
+reciCuLnCwj0mNtSX,Assessment data,Assessment,multipleRecordLinks,Assessments
+recqxpBLmkvHUekG5,Assessment data,Other data,singleLineText,
+recwQSdqWuAkGTD7A,Assessment data,Number assessed,number,
+recY7JWr9DuRAePn6,Assessment data,Number assessed - BIPOC,number,
+recuWfKbaFtRXMm73,Assessment data,Number assessed - FRL,number,
+recKLtvISJII5HCPt,Assessment data,Number assessed - ELL,number,
+recIX6VocIOxSvYMx,Assessment data,Number assessed - SPED,number,
+rechzWYsW6D2lUTr5,Assessment data,Met or exceeds - all,number,
+recI8qR8IpGYE4del,Assessment data,Met or exceeds - BIPOC,number,
+recmlY40d1cGGEEM7,Assessment data,Met or exceeds - FRL,number,
+rec0fe9mutAjn0FjK,Assessment data,Met or exceeds - ELL,number,
+recE40abHQGd5LL6O,Assessment data,Met or exceeds - SPED,number,
+recr0bairJXMGPfJc,Assessments,Short Name,singleLineText,
+recJrIWMHqOWywPxX,Assessments,Full Name,singleLineText,
+recVWgBE6sGiOqA0v,Assessments,Domain,singleLineText,
+rec4aVuGrt2l9Q4ej,Assessments,Grades,multipleSelects,"PK3, PK4, K, 1st, 2nd, 3rd, 4th, 5th, 6th, 7th, 8th, 9th, 10th, 11th, 12th"
+rec3kuUyJ8K5kxgEg,Assessments,Charter assessments,multipleRecordLinks,Assessment data
+recb2ai3BLY8ZXPE1,Charter applications,Charter App key,formula,"CONCATENATE({Application window},"" - "",{Charter})"
+recDeEkjwDnOLksey,Charter applications,Short Name,multipleLookupValues,
+recaeeyb5HJQAGuBb,Charter applications,Full Name,multipleLookupValues,
+reckBhDw6nfaVV2My,Charter applications,Target open,date,
+recSanqlKxSL5rnOl,Charter applications,Target community (from Charter),multipleLookupValues,
+recKiXGWUUiRCGnUM,Charter applications,Support timeline,multipleAttachments,
+recLH8uzAoYZwbLOv,Charter applications,Landscape analysis (from Charter),multipleLookupValues,
+recNEmM76yUoOsHGu,Charter applications,Cohorts (from Charter),multipleLookupValues,
+recVwaB0VNHrdFfWn,Charter applications,Application window,singleLineText,
+recCTxc1YMAGbVTJt,Charter applications,Key dates,formula,"""LOI: "" & IF({Letter of Intent deadline},DATETIME_FORMAT({Letter of Intent deadline},'MM-DD-YYYY'),""N/A"") & ""\nApplication deadline: "" & IF({App submission deadline},DATETIME_FORMAT({App submission deadline},'MM-DD-YYYY'),""N/A"") & ""\nCapacity interview: "" & IF({Capacity Interview Projected Date},DATETIME_FORMAT({Capacity Interview Projected Date},'MM-DD-YYYY'),""N/A"") & ""\nDecision expected: "" & IF({Expected decision},DATETIME_FORMAT({Expected decision},'MM-DD-YYYY'),""N/A"")"
+rec4p9BXJFPUrrX47,Charter applications,Milestones,formula,"""LOI: "" & IF({LOI submitted},""Submitted"",""Not submitted"") &
+""\nETLs: "" & 
+""\nApplication: "" & IF({App submitted},""Submitted"",""Not submitted"") &
+""\nCapacity interview: "" & IF({Capacity Interview Complete},""Complete"",""Not complete"") &
+""\nDecision: "" & IF({Authorizer decision rec'd},{Authorizer decision},""TBD"")"
+rec84we0J8RFs2JUY,Charter applications,Laying the groundwork checklist,formula,"IF({App submitted},""App submitted"",
+  ""Landscape analysis: "" & IF({Landscape analysis (from Charter)},""Complete"", ""Incomplete"") &
+""\nCharter design album part 1: ""& IF(FIND(""Charter design"",{Checkboxes}), ""Complete"", ""Incomplete""))"
+recLkVRkHR0QdbeaS,Charter applications,Pre-application checklist,formula,"IF({App submitted},""App submitted"",
+  ""Landscape analysis: "" & IF({Landscape analysis (from Charter)},""Complete"", ""Incomplete"") &
+""\nCharter design album part 1: ""& IF(FIND(""Charter design"",{Checkboxes}), ""Complete"", ""Incomplete""))"
+rectqdkydNCBYJmj5,Charter applications,Pre-authorization checklist,formula,"IF({Authorizer decision rec'd},""Decision received"",
+""Capacity interview training: "" & IF(FIND(""Capacity interview training"",{Checkboxes}),""Complete"",""Incomplete""))"
+recWVWZZyB7UaSjqa,Charter applications,Authorizer,singleLineText,
+rec6t8MsF5MNiACbE,Charter applications,# of students,number,
+recL0TIYjoaZkfRSH,Charter applications,Beginning age,multipleRecordLinks,Ages-Grades
+recmpHCSEZll8Mrde,Charter applications,Ending age,multipleRecordLinks,Ages-Grades
+recfkzxMMwSB7ETJ1,Charter applications,Grades,formula,"{Beginning age} & ""-"" & {Ending age} "
+recfYwCueHZ6rDpJz,Charter applications,Letter of Intent req'd,singleSelect,"Required, Allowed, Does not apply"
+recVKo5AGW9V2CYsD,Charter applications,Letter of Intent deadline,date,
+recXWZ1Hk6sx0h2BN,Charter applications,LOI submitted,date,
+recbrfmqqfOUuQfYf,Charter applications,LOI,multipleAttachments,
+recAn6nDuU5UkrqEF,Charter applications,Expected decision,date,
+rec43Nc769sK1bYd1,Charter applications,Likelihood of authorization,singleSelect,"High, Med-High, Medium, Med-Low, Low"
+reczewFUA7udMp5cy,Charter applications,Likelihood of opening on time,singleSelect,"High, Med-High, Medium, Med-Low, Low"
+recP1WGOYj8GcJwMo,Charter applications,Checkboxes,multipleRecordLinks,Charter application steps
+recHGsG5BZHamUwOt,Charter applications,App submission deadline,date,
+recskN74mKedXG7I9,Charter applications,App submitted,date,
+rec4Yi5TWOnOPT1VM,Charter applications,Joint kickoff meeting,date,
+recG2S4RoBai1C5yN,Charter applications,Internal WF support launch meeting,date,
+rech319TKDVNCgGZ4,Charter applications,Charter app walkthrough,date,
+recUhl1Pk4JTdykA3,Charter applications,Capacity Interview Projected Date,date,
+recrwqBL92B728ya0,Charter applications,Capacity Interview Complete,date,
+recvYK0n6JBMzJxnq,Charter applications,Authorizer decision expected date,date,
+recU6on3gtyWmUahC,Charter applications,Authorizer decision rec'd,date,
+recBqUN0yQ1F1SjR6,Charter applications,Authorizer decision,singleSelect,"Approved, Denied"
+recSkvZmqHiiPjsHM,Charter applications,Charter Design Advice Session Complete,date,
+recjUfZfPb8ZdeHRm,Charter applications,Board membership agreement signed,date,
+recxYH8hN2rGzs9PM,Charter applications,TL membership agreement signed,date,
+recM1RAe5IVgotQJQ,Charter applications,Charter design,multipleAttachments,
+recBBQ68dPxp6d3aG,Charter applications,Budget planning exercises,multipleAttachments,
+recSbaALwGdBx5iPl,Charter applications,Most recent application,checkbox,
+rec1St9ryMZlFVZvx,Charter applications,Status,singleSelect,"Pre application, Preparing application, Awaiting decision, Authorized, preparing to open, Open, Application denied"
+recAa1vbkVYENFIy2,Charter applications,Team members,multipleRecordLinks,Charter roles
+recnJjtjJ3N7ISVIn,Charter applications,Team members (excl. board),rollup,
+recbqac1BJdckAleD,Charter applications,Board members,rollup,
+recqWoFavqmKCz5Pc,Charter applications,Opportunities and challenges,multilineText,
+recU4yrBSv0cGWhJa,Charter applications,Steps,formula,"""Landscape analysis: "" & IF(FIND(""Landscape Analysis"",{Checkboxes}), ""Yes"", ""No"") &
+""\nCharter design album part 1: "" & IF(FIND(""Charter Design"",{Checkboxes}), ""Yes"", ""No"") &""\nApp team recruited: "" & IF(FIND(""App team"",{Checkboxes}), ""Yes"", ""No"") &
+""\nWF & Team Kickoff: "" & IF({Joint kickoff meeting},""Yes"", ""No"") &
+""\nCharter app roles ID'd: "" & IF(FIND(""Charter app roles"",{Checkboxes}), ""Yes"", ""No"") &
+""\nCharter app walkthrough: "" & IF({Charter app walkthrough}, ""Yes"", ""No"") &
+""\nInternal WF support launch mtg: "" & IF({Internal WF support launch meeting}, ""Yes"", ""No"") &
+""\nCharter app project mgmt timeline: "" & IF(FIND(""Charter app project mgmt timeline"",{Checkboxes}), ""Yes"", ""No"") &
+""\nLogic model complete: "" & IF(FIND(""Logic model complete"",{Checkboxes}), ""Yes"", ""No"") &""\nCommunity engagement launched: "" & IF(FIND(""Community engagement launched"",{Checkboxes}), ""Yes"", ""No"") &
+""\nCharter budget planning exerices complete: "" & IF(FIND(""Charter budget"",{Checkboxes}), ""Yes"", ""No"") &
+""\nLOI submitted: "" & IF({LOI submitted}, ""Yes"", ""No"") &
+""\nETLs identified: "" & IF(FIND(""ETLs identified"",{Checkboxes}), ""Yes"", ""No"") &
+""\nBoard recruited: "" & IF(FIND(""Board recruited"",{Checkboxes}), ""Yes"", ""No"") &
+""\nFinal budget submitted: "" & IF(FIND(""Final budget"",{Checkboxes}), ""Yes"", ""No"")"
+recSp3JapBpl5wd8R,Charter applications,Charter,multipleRecordLinks,Charters
+rec9xPX5yfw0e2iwN,Ages-Grades,Name,singleLineText,
+recZfkeXWf7qAO7lI,Ages-Grades,Charter applications,multipleRecordLinks,Charter applications
+rec84D2NLSc2UD4lc,Ages-Grades,Charter applications 2,multipleRecordLinks,Charter applications
+recU4ygPAIFwUPpNg,Charter application steps,Name,singleLineText,
+recoXYEbfWzv1mw50,Charter application steps,Section,singleSelect,"Preparing the application, Pre-app preparation, Preparing for implementation, Preparing for evaluation, Laying the groundwork"
+rec15Msn4fuz1S4BA,Charter application steps,Required if section complete,checkbox,
+rec93ORf66Shus00p,Charter application steps,Charter applications,multipleRecordLinks,Charter applications
+recShcYtyPTuRS64d,Schools,Current TLs discovery status,rollup,
+rec0GpfQUTOJsvJpL,Schools,Primary Contact ID,multipleLookupValues,
+rec7IzBxm6ThuicI7,Schools,location_id,multipleLookupValues,
+recy0pxwnksKiAQ2g,Schools,educatorsXschools_id,multipleLookupValues,
+recNEIaAMFLMjZ50f,Schools,guide_assignment_id,multipleLookupValues,
+recwNhcKatxaAUpqS,Schools,loan_id,multipleLookupValues,
+recYZ9pYKQsl0CArj,Schools,grant_id,multipleLookupValues,
+recdYFnHoDKob5YgE,Schools,school_note_id,multipleLookupValues,
+recnuq7c4CiHXjxk3,Schools,family_survey_id,multipleLookupValues,
+recbCjG4sjY6vS8Az,Schools,nine_ninety_id,multipleLookupValues,
+rec09YdNQmiDh5pjv,Schools,action_step_id,multipleLookupValues,
+recnuYz23EDRYi1o5,Charters,charter_id,formula,RECORD_ID()
+recqyumEIgKAgeKaI,Charters,Record ID (from Schools),multipleLookupValues,
+reclVQWnt1CK3Gif7,Charters,990 Record ID (from 990s),multipleLookupValues,
+recCLLwEwfXihmuHv,Charters,Doc ID (from School governance documents),multipleLookupValues,
+recjOzrNl3HT0NZHI,Charters,recID (from Membership fee school x year),multipleLookupValues,
+recuTo3Qe9yc0cLgl,Charters,Location ID (from Locations),multipleLookupValues,
+recWiek3ecEuuicwF,Charters,RecID (from School reports),multipleLookupValues,
+recb6aRhTUDBp460T,Charters,charter_assessment_id,multipleLookupValues,
+recWUqa8ftVEe19ey,Charters,recId (from Charter authorizers and contacts),multipleLookupValues,
+recD5q5RwDW64LrIj,Charters,recID (from Charter applications),multipleLookupValues,
+recKRUa29HrqPbtkn,Charters,Nonprofit status,singleSelect,"Intend to apply direct - not yet applied, Awaiting IRS determination for direct 501c3, Approved directly by IRS, Intend to use group exemption - not yet approved, Part of group exemption"
+recmB5nN8YeaurlbS,Charters,Charter-level membership agreement,multipleAttachments,
+recWavthgiuOIH6Jg,Charters,Charter-level membership agreement signed,date,
+recPwE2iovw3iQPPe,Charters,TL discovery status,multipleLookupValues,
+rec6sMU2TWjoskSwb,Charters,Membership status of schools,multipleLookupValues,
+rec8SDPprFnj6jn2H,Locations,school_id,multipleLookupValues,
+recIgauCKA71Db52K,Locations,charter_id,multipleLookupValues,
+recafmRhA24zR0Epr,Educators,educatorsXschools_id,multipleLookupValues,
+recfY2EtOMsdPL0KD,Educators,educator_notes_id,multipleLookupValues,
+recUzIN7ElcD0AEoh,Educators,montessori_cert_id,multipleLookupValues,
+rece8to1iPt1zG6wd,Educators,email_id,multipleLookupValues,
+recBn3Ax2XxcEyPD3,Educators,ssj_old_start_a_school_id,multipleLookupValues,
+recCTO0jj0VbvUF4P,Educators,ssj_fillout_form_id,multipleLookupValues,
+rech7xn4csqztkhWo,Educators,meeting_id,multipleLookupValues,
+recBDHJp3oYEgfg3g,Educators x Schools,TL discovery status,rollup,
+recerkSW1irGbG3xV,Grants,grant_id,formula,RECORD_ID()
+recx5QY9s6UVfLzfN,Loans,loan_id,formula,RECORD_ID()
+recGH9Obp9sKbyroz,Governance docs,govdoc_id,formula,RECORD_ID()
+recyAzNggpG2L10EJ,990s,nine_ninety_id,formula,RECORD_ID()
+recJzXPXzHFtcIk4f,School notes,school_note_id,formula,RECORD_ID()
+recUrrgrbuFAbUrBe,Educator notes,educator_notes_id,formula,RECORD_ID()
+reck5V1HVptx3NEkN,Family Survey,Record ID,formula,RECORD_ID()
+recO4dDp9Q6WM5a3F,Action steps,action_step_id,formula,RECORD_ID()
+recuPRcb74BIF0NIj,Automations,Script with title,formula,"""//"" & {Automation Name} & ""\n"" & {Script}"
+recFf1O1ItaZAch1t,Membership fee school x year,mem_fee_annual_id,formula,RECORD_ID()
+recJyqBp9zpPqHRF5,Annual enrollment and demographics,annual_data_id,formula,RECORD_ID()
+recpsQRUdRxE6shwl,Charter roles,charter_role_id,formula,RECORD_ID()
+recuSMVNgsWJC5oTE,Assessment data,assessment_data_id,formula,RECORD_ID()
+recu9rXg02RGphyKa,Charter applications,charter_app_id,formula,RECORD_ID()
+rec5CYVbuvzbzfvPZ,Charter applications,Charter app roles ID'd,checkbox,
+recgOkkQb4WfjO5GU,Charter applications,Charter app project mgmt plan complete,checkbox,
+recOaPxjA2MSwsUGs,Charter applications,Logic model complete,checkbox,
+recSnxh9QzC4Uqy3i,Charter applications,Community engagement plan launched,checkbox,
+rec54JhrKYc7SkyjV,Charter applications,Nonprofit status,multipleLookupValues,
+recDb6AB8SlDTOaCP,Charter applications,Joint kickoff meeting complete,checkbox,
+recukE56qqlot1n1j,Charter applications,Capacity interview training complete,checkbox,
+recxxhkAzwHYD5MeV,Charter applications,Final budget,multipleAttachments,
+rectcHQ4evmqgkH4i,Charter applications,Current TLs (from Schools) (from Charter),multipleLookupValues,
+recxJ865HVqo53fnk,Charter applications,Current TL discovery status,multipleLookupValues,
+rec35rKCXcHlqh4qw,Charter applications,Charter-level membership agreement signed,multipleLookupValues,
+recpoAwgireHYX9gm,Charter applications,Membership status of schools,multipleLookupValues,
+rec4aV7QedY0Hq2QV,990s,short_name,multipleLookupValues,
+recsn7jvdy1eTBqL4,990s,supabase_id,singleLineText,
+recC4Cjt8RhJDCFGy,Supabase join 990 with school,id,singleLineText,
+reckZU1OipNIdh0pp,Supabase join 990 with school,990_year,singleLineText,
+recu7lZbdRbQTfrXq,Supabase join 990 with school,short_name,singleLineText,
+reclvoRbwKSSJEJFG,SSJ Fillout Forms,Source for non-TLs,singleSelect,"Advertisement, Indeed, Direct Email, Media, RCG Talent Solutions, Conference, Black Wildflowers Fund, Referred by Partner Organization, I Previously Worked at a Wildflower School, Social Media, Web Search (e.g., Google, ChatGPT), Referred by a Wildflower Teacher/Partner, Family/Friend, Word of Mouth, Other"
+recZZRla7Sqsm8RO0,Meetings,meeting_id,formula,RECORD_ID()
+recbLf2PgYjaVHhnG,Educators,Email Addresses,multipleRecordLinks,Email Addresses
+recOjMFOrGoIfJ9Ha,Email Addresses,Email Address,email,
+recOIzFRK9HmDhywQ,Email Addresses,Email Type,singleSelect,"Personal, Work (non-Wildflower), Work - Wildflower School, Work - Wildflower Foundation"
+recVVYUrIWghc0uw3,Email Addresses,Current Primary Email,checkbox,
+recW3wWE8kNDLpScf,Email Addresses,Active?,checkbox,
+recaxXOLMoYslnFI0,Email Addresses,Educator,multipleRecordLinks,Educators
+reckbJwxOscrs7CLf,Email Addresses,educator_id,multipleLookupValues,
+recgWK3XBdWF5ppB9,Email Addresses,email_address_id,formula,RECORD_ID()
+rect8Xbd8pPGUok4R,Educators,Current Primary Email Address,multipleLookupValues,
+recBnL0TQjLdaBb35,Educators,Pronunciation,singleLineText,
+recSyB0cHMskuekWZ,Educators,Inactive Flag,formula,"NOT(AND(OR({Currently Active at a School?},{Discovery status} = ""In process"",AND({Discovery status}=""Complete"",{FormerlyActive}= FALSE()),AND(NOT({Discovery status}),{Assigned Partner},NOT({FormerlyActive}))),NOT({Individual Type}=""Community Member"")))"
+recOTS4d4pi0YbVoO,Educators,CountofLinkedSchools,count,
+recP5W2p17139kyx0,Educators,FormerlyActive,formula,"AND({CountofLinkedSchools}>0,{Currently Active School}=FALSE())"
+recmsjjNAOdwOLMkw,Educators,Most recent fillout form,rollup,
+recYRN63ChYmRZozj,Educators x Schools,School Name,multipleLookupValues,
+recakszSGGLuVlXi2,Charter roles,Current Primary Email Address (from Educator record),multipleLookupValues,
+rectm72nbMWkTL46x,Grants,school_id,multipleLookupValues,
+reczEPOgzNWAEwWaT,Loans,school_id,multipleLookupValues,
+reciamhL2uGdFU4WM,Governance docs,school_id,multipleLookupValues,
+recHC12BoqEDrXFY9,990s,school_id,multipleLookupValues,
+recbC4DtTTxgnIVFR,School notes,school_id,multipleLookupValues,
+reca9UMSfuyoRQFKV,Family Survey,school_id (from School),multipleLookupValues,
+recaIdkVPV6yIpEWv,Membership fee school x year,school_id (from School),multipleLookupValues,
+recSz9yYix06SoyyF,Annual enrollment and demographics,school_id (from School),multipleLookupValues,
+rec8vSowvlMCBC6lC,Assessment data,school_id (from School),multipleLookupValues,
+rec9INdPooVTdhoD8,Schools,Stage_Status,formula,"IF({SSJ Stage} = ""Complete"",{School Status},{SSJ Stage})"
+rec27Gficzk4fb53A,Schools,Charter Short Name,multipleLookupValues,
+recld9CpkKUMAk4Og,Educators,Status for Active School,multipleLookupValues,
+recIEti2IfEh6IJRC,Educators,Stage_Status for Active School,multipleLookupValues,
+recwM4mgHEpqObO28,Educators,Assigned Partner Short Name,multipleLookupValues,
+recKhmZf4bpmAKVnO,Educators x Schools,Stage_Status,multipleLookupValues,
+recNuanb6vptDvOzQ,Grants,Issued by Short Name,multipleLookupValues,
+rec6afBiXBH0LgPqJ,Montessori Certs,educator_id,multipleLookupValues,
+rec4pBKg8zJ2c7LB0,SSJ Fillout Forms,educator_id,multipleLookupValues,
+recnOWfVVaxNoHjz0,School notes,Partner Short Name,multipleLookupValues,
+recjxdH2gpsQ0BOLk,Educator notes,educator_id,multipleLookupValues,
+rec1wVXCzvKSZmMYT,Action steps,school_id,multipleLookupValues,
+recFY2KGCZVpGfZqx,Action steps,School Short Name,multipleLookupValues,
+recRTSvzZXEDw6MCK,Schools,Current Guides,rollup,
+reciVqWjWS92SCR09,Schools,activeLatitude,multipleLookupValues,
+recxGVD9lUQx5H5iD,Schools,activeLongitude,multipleLookupValues,
+recF2Xmwdxa1IujjE,Event attendance,Event Name,multipleLookupValues,
+recJPc1UyvNp8qhGx,Schools,Logo - main rectangle,multipleAttachments,
+recsijLt5BeFf1DZn,Schools,Logo - flower only,multipleAttachments,
+rectgo4iGPttncIOA,Montessori Certs,Field 12,singleLineText,
+recDq8p4KN8ps31gv,Schools,Logo - main square,multipleAttachments,
+recVIzfvU66KtZ4nd,Montessori Certs,Level,multipleLookupValues,
+rec3xKwJSeJF9cYtU,School notes,Headline (Notes),aiText,
+recflX5MdEF7XKrNZ,Membership fee school x year,School year,multipleLookupValues,
+reciRamOXz1RaCN14,Schools,Educators,singleLineText,
+recRUEBKF7oUxG2CW,Schools,charter_id,multipleLookupValues,
+recj9FPZMBVi78bko,School notes,charter_id,multipleLookupValues,
+reckSIkJjGSP7CLvu,Action steps,charter_id,multipleLookupValues,
+recpf2nLvOxZBfNZW,Charter applications,charter_id,multipleLookupValues,
+recv6JJ6Huev7mklB,Reports and submissions,charter_id,multipleLookupValues,
+recI0YAFqPNlB6oNT,Charters,Currently active (from Non-TL roles),multipleLookupValues,
+recTq8nhl9LqU1tjX,Charters,Role (from Non-TL roles),multipleLookupValues,
+rec2gkJuy2eBqd1DO,Governance docs,charter_id,multipleLookupValues,
+rec2LhRxrxBGC60iK,Charter authorizers and contacts,charter_id,multipleLookupValues,
+rec4jywzgSbHd0CtV,Charters,Initial target ages,multipleLookupValues,
+rec7fV8nIXgxW0Muv,Charters,Name (from Non-TL roles),multipleLookupValues,
+receTyj2GromJTkYn,990s,charter_id,multipleLookupValues,
+recfKhMYhKXz1FV4V,Assessment data,charter_id,multipleLookupValues,
+recgp0KoA4bGRLLEa,Charter roles,charter_id,multipleLookupValues,
+rechnRXAsvKEFCgtK,Educators x Schools,charter_id,multipleLookupValues,

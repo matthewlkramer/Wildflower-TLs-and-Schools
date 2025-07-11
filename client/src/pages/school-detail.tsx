@@ -2429,7 +2429,7 @@ export default function SchoolDetail() {
                           onClick={() => {
                             setIsEditingDetails(true);
                             setEditedDetails({
-                              programFocus: school?.programFocus || '',
+                              programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
                               agesServed: school?.agesServed || [],
                               numberOfClassrooms: school?.numberOfClassrooms || '',
                               enrollmentCap: school?.enrollmentCap || '',
@@ -2463,14 +2463,38 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Program Focus</label>
                           {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
-                              value={editedDetails?.programFocus || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, programFocus: e.target.value })}
-                            />
+                            <Select
+                              value={editedDetails?.programFocus?.[0] || ''}
+                              onValueChange={(value) => setEditedDetails({ 
+                                ...editedDetails, 
+                                programFocus: value ? [value] : [] 
+                              })}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select program focus" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {fieldOptions?.programFocus?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.programFocus || '-'}</p>
+                            <div className="mt-1">
+                              {school.programFocus && school.programFocus.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {school.programFocus.map((focus, idx) => (
+                                    <Badge key={idx} variant="secondary" className="text-xs">
+                                      {focus}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-sm text-slate-400">-</p>
+                              )}
+                            </div>
                           )}
                         </div>
                         <div>
@@ -2597,12 +2621,21 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Current FY End</label>
                           {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
+                            <Select
                               value={editedDetails?.currentFYEnd || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, currentFYEnd: e.target.value })}
-                            />
+                              onValueChange={(value) => setEditedDetails({ ...editedDetails, currentFYEnd: value })}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select FY end date" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {fieldOptions?.currentFYEnd?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.currentFYEnd || '-'}</p>
                           )}
