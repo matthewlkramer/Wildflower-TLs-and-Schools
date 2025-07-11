@@ -451,6 +451,7 @@ export class SimpleAirtableStorage implements IStorage {
       createdTime: record.createdTime,
       
       // --- Legal Entity Fields ---
+      legalStructure: fields['Legal structure'] || undefined,
       currentFYEnd: fields['Current FY end'] || undefined,
       EIN: fields['EIN'] || undefined,
       legalName: fields['Legal Name'] || undefined,
@@ -670,6 +671,7 @@ export class SimpleAirtableStorage implements IStorage {
       if (hasValue(school.governanceModel)) updateFields["Governance Model"] = school.governanceModel;
       if (hasValue(school.programFocus)) updateFields["Program Focus"] = school.programFocus;
       if (hasValue(school.numberOfClassrooms)) updateFields["Number of classrooms"] = school.numberOfClassrooms;
+      if (hasValue(school.legalStructure)) updateFields["Legal structure"] = school.legalStructure;
       if (hasValue(school.EIN)) updateFields["EIN"] = school.EIN;
       if (hasValue(school.legalName)) updateFields["Legal Name"] = school.legalName;
       if (hasValue(school.incorporationDate)) updateFields["Incorporation Date"] = school.incorporationDate;

@@ -2435,6 +2435,7 @@ export default function SchoolDetail() {
                               numberOfClassrooms: school?.numberOfClassrooms || '',
                               enrollmentCap: school?.enrollmentCap || '',
                               membershipStatus: school?.membershipStatus || '',
+                              legalStructure: school?.legalStructure || '',
                               EIN: school?.EIN || '',
                               legalName: school?.legalName || '',
                               incorporationDate: school?.incorporationDate || '',
@@ -2638,6 +2639,19 @@ export default function SchoolDetail() {
                             />
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.legalName || '-'}</p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Legal Structure</label>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.legalStructure || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, legalStructure: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.legalStructure || '-'}</p>
                           )}
                         </div>
                         <div>
