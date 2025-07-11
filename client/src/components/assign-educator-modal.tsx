@@ -180,9 +180,9 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem value="" disabled>
+                            <div className="px-2 py-1 text-sm text-gray-500">
                               {searchTerm ? "No educators found matching your search" : "No educators available"}
-                            </SelectItem>
+                            </div>
                           )}
                         </SelectContent>
                       </Select>
