@@ -2458,11 +2458,12 @@ export default function SchoolDetail() {
                           <Button
                             size="sm"
                             onClick={() => {
-                              // Helper function to filter out empty values
+                              // Helper function to filter out empty values (but keep currentFYEnd)
                               const filterEmptyValues = (obj: any) => {
                                 const filtered: any = {};
                                 Object.entries(obj).forEach(([key, value]) => {
-                                  if (value !== undefined && value !== null && value !== '') {
+                                  // Always include currentFYEnd even if empty (dropdown selection)
+                                  if (key === 'currentFYEnd' || (value !== undefined && value !== null && value !== '')) {
                                     if (Array.isArray(value) && value.length === 0) return;
                                     filtered[key] = value;
                                   }
