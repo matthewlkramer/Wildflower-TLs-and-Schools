@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -24,9 +24,10 @@ interface AssignEducatorModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   schoolId: string;
+  preselectedEducatorId?: string;
 }
 
-export default function AssignEducatorModal({ open, onOpenChange, schoolId }: AssignEducatorModalProps) {
+export default function AssignEducatorModal({ open, onOpenChange, schoolId, preselectedEducatorId }: AssignEducatorModalProps) {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -49,12 +50,20 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId }: As
   const form = useForm({
     resolver: zodResolver(assignEducatorSchema),
     defaultValues: {
-      educatorId: "",
+      educatorId: preselectedEducatorId || "",
       role: [],
       startDate: "",
       emailAtSchool: "",
     },
   });
+
+  // Set preselected educator when provided
+  useEffect(() => {
+    if (preselectedEducatorId) {
+      form.setValue("educatorId", preselectedEducatorId);
+      setSearchTerm(""); // Clear search when educator is preselected
+    }
+  }, [preselectedEducatorId, form]);
 
   const assignEducatorMutation = useMutation({
     mutationFn: async (data: z.infer<typeof assignEducatorSchema>) => {

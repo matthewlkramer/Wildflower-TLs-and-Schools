@@ -1258,6 +1258,7 @@ export default function SchoolDetail() {
   const [isCreatingLocation, setIsCreatingLocation] = useState(false);
   const [isCreatingTeacher, setIsCreatingTeacher] = useState(false);
   const [isAssociatingTeacher, setIsAssociatingTeacher] = useState(false);
+  const [preselectedEducatorId, setPreselectedEducatorId] = useState<string | undefined>(undefined);
   const [isCreatingGuideAssignment, setIsCreatingGuideAssignment] = useState(false);
   const [editingAssociationId, setEditingAssociationId] = useState<string | null>(null);
   const [deletingAssociationId, setDeletingAssociationId] = useState<string | null>(null);
@@ -4722,14 +4723,25 @@ export default function SchoolDetail() {
       {/* Educator Assignment Modals */}
       <AssignEducatorModal
         open={isAssociatingTeacher}
-        onOpenChange={setIsAssociatingTeacher}
+        onOpenChange={(open) => {
+          setIsAssociatingTeacher(open);
+          if (!open) {
+            setPreselectedEducatorId(undefined); // Clear preselection when modal closes
+          }
+        }}
         schoolId={id || ""}
+        preselectedEducatorId={preselectedEducatorId}
       />
       
       <CreateAndAssignEducatorModal
         open={isCreatingTeacher}
         onOpenChange={setIsCreatingTeacher}
         schoolId={id || ""}
+        onSwitchToAssign={(educatorId: string) => {
+          setPreselectedEducatorId(educatorId);
+          setIsCreatingTeacher(false);
+          setIsAssociatingTeacher(true);
+        }}
       />
     </>
   );
