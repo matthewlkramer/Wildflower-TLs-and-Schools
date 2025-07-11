@@ -2502,7 +2502,7 @@ export default function SchoolDetail() {
                           </div>
                         ) : (
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
                             onClick={() => {
                               setIsEditingDetails(true);
@@ -2535,7 +2535,8 @@ export default function SchoolDetail() {
                               });
                             }}
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
                           </Button>
                         )}
                       </div>
@@ -2585,7 +2586,48 @@ export default function SchoolDetail() {
 
                     {/* Program Details Section */}
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4">Program Details</h3>
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold text-slate-900">Program Details</h3>
+                        {!isEditingDetails && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setIsEditingDetails(true);
+                              setEditedDetails({
+                                name: school?.name || '',
+                                shortName: school?.shortName || '',
+                                priorNames: school?.priorNames || '',
+                                programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
+                                agesServed: school?.agesServed || [],
+                                numberOfClassrooms: school?.numberOfClassrooms || '',
+                                enrollmentCap: school?.enrollmentCap || '',
+                                membershipStatus: school?.membershipStatus || '',
+                                legalStructure: school?.legalStructure || '',
+                                EIN: school?.EIN || '',
+                                legalName: school?.legalName || '',
+                                incorporationDate: school?.incorporationDate || '',
+                                nonprofitStatus: school?.nonprofitStatus || '',
+                                currentFYEnd: school?.currentFYEnd || '',
+                                governanceModel: school?.governanceModel || '',
+                                groupExemptionStatus: school?.groupExemptionStatus || '',
+                                groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
+                                groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
+                                businessInsurance: school?.businessInsurance || '',
+                                billComAccount: school?.billComAccount || '',
+                                email: school?.email || '',
+                                phone: school?.phone || '',
+                                website: school?.website || '',
+                                instagram: school?.instagram || '',
+                                facebook: school?.facebook || ''
+                              });
+                            }}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </Button>
+                        )}
+                      </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Program Focus</label>
@@ -2753,7 +2795,48 @@ export default function SchoolDetail() {
 
                     {/* Legal Entity Section */}
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4">Legal Entity</h3>
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold text-slate-900">Legal Entity</h3>
+                        {!isEditingDetails && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setIsEditingDetails(true);
+                              setEditedDetails({
+                                name: school?.name || '',
+                                shortName: school?.shortName || '',
+                                priorNames: school?.priorNames || '',
+                                programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
+                                agesServed: school?.agesServed || [],
+                                numberOfClassrooms: school?.numberOfClassrooms || '',
+                                enrollmentCap: school?.enrollmentCap || '',
+                                membershipStatus: school?.membershipStatus || '',
+                                legalStructure: school?.legalStructure || '',
+                                EIN: school?.EIN || '',
+                                legalName: school?.legalName || '',
+                                incorporationDate: school?.incorporationDate || '',
+                                nonprofitStatus: school?.nonprofitStatus || '',
+                                currentFYEnd: school?.currentFYEnd || '',
+                                governanceModel: school?.governanceModel || '',
+                                groupExemptionStatus: school?.groupExemptionStatus || '',
+                                groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
+                                groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
+                                businessInsurance: school?.businessInsurance || '',
+                                billComAccount: school?.billComAccount || '',
+                                email: school?.email || '',
+                                phone: school?.phone || '',
+                                website: school?.website || '',
+                                instagram: school?.instagram || '',
+                                facebook: school?.facebook || ''
+                              });
+                            }}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </Button>
+                        )}
+                      </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">EIN</label>
@@ -2992,7 +3075,48 @@ export default function SchoolDetail() {
 
                     {/* Business & Financial Systems Section */}
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4">Business & Financial Systems</h3>
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold text-slate-900">Business & Financial Systems</h3>
+                        {!isEditingDetails && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setIsEditingDetails(true);
+                              setEditedDetails({
+                                name: school?.name || '',
+                                shortName: school?.shortName || '',
+                                priorNames: school?.priorNames || '',
+                                programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
+                                agesServed: school?.agesServed || [],
+                                numberOfClassrooms: school?.numberOfClassrooms || '',
+                                enrollmentCap: school?.enrollmentCap || '',
+                                membershipStatus: school?.membershipStatus || '',
+                                legalStructure: school?.legalStructure || '',
+                                EIN: school?.EIN || '',
+                                legalName: school?.legalName || '',
+                                incorporationDate: school?.incorporationDate || '',
+                                nonprofitStatus: school?.nonprofitStatus || '',
+                                currentFYEnd: school?.currentFYEnd || '',
+                                governanceModel: school?.governanceModel || '',
+                                groupExemptionStatus: school?.groupExemptionStatus || '',
+                                groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
+                                groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
+                                businessInsurance: school?.businessInsurance || '',
+                                billComAccount: school?.billComAccount || '',
+                                email: school?.email || '',
+                                phone: school?.phone || '',
+                                website: school?.website || '',
+                                instagram: school?.instagram || '',
+                                facebook: school?.facebook || ''
+                              });
+                            }}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </Button>
+                        )}
+                      </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Business Insurance</label>
@@ -3034,7 +3158,48 @@ export default function SchoolDetail() {
 
                     {/* Contact Information & Communications Section */}
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4">School Contact Information & Communications</h3>
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold text-slate-900">School Contact Information & Communications</h3>
+                        {!isEditingDetails && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setIsEditingDetails(true);
+                              setEditedDetails({
+                                name: school?.name || '',
+                                shortName: school?.shortName || '',
+                                priorNames: school?.priorNames || '',
+                                programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
+                                agesServed: school?.agesServed || [],
+                                numberOfClassrooms: school?.numberOfClassrooms || '',
+                                enrollmentCap: school?.enrollmentCap || '',
+                                membershipStatus: school?.membershipStatus || '',
+                                legalStructure: school?.legalStructure || '',
+                                EIN: school?.EIN || '',
+                                legalName: school?.legalName || '',
+                                incorporationDate: school?.incorporationDate || '',
+                                nonprofitStatus: school?.nonprofitStatus || '',
+                                currentFYEnd: school?.currentFYEnd || '',
+                                governanceModel: school?.governanceModel || '',
+                                groupExemptionStatus: school?.groupExemptionStatus || '',
+                                groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
+                                groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
+                                businessInsurance: school?.businessInsurance || '',
+                                billComAccount: school?.billComAccount || '',
+                                email: school?.email || '',
+                                phone: school?.phone || '',
+                                website: school?.website || '',
+                                instagram: school?.instagram || '',
+                                facebook: school?.facebook || ''
+                              });
+                            }}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </Button>
+                        )}
+                      </div>
                       
                       {/* Primary Contact */}
                       <div className="mb-6">
