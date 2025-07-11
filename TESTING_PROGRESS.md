@@ -3,9 +3,19 @@
 ## Current Test: TEST SCHOOL - Debug Testing
 
 ### Issue #1: Test School Not Visible in UI
-**Status**: 🔍 Debugging
+**Status**: ✅ Resolved - School exists but wasn't showing in list
 **Created**: Via API at 2025-07-11T15:54:52.000Z
 **ID**: recET7shK7qloVb57
+
+### Issue #2: 404 Error on School Detail Page
+**Status**: ✅ Resolved - Route is `/school/:id` not `/schools/:id`
+**URL**: /schools/recGFQgorvjHxzXc3 (incorrect) → /school/recGFQgorvjHxzXc3 (correct)
+**Error**: "404 page not found" when navigating to test school detail page
+
+#### Debug Steps:
+1. ✅ Verified both test schools exist in API (recET7shK7qloVb57 and recGFQgorvjHxzXc3)
+2. ✅ API endpoint /api/schools/:id works correctly
+3. ✅ Found frontend route is `/school/:id` (singular) not `/schools/:id` (plural)
 
 #### Debug Steps:
 1. ✅ Confirmed school created successfully via API
