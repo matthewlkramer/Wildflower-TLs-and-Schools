@@ -86,14 +86,14 @@ function TeacherAssociationRow({
         <TableCell>
           {teacher ? (
             <Link 
-              href={`/teachers/${teacher.id}`}
+              href={`/teacher/${teacher.id}`}
               className="text-wildflower-blue hover:underline"
             >
               {teacher.fullName || teacher.firstName + ' ' + teacher.lastName}
             </Link>
           ) : (
             <Link 
-              href={`/teachers/${association.educatorId}`}
+              href={`/teacher/${association.educatorId}`}
               className="text-wildflower-blue hover:underline"
             >
               {association.educatorName || association.educatorId}
@@ -192,14 +192,14 @@ function TeacherAssociationRow({
       <TableCell>
         {teacher ? (
           <Link 
-            href={`/teachers/${teacher.id}`}
+            href={`/teacher/${teacher.id}`}
             className="text-wildflower-blue hover:underline"
           >
             {teacher.fullName}
           </Link>
         ) : (
           <Link 
-            href={`/teachers/${association.educatorId}`}
+            href={`/teacher/${association.educatorId}`}
             className="text-wildflower-blue hover:underline"
           >
             {association.educatorName || association.educatorId}
@@ -305,10 +305,12 @@ function TeacherAssociationRow({
             className="h-8 w-8 p-0"
             onClick={() => {
               if (teacher) {
-                window.open(`/teachers/${teacher.id}`, '_blank');
+                window.open(`/teacher/${teacher.id}`, '_blank');
+              } else {
+                window.open(`/teacher/${association.educatorId}`, '_blank');
               }
             }}
-            disabled={!teacher}
+            disabled={!teacher && !association.educatorId}
           >
             <ExternalLink className="h-4 w-4" />
           </Button>
