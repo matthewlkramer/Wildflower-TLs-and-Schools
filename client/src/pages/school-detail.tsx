@@ -2387,12 +2387,24 @@ export default function SchoolDetail() {
                           <Button
                             size="sm"
                             onClick={() => {
-                              // Convert numeric fields to numbers
-                            const formattedData = {
-                              ...editedDetails,
-                              enrollmentCap: editedDetails.enrollmentCap && editedDetails.enrollmentCap !== '' ? Number(editedDetails.enrollmentCap) : undefined
-                            };
-                            updateSchoolDetailsMutation.mutate(formattedData);
+                              // Helper function to filter out empty values
+                              const filterEmptyValues = (obj: any) => {
+                                const filtered: any = {};
+                                Object.entries(obj).forEach(([key, value]) => {
+                                  if (value !== undefined && value !== null && value !== '') {
+                                    if (Array.isArray(value) && value.length === 0) return;
+                                    filtered[key] = value;
+                                  }
+                                });
+                                return filtered;
+                              };
+
+                              // Convert numeric fields and filter empty values
+                              const formattedData = filterEmptyValues({
+                                ...editedDetails,
+                                enrollmentCap: editedDetails.enrollmentCap && editedDetails.enrollmentCap !== '' ? Number(editedDetails.enrollmentCap) : undefined
+                              });
+                              updateSchoolDetailsMutation.mutate(formattedData);
                             }}
                             disabled={updateSchoolDetailsMutation.isPending}
                           >
