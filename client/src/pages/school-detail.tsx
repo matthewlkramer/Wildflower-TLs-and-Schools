@@ -1415,6 +1415,8 @@ export default function SchoolDetail() {
 
   // Update Add New options when active tab changes
   useEffect(() => {
+    console.log("SchoolDetail: Setting up Add New options for tab:", activeTab);
+    
     const getAddNewOptions = () => {
       switch (activeTab) {
         case "tls":
@@ -1454,7 +1456,14 @@ export default function SchoolDetail() {
     };
 
     const options = getAddNewOptions();
+    console.log("SchoolDetail: Setting options:", options);
     setAddNewOptions(options);
+
+    // Cleanup when component unmounts
+    return () => {
+      console.log("SchoolDetail: Cleaning up Add New options");
+      setAddNewOptions([]);
+    };
   }, [activeTab, setAddNewOptions]);
 
 
