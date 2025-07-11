@@ -19,9 +19,10 @@ interface HeaderProps {
   onToggleFilters?: () => void;
   onAddNew?: () => void;
   addNewOptions?: Array<{ label: string; onClick: () => void; }>;
+  setAddNewOptions?: (options: Array<{ label: string; onClick: () => void; }>) => void;
 }
 
-export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder, showFilters = false, onToggleFilters, onAddNew, addNewOptions }: HeaderProps) {
+export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder, showFilters = false, onToggleFilters, onAddNew, addNewOptions, setAddNewOptions }: HeaderProps) {
   const [location] = useLocation();
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);

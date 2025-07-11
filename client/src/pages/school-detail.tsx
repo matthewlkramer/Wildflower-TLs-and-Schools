@@ -1246,7 +1246,7 @@ function LoanRow({
 
 export default function SchoolDetail() {
   const { id } = useParams<{ id: string }>();
-  const { addNewOptions, setAddNewOptions } = useAddNew();
+  const { setAddNewOptions } = useAddNew();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activeTab, setActiveTab] = useState("summary");

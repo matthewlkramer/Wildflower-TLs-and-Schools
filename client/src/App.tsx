@@ -71,6 +71,8 @@ function AppContent() {
   const [addNewOptions, setAddNewOptions] = useState<Array<{ label: string; onClick: () => void; }>>([]);
   
 
+  
+
 
   // Reset search when navigating between pages
   const isDashboardActive = location === "/" || location === "/dashboard";
@@ -87,6 +89,7 @@ function AppContent() {
               searchTerm={searchTerm} 
               onSearchChange={setSearchTerm}
               addNewOptions={addNewOptions}
+              setAddNewOptions={setAddNewOptions}
             />
             <Router />
             <TourLauncher />
