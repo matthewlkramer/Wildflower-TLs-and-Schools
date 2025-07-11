@@ -4,31 +4,30 @@ import AddSchoolModal from "@/components/add-school-modal";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { type School } from "@shared/schema";
-import { useSearch, useAddNew } from "@/App";
+import { useSearch } from "@/App";
 import { useCachedSchools } from "@/hooks/use-cached-data";
 import { useUserFilter } from "@/contexts/user-filter-context";
+import { addNewEmitter } from "@/lib/add-new-emitter";
 
 export default function Schools() {
   const { searchTerm } = useSearch();
   const { showOnlyMyRecords, currentUser } = useUserFilter();
-  const { setAddNewOptions } = useAddNew();
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
 
   const { data: schools, isLoading, prefetchSchool } = useCachedSchools();
 
   // Set up Add New button in header
   useEffect(() => {
-    console.log("Schools component: Setting up Add New options");
-    setAddNewOptions([
-      { label: "Add School", onClick: () => setAddSchoolModalOpen(true) }
-    ]);
-
-    // Cleanup - remove options when component unmounts
+    const options = [
+      { label: "Create New School", onClick: () => setAddSchoolModalOpen(true) }
+    ];
+    
+    addNewEmitter.setOptions(options);
+    
     return () => {
-      console.log("Schools component: Cleaning up Add New options");
-      setAddNewOptions([]);
+      addNewEmitter.setOptions([]);
     };
-  }, [setAddNewOptions]);
+  }, []);
 
   const filteredSchools = (schools || []).filter((school: School) => {
     const searchTermLower = searchTerm.toLowerCase();

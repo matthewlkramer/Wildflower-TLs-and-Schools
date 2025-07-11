@@ -3,23 +3,32 @@ import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
 import type { Charter } from "@shared/schema";
-import { useSearch, usePageTitle, useAddNew } from "@/App";
+import { useSearch, usePageTitle } from "@/App";
 import { useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { getStatusColor } from "@/lib/utils";
 import { useUserFilter } from "@/contexts/user-filter-context";
+import { addNewEmitter } from "@/lib/add-new-emitter";
 
 export default function Charters() {
   const { searchTerm } = useSearch();
   const { showOnlyMyRecords, currentUser } = useUserFilter();
   const { setPageTitle } = usePageTitle();
-  const { setAddNewOptions } = useAddNew();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
     setPageTitle("Charters");
-    setAddNewOptions([]);
-  }, [setPageTitle, setAddNewOptions]);
+    
+    const options = [
+      { label: "Create New Charter", onClick: () => console.log("Create Charter - to be implemented") }
+    ];
+    
+    addNewEmitter.setOptions(options);
+    
+    return () => {
+      addNewEmitter.setOptions([]);
+    };
+  }, [setPageTitle]);
 
   const { data: charters = [], isLoading } = useQuery<Charter[]>({
     queryKey: ["/api/charters"],

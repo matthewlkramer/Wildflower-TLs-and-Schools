@@ -7,6 +7,10 @@ import { Link } from "wouter";
 import { format, parseISO, isToday, isTomorrow, isPast, differenceInDays } from "date-fns";
 import { useUserFilter } from "@/contexts/user-filter-context";
 import { ActionStep, School } from "@/lib/schema";
+import { useEffect, useState } from "react";
+import { addNewEmitter } from "@/lib/add-new-emitter";
+import AddEducatorModal from "@/components/add-teacher-modal";
+import AddSchoolModal from "@/components/add-school-modal";
 
 // Helper function to format due dates
 function formatDueDate(dueDate: string | null) {
@@ -43,6 +47,24 @@ function getStatusColor(status: string | null, dueDate: string | null) {
 
 export default function Dashboard() {
   const { selectedUser } = useUserFilter();
+  const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
+  const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
+  
+  // Set up Add New options for dashboard
+  useEffect(() => {
+    const options = [
+      { label: "Create New School", onClick: () => setShowAddSchoolModal(true) },
+      { label: "Create New Teacher", onClick: () => setShowAddEducatorModal(true) },
+      { label: "Create New Charter", onClick: () => console.log("Create Charter - to be implemented") },
+      { label: "Create New Task", onClick: () => console.log("Create Task - to be implemented") }
+    ];
+    
+    addNewEmitter.setOptions(options);
+    
+    return () => {
+      addNewEmitter.setOptions([]);
+    };
+  }, []);
 
   // Fetch user's action steps
   const { data: actionSteps = [], isLoading: actionStepsLoading } = useQuery<ActionStep[]>({
@@ -85,7 +107,8 @@ export default function Dashboard() {
     .slice(0, 5); // Show top 5 tasks
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <>
+      <div className="container mx-auto px-4 py-6">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-600 mt-1">Welcome back! Here's your overview.</p>
@@ -262,5 +285,16 @@ export default function Dashboard() {
         </Card>
       </div>
     </div>
+    
+    <AddEducatorModal 
+      open={showAddEducatorModal} 
+      onOpenChange={setShowAddEducatorModal} 
+    />
+    
+    <AddSchoolModal 
+      open={showAddSchoolModal} 
+      onOpenChange={setShowAddSchoolModal} 
+    />
+  </>
   );
 }
