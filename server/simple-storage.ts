@@ -676,12 +676,11 @@ export class SimpleAirtableStorage implements IStorage {
       if (hasValue(school.legalName)) updateFields["Legal Name"] = school.legalName;
       if (hasValue(school.incorporationDate)) updateFields["Incorporation Date"] = school.incorporationDate;
       if (hasValue(school.nonprofitStatus)) updateFields["Nonprofit status"] = school.nonprofitStatus;
-      if (hasValue(school.dateReceivedGroupExemption)) updateFields["Date received group exemption"] = school.dateReceivedGroupExemption;
-      if (hasValue(school.dateWithdrawnGroupExemption)) updateFields["Date withdrawn from Group Exemption"] = school.dateWithdrawnGroupExemption;
+      // Note: dateReceivedGroupExemption and dateWithdrawnGroupExemption are legacy fields, using groupExemptionDateGranted and groupExemptionDateWithdrawn instead
       if (hasValue(school.currentFYEnd)) updateFields["Current FY end"] = school.currentFYEnd;
       if (hasValue(school.groupExemptionStatus)) updateFields["Group exemption status"] = school.groupExemptionStatus;
-      if (hasValue(school.groupExemptionDateGranted)) updateFields["Group exemption date granted"] = school.groupExemptionDateGranted;
-      if (hasValue(school.groupExemptionDateWithdrawn)) updateFields["Group exemption date withdrawn"] = school.groupExemptionDateWithdrawn;
+      if (hasValue(school.groupExemptionDateGranted)) updateFields["Date received group exemption"] = school.groupExemptionDateGranted;
+      if (hasValue(school.groupExemptionDateWithdrawn)) updateFields["Date withdrawn from Group Exemption"] = school.groupExemptionDateWithdrawn;
       if (hasValue(school.businessInsurance)) updateFields["Business Insurance"] = school.businessInsurance;
       if (hasValue(school.billComAccount)) updateFields["Bill.com Account"] = school.billComAccount;
       
