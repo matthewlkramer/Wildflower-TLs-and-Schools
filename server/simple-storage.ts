@@ -1122,7 +1122,7 @@ export class SimpleAirtableStorage implements IStorage {
       console.log("Creating location in Airtable:", location);
       
       const record = await base("Locations").create({
-        "school_id": [location.schoolId], // Link field to Schools table
+        "Schools": [location.schoolId], // Link field to Schools table
         "Address": location.address,
         "Current physical address?": location.currentPhysicalAddress,
         "Current mailing address?": location.currentMailingAddress,
