@@ -98,12 +98,12 @@
 - Facebook: ✅ "https://facebook.com/testschool"
 - Instagram: ✅ "@testschool_edu"
 
-**Program Details Section**: ✅ PASS (UI Testing)
-- Ages Served: ✅ PASS - Dropdown with comprehensive options (Parent-child, Infants, Toddlers, Primary, etc.)
-- Membership Status: ✅ PASS - Save successful via UI
-- Number of Classrooms: ⏳ Testing next
-- Enrollment Cap: ⏳ Testing next
-- Program Focus: ⏳ Testing next
+**Program Details Section**: ✅ MOSTLY WORKING
+- Ages Served: ✅ PASS - Dropdown with comprehensive options
+- Membership Status: ✅ PASS - Save successful via UI  
+- Number of Classrooms: ✅ PASS - Numeric input works (saved: 4)
+- Enrollment Cap: ✅ PASS - Numeric input works (saved: 80)
+- Program Focus: ❌ FAIL - Multi-select permissions issue (even with valid options)
 
 **Legal Entity Section**: ❌ ISSUES FOUND
 - EIN: ❌ FAIL - Returns null
@@ -112,5 +112,11 @@
 - Governance Model: ❌ FAIL - "Insufficient permissions to create new select option"
 
 **Critical Issue**: Dropdown fields require predefined Airtable values, not custom inputs
+
+#### Systematic Field Testing Summary:
+- **Text inputs**: ✅ Working (Name, Short Name, Email, Phone, Website, etc.)
+- **Dropdown fields**: ⚠️ Restricted to predefined Airtable options only
+- **Multi-select fields**: ⚠️ Must use valid option combinations  
+- **Numeric fields**: ⏳ Testing in progress
 
 ### Tab 3-10: ⏳ Pending
