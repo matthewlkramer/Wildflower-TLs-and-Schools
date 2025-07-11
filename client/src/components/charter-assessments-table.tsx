@@ -107,6 +107,9 @@ export function CharterAssessmentsTable({ charterId }: CharterAssessmentsTablePr
         domLayout="normal"
         headerHeight={40}
         rowHeight={30}
+        context={{
+          componentName: 'charter-assessments-table'
+        }}
         defaultColDef={{
           sortable: true,
           resizable: true,

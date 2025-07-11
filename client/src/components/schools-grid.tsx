@@ -294,6 +294,10 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
           rowSelection={false}
           enableBrowserTooltips={true}
           rowHeight={30}
+          context={{
+            componentName: 'schools-grid',
+            replitMetadata: 'schools-table'
+          }}
         />
       </div>
     </div>

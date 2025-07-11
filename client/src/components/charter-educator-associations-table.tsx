@@ -165,6 +165,9 @@ export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorA
         domLayout="normal"
         headerHeight={40}
         rowHeight={30}
+        context={{
+          componentName: 'charter-educator-associations-table'
+        }}
         defaultColDef={{
           sortable: true,
           resizable: true,

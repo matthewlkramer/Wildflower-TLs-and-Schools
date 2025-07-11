@@ -167,6 +167,9 @@ export default function Charters() {
             domLayout="normal"
             headerHeight={40}
             rowHeight={30}
+            context={{
+              componentName: 'charters-grid'
+            }}
             defaultColDef={{
               sortable: true,
               resizable: true,

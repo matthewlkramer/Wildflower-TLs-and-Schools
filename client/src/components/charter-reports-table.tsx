@@ -117,6 +117,9 @@ export function CharterReportsTable({ charterId }: CharterReportsTableProps) {
         domLayout="normal"
         headerHeight={40}
         rowHeight={30}
+        context={{
+          componentName: 'charter-reports-table'
+        }}
         defaultColDef={{
           sortable: true,
           resizable: true,

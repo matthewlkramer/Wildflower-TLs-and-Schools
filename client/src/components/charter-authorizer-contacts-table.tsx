@@ -139,6 +139,9 @@ export function CharterAuthorizerContactsTable({ charterId }: CharterAuthorizerC
         domLayout="normal"
         headerHeight={40}
         rowHeight={30}
+        context={{
+          componentName: 'charter-authorizer-contacts-table'
+        }}
         defaultColDef={{
           sortable: true,
           resizable: true,

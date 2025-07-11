@@ -161,7 +161,9 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
           domLayout="autoHeight"
           headerHeight={40}
           rowHeight={30}
-
+          context={{
+            componentName: 'email-addresses-table'
+          }}
           defaultColDef={{
             sortable: true,
             resizable: true,
