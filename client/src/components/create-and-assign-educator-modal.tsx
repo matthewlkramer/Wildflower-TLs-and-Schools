@@ -92,6 +92,8 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
 
   const createAndAssignEducatorMutation = useMutation({
     mutationFn: async (data: z.infer<typeof createAndAssignEducatorSchema>) => {
+      console.log("Creating educator with data:", data);
+      
       // First create the educator (fullName is calculated field, so excluded)
       const educator = await apiRequest("POST", "/api/educators", {
         firstName: data.firstName,
@@ -101,9 +103,11 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
         nonWildflowerEmail: data.nonWildflowerEmail,
       });
 
+      console.log("Educator created:", educator);
+
       // Then create the association (only if role is provided)
       if (data.role && data.role.length > 0) {
-        await apiRequest("POST", "/api/teacher-school-associations", {
+        console.log("Creating association with:", {
           educatorId: educator.id,
           schoolId: schoolId,
           role: data.role,
@@ -111,6 +115,19 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
           emailAtSchool: data.emailAtSchool,
           isActive: true,
         });
+        
+        const association = await apiRequest("POST", "/api/teacher-school-associations", {
+          educatorId: educator.id,
+          schoolId: schoolId,
+          role: data.role,
+          startDate: data.startDate,
+          emailAtSchool: data.emailAtSchool,
+          isActive: true,
+        });
+
+        console.log("Association created:", association);
+      } else {
+        console.log("No role provided, skipping association creation");
       }
 
       return educator;
@@ -126,7 +143,8 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
       form.reset();
       onOpenChange(false);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Error creating and assigning educator:", error);
       toast({
         title: "Error",
         description: "Failed to create and assign educator",
