@@ -660,7 +660,7 @@ export class SimpleAirtableStorage implements IStorage {
       if (school.narrative !== undefined) updateFields["Narrative"] = school.narrative;
       if (school.institutionalPartner !== undefined) updateFields["Institutional partner"] = school.institutionalPartner;
       if (school.opened !== undefined) updateFields["Opened"] = school.opened;
-      if (school.membershipStatus !== undefined) updateFields["Membership status"] = school.membershipStatus;
+      if (school.membershipStatus !== undefined) updateFields["Membership Status"] = school.membershipStatus;
       if (school.founders !== undefined) updateFields["Founders"] = school.founders;
       if (school.membershipAgreementDate !== undefined) updateFields["Membership Agreement Date"] = school.membershipAgreementDate;
       if (school.signedMembershipAgreement !== undefined) updateFields["Signed Membership Agreement"] = school.signedMembershipAgreement;
@@ -673,8 +673,17 @@ export class SimpleAirtableStorage implements IStorage {
       if (school.status !== undefined) updateFields["Status"] = school.status;
       if (school.stageStatus !== undefined) updateFields["Stage/Status"] = school.stageStatus;
       if (school.openDate !== undefined) updateFields["Open Date"] = school.openDate;
-      if (school.enrollmentCap !== undefined) updateFields["Enrollment Cap"] = school.enrollmentCap;
+      if (school.enrollmentCap !== undefined) updateFields["Enrollment at Full Capacity"] = parseInt(school.enrollmentCap) || 0;
       if (school.currentEnrollment !== undefined) updateFields["Current Enrollment"] = school.currentEnrollment;
+      if (school.programFocus !== undefined) updateFields["Program Focus"] = school.programFocus;
+      if (school.numberOfClassrooms !== undefined) updateFields["Number of Classrooms"] = school.numberOfClassrooms;
+      if (school.legalStructure !== undefined) updateFields["Legal Structure"] = school.legalStructure;
+      if (school.currentFYEnd !== undefined) updateFields["Current FY End"] = school.currentFYEnd;
+      if (school.groupExemptionStatus !== undefined) updateFields["Group exemption status"] = school.groupExemptionStatus;
+      if (school.groupExemptionDateGranted !== undefined) updateFields["Group exemption date granted"] = school.groupExemptionDateGranted;
+      if (school.groupExemptionDateWithdrawn !== undefined) updateFields["Group exemption date withdrawn"] = school.groupExemptionDateWithdrawn;
+      if (school.businessInsurance !== undefined) updateFields["Business Insurance"] = school.businessInsurance;
+      if (school.billComAccount !== undefined) updateFields["Bill.com Account"] = school.billComAccount;
 
       const record = await base("Schools").update(id, updateFields);
       return this.transformSchoolRecord(record);
