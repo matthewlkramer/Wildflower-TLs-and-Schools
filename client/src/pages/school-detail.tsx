@@ -2458,13 +2458,14 @@ export default function SchoolDetail() {
                           <Button
                             size="sm"
                             onClick={() => {
-                              // Helper function to filter out empty values (but keep currentFYEnd)
+                              // Helper function to filter out empty values (but keep currentFYEnd and arrays)
                               const filterEmptyValues = (obj: any) => {
                                 const filtered: any = {};
                                 Object.entries(obj).forEach(([key, value]) => {
                                   // Always include currentFYEnd even if empty (dropdown selection)
-                                  if (key === 'currentFYEnd' || (value !== undefined && value !== null && value !== '')) {
-                                    if (Array.isArray(value) && value.length === 0) return;
+                                  // Always include programFocus arrays (even if empty to clear the field)
+                                  if (key === 'currentFYEnd' || key === 'programFocus' || (value !== undefined && value !== null && value !== '')) {
+                                    if (Array.isArray(value) && value.length === 0 && key !== 'programFocus') return;
                                     filtered[key] = value;
                                   }
                                 });
