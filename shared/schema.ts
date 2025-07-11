@@ -254,7 +254,6 @@ export interface School {
   membershipTerminationLetter?: string;
 
   // Legal entity
-  legalStructure?: string;
   EIN?: string;
   legalName?: string;
   incorporationDate?: string;
@@ -592,6 +591,12 @@ export const schoolSchema = z.object({
   groupExemptionStatus: z.string().optional(),
   groupExemptionDateGranted: z.string().optional(),
   groupExemptionDateWithdrawn: z.string().optional(),
+  dateReceivedGroupExemption: z.string().optional(),
+  dateWithdrawnGroupExemption: z.string().optional(),
+  EIN: z.string().optional(),
+  legalName: z.string().optional(),
+  incorporationDate: z.string().optional(),
+  nonprofitStatus: z.string().optional(),
   ssjBoardDevelopment: z.string().optional(),
   enteredVisioningDate: z.string().optional(),
   enteredPlanningDate: z.string().optional(),

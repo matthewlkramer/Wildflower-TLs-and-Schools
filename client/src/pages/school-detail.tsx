@@ -2435,12 +2435,17 @@ export default function SchoolDetail() {
                               numberOfClassrooms: school?.numberOfClassrooms || '',
                               enrollmentCap: school?.enrollmentCap || '',
                               membershipStatus: school?.membershipStatus || '',
-                              legalStructure: school?.legalStructure || '',
+                              EIN: school?.EIN || '',
+                              legalName: school?.legalName || '',
+                              incorporationDate: school?.incorporationDate || '',
+                              nonprofitStatus: school?.nonprofitStatus || '',
                               currentFYEnd: school?.currentFYEnd || '',
                               governanceModel: school?.governanceModel || '',
                               groupExemptionStatus: school?.groupExemptionStatus || '',
                               groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
                               groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
+                              dateReceivedGroupExemption: school?.dateReceivedGroupExemption || '',
+                              dateWithdrawnGroupExemption: school?.dateWithdrawnGroupExemption || '',
                               businessInsurance: school?.businessInsurance || '',
                               billComAccount: school?.billComAccount || '',
                               email: school?.email || '',
@@ -2611,32 +2616,64 @@ export default function SchoolDetail() {
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">EIN</label>
-                          <p className="text-sm text-slate-900 mt-1">-</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Legal Name</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.name || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Legal Structure</label>
                           {isEditingDetails ? (
                             <Input
                               type="text"
                               className="mt-1"
-                              value={editedDetails?.legalStructure || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, legalStructure: e.target.value })}
+                              value={editedDetails?.EIN || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, EIN: e.target.value })}
                             />
                           ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.legalStructure || '-'}</p>
+                            <p className="text-sm text-slate-900 mt-1">{school.EIN || '-'}</p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Legal Name</label>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.legalName || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, legalName: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.legalName || '-'}</p>
                           )}
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Incorporation Date</label>
-                          <p className="text-sm text-slate-900 mt-1">-</p>
+                          {isEditingDetails ? (
+                            <Input
+                              type="date"
+                              className="mt-1"
+                              value={editedDetails?.incorporationDate || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, incorporationDate: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.incorporationDate || '-'}</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Nonprofit Status</label>
-                          <p className="text-sm text-slate-900 mt-1">-</p>
+                          {isEditingDetails ? (
+                            <Select
+                              value={editedDetails?.nonprofitStatus || ''}
+                              onValueChange={(value) => setEditedDetails({ ...editedDetails, nonprofitStatus: value })}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select nonprofit status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {fieldOptions?.nonprofitStatus?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.nonprofitStatus || '-'}</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Current FY End</label>
@@ -2690,12 +2727,21 @@ export default function SchoolDetail() {
                           <div>
                             <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Group Exemption Status</label>
                             {isEditingDetails ? (
-                              <Input
-                                type="text"
-                                className="mt-1"
+                              <Select
                                 value={editedDetails?.groupExemptionStatus || ''}
-                                onChange={(e) => setEditedDetails({ ...editedDetails, groupExemptionStatus: e.target.value })}
-                              />
+                                onValueChange={(value) => setEditedDetails({ ...editedDetails, groupExemptionStatus: value })}
+                              >
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {fieldOptions?.groupExemptionStatus?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             ) : (
                               <p className="text-sm text-slate-900 mt-1">{school.groupExemptionStatus || '-'}</p>
                             )}

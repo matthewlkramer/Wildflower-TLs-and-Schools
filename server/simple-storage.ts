@@ -448,7 +448,16 @@ export class SimpleAirtableStorage implements IStorage {
       activeAssignedPartnerShortName: fields['Active Assigned Partner Short Name'] || '',
       selfReflection: fields['Self-reflection'] || '',
       inactiveFlag: fields['Inactive Flag'] || '',
-      createdTime: record.createdTime
+      createdTime: record.createdTime,
+      
+      // --- Legal Entity Fields ---
+      currentFYEnd: fields['Current FY end'] || undefined,
+      EIN: fields['EIN'] || undefined,
+      legalName: fields['Legal Name'] || undefined,
+      incorporationDate: fields['Incorporation Date'] || undefined,
+      nonprofitStatus: fields['Nonprofit status'] || undefined,
+      dateReceivedGroupExemption: fields['Date received group exemption'] || undefined,
+      dateWithdrawnGroupExemption: fields['Date withdrawn from Group Exemption'] || undefined
 
       
     };
@@ -661,8 +670,13 @@ export class SimpleAirtableStorage implements IStorage {
       if (hasValue(school.governanceModel)) updateFields["Governance Model"] = school.governanceModel;
       if (hasValue(school.programFocus)) updateFields["Program Focus"] = school.programFocus;
       if (hasValue(school.numberOfClassrooms)) updateFields["Number of classrooms"] = school.numberOfClassrooms;
-      if (hasValue(school.legalStructure)) updateFields["Legal Structure"] = school.legalStructure;
-      if (hasValue(school.currentFYEnd)) updateFields["Current FY End"] = school.currentFYEnd;
+      if (hasValue(school.EIN)) updateFields["EIN"] = school.EIN;
+      if (hasValue(school.legalName)) updateFields["Legal Name"] = school.legalName;
+      if (hasValue(school.incorporationDate)) updateFields["Incorporation Date"] = school.incorporationDate;
+      if (hasValue(school.nonprofitStatus)) updateFields["Nonprofit status"] = school.nonprofitStatus;
+      if (hasValue(school.dateReceivedGroupExemption)) updateFields["Date received group exemption"] = school.dateReceivedGroupExemption;
+      if (hasValue(school.dateWithdrawnGroupExemption)) updateFields["Date withdrawn from Group Exemption"] = school.dateWithdrawnGroupExemption;
+      if (hasValue(school.currentFYEnd)) updateFields["Current FY end"] = school.currentFYEnd;
       if (hasValue(school.groupExemptionStatus)) updateFields["Group exemption status"] = school.groupExemptionStatus;
       if (hasValue(school.groupExemptionDateGranted)) updateFields["Group exemption date granted"] = school.groupExemptionDateGranted;
       if (hasValue(school.groupExemptionDateWithdrawn)) updateFields["Group exemption date withdrawn"] = school.groupExemptionDateWithdrawn;
@@ -762,6 +776,20 @@ export class SimpleAirtableStorage implements IStorage {
         "7/31",
         "8/31", 
         "12/31"
+      ],
+      nonprofitStatus: [
+        "group exemption",
+        "independent", 
+        "for profit",
+        "Partnership",
+        "Under Charter 501c3"
+      ],
+      groupExemptionStatus: [
+        "Applying",
+        "Active",
+        "Issues", 
+        "Withdrawn",
+        "Other - Not part of exemption"
       ]
     };
 
