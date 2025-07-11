@@ -27,7 +27,8 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const { showOnlyMyRecords, setShowOnlyMyRecords } = useUserFilter();
   
-  console.log("Header RENDER: addNewOptions =", addNewOptions, "location =", location);
+  // Debug: Log when header renders
+  // console.log("Header RENDER: addNewOptions =", addNewOptions, "location =", location);
 
 
 
@@ -115,10 +116,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                   </div>
                 )}
 
-                {(() => {
-                  console.log("Header: addNewOptions =", addNewOptions, "length =", addNewOptions?.length);
-                  return addNewOptions && addNewOptions.length > 1;
-                })() ? (
+                {addNewOptions && addNewOptions.length > 1 ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button 

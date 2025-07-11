@@ -1415,14 +1415,12 @@ export default function SchoolDetail() {
 
   // Update Add New options when active tab changes
   useEffect(() => {
-    console.log("SchoolDetail: Setting up Add New options for tab:", activeTab);
-    
     const getAddNewOptions = () => {
       switch (activeTab) {
         case "tls":
           return [
-            { label: "Create New Educator", onClick: () => setIsCreatingTeacher(true) },
-            { label: "Associate Existing Educator", onClick: () => setIsAssociatingTeacher(true) }
+            { label: "Create New Educator at This School", onClick: () => setIsCreatingTeacher(true) },
+            { label: "Assign Educator to This School", onClick: () => setIsAssociatingTeacher(true) }
           ];
         case "locations":
           return [{ label: "Add Location", onClick: () => setIsCreatingLocation(true) }];
@@ -1456,12 +1454,10 @@ export default function SchoolDetail() {
     };
 
     const options = getAddNewOptions();
-    console.log("SchoolDetail: Setting options:", options);
     setAddNewOptions(options);
 
     // Cleanup when component unmounts
     return () => {
-      console.log("SchoolDetail: Cleaning up Add New options");
       setAddNewOptions([]);
     };
   }, [activeTab, setAddNewOptions]);

@@ -41,9 +41,7 @@ const AddNewContext = createContext<{
   setAddNewOptions: (options: Array<{ label: string; onClick: () => void; }>) => void;
 }>({
   addNewOptions: [],
-  setAddNewOptions: () => {
-    console.log("WARNING: setAddNewOptions called on default context");
-  },
+  setAddNewOptions: () => {},
 });
 
 export const useSearch = () => useContext(SearchContext);
@@ -71,17 +69,6 @@ function AppContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [pageTitle, setPageTitle] = useState("");
   const [addNewOptions, setAddNewOptions] = useState<Array<{ label: string; onClick: () => void; }>>([]);
-  
-  // Create a wrapped setAddNewOptions with debug logging
-  const setAddNewOptionsWithDebug = (options: Array<{ label: string; onClick: () => void; }>) => {
-    console.log("App.tsx: setAddNewOptions called with:", options);
-    setAddNewOptions(options);
-  };
-  
-  // Debug logging for addNewOptions changes
-  useEffect(() => {
-    console.log("App.tsx: addNewOptions changed to:", addNewOptions);
-  }, [addNewOptions]);
 
   // Reset search when navigating between pages
   const isDashboardActive = location === "/" || location === "/dashboard";
@@ -92,7 +79,7 @@ function AppContent() {
   return (
     <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>
       <PageTitleContext.Provider value={{ pageTitle, setPageTitle }}>
-        <AddNewContext.Provider value={{ addNewOptions, setAddNewOptions: setAddNewOptionsWithDebug }}>
+        <AddNewContext.Provider value={{ addNewOptions, setAddNewOptions }}>
           <div className="min-h-screen bg-slate-50">
             <Header 
               searchTerm={searchTerm} 
