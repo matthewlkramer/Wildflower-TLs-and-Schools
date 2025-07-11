@@ -1,82 +1,88 @@
-# Quick Testing Guide
+# Systematic Testing and Debugging Guide
 
-## How to Use Test Mode
+## Overview
+This guide provides a methodical approach to test every button, field, and function in the school management system to ensure all CRUD operations work correctly.
 
-1. **Enable Test Mode**: Look for the test tube icon and toggle at the top of the app
-2. **Orange Banner**: When test mode is active, you'll see an orange "Testing enabled" banner
-3. **Safe Testing**: All create/edit/delete operations will be simulated - no real data changes
-4. **View Data**: You can still view all your real data normally
+## Testing Methodology
 
-## What Test Mode Does
+### Phase 1: Test School Creation
+1. **Create Test School**: Use "Add School" button on schools dashboard
+2. **Basic Data Entry**: Enter minimal required fields
+3. **Verification**: Confirm school appears in list and detail page loads
 
-### ✅ Safe Operations (Simulated)
-- **Creating new records**: Add School, Add Teacher, Add Charter
-- **Editing existing data**: All edit forms and inline editing
-- **Deleting records**: All delete operations
-- **Association changes**: Teacher-school associations, guide assignments
+### Phase 2: Systematic Tab Testing
+For each tab, test every interactive element:
 
-### ✅ Normal Operations (Real)
-- **Viewing data**: All tables and detail pages show real data
-- **Searching**: Search and filtering work normally
-- **Navigation**: Moving between pages works normally
+#### Tab 1: Summary
+- **Interactive Elements**: None expected
+- **Status**: Skip to next tab
 
-## Testing Workflow
+#### Tab 2: Details  
+- **Interactive Elements**: "Edit Details" button
+- **Test Process**:
+  1. Click "Edit Details" button
+  2. Edit first field, save
+  3. Wait for update, take screenshot
+  4. Verify data appears correctly
+  5. If error/no update: Debug and document
+  6. If success: Move to next field
+  7. Repeat for all fields
 
-### Quick Test (5 minutes)
-1. Turn on Test Mode
-2. Try adding a new school from the Schools page
-3. Try editing a school's details
-4. Try adding a teacher association
-5. Watch for orange success messages
+#### Tab 3: [Continue for each tab]
 
-### Comprehensive Test (30 minutes)
-Follow the detailed checklist in `TESTING_PLAN.md`
+### Phase 3: Table Operations Testing
+For tabs with data tables:
+1. **Add Record**: Use "Add New" button (not direct API)
+2. **Edit Record**: Test inline editing
+3. **Delete Record**: Test delete functionality
+4. **View Record**: Test modal/detail views
 
-## Visual Indicators
+### Phase 4: Cleanup
+1. Delete all test sub-records
+2. Delete test school
+3. Verify cleanup complete
 
-- **🧪 Test Mode ON**: Orange toggle, orange banner, orange toast messages
-- **✅ Simulated Success**: "Test mode: Operation completed successfully"
-- **❌ Real Operation**: Regular success/error messages (when test mode is off)
+## Test Results Log
 
-## Pro Tips
+### Test School: [Name]
+- **Created**: [Timestamp]
+- **ID**: [School ID]
+- **Status**: [Active/Testing/Deleted]
 
-- **Leave test mode on** while going through your testing checklist
-- **Toggle it off** when you want to make real changes
-- **Orange toast messages** confirm operations were simulated
-- **Test with confidence** - your real data is completely safe
+### Tab Testing Results
 
-## Troubleshooting
+#### Summary Tab
+- **Interactive Elements**: None
+- **Status**: ✅ No testing required
 
-If something doesn't work in test mode:
-1. Check the browser console for errors
-2. Toggle test mode off and on again
-3. Refresh the page if needed
-4. Report the specific action that failed
+#### Details Tab  
+- **Edit Details Button**: [Status]
+- **Field Testing**:
+  - Field 1: [Status] - [Notes]
+  - Field 2: [Status] - [Notes]
+  - [Continue for all fields]
 
-## Example Test Scenarios
+#### [Continue for each tab]
 
-### Scenario 1: School Management
-1. Enable test mode
-2. Go to Schools page
-3. Click "Add School" 
-4. Fill out the form
-5. Save - should see orange success message
-6. Go to a school detail page
-7. Try editing various fields
-8. Each save should show orange confirmation
+## Issues Found
+- **Issue 1**: [Description] - [Resolution]
+- **Issue 2**: [Description] - [Resolution]
 
-### Scenario 2: Teacher Management  
-1. Stay in test mode
-2. Go to Teachers page
-3. Click "Add Educator"
-4. Fill form and save
-5. Go to teacher detail page
-6. Test editing contact info, demographics, etc.
+## Debugging Steps
+When issues are found:
+1. **Capture**: Screenshot of error state
+2. **Console**: Check browser console for errors
+3. **Network**: Verify API calls in Network tab
+4. **Logs**: Check server logs for backend errors
+5. **Validation**: Run validation scripts
+6. **Fix**: Implement resolution
+7. **Retest**: Verify fix works
+8. **Document**: Update this guide
 
-### Scenario 3: Associations
-1. Stay in test mode
-2. Go to school detail page, TLs tab
-3. Try "Associate Existing Educator"
-4. Try editing teacher roles/dates
-5. Try "End Stint" action
-6. All should show orange confirmations
+## Success Criteria
+- ✅ All buttons respond correctly
+- ✅ All data saves and displays properly
+- ✅ All CRUD operations work
+- ✅ No console errors
+- ✅ Proper error handling for invalid data
+- ✅ Clean test data removal
