@@ -23,9 +23,9 @@ const createAndAssignEducatorSchema = z.object({
   primaryPhone: z.string().optional(),
   homeAddress: z.string().optional(),
   
-  // Assignment fields (all optional except role which needs at least one)
-  role: z.array(z.string()).optional(),
-  startDate: z.string().optional(),
+  // Assignment fields (role is required for association creation)
+  role: z.array(z.string()).min(1, "Please select at least one role"),
+  startDate: z.string().min(1, "Start date is required"),
   emailAtSchool: z.string().email("Please enter a valid email").optional().or(z.literal("")),
 });
 
@@ -55,7 +55,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
       primaryPhone: "",
       homeAddress: "",
       role: [],
-      startDate: "",
+      startDate: new Date().toISOString().split('T')[0], // Default to today
       emailAtSchool: "",
     },
   });
@@ -106,7 +106,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
       const educator = await educatorResponse.json();
       console.log("Educator created:", educator);
 
-      // Then create the association (only if role is provided)
+      // Then create the association (role is now required by schema)
       if (data.role && data.role.length > 0) {
         console.log("Creating association with:", {
           educatorId: educator.id,
@@ -277,7 +277,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
                     name="role"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Role(s)</FormLabel>
+                        <FormLabel>Role(s) *</FormLabel>
                         <FormControl>
                           <Select 
                             value={field.value?.[0] || ""} 
@@ -305,7 +305,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
                     name="startDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Start Date</FormLabel>
+                        <FormLabel>Start Date *</FormLabel>
                         <FormControl>
                           <Input {...field} type="date" />
                         </FormControl>
