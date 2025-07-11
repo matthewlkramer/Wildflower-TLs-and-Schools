@@ -28,7 +28,7 @@ import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssoci
 import { getInitials, getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useAddNew } from "../App";
+import { addNewEmitter } from "@/lib/add-new-emitter";
 
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
 import { GoogleMap } from "@/components/google-map";
@@ -1246,7 +1246,7 @@ function LoanRow({
 
 export default function SchoolDetail() {
   const { id } = useParams<{ id: string }>();
-  const { setAddNewOptions } = useAddNew();
+
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activeTab, setActiveTab] = useState("summary");
@@ -1454,17 +1454,13 @@ export default function SchoolDetail() {
     };
 
     const options = getAddNewOptions();
-    if (setAddNewOptions) {
-      setAddNewOptions(options);
-    }
+    addNewEmitter.setOptions(options);
 
     // Cleanup when component unmounts
     return () => {
-      if (setAddNewOptions) {
-        setAddNewOptions([]);
-      }
+      addNewEmitter.setOptions([]);
     };
-  }, [activeTab, setAddNewOptions]);
+  }, [activeTab]);
 
 
   const { data: school, isLoading } = useQuery<School>({

@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState, createContext, useContext, useEffect } from "react";
+import { addNewEmitter } from "@/lib/add-new-emitter";
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
 import { UserFilterProvider } from "@/contexts/user-filter-context";
@@ -69,6 +70,19 @@ function AppContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [pageTitle, setPageTitle] = useState("");
   const [addNewOptions, setAddNewOptions] = useState<Array<{ label: string; onClick: () => void; }>>([]);
+  
+  // Listen to add new options changes
+  useEffect(() => {
+    const handleOptionsChanged = (e: CustomEvent) => {
+      setAddNewOptions(e.detail);
+    };
+    
+    addNewEmitter.addEventListener('optionsChanged', handleOptionsChanged as EventListener);
+    
+    return () => {
+      addNewEmitter.removeEventListener('optionsChanged', handleOptionsChanged as EventListener);
+    };
+  }, []);
   
 
   
