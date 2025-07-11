@@ -291,7 +291,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
             params.api.sizeColumnsToFit();
           }}
           animateRows={true}
-          rowSelection={false}
+          rowSelection={undefined}
           enableBrowserTooltips={true}
           rowHeight={30}
           context={{
