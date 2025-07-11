@@ -87,6 +87,30 @@
    - Save Changes button: ✅ PASS
    - UI refresh: ✅ PASS - Changes visible immediately
 
-**Next Test**: Test other fields in Details tab
+**Current Test**: Systematic testing of ALL Details tab fields
+
+#### Field Testing Results by Section:
+
+**Contact Information Section**: ✅ PASS
+- Email: ✅ "test-contact@school.edu" 
+- Phone: ✅ "555-0123-TEST"
+- Website: ✅ "https://test-school.edu"
+- Facebook: ✅ "https://facebook.com/testschool"
+- Instagram: ✅ "@testschool_edu"
+
+**Program Details Section**: ❌ ISSUES FOUND
+- Program Focus: ❌ FAIL - Permission error with custom values
+- Ages Served: ❌ FAIL - "Insufficient permissions to create new select option"
+- Number of Classrooms: ❌ FAIL - Returns null
+- Enrollment Cap: ❌ FAIL - Returns null
+- Membership Status: ❌ FAIL - Returns null
+
+**Legal Entity Section**: ❌ ISSUES FOUND
+- EIN: ❌ FAIL - Returns null
+- Legal Name: ❌ FAIL - Returns null  
+- Legal Structure: ❌ FAIL - Returns null
+- Governance Model: ❌ FAIL - "Insufficient permissions to create new select option"
+
+**Critical Issue**: Dropdown fields require predefined Airtable values, not custom inputs
 
 ### Tab 3-10: ⏳ Pending
