@@ -2463,24 +2463,43 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Program Focus</label>
                           {isEditingDetails ? (
-                            <Select
-                              value={editedDetails?.programFocus?.[0] || ''}
-                              onValueChange={(value) => setEditedDetails({ 
-                                ...editedDetails, 
-                                programFocus: value ? [value] : [] 
-                              })}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue placeholder="Select program focus" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {fieldOptions?.programFocus?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <div className="mt-1">
+                              <label className="text-xs text-slate-500 mb-2 block">Select multiple options</label>
+                              <div className="flex flex-wrap gap-2">
+                                {fieldOptions?.programFocus?.filter((option: string) => option && option.trim() !== '').map((option: string) => {
+                                  const isSelected = editedDetails?.programFocus?.includes(option) || false;
+                                  return (
+                                    <button
+                                      key={option}
+                                      type="button"
+                                      onClick={() => {
+                                        const currentFocus = editedDetails?.programFocus || [];
+                                        if (isSelected) {
+                                          // Remove from array
+                                          setEditedDetails({
+                                            ...editedDetails,
+                                            programFocus: currentFocus.filter(f => f !== option)
+                                          });
+                                        } else {
+                                          // Add to array
+                                          setEditedDetails({
+                                            ...editedDetails,
+                                            programFocus: [...currentFocus, option]
+                                          });
+                                        }
+                                      }}
+                                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                                        isSelected 
+                                          ? 'bg-blue-100 text-blue-800 border-blue-300' 
+                                          : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                                      }`}
+                                    >
+                                      {option}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
                           ) : (
                             <div className="mt-1">
                               {school.programFocus && school.programFocus.length > 0 ? (

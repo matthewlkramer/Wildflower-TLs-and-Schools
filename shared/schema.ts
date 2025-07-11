@@ -551,6 +551,7 @@ export const schoolSchema = z.object({
   about: z.string().optional(),
   aboutSpanish: z.string().optional(),
   agesServed: z.array(z.string()).optional(),
+  programFocus: z.array(z.string()).optional(),
   schoolType: z.string().optional(),
   governanceModel: z.string().optional(),
   status: z.string().optional(),
@@ -570,7 +571,7 @@ export const schoolSchema = z.object({
   timezone: z.string().optional(),
   currentTLs: z.union([z.string(), z.number()]).optional(),
   currentGuides: z.array(z.string()).optional(),
-  programFocus: z.string().optional(),
+
   numberOfClassrooms: z.string().optional(),
   leftNetworkDate: z.string().optional(),
   leftNetworkReason: z.string().optional(),
