@@ -69,6 +69,8 @@ function AppContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [pageTitle, setPageTitle] = useState("");
   const [addNewOptions, setAddNewOptions] = useState<Array<{ label: string; onClick: () => void; }>>([]);
+  
+
 
   // Reset search when navigating between pages
   const isDashboardActive = location === "/" || location === "/dashboard";
