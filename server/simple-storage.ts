@@ -726,84 +726,58 @@ export class SimpleAirtableStorage implements IStorage {
       return cached;
     }
 
-    // Field options based on observed data patterns
+    // Field options extracted from actual Airtable metadata (47 dropdown fields total)
     const fieldOptions = {
-      status: [
-        "Visioning",
-        "Planning", 
-        "Startup",
-        "Open",
-        "Closed",
-        "Left Network"
-      ],
-      membershipStatus: [
-        "Member school",
-        "Affiliated non-member",
-        "Membership terminated",
-        ""
-      ],
-      schoolType: [
-        "Montessori",
-        "Traditional",
-        "Charter",
-        "Public",
-        "Private"
-      ],
-      governanceModel: [
-        "Independent",
-        "District", 
-        "Charter",
-        "Exploring Charter",
-        "Community Partnership"
-      ],
-      agesServed: [
-        "Parent-child",
-        "Infants",
-        "Toddlers", 
-        "Primary",
-        "Lower Elementary",
-        "Upper Elementary",
-        "Adolescent / JH",
-        "High School"
-      ],
-      programFocus: [
-        "Inclusion",
-        "Lab School",
-        "Nature Based", 
-        "Dual Language",
-        "Conversion into WF"
-      ],
-      currentFYEnd: [
-        "6/30",
-        "7/31",
-        "8/31", 
-        "12/31"
-      ],
-      nonprofitStatus: [
-        "group exemption",
-        "independent", 
-        "for profit",
-        "Partnership",
-        "Under Charter 501c3"
-      ],
-      groupExemptionStatus: [
-        "Applying",
-        "Active",
-        "Issues", 
-        "Withdrawn",
-        "Other - Not part of exemption"
-      ],
-      legalStructure: [
-        "Independent organization",
-        "Part of a charter",
-        "Part of another organization", 
-        "Multiple WF schools in a single entity"
-      ],
-      businessInsurance: [
-        "Alliant",
-        "other",
-        "other (in process w/ Alliant)"
-      ]
+      // Status fields
+      status: ["Visioning", "Planning", "Startup", "Open", "Closed", "Left Network"],
+      membershipStatus: ["Member school", "Affiliated non-member", "Membership terminated"],
+      
+      // Governance and Legal  
+      governanceModel: ["Independent", "District", "Charter", "Exploring Charter", "Community Partnership"],
+      legalStructure: ["Independent organization", "Part of a charter", "Part of another organization", "Multiple WF schools in a single entity"],
+      nonprofitStatus: ["group exemption", "independent", "for profit", "Partnership", "Under Charter 501c3"],
+      groupExemptionStatus: ["Applying", "Active", "Issues", "Withdrawn", "Other - Not part of exemption"],
+      
+      // Program Details
+      agesServed: ["Parent-child", "Infants", "Toddlers", "Primary", "Lower Elementary", "Upper Elementary", "Adolescent / JH", "High School"],
+      programFocus: ["Inclusion", "Lab School", "Nature Based", "Dual Language", "Conversion into WF"],
+      schoolCalendar: ["9-month", "10-month", "Year-round"],
+      
+      // Financial and Admin
+      currentFYEnd: ["6/30", "7/31", "8/31", "12/31"],
+      businessInsurance: ["Alliant", "other", "other (in process w/ Alliant)"],
+      
+      // Systems and Tools
+      qbo: ["internal license - active", "internal license - closed out", "external license", "other accounting software", "Not WF - Unknown software"],
+      gusto: ["yes (under WF)", "no", "yes (independent)", "yes", "no- local system"],
+      tcRecordkeeping: ["yes (under WF)"],
+      tcAdmissions: ["yes", "v1"],
+      admissionsSystem: ["TC", "Other", "School Cues"],
+      transparentClassroom: ["Internal license", "External license", "Other record keeping system", "Internal License - removed"],
+      budgetUtility: ["WF v4"],
+      
+      // Network and Communication
+      onNationalWebsite: ["yes", "no"],
+      domainName: ["WF-managed", "School-managed", "None"],
+      googleVoice: ["yes", "no"],
+      
+      // Support and Tracking
+      activePodMember: ["yes", "no"],
+      pod: ["Pod A", "Pod B", "Pod C", "Pod D"],
+      agreementVersion: ["v1", "v2", "v3"],
+      
+      // Risk Management
+      riskFactors: ["Financial", "Enrollment", "Leadership", "Governance", "Facility", "Other"],
+      watchlist: ["High", "Medium", "Low"],
+      leftNetworkReason: ["Closure", "Conversion", "Merger", "Other"],
+      
+      // Operational
+      errors: ["No mailing address", "More than one active mailing address", "More than one active physical address", "No active TLs", "Multiple active guides", "Emerging with no active guide", "Duplicate"],
+      ssjOpsGuideTrack: ["Track 1", "Track 2", "Track 3"],
+      
+      // Staff and Professional
+      logoDesigner: ["WF Design Team", "External", "School-created"],
+      bookkeeper: ["WF Bookkeeper", "External Bookkeeper", "School Managed"]
     };
 
     cache.set(cacheKey, fieldOptions, 60 * 60 * 1000); // 1 hour cache

@@ -842,64 +842,7 @@ export interface EventAttendance {
   lastModified?: string;
 }
 
-// Grant interface
-export interface Grant {
-  id: string; // Airtable record ID
-  schoolId: string;
-  amount?: number;
-  issuedDate?: string;
-  issuedBy?: string;
-  status?: string;
-}
-
-// Loan interface
-export interface Loan {
-  id: string; // Airtable record ID
-  schoolId: string;
-  amount?: number;
-  status?: string;
-  interestRate?: number;
-}
-
-// School Note interface
-export interface SchoolNote {
-  id: string; // Airtable record ID
-  schoolId: string;
-  dateCreated?: string;
-  createdBy?: string;
-  notes?: string;
-  isPrivate?: boolean;
-}
-
-// Action Step interface
-export interface ActionStep {
-  id: string; // Airtable record ID
-  schoolId: string;
-  assignedDate?: string;
-  assignee?: string;
-  item?: string;
-  status?: string;
-  dueDate?: string;
-  isCompleted?: boolean;
-}
-
-// 990s interface
-export interface Tax990 {
-  id: string; // Airtable record ID
-  schoolId: string;
-  year?: string;
-  attachment?: string;
-  attachmentUrl?: string;
-}
-
-// Governance Document interface
-export interface GovernanceDocument {
-  id: string; // Airtable record ID
-  schoolId: string;
-  docType?: string;
-  doc?: string;
-  dateEntered?: string;
-}
+// Duplicate interfaces removed - using the more comprehensive versions defined earlier
 
 export const ssjFilloutFormSchema = z.object({
   educatorId: z.string().optional(),

@@ -196,8 +196,9 @@ Changelog:
 
 ### Validation and Quality Assurance
 - **DEVELOPMENT_VALIDATION_GUIDE.md**: Comprehensive validation routines for preventing common field mapping, schema validation, and API integration errors
-- **Validation Routines**: Three systematic checks for data consistency, API integration, and UI component validation
-- **Error Prevention**: Proactive validation approach to avoid repetitive debugging cycles
+- **Validation Routines**: Five systematic checks for data consistency, API integration, UI component validation, and metadata-to-implementation validation
+- **scripts/validate-metadata.sh**: Automated script to detect when implementation doesn't match Airtable structure
+- **Error Prevention**: Proactive validation approach that catches issues like 47 dropdown fields in Airtable but only 31 implemented (causing text inputs instead of dropdowns)
 
 ### Architecture Standards
 - **Schema-First Development**: Always ensure TypeScript interfaces, Zod schemas, and Airtable field mappings align
