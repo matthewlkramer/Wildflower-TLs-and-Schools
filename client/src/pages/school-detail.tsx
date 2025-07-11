@@ -92,7 +92,12 @@ function TeacherAssociationRow({
               {teacher.fullName || teacher.firstName + ' ' + teacher.lastName}
             </Link>
           ) : (
-            association.educatorId
+            <Link 
+              href={`/teachers/${association.educatorId}`}
+              className="text-wildflower-blue hover:underline"
+            >
+              {association.educatorName || association.educatorId}
+            </Link>
           )}
         </TableCell>
         <TableCell>
@@ -193,7 +198,12 @@ function TeacherAssociationRow({
             {teacher.fullName}
           </Link>
         ) : (
-          association.educatorId
+          <Link 
+            href={`/teachers/${association.educatorId}`}
+            className="text-wildflower-blue hover:underline"
+          >
+            {association.educatorName || association.educatorId}
+          </Link>
         )}
       </TableCell>
       <TableCell>

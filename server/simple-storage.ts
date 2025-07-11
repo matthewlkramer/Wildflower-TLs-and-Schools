@@ -856,11 +856,16 @@ export class SimpleAirtableStorage implements IStorage {
       const schools = await this.getSchools();
       const schoolMap = new Map(schools.map(school => [school.id, school.shortName || school.name]));
       
+      // Get all educators to map educator IDs to full names
+      const educators = await this.getEducators();
+      const educatorMap = new Map(educators.map(educator => [educator.id, educator.fullName || `${educator.firstName} ${educator.lastName}`]));
+      
       return records.map(record => ({
         id: record.id,
         educatorId: Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || ''),
         schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
         schoolShortName: schoolMap.get(Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || '')) || '',
+        educatorName: educatorMap.get(Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || '')) || '',
         role: record.fields["Roles"] ? [String(record.fields["Roles"])] : [], // Changed to array
         status: String(record.fields["Stage_Status"] || ''),
         startDate: String(record.fields["Start Date"] || ''),

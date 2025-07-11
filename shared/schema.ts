@@ -345,6 +345,7 @@ export interface EducatorSchoolAssociation {
   educatorId: string;
   schoolId: string;
   schoolShortName?: string;
+  educatorName?: string;
   role?: string[];
   status?: string;
   stageStatus?: string;
