@@ -879,11 +879,12 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       console.log("Creating association in Airtable:", association);
       
-      // Create the association record in the "Educators x Schools" table
+      // Try different field names for the link fields
+      // Common patterns: "Educator", "School", "Educators", "Schools"
       const record = await base("Educators x Schools").create([{
         fields: {
-          "educator_id": [association.educatorId], // Link to Educators table
-          "school_id": [association.schoolId],     // Link to Schools table
+          "Educator": [association.educatorId], // Try "Educator" as link field
+          "School": [association.schoolId],     // Try "School" as link field
           "Roles": association.role && association.role.length > 0 ? association.role[0] : undefined,
           "Start Date": association.startDate || undefined,
           "End Date": association.endDate || undefined,
@@ -909,6 +910,43 @@ export class SimpleAirtableStorage implements IStorage {
       };
     } catch (error) {
       console.error("Error creating educator school association:", error);
+      
+      // If that fails, try other common field names
+      if (error.message && error.message.includes('cannot accept a value')) {
+        try {
+          console.log("Trying alternative field names...");
+          const record = await base("Educators x Schools").create([{
+            fields: {
+              "Educators": [association.educatorId], // Try "Educators" as link field
+              "Schools": [association.schoolId],     // Try "Schools" as link field
+              "Roles": association.role && association.role.length > 0 ? association.role[0] : undefined,
+              "Start Date": association.startDate || undefined,
+              "End Date": association.endDate || undefined,
+              "Currently Active": association.isActive !== undefined ? association.isActive : true,
+              "Email at School": association.emailAtSchool || undefined,
+            }
+          }]);
+          
+          console.log("Association created successfully with alternative field names:", record[0].id);
+          
+          return {
+            id: record[0].id,
+            educatorId: association.educatorId,
+            schoolId: association.schoolId,
+            role: association.role || [],
+            startDate: association.startDate || '',
+            endDate: association.endDate || '',
+            isActive: association.isActive !== undefined ? association.isActive : true,
+            emailAtSchool: association.emailAtSchool || '',
+            created: new Date().toISOString(),
+            lastModified: new Date().toISOString(),
+          };
+        } catch (error2) {
+          console.error("Both attempts failed:", error2);
+          throw error2;
+        }
+      }
+      
       throw error;
     }
   }
