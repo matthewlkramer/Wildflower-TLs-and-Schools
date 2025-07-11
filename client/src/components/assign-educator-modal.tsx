@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { type Educator } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Search } from "lucide-react";
+
 
 const assignEducatorSchema = z.object({
   educatorId: z.string().min(1, "Please select an educator"),
@@ -29,24 +29,12 @@ interface AssignEducatorModalProps {
 
 export default function AssignEducatorModal({ open, onOpenChange, schoolId, preselectedEducatorId }: AssignEducatorModalProps) {
   const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedEducator, setSelectedEducator] = useState<Educator | null>(null);
 
   const { data: educators = [] } = useQuery<Educator[]>({
     queryKey: ["/api/teachers"], // Using legacy endpoint for compatibility
     enabled: open,
   });
-
-  // Filter educators based on search term
-  const filteredEducators = useMemo(() => {
-    if (!searchTerm) return educators;
-    const term = searchTerm.toLowerCase();
-    return educators.filter(educator => 
-      (educator.fullName || `${educator.firstName} ${educator.lastName}`).toLowerCase().includes(term) ||
-      (educator.firstName || "").toLowerCase().includes(term) ||
-      (educator.lastName || "").toLowerCase().includes(term)
-    );
-  }, [educators, searchTerm]);
 
   const form = useForm({
     resolver: zodResolver(assignEducatorSchema),
@@ -64,7 +52,7 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
       form.setValue("educatorId", preselectedEducatorId);
       const educator = educators.find(e => e.id === preselectedEducatorId);
       setSelectedEducator(educator || null);
-      setSearchTerm(""); // Clear search when educator is preselected
+      // Clear when educator is preselected
     }
   }, [preselectedEducatorId, form, educators]);
 
@@ -95,7 +83,6 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
         description: "Educator assigned to school successfully",
       });
       form.reset();
-      setSearchTerm("");
       setSelectedEducator(null);
       onOpenChange(false);
     },
@@ -139,15 +126,6 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
                   <FormLabel>Select Educator *</FormLabel>
                   <FormControl>
                     <div className="space-y-2">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                        <Input
-                          placeholder="Search educators by name..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="pl-10"
-                        />
-                      </div>
                       <Select 
                         value={field.value} 
                         onValueChange={(value) => {
@@ -157,7 +135,7 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
                         }}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select an educator">
+                          <SelectValue placeholder="Search and select an educator">
                             {selectedEducator && (
                               <span className="text-left">
                                 {selectedEducator.fullName || `${selectedEducator.firstName} ${selectedEducator.lastName}`}
@@ -166,24 +144,18 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
-                          {filteredEducators.length > 0 ? (
-                            filteredEducators.map((educator) => (
-                              <SelectItem key={educator.id} value={educator.id}>
-                                <div className="flex flex-col">
-                                  <span className="font-medium">
-                                    {educator.fullName || `${educator.firstName} ${educator.lastName}`}
-                                  </span>
-                                  {educator.primaryEmail && (
-                                    <span className="text-sm text-gray-500">{educator.primaryEmail}</span>
-                                  )}
-                                </div>
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <div className="px-2 py-1 text-sm text-gray-500">
-                              {searchTerm ? "No educators found matching your search" : "No educators available"}
-                            </div>
-                          )}
+                          {educators.map((educator) => (
+                            <SelectItem key={educator.id} value={educator.id}>
+                              <div className="flex flex-col">
+                                <span className="font-medium">
+                                  {educator.fullName || `${educator.firstName} ${educator.lastName}`}
+                                </span>
+                                {educator.primaryEmail && (
+                                  <span className="text-sm text-gray-500">{educator.primaryEmail}</span>
+                                )}
+                              </div>
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       {selectedEducator && (
