@@ -15,8 +15,8 @@ import { Search } from "lucide-react";
 
 const assignEducatorSchema = z.object({
   educatorId: z.string().min(1, "Please select an educator"),
-  role: z.array(z.string()).min(1, "Please select at least one role"),
-  startDate: z.string().min(1, "Start date is required"),
+  role: z.array(z.string()).optional(),
+  startDate: z.string().optional(),
   emailAtSchool: z.string().email("Please enter a valid email").optional().or(z.literal("")),
 });
 
@@ -30,6 +30,7 @@ interface AssignEducatorModalProps {
 export default function AssignEducatorModal({ open, onOpenChange, schoolId, preselectedEducatorId }: AssignEducatorModalProps) {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedEducator, setSelectedEducator] = useState<Educator | null>(null);
 
   const { data: educators = [] } = useQuery<Educator[]>({
     queryKey: ["/api/teachers"], // Using legacy endpoint for compatibility
@@ -61,18 +62,20 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
   useEffect(() => {
     if (preselectedEducatorId) {
       form.setValue("educatorId", preselectedEducatorId);
+      const educator = educators.find(e => e.id === preselectedEducatorId);
+      setSelectedEducator(educator || null);
       setSearchTerm(""); // Clear search when educator is preselected
     }
-  }, [preselectedEducatorId, form]);
+  }, [preselectedEducatorId, form, educators]);
 
   const assignEducatorMutation = useMutation({
     mutationFn: async (data: z.infer<typeof assignEducatorSchema>) => {
       return await apiRequest("POST", "/api/teacher-school-associations", {
         educatorId: data.educatorId,
         schoolId: schoolId,
-        role: data.role,
-        startDate: data.startDate,
-        emailAtSchool: data.emailAtSchool,
+        role: data.role || [],
+        startDate: data.startDate || "",
+        emailAtSchool: data.emailAtSchool || "",
         isActive: true,
       });
     },
@@ -93,6 +96,7 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
       });
       form.reset();
       setSearchTerm("");
+      setSelectedEducator(null);
       onOpenChange(false);
     },
     onError: () => {
@@ -132,30 +136,62 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
               name="educatorId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Select Educator</FormLabel>
+                  <FormLabel>Select Educator *</FormLabel>
                   <FormControl>
                     <div className="space-y-2">
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                         <Input
-                          placeholder="Search educators..."
+                          placeholder="Search educators by name..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                           className="pl-10"
                         />
                       </div>
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select 
+                        value={field.value} 
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          const educator = educators.find(e => e.id === value);
+                          setSelectedEducator(educator || null);
+                        }}
+                      >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select an educator" />
+                          <SelectValue placeholder="Select an educator">
+                            {selectedEducator && (
+                              <span className="text-left">
+                                {selectedEducator.fullName || `${selectedEducator.firstName} ${selectedEducator.lastName}`}
+                              </span>
+                            )}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
-                          {filteredEducators.map((educator) => (
-                            <SelectItem key={educator.id} value={educator.id}>
-                              {educator.fullName || `${educator.firstName} ${educator.lastName}`}
+                          {filteredEducators.length > 0 ? (
+                            filteredEducators.map((educator) => (
+                              <SelectItem key={educator.id} value={educator.id}>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">
+                                    {educator.fullName || `${educator.firstName} ${educator.lastName}`}
+                                  </span>
+                                  {educator.primaryEmail && (
+                                    <span className="text-sm text-gray-500">{educator.primaryEmail}</span>
+                                  )}
+                                </div>
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="" disabled>
+                              {searchTerm ? "No educators found matching your search" : "No educators available"}
                             </SelectItem>
-                          ))}
+                          )}
                         </SelectContent>
                       </Select>
+                      {selectedEducator && (
+                        <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                          <strong>Selected:</strong> {selectedEducator.fullName || `${selectedEducator.firstName} ${selectedEducator.lastName}`}
+                          {selectedEducator.primaryEmail && <span className="ml-2">({selectedEducator.primaryEmail})</span>}
+                        </div>
+                      )}
                     </div>
                   </FormControl>
                   <FormMessage />
