@@ -211,7 +211,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/schools/:id", async (req, res) => {
     try {
       const id = req.params.id;
-      console.log('Update request for fields:', Object.keys(req.body));
       const schoolData = schoolSchema.partial().parse(req.body);
       const school = await storage.updateSchool(id, schoolData);
       if (!school) {

@@ -798,6 +798,11 @@ export class SimpleAirtableStorage implements IStorage {
         "Part of a charter",
         "Part of another organization", 
         "Multiple WF schools in a single entity"
+      ],
+      businessInsurance: [
+        "Alliant",
+        "other",
+        "other (in process w/ Alliant)"
       ]
     };
 

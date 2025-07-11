@@ -2929,12 +2929,21 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Business Insurance</label>
                           {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
+                            <Select
                               value={editedDetails?.businessInsurance || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, businessInsurance: e.target.value })}
-                            />
+                              onValueChange={(value) => setEditedDetails({ ...editedDetails, businessInsurance: value })}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select business insurance" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {fieldOptions?.businessInsurance?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.businessInsurance || '-'}</p>
                           )}
