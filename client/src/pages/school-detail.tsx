@@ -2224,17 +2224,17 @@ export default function SchoolDetail() {
                             </div>
                           </div>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-3">
                           {/* SSJ status fields */}
                           {school.status && ['planning', 'startup', 'visioning'].includes(school.status.toLowerCase()) && (
                             <>
                               <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-1">SSJ Stage</h4>
-                                <p className="text-base text-gray-900">{school.ssjStage || school.status || 'Not specified'}</p>
+                                <p className="text-xs text-gray-500 uppercase tracking-wider">SSJ Stage</p>
+                                <p className="text-sm font-medium text-gray-900 mt-1">{school.ssjStage || school.status || 'Not specified'}</p>
                               </div>
                               <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-1">Current Guides</h4>
-                                <p className="text-base text-gray-900">
+                                <p className="text-xs text-gray-500 uppercase tracking-wider">Current Guides</p>
+                                <p className="text-sm font-medium text-gray-900 mt-1">
                                   {school.currentGuides && school.currentGuides.length > 0 
                                     ? school.currentGuides.join(', ')
                                     : 'None assigned'
@@ -2242,8 +2242,8 @@ export default function SchoolDetail() {
                                 </p>
                               </div>
                               <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-1">SSJ Projected Open</h4>
-                                <p className="text-base text-gray-900">{school.ssjProjectedOpen || 'Not specified'}</p>
+                                <p className="text-xs text-gray-500 uppercase tracking-wider">SSJ Projected Open</p>
+                                <p className="text-sm font-medium text-gray-900 mt-1">{school.ssjProjectedOpen || 'Not specified'}</p>
                               </div>
                             </>
                           )}
@@ -2255,12 +2255,12 @@ export default function SchoolDetail() {
                           ) && (
                             <>
                               <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-1">Left Network Date</h4>
-                                <p className="text-base text-gray-900">{school.leftNetworkDate || 'Not specified'}</p>
+                                <p className="text-xs text-gray-500 uppercase tracking-wider">Left Network Date</p>
+                                <p className="text-sm font-medium text-gray-900 mt-1">{school.leftNetworkDate || 'Not specified'}</p>
                               </div>
                               <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-1">Left Network Reason</h4>
-                                <p className="text-base text-gray-900">{school.leftNetworkReason || 'Not specified'}</p>
+                                <p className="text-xs text-gray-500 uppercase tracking-wider">Left Network Reason</p>
+                                <p className="text-sm font-medium text-gray-900 mt-1">{school.leftNetworkReason || 'Not specified'}</p>
                               </div>
                             </>
                           )}
@@ -2286,35 +2286,35 @@ export default function SchoolDetail() {
                         <CardHeader>
                           <CardTitle className="text-lg">School General Contact Info</CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-3">
                           <div>
-                            <h4 className="text-sm font-medium text-gray-700 mb-1">Email</h4>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Email</p>
                             {school.email ? (
-                              <a href={`mailto:${school.email}`} className="text-base text-blue-600 hover:underline">
+                              <a href={`mailto:${school.email}`} className="text-sm font-medium text-blue-600 hover:underline mt-1 block">
                                 {school.email}
                               </a>
                             ) : (
-                              <p className="text-base text-gray-400">Not specified</p>
+                              <p className="text-sm font-medium text-gray-400 mt-1">Not specified</p>
                             )}
                           </div>
                           <div>
-                            <h4 className="text-sm font-medium text-gray-700 mb-1">Phone</h4>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Phone</p>
                             {school.phone ? (
-                              <a href={`tel:${school.phone}`} className="text-base text-blue-600 hover:underline">
+                              <a href={`tel:${school.phone}`} className="text-sm font-medium text-blue-600 hover:underline mt-1 block">
                                 {school.phone}
                               </a>
                             ) : (
-                              <p className="text-base text-gray-400">Not specified</p>
+                              <p className="text-sm font-medium text-gray-400 mt-1">Not specified</p>
                             )}
                           </div>
                           <div>
-                            <h4 className="text-sm font-medium text-gray-700 mb-1">Website</h4>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">Website</p>
                             {school.website ? (
-                              <a href={school.website} target="_blank" rel="noopener noreferrer" className="text-base text-blue-600 hover:underline">
+                              <a href={school.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-600 hover:underline mt-1 block">
                                 {school.website}
                               </a>
                             ) : (
-                              <p className="text-base text-gray-400">Not specified</p>
+                              <p className="text-sm font-medium text-gray-400 mt-1">Not specified</p>
                             )}
                           </div>
                         </CardContent>
