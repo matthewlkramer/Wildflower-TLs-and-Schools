@@ -159,6 +159,9 @@ export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
           domLayout="normal"
           headerHeight={40}
           rowHeight={35}
+          context={{
+            componentName: 'charter-notes-table'
+          }}
           defaultColDef={{
             sortable: true,
             resizable: true,

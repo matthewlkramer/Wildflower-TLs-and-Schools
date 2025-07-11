@@ -119,7 +119,9 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
             domLayout="autoHeight"
             headerHeight={40}
             rowHeight={30}
-
+            context={{
+              componentName: 'ssj-fillout-forms-table'
+            }}
             defaultColDef={{
               sortable: true,
               resizable: true,

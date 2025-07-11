@@ -182,6 +182,9 @@ export function CharterActionStepsTable({ charterId }: CharterActionStepsTablePr
           domLayout="normal"
           headerHeight={40}
           rowHeight={35}
+          context={{
+            componentName: 'charter-action-steps-table'
+          }}
           defaultColDef={{
             sortable: true,
             resizable: true,
