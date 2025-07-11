@@ -1043,19 +1043,34 @@ export class SimpleAirtableStorage implements IStorage {
 
   // Location operations (mock implementation for now)
   async getLocations(): Promise<Location[]> {
-    // For now, return mock data based on schools
-    const schools = await this.getSchools();
-    return schools.map((school, index) => ({
-      id: `loc_${school.id}`,
-      schoolId: school.id,
-      address: school.address,
-      currentPhysicalAddress: false,
-      currentMailingAddress: false,
-      startDate: '2023-01-01',
-      endDate: undefined,
-      created: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-    })).filter(location => location.address); // Only include if has address
+    try {
+      console.log("Fetching all locations from Airtable...");
+      const records = await base("Locations").select().all();
+      console.log(`Found ${records.length} location records`);
+      
+      if (records.length > 0) {
+        console.log("Sample location record fields:", Object.keys(records[0].fields));
+        console.log("Sample location record:", records[0].fields);
+      }
+      
+      return records.map(record => {
+        const schoolId = record.fields["school_id"] || record.fields["School"] || record.fields["Schools"];
+        return {
+          id: record.id,
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+          address: String(record.fields["Address"] || ''),
+          currentPhysicalAddress: Boolean(record.fields["Current physical address?"]),
+          currentMailingAddress: Boolean(record.fields["Current mailing address?"]),
+          startDate: String(record.fields["Start of time at location"] || ''),
+          endDate: String(record.fields["End of time at location"] || ''),
+          created: String(record.fields["Created"] || new Date().toISOString()),
+          lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+      return [];
+    }
   }
 
   async getLocation(id: string): Promise<Location | undefined> {
@@ -1065,13 +1080,13 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getLocationsBySchoolId(schoolId: string): Promise<Location[]> {
     try {
-      // Query the "Locations" table filtered by school_id
+      // Query locations filtered by School field (correct field name from Airtable)
       const records = await base("Locations").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+        filterByFormula: `FIND('${schoolId}', {School}) > 0`
       }).all();
       
       return records.map(record => {
-        const schoolId = record.fields["school_id"];
+        const schoolField = record.fields["School"];
         const address = record.fields["Address"];
         const currentPhysical = record.fields["Current physical address?"];
         const currentMailing = record.fields["Current mailing address?"];
@@ -1082,7 +1097,7 @@ export class SimpleAirtableStorage implements IStorage {
         
         return {
           id: record.id,
-          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+          schoolId: Array.isArray(schoolField) ? String(schoolField[0] || '') : String(schoolField || ''),
           address: String(address || ''),
           currentPhysicalAddress: Boolean(currentPhysical),
           currentMailingAddress: Boolean(currentMailing),
@@ -1094,25 +1109,6 @@ export class SimpleAirtableStorage implements IStorage {
       });
     } catch (error) {
       console.error(`Error fetching locations for ${schoolId}:`, error);
-      // Fallback to using school's address if locations table doesn't exist
-      try {
-        const school = await this.getSchool(schoolId);
-        if (school && school.address) {
-          return [{
-            id: `fallback_${schoolId}`,
-            schoolId: schoolId,
-            address: school.address,
-            currentPhysicalAddress: false,
-            currentMailingAddress: false,
-            startDate: '',
-            endDate: '',
-            created: new Date().toISOString(),
-            lastModified: new Date().toISOString(),
-          }];
-        }
-      } catch (fallbackError) {
-        console.error(`Fallback location fetch failed:`, fallbackError);
-      }
       return [];
     }
   }
@@ -1122,15 +1118,13 @@ export class SimpleAirtableStorage implements IStorage {
       console.log("Creating location in Airtable:", location);
       
       const record = await base("Locations").create({
-        "School": [location.schoolId], // Link field to Schools table
+        "School": [location.schoolId], // Correct field name from Airtable structure
         "Address": location.address,
-        "Current physical address?": location.currentPhysicalAddress,
-        "Current mailing address?": location.currentMailingAddress,
         "Start of time at location": location.startDate || undefined,
         "End of time at location": location.endDate || undefined,
       });
       
-      console.log("Location created successfully:", record.id);
+      console.log("Location created successfully with school link:", record.id);
       
       return {
         id: record.id,
@@ -1616,7 +1610,7 @@ export class SimpleAirtableStorage implements IStorage {
       // Extract school IDs from guide assignments
       const schoolIds = new Set<string>();
       guideAssignments.forEach(record => {
-        const schoolId = record.fields["School"];
+        const schoolField = record.fields["School"];
         if (Array.isArray(schoolId) && schoolId[0]) {
           schoolIds.add(schoolId[0]);
         } else if (schoolId) {
