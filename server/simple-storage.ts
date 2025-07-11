@@ -203,6 +203,10 @@ export interface IStorage {
   // Charter-related operations
   getSchoolsByCharterId(charterId: string): Promise<School[]>;
   getCharterRolesByCharterId(charterId: string): Promise<CharterRole[]>;
+  
+  // Metadata operations
+  getMetadata(): Promise<any[]>;
+  getSchoolFieldOptions(): Promise<any>;
   getCharterApplicationsByCharterId(charterId: string): Promise<CharterApplication[]>;
   getCharterAuthorizerContactsByCharterId(charterId: string): Promise<CharterAuthorizerContact[]>;
   getReportSubmissionsByCharterId(charterId: string): Promise<ReportSubmission[]>;
@@ -637,7 +641,40 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const updateFields: any = {};
       
+      // Map all school fields to Airtable field names
       if (school.name !== undefined) updateFields["Name"] = school.name;
+      if (school.shortName !== undefined) updateFields["Short Name"] = school.shortName;
+      if (school.priorNames !== undefined) updateFields["Prior Names"] = school.priorNames;
+      if (school.logo !== undefined) updateFields["Logo"] = school.logo;
+      if (school.activeLocationCity !== undefined) updateFields["Active Location City"] = school.activeLocationCity;
+      if (school.activeLocationState !== undefined) updateFields["Active Location State"] = school.activeLocationState;
+      if (school.targetCity !== undefined) updateFields["Target City"] = school.targetCity;
+      if (school.targetState !== undefined) updateFields["Target State"] = school.targetState;
+      if (school.locality !== undefined) updateFields["Locality"] = school.locality;
+      if (school.targetCommunity !== undefined) updateFields["Target community"] = school.targetCommunity;
+      if (school.phone !== undefined) updateFields["School Phone"] = school.phone;
+      if (school.email !== undefined) updateFields["School Email"] = school.email;
+      if (school.website !== undefined) updateFields["Website"] = school.website;
+      if (school.instagram !== undefined) updateFields["Instagram"] = school.instagram;
+      if (school.facebook !== undefined) updateFields["Facebook"] = school.facebook;
+      if (school.narrative !== undefined) updateFields["Narrative"] = school.narrative;
+      if (school.institutionalPartner !== undefined) updateFields["Institutional partner"] = school.institutionalPartner;
+      if (school.opened !== undefined) updateFields["Opened"] = school.opened;
+      if (school.membershipStatus !== undefined) updateFields["Membership status"] = school.membershipStatus;
+      if (school.founders !== undefined) updateFields["Founders"] = school.founders;
+      if (school.membershipAgreementDate !== undefined) updateFields["Membership Agreement Date"] = school.membershipAgreementDate;
+      if (school.signedMembershipAgreement !== undefined) updateFields["Signed Membership Agreement"] = school.signedMembershipAgreement;
+      if (school.agreementVersion !== undefined) updateFields["Agreement Version"] = school.agreementVersion;
+      if (school.about !== undefined) updateFields["About"] = school.about;
+      if (school.aboutSpanish !== undefined) updateFields["About Spanish"] = school.aboutSpanish;
+      if (school.agesServed !== undefined) updateFields["Ages served"] = school.agesServed;
+      if (school.schoolType !== undefined) updateFields["School Type"] = school.schoolType;
+      if (school.governanceModel !== undefined) updateFields["Governance Model"] = school.governanceModel;
+      if (school.status !== undefined) updateFields["Status"] = school.status;
+      if (school.stageStatus !== undefined) updateFields["Stage/Status"] = school.stageStatus;
+      if (school.openDate !== undefined) updateFields["Open Date"] = school.openDate;
+      if (school.enrollmentCap !== undefined) updateFields["Enrollment Cap"] = school.enrollmentCap;
+      if (school.currentEnrollment !== undefined) updateFields["Current Enrollment"] = school.currentEnrollment;
 
       const record = await base("Schools").update(id, updateFields);
       return this.transformSchoolRecord(record);
@@ -655,6 +692,64 @@ export class SimpleAirtableStorage implements IStorage {
       console.error(`Error deleting school ${id} from Airtable:`, error);
       return false;
     }
+  }
+
+  // Metadata operations
+  async getMetadata(): Promise<any[]> {
+    // Since we can't access the Metadata table, return field options based on our schema
+    return [];
+  }
+
+  async getSchoolFieldOptions(): Promise<any> {
+    const cacheKey = 'school-field-options';
+    const cached = cache.get<any>(cacheKey);
+    if (cached) {
+      console.log('[Cache Hit] School Field Options');
+      return cached;
+    }
+
+    // Field options based on observed data patterns
+    const fieldOptions = {
+      status: [
+        "Visioning",
+        "Planning", 
+        "Startup",
+        "Open",
+        "Closed",
+        "Left Network"
+      ],
+      membershipStatus: [
+        "Member school",
+        "Affiliated non-member",
+        "Membership terminated",
+        ""
+      ],
+      schoolType: [
+        "Montessori",
+        "Traditional",
+        "Charter",
+        "Public",
+        "Private"
+      ],
+      governanceModel: [
+        "Non-profit",
+        "For-profit",
+        "Cooperative",
+        "Charter"
+      ],
+      agesServed: [
+        "Toddler (18m-3yr)",
+        "Primary (3-6yr)",
+        "Lower Elementary (6-9yr)", 
+        "Upper Elementary (9-12yr)",
+        "Middle School (12-15yr)",
+        "High School (15-18yr)"
+      ]
+    };
+
+    cache.set(cacheKey, fieldOptions, 60 * 60 * 1000); // 1 hour cache
+    console.log('[Cache Miss] School Field Options - generated from schema');
+    return fieldOptions;
   }
 
   // Educator-School Association operations (simplified)

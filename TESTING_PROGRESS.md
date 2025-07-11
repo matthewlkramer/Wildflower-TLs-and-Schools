@@ -31,6 +31,12 @@
 - **Root Cause**: Airtable account lacks delete permissions on Schools table
 - **Status**: ⚠️ BLOCKED - Cannot test delete functionality due to Airtable permissions
 
+### School Editing Bug - FIXED
+- **Issue**: School editing fails with "Invalid school data" validation errors
+- **Root Cause**: updateSchool method in simple-storage.ts only handled "name" field
+- **Solution**: Fixed field mapping to handle all school properties with correct Airtable field names
+- **Status**: ✅ RESOLVED - Complete field mapping implemented with proper validation logging
+
 ## Current Testing Queue 🔄
 
 ### School Management

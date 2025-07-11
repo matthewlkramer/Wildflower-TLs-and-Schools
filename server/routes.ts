@@ -211,6 +211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/schools/:id", async (req, res) => {
     try {
       const id = req.params.id;
+      console.log('Updating school:', id, 'with data:', JSON.stringify(req.body, null, 2));
       const schoolData = schoolSchema.partial().parse(req.body);
       const school = await storage.updateSchool(id, schoolData);
       if (!school) {
@@ -219,8 +220,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(school);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.log('Validation errors:', error.errors);
         return res.status(400).json({ message: "Invalid school data", errors: error.errors });
       }
+      console.error('School update error:', error);
       res.status(500).json({ message: "Failed to update school" });
     }
   });
@@ -822,6 +825,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(notes);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch educator notes for educator" });
+    }
+  });
+
+  // Metadata routes
+  app.get("/api/metadata", async (req, res) => {
+    try {
+      const metadata = await storage.getMetadata();
+      res.json(metadata);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch metadata" });
+    }
+  });
+
+  app.get("/api/metadata/school-field-options", async (req, res) => {
+    try {
+      const options = await storage.getSchoolFieldOptions();
+      res.json(options);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch school field options" });
     }
   });
 
