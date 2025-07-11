@@ -95,7 +95,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
       console.log("Creating educator with data:", data);
       
       // First create the educator (fullName is calculated field, so excluded)
-      const educator = await apiRequest("POST", "/api/educators", {
+      const educatorResponse = await apiRequest("POST", "/api/educators", {
         firstName: data.firstName,
         lastName: data.lastName,
         primaryPhone: data.primaryPhone,
@@ -103,6 +103,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
         nonWildflowerEmail: data.nonWildflowerEmail,
       });
 
+      const educator = await educatorResponse.json();
       console.log("Educator created:", educator);
 
       // Then create the association (only if role is provided)
@@ -116,7 +117,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
           isActive: true,
         });
         
-        const association = await apiRequest("POST", "/api/teacher-school-associations", {
+        const associationResponse = await apiRequest("POST", "/api/teacher-school-associations", {
           educatorId: educator.id,
           schoolId: schoolId,
           role: data.role,
@@ -125,6 +126,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
           isActive: true,
         });
 
+        const association = await associationResponse.json();
         console.log("Association created:", association);
       } else {
         console.log("No role provided, skipping association creation");
