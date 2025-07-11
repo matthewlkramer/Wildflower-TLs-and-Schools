@@ -699,6 +699,8 @@ export class SimpleAirtableStorage implements IStorage {
         }
       }
 
+      console.log('CRITICAL DEBUG - currentFYEnd before sending:', school.currentFYEnd);
+      console.log('CRITICAL DEBUG - updateFields contains Current FY end?:', 'Current FY end' in updateFields);
       console.log('Sending to Airtable:', Object.keys(updateFields));
       const record = await base("Schools").update(id, updateFields);
       return this.transformSchoolRecord(record);
