@@ -1514,6 +1514,18 @@ export default function SchoolDetail() {
     enabled: !!id,
   });
 
+  // Metadata for dropdown options
+  const { data: fieldOptions } = useQuery<any>({
+    queryKey: ["/api/metadata/school-field-options"],
+    queryFn: async () => {
+      const response = await fetch("/api/metadata/school-field-options", { 
+        credentials: "include" 
+      });
+      if (!response.ok) throw new Error("Failed to fetch field options");
+      return response.json();
+    },
+  });
+
   const form = useForm({
     resolver: zodResolver(insertSchoolSchema),
     defaultValues: {
@@ -2375,7 +2387,12 @@ export default function SchoolDetail() {
                           <Button
                             size="sm"
                             onClick={() => {
-                              updateSchoolDetailsMutation.mutate(editedDetails);
+                              // Convert numeric fields to numbers
+                            const formattedData = {
+                              ...editedDetails,
+                              enrollmentCap: editedDetails.enrollmentCap && editedDetails.enrollmentCap !== '' ? Number(editedDetails.enrollmentCap) : undefined
+                            };
+                            updateSchoolDetailsMutation.mutate(formattedData);
                             }}
                             disabled={updateSchoolDetailsMutation.isPending}
                           >
@@ -2447,16 +2464,24 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Ages Served</label>
                           {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
-                              value={editedDetails?.agesServed ? editedDetails.agesServed.join(', ') : ''}
-                              onChange={(e) => setEditedDetails({ 
+                            <Select
+                              value={editedDetails?.agesServed?.[0] || ''}
+                              onValueChange={(value) => setEditedDetails({ 
                                 ...editedDetails, 
-                                agesServed: e.target.value.split(',').map(s => s.trim()).filter(s => s) 
+                                agesServed: value ? [value] : [] 
                               })}
-                              placeholder="e.g., 3-6, 6-9"
-                            />
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select age range" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {fieldOptions?.agesServed?.map((option: string) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           ) : (
                             <div className="mt-1">
                               {school.agesServed && school.agesServed.length > 0 ? (
@@ -2502,12 +2527,21 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Membership Status</label>
                           {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
+                            <Select
                               value={editedDetails?.membershipStatus || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, membershipStatus: e.target.value })}
-                            />
+                              onValueChange={(value) => setEditedDetails({ ...editedDetails, membershipStatus: value })}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select membership status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {fieldOptions?.membershipStatus?.map((option: string) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option || 'None'}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.membershipStatus || '-'}</p>
                           )}
@@ -2564,12 +2598,21 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Governance Model</label>
                           {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
+                            <Select
                               value={editedDetails?.governanceModel || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, governanceModel: e.target.value })}
-                            />
+                              onValueChange={(value) => setEditedDetails({ ...editedDetails, governanceModel: value })}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select governance model" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {fieldOptions?.governanceModel?.map((option: string) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.governanceModel || '-'}</p>
                           )}
