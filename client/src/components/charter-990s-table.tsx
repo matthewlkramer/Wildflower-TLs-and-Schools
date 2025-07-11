@@ -133,6 +133,9 @@ export function Charter990sTable({ charterId }: Charter990sTableProps) {
         domLayout="normal"
         headerHeight={40}
         rowHeight={30}
+        context={{
+          componentName: 'charter-990s-table'
+        }}
         defaultColDef={{
           sortable: true,
           resizable: true,

@@ -111,6 +111,9 @@ export function CharterRolesTable({ charterId }: CharterRolesTableProps) {
         domLayout="normal"
         headerHeight={40}
         rowHeight={30}
+        context={{
+          componentName: 'charter-roles-table'
+        }}
         defaultColDef={{
           sortable: true,
           resizable: true,

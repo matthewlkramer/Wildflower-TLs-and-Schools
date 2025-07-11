@@ -89,7 +89,9 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
           domLayout="autoHeight"
           headerHeight={40}
           rowHeight={30}
-
+          context={{
+            componentName: 'event-attendance-table'
+          }}
           defaultColDef={{
             sortable: true,
             resizable: true,

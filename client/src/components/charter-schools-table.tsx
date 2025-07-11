@@ -109,6 +109,9 @@ export function CharterSchoolsTable({ charterId }: CharterSchoolsTableProps) {
         domLayout="normal"
         headerHeight={40}
         rowHeight={30}
+        context={{
+          componentName: 'charter-schools-table'
+        }}
         defaultColDef={{
           sortable: true,
           resizable: true,

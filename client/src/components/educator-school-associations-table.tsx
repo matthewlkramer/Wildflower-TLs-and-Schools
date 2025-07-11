@@ -230,7 +230,9 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
           domLayout="autoHeight"
           headerHeight={40}
           rowHeight={30}
-
+          context={{
+            componentName: 'educator-school-associations-table'
+          }}
           defaultColDef={{
             sortable: true,
             resizable: true,

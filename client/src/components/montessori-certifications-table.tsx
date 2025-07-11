@@ -130,7 +130,9 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
           domLayout="autoHeight"
           headerHeight={40}
           rowHeight={30}
-
+          context={{
+            componentName: 'montessori-certifications-table'
+          }}
           defaultColDef={{
             sortable: true,
             resizable: true,
