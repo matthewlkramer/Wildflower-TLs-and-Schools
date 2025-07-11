@@ -396,7 +396,7 @@ export class SimpleAirtableStorage implements IStorage {
       currentEnrollment: fields["Current Enrollment"] || undefined,
       publicFundingSources: fields["Public Funding Sources"] || [],
       programFocus: fields["Program Focus"] || undefined,
-      numberOfClassrooms: fields["Number of Classrooms"] || undefined,
+      numberOfClassrooms: fields["# of Classrooms"] || fields["Number of Classrooms"] || undefined,
       leftNetworkDate: fields["Left Network Date"] || undefined,
       leftNetworkReason: fields["Left Network Reason"] || undefined,
       membershipFeeStatus: fields["Membership Fee Status"] || undefined,
@@ -660,7 +660,7 @@ export class SimpleAirtableStorage implements IStorage {
       if (hasValue(school.agesServed)) updateFields["Ages served"] = school.agesServed;
       if (hasValue(school.governanceModel)) updateFields["Governance Model"] = school.governanceModel;
       if (hasValue(school.programFocus)) updateFields["Program Focus"] = school.programFocus;
-      if (hasValue(school.numberOfClassrooms)) updateFields["Number of Classrooms"] = school.numberOfClassrooms;
+      if (hasValue(school.numberOfClassrooms)) updateFields["# of Classrooms"] = school.numberOfClassrooms;
       if (hasValue(school.legalStructure)) updateFields["Legal Structure"] = school.legalStructure;
       if (hasValue(school.currentFYEnd)) updateFields["Current FY End"] = school.currentFYEnd;
       if (hasValue(school.groupExemptionStatus)) updateFields["Group exemption status"] = school.groupExemptionStatus;
