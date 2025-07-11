@@ -34,6 +34,7 @@ import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
 import { GoogleMap } from "@/components/google-map";
 import AssignEducatorModal from "@/components/assign-educator-modal";
 import CreateAndAssignEducatorModal from "@/components/create-and-assign-educator-modal";
+import { useTableRefresh, refreshSchoolData } from "@/hooks/use-table-refresh";
 
 // TeacherAssociationRow component for inline editing
 function TeacherAssociationRow({ 
@@ -1475,20 +1476,22 @@ export default function SchoolDetail() {
     },
   });
 
-  const { data: associations, isLoading: associationsLoading } = useQuery<TeacherSchoolAssociation[]>({
-    queryKey: ["/api/school-associations", id],
+  const { data: associations, isLoading: associationsLoading, refetch: refetchAssociations } = useQuery<TeacherSchoolAssociation[]>({
+    queryKey: [`/api/school-associations/${id}`],
     queryFn: async () => {
       const response = await fetch(`/api/school-associations/${id}`, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch associations");
       return response.json();
     },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const { data: teachers } = useQuery<Teacher[]>({
     queryKey: ["/api/teachers"],
   });
 
-  const { data: locations, isLoading: locationsLoading } = useQuery<Location[]>({
+  const { data: locations, isLoading: locationsLoading, refetch: refetchLocations } = useQuery<Location[]>({
     queryKey: [`/api/locations/school/${id}`],
     queryFn: async () => {
       const response = await fetch(`/api/locations/school/${id}`, { credentials: "include" });
@@ -1496,6 +1499,8 @@ export default function SchoolDetail() {
       return response.json();
     },
     enabled: !!id,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const { data: guideAssignments, isLoading: guidesLoading } = useQuery<GuideAssignment[]>({
@@ -1692,7 +1697,10 @@ export default function SchoolDetail() {
       return await apiRequest("POST", "/api/locations", { ...data, schoolId: id });
     },
     onSuccess: () => {
+      // Force immediate refetch
       queryClient.invalidateQueries({ queryKey: [`/api/locations/school/${id}`] });
+      queryClient.refetchQueries({ queryKey: [`/api/locations/school/${id}`] });
+      
       setIsCreatingLocation(false);
       setNewLocation({
         address: "",
@@ -1720,7 +1728,10 @@ export default function SchoolDetail() {
       return await apiRequest("PUT", `/api/locations/${locationId}`, data);
     },
     onSuccess: () => {
+      // Force immediate refetch
       queryClient.invalidateQueries({ queryKey: [`/api/locations/school/${id}`] });
+      queryClient.refetchQueries({ queryKey: [`/api/locations/school/${id}`] });
+      
       setEditingLocationId(null);
       toast({
         title: "Success",
@@ -1741,7 +1752,10 @@ export default function SchoolDetail() {
       return await apiRequest("DELETE", `/api/locations/${locationId}`);
     },
     onSuccess: () => {
+      // Force immediate refetch
       queryClient.invalidateQueries({ queryKey: [`/api/locations/school/${id}`] });
+      queryClient.refetchQueries({ queryKey: [`/api/locations/school/${id}`] });
+      
       setLocationDeleteModalOpen(false);
       setDeletingLocationId(null);
       toast({
@@ -1763,7 +1777,11 @@ export default function SchoolDetail() {
       return await apiRequest("PUT", `/api/teacher-school-associations/${associationId}`, data);
     },
     onSuccess: () => {
+      // Invalidate and refetch with both query key formats
+      queryClient.invalidateQueries({ queryKey: [`/api/school-associations/${id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/school-associations", id] });
+      queryClient.refetchQueries({ queryKey: [`/api/school-associations/${id}`] });
+      
       setEditingAssociationId(null);
       toast({
         title: "Success",
@@ -1784,7 +1802,11 @@ export default function SchoolDetail() {
       return await apiRequest("DELETE", `/api/teacher-school-associations/${associationId}`);
     },
     onSuccess: () => {
+      // Invalidate and force refetch
+      queryClient.invalidateQueries({ queryKey: [`/api/school-associations/${id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/school-associations", id] });
+      queryClient.refetchQueries({ queryKey: [`/api/school-associations/${id}`] });
+      
       setAssociationDeleteModalOpen(false);
       setDeletingAssociationId(null);
       toast({
@@ -1810,7 +1832,11 @@ export default function SchoolDetail() {
       });
     },
     onSuccess: () => {
+      // Invalidate and force refetch
+      queryClient.invalidateQueries({ queryKey: [`/api/school-associations/${id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/school-associations", id] });
+      queryClient.refetchQueries({ queryKey: [`/api/school-associations/${id}`] });
+      
       toast({
         title: "Success",
         description: "Teacher stint ended successfully",

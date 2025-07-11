@@ -135,9 +135,20 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
       return educator;
     },
     onSuccess: () => {
+      // Invalidate all possible query key formats
       queryClient.invalidateQueries({ queryKey: ["/api/educators"] });
       queryClient.invalidateQueries({ queryKey: ["/api/teachers"] }); // Legacy compatibility
+      queryClient.invalidateQueries({ queryKey: [`/api/school-associations/${schoolId}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/school-associations", schoolId] });
+      
+      // Force refetch all school-related data
+      queryClient.refetchQueries({ queryKey: [`/api/school-associations/${schoolId}`] });
+      
+      // Additional safety - refetch after a short delay
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: [`/api/school-associations/${schoolId}`] });
+      }, 500);
+      
       toast({
         title: "Success",
         description: "Educator created and assigned to school successfully",

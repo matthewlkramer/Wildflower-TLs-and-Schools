@@ -77,7 +77,16 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
       });
     },
     onSuccess: () => {
+      // Invalidate both query key formats and force refetch
+      queryClient.invalidateQueries({ queryKey: [`/api/school-associations/${schoolId}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/school-associations", schoolId] });
+      queryClient.refetchQueries({ queryKey: [`/api/school-associations/${schoolId}`] });
+      
+      // Additional safety - refetch after a short delay
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: [`/api/school-associations/${schoolId}`] });
+      }, 500);
+      
       toast({
         title: "Success",
         description: "Educator assigned to school successfully",
