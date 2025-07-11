@@ -7,8 +7,7 @@ import { useState, createContext, useContext, useEffect } from "react";
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
 import { UserFilterProvider } from "@/contexts/user-filter-context";
-import { TestModeToggle } from "@/components/TestModeToggle";
-import { setupTestModeApi } from "@/lib/test-mode-api";
+
 import Dashboard from "@/pages/dashboard";
 import Teachers from "@/pages/teachers";
 import Schools from "@/pages/schools";
@@ -42,7 +41,9 @@ const AddNewContext = createContext<{
   setAddNewOptions: (options: Array<{ label: string; onClick: () => void; }>) => void;
 }>({
   addNewOptions: [],
-  setAddNewOptions: () => {},
+  setAddNewOptions: () => {
+    console.log("WARNING: setAddNewOptions called on default context");
+  },
 });
 
 export const useSearch = () => useContext(SearchContext);
@@ -70,6 +71,17 @@ function AppContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [pageTitle, setPageTitle] = useState("");
   const [addNewOptions, setAddNewOptions] = useState<Array<{ label: string; onClick: () => void; }>>([]);
+  
+  // Create a wrapped setAddNewOptions with debug logging
+  const setAddNewOptionsWithDebug = (options: Array<{ label: string; onClick: () => void; }>) => {
+    console.log("App.tsx: setAddNewOptions called with:", options);
+    setAddNewOptions(options);
+  };
+  
+  // Debug logging for addNewOptions changes
+  useEffect(() => {
+    console.log("App.tsx: addNewOptions changed to:", addNewOptions);
+  }, [addNewOptions]);
 
   // Reset search when navigating between pages
   const isDashboardActive = location === "/" || location === "/dashboard";
@@ -80,9 +92,8 @@ function AppContent() {
   return (
     <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>
       <PageTitleContext.Provider value={{ pageTitle, setPageTitle }}>
-        <AddNewContext.Provider value={{ addNewOptions, setAddNewOptions }}>
+        <AddNewContext.Provider value={{ addNewOptions, setAddNewOptions: setAddNewOptionsWithDebug }}>
           <div className="min-h-screen bg-slate-50">
-            <TestModeToggle />
             <Header 
               searchTerm={searchTerm} 
               onSearchChange={setSearchTerm}
@@ -99,12 +110,6 @@ function AppContent() {
 }
 
 function App() {
-  useEffect(() => {
-    // Set up test mode API wrapper
-    const cleanup = setupTestModeApi();
-    return cleanup;
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

@@ -26,6 +26,8 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const { showOnlyMyRecords, setShowOnlyMyRecords } = useUserFilter();
+  
+  console.log("Header RENDER: addNewOptions =", addNewOptions, "location =", location);
 
 
 
