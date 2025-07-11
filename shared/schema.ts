@@ -199,7 +199,7 @@ export interface School {
   logoFlowerOnly?: string;
   logoMainRectangle?: string;
   logoUrl?: string;
-  programFocus?: string;
+  programFocus?: string[];
   schoolCalendar?: string;
   schoolSchedule?: string;
   leftNetworkDate?: string;
