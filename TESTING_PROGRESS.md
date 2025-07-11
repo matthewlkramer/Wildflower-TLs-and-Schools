@@ -77,7 +77,9 @@
 1. **School Name**: 
    - Original: "TEST SCHOOL"
    - Updated to: "TEST SCHOOL - UPDATED" (via PUT API)
-   - Status: ✅ API update successful
+   - Status: ✅ PASS - API update successful and visible in UI
    - Issue Fixed: Changed from PATCH to PUT endpoint
+
+**Next Test**: Edit Details button - Testing field updates via UI
 
 ### Tab 3-10: ⏳ Pending
