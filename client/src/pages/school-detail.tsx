@@ -3332,13 +3332,13 @@ export default function SchoolDetail() {
 
                 <TabsContent value="tls" className="mt-0">
                   <div className="space-y-6">
-                    {/* Current Team Leaders Overview */}
+                    {/* Current Teacher Leaders Overview */}
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
                       <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
                         <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        Current Team Leaders
+                        Current Teacher Leaders
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
@@ -3389,9 +3389,9 @@ export default function SchoolDetail() {
                       </div>
                     </div>
 
-                    {/* Team Leaders Table */}
+                    {/* Teacher Leaders Table */}
                     <div className="space-y-4">
-                      <h4 className="font-medium text-slate-900">Team Leader History & Details</h4>
+                      <h4 className="font-medium text-slate-900">Teacher Leader History & Details</h4>
                       {associationsLoading ? (
                         <div className="space-y-3">
                           <Skeleton className="h-8 w-full" />
@@ -3399,7 +3399,7 @@ export default function SchoolDetail() {
                           <Skeleton className="h-8 w-full" />
                         </div>
                       ) : (() => {
-                        // Filter associations to only show Team Leaders
+                        // Filter associations to only show Teacher Leaders
                         const tlAssociations = associations?.filter(association => 
                           association.roles && 
                           (Array.isArray(association.roles) 
@@ -3533,9 +3533,9 @@ export default function SchoolDetail() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                               </svg>
                             </div>
-                            <p className="font-medium">No Team Leaders found for this school.</p>
-                            <p className="text-sm mt-2">Team Leaders will appear here when educators are assigned TL roles.</p>
-                            <p className="text-sm mt-1">Use the Teachers tab to assign Team Leader roles to educators.</p>
+                            <p className="font-medium">No Teacher Leaders found for this school.</p>
+                            <p className="text-sm mt-2">Teacher Leaders will appear here when educators are assigned TL roles.</p>
+                            <p className="text-sm mt-1">Use the Teachers tab to assign Teacher Leader roles to educators.</p>
                           </div>
                         );
                       })()}
