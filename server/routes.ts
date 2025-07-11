@@ -211,9 +211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/schools/:id", async (req, res) => {
     try {
       const id = req.params.id;
-      console.log('Updating school:', id, 'with data:', JSON.stringify(req.body, null, 2));
       const schoolData = schoolSchema.partial().parse(req.body);
-      console.log('After schema validation:', JSON.stringify(schoolData, null, 2));
       const school = await storage.updateSchool(id, schoolData);
       if (!school) {
         return res.status(404).json({ message: "School not found" });

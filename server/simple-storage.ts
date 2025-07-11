@@ -678,13 +678,7 @@ export class SimpleAirtableStorage implements IStorage {
       if (hasValue(school.incorporationDate)) updateFields["Incorporation Date"] = school.incorporationDate;
       if (hasValue(school.nonprofitStatus)) updateFields["Nonprofit status"] = school.nonprofitStatus;
       // Note: dateReceivedGroupExemption and dateWithdrawnGroupExemption are legacy fields, using groupExemptionDateGranted and groupExemptionDateWithdrawn instead
-      // Force currentFYEnd to be included for testing
-      if (school.currentFYEnd !== undefined) {
-        updateFields["Current FY end"] = school.currentFYEnd;
-        console.log('DEBUG: Added currentFYEnd to updateFields:', school.currentFYEnd);
-      } else {
-        console.log('DEBUG: currentFYEnd is undefined, not adding to updateFields');
-      }
+      if (hasValue(school.currentFYEnd)) updateFields["Current FY end"] = school.currentFYEnd;
       if (hasValue(school.groupExemptionStatus)) updateFields["Group exemption status"] = school.groupExemptionStatus;
       if (hasValue(school.groupExemptionDateGranted)) updateFields["Date received group exemption"] = school.groupExemptionDateGranted;
       if (hasValue(school.groupExemptionDateWithdrawn)) updateFields["Date withdrawn from Group Exemption"] = school.groupExemptionDateWithdrawn;
@@ -699,8 +693,6 @@ export class SimpleAirtableStorage implements IStorage {
         }
       }
 
-      console.log('CRITICAL DEBUG - currentFYEnd before sending:', school.currentFYEnd);
-      console.log('CRITICAL DEBUG - updateFields contains Current FY end?:', 'Current FY end' in updateFields);
       console.log('Sending to Airtable:', Object.keys(updateFields));
       const record = await base("Schools").update(id, updateFields);
       return this.transformSchoolRecord(record);
