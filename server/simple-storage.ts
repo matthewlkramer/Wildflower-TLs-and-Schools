@@ -876,7 +876,41 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async createEducatorSchoolAssociation(association: InsertEducatorSchoolAssociation): Promise<EducatorSchoolAssociation> {
-    throw new Error("Not implemented");
+    try {
+      console.log("Creating association in Airtable:", association);
+      
+      // Create the association record in the "Educators x Schools" table
+      const record = await base("Educators x Schools").create([{
+        fields: {
+          "educator_id": [association.educatorId], // Link to Educators table
+          "school_id": [association.schoolId],     // Link to Schools table
+          "Roles": association.role && association.role.length > 0 ? association.role[0] : undefined,
+          "Start Date": association.startDate || undefined,
+          "End Date": association.endDate || undefined,
+          "Currently Active": association.isActive !== undefined ? association.isActive : true,
+          "Email at School": association.emailAtSchool || undefined,
+        }
+      }]);
+      
+      console.log("Association created successfully:", record[0].id);
+      
+      // Return the created association
+      return {
+        id: record[0].id,
+        educatorId: association.educatorId,
+        schoolId: association.schoolId,
+        role: association.role || [],
+        startDate: association.startDate || '',
+        endDate: association.endDate || '',
+        isActive: association.isActive !== undefined ? association.isActive : true,
+        emailAtSchool: association.emailAtSchool || '',
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Error creating educator school association:", error);
+      throw error;
+    }
   }
 
   async deleteEducatorSchoolAssociation(id: string): Promise<boolean> {
