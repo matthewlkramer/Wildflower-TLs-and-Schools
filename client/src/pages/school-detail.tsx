@@ -2402,7 +2402,8 @@ export default function SchoolDetail() {
                               // Convert numeric fields and filter empty values
                               const formattedData = filterEmptyValues({
                                 ...editedDetails,
-                                enrollmentCap: editedDetails.enrollmentCap && editedDetails.enrollmentCap !== '' ? Number(editedDetails.enrollmentCap) : undefined
+                                enrollmentCap: editedDetails.enrollmentCap && editedDetails.enrollmentCap !== '' ? Number(editedDetails.enrollmentCap) : undefined,
+                                numberOfClassrooms: editedDetails.numberOfClassrooms && editedDetails.numberOfClassrooms !== '' ? Number(editedDetails.numberOfClassrooms) : undefined
                               });
                               updateSchoolDetailsMutation.mutate(formattedData);
                             }}
@@ -2557,7 +2558,7 @@ export default function SchoolDetail() {
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Number of Classrooms</label>
                           {isEditingDetails ? (
                             <Input
-                              type="text"
+                              type="number"
                               className="mt-1"
                               value={editedDetails?.numberOfClassrooms || ''}
                               onChange={(e) => setEditedDetails({ ...editedDetails, numberOfClassrooms: e.target.value })}
@@ -2570,7 +2571,7 @@ export default function SchoolDetail() {
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Enrollment Capacity</label>
                           {isEditingDetails ? (
                             <Input
-                              type="text"
+                              type="number"
                               className="mt-1"
                               value={editedDetails?.enrollmentCap || ''}
                               onChange={(e) => setEditedDetails({ ...editedDetails, enrollmentCap: e.target.value })}

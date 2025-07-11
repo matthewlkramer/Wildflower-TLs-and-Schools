@@ -219,7 +219,7 @@ export interface School {
   openDate?: string;
   enrollmentCap?: number;
   currentEnrollment?: number;
-  numberOfClassrooms?: string;
+  numberOfClassrooms?: number;
   publicFundingSources?: string[];
   flexibleTuition?: string;
   activePodMember?: string;
@@ -572,7 +572,7 @@ export const schoolSchema = z.object({
   currentTLs: z.union([z.string(), z.number()]).optional(),
   currentGuides: z.array(z.string()).optional(),
 
-  numberOfClassrooms: z.string().optional(),
+  numberOfClassrooms: z.number().optional(),
   leftNetworkDate: z.string().optional(),
   leftNetworkReason: z.string().optional(),
   publicFundingSources: z.array(z.string()).optional(),
