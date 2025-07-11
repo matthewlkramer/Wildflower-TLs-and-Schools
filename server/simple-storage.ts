@@ -76,6 +76,7 @@ export interface IStorage {
   getEducatorAssociations(educatorId: string): Promise<EducatorSchoolAssociation[]>;
   getSchoolAssociations(schoolId: string): Promise<EducatorSchoolAssociation[]>;
   createEducatorSchoolAssociation(association: InsertEducatorSchoolAssociation): Promise<EducatorSchoolAssociation>;
+  updateEducatorSchoolAssociation(id: string, association: Partial<InsertEducatorSchoolAssociation>): Promise<EducatorSchoolAssociation | undefined>;
   deleteEducatorSchoolAssociation(id: string): Promise<boolean>;
 
   // Location operations
@@ -198,6 +199,7 @@ export interface IStorage {
   getTeacherSchoolAssociations(): Promise<TeacherSchoolAssociation[]>;
   getTeacherAssociations(teacherId: string): Promise<TeacherSchoolAssociation[]>;
   createTeacherSchoolAssociation(association: InsertTeacherSchoolAssociation): Promise<TeacherSchoolAssociation>;
+  updateTeacherSchoolAssociation(id: string, association: Partial<InsertTeacherSchoolAssociation>): Promise<TeacherSchoolAssociation | undefined>;
   deleteTeacherSchoolAssociation(id: string): Promise<boolean>;
 
   // Charter-related operations
@@ -956,6 +958,40 @@ export class SimpleAirtableStorage implements IStorage {
     }
   }
 
+  async updateEducatorSchoolAssociation(id: string, association: Partial<InsertEducatorSchoolAssociation>): Promise<EducatorSchoolAssociation | undefined> {
+    try {
+      console.log("Updating association in Airtable:", id, association);
+      
+      const updateFields: any = {};
+      
+      if (association.role !== undefined) updateFields["Roles"] = association.role && association.role.length > 0 ? association.role[0] : undefined;
+      if (association.startDate !== undefined) updateFields["Start Date"] = association.startDate;
+      if (association.endDate !== undefined) updateFields["End Date"] = association.endDate;
+      if (association.isActive !== undefined) updateFields["Currently Active"] = association.isActive;
+      if (association.emailAtSchool !== undefined) updateFields["Email at School"] = association.emailAtSchool;
+      
+      const record = await base("Educators x Schools").update(id, updateFields);
+      console.log("Association updated successfully:", record.id);
+      
+      // Return the updated association
+      return {
+        id: record.id,
+        educatorId: Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || ''),
+        schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
+        role: record.fields["Roles"] ? [String(record.fields["Roles"])] : [],
+        startDate: String(record.fields["Start Date"] || ''),
+        endDate: String(record.fields["End Date"] || ''),
+        isActive: record.fields["Currently Active"] === true || record.fields["Currently Active"] === "true",
+        emailAtSchool: String(record.fields["Email at School"] || ''),
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Created"] || new Date().toISOString()),
+      };
+    } catch (error) {
+      console.error("Error updating educator school association:", error);
+      throw error;
+    }
+  }
+
   async deleteEducatorSchoolAssociation(id: string): Promise<boolean> {
     return false;
   }
@@ -995,6 +1031,10 @@ export class SimpleAirtableStorage implements IStorage {
 
   async createTeacherSchoolAssociation(association: InsertTeacherSchoolAssociation): Promise<TeacherSchoolAssociation> {
     return this.createEducatorSchoolAssociation(association);
+  }
+
+  async updateTeacherSchoolAssociation(id: string, association: Partial<InsertTeacherSchoolAssociation>): Promise<TeacherSchoolAssociation | undefined> {
+    return this.updateEducatorSchoolAssociation(id, association);
   }
 
   async deleteTeacherSchoolAssociation(id: string): Promise<boolean> {

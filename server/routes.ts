@@ -297,6 +297,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/teacher-school-associations/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const associationData = educatorSchoolAssociationSchema.partial().parse(req.body);
+      const association = await storage.updateTeacherSchoolAssociation(id, associationData);
+      if (!association) {
+        return res.status(404).json({ message: "Association not found" });
+      }
+      res.json(association);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid association data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update association" });
+    }
+  });
+
   app.delete("/api/teacher-school-associations/:id", async (req, res) => {
     try {
       const id = req.params.id;
