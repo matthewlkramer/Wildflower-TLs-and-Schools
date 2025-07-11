@@ -32,6 +32,8 @@ import { addNewEmitter } from "@/lib/add-new-emitter";
 
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
 import { GoogleMap } from "@/components/google-map";
+import AssignEducatorModal from "@/components/assign-educator-modal";
+import CreateAndAssignEducatorModal from "@/components/create-and-assign-educator-modal";
 
 // TeacherAssociationRow component for inline editing
 function TeacherAssociationRow({ 
@@ -4716,6 +4718,19 @@ export default function SchoolDetail() {
           </DialogContent>
         </Dialog>
       )}
+      
+      {/* Educator Assignment Modals */}
+      <AssignEducatorModal
+        open={isAssociatingTeacher}
+        onOpenChange={setIsAssociatingTeacher}
+        schoolId={id || ""}
+      />
+      
+      <CreateAndAssignEducatorModal
+        open={isCreatingTeacher}
+        onOpenChange={setIsCreatingTeacher}
+        schoolId={id || ""}
+      />
     </>
   );
 }

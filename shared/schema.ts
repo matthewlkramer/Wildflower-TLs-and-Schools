@@ -682,10 +682,11 @@ export const educatorSchoolAssociationSchema = z.object({
   educatorId: z.string().min(1, "Educator ID is required"),
   schoolId: z.string().min(1, "School ID is required"),
   schoolShortName: z.string().optional(),
-  role: z.string().optional(),
+  role: z.array(z.string()).optional(),
   status: z.string().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
+  emailAtSchool: z.string().optional(),
   isPrimary: z.boolean().optional(),
   isActive: z.boolean().optional(),
 });
