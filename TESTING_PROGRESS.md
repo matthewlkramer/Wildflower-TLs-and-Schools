@@ -118,27 +118,37 @@
 - Business Insurance: ❌ FAIL - "State Farm Business" not valid option
 - BillCom Account: ❌ FAIL - Permission error
 
-**Critical Issue**: Dropdown fields require predefined Airtable values, not custom inputs
+**ROOT CAUSE CORRECTED**: Fields are configured correctly in Airtable. Issue was using invalid dropdown values instead of valid ones from metadata.
+
+**SOLUTION IMPLEMENTED**: Use correct values from metadata endpoint:
+- EIN: ✅ TEXT FIELD - "12-3456789" saved successfully
+- Legal Name: ✅ TEXT FIELD - "Test School Legal Entity LLC" saved successfully
+- Nonprofit Status: ✅ DROPDOWN - "independent" saved successfully  
+- Current FY End: ✅ DROPDOWN - "6/30" saved successfully
+- Business Insurance: ✅ DROPDOWN - "Alliant" saved successfully
+
+**REMAINING ISSUE**: Program Focus has permission restrictions even with valid options
 
 #### COMPLETE DETAILS TAB FIELD TESTING RESULTS:
 
-**✅ WORKING FIELDS (15 fields)**:
-- Text Inputs: Name, Short Name, Email, Phone, Website, Facebook, Instagram
+**✅ WORKING FIELDS (21 fields)**:
+- Text Inputs: Name, Short Name, Email, Phone, Website, Facebook, Instagram, EIN, Legal Name, Group Exemption Status
 - Numeric Inputs: Number of Classrooms, Enrollment Cap  
-- Single Dropdowns: Ages Served, Membership Status, Governance Model, Legal Structure
+- Single Dropdowns: Ages Served, Membership Status, Governance Model, Legal Structure, Nonprofit Status, Current FY End, Business Insurance
 - Date Fields: Group Exemption Date Granted, Date Received Group Exemption
-- Text Fields: Group Exemption Status
 
-**❌ FAILING FIELDS (7+ fields)**:
-- Dropdown Permission Issues: EIN, Legal Name, Nonprofit Status, Current FY End, Business Insurance, BillCom Account
-- Multi-select Issues: Program Focus (permission restrictions)
+**❌ FAILING FIELDS (2 fields)**:
+- Multi-select Issues: Program Focus (permission restrictions even with valid options)
+- Permission Issues: BillCom Account (needs investigation)
 
-**VALIDATION PATTERNS IDENTIFIED**:
+**VALIDATION PATTERNS CONFIRMED**:
 - Text inputs: ✅ Work perfectly for free-form fields
 - Numeric inputs: ✅ Work perfectly 
-- Single-select dropdowns: ⚠️ Work ONLY with predefined Airtable options
-- Multi-select fields: ❌ Airtable permission restrictions prevent updates
+- Single-select dropdowns: ✅ Work perfectly with valid options from metadata
+- Multi-select fields: ❌ Some have Airtable permission restrictions
 - Date fields: ✅ Work when formatted correctly
+
+**SUCCESS RATE**: 21/23 fields working (91% success rate)
 
 ### Tab 2 Details: ✅ COMPLETE (18/26 fields working)
 
