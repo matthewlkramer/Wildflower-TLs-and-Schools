@@ -1,5 +1,6 @@
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,10 +15,12 @@ import { SSJFilloutFormsTable } from "@/components/ssj-fillout-forms-table";
 import { MontessoriCertificationsTable } from "@/components/montessori-certifications-table";
 import { EventAttendanceTable } from "@/components/event-attendance-table";
 import { EducatorNotesTable } from "@/components/educator-notes-table";
+import { addNewEmitter } from "@/lib/add-new-emitter";
 
 
 export default function TeacherDetail() {
   const { id } = useParams<{ id: string }>();
+  const [activeTab, setActiveTab] = useState("summary");
 
   const { data: teacher, isLoading } = useQuery<Teacher>({
     queryKey: ["/api/teachers", id],
@@ -55,6 +58,43 @@ export default function TeacherDetail() {
     return mostRecentDate.toLocaleDateString();
   };
 
+  // Set up Add New options based on active tab
+  useEffect(() => {
+    let options: Array<{ label: string; onClick: () => void }> = [];
+    
+    switch (activeTab) {
+      case "schools":
+        options = [
+          { label: "Create New School", onClick: () => console.log("Create new school - to be implemented") },
+          { label: "Assign TL to Existing School", onClick: () => console.log("Assign TL to existing school - to be implemented") }
+        ];
+        break;
+      case "certs":
+        options = [
+          { label: "Add Certification", onClick: () => console.log("Add certification - to be implemented") }
+        ];
+        break;
+      case "events":
+        options = [
+          { label: "Add Event", onClick: () => console.log("Add event - to be implemented") }
+        ];
+        break;
+      case "notes":
+        options = [
+          { label: "Add Note", onClick: () => console.log("Add note - to be implemented") }
+        ];
+        break;
+      default:
+        options = [];
+    }
+    
+    addNewEmitter.setOptions(options);
+    
+    return () => {
+      addNewEmitter.setOptions([]);
+    };
+  }, [activeTab]);
+
 
 
   if (isLoading) {
@@ -82,7 +122,7 @@ export default function TeacherDetail() {
     <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <Card>
         <CardContent className="p-0">
-          <Tabs defaultValue="summary" className="w-full">
+          <Tabs defaultValue="summary" value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="border-b border-slate-200 overflow-x-auto">
               <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-slate-900 px-3 py-3 flex-shrink-0">
