@@ -653,7 +653,8 @@ export class SimpleAirtableStorage implements IStorage {
       
       // Helper function to check if value should be included
       const hasValue = (value: any): boolean => {
-        if (value === undefined || value === null || value === '') return false;
+        if (value === undefined || value === null) return false;
+        if (value === '') return false;
         if (Array.isArray(value) && value.length === 0) return false;
         return true;
       };
@@ -677,7 +678,8 @@ export class SimpleAirtableStorage implements IStorage {
       if (hasValue(school.incorporationDate)) updateFields["Incorporation Date"] = school.incorporationDate;
       if (hasValue(school.nonprofitStatus)) updateFields["Nonprofit status"] = school.nonprofitStatus;
       // Note: dateReceivedGroupExemption and dateWithdrawnGroupExemption are legacy fields, using groupExemptionDateGranted and groupExemptionDateWithdrawn instead
-      if (hasValue(school.currentFYEnd)) updateFields["Current FY end"] = school.currentFYEnd;
+      // Always include currentFYEnd if it exists (dropdown selection)
+      if (school.currentFYEnd !== undefined) updateFields["Current FY end"] = school.currentFYEnd;
       if (hasValue(school.groupExemptionStatus)) updateFields["Group exemption status"] = school.groupExemptionStatus;
       if (hasValue(school.groupExemptionDateGranted)) updateFields["Date received group exemption"] = school.groupExemptionDateGranted;
       if (hasValue(school.groupExemptionDateWithdrawn)) updateFields["Date withdrawn from Group Exemption"] = school.groupExemptionDateWithdrawn;
