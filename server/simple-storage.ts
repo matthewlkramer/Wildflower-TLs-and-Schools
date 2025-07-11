@@ -1118,31 +1118,81 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async createLocation(location: InsertLocation): Promise<Location> {
-    // Mock implementation - in reality this would create in Airtable
-    const newLocation: Location = {
-      id: `loc_${Date.now()}`,
-      ...location,
-      created: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-    };
-    return newLocation;
+    try {
+      console.log("Creating location in Airtable:", location);
+      
+      const record = await base("Locations").create({
+        "school_id": [location.schoolId], // Link field to Schools table
+        "Address": location.address,
+        "Current physical address?": location.currentPhysicalAddress,
+        "Current mailing address?": location.currentMailingAddress,
+        "Start of time at location": location.startDate || undefined,
+        "End of time at location": location.endDate || undefined,
+      });
+      
+      console.log("Location created successfully:", record.id);
+      
+      return {
+        id: record.id,
+        schoolId: location.schoolId,
+        address: location.address,
+        currentPhysicalAddress: location.currentPhysicalAddress,
+        currentMailingAddress: location.currentMailingAddress,
+        startDate: location.startDate || '',
+        endDate: location.endDate || '',
+        created: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Error creating location:", error);
+      throw error;
+    }
   }
 
   async updateLocation(id: string, location: Partial<InsertLocation>): Promise<Location | undefined> {
-    // Mock implementation - in reality this would update in Airtable
-    const existing = await this.getLocation(id);
-    if (!existing) return undefined;
-    
-    return {
-      ...existing,
-      ...location,
-      lastModified: new Date().toISOString(),
-    };
+    try {
+      console.log("Updating location in Airtable:", id, location);
+      
+      const updateFields: any = {};
+      
+      if (location.address !== undefined) updateFields["Address"] = location.address;
+      if (location.currentPhysicalAddress !== undefined) updateFields["Current physical address?"] = location.currentPhysicalAddress;
+      if (location.currentMailingAddress !== undefined) updateFields["Current mailing address?"] = location.currentMailingAddress;
+      if (location.startDate !== undefined) updateFields["Start of time at location"] = location.startDate || undefined;
+      if (location.endDate !== undefined) updateFields["End of time at location"] = location.endDate || undefined;
+      
+      const record = await base("Locations").update(id, updateFields);
+      console.log("Location updated successfully:", record.id);
+      
+      return {
+        id: record.id,
+        schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0] || '') : String(record.fields["school_id"] || ''),
+        address: String(record.fields["Address"] || ''),
+        currentPhysicalAddress: Boolean(record.fields["Current physical address?"]),
+        currentMailingAddress: Boolean(record.fields["Current mailing address?"]),
+        startDate: String(record.fields["Start of time at location"] || ''),
+        endDate: String(record.fields["End of time at location"] || ''),
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+      };
+    } catch (error) {
+      console.error("Error updating location:", error);
+      throw error;
+    }
   }
 
   async deleteLocation(id: string): Promise<boolean> {
-    // Mock implementation - in reality this would delete from Airtable
-    return true;
+    try {
+      console.log("Deleting location from Airtable:", id);
+      
+      await base("Locations").destroy(id);
+      console.log("Location deleted successfully:", id);
+      
+      return true;
+    } catch (error) {
+      console.error("Error deleting location:", error);
+      throw error;
+    }
   }
 
   // Guide assignment operations
