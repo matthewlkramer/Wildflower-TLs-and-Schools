@@ -740,12 +740,14 @@ export class SimpleAirtableStorage implements IStorage {
         "Charter"
       ],
       agesServed: [
-        "Toddler (18m-3yr)",
-        "Primary (3-6yr)",
-        "Lower Elementary (6-9yr)", 
-        "Upper Elementary (9-12yr)",
-        "Middle School (12-15yr)",
-        "High School (15-18yr)"
+        "Infants",
+        "Toddlers", 
+        "Primary",
+        "Lower Elementary",
+        "Upper Elementary",
+        "Adolescent / JH",
+        "High School",
+        "Parent-child"
       ]
     };
 
