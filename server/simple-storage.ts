@@ -792,6 +792,12 @@ export class SimpleAirtableStorage implements IStorage {
         "Issues", 
         "Withdrawn",
         "Other - Not part of exemption"
+      ],
+      legalStructure: [
+        "Independent organization",
+        "Part of a charter",
+        "Part of another organization", 
+        "Multiple WF schools in a single entity"
       ]
     };
 

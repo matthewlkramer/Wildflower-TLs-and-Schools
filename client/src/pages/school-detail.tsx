@@ -2621,8 +2621,29 @@ export default function SchoolDetail() {
                             <Input
                               type="text"
                               className="mt-1"
+                              placeholder="XX-XXXXXXX"
                               value={editedDetails?.EIN || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, EIN: e.target.value })}
+                              onChange={(e) => {
+                                let value = e.target.value.replace(/[^\d-]/g, ''); // Only allow digits and hyphens
+                                // Auto-format: add hyphen after 2 digits if not present
+                                if (value.length === 2 && !value.includes('-')) {
+                                  value = value + '-';
+                                }
+                                // Limit length to 10 characters (XX-XXXXXXX)
+                                if (value.length <= 10) {
+                                  setEditedDetails({ ...editedDetails, EIN: value });
+                                }
+                              }}
+                              onBlur={(e) => {
+                                // Validate EIN format on blur
+                                const einPattern = /^\d{2}-\d{7}$/;
+                                if (e.target.value && !einPattern.test(e.target.value)) {
+                                  // Show error or highlight invalid format
+                                  e.target.style.borderColor = '#ef4444';
+                                } else {
+                                  e.target.style.borderColor = '';
+                                }
+                              }}
                             />
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.EIN || '-'}</p>
@@ -2644,12 +2665,21 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Legal Structure</label>
                           {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
+                            <Select
                               value={editedDetails?.legalStructure || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, legalStructure: e.target.value })}
-                            />
+                              onValueChange={(value) => setEditedDetails({ ...editedDetails, legalStructure: value })}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select legal structure" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {fieldOptions?.legalStructure?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.legalStructure || '-'}</p>
                           )}
