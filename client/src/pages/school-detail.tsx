@@ -2451,97 +2451,94 @@ export default function SchoolDetail() {
 
                 <TabsContent value="details" className="mt-0">
                   <div className="space-y-6">
-                    {/* Edit Button for Details Tab */}
-                    <div className="flex justify-end gap-2">
-                      {isEditingDetails ? (
-                        <>
-                          <Button
-                            size="sm"
-                            onClick={() => {
-                              // Helper function to filter out empty values (but keep currentFYEnd and arrays)
-                              const filterEmptyValues = (obj: any) => {
-                                const filtered: any = {};
-                                Object.entries(obj).forEach(([key, value]) => {
-                                  // Always include currentFYEnd even if empty (dropdown selection)
-                                  // Always include programFocus arrays (even if empty to clear the field)
-                                  if (key === 'currentFYEnd' || key === 'programFocus' || (value !== undefined && value !== null && value !== '')) {
-                                    if (Array.isArray(value) && value.length === 0 && key !== 'programFocus') return;
-                                    filtered[key] = value;
-                                  }
-                                });
-                                return filtered;
-                              };
 
-                              // Convert numeric fields and filter empty values
-                              const formattedData = filterEmptyValues({
-                                ...editedDetails,
-                                enrollmentCap: editedDetails.enrollmentCap && editedDetails.enrollmentCap !== '' ? Number(editedDetails.enrollmentCap) : undefined,
-                                numberOfClassrooms: editedDetails.numberOfClassrooms && editedDetails.numberOfClassrooms !== '' ? Number(editedDetails.numberOfClassrooms) : undefined
-                              });
-                              updateSchoolDetailsMutation.mutate(formattedData);
-                            }}
-                            disabled={updateSchoolDetailsMutation.isPending}
-                          >
-                            Save Changes
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              setIsEditingDetails(false);
-                              setEditedDetails(null);
-                            }}
-                            disabled={updateSchoolDetailsMutation.isPending}
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setIsEditingDetails(true);
-                            setEditedDetails({
-                              name: school?.name || '',
-                              shortName: school?.shortName || '',
-                              priorNames: school?.priorNames || '',
-                              programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
-                              agesServed: school?.agesServed || [],
-                              numberOfClassrooms: school?.numberOfClassrooms || '',
-                              enrollmentCap: school?.enrollmentCap || '',
-                              membershipStatus: school?.membershipStatus || '',
-                              legalStructure: school?.legalStructure || '',
-                              EIN: school?.EIN || '',
-                              legalName: school?.legalName || '',
-                              incorporationDate: school?.incorporationDate || '',
-                              nonprofitStatus: school?.nonprofitStatus || '',
-                              currentFYEnd: school?.currentFYEnd || '',
-                              governanceModel: school?.governanceModel || '',
-                              groupExemptionStatus: school?.groupExemptionStatus || '',
-                              groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
-                              groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
-                              dateReceivedGroupExemption: school?.dateReceivedGroupExemption || '',
-                              dateWithdrawnGroupExemption: school?.dateWithdrawnGroupExemption || '',
-                              businessInsurance: school?.businessInsurance || '',
-                              billComAccount: school?.billComAccount || '',
-                              email: school?.email || '',
-                              phone: school?.phone || '',
-                              website: school?.website || '',
-                              instagram: school?.instagram || '',
-                              facebook: school?.facebook || '',
-                            });
-                          }}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit Details
-                        </Button>
-                      )}
-                    </div>
 
                     {/* Name Section */}
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4">Name</h3>
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold text-slate-900">Name</h3>
+                        {isEditingDetails ? (
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                // Helper function to filter out empty values (but keep currentFYEnd and arrays)
+                                const filterEmptyValues = (obj: any) => {
+                                  const filtered: any = {};
+                                  Object.entries(obj).forEach(([key, value]) => {
+                                    // Always include currentFYEnd even if empty (dropdown selection)
+                                    // Always include programFocus arrays (even if empty to clear the field)
+                                    if (key === 'currentFYEnd' || key === 'programFocus' || (value !== undefined && value !== null && value !== '')) {
+                                      if (Array.isArray(value) && value.length === 0 && key !== 'programFocus') return;
+                                      filtered[key] = value;
+                                    }
+                                  });
+                                  return filtered;
+                                };
+
+                                // Convert numeric fields and filter empty values
+                                const formattedData = filterEmptyValues({
+                                  ...editedDetails,
+                                  enrollmentCap: editedDetails.enrollmentCap && editedDetails.enrollmentCap !== '' ? Number(editedDetails.enrollmentCap) : undefined,
+                                  numberOfClassrooms: editedDetails.numberOfClassrooms && editedDetails.numberOfClassrooms !== '' ? Number(editedDetails.numberOfClassrooms) : undefined
+                                });
+                                updateSchoolDetailsMutation.mutate(formattedData);
+                              }}
+                              disabled={updateSchoolDetailsMutation.isPending}
+                            >
+                              Save Changes
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setIsEditingDetails(false);
+                                setEditedDetails(null);
+                              }}
+                              disabled={updateSchoolDetailsMutation.isPending}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setIsEditingDetails(true);
+                              setEditedDetails({
+                                name: school?.name || '',
+                                shortName: school?.shortName || '',
+                                priorNames: school?.priorNames || '',
+                                programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
+                                agesServed: school?.agesServed || [],
+                                numberOfClassrooms: school?.numberOfClassrooms || '',
+                                enrollmentCap: school?.enrollmentCap || '',
+                                membershipStatus: school?.membershipStatus || '',
+                                legalStructure: school?.legalStructure || '',
+                                EIN: school?.EIN || '',
+                                legalName: school?.legalName || '',
+                                incorporationDate: school?.incorporationDate || '',
+                                nonprofitStatus: school?.nonprofitStatus || '',
+                                currentFYEnd: school?.currentFYEnd || '',
+                                governanceModel: school?.governanceModel || '',
+                                groupExemptionStatus: school?.groupExemptionStatus || '',
+                                groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
+                                groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
+                                businessInsurance: school?.businessInsurance || '',
+                                billComAccount: school?.billComAccount || '',
+                                email: school?.email || '',
+                                phone: school?.phone || '',
+                                website: school?.website || '',
+                                instagram: school?.instagram || '',
+                                facebook: school?.facebook || ''
+                              });
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">School Name</label>
@@ -2948,9 +2945,17 @@ export default function SchoolDetail() {
                             {isEditingDetails ? (
                               <Input
                                 type="date"
-                                className="mt-1"
+                                className={`mt-1 ${
+                                  editedDetails?.groupExemptionStatus === 'Applying' || 
+                                  editedDetails?.groupExemptionStatus === 'Other - Not part of exemption'
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''
+                                }`}
                                 value={editedDetails?.groupExemptionDateGranted || ''}
                                 onChange={(e) => setEditedDetails({ ...editedDetails, groupExemptionDateGranted: e.target.value })}
+                                disabled={
+                                  editedDetails?.groupExemptionStatus === 'Applying' || 
+                                  editedDetails?.groupExemptionStatus === 'Other - Not part of exemption'
+                                }
                               />
                             ) : (
                               <p className="text-sm text-slate-900 mt-1">{school.groupExemptionDateGranted || '-'}</p>
@@ -2961,9 +2966,21 @@ export default function SchoolDetail() {
                             {isEditingDetails ? (
                               <Input
                                 type="date"
-                                className="mt-1"
+                                className={`mt-1 ${
+                                  editedDetails?.groupExemptionStatus === 'Applying' || 
+                                  editedDetails?.groupExemptionStatus === 'Other - Not part of exemption' ||
+                                  editedDetails?.groupExemptionStatus === 'Active' ||
+                                  editedDetails?.groupExemptionStatus === 'Issues'
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''
+                                }`}
                                 value={editedDetails?.groupExemptionDateWithdrawn || ''}
                                 onChange={(e) => setEditedDetails({ ...editedDetails, groupExemptionDateWithdrawn: e.target.value })}
+                                disabled={
+                                  editedDetails?.groupExemptionStatus === 'Applying' || 
+                                  editedDetails?.groupExemptionStatus === 'Other - Not part of exemption' ||
+                                  editedDetails?.groupExemptionStatus === 'Active' ||
+                                  editedDetails?.groupExemptionStatus === 'Issues'
+                                }
                               />
                             ) : (
                               <p className="text-sm text-slate-900 mt-1">{school.groupExemptionDateWithdrawn || '-'}</p>
