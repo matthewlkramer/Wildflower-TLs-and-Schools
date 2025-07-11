@@ -23,9 +23,9 @@ const createAndAssignEducatorSchema = z.object({
   primaryPhone: z.string().optional(),
   homeAddress: z.string().optional(),
   
-  // Assignment fields (role is required for association creation)
-  role: z.array(z.string()).min(1, "Please select at least one role"),
-  startDate: z.string().min(1, "Start date is required"),
+  // Assignment fields (all optional - only educator/school link required for association)
+  role: z.array(z.string()).optional(),
+  startDate: z.string().optional(),
   emailAtSchool: z.string().email("Please enter a valid email").optional().or(z.literal("")),
 });
 
@@ -55,7 +55,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
       primaryPhone: "",
       homeAddress: "",
       role: [],
-      startDate: new Date().toISOString().split('T')[0], // Default to today
+      startDate: "",
       emailAtSchool: "",
     },
   });
@@ -106,31 +106,27 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
       const educator = await educatorResponse.json();
       console.log("Educator created:", educator);
 
-      // Then create the association (role is now required by schema)
-      if (data.role && data.role.length > 0) {
-        console.log("Creating association with:", {
-          educatorId: educator.id,
-          schoolId: schoolId,
-          role: data.role,
-          startDate: data.startDate,
-          emailAtSchool: data.emailAtSchool,
-          isActive: true,
-        });
-        
-        const associationResponse = await apiRequest("POST", "/api/teacher-school-associations", {
-          educatorId: educator.id,
-          schoolId: schoolId,
-          role: data.role,
-          startDate: data.startDate,
-          emailAtSchool: data.emailAtSchool,
-          isActive: true,
-        });
+      // Always create the association (Airtable only needs educator + school IDs)
+      console.log("Creating association with:", {
+        educatorId: educator.id,
+        schoolId: schoolId,
+        role: data.role || [],
+        startDate: data.startDate || "",
+        emailAtSchool: data.emailAtSchool || "",
+        isActive: true,
+      });
+      
+      const associationResponse = await apiRequest("POST", "/api/teacher-school-associations", {
+        educatorId: educator.id,
+        schoolId: schoolId,
+        role: data.role || [],
+        startDate: data.startDate || "",
+        emailAtSchool: data.emailAtSchool || "",
+        isActive: true,
+      });
 
-        const association = await associationResponse.json();
-        console.log("Association created:", association);
-      } else {
-        console.log("No role provided, skipping association creation");
-      }
+      const association = await associationResponse.json();
+      console.log("Association created:", association);
 
       return educator;
     },
@@ -277,7 +273,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
                     name="role"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Role(s) *</FormLabel>
+                        <FormLabel>Role(s)</FormLabel>
                         <FormControl>
                           <Select 
                             value={field.value?.[0] || ""} 
@@ -305,7 +301,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
                     name="startDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Start Date *</FormLabel>
+                        <FormLabel>Start Date</FormLabel>
                         <FormControl>
                           <Input {...field} type="date" />
                         </FormControl>
