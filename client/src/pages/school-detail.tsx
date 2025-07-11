@@ -2475,7 +2475,7 @@ export default function SchoolDetail() {
                                 <SelectValue placeholder="Select age range" />
                               </SelectTrigger>
                               <SelectContent>
-                                {fieldOptions?.agesServed?.map((option: string) => (
+                                {fieldOptions?.agesServed?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
                                   <SelectItem key={option} value={option}>
                                     {option}
                                   </SelectItem>
@@ -2535,9 +2535,9 @@ export default function SchoolDetail() {
                                 <SelectValue placeholder="Select membership status" />
                               </SelectTrigger>
                               <SelectContent>
-                                {fieldOptions?.membershipStatus?.map((option: string) => (
+                                {fieldOptions?.membershipStatus?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
                                   <SelectItem key={option} value={option}>
-                                    {option || 'None'}
+                                    {option}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -2606,7 +2606,7 @@ export default function SchoolDetail() {
                                 <SelectValue placeholder="Select governance model" />
                               </SelectTrigger>
                               <SelectContent>
-                                {fieldOptions?.governanceModel?.map((option: string) => (
+                                {fieldOptions?.governanceModel?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
                                   <SelectItem key={option} value={option}>
                                     {option}
                                   </SelectItem>

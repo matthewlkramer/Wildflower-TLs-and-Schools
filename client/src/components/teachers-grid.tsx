@@ -309,8 +309,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
           pagination={false}
           rowHeight={30}
           context={{
-            componentName: 'teachers-grid',
-            replitMetadata: 'teachers-table'
+            componentName: 'teachers-grid'
           }}
         />
       </div>

@@ -295,8 +295,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
           enableBrowserTooltips={true}
           rowHeight={30}
           context={{
-            componentName: 'schools-grid',
-            replitMetadata: 'schools-table'
+            componentName: 'schools-grid'
           }}
         />
       </div>
