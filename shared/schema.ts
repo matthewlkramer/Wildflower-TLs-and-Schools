@@ -598,6 +598,7 @@ export const schoolSchema = z.object({
   EIN: z.string().optional(),
   legalName: z.string().optional(),
   incorporationDate: z.string().optional(),
+  currentFYEnd: z.string().optional(),
   nonprofitStatus: z.string().optional(),
   ssjBoardDevelopment: z.string().optional(),
   enteredVisioningDate: z.string().optional(),
