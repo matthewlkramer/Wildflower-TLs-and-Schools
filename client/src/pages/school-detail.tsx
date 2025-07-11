@@ -1339,8 +1339,79 @@ export default function SchoolDetail() {
   });
   const [isEditingDetails, setIsEditingDetails] = useState(false);
   const [editedDetails, setEditedDetails] = useState<any>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const { toast } = useToast();
+
+  // Validation function
+  const validateField = (fieldName: string, value: any): string => {
+    switch (fieldName) {
+      case 'EIN':
+        if (value && !/^\d{2}-\d{7}$/.test(value)) {
+          return 'EIN must be in format XX-XXXXXXX';
+        }
+        break;
+      case 'numberOfClassrooms':
+      case 'enrollmentCap':
+        if (value && (isNaN(value) || value < 0)) {
+          return 'Must be a positive number';
+        }
+        break;
+      case 'email':
+        if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          return 'Must be a valid email address';
+        }
+        break;
+      case 'incorporationDate':
+      case 'groupExemptionDateGranted':
+      case 'groupExemptionDateWithdrawn':
+      case 'dateReceivedGroupExemption':
+      case 'dateWithdrawnGroupExemption':
+        if (value && isNaN(Date.parse(value))) {
+          return 'Must be a valid date';
+        }
+        break;
+    }
+    return '';
+  };
+
+  // Helper function to check if field has validation error
+  const hasValidationError = (fieldName: string): boolean => {
+    return Boolean(validationErrors[fieldName]);
+  };
+
+  // Helper function to get error styling
+  const getFieldErrorStyle = (fieldName: string): string => {
+    return hasValidationError(fieldName) 
+      ? 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-500' 
+      : '';
+  };
+
+  // Validate field on change and update errors
+  const handleFieldChange = (fieldName: string, value: any) => {
+    const error = validateField(fieldName, value);
+    setValidationErrors(prev => ({
+      ...prev,
+      [fieldName]: error
+    }));
+    setEditedDetails({ ...editedDetails, [fieldName]: value });
+  };
+
+  // Validate existing data when entering edit mode
+  useEffect(() => {
+    if (isEditingDetails && editedDetails) {
+      const errors: Record<string, string> = {};
+      Object.keys(editedDetails).forEach(key => {
+        const error = validateField(key, editedDetails[key]);
+        if (error) {
+          errors[key] = error;
+        }
+      });
+      setValidationErrors(errors);
+    } else {
+      setValidationErrors({});
+    }
+  }, [isEditingDetails, editedDetails]);
 
   // Update Add New options when active tab changes
   useEffect(() => {
@@ -2563,12 +2634,22 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Number of Classrooms</label>
                           {isEditingDetails ? (
-                            <Input
-                              type="number"
-                              className="mt-1"
-                              value={editedDetails?.numberOfClassrooms || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, numberOfClassrooms: e.target.value })}
-                            />
+                            <div className="relative">
+                              <Input
+                                type="number"
+                                className={`mt-1 ${getFieldErrorStyle('numberOfClassrooms')}`}
+                                value={editedDetails?.numberOfClassrooms || ''}
+                                onChange={(e) => handleFieldChange('numberOfClassrooms', e.target.value)}
+                              />
+                              {hasValidationError('numberOfClassrooms') && (
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                  <div className="h-4 w-4 text-red-500">⚠</div>
+                                </div>
+                              )}
+                              {hasValidationError('numberOfClassrooms') && (
+                                <p className="mt-1 text-xs text-red-600">{validationErrors.numberOfClassrooms}</p>
+                              )}
+                            </div>
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.numberOfClassrooms || '-'}</p>
                           )}
@@ -2576,12 +2657,22 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Enrollment Capacity</label>
                           {isEditingDetails ? (
-                            <Input
-                              type="number"
-                              className="mt-1"
-                              value={editedDetails?.enrollmentCap || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, enrollmentCap: e.target.value })}
-                            />
+                            <div className="relative">
+                              <Input
+                                type="number"
+                                className={`mt-1 ${getFieldErrorStyle('enrollmentCap')}`}
+                                value={editedDetails?.enrollmentCap || ''}
+                                onChange={(e) => handleFieldChange('enrollmentCap', e.target.value)}
+                              />
+                              {hasValidationError('enrollmentCap') && (
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                  <div className="h-4 w-4 text-red-500">⚠</div>
+                                </div>
+                              )}
+                              {hasValidationError('enrollmentCap') && (
+                                <p className="mt-1 text-xs text-red-600">{validationErrors.enrollmentCap}</p>
+                              )}
+                            </div>
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.enrollmentCap || '-'}</p>
                           )}
@@ -2618,33 +2709,33 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">EIN</label>
                           {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
-                              placeholder="XX-XXXXXXX"
-                              value={editedDetails?.EIN || ''}
-                              onChange={(e) => {
-                                let value = e.target.value.replace(/[^\d-]/g, ''); // Only allow digits and hyphens
-                                // Auto-format: add hyphen after 2 digits if not present
-                                if (value.length === 2 && !value.includes('-')) {
-                                  value = value + '-';
-                                }
-                                // Limit length to 10 characters (XX-XXXXXXX)
-                                if (value.length <= 10) {
-                                  setEditedDetails({ ...editedDetails, EIN: value });
-                                }
-                              }}
-                              onBlur={(e) => {
-                                // Validate EIN format on blur
-                                const einPattern = /^\d{2}-\d{7}$/;
-                                if (e.target.value && !einPattern.test(e.target.value)) {
-                                  // Show error or highlight invalid format
-                                  e.target.style.borderColor = '#ef4444';
-                                } else {
-                                  e.target.style.borderColor = '';
-                                }
-                              }}
-                            />
+                            <div className="relative">
+                              <Input
+                                type="text"
+                                className={`mt-1 ${getFieldErrorStyle('EIN')}`}
+                                placeholder="XX-XXXXXXX"
+                                value={editedDetails?.EIN || ''}
+                                onChange={(e) => {
+                                  let value = e.target.value.replace(/[^\d-]/g, ''); // Only allow digits and hyphens
+                                  // Auto-format: add hyphen after 2 digits if not present
+                                  if (value.length === 2 && !value.includes('-')) {
+                                    value = value + '-';
+                                  }
+                                  // Limit length to 10 characters (XX-XXXXXXX)
+                                  if (value.length <= 10) {
+                                    handleFieldChange('EIN', value);
+                                  }
+                                }}
+                              />
+                              {hasValidationError('EIN') && (
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                  <div className="h-4 w-4 text-red-500">⚠</div>
+                                </div>
+                              )}
+                              {hasValidationError('EIN') && (
+                                <p className="mt-1 text-xs text-red-600">{validationErrors.EIN}</p>
+                              )}
+                            </div>
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.EIN || '-'}</p>
                           )}
@@ -2654,9 +2745,9 @@ export default function SchoolDetail() {
                           {isEditingDetails ? (
                             <Input
                               type="text"
-                              className="mt-1"
+                              className={`mt-1 ${getFieldErrorStyle('legalName')}`}
                               value={editedDetails?.legalName || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, legalName: e.target.value })}
+                              onChange={(e) => handleFieldChange('legalName', e.target.value)}
                             />
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.legalName || '-'}</p>
@@ -2687,12 +2778,22 @@ export default function SchoolDetail() {
                         <div>
                           <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Incorporation Date</label>
                           {isEditingDetails ? (
-                            <Input
-                              type="date"
-                              className="mt-1"
-                              value={editedDetails?.incorporationDate || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, incorporationDate: e.target.value })}
-                            />
+                            <div className="relative">
+                              <Input
+                                type="date"
+                                className={`mt-1 ${getFieldErrorStyle('incorporationDate')}`}
+                                value={editedDetails?.incorporationDate || ''}
+                                onChange={(e) => handleFieldChange('incorporationDate', e.target.value)}
+                              />
+                              {hasValidationError('incorporationDate') && (
+                                <div className="absolute inset-y-0 right-8 pr-3 flex items-center pointer-events-none">
+                                  <div className="h-4 w-4 text-red-500">⚠</div>
+                                </div>
+                              )}
+                              {hasValidationError('incorporationDate') && (
+                                <p className="mt-1 text-xs text-red-600">{validationErrors.incorporationDate}</p>
+                              )}
+                            </div>
                           ) : (
                             <p className="text-sm text-slate-900 mt-1">{school.incorporationDate || '-'}</p>
                           )}
@@ -2863,12 +2964,22 @@ export default function SchoolDetail() {
                           <div>
                             <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">General School Email</label>
                             {isEditingDetails ? (
-                              <Input
-                                type="email"
-                                className="mt-1"
-                                value={editedDetails?.email || ''}
-                                onChange={(e) => setEditedDetails({ ...editedDetails, email: e.target.value })}
-                              />
+                              <div className="relative">
+                                <Input
+                                  type="email"
+                                  className={`mt-1 ${getFieldErrorStyle('email')}`}
+                                  value={editedDetails?.email || ''}
+                                  onChange={(e) => handleFieldChange('email', e.target.value)}
+                                />
+                                {hasValidationError('email') && (
+                                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="h-4 w-4 text-red-500">⚠</div>
+                                  </div>
+                                )}
+                                {hasValidationError('email') && (
+                                  <p className="mt-1 text-xs text-red-600">{validationErrors.email}</p>
+                                )}
+                              </div>
                             ) : (
                               <p className="text-sm text-slate-900 mt-1">{school.email || '-'}</p>
                             )}
