@@ -641,50 +641,43 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const updateFields: any = {};
       
-      // Map all school fields to Airtable field names
-      if (school.name !== undefined) updateFields["Name"] = school.name;
-      if (school.shortName !== undefined) updateFields["Short Name"] = school.shortName;
-      if (school.priorNames !== undefined) updateFields["Prior Names"] = school.priorNames;
-      if (school.logo !== undefined) updateFields["Logo"] = school.logo;
-      if (school.activeLocationCity !== undefined) updateFields["Active Location City"] = school.activeLocationCity;
-      if (school.activeLocationState !== undefined) updateFields["Active Location State"] = school.activeLocationState;
-      if (school.targetCity !== undefined) updateFields["Target City"] = school.targetCity;
-      if (school.targetState !== undefined) updateFields["Target State"] = school.targetState;
-      if (school.locality !== undefined) updateFields["Locality"] = school.locality;
-      if (school.targetCommunity !== undefined) updateFields["Target community"] = school.targetCommunity;
-      if (school.phone !== undefined) updateFields["School Phone"] = school.phone;
-      if (school.email !== undefined) updateFields["School Email"] = school.email;
-      if (school.website !== undefined) updateFields["Website"] = school.website;
-      if (school.instagram !== undefined) updateFields["Instagram"] = school.instagram;
-      if (school.facebook !== undefined) updateFields["Facebook"] = school.facebook;
-      if (school.narrative !== undefined) updateFields["Narrative"] = school.narrative;
-      if (school.institutionalPartner !== undefined) updateFields["Institutional partner"] = school.institutionalPartner;
-      if (school.opened !== undefined) updateFields["Opened"] = school.opened;
-      if (school.membershipStatus !== undefined && school.membershipStatus !== "") updateFields["Membership Status"] = school.membershipStatus;
-      if (school.founders !== undefined) updateFields["Founders"] = school.founders;
-      if (school.membershipAgreementDate !== undefined) updateFields["Membership Agreement Date"] = school.membershipAgreementDate;
-      if (school.signedMembershipAgreement !== undefined) updateFields["Signed Membership Agreement"] = school.signedMembershipAgreement;
-      if (school.agreementVersion !== undefined) updateFields["Agreement Version"] = school.agreementVersion;
-      if (school.about !== undefined) updateFields["About"] = school.about;
-      if (school.aboutSpanish !== undefined) updateFields["About Spanish"] = school.aboutSpanish;
-      if (school.agesServed !== undefined && Array.isArray(school.agesServed) && school.agesServed.length > 0) updateFields["Ages served"] = school.agesServed;
-      if (school.schoolType !== undefined) updateFields["School Type"] = school.schoolType;
-      if (school.governanceModel !== undefined && school.governanceModel !== "") updateFields["Governance Model"] = school.governanceModel;
-      if (school.status !== undefined) updateFields["Status"] = school.status;
-      if (school.stageStatus !== undefined) updateFields["Stage/Status"] = school.stageStatus;
-      if (school.openDate !== undefined) updateFields["Open Date"] = school.openDate;
-      if (school.enrollmentCap !== undefined) updateFields["Enrollment at Full Capacity"] = parseInt(school.enrollmentCap) || 0;
-      if (school.currentEnrollment !== undefined) updateFields["Current Enrollment"] = school.currentEnrollment;
-      if (school.programFocus !== undefined && school.programFocus !== "") updateFields["Program Focus"] = school.programFocus;
-      if (school.numberOfClassrooms !== undefined && school.numberOfClassrooms !== "") updateFields["Number of Classrooms"] = school.numberOfClassrooms;
-      if (school.legalStructure !== undefined && school.legalStructure !== "") updateFields["Legal Structure"] = school.legalStructure;
-      if (school.currentFYEnd !== undefined && school.currentFYEnd !== "") updateFields["Current FY End"] = school.currentFYEnd;
-      if (school.groupExemptionStatus !== undefined && school.groupExemptionStatus !== "") updateFields["Group exemption status"] = school.groupExemptionStatus;
-      if (school.groupExemptionDateGranted !== undefined && school.groupExemptionDateGranted !== "") updateFields["Group exemption date granted"] = school.groupExemptionDateGranted;
-      if (school.groupExemptionDateWithdrawn !== undefined && school.groupExemptionDateWithdrawn !== "") updateFields["Group exemption date withdrawn"] = school.groupExemptionDateWithdrawn;
-      if (school.businessInsurance !== undefined && school.businessInsurance !== "") updateFields["Business Insurance"] = school.businessInsurance;
-      if (school.billComAccount !== undefined && school.billComAccount !== "") updateFields["Bill.com Account"] = school.billComAccount;
+      // Helper function to check if value should be included
+      const hasValue = (value: any): boolean => {
+        if (value === undefined || value === null || value === '') return false;
+        if (Array.isArray(value) && value.length === 0) return false;
+        return true;
+      };
+      
+      // Only map fields with actual values - exclude empty strings and empty arrays
+      if (hasValue(school.name)) updateFields["Name"] = school.name;
+      if (hasValue(school.shortName)) updateFields["Short Name"] = school.shortName;
+      if (hasValue(school.phone)) updateFields["School Phone"] = school.phone;
+      if (hasValue(school.email)) updateFields["School Email"] = school.email;
+      if (hasValue(school.website)) updateFields["Website"] = school.website;
+      if (hasValue(school.instagram)) updateFields["Instagram"] = school.instagram;
+      if (hasValue(school.facebook)) updateFields["Facebook"] = school.facebook;
+      if (hasValue(school.membershipStatus)) updateFields["Membership Status"] = school.membershipStatus;
+      if (hasValue(school.agesServed)) updateFields["Ages served"] = school.agesServed;
+      if (hasValue(school.governanceModel)) updateFields["Governance Model"] = school.governanceModel;
+      if (hasValue(school.programFocus)) updateFields["Program Focus"] = school.programFocus;
+      if (hasValue(school.numberOfClassrooms)) updateFields["Number of Classrooms"] = school.numberOfClassrooms;
+      if (hasValue(school.legalStructure)) updateFields["Legal Structure"] = school.legalStructure;
+      if (hasValue(school.currentFYEnd)) updateFields["Current FY End"] = school.currentFYEnd;
+      if (hasValue(school.groupExemptionStatus)) updateFields["Group exemption status"] = school.groupExemptionStatus;
+      if (hasValue(school.groupExemptionDateGranted)) updateFields["Group exemption date granted"] = school.groupExemptionDateGranted;
+      if (hasValue(school.groupExemptionDateWithdrawn)) updateFields["Group exemption date withdrawn"] = school.groupExemptionDateWithdrawn;
+      if (hasValue(school.businessInsurance)) updateFields["Business Insurance"] = school.businessInsurance;
+      if (hasValue(school.billComAccount)) updateFields["Bill.com Account"] = school.billComAccount;
+      
+      // Handle enrollment capacity with number conversion
+      if (school.enrollmentCap !== undefined && school.enrollmentCap !== '') {
+        const enrollmentNum = parseInt(school.enrollmentCap.toString());
+        if (!isNaN(enrollmentNum)) {
+          updateFields["Enrollment at Full Capacity"] = enrollmentNum;
+        }
+      }
 
+      console.log('Sending to Airtable:', Object.keys(updateFields));
       const record = await base("Schools").update(id, updateFields);
       return this.transformSchoolRecord(record);
     } catch (error) {
