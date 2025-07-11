@@ -2502,6 +2502,9 @@ export default function SchoolDetail() {
                           onClick={() => {
                             setIsEditingDetails(true);
                             setEditedDetails({
+                              name: school?.name || '',
+                              shortName: school?.shortName || '',
+                              priorNames: school?.priorNames || '',
                               programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
                               agesServed: school?.agesServed || [],
                               numberOfClassrooms: school?.numberOfClassrooms || '',
@@ -2533,6 +2536,53 @@ export default function SchoolDetail() {
                           Edit Details
                         </Button>
                       )}
+                    </div>
+
+                    {/* Name Section */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4">Name</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">School Name</label>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.name || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, name: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.name || '-'}</p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Short Name</label>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.shortName || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, shortName: e.target.value })}
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.shortName || '-'}</p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Prior Names</label>
+                          {isEditingDetails ? (
+                            <Input
+                              type="text"
+                              className="mt-1"
+                              value={editedDetails?.priorNames || ''}
+                              onChange={(e) => setEditedDetails({ ...editedDetails, priorNames: e.target.value })}
+                              placeholder="Comma-separated list of names"
+                            />
+                          ) : (
+                            <p className="text-sm text-slate-900 mt-1">{school.priorNames || '-'}</p>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     {/* Program Details Section */}

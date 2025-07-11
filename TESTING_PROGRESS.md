@@ -71,11 +71,13 @@
 ### Tab 2: Details 🔄
 - **Status**: Testing in Progress
 - **Edit Details Button**: Testing
+- **Enhancement**: ✅ Added Name card at top with School Name, Short Name, Prior Names
 
 #### Field Testing Results:
 1. **School Name**: 
    - Original: "TEST SCHOOL"
-   - Updated to: "TEST SCHOOL - UPDATED"
-   - Status: ⏳ Awaiting visual confirmation
+   - Updated to: "TEST SCHOOL - UPDATED" (via PUT API)
+   - Status: ✅ API update successful
+   - Issue Fixed: Changed from PATCH to PUT endpoint
 
 ### Tab 3-10: ⏳ Pending
