@@ -192,6 +192,18 @@ Changelog:
 - July 11, 2025. Major schema validation fix: resolved critical field update issues by conducting comprehensive Zod schema audit, discovered currentFYEnd and 25+ other critical fields were missing from schoolSchema causing validation to filter out valid data during updates, added all missing fields including logo variants, SSJ business/funding fields, program details, partner assignments, and metadata fields, eliminated "field not updating" issues across all school detail forms, cleaned up legacy file confusion by moving 8 duplicate/retired files to server/retired/ directory with comprehensive documentation
 ```
 
+## Development Guidelines
+
+### Validation and Quality Assurance
+- **DEVELOPMENT_VALIDATION_GUIDE.md**: Comprehensive validation routines for preventing common field mapping, schema validation, and API integration errors
+- **Validation Routines**: Three systematic checks for data consistency, API integration, and UI component validation
+- **Error Prevention**: Proactive validation approach to avoid repetitive debugging cycles
+
+### Architecture Standards
+- **Schema-First Development**: Always ensure TypeScript interfaces, Zod schemas, and Airtable field mappings align
+- **Field Mapping Consistency**: Read and write operations must use identical field names
+- **Component Type Matching**: UI input types must match underlying data types (text→Input, select→Select, etc.)
+
 ## User Preferences
 
 ```

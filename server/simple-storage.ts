@@ -439,7 +439,7 @@ export class SimpleAirtableStorage implements IStorage {
       businessInsurance: fields['Business Insurance'] || '',
       nameSelectionProposal: fields['Name Selection Proposal'] || '',
       trademarkFiled: fields['Trademark Filed'] || '',
-      billComAccount: fields['Bill.com Account'] || '',
+      billComAccount: fields['Bill.com account'] || '',
       googleWorkspacePath: fields['Google Workspace Org Unit Path'] || '',
       budgetLink: fields['Budget Link'] || '',
       bookkeeper: fields['Bookkeeper / Accountant'] || '',
@@ -683,7 +683,7 @@ export class SimpleAirtableStorage implements IStorage {
       if (hasValue(school.groupExemptionDateGranted)) updateFields["Date received group exemption"] = school.groupExemptionDateGranted;
       if (hasValue(school.groupExemptionDateWithdrawn)) updateFields["Date withdrawn from Group Exemption"] = school.groupExemptionDateWithdrawn;
       if (hasValue(school.businessInsurance)) updateFields["Business Insurance"] = school.businessInsurance;
-      if (hasValue(school.billComAccount)) updateFields["Bill.com Account"] = school.billComAccount;
+      if (hasValue(school.billComAccount)) updateFields["Bill.com account"] = school.billComAccount;
       
       // Handle enrollment capacity with number conversion
       if (school.enrollmentCap !== undefined && school.enrollmentCap !== '') {
