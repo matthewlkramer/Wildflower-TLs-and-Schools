@@ -3331,61 +3331,215 @@ export default function SchoolDetail() {
                 </TabsContent>
 
                 <TabsContent value="tls" className="mt-0">
-                  <div className="space-y-4">
-                    
-                    {associationsLoading ? (
-                      <div className="space-y-3">
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-8 w-full" />
-                      </div>
-                    ) : associations && associations.length > 0 ? (
-                      <div className="border rounded-lg">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Name</TableHead>
-                              <TableHead>Role(s)</TableHead>
-                              <TableHead>Founder</TableHead>
-                              <TableHead>Email</TableHead>
-                              <TableHead>Phone</TableHead>
-                              <TableHead>Start Date</TableHead>
-                              <TableHead>End Date</TableHead>
-                              <TableHead>Currently Active</TableHead>
-                              <TableHead className="w-[200px]">Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {associations.map((association) => {
-                              const teacher = teachers?.find(t => t.id === association.educatorId);
-                              return (
-                                <TeacherAssociationRow
-                                  key={association.id}
-                                  association={association}
-                                  teacher={teacher}
-                                  school={school}
-                                  isEditing={editingAssociationId === association.id}
-                                  onEdit={() => setEditingAssociationId(association.id)}
-                                  onSave={(data) => updateAssociationMutation.mutate({ associationId: association.id, data })}
-                                  onCancel={() => setEditingAssociationId(null)}
-                                  onDelete={() => {
-                                    setDeletingAssociationId(association.id);
-                                    setAssociationDeleteModalOpen(true);
-                                  }}
-                                  onEndStint={() => endStintMutation.mutate(association.id)}
-                                  isSaving={updateAssociationMutation.isPending}
-                                />
+                  <div className="space-y-6">
+                    {/* Current Team Leaders Overview */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        Current Team Leaders
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Active TLs</label>
+                          <p className="text-sm font-medium text-slate-900 mt-1">
+                            {(() => {
+                              const tlAssociations = associations?.filter(association => 
+                                association.isActive && 
+                                association.roles && 
+                                (Array.isArray(association.roles) 
+                                  ? association.roles.some(role => role && role.toLowerCase().includes('teacher leader'))
+                                  : association.roles.toLowerCase().includes('teacher leader')
+                                )
                               );
-                            })}
-                          </TableBody>
-                        </Table>
+                              return tlAssociations?.length || 0;
+                            })()}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Current TL Names</label>
+                          <p className="text-sm font-medium text-slate-900 mt-1">
+                            {typeof school.currentTLs === 'string' 
+                              ? school.currentTLs
+                              : school.currentTLs && Array.isArray(school.currentTLs) && school.currentTLs.length > 0 
+                                ? school.currentTLs.join(', ')
+                                : 'None assigned'
+                            }
+                          </p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">TL Transitions This Year</label>
+                          <p className="text-sm font-medium text-slate-900 mt-1">
+                            {(() => {
+                              const currentYear = new Date().getFullYear();
+                              const transitions = associations?.filter(association => 
+                                association.roles && 
+                                (Array.isArray(association.roles) 
+                                  ? association.roles.some(role => role && role.toLowerCase().includes('teacher leader'))
+                                  : association.roles.toLowerCase().includes('teacher leader')
+                                ) &&
+                                (association.startDate && new Date(association.startDate).getFullYear() === currentYear ||
+                                 association.endDate && new Date(association.endDate).getFullYear() === currentYear)
+                              );
+                              return transitions?.length || 0;
+                            })()}
+                          </p>
+                        </div>
                       </div>
-                    ) : (
-                      <div className="text-center py-8 text-slate-500">
-                        <p>No teachers found for this school.</p>
-                        <p className="text-sm mt-2">Use the buttons above to create educators or associate existing educators with this school.</p>
-                      </div>
-                    )}
+                    </div>
+
+                    {/* Team Leaders Table */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-slate-900">Team Leader History & Details</h4>
+                      {associationsLoading ? (
+                        <div className="space-y-3">
+                          <Skeleton className="h-8 w-full" />
+                          <Skeleton className="h-8 w-full" />
+                          <Skeleton className="h-8 w-full" />
+                        </div>
+                      ) : (() => {
+                        // Filter associations to only show Team Leaders
+                        const tlAssociations = associations?.filter(association => 
+                          association.roles && 
+                          (Array.isArray(association.roles) 
+                            ? association.roles.some(role => role && role.toLowerCase().includes('teacher leader'))
+                            : association.roles.toLowerCase().includes('teacher leader')
+                          )
+                        );
+                        
+                        return tlAssociations && tlAssociations.length > 0 ? (
+                          <div className="border rounded-lg">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Name</TableHead>
+                                  <TableHead>TL Role Type</TableHead>
+                                  <TableHead>TL Experience</TableHead>
+                                  <TableHead>Email</TableHead>
+                                  <TableHead>Start Date</TableHead>
+                                  <TableHead>End Date</TableHead>
+                                  <TableHead>Currently Active</TableHead>
+                                  <TableHead className="w-[200px]">Actions</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {tlAssociations.map((association) => {
+                                  const teacher = teachers?.find(t => t.id === association.educatorId);
+                                  const tlRoles = Array.isArray(association.roles) 
+                                    ? association.roles.filter(role => role && role.toLowerCase().includes('teacher leader'))
+                                    : [association.roles].filter(role => role && role.toLowerCase().includes('teacher leader'));
+                                  
+                                  return (
+                                    <TableRow key={association.id}>
+                                      <TableCell className="font-medium">
+                                        <div>
+                                          <p className="text-sm font-medium text-slate-900">
+                                            {teacher ? `${teacher.firstName} ${teacher.lastName}` : 'Unknown Educator'}
+                                          </p>
+                                          {teacher?.preferredName && teacher.preferredName !== teacher.firstName && (
+                                            <p className="text-xs text-slate-500">"{teacher.preferredName}"</p>
+                                          )}
+                                        </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        <div className="flex flex-wrap gap-1">
+                                          {tlRoles.map((role, idx) => (
+                                            <Badge key={idx} variant="secondary" className="text-xs">
+                                              {role === 'Teacher Leader' ? 'TL' : 
+                                               role === 'Emerging Teacher Leader' ? 'ETL' : 
+                                               role}
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        <span className="text-sm text-slate-600">
+                                          {(() => {
+                                            if (!association.startDate) return 'Unknown';
+                                            const startYear = new Date(association.startDate).getFullYear();
+                                            const endYear = association.endDate ? new Date(association.endDate).getFullYear() : new Date().getFullYear();
+                                            const years = endYear - startYear + (association.isActive ? 0 : -1);
+                                            return years > 0 ? `${years} year${years > 1 ? 's' : ''}` : 'Less than 1 year';
+                                          })()}
+                                        </span>
+                                      </TableCell>
+                                      <TableCell>
+                                        <span className="text-sm text-slate-600">
+                                          {school.email || teacher?.email || '-'}
+                                        </span>
+                                      </TableCell>
+                                      <TableCell>
+                                        <span className="text-sm text-slate-600">
+                                          {association.startDate ? new Date(association.startDate).toLocaleDateString() : '-'}
+                                        </span>
+                                      </TableCell>
+                                      <TableCell>
+                                        <span className="text-sm text-slate-600">
+                                          {association.endDate ? new Date(association.endDate).toLocaleDateString() : '-'}
+                                        </span>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Badge variant={association.isActive ? "default" : "secondary"}>
+                                          {association.isActive ? "Active" : "Inactive"}
+                                        </Badge>
+                                      </TableCell>
+                                      <TableCell>
+                                        <div className="flex gap-1">
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => setEditingAssociationId(association.id)}
+                                            className="h-8 px-2"
+                                            title="Edit TL details"
+                                          >
+                                            <Edit className="h-3 w-3" />
+                                          </Button>
+                                          {association.isActive && (
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              onClick={() => endStintMutation.mutate(association.id)}
+                                              className="h-8 px-2"
+                                              title="End TL stint"
+                                            >
+                                              <Clock className="h-3 w-3" />
+                                            </Button>
+                                          )}
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => {
+                                              setDeletingAssociationId(association.id);
+                                              setAssociationDeleteModalOpen(true);
+                                            }}
+                                            className="h-8 px-2 text-red-600 hover:text-red-700"
+                                            title="Delete TL record"
+                                          >
+                                            <Trash2 className="h-3 w-3" />
+                                          </Button>
+                                        </div>
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 text-slate-500">
+                            <div className="mb-4">
+                              <svg className="w-12 h-12 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                            </div>
+                            <p className="font-medium">No Team Leaders found for this school.</p>
+                            <p className="text-sm mt-2">Team Leaders will appear here when educators are assigned TL roles.</p>
+                            <p className="text-sm mt-1">Use the Teachers tab to assign Team Leader roles to educators.</p>
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </TabsContent>
 
