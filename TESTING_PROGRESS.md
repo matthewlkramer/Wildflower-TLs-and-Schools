@@ -80,6 +80,13 @@
    - Status: ✅ PASS - API update successful and visible in UI
    - Issue Fixed: Changed from PATCH to PUT endpoint
 
-**Next Test**: Edit Details button - Testing field updates via UI
+2. **UI Edit Workflow**:
+   - Edit Details button: ✅ PASS
+   - Name field update: ✅ PASS - "TEST SCHOOL - UI EDIT TEST"
+   - Short Name field update: ✅ PASS - "UI-TEST"
+   - Save Changes button: ✅ PASS
+   - UI refresh: ✅ PASS - Changes visible immediately
+
+**Next Test**: Test other fields in Details tab
 
 ### Tab 3-10: ⏳ Pending
