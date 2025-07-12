@@ -1,8 +1,20 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./simple-storage";
+import { loanStorage } from "./loan-storage";
 import { cache } from "./cache";
 import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema } from "@shared/schema";
+import { 
+  insertLoanApplicationSchema,
+  insertBorrowerSchema,
+  insertLoanSchema,
+  insertLoanPaymentSchema,
+  insertLoanDocumentSchema,
+  insertLoanCovenantSchema,
+  insertLoanCommitteeReviewSchema,
+  insertCapitalSourceSchema,
+  insertQuarterlyReportSchema
+} from "@shared/loan-schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1148,6 +1160,492 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(associations);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch charter educator associations" });
+    }
+  });
+
+  // ==================== LOAN MANAGEMENT SYSTEM API ROUTES ====================
+  
+  // Loan Applications
+  app.get("/api/loan-applications", async (req, res) => {
+    try {
+      const applications = await loanStorage.getLoanApplications();
+      res.json(applications);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch loan applications" });
+    }
+  });
+
+  app.get("/api/loan-applications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const application = await loanStorage.getLoanApplication(id);
+      if (!application) {
+        return res.status(404).json({ message: "Loan application not found" });
+      }
+      res.json(application);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch loan application" });
+    }
+  });
+
+  app.post("/api/loan-applications", async (req, res) => {
+    try {
+      const applicationData = insertLoanApplicationSchema.parse(req.body);
+      const application = await loanStorage.createLoanApplication(applicationData);
+      res.status(201).json(application);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid application data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create loan application" });
+    }
+  });
+
+  app.put("/api/loan-applications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertLoanApplicationSchema.partial().parse(req.body);
+      const application = await loanStorage.updateLoanApplication(id, updateData);
+      if (!application) {
+        return res.status(404).json({ message: "Loan application not found" });
+      }
+      res.json(application);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid application data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update loan application" });
+    }
+  });
+
+  app.delete("/api/loan-applications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await loanStorage.deleteLoanApplication(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Loan application not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete loan application" });
+    }
+  });
+
+  // Borrowers
+  app.get("/api/borrowers", async (req, res) => {
+    try {
+      const borrowers = await loanStorage.getBorrowers();
+      res.json(borrowers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch borrowers" });
+    }
+  });
+
+  app.get("/api/borrowers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const borrower = await loanStorage.getBorrower(id);
+      if (!borrower) {
+        return res.status(404).json({ message: "Borrower not found" });
+      }
+      res.json(borrower);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch borrower" });
+    }
+  });
+
+  app.post("/api/borrowers", async (req, res) => {
+    try {
+      const borrowerData = insertBorrowerSchema.parse(req.body);
+      const borrower = await loanStorage.createBorrower(borrowerData);
+      res.status(201).json(borrower);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid borrower data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create borrower" });
+    }
+  });
+
+  app.put("/api/borrowers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertBorrowerSchema.partial().parse(req.body);
+      const borrower = await loanStorage.updateBorrower(id, updateData);
+      if (!borrower) {
+        return res.status(404).json({ message: "Borrower not found" });
+      }
+      res.json(borrower);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid borrower data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update borrower" });
+    }
+  });
+
+  // Loans
+  app.get("/api/loans", async (req, res) => {
+    try {
+      const loans = await loanStorage.getLoans();
+      res.json(loans);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch loans" });
+    }
+  });
+
+  app.get("/api/loans/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const loan = await loanStorage.getLoan(id);
+      if (!loan) {
+        return res.status(404).json({ message: "Loan not found" });
+      }
+      res.json(loan);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch loan" });
+    }
+  });
+
+  app.get("/api/loans/number/:loanNumber", async (req, res) => {
+    try {
+      const loanNumber = req.params.loanNumber;
+      const loan = await loanStorage.getLoanByNumber(loanNumber);
+      if (!loan) {
+        return res.status(404).json({ message: "Loan not found" });
+      }
+      res.json(loan);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch loan" });
+    }
+  });
+
+  app.post("/api/loans", async (req, res) => {
+    try {
+      const loanData = insertLoanSchema.parse(req.body);
+      const loan = await loanStorage.createLoan(loanData);
+      res.status(201).json(loan);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid loan data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create loan" });
+    }
+  });
+
+  app.put("/api/loans/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertLoanSchema.partial().parse(req.body);
+      const loan = await loanStorage.updateLoan(id, updateData);
+      if (!loan) {
+        return res.status(404).json({ message: "Loan not found" });
+      }
+      res.json(loan);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid loan data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update loan" });
+    }
+  });
+
+  // Loan Payments
+  app.get("/api/loans/:loanId/payments", async (req, res) => {
+    try {
+      const loanId = parseInt(req.params.loanId);
+      const payments = await loanStorage.getLoanPayments(loanId);
+      res.json(payments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch loan payments" });
+    }
+  });
+
+  app.post("/api/loan-payments", async (req, res) => {
+    try {
+      const paymentData = insertLoanPaymentSchema.parse(req.body);
+      const payment = await loanStorage.createLoanPayment(paymentData);
+      res.status(201).json(payment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid payment data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create loan payment" });
+    }
+  });
+
+  app.put("/api/loan-payments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertLoanPaymentSchema.partial().parse(req.body);
+      const payment = await loanStorage.updateLoanPayment(id, updateData);
+      if (!payment) {
+        return res.status(404).json({ message: "Payment not found" });
+      }
+      res.json(payment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid payment data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update loan payment" });
+    }
+  });
+
+  // Loan Documents
+  app.get("/api/loan-documents", async (req, res) => {
+    try {
+      const { loanId, applicationId } = req.query;
+      const documents = await loanStorage.getLoanDocuments(
+        loanId ? parseInt(loanId as string) : undefined,
+        applicationId ? parseInt(applicationId as string) : undefined
+      );
+      res.json(documents);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch loan documents" });
+    }
+  });
+
+  app.post("/api/loan-documents", async (req, res) => {
+    try {
+      const documentData = insertLoanDocumentSchema.parse(req.body);
+      const document = await loanStorage.createLoanDocument(documentData);
+      res.status(201).json(document);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid document data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create loan document" });
+    }
+  });
+
+  app.put("/api/loan-documents/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertLoanDocumentSchema.partial().parse(req.body);
+      const document = await loanStorage.updateLoanDocument(id, updateData);
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      res.json(document);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid document data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update loan document" });
+    }
+  });
+
+  // Loan Covenants
+  app.get("/api/loans/:loanId/covenants", async (req, res) => {
+    try {
+      const loanId = parseInt(req.params.loanId);
+      const covenants = await loanStorage.getLoanCovenants(loanId);
+      res.json(covenants);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch loan covenants" });
+    }
+  });
+
+  app.post("/api/loan-covenants", async (req, res) => {
+    try {
+      const covenantData = insertLoanCovenantSchema.parse(req.body);
+      const covenant = await loanStorage.createLoanCovenant(covenantData);
+      res.status(201).json(covenant);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid covenant data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create loan covenant" });
+    }
+  });
+
+  app.put("/api/loan-covenants/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertLoanCovenantSchema.partial().parse(req.body);
+      const covenant = await loanStorage.updateLoanCovenant(id, updateData);
+      if (!covenant) {
+        return res.status(404).json({ message: "Covenant not found" });
+      }
+      res.json(covenant);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid covenant data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update loan covenant" });
+    }
+  });
+
+  // Loan Committee Reviews
+  app.get("/api/loan-applications/:applicationId/reviews", async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.applicationId);
+      const reviews = await loanStorage.getLoanCommitteeReviews(applicationId);
+      res.json(reviews);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch committee reviews" });
+    }
+  });
+
+  app.post("/api/loan-committee-reviews", async (req, res) => {
+    try {
+      const reviewData = insertLoanCommitteeReviewSchema.parse(req.body);
+      const review = await loanStorage.createLoanCommitteeReview(reviewData);
+      res.status(201).json(review);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid review data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create committee review" });
+    }
+  });
+
+  app.put("/api/loan-committee-reviews/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertLoanCommitteeReviewSchema.partial().parse(req.body);
+      const review = await loanStorage.updateLoanCommitteeReview(id, updateData);
+      if (!review) {
+        return res.status(404).json({ message: "Review not found" });
+      }
+      res.json(review);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid review data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update committee review" });
+    }
+  });
+
+  // Capital Sources
+  app.get("/api/capital-sources", async (req, res) => {
+    try {
+      const sources = await loanStorage.getCapitalSources();
+      res.json(sources);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch capital sources" });
+    }
+  });
+
+  app.get("/api/capital-sources/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const source = await loanStorage.getCapitalSource(id);
+      if (!source) {
+        return res.status(404).json({ message: "Capital source not found" });
+      }
+      res.json(source);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch capital source" });
+    }
+  });
+
+  app.post("/api/capital-sources", async (req, res) => {
+    try {
+      const sourceData = insertCapitalSourceSchema.parse(req.body);
+      const source = await loanStorage.createCapitalSource(sourceData);
+      res.status(201).json(source);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid capital source data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create capital source" });
+    }
+  });
+
+  app.put("/api/capital-sources/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertCapitalSourceSchema.partial().parse(req.body);
+      const source = await loanStorage.updateCapitalSource(id, updateData);
+      if (!source) {
+        return res.status(404).json({ message: "Capital source not found" });
+      }
+      res.json(source);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid capital source data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update capital source" });
+    }
+  });
+
+  // Quarterly Reports
+  app.get("/api/loans/:loanId/quarterly-reports", async (req, res) => {
+    try {
+      const loanId = parseInt(req.params.loanId);
+      const reports = await loanStorage.getQuarterlyReports(loanId);
+      res.json(reports);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch quarterly reports" });
+    }
+  });
+
+  app.post("/api/quarterly-reports", async (req, res) => {
+    try {
+      const reportData = insertQuarterlyReportSchema.parse(req.body);
+      const report = await loanStorage.createQuarterlyReport(reportData);
+      res.status(201).json(report);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid report data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create quarterly report" });
+    }
+  });
+
+  app.put("/api/quarterly-reports/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertQuarterlyReportSchema.partial().parse(req.body);
+      const report = await loanStorage.updateQuarterlyReport(id, updateData);
+      if (!report) {
+        return res.status(404).json({ message: "Report not found" });
+      }
+      res.json(report);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid report data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update quarterly report" });
+    }
+  });
+
+  // Analytics and Dashboard Endpoints
+  app.get("/api/loan-dashboard/summary", async (req, res) => {
+    try {
+      const summary = await loanStorage.getLoanSummary();
+      res.json(summary);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch loan summary" });
+    }
+  });
+
+  app.get("/api/loan-dashboard/upcoming-payments", async (req, res) => {
+    try {
+      const days = req.query.days ? parseInt(req.query.days as string) : 30;
+      const payments = await loanStorage.getUpcomingPayments(days);
+      res.json(payments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch upcoming payments" });
+    }
+  });
+
+  app.get("/api/loan-dashboard/overdue-payments", async (req, res) => {
+    try {
+      const payments = await loanStorage.getOverduePayments();
+      res.json(payments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch overdue payments" });
+    }
+  });
+
+  app.get("/api/loan-dashboard/covenant-violations", async (req, res) => {
+    try {
+      const violations = await loanStorage.getCovenantViolations();
+      res.json(violations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch covenant violations" });
     }
   });
 

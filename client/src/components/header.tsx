@@ -37,6 +37,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const isTeachersActive = location === "/teachers" || location.startsWith("/teacher/");
   const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
   const isChartersActive = location === "/charters" || location.startsWith("/charter/");
+  const isLoansActive = location === "/loans" || location.startsWith("/loan/");
 
   const handleAddNew = () => {
     if (onAddNew) {
@@ -99,6 +100,13 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                     : "text-slate-500 hover:text-slate-700"
                 }`}>
                   Charters
+                </Link>
+                <Link href="/loans" className={`px-2 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
+                  isLoansActive
+                    ? "text-wildflower-blue"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}>
+                  Loans
                 </Link>
               </nav>
               

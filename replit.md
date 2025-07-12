@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack web application for managing teachers and schools in the Wildflower Schools network. The system allows users to create, read, update, and delete teacher and school records, as well as manage associations between teachers and schools.
+This is a comprehensive educational management platform for the Wildflower Schools network. The system provides advanced functionality for managing teachers, schools, charters, and a complete loan origination and management system. Users can manage educational records, track relationships between educators and schools, and handle the full loan lifecycle from application to servicing.
 
 ## System Architecture
 
@@ -33,23 +33,40 @@ This is a full-stack web application for managing teachers and schools in the Wi
 - **Error Handler**: `server/error-handler.ts` - Centralized error handling
 
 ### Database Schema
+
+#### Educational Data (Airtable)
 - **teachers**: Teacher profiles with personal and professional information
 - **schools**: School information including location and type
 - **teacher_school_associations**: Many-to-many relationship between teachers and schools
+- **charters**: Charter school information and management
+
+#### Loan Management System (PostgreSQL)
+- **borrowers**: Borrower profiles and entity information
+- **loan_applications**: Loan application submissions and underwriting data
+- **loans**: Active loan records with terms and balances
+- **loan_payments**: Payment schedules and transaction history
+- **loan_documents**: Document management for loan files
+- **loan_covenants**: Covenant tracking and compliance monitoring
+- **loan_committee_reviews**: Committee approval workflow
+- **capital_sources**: Capital funding source management
+- **quarterly_reports**: Investor and regulatory reporting
 
 ## Key Components
 
 ### Frontend Components
-- **Pages**: Teachers list, Schools list, Teacher detail, School detail
+- **Educational Pages**: Teachers list, Schools list, Charters list, Teacher detail, School detail, Charter detail
+- **Loan Management Pages**: Loan dashboard, Applications, Active loans, Borrower management, Reports
 - **Shared Components**: Header navigation, data tables, modal forms, delete confirmations
 - **UI Components**: Complete shadcn/ui component library implementation
 - **Form Components**: Add teacher/school modals with validation
+- **Loan Components**: Dashboard widgets, payment tracking, document management
 
 ### Backend Components
-- **Routes**: RESTful API endpoints for teachers, schools, and associations
-- **Storage Layer**: Abstract storage interface with in-memory implementation
-- **Database Integration**: Drizzle ORM with PostgreSQL schema definitions
-- **Validation**: Zod schemas for request/response validation
+- **Educational Routes**: RESTful API endpoints for teachers, schools, charters, and associations
+- **Loan Management Routes**: Complete loan API including applications, origination, servicing, and reporting
+- **Storage Layer**: Dual storage system - Airtable for educational data, PostgreSQL for loan data
+- **Database Integration**: Drizzle ORM with PostgreSQL schema definitions for loan system
+- **Validation**: Zod schemas for request/response validation across all systems
 
 ## Data Flow
 
@@ -198,6 +215,7 @@ Changelog:
 - July 11, 2025. Fixed TL table navigation issues: corrected routing paths from `/teachers/:id` to `/teacher/:id` to match App.tsx route definitions, fixed clickable educator names in TL tables, updated open button to work correctly for both teacher and association records, eliminated navigation crashes when clicking on educator names or open buttons
 - July 11, 2025. Implemented "End stint" functionality: added missing PUT route for `/api/teacher-school-associations/:id` in server/routes.ts, added updateEducatorSchoolAssociation and updateTeacherSchoolAssociation methods to storage interface and implementation, implemented proper Airtable update logic to set end date to today's date and mark association as inactive, fixed missing backend infrastructure for association updates
 - July 11, 2025. Fixed locations functionality: replaced mock implementation with proper Airtable integration for createLocation, updateLocation, and deleteLocation methods in storage layer, implemented correct field mappings to "Locations" table including school_id link field, address, current physical/mailing address booleans, and start/end date fields, resolved issue where location creation appeared to work but table didn't refresh due to data not being persisted to Airtable
+- July 12, 2025. Major system expansion with comprehensive loan management platform: implemented complete loan origination and servicing system including database schema design with 9 loan-specific tables using Drizzle ORM and PostgreSQL, created full-featured loan management interface with dashboard, applications tracking, active loans management, borrower profiles, and reporting capabilities, built comprehensive API layer with 40+ endpoints covering loan applications, underwriting, committee reviews, document management, payment processing, covenant tracking, capital management, and quarterly reporting, added responsive loan dashboard with real-time metrics, payment tracking, and portfolio analytics
 ```
 
 ## Development Guidelines

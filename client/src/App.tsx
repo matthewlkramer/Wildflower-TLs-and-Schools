@@ -13,6 +13,7 @@ import Dashboard from "@/pages/dashboard";
 import Teachers from "@/pages/teachers";
 import Schools from "@/pages/schools";
 import Charters from "@/pages/charters";
+import LoansPage from "@/pages/loans";
 import TeacherDetail from "@/pages/teacher-detail";
 import SchoolDetail from "@/pages/school-detail";
 import CharterDetail from "@/pages/charter-detail";
@@ -60,6 +61,7 @@ function Router() {
       <Route path="/school/:id" component={SchoolDetail} />
       <Route path="/charters" component={Charters} />
       <Route path="/charter/:id" component={CharterDetail} />
+      <Route path="/loans" component={LoansPage} />
       <Route component={NotFound} />
     </Switch>
   );
