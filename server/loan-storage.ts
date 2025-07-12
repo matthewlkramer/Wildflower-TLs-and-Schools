@@ -12,7 +12,7 @@ import {
   quarterlyReports,
   type InsertBorrower,
   type InsertLoanApplication,
-  type InsertLoan,
+  type InsertLoanRecord,
   type InsertLoanPayment,
   type InsertLoanDocument,
   type InsertLoanCovenant,
@@ -21,14 +21,14 @@ import {
   type InsertQuarterlyReport,
   type Borrower,
   type LoanApplication,
-  type Loan,
+  type LoanRecord,
   type LoanPayment,
   type LoanDocument,
   type LoanCovenant,
   type LoanCommitteeReview,
   type CapitalSource,
   type QuarterlyReport
-} from "@shared/loan-schema";
+} from "@shared/schema";
 
 // Loan Storage Interface
 export interface ILoanStorage {
@@ -47,10 +47,10 @@ export interface ILoanStorage {
   deleteLoanApplication(id: number): Promise<boolean>;
 
   // Loan methods
-  getLoans(): Promise<Loan[]>;
-  getLoanById(id: number): Promise<Loan | undefined>;
-  createLoan(loan: InsertLoan): Promise<Loan>;
-  updateLoan(id: number, loan: Partial<InsertLoan>): Promise<Loan | undefined>;
+  getLoans(): Promise<LoanRecord[]>;
+  getLoanById(id: number): Promise<LoanRecord | undefined>;
+  createLoan(loan: InsertLoanRecord): Promise<LoanRecord>;
+  updateLoan(id: number, loan: Partial<InsertLoanRecord>): Promise<LoanRecord | undefined>;
   deleteLoan(id: number): Promise<boolean>;
 
   // Loan Payment methods
@@ -153,21 +153,21 @@ export class DatabaseLoanStorage implements ILoanStorage {
   }
 
   // Loan methods
-  async getLoans(): Promise<Loan[]> {
+  async getLoans(): Promise<LoanRecord[]> {
     return await db.select().from(loans);
   }
 
-  async getLoanById(id: number): Promise<Loan | undefined> {
+  async getLoanById(id: number): Promise<LoanRecord | undefined> {
     const result = await db.select().from(loans).where(eq(loans.id, id));
     return result[0];
   }
 
-  async createLoan(loan: InsertLoan): Promise<Loan> {
+  async createLoan(loan: InsertLoanRecord): Promise<LoanRecord> {
     const result = await db.insert(loans).values(loan).returning();
     return result[0];
   }
 
-  async updateLoan(id: number, loan: Partial<InsertLoan>): Promise<Loan | undefined> {
+  async updateLoan(id: number, loan: Partial<InsertLoanRecord>): Promise<LoanRecord | undefined> {
     const result = await db.update(loans)
       .set({ ...loan, updatedAt: new Date() })
       .where(eq(loans.id, id))

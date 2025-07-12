@@ -4,17 +4,29 @@ import { storage } from "./simple-storage";
 import { loanStorage } from "./loan-storage";
 import { cache } from "./cache";
 import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema } from "@shared/schema";
+import { createInsertSchema } from "drizzle-zod";
 import { 
-  insertLoanApplicationSchema,
-  insertBorrowerSchema,
-  insertLoanSchema,
-  insertLoanPaymentSchema,
-  insertLoanDocumentSchema,
-  insertLoanCovenantSchema,
-  insertLoanCommitteeReviewSchema,
-  insertCapitalSourceSchema,
-  insertQuarterlyReportSchema
-} from "@shared/loan-schema";
+  borrowers,
+  loanApplications,
+  loans,
+  loanPayments,
+  loanDocuments,
+  loanCovenants,
+  loanCommitteeReviews,
+  capitalSources,
+  quarterlyReports
+} from "@shared/schema";
+
+// Create insert schemas for validation
+const insertBorrowerSchema = createInsertSchema(borrowers);
+const insertLoanApplicationSchema = createInsertSchema(loanApplications);
+const insertLoanSchema = createInsertSchema(loans);
+const insertLoanPaymentSchema = createInsertSchema(loanPayments);
+const insertLoanDocumentSchema = createInsertSchema(loanDocuments);
+const insertLoanCovenantSchema = createInsertSchema(loanCovenants);
+const insertLoanCommitteeReviewSchema = createInsertSchema(loanCommitteeReviews);
+const insertCapitalSourceSchema = createInsertSchema(capitalSources);
+const insertQuarterlyReportSchema = createInsertSchema(quarterlyReports);
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1614,7 +1626,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Analytics and Dashboard Endpoints
   app.get("/api/loan-dashboard/summary", async (req, res) => {
     try {
-      const summary = await loanStorage.getLoanSummary();
+      const summary = await loanStorage.getDashboardSummary();
       res.json(summary);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch loan summary" });
