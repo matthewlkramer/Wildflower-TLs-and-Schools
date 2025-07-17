@@ -562,11 +562,12 @@ export default function PromissoryNoteManager() {
                   });
                 } else {
                   // Creating new or updating existing
-                  const templateData = {
-                    ...editingTemplate,
-                    createdBy: editingTemplate?.createdBy || "Admin User"
+                  const { createdAt, updatedAt, ...templateData } = editingTemplate!;
+                  const cleanedData = {
+                    ...templateData,
+                    createdBy: templateData.createdBy || "Admin User"
                   };
-                  templateMutation.mutate(templateData);
+                  templateMutation.mutate(cleanedData);
                 }
               }}
               disabled={templateMutation.isPending || newVersionMutation.isPending}

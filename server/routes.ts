@@ -1975,7 +1975,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/promissory-note-templates/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const updateData = insertPromissoryNoteTemplateSchema.partial().parse(req.body);
+      // Exclude timestamp fields that should be managed by backend
+      const { createdAt, updatedAt, ...requestData } = req.body;
+      const updateData = insertPromissoryNoteTemplateSchema.partial().parse(requestData);
       const template = await loanStorage.updatePromissoryNoteTemplate(id, updateData);
       if (!template) {
         return res.status(404).json({ message: "Template not found" });
