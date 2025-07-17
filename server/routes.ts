@@ -1322,18 +1322,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const loans = await loanStorage.getLoans();
       
-      // Fetch borrower data for each loan
+      // Fetch borrower data for each loan using borrower_id
       const loansWithSchools = await Promise.all(
         loans.map(async (loan) => {
-          // Get school data from Airtable using schoolId
-          const school = await storage.getSchool(loan.schoolId);
+          // Get borrower data from loan storage (which maps to school via borrower_id)
+          const borrower = await loanStorage.getBorrowerById(loan.borrowerId);
           return {
             ...loan,
-            borrower: school ? { 
-              id: school.id, 
-              name: school.name || school.shortName,
-              schoolId: loan.schoolId 
-            } : null
+            borrower: borrower ? { 
+              id: borrower.id, 
+              name: borrower.name,
+              schoolId: borrower.schoolId 
+            } : {
+              id: loan.borrowerId,
+              name: `Borrower ${loan.borrowerId}`,
+              schoolId: null
+            }
           };
         })
       );
@@ -1341,6 +1345,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(loansWithSchools);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch loans" });
+    }
+  });
+
+  app.get("/api/loans/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const loan = await loanStorage.getLoanById(id);
+      if (!loan) {
+        return res.status(404).json({ message: "Loan not found" });
+      }
+      
+      // Get borrower data
+      const borrower = await loanStorage.getBorrowerById(loan.borrowerId);
+      const loanWithBorrower = {
+        ...loan,
+        borrower: borrower ? { 
+          id: borrower.id, 
+          name: borrower.name,
+          schoolId: borrower.schoolId 
+        } : {
+          id: loan.borrowerId,
+          name: `Borrower ${loan.borrowerId}`,
+          schoolId: null
+        }
+      };
+      
+      res.json(loanWithBorrower);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch loan" });
     }
   });
 
