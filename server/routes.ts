@@ -1321,7 +1321,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/loans", async (req, res) => {
     try {
       const loans = await loanStorage.getLoans();
-      res.json(loans);
+      
+      // Fetch borrower data for each loan
+      const loansWithBorrowers = await Promise.all(
+        loans.map(async (loan) => {
+          const borrower = await loanStorage.getBorrowerById(loan.borrowerId);
+          return {
+            ...loan,
+            borrower: borrower || null
+          };
+        })
+      );
+      
+      res.json(loansWithBorrowers);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch loans" });
     }

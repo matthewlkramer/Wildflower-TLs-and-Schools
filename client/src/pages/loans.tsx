@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { usePageTitle } from "@/App";
 import { Button } from "@/components/ui/button";
@@ -35,9 +35,11 @@ interface LoanSummary {
 
 export default function LoansPage() {
   const { setPageTitle } = usePageTitle();
-  setPageTitle("Loan Management");
-
   const [activeTab, setActiveTab] = useState("dashboard");
+
+  useEffect(() => {
+    setPageTitle("Loan Management");
+  }, [setPageTitle]);
 
   // Dashboard summary query
   const { data: summary, isLoading: summaryLoading } = useQuery<LoanSummary>({
@@ -346,18 +348,22 @@ export default function LoansPage() {
                           {getStatusBadge(loan.status)}
                         </div>
                         <CardDescription>
-                          Borrower ID: {loan.borrowerId} | Balance: {formatCurrency(loan.currentPrincipalBalance)}
+                          {loan.borrower?.name || `Borrower ID: ${loan.borrowerId}`} | Balance: {formatCurrency(loan.currentPrincipalBalance || 0)}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="grid grid-cols-3 gap-4 text-sm">
                           <div>
-                            <p className="text-muted-foreground">Interest Rate</p>
-                            <p className="font-medium">{(parseFloat(loan.interestRate) * 100).toFixed(2)}%</p>
+                            <p className="text-muted-foreground">Original Amount</p>
+                            <p className="font-medium">{formatCurrency(loan.principalAmount || 0)}</p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground">Maturity Date</p>
-                            <p className="font-medium">{loan.maturityDate ? new Date(loan.maturityDate).toLocaleDateString() : 'Not set'}</p>
+                            <p className="text-muted-foreground">Interest Rate</p>
+                            <p className="font-medium">{(parseFloat(loan.interestRate || 0) * 100).toFixed(2)}%</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Origination Date</p>
+                            <p className="font-medium">{loan.originationDate ? new Date(loan.originationDate).toLocaleDateString() : (loan.issueDate ? new Date(loan.issueDate).toLocaleDateString() : 'Not set')}</p>
                           </div>
                         </div>
                       </CardContent>

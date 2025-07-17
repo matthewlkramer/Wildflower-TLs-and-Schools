@@ -35,7 +35,7 @@ export default function LoanDetail() {
 
   // Fetch loan details with borrower information
   const { data: loan, isLoading, error } = useQuery<LoanWithBorrower>({
-    queryKey: ["/api/loans", id],
+    queryKey: [`/api/loans/${id}`],
     enabled: !!id
   });
 
