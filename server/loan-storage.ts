@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq, and, gte, lte, isNull } from "drizzle-orm";
+import { eq, and, gte, lte, isNull, sql } from "drizzle-orm";
 import { 
   borrowers,
   loanApplications,
@@ -52,6 +52,15 @@ export interface ILoanStorage {
   createLoan(loan: InsertLoanRecord): Promise<LoanRecord>;
   updateLoan(id: number, loan: Partial<InsertLoanRecord>): Promise<LoanRecord | undefined>;
   deleteLoan(id: number): Promise<boolean>;
+  
+  // Loan origination workflow methods
+  getLoansInOrigination(): Promise<LoanRecord[]>;
+  updateLoanOriginationStatus(id: number, status: string, updates?: Partial<InsertLoanRecord>): Promise<LoanRecord>;
+  completeLoanACHSetup(id: number, stripeData: {
+    connectAccountId?: string;
+    customerId?: string;
+    bankAccountId?: string;
+  }): Promise<LoanRecord>;
 
   // Loan Payment methods
   getLoanPayments(): Promise<LoanPayment[]>;
@@ -180,6 +189,59 @@ export class DatabaseLoanStorage implements ILoanStorage {
     return result.rowCount > 0;
   }
 
+  // Loan origination workflow methods
+  async getLoansInOrigination(): Promise<LoanRecord[]> {
+    const result = await db.select()
+      .from(loans)
+      .leftJoin(borrowers, eq(loans.borrowerId, borrowers.id))
+      .where(sql`${loans.originationStatus} != 'funded'`);
+    
+    return result.map(row => ({
+      ...row.loans,
+      borrower: row.borrowers
+    })) as LoanRecord[];
+  }
+
+  async updateLoanOriginationStatus(id: number, status: string, updates?: Partial<InsertLoanRecord>): Promise<LoanRecord> {
+    const updateData = {
+      originationStatus: status,
+      updatedAt: new Date(),
+      ...updates
+    };
+
+    const result = await db.update(loans)
+      .set(updateData)
+      .where(eq(loans.id, id))
+      .returning();
+    
+    return result[0];
+  }
+
+  async completeLoanACHSetup(id: number, stripeData: {
+    connectAccountId?: string;
+    customerId?: string;
+    bankAccountId?: string;
+  }): Promise<LoanRecord> {
+    const updateData = {
+      stripeConnectAccountId: stripeData.connectAccountId,
+      stripeCustomerId: stripeData.customerId,
+      stripeBankAccountId: stripeData.bankAccountId,
+      achSetupCompleted: true,
+      achSetupCompletedDate: new Date(),
+      achMandateAccepted: true,
+      achMandateAcceptedDate: new Date(),
+      updatedAt: new Date(),
+      originationStatus: 'ready_to_fund'
+    };
+
+    const result = await db.update(loans)
+      .set(updateData)
+      .where(eq(loans.id, id))
+      .returning();
+    
+    return result[0];
+  }
+
   // Loan Payment methods
   async getLoanPayments(): Promise<LoanPayment[]> {
     return await db.select().from(loanPayments);
@@ -280,19 +342,20 @@ export class DatabaseLoanStorage implements ILoanStorage {
     totalOutstanding: number;
     pendingApplications: number;
   }> {
-    const [totalLoansResult] = await db.select({ count: 'count(*)' }).from(loans);
-    const [activeLoansResult] = await db.select({ count: 'count(*)' }).from(loans).where(eq(loans.status, 'active'));
-    const [pendingApplicationsResult] = await db.select({ count: 'count(*)' }).from(loanApplications).where(eq(loanApplications.status, 'submitted'));
+    // Use sql function for proper count queries
+    const [totalLoansResult] = await db.select({ count: sql<number>`count(*)` }).from(loans);
+    const [activeLoansResult] = await db.select({ count: sql<number>`count(*)` }).from(loans).where(eq(loans.status, 'active'));
+    const [pendingApplicationsResult] = await db.select({ count: sql<number>`count(*)` }).from(loanApplications).where(eq(loanApplications.status, 'submitted'));
     
     // Calculate total outstanding by summing current principal balances
     const activeLoansData = await db.select({ balance: loans.currentPrincipalBalance }).from(loans).where(eq(loans.status, 'active'));
-    const totalOutstanding = activeLoansData.reduce((sum, loan) => sum + (loan.balance || 0), 0);
+    const totalOutstanding = activeLoansData.reduce((sum, loan) => sum + parseFloat(loan.balance?.toString() || '0'), 0);
 
     return {
-      totalLoans: parseInt(totalLoansResult.count as string) || 0,
-      activeLoans: parseInt(activeLoansResult.count as string) || 0,
+      totalLoans: totalLoansResult.count || 0,
+      activeLoans: activeLoansResult.count || 0,
       totalOutstanding,
-      pendingApplications: parseInt(pendingApplicationsResult.count as string) || 0
+      pendingApplications: pendingApplicationsResult.count || 0
     };
   }
 

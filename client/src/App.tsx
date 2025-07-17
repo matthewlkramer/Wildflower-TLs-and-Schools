@@ -14,6 +14,9 @@ import Teachers from "@/pages/teachers";
 import Schools from "@/pages/schools";
 import Charters from "@/pages/charters";
 import LoansPage from "@/pages/loans";
+import LoanOrigination from "@/pages/loan-origination";
+import ACHSetup from "@/pages/ach-setup";
+import ACHSetupComplete from "@/pages/ach-setup-complete";
 import TeacherDetail from "@/pages/teacher-detail";
 import SchoolDetail from "@/pages/school-detail";
 import CharterDetail from "@/pages/charter-detail";
@@ -62,6 +65,9 @@ function Router() {
       <Route path="/charters" component={Charters} />
       <Route path="/charter/:id" component={CharterDetail} />
       <Route path="/loans" component={LoansPage} />
+      <Route path="/loan-origination" component={LoanOrigination} />
+      <Route path="/ach-setup/:loanId" component={ACHSetup} />
+      <Route path="/ach-setup-complete" component={ACHSetupComplete} />
       <Route component={NotFound} />
     </Switch>
   );

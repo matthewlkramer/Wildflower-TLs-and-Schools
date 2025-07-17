@@ -1129,6 +1129,22 @@ export const loans = pgTable("loans", {
   loanOfficer: text("loan_officer"),
   servicer: text("servicer"),
   
+  // Origination Workflow Tracking
+  originationStatus: text("origination_status").default("pending_approval"), // pending_approval, approved, documents_pending, ach_pending, ready_to_fund, funded
+  promissoryNoteSigned: boolean("promissory_note_signed").default(false),
+  promissoryNoteSignedDate: timestamp("promissory_note_signed_date"),
+  achSetupCompleted: boolean("ach_setup_completed").default(false),
+  achSetupCompletedDate: timestamp("ach_setup_completed_date"),
+  fundsDistributed: boolean("funds_distributed").default(false),
+  fundsDistributedDate: timestamp("funds_distributed_date"),
+  
+  // Stripe Integration
+  stripeConnectAccountId: text("stripe_connect_account_id"),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeBankAccountId: text("stripe_bank_account_id"),
+  achMandateAccepted: boolean("ach_mandate_accepted").default(false),
+  achMandateAcceptedDate: timestamp("ach_mandate_accepted_date"),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -1382,5 +1398,14 @@ export type CapitalSource = typeof capitalSources.$inferSelect;
 export type InsertCapitalSource = typeof capitalSources.$inferInsert;
 export type QuarterlyReport = typeof quarterlyReports.$inferSelect;
 export type InsertQuarterlyReport = typeof quarterlyReports.$inferInsert;
+
+// Origination Workflow Types
+export type OriginationStatus = 
+  | "pending_approval"
+  | "approved" 
+  | "documents_pending"
+  | "ach_pending"
+  | "ready_to_fund"
+  | "funded";
 
 

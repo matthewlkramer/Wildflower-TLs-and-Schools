@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import Stripe from "stripe";
 import { storage } from "./simple-storage";
 import { loanStorage } from "./loan-storage";
 import { cache } from "./cache";
@@ -28,6 +29,14 @@ const insertLoanCommitteeReviewSchema = createInsertSchema(loanCommitteeReviews)
 const insertCapitalSourceSchema = createInsertSchema(capitalSources);
 const insertQuarterlyReportSchema = createInsertSchema(quarterlyReports);
 import { z } from "zod";
+
+// Initialize Stripe
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Educator routes (primary)
@@ -1345,6 +1354,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/loans/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const loan = await loanStorage.getLoanById(id);
+      if (!loan) {
+        return res.status(404).json({ message: "Loan not found" });
+      }
+      
+      // Get borrower details
+      const borrower = await loanStorage.getBorrowerById(loan.borrowerId);
+      const loanWithBorrower = { ...loan, borrower };
+      
+      res.json(loanWithBorrower);
+    } catch (error) {
+      console.error("Error fetching loan:", error);
+      res.status(500).json({ message: "Failed to fetch loan" });
+    }
+  });
+
   app.put("/api/loans/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -1359,6 +1387,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid loan data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to update loan" });
+    }
+  });
+
+  // Loan Origination Workflow Routes
+  app.get("/api/loans/origination-pipeline", async (req, res) => {
+    try {
+      const loans = await loanStorage.getLoansInOrigination();
+      res.json(loans);
+    } catch (error) {
+      console.error("Error fetching origination pipeline:", error);
+      res.status(500).json({ message: "Failed to fetch origination pipeline" });
+    }
+  });
+
+  app.post("/api/loans/:id/ach-setup", async (req, res) => {
+    try {
+      const loanId = parseInt(req.params.id);
+      const { paymentMethodId, accountHolderName } = req.body;
+
+      if (!paymentMethodId || !accountHolderName) {
+        return res.status(400).json({ message: "Payment method ID and account holder name required" });
+      }
+
+      // Get loan details
+      const loan = await loanStorage.getLoanById(loanId);
+      if (!loan) {
+        return res.status(404).json({ message: "Loan not found" });
+      }
+
+      const borrower = await loanStorage.getBorrowerById(loan.borrowerId);
+      if (!borrower) {
+        return res.status(404).json({ message: "Borrower not found" });
+      }
+
+      // Create or retrieve Stripe customer
+      let customerId = loan.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: borrower.primaryContactEmail || undefined,
+          name: borrower.entityName,
+          metadata: {
+            borrowerId: borrower.id.toString(),
+            loanId: loanId.toString(),
+          },
+        });
+        customerId = customer.id;
+      }
+
+      // Attach payment method to customer
+      await stripe.paymentMethods.attach(paymentMethodId, {
+        customer: customerId,
+      });
+
+      // Create ACH mandate
+      const setupIntent = await stripe.setupIntents.create({
+        customer: customerId,
+        payment_method: paymentMethodId,
+        usage: 'off_session',
+        confirm: true,
+        payment_method_types: ['us_bank_account'],
+      });
+
+      if (setupIntent.status !== 'succeeded') {
+        return res.status(400).json({ message: "Failed to set up ACH mandate" });
+      }
+
+      // Update loan with Stripe details
+      const updatedLoan = await loanStorage.completeLoanACHSetup(loanId, {
+        customerId,
+        bankAccountId: paymentMethodId,
+      });
+
+      res.json({
+        success: true,
+        loan: updatedLoan,
+        setupIntent: setupIntent.id,
+      });
+    } catch (error) {
+      console.error("Error setting up ACH:", error);
+      res.status(500).json({ message: "Failed to set up ACH" });
+    }
+  });
+
+  app.patch("/api/loans/:id/origination-status", async (req, res) => {
+    try {
+      const loanId = parseInt(req.params.id);
+      const { status, ...updates } = req.body;
+
+      const updatedLoan = await loanStorage.updateLoanOriginationStatus(loanId, status, updates);
+      res.json(updatedLoan);
+    } catch (error) {
+      console.error("Error updating origination status:", error);
+      res.status(500).json({ message: "Failed to update origination status" });
     }
   });
 

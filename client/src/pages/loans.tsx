@@ -12,8 +12,10 @@ import {
   Clock, 
   AlertTriangle,
   FileText,
-  Users
+  Users,
+  Settings
 } from "lucide-react";
+import { Link } from "wouter";
 import { 
   type LoanApplication, 
   type Loan, 
@@ -110,10 +112,18 @@ export default function LoansPage() {
               Comprehensive loan origination, servicing, and portfolio management
             </p>
           </div>
-          <Button className="bg-purple-600 hover:bg-purple-700">
-            <Plus className="mr-2 h-4 w-4" />
-            New Application
-          </Button>
+          <div className="flex gap-2">
+            <Link href="/loan-origination">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Origination Pipeline
+              </Button>
+            </Link>
+            <Button className="bg-purple-600 hover:bg-purple-700">
+              <Plus className="mr-2 h-4 w-4" />
+              New Application
+            </Button>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
