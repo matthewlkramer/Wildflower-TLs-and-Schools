@@ -41,7 +41,7 @@ export default function LoanDetail() {
 
   useEffect(() => {
     if (loan) {
-      setPageTitle(`Loan ${loan.loanNumber}`);
+      setPageTitle(`Loan ${loan.loanNumber || loan.id || 'Details'}`);
     }
   }, [loan, setPageTitle]);
 
@@ -67,7 +67,9 @@ export default function LoanDetail() {
     });
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | undefined | null) => {
+    if (!status) return null;
+    
     const statusConfig: Record<string, { variant: "default" | "secondary" | "destructive" | "outline", color: string }> = {
       'active': { variant: 'default', color: 'text-green-600 bg-green-50 border-green-200' },
       'paid_off': { variant: 'outline', color: 'text-gray-500 bg-gray-50 border-gray-200' },
@@ -83,7 +85,9 @@ export default function LoanDetail() {
     );
   };
 
-  const getOriginationStatusBadge = (status: string) => {
+  const getOriginationStatusBadge = (status: string | undefined | null) => {
+    if (!status) return null;
+    
     const statusConfig: Record<string, { icon: any, color: string, text: string }> = {
       'pending_approval': { icon: Clock, color: 'text-yellow-600', text: 'Pending Approval' },
       'approved': { icon: CheckCircle, color: 'text-green-600', text: 'Approved' },
@@ -93,7 +97,7 @@ export default function LoanDetail() {
       'funded': { icon: CheckCircle, color: 'text-green-600', text: 'Funded' }
     };
 
-    const config = statusConfig[status] || { icon: AlertCircle, color: 'text-gray-500', text: status };
+    const config = statusConfig[status] || { icon: AlertCircle, color: 'text-gray-500', text: status || 'Unknown' };
     const IconComponent = config.icon;
     
     return (
@@ -140,7 +144,7 @@ export default function LoanDetail() {
   }
 
   const outstandingBalance = parseFloat(loan.currentPrincipalBalance || '0');
-  const principalAmount = parseFloat(loan.principalAmount);
+  const principalAmount = parseFloat(loan.principalAmount || '0');
   const paidAmount = principalAmount - outstandingBalance;
   const paymentProgress = principalAmount > 0 ? (paidAmount / principalAmount) * 100 : 0;
 
