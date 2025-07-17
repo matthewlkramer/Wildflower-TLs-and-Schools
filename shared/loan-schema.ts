@@ -1,4 +1,4 @@
-import { pgTable, serial, text, decimal, boolean, timestamp, integer, uuid } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, decimal, boolean, timestamp, integer, uuid, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -234,6 +234,18 @@ export const capitalSources = pgTable("capital_sources", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Report Schedule Configuration
+export const reportSchedules = pgTable("report_schedules", {
+  id: serial("id").primaryKey(),
+  quarter: integer("quarter").notNull(), // 1, 2, 3, 4
+  dueMonth: integer("due_month").notNull(), // 1-12 
+  dueDay: integer("due_day").notNull(), // 1-31
+  reminderWeeksBefore: integer("reminder_weeks_before").notNull().default(4), // weeks before due date to send reminder
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Quarterly Reports - From borrowers
 export const quarterlyReports = pgTable("quarterly_reports", {
   id: serial("id").primaryKey(),
@@ -260,16 +272,84 @@ export const quarterlyReports = pgTable("quarterly_reports", {
   enrollment: integer("enrollment"),
   teacherCount: integer("teacher_count"),
   
-  // Compliance
-  status: text("status").notNull().default("pending"), // pending, submitted, under_review, approved, rejected
+  // Risk Assessment
+  riskRating: text("risk_rating"), // 1-Moderate, 2-Substantial Risk, 3-High Risk, 4-Work-out
+  previousRiskRating: text("previous_risk_rating"),
+  
+  // Compliance and Tracking
+  status: text("status").notNull().default("pending"), // pending, submitted, under_review, approved, rejected, overdue
   reviewedBy: text("reviewed_by"),
   reviewDate: timestamp("review_date"),
   reviewNotes: text("review_notes"),
+  
+  // Reminder tracking
+  remindersSent: integer("reminders_sent").notNull().default(0),
+  lastReminderSent: timestamp("last_reminder_sent"),
+  reminderNotes: text("reminder_notes"),
   
   attachmentPath: text("attachment_path"), // Path to uploaded financial statements
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Reminder Log for tracking outreach
+export const quarterlyReportReminders = pgTable("quarterly_report_reminders", {
+  id: serial("id").primaryKey(),
+  quarterlyReportId: integer("quarterly_report_id").references(() => quarterlyReports.id).notNull(),
+  reminderType: text("reminder_type").notNull(), // initial, follow_up, final, custom
+  sentDate: timestamp("sent_date").notNull(),
+  method: text("method").notNull(), // email, phone, in_person
+  recipientEmail: text("recipient_email"),
+  subject: text("subject"),
+  message: text("message"),
+  sentBy: text("sent_by").notNull(),
+  response: text("response"), // borrower response if any
+  responseDate: timestamp("response_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Promissory Note Templates
+export const promissoryNoteTemplates = pgTable("promissory_note_templates", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // e.g., "Sunlight Promissory Note", "Founder's Promissory Note"
+  templateType: text("template_type").notNull(), // "standard", "founders", "bridge", etc.
+  version: integer("version").notNull(), // version number for template history
+  content: text("content").notNull(), // full template content with placeholder fields
+  variableFields: jsonb("variable_fields"), // array of field definitions
+  isActive: boolean("is_active").notNull().default(true),
+  createdBy: text("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Template Field Definitions
+export const templateFields = pgTable("template_fields", {
+  id: serial("id").primaryKey(),
+  templateId: integer("template_id").references(() => promissoryNoteTemplates.id).notNull(),
+  fieldName: text("field_name").notNull(), // e.g., "SCHOOL_NAME", "LOAN_AMOUNT"
+  fieldLabel: text("field_label").notNull(), // e.g., "School Name", "Loan Amount"
+  fieldType: text("field_type").notNull(), // "text", "number", "date", "currency", "address"
+  placeholder: text("placeholder").notNull(), // e.g., "[SCHOOL NAME]", "$[ ]"
+  isRequired: boolean("is_required").notNull().default(true),
+  defaultValue: text("default_value"),
+  validationRules: jsonb("validation_rules"), // regex, min/max values, etc.
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Generated Documents (when templates are filled out)
+export const generatedDocuments = pgTable("generated_documents", {
+  id: serial("id").primaryKey(),
+  loanId: integer("loan_id").references(() => loans.id).notNull(),
+  templateId: integer("template_id").references(() => promissoryNoteTemplates.id).notNull(),
+  documentType: text("document_type").notNull(), // "promissory_note", "security_agreement", etc.
+  generatedContent: text("generated_content").notNull(), // filled template
+  fieldValues: jsonb("field_values").notNull(), // values used to fill the template
+  generatedBy: text("generated_by").notNull(),
+  generatedAt: timestamp("generated_at").defaultNow(),
+  status: text("status").notNull().default("draft"), // draft, reviewed, signed, executed
+  filePath: text("file_path"), // path to generated PDF/DOCX file
 });
 
 // Define relationships
@@ -354,7 +434,36 @@ export const selectCapitalSourceSchema = createSelectSchema(capitalSources);
 export type InsertCapitalSource = z.infer<typeof insertCapitalSourceSchema>;
 export type CapitalSource = z.infer<typeof selectCapitalSourceSchema>;
 
+// Report Schedule schemas
+export const insertReportScheduleSchema = createInsertSchema(reportSchedules);
+export const selectReportScheduleSchema = createSelectSchema(reportSchedules);
+export type InsertReportSchedule = z.infer<typeof insertReportScheduleSchema>;
+export type ReportSchedule = z.infer<typeof selectReportScheduleSchema>;
+
+// Quarterly Report schemas
 export const insertQuarterlyReportSchema = createInsertSchema(quarterlyReports);
 export const selectQuarterlyReportSchema = createSelectSchema(quarterlyReports);
 export type InsertQuarterlyReport = z.infer<typeof insertQuarterlyReportSchema>;
 export type QuarterlyReport = z.infer<typeof selectQuarterlyReportSchema>;
+
+// Reminder schemas
+export const insertQuarterlyReportReminderSchema = createInsertSchema(quarterlyReportReminders);
+export const selectQuarterlyReportReminderSchema = createSelectSchema(quarterlyReportReminders);
+export type InsertQuarterlyReportReminder = z.infer<typeof insertQuarterlyReportReminderSchema>;
+export type QuarterlyReportReminder = z.infer<typeof selectQuarterlyReportReminderSchema>;
+
+// Promissory Note Template schemas
+export const insertPromissoryNoteTemplateSchema = createInsertSchema(promissoryNoteTemplates);
+export const selectPromissoryNoteTemplateSchema = createSelectSchema(promissoryNoteTemplates);
+export type InsertPromissoryNoteTemplate = z.infer<typeof insertPromissoryNoteTemplateSchema>;
+export type PromissoryNoteTemplate = z.infer<typeof selectPromissoryNoteTemplateSchema>;
+
+export const insertTemplateFieldSchema = createInsertSchema(templateFields);
+export const selectTemplateFieldSchema = createSelectSchema(templateFields);
+export type InsertTemplateField = z.infer<typeof insertTemplateFieldSchema>;
+export type TemplateField = z.infer<typeof selectTemplateFieldSchema>;
+
+export const insertGeneratedDocumentSchema = createInsertSchema(generatedDocuments);
+export const selectGeneratedDocumentSchema = createSelectSchema(generatedDocuments);
+export type InsertGeneratedDocument = z.infer<typeof insertGeneratedDocumentSchema>;
+export type GeneratedDocument = z.infer<typeof selectGeneratedDocumentSchema>;

@@ -30,6 +30,27 @@ import {
   type QuarterlyReport
 } from "@shared/schema";
 
+import {
+  reportSchedules,
+  quarterlyReportReminders,
+  type InsertReportSchedule,
+  type InsertQuarterlyReportReminder,
+  type ReportSchedule,
+  type QuarterlyReportReminder
+} from "@shared/loan-schema";
+
+import {
+  promissoryNoteTemplates,
+  templateFields,
+  generatedDocuments,
+  type InsertPromissoryNoteTemplate,
+  type InsertTemplateField,
+  type InsertGeneratedDocument,
+  type PromissoryNoteTemplate,
+  type TemplateField,
+  type GeneratedDocument
+} from "@shared/schema";
+
 // Loan Storage Interface
 export interface ILoanStorage {
   // Borrower methods
@@ -89,7 +110,45 @@ export interface ILoanStorage {
 
   // Quarterly Report methods
   getQuarterlyReports(): Promise<QuarterlyReport[]>;
+  getQuarterlyReportsByLoanId(loanId: number): Promise<QuarterlyReport[]>;
   createQuarterlyReport(report: InsertQuarterlyReport): Promise<QuarterlyReport>;
+  updateQuarterlyReport(id: number, report: Partial<InsertQuarterlyReport>): Promise<QuarterlyReport | undefined>;
+  getQuarterlyReportsForTracking(): Promise<(QuarterlyReport & { borrowerName: string; loanNumber: string })[]>;
+  getOverdueQuarterlyReports(): Promise<(QuarterlyReport & { borrowerName: string; loanNumber: string })[]>;
+  generateQuarterlyReportsForPeriod(year: number, quarter: number): Promise<void>;
+  
+  // Report Schedule methods
+  getReportSchedules(): Promise<ReportSchedule[]>;
+  createReportSchedule(schedule: InsertReportSchedule): Promise<ReportSchedule>;
+  updateReportSchedule(id: number, schedule: Partial<InsertReportSchedule>): Promise<ReportSchedule | undefined>;
+  deleteReportSchedule(id: number): Promise<boolean>;
+  
+  // Reminder methods
+  getQuarterlyReportReminders(quarterlyReportId: number): Promise<QuarterlyReportReminder[]>;
+  createQuarterlyReportReminder(reminder: InsertQuarterlyReportReminder): Promise<QuarterlyReportReminder>;
+  sendQuarterlyReportReminder(quarterlyReportId: number, reminderType: string, sentBy: string): Promise<QuarterlyReportReminder>;
+
+  // Promissory Note Template methods
+  getPromissoryNoteTemplates(): Promise<PromissoryNoteTemplate[]>;
+  getPromissoryNoteTemplateById(id: number): Promise<PromissoryNoteTemplate | undefined>;
+  getPromissoryNoteTemplatesByType(templateType: string): Promise<PromissoryNoteTemplate[]>;
+  createPromissoryNoteTemplate(template: InsertPromissoryNoteTemplate): Promise<PromissoryNoteTemplate>;
+  updatePromissoryNoteTemplate(id: number, template: Partial<InsertPromissoryNoteTemplate>): Promise<PromissoryNoteTemplate | undefined>;
+  createNewTemplateVersion(originalId: number, updates: Partial<InsertPromissoryNoteTemplate>, createdBy: string): Promise<PromissoryNoteTemplate>;
+  
+  // Template Field methods
+  getTemplateFields(templateId: number): Promise<TemplateField[]>;
+  createTemplateField(field: InsertTemplateField): Promise<TemplateField>;
+  updateTemplateField(id: number, field: Partial<InsertTemplateField>): Promise<TemplateField | undefined>;
+  deleteTemplateField(id: number): Promise<boolean>;
+  
+  // Document Generation methods
+  generatePromissoryNote(loanId: number, templateId: number, fieldValues: Record<string, any>, generatedBy: string): Promise<GeneratedDocument>;
+  getGeneratedDocuments(loanId: number): Promise<GeneratedDocument[]>;
+  
+  // Template parsing methods
+  parseTemplateFields(content: string): string[];
+  fillTemplate(template: PromissoryNoteTemplate, fieldValues: Record<string, any>): string;
 
   // Dashboard and analytics methods
   getDashboardSummary(): Promise<{
@@ -336,9 +395,307 @@ export class DatabaseLoanStorage implements ILoanStorage {
     return await db.select().from(quarterlyReports);
   }
 
+  async getQuarterlyReportsByLoanId(loanId: number): Promise<QuarterlyReport[]> {
+    return await db.select().from(quarterlyReports).where(eq(quarterlyReports.loanId, loanId));
+  }
+
   async createQuarterlyReport(report: InsertQuarterlyReport): Promise<QuarterlyReport> {
     const result = await db.insert(quarterlyReports).values(report).returning();
     return result[0];
+  }
+
+  async updateQuarterlyReport(id: number, report: Partial<InsertQuarterlyReport>): Promise<QuarterlyReport | undefined> {
+    const result = await db.update(quarterlyReports)
+      .set({ ...report, updatedAt: new Date() })
+      .where(eq(quarterlyReports.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getQuarterlyReportsForTracking(): Promise<(QuarterlyReport & { borrowerName: string; loanNumber: string })[]> {
+    const result = await db.select({
+      report: quarterlyReports,
+      borrower: borrowers,
+      loan: loans
+    })
+      .from(quarterlyReports)
+      .leftJoin(loans, eq(quarterlyReports.loanId, loans.id))
+      .leftJoin(borrowers, eq(loans.borrowerId, borrowers.id))
+      .orderBy(quarterlyReports.dueDate);
+    
+    return result.map(row => ({
+      ...row.report,
+      borrowerName: row.borrower?.name || 'Unknown',
+      loanNumber: row.loan?.loanNumber || 'Unknown'
+    }));
+  }
+
+  async getOverdueQuarterlyReports(): Promise<(QuarterlyReport & { borrowerName: string; loanNumber: string })[]> {
+    const result = await db.select({
+      report: quarterlyReports,
+      borrower: borrowers,
+      loan: loans
+    })
+      .from(quarterlyReports)
+      .leftJoin(loans, eq(quarterlyReports.loanId, loans.id))
+      .leftJoin(borrowers, eq(loans.borrowerId, borrowers.id))
+      .where(
+        and(
+          lte(quarterlyReports.dueDate, new Date()),
+          isNull(quarterlyReports.submissionDate)
+        )
+      );
+    
+    return result.map(row => ({
+      ...row.report,
+      borrowerName: row.borrower?.name || 'Unknown',
+      loanNumber: row.loan?.loanNumber || 'Unknown'
+    }));
+  }
+
+  async generateQuarterlyReportsForPeriod(year: number, quarter: number): Promise<void> {
+    // Get report schedule for this quarter
+    const [schedule] = await db.select()
+      .from(reportSchedules)
+      .where(and(eq(reportSchedules.quarter, quarter), eq(reportSchedules.isActive, true)));
+    
+    if (!schedule) {
+      throw new Error(`No active schedule found for Q${quarter}`);
+    }
+
+    // Calculate due date
+    const dueDate = new Date(year, schedule.dueMonth - 1, schedule.dueDay);
+    
+    // Get all active loans
+    const activeLoans = await db.select().from(loans).where(eq(loans.status, 'active'));
+    
+    // Create quarterly report records for each active loan
+    const reportsToCreate = activeLoans.map(loan => ({
+      loanId: loan.id,
+      reportYear: year,
+      reportQuarter: quarter,
+      dueDate,
+      status: 'pending' as const
+    }));
+
+    if (reportsToCreate.length > 0) {
+      await db.insert(quarterlyReports).values(reportsToCreate);
+    }
+  }
+
+  // Report Schedule methods
+  async getReportSchedules(): Promise<ReportSchedule[]> {
+    return await db.select().from(reportSchedules).orderBy(reportSchedules.quarter);
+  }
+
+  async createReportSchedule(schedule: InsertReportSchedule): Promise<ReportSchedule> {
+    const result = await db.insert(reportSchedules).values(schedule).returning();
+    return result[0];
+  }
+
+  async updateReportSchedule(id: number, schedule: Partial<InsertReportSchedule>): Promise<ReportSchedule | undefined> {
+    const result = await db.update(reportSchedules)
+      .set({ ...schedule, updatedAt: new Date() })
+      .where(eq(reportSchedules.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteReportSchedule(id: number): Promise<boolean> {
+    const result = await db.delete(reportSchedules).where(eq(reportSchedules.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Reminder methods
+  async getQuarterlyReportReminders(quarterlyReportId: number): Promise<QuarterlyReportReminder[]> {
+    return await db.select().from(quarterlyReportReminders)
+      .where(eq(quarterlyReportReminders.quarterlyReportId, quarterlyReportId))
+      .orderBy(quarterlyReportReminders.sentDate);
+  }
+
+  async createQuarterlyReportReminder(reminder: InsertQuarterlyReportReminder): Promise<QuarterlyReportReminder> {
+    const result = await db.insert(quarterlyReportReminders).values(reminder).returning();
+    return result[0];
+  }
+
+  async sendQuarterlyReportReminder(quarterlyReportId: number, reminderType: string, sentBy: string): Promise<QuarterlyReportReminder> {
+    // Get the quarterly report with loan and borrower info
+    const [reportData] = await db.select({
+      report: quarterlyReports,
+      loan: loans,
+      borrower: borrowers
+    })
+      .from(quarterlyReports)
+      .leftJoin(loans, eq(quarterlyReports.loanId, loans.id))
+      .leftJoin(borrowers, eq(loans.borrowerId, borrowers.id))
+      .where(eq(quarterlyReports.id, quarterlyReportId));
+
+    if (!reportData) {
+      throw new Error('Quarterly report not found');
+    }
+
+    // Create reminder record
+    const reminderData: InsertQuarterlyReportReminder = {
+      quarterlyReportId,
+      reminderType,
+      sentDate: new Date(),
+      method: 'email',
+      recipientEmail: reportData.borrower?.primaryContactEmail || '',
+      subject: `Q${reportData.report.reportQuarter} ${reportData.report.reportYear} Quarterly Report Due`,
+      message: `Your quarterly report for Q${reportData.report.reportQuarter} ${reportData.report.reportYear} is due on ${reportData.report.dueDate?.toLocaleDateString()}.`,
+      sentBy
+    };
+
+    const reminder = await this.createQuarterlyReportReminder(reminderData);
+
+    // Update the quarterly report reminder tracking
+    await db.update(quarterlyReports)
+      .set({
+        remindersSent: sql`${quarterlyReports.remindersSent} + 1`,
+        lastReminderSent: new Date()
+      })
+      .where(eq(quarterlyReports.id, quarterlyReportId));
+
+    return reminder;
+  }
+
+  // Promissory Note Template methods
+  async getPromissoryNoteTemplates(): Promise<PromissoryNoteTemplate[]> {
+    return await db.select().from(promissoryNoteTemplates)
+      .orderBy(promissoryNoteTemplates.name, promissoryNoteTemplates.version);
+  }
+
+  async getPromissoryNoteTemplateById(id: number): Promise<PromissoryNoteTemplate | undefined> {
+    const result = await db.select().from(promissoryNoteTemplates)
+      .where(eq(promissoryNoteTemplates.id, id));
+    return result[0];
+  }
+
+  async getPromissoryNoteTemplatesByType(templateType: string): Promise<PromissoryNoteTemplate[]> {
+    return await db.select().from(promissoryNoteTemplates)
+      .where(eq(promissoryNoteTemplates.templateType, templateType))
+      .orderBy(promissoryNoteTemplates.version);
+  }
+
+  async createPromissoryNoteTemplate(template: InsertPromissoryNoteTemplate): Promise<PromissoryNoteTemplate> {
+    const result = await db.insert(promissoryNoteTemplates).values(template).returning();
+    return result[0];
+  }
+
+  async updatePromissoryNoteTemplate(id: number, template: Partial<InsertPromissoryNoteTemplate>): Promise<PromissoryNoteTemplate | undefined> {
+    const result = await db.update(promissoryNoteTemplates)
+      .set({ ...template, updatedAt: new Date() })
+      .where(eq(promissoryNoteTemplates.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async createNewTemplateVersion(originalId: number, updates: Partial<InsertPromissoryNoteTemplate>, createdBy: string): Promise<PromissoryNoteTemplate> {
+    // Get the original template
+    const original = await this.getPromissoryNoteTemplateById(originalId);
+    if (!original) {
+      throw new Error('Original template not found');
+    }
+
+    // Find the highest version for this template type
+    const existingVersions = await db.select({ version: promissoryNoteTemplates.version })
+      .from(promissoryNoteTemplates)
+      .where(eq(promissoryNoteTemplates.templateType, original.templateType));
+    
+    const maxVersion = Math.max(...existingVersions.map(v => v.version || 0));
+    const newVersion = maxVersion + 1;
+
+    // Create new version
+    const newTemplate: InsertPromissoryNoteTemplate = {
+      ...original,
+      ...updates,
+      version: newVersion,
+      createdBy,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    // Remove the id so it creates a new record
+    delete (newTemplate as any).id;
+
+    const result = await db.insert(promissoryNoteTemplates).values(newTemplate).returning();
+    return result[0];
+  }
+
+  // Template Field methods
+  async getTemplateFields(templateId: number): Promise<TemplateField[]> {
+    return await db.select().from(templateFields)
+      .where(eq(templateFields.templateId, templateId))
+      .orderBy(templateFields.sortOrder);
+  }
+
+  async createTemplateField(field: InsertTemplateField): Promise<TemplateField> {
+    const result = await db.insert(templateFields).values(field).returning();
+    return result[0];
+  }
+
+  async updateTemplateField(id: number, field: Partial<InsertTemplateField>): Promise<TemplateField | undefined> {
+    const result = await db.update(templateFields)
+      .set(field)
+      .where(eq(templateFields.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteTemplateField(id: number): Promise<boolean> {
+    const result = await db.delete(templateFields).where(eq(templateFields.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Document Generation methods
+  async generatePromissoryNote(loanId: number, templateId: number, fieldValues: Record<string, any>, generatedBy: string): Promise<GeneratedDocument> {
+    const template = await this.getPromissoryNoteTemplateById(templateId);
+    if (!template) {
+      throw new Error('Template not found');
+    }
+
+    const generatedContent = this.fillTemplate(template, fieldValues);
+
+    const document: InsertGeneratedDocument = {
+      loanId,
+      templateId,
+      documentType: 'promissory_note',
+      generatedContent,
+      fieldValues,
+      generatedBy,
+      generatedAt: new Date(),
+      status: 'draft'
+    };
+
+    const result = await db.insert(generatedDocuments).values(document).returning();
+    return result[0];
+  }
+
+  async getGeneratedDocuments(loanId: number): Promise<GeneratedDocument[]> {
+    return await db.select().from(generatedDocuments)
+      .where(eq(generatedDocuments.loanId, loanId))
+      .orderBy(generatedDocuments.generatedAt);
+  }
+
+  // Template parsing methods
+  parseTemplateFields(content: string): string[] {
+    // Find all placeholders in brackets like [FIELD_NAME], $[AMOUNT], etc.
+    const fieldRegex = /\[([^\]]+)\]/g;
+    const matches = content.match(fieldRegex) || [];
+    return [...new Set(matches)]; // remove duplicates
+  }
+
+  fillTemplate(template: PromissoryNoteTemplate, fieldValues: Record<string, any>): string {
+    let content = template.content;
+    
+    // Replace each field value in the template
+    Object.entries(fieldValues).forEach(([fieldName, value]) => {
+      const placeholder = `[${fieldName}]`;
+      const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      content = content.replace(regex, value?.toString() || '');
+    });
+
+    return content;
   }
 
   // Dashboard and analytics methods

@@ -17,6 +17,13 @@ import {
   capitalSources,
   quarterlyReports
 } from "@shared/schema";
+import {
+  reportSchedules,
+  quarterlyReportReminders,
+  promissoryNoteTemplates,
+  templateFields,
+  generatedDocuments
+} from "@shared/loan-schema";
 
 // Create insert schemas for validation
 const insertBorrowerSchema = createInsertSchema(borrowers);
@@ -28,6 +35,11 @@ const insertLoanCovenantSchema = createInsertSchema(loanCovenants);
 const insertLoanCommitteeReviewSchema = createInsertSchema(loanCommitteeReviews);
 const insertCapitalSourceSchema = createInsertSchema(capitalSources);
 const insertQuarterlyReportSchema = createInsertSchema(quarterlyReports);
+const insertReportScheduleSchema = createInsertSchema(reportSchedules);
+const insertQuarterlyReportReminderSchema = createInsertSchema(quarterlyReportReminders);
+const insertPromissoryNoteTemplateSchema = createInsertSchema(promissoryNoteTemplates);
+const insertTemplateFieldSchema = createInsertSchema(templateFields);
+const insertGeneratedDocumentSchema = createInsertSchema(generatedDocuments);
 import { z } from "zod";
 
 // Initialize Stripe
@@ -1719,6 +1731,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get quarterly reports for tracking (includes borrower names)
+  app.get("/api/quarterly-reports/tracking", async (req, res) => {
+    try {
+      const reports = await loanStorage.getQuarterlyReportsForTracking();
+      res.json(reports);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch quarterly reports tracking data" });
+    }
+  });
+
+  // Get overdue quarterly reports
+  app.get("/api/quarterly-reports/overdue", async (req, res) => {
+    try {
+      const reports = await loanStorage.getOverdueQuarterlyReports();
+      res.json(reports);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch overdue quarterly reports" });
+    }
+  });
+
+  // Generate quarterly reports for a period
+  app.post("/api/quarterly-reports/generate", async (req, res) => {
+    try {
+      const { year, quarter } = req.body;
+      if (!year || !quarter) {
+        return res.status(400).json({ message: "Year and quarter are required" });
+      }
+      await loanStorage.generateQuarterlyReportsForPeriod(year, quarter);
+      res.json({ message: "Quarterly reports generated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to generate quarterly reports" });
+    }
+  });
+
+  // Report schedules routes
+  app.get("/api/report-schedules", async (req, res) => {
+    try {
+      const schedules = await loanStorage.getReportSchedules();
+      res.json(schedules);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch report schedules" });
+    }
+  });
+
+  app.post("/api/report-schedules", async (req, res) => {
+    try {
+      const scheduleData = insertReportScheduleSchema.parse(req.body);
+      const schedule = await loanStorage.createReportSchedule(scheduleData);
+      res.status(201).json(schedule);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid schedule data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create report schedule" });
+    }
+  });
+
+  app.put("/api/report-schedules/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertReportScheduleSchema.partial().parse(req.body);
+      const schedule = await loanStorage.updateReportSchedule(id, updateData);
+      if (!schedule) {
+        return res.status(404).json({ message: "Schedule not found" });
+      }
+      res.json(schedule);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid schedule data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update report schedule" });
+    }
+  });
+
+  app.delete("/api/report-schedules/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await loanStorage.deleteReportSchedule(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Schedule not found" });
+      }
+      res.json({ message: "Schedule deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete report schedule" });
+    }
+  });
+
+  // Reminder routes
+  app.get("/api/quarterly-reports/:id/reminders", async (req, res) => {
+    try {
+      const quarterlyReportId = parseInt(req.params.id);
+      const reminders = await loanStorage.getQuarterlyReportReminders(quarterlyReportId);
+      res.json(reminders);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch reminders" });
+    }
+  });
+
+
+
   app.put("/api/quarterly-reports/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -1771,6 +1883,157 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(violations);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch covenant violations" });
+    }
+  });
+
+  // Promissory Note Template routes
+  app.get("/api/promissory-note-templates", async (req, res) => {
+    try {
+      const templates = await loanStorage.getPromissoryNoteTemplates();
+      res.json(templates);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch promissory note templates" });
+    }
+  });
+
+  app.get("/api/promissory-note-templates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const template = await loanStorage.getPromissoryNoteTemplateById(id);
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      res.json(template);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch template" });
+    }
+  });
+
+  app.post("/api/promissory-note-templates", async (req, res) => {
+    try {
+      const templateData = insertPromissoryNoteTemplateSchema.parse(req.body);
+      const template = await loanStorage.createPromissoryNoteTemplate(templateData);
+      res.status(201).json(template);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid template data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create template" });
+    }
+  });
+
+  app.put("/api/promissory-note-templates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertPromissoryNoteTemplateSchema.partial().parse(req.body);
+      const template = await loanStorage.updatePromissoryNoteTemplate(id, updateData);
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      res.json(template);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid template data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update template" });
+    }
+  });
+
+  app.post("/api/promissory-note-templates/:id/new-version", async (req, res) => {
+    try {
+      const originalId = parseInt(req.params.id);
+      const { createdBy, ...updateData } = req.body;
+      const newTemplate = await loanStorage.createNewTemplateVersion(originalId, updateData, createdBy);
+      res.status(201).json(newTemplate);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create new template version" });
+    }
+  });
+
+  // Template field routes
+  app.get("/api/promissory-note-templates/:id/fields", async (req, res) => {
+    try {
+      const templateId = parseInt(req.params.id);
+      const fields = await loanStorage.getTemplateFields(templateId);
+      res.json(fields);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch template fields" });
+    }
+  });
+
+  app.post("/api/template-fields", async (req, res) => {
+    try {
+      const fieldData = insertTemplateFieldSchema.parse(req.body);
+      const field = await loanStorage.createTemplateField(fieldData);
+      res.status(201).json(field);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid field data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create template field" });
+    }
+  });
+
+  app.put("/api/template-fields/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertTemplateFieldSchema.partial().parse(req.body);
+      const field = await loanStorage.updateTemplateField(id, updateData);
+      if (!field) {
+        return res.status(404).json({ message: "Field not found" });
+      }
+      res.json(field);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid field data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update template field" });
+    }
+  });
+
+  app.delete("/api/template-fields/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await loanStorage.deleteTemplateField(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Field not found" });
+      }
+      res.json({ message: "Field deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete template field" });
+    }
+  });
+
+  // Document generation routes
+  app.post("/api/loans/:loanId/generate-promissory-note", async (req, res) => {
+    try {
+      const loanId = parseInt(req.params.loanId);
+      const { templateId, fieldValues, generatedBy } = req.body;
+      const document = await loanStorage.generatePromissoryNote(loanId, templateId, fieldValues, generatedBy);
+      res.status(201).json(document);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to generate promissory note" });
+    }
+  });
+
+  app.get("/api/loans/:loanId/documents", async (req, res) => {
+    try {
+      const loanId = parseInt(req.params.loanId);
+      const documents = await loanStorage.getGeneratedDocuments(loanId);
+      res.json(documents);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch generated documents" });
+    }
+  });
+
+  // Template parsing utility
+  app.post("/api/parse-template-fields", async (req, res) => {
+    try {
+      const { content } = req.body;
+      const fields = loanStorage.parseTemplateFields(content);
+      res.json({ fields });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to parse template fields" });
     }
   });
 

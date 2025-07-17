@@ -13,7 +13,8 @@ import {
   AlertTriangle,
   FileText,
   Users,
-  Settings
+  Settings,
+  Calendar
 } from "lucide-react";
 import { Link } from "wouter";
 import { 
@@ -22,6 +23,8 @@ import {
   type LoanPayment,
   type Borrower 
 } from "@shared/loan-schema";
+import QuarterlyReportsTracker from "@/components/QuarterlyReportsTracker";
+import PromissoryNoteManager from "@/components/PromissoryNoteManager";
 
 interface LoanSummary {
   totalLoans: number;
@@ -127,12 +130,14 @@ export default function LoansPage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="applications">Applications</TabsTrigger>
             <TabsTrigger value="loans">Active Loans</TabsTrigger>
             <TabsTrigger value="borrowers">Borrowers</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
           {/* Dashboard Tab */}
@@ -470,6 +475,16 @@ export default function LoansPage() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Templates Tab */}
+          <TabsContent value="templates" className="space-y-4">
+            <PromissoryNoteManager />
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-4">
+            <QuarterlyReportsTracker />
           </TabsContent>
         </Tabs>
       </div>

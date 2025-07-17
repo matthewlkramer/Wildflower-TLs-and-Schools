@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createInsertSchema } from "drizzle-zod";
-import { pgTable, serial, text, integer, decimal, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, decimal, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 // Airtable-based schema for Wildflower Schools
@@ -1449,5 +1449,76 @@ export type OriginationStatus =
   | "ach_pending"
   | "ready_to_fund"
   | "funded";
+
+// Promissory Note Templates for loan documentation
+export const promissoryNoteTemplates = pgTable("promissory_note_templates", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // e.g., "Sunlight Promissory Note", "Founder's Promissory Note"
+  templateType: text("template_type").notNull(), // "standard", "founders", "bridge", etc.
+  version: integer("version").notNull(), // version number for template history
+  content: text("content").notNull(), // full template content with placeholder fields
+  variableFields: jsonb("variable_fields"), // array of field definitions
+  isActive: boolean("is_active").notNull().default(true),
+  createdBy: text("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Template Field Definitions for dynamic form generation
+export const templateFields = pgTable("template_fields", {
+  id: serial("id").primaryKey(),
+  templateId: integer("template_id").references(() => promissoryNoteTemplates.id).notNull(),
+  fieldName: text("field_name").notNull(), // e.g., "SCHOOL_NAME", "LOAN_AMOUNT"
+  fieldLabel: text("field_label").notNull(), // e.g., "School Name", "Loan Amount"
+  fieldType: text("field_type").notNull(), // "text", "number", "date", "currency", "address"
+  placeholder: text("placeholder").notNull(), // e.g., "[SCHOOL NAME]", "$[ ]"
+  isRequired: boolean("is_required").notNull().default(true),
+  defaultValue: text("default_value"),
+  validationRules: jsonb("validation_rules"), // regex, min/max values, etc.
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Generated Documents (when templates are filled out for specific loans)
+export const generatedDocuments = pgTable("generated_documents", {
+  id: serial("id").primaryKey(),
+  loanId: integer("loan_id").notNull(), // references loan from loan-schema
+  templateId: integer("template_id").references(() => promissoryNoteTemplates.id).notNull(),
+  documentType: text("document_type").notNull(), // "promissory_note", "security_agreement", etc.
+  generatedContent: text("generated_content").notNull(), // filled template
+  fieldValues: jsonb("field_values").notNull(), // values used to fill the template
+  generatedBy: text("generated_by").notNull(),
+  generatedAt: timestamp("generated_at").defaultNow(),
+  status: text("status").notNull().default("draft"), // draft, reviewed, signed, executed
+  filePath: text("file_path"), // path to generated PDF/DOCX file
+});
+
+// Promissory Note Template Relations
+export const promissoryNoteTemplatesRelations = relations(promissoryNoteTemplates, ({ many }) => ({
+  fields: many(templateFields),
+  generatedDocuments: many(generatedDocuments),
+}));
+
+export const templateFieldsRelations = relations(templateFields, ({ one }) => ({
+  template: one(promissoryNoteTemplates, {
+    fields: [templateFields.templateId],
+    references: [promissoryNoteTemplates.id],
+  }),
+}));
+
+export const generatedDocumentsRelations = relations(generatedDocuments, ({ one }) => ({
+  template: one(promissoryNoteTemplates, {
+    fields: [generatedDocuments.templateId],
+    references: [promissoryNoteTemplates.id],
+  }),
+}));
+
+// Promissory Note Type Exports
+export type PromissoryNoteTemplate = typeof promissoryNoteTemplates.$inferSelect;
+export type InsertPromissoryNoteTemplate = typeof promissoryNoteTemplates.$inferInsert;
+export type TemplateField = typeof templateFields.$inferSelect;
+export type InsertTemplateField = typeof templateFields.$inferInsert;
+export type GeneratedDocument = typeof generatedDocuments.$inferSelect;
+export type InsertGeneratedDocument = typeof generatedDocuments.$inferInsert;
 
 
