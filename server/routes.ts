@@ -1982,7 +1982,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(template);
     } catch (error) {
+      console.error("Template update error:", error);
       if (error instanceof z.ZodError) {
+        console.error("Validation errors:", error.errors);
         return res.status(400).json({ message: "Invalid template data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to update template" });

@@ -105,10 +105,11 @@ export default function PromissoryNoteManager() {
       setShowTemplateDialog(false);
       setEditingTemplate(null);
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Template save error:", error);
       toast({
         title: "Error",
-        description: "Failed to save template.",
+        description: error.message || "Failed to save template.",
         variant: "destructive",
       });
     },
@@ -561,7 +562,11 @@ export default function PromissoryNoteManager() {
                   });
                 } else {
                   // Creating new or updating existing
-                  templateMutation.mutate(editingTemplate!);
+                  const templateData = {
+                    ...editingTemplate,
+                    createdBy: editingTemplate?.createdBy || "Admin User"
+                  };
+                  templateMutation.mutate(templateData);
                 }
               }}
               disabled={templateMutation.isPending || newVersionMutation.isPending}
