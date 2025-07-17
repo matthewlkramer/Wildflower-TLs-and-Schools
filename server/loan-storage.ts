@@ -191,15 +191,21 @@ export class DatabaseLoanStorage implements ILoanStorage {
 
   // Loan origination workflow methods
   async getLoansInOrigination(): Promise<LoanRecord[]> {
-    const result = await db.select()
+    const result = await db.select({
+      loan: loans,
+      borrower: borrowers
+    })
       .from(loans)
       .leftJoin(borrowers, eq(loans.borrowerId, borrowers.id))
       .where(sql`${loans.originationStatus} != 'funded'`);
     
     return result.map(row => ({
-      ...row.loans,
-      borrower: row.borrowers
-    })) as LoanRecord[];
+      ...row.loan,
+      borrower: row.borrower ? {
+        ...row.borrower,
+        entityName: row.borrower.name // Map 'name' to 'entityName' for frontend
+      } : null
+    }));
   }
 
   async updateLoanOriginationStatus(id: number, status: string, updates?: Partial<InsertLoanRecord>): Promise<LoanRecord> {

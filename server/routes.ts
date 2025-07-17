@@ -1315,19 +1315,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loans/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const loan = await loanStorage.getLoan(id);
-      if (!loan) {
-        return res.status(404).json({ message: "Loan not found" });
-      }
-      res.json(loan);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch loan" });
-    }
-  });
-
   app.get("/api/loans/number/:loanNumber", async (req, res) => {
     try {
       const loanNumber = req.params.loanNumber;
@@ -1351,6 +1338,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid loan data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to create loan" });
+    }
+  });
+
+  // Loan Origination Workflow Routes (must come before parameterized routes)
+  app.get("/api/loans/origination-pipeline", async (req, res) => {
+    try {
+      console.log("Fetching origination pipeline loans...");
+      const loans = await loanStorage.getLoansInOrigination();
+      console.log("Found loans:", loans?.length || 0);
+      res.json(loans);
+    } catch (error) {
+      console.error("Error fetching origination pipeline:", error);
+      console.error("Stack trace:", error.stack);
+      res.status(500).json({ message: "Failed to fetch origination pipeline", error: error.message });
     }
   });
 
@@ -1390,16 +1391,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Loan Origination Workflow Routes
-  app.get("/api/loans/origination-pipeline", async (req, res) => {
-    try {
-      const loans = await loanStorage.getLoansInOrigination();
-      res.json(loans);
-    } catch (error) {
-      console.error("Error fetching origination pipeline:", error);
-      res.status(500).json({ message: "Failed to fetch origination pipeline" });
-    }
-  });
+
 
   app.post("/api/loans/:id/ach-setup", async (req, res) => {
     try {
