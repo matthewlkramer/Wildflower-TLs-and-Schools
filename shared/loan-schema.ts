@@ -28,42 +28,14 @@ export const loanApplications = pgTable("loan_applications", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Borrowers - Can be schools or other entities
-export const borrowers = pgTable("borrowers", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  type: text("type").notNull(), // school, organization, individual
-  schoolId: text("school_id"), // Link to existing school if applicable
-  
-  // Contact Information
-  primaryContactName: text("primary_contact_name"),
-  primaryContactEmail: text("primary_contact_email"),
-  primaryContactPhone: text("primary_contact_phone"),
-  businessAddress: text("business_address"),
-  
-  // Business Information
-  taxId: text("tax_id"),
-  incorporationState: text("incorporation_state"),
-  businessType: text("business_type"), // LLC, Corporation, Non-profit
-  yearEstablished: integer("year_established"),
-  
-  // Financial Information
-  annualRevenue: decimal("annual_revenue", { precision: 12, scale: 2 }),
-  totalAssets: decimal("total_assets", { precision: 12, scale: 2 }),
-  totalLiabilities: decimal("total_liabilities", { precision: 12, scale: 2 }),
-  
-  creditScore: integer("credit_score"),
-  
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+// Note: Borrowers table removed - loans now reference schools directly via Airtable school IDs
 
 // Loans - Originated loans
 export const loans = pgTable("loans", {
   id: serial("id").primaryKey(),
   loanNumber: text("loan_number").unique().notNull(),
   applicationId: integer("application_id").references(() => loanApplications.id),
-  borrowerId: integer("borrower_id").references(() => borrowers.id).notNull(),
+  schoolId: text("school_id").notNull(), // References Airtable school ID
   
   // Loan Terms
   principalAmount: decimal("principal_amount", { precision: 12, scale: 2 }).notNull(),
@@ -359,13 +331,8 @@ export const loanApplicationsRelations = relations(loanApplications, ({ many, on
   committeeReviews: many(loanCommitteeReviews),
 }));
 
-export const borrowersRelations = relations(borrowers, ({ many }) => ({
-  loans: many(loans),
-}));
-
 export const loansRelations = relations(loans, ({ many, one }) => ({
   application: one(loanApplications, { fields: [loans.applicationId], references: [loanApplications.id] }),
-  borrower: one(borrowers, { fields: [loans.borrowerId], references: [borrowers.id] }),
   payments: many(loanPayments),
   documents: many(loanDocuments),
   covenants: many(loanCovenants),
@@ -399,10 +366,7 @@ export const selectLoanApplicationSchema = createSelectSchema(loanApplications);
 export type InsertLoanApplication = z.infer<typeof insertLoanApplicationSchema>;
 export type LoanApplication = z.infer<typeof selectLoanApplicationSchema>;
 
-export const insertBorrowerSchema = createInsertSchema(borrowers);
-export const selectBorrowerSchema = createSelectSchema(borrowers);
-export type InsertBorrower = z.infer<typeof insertBorrowerSchema>;
-export type Borrower = z.infer<typeof selectBorrowerSchema>;
+// Note: Borrower schemas removed - using school data directly from Airtable
 
 export const insertLoanSchema = createInsertSchema(loans);
 export const selectLoanSchema = createSelectSchema(loans);

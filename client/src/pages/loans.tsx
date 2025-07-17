@@ -14,17 +14,24 @@ import {
   FileText,
   Users,
   Settings,
-  Calendar
+  Calendar,
+  LayoutGrid,
+  Table,
+  ExternalLink
 } from "lucide-react";
 import { Link } from "wouter";
 import { 
   type LoanApplication, 
   type Loan, 
-  type LoanPayment,
-  type Borrower 
+  type LoanPayment
 } from "@shared/loan-schema";
 import QuarterlyReportsTracker from "@/components/QuarterlyReportsTracker";
 import PromissoryNoteManager from "@/components/PromissoryNoteManager";
+import { AgGridReact } from "ag-grid-react";
+import { ColDef, themeMaterial, AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+
+// Register AG Grid modules
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface LoanSummary {
   totalLoans: number;
@@ -36,6 +43,7 @@ interface LoanSummary {
 export default function LoansPage() {
   const { setPageTitle } = usePageTitle();
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [loansViewType, setLoansViewType] = useState<"cards" | "table">("cards");
 
   useEffect(() => {
     setPageTitle("Loan Management");
@@ -106,6 +114,80 @@ export default function LoansPage() {
       </Badge>
     );
   };
+
+  // Column definitions for loans table
+  const loansColumnDefs: ColDef[] = [
+    {
+      headerName: "Loan #",
+      field: "loanNumber",
+      width: 120,
+      cellRenderer: (params: any) => (
+        <Link href={`/loans/${params.data.id}`} className="text-blue-600 hover:text-blue-800 font-medium">
+          {params.value}
+        </Link>
+      )
+    },
+    {
+      headerName: "School",
+      field: "borrower.name",
+      width: 200,
+      valueGetter: (params: any) => params.data.borrower?.name || `Borrower ID: ${params.data.borrowerId}`
+    },
+    {
+      headerName: "Original Amount",
+      field: "principalAmount",
+      width: 140,
+      valueFormatter: (params: any) => formatCurrency(params.value || 0)
+    },
+    {
+      headerName: "Current Balance",
+      field: "currentPrincipalBalance", 
+      width: 140,
+      valueFormatter: (params: any) => formatCurrency(params.value || 0)
+    },
+    {
+      headerName: "Interest Rate",
+      field: "interestRate",
+      width: 120,
+      valueFormatter: (params: any) => `${(parseFloat(params.value || 0) * 100).toFixed(2)}%`
+    },
+    {
+      headerName: "Origination Date",
+      field: "originationDate",
+      width: 140,
+      valueFormatter: (params: any) => {
+        if (!params.value && params.data.issueDate) {
+          return new Date(params.data.issueDate).toLocaleDateString();
+        }
+        return params.value ? new Date(params.value).toLocaleDateString() : 'Not set';
+      }
+    },
+    {
+      headerName: "Maturity Date",
+      field: "maturityDate",
+      width: 140,
+      valueFormatter: (params: any) => params.value ? new Date(params.value).toLocaleDateString() : 'Not set'
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      width: 120,
+      cellRenderer: (params: any) => getStatusBadge(params.value)
+    },
+    {
+      headerName: "Actions",
+      width: 100,
+      cellRenderer: (params: any) => (
+        <div className="flex items-center space-x-2">
+          <Link href={`/loans/${params.data.id}`}>
+            <Button variant="ghost" size="sm">
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+      )
+    }
+  ];
 
   return (
     <div className="h-full flex flex-col">
@@ -327,50 +409,99 @@ export default function LoansPage() {
           <TabsContent value="loans" className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Active Loans</h2>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Originate Loan
-              </Button>
+              <div className="flex items-center gap-2">
+                {/* View Toggle */}
+                <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                  <Button
+                    variant={loansViewType === "cards" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setLoansViewType("cards")}
+                    className="h-8 px-3"
+                  >
+                    <LayoutGrid className="h-4 w-4 mr-1" />
+                    Cards
+                  </Button>
+                  <Button
+                    variant={loansViewType === "table" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setLoansViewType("table")}
+                    className="h-8 px-3"
+                  >
+                    <Table className="h-4 w-4 mr-1" />
+                    Table
+                  </Button>
+                </div>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Originate Loan
+                </Button>
+              </div>
             </div>
 
             {loansLoading ? (
               <div className="text-center py-8">Loading loans...</div>
             ) : loans && loans.length > 0 ? (
-              <div className="grid gap-4">
-                {loans.map((loan) => (
-                  <Link key={loan.id} href={`/loans/${loan.id}`}>
-                    <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg text-blue-600 hover:text-blue-800">
-                            Loan #{loan.loanNumber}
-                          </CardTitle>
-                          {getStatusBadge(loan.status)}
-                        </div>
-                        <CardDescription>
-                          {loan.borrower?.name || `Borrower ID: ${loan.borrowerId}`} | Balance: {formatCurrency(loan.currentPrincipalBalance || 0)}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <p className="text-muted-foreground">Original Amount</p>
-                            <p className="font-medium">{formatCurrency(loan.principalAmount || 0)}</p>
+              loansViewType === "cards" ? (
+                <div className="grid gap-4">
+                  {loans.map((loan) => (
+                    <Link key={loan.id} href={`/loans/${loan.id}`}>
+                      <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-lg text-blue-600 hover:text-blue-800">
+                              Loan #{loan.loanNumber}
+                            </CardTitle>
+                            {getStatusBadge(loan.status)}
                           </div>
-                          <div>
-                            <p className="text-muted-foreground">Interest Rate</p>
-                            <p className="font-medium">{(parseFloat(loan.interestRate || 0) * 100).toFixed(2)}%</p>
+                          <CardDescription>
+                            {loan.borrower?.name || `Borrower ID: ${loan.borrowerId}`} | Balance: {formatCurrency(loan.currentPrincipalBalance || 0)}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <p className="text-muted-foreground">Original Amount</p>
+                              <p className="font-medium">{formatCurrency(loan.principalAmount || 0)}</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Interest Rate</p>
+                              <p className="font-medium">{(parseFloat(loan.interestRate || 0) * 100).toFixed(2)}%</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Origination Date</p>
+                              <p className="font-medium">{loan.originationDate ? new Date(loan.originationDate).toLocaleDateString() : (loan.issueDate ? new Date(loan.issueDate).toLocaleDateString() : 'Not set')}</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-muted-foreground">Origination Date</p>
-                            <p className="font-medium">{loan.originationDate ? new Date(loan.originationDate).toLocaleDateString() : (loan.issueDate ? new Date(loan.issueDate).toLocaleDateString() : 'Not set')}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="h-96">
+                  <div style={{ height: "100%", width: "100%" }}>
+                    <AgGridReact
+                      theme={themeMaterial}
+                      rowData={loans}
+                      columnDefs={loansColumnDefs}
+                      domLayout="normal"
+                      animateRows={true}
+                      rowSelection="none"
+                      suppressRowClickSelection={true}
+                      headerHeight={40}
+                      rowHeight={35}
+                      context={{
+                        componentName: 'loans-table'
+                      }}
+                      defaultColDef={{
+                        sortable: true,
+                        resizable: true,
+                        filter: true,
+                      }}
+                    />
+                  </div>
+                </div>
+              )
             ) : (
               <Card>
                 <CardContent className="text-center py-8">

@@ -1323,17 +1323,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const loans = await loanStorage.getLoans();
       
       // Fetch borrower data for each loan
-      const loansWithBorrowers = await Promise.all(
+      const loansWithSchools = await Promise.all(
         loans.map(async (loan) => {
-          const borrower = await loanStorage.getBorrowerById(loan.borrowerId);
+          // Get school data from Airtable using schoolId
+          const school = await storage.getSchool(loan.schoolId);
           return {
             ...loan,
-            borrower: borrower || null
+            borrower: school ? { 
+              id: school.id, 
+              name: school.name || school.shortName,
+              schoolId: loan.schoolId 
+            } : null
           };
         })
       );
       
-      res.json(loansWithBorrowers);
+      res.json(loansWithSchools);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch loans" });
     }
