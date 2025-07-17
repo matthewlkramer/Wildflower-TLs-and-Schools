@@ -1078,6 +1078,41 @@ export const borrowers = pgTable("borrowers", {
   primaryContactPhone: text("primary_contact_phone"),
   businessAddress: text("business_address"),
   
+  // Geographic and school tracking
+  schoolNumber: integer("school_number"),
+  state: text("state"),
+  censusTract: text("census_tract"),
+  
+  // CDFI eligibility tracking
+  cdfiTract2015: boolean("cdfi_tract_2015"),
+  cdfiTract2020: boolean("cdfi_tract_2020"),
+  schoolCdfiTract: boolean("school_cdfi_tract"),
+  disadvantagedCommunity: boolean("disadvantaged_community"),
+  climateDisadvantaged: boolean("climate_disadvantaged"),
+  
+  // Charter and school characteristics
+  isCharter: boolean("is_charter"),
+  currentTeacherMentoring: boolean("current_teacher_mentoring"),
+  anyTeacherMentoring: boolean("any_teacher_mentoring"),
+  childcareDesert: boolean("childcare_desert"),
+  
+  // Demographics (percentages)
+  percentLowIncomeTransition: decimal("percent_low_income_transition", { precision: 5, scale: 2 }),
+  percentAfricanAmerican: decimal("percent_african_american", { precision: 5, scale: 2 }),
+  percentLatino: decimal("percent_latino", { precision: 5, scale: 2 }),
+  
+  // School characteristics
+  schoolHighPoverty: boolean("school_high_poverty"),
+  schoolHighPotential: boolean("school_high_potential"),
+  bipocTeacherLeader: boolean("bipoc_teacher_leader"),
+  lowIncomeTeacherLeader: boolean("low_income_teacher_leader"),
+  womanTeacherLeader: boolean("woman_teacher_leader"),
+  
+  // Contact information
+  email1: text("email_1"),
+  email2: text("email_2"),
+  email3: text("email_3"),
+  
   // Business Information
   taxId: text("tax_id"),
   incorporationState: text("incorporation_state"),
@@ -1119,6 +1154,13 @@ export const loans = pgTable("loans", {
   status: text("status").notNull().default("pending"), // pending, active, paid_off, default, charged_off
   originationDate: timestamp("origination_date"),
   maturityDate: timestamp("maturity_date"),
+  
+  // CSV tracking fields
+  fiscalYear: integer("fiscal_year"),
+  calendarYear: integer("calendar_year"),
+  issueDate: timestamp("issue_date"),
+  useOfProceeds: text("use_of_proceeds"),
+  notes: text("notes"),
   
   // Current Balances
   currentPrincipalBalance: decimal("current_principal_balance", { precision: 12, scale: 2 }),
