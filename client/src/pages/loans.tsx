@@ -331,31 +331,33 @@ export default function LoansPage() {
             ) : loans && loans.length > 0 ? (
               <div className="grid gap-4">
                 {loans.map((loan) => (
-                  <Card key={loan.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">
-                          Loan #{loan.loanNumber}
-                        </CardTitle>
-                        {getStatusBadge(loan.status)}
-                      </div>
-                      <CardDescription>
-                        Borrower: {loan.borrowerId} | Balance: {formatCurrency(loan.currentPrincipalBalance)}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <p className="text-muted-foreground">Interest Rate</p>
-                          <p className="font-medium">{loan.interestRate}%</p>
+                  <Link key={loan.id} href={`/loans/${loan.id}`}>
+                    <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg text-blue-600 hover:text-blue-800">
+                            Loan #{loan.loanNumber}
+                          </CardTitle>
+                          {getStatusBadge(loan.status)}
                         </div>
-                        <div>
-                          <p className="text-muted-foreground">Maturity Date</p>
-                          <p className="font-medium">{new Date(loan.maturityDate).toLocaleDateString()}</p>
+                        <CardDescription>
+                          Borrower ID: {loan.borrowerId} | Balance: {formatCurrency(loan.currentPrincipalBalance)}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">Interest Rate</p>
+                            <p className="font-medium">{(parseFloat(loan.interestRate) * 100).toFixed(2)}%</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Maturity Date</p>
+                            <p className="font-medium">{loan.maturityDate ? new Date(loan.maturityDate).toLocaleDateString() : 'Not set'}</p>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             ) : (
