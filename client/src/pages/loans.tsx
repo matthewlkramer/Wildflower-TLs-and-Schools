@@ -1,10 +1,20 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePageTitle } from "@/App";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { apiRequest } from "@/lib/queryClient";
 import { 
   Plus, 
   TrendingUp, 
@@ -40,10 +50,75 @@ interface LoanSummary {
   pendingApplications: number;
 }
 
+// Form schema for loan application
+const loanApplicationSchema = z.object({
+  borrowerName: z.string().min(1, "Borrower name is required"),
+  requestedAmount: z.string().min(1, "Requested amount is required"),
+  purpose: z.string().min(1, "Purpose is required"),
+  contactEmail: z.string().email("Valid email is required"),
+  contactPhone: z.string().optional(),
+  businessAddress: z.string().optional(),
+  annualRevenue: z.string().optional(),
+  existingDebt: z.string().optional(),
+});
+
 export default function LoansPage() {
   const { setPageTitle } = usePageTitle();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loansViewType, setLoansViewType] = useState<"cards" | "table">("cards");
+  const [showApplicationDialog, setShowApplicationDialog] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Form for loan application
+  const form = useForm<z.infer<typeof loanApplicationSchema>>({
+    resolver: zodResolver(loanApplicationSchema),
+    defaultValues: {
+      borrowerName: "",
+      requestedAmount: "",
+      purpose: "",
+      contactEmail: "",
+      contactPhone: "",
+      businessAddress: "",
+      annualRevenue: "",
+      existingDebt: "",
+    },
+  });
+
+  // Create application mutation
+  const createApplicationMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof loanApplicationSchema>) => {
+      const applicationData = {
+        ...data,
+        applicationNumber: `APP-${Date.now()}`, // Generate unique application number
+        requestedAmount: parseFloat(data.requestedAmount),
+        annualRevenue: data.annualRevenue ? parseFloat(data.annualRevenue) : undefined,
+        existingDebt: data.existingDebt ? parseFloat(data.existingDebt) : undefined,
+        status: "submitted",
+      };
+      return apiRequest("POST", "/api/loan-applications", applicationData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Application Created",
+        description: "Loan application has been submitted successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/loan-applications"] });
+      setShowApplicationDialog(false);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create loan application.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof loanApplicationSchema>) => {
+    createApplicationMutation.mutate(values);
+  };
 
   useEffect(() => {
     setPageTitle("Loan Management");
@@ -206,10 +281,141 @@ export default function LoansPage() {
                 Origination Pipeline
               </Button>
             </Link>
-            <Button className="bg-purple-600 hover:bg-purple-700">
-              <Plus className="mr-2 h-4 w-4" />
-              New Application
-            </Button>
+            <Dialog open={showApplicationDialog} onOpenChange={setShowApplicationDialog}>
+              <DialogTrigger asChild>
+                <Button className="bg-purple-600 hover:bg-purple-700">
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Application
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Create New Loan Application</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="borrowerName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Borrower Name *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="School or organization name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="requestedAmount"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Requested Amount *</FormLabel>
+                            <FormControl>
+                              <Input type="number" placeholder="50000" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="purpose"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Purpose *</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Describe the purpose of the loan" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="contactEmail"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Contact Email *</FormLabel>
+                            <FormControl>
+                              <Input type="email" placeholder="contact@school.org" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="contactPhone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Contact Phone</FormLabel>
+                            <FormControl>
+                              <Input placeholder="(555) 123-4567" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="businessAddress"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Business Address</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Full business address" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="annualRevenue"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Annual Revenue</FormLabel>
+                            <FormControl>
+                              <Input type="number" placeholder="250000" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="existingDebt"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Existing Debt</FormLabel>
+                            <FormControl>
+                              <Input type="number" placeholder="25000" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="flex justify-end space-x-2 pt-4">
+                      <Button type="button" variant="outline" onClick={() => setShowApplicationDialog(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" disabled={createApplicationMutation.isPending}>
+                        {createApplicationMutation.isPending ? "Creating..." : "Create Application"}
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -364,10 +570,14 @@ export default function LoansPage() {
           <TabsContent value="applications" className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Loan Applications</h2>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                New Application
-              </Button>
+              <Dialog open={showApplicationDialog} onOpenChange={setShowApplicationDialog}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Application
+                  </Button>
+                </DialogTrigger>
+              </Dialog>
             </div>
 
             {applicationsLoading ? (
@@ -384,7 +594,7 @@ export default function LoansPage() {
                         {getStatusBadge(application.status)}
                       </div>
                       <CardDescription>
-                        Purpose: {application.loanPurpose} | Submitted: {new Date(application.submissionDate).toLocaleDateString()}
+                        Purpose: {application.purpose} | Submitted: {new Date(application.applicationDate).toLocaleDateString()}
                       </CardDescription>
                     </CardHeader>
                   </Card>
@@ -396,10 +606,14 @@ export default function LoansPage() {
                   <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-4 text-lg font-semibold">No applications yet</h3>
                   <p className="text-muted-foreground">Get started by creating a new loan application.</p>
-                  <Button className="mt-4">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Application
-                  </Button>
+                  <Dialog open={showApplicationDialog} onOpenChange={setShowApplicationDialog}>
+                    <DialogTrigger asChild>
+                      <Button className="mt-4">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create Application
+                      </Button>
+                    </DialogTrigger>
+                  </Dialog>
                 </CardContent>
               </Card>
             )}
