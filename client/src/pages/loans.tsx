@@ -142,9 +142,9 @@ export default function LoansPage() {
     enabled: activeTab === "loans"
   });
 
-  // Borrowers query
-  const { data: borrowers, isLoading: borrowersLoading } = useQuery<Borrower[]>({
-    queryKey: ["/api/borrowers"],
+  // Borrowers query - using school view endpoint
+  const { data: borrowers, isLoading: borrowersLoading } = useQuery<any[]>({
+    queryKey: ["/api/borrowers/school-view"],
     enabled: activeTab === "borrowers"
   });
 
@@ -745,28 +745,99 @@ export default function LoansPage() {
               <div className="text-center py-8">Loading borrowers...</div>
             ) : borrowers && borrowers.length > 0 ? (
               <div className="grid gap-4">
-                {borrowers.map((borrower) => (
-                  <Card key={borrower.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                    <CardHeader>
-                      <CardTitle className="text-lg">{borrower.name}</CardTitle>
-                      <CardDescription>
-                        {borrower.entityType} | Added: {new Date(borrower.createdAt).toLocaleDateString()}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <p className="text-muted-foreground">Email</p>
-                          <p className="font-medium">{borrower.email || 'Not provided'}</p>
+                {borrowers.map((borrower) => {
+                  const schoolData = borrower.schoolData;
+                  const loans = borrower.loans || [];
+                  
+                  // Separate loans by status
+                  const activeLoans = loans.filter(loan => loan.status === 'active');
+                  const paidOffLoans = loans.filter(loan => loan.status === 'paid_off');
+                  const distressedLoans = loans.filter(loan => loan.status === 'default' || loan.status === 'charged_off');
+                  
+                  return (
+                    <Card key={borrower.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <Link href={`/school/${borrower.schoolId}`} className="text-blue-600 hover:text-blue-800">
+                            <CardTitle className="text-lg cursor-pointer hover:underline">
+                              {schoolData?.name || borrower.name}
+                            </CardTitle>
+                          </Link>
+                          <div className="flex flex-wrap gap-1">
+                            {/* Active loans - green if good standing, red if distressed */}
+                            {activeLoans.map((loan) => (
+                              <Badge key={loan.id} variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">
+                                {loan.loanNumber}
+                              </Badge>
+                            ))}
+                            {/* Distressed loans - red */}
+                            {distressedLoans.map((loan) => (
+                              <Badge key={loan.id} variant="destructive" className="bg-red-100 text-red-800">
+                                {loan.loanNumber}
+                              </Badge>
+                            ))}
+                            {/* Paid off loans - tan */}
+                            {paidOffLoans.map((loan) => (
+                              <Badge key={loan.id} variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
+                                {loan.loanNumber}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-muted-foreground">Phone</p>
-                          <p className="font-medium">{borrower.phone || 'Not provided'}</p>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="space-y-2 text-sm">
+                          {/* Date opened */}
+                          {schoolData?.opened && (
+                            <div>
+                              <span className="text-muted-foreground">Opened: </span>
+                              <span className="font-medium">{new Date(schoolData.opened).toLocaleDateString()}</span>
+                            </div>
+                          )}
+                          
+                          {/* Current TLs */}
+                          {schoolData?.currentTls && (
+                            <div>
+                              <span className="text-muted-foreground">Current TLs: </span>
+                              <span className="font-medium">{schoolData.currentTls}</span>
+                            </div>
+                          )}
+                          
+                          {/* TL Email addresses */}
+                          {(borrower.email1 || borrower.email2 || borrower.email3) && (
+                            <div>
+                              <span className="text-muted-foreground">TL Emails: </span>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {borrower.email1 && (
+                                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                    {borrower.email1}
+                                  </span>
+                                )}
+                                {borrower.email2 && (
+                                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                    {borrower.email2}
+                                  </span>
+                                )}
+                                {borrower.email3 && (
+                                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                    {borrower.email3}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Show message if no school data found */}
+                          {!schoolData && (
+                            <div className="text-muted-foreground text-xs">
+                              School data not found for ID: {borrower.schoolId}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             ) : (
               <Card>

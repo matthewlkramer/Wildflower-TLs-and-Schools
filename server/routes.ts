@@ -1274,6 +1274,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Borrowers with school data and loan status
+  app.get("/api/borrowers/school-view", async (req, res) => {
+    try {
+      const borrowers = await loanStorage.getBorrowers();
+      const loans = await loanStorage.getLoans();
+      
+      // Get school data for each borrower
+      const enrichedBorrowers = await Promise.all(
+        borrowers.map(async (borrower) => {
+          let schoolData = null;
+          if (borrower.schoolId) {
+            try {
+              schoolData = await storage.getSchool(borrower.schoolId);
+            } catch (error) {
+              console.error(`Failed to fetch school data for ${borrower.schoolId}:`, error);
+            }
+          }
+          
+          // Get loans for this borrower
+          const borrowerLoans = loans.filter(loan => loan.borrowerId === borrower.id);
+          
+          return {
+            ...borrower,
+            schoolData,
+            loans: borrowerLoans
+          };
+        })
+      );
+      
+      res.json(enrichedBorrowers);
+    } catch (error) {
+      console.error('Error fetching borrowers school view:', error);
+      res.status(500).json({ message: "Failed to fetch borrowers with school data" });
+    }
+  });
+
   app.get("/api/borrowers/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
