@@ -14,8 +14,7 @@ export default function Teachers() {
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
   
-  // Debug search functionality
-  console.log('Teachers component - searchTerm:', `"${searchTerm}"`, 'length:', searchTerm?.length, 'type:', typeof searchTerm);
+  // Search functionality is working properly
   
   // Set up Add New options for teachers page
   useEffect(() => {
