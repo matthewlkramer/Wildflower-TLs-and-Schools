@@ -8,7 +8,9 @@ import { addNewEmitter } from "@/lib/add-new-emitter";
 import AddEducatorModal from "@/components/add-teacher-modal";
 
 export default function Teachers() {
-  const { searchTerm, setSearchTerm } = useSearch();
+  const searchContext = useSearch();
+  const { searchTerm, setSearchTerm } = searchContext;
+  console.log('Teachers - useSearch context result:', searchContext);
   const { showOnlyMyRecords, currentUser } = useUserFilter();
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
 
