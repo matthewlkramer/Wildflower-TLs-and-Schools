@@ -118,7 +118,10 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                       type="text"
                       placeholder={getSearchPlaceholder()}
                       value={searchTerm}
-                      onChange={(e) => onSearchChange(e.target.value)}
+                      onChange={(e) => {
+                        console.log('Header input onChange:', e.target.value);
+                        onSearchChange(e.target.value);
+                      }}
                       className="w-32 sm:w-48 lg:w-64 pl-10"
                     />
                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />

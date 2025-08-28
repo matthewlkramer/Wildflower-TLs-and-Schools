@@ -14,7 +14,8 @@ export default function Teachers() {
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
   
-  // Search functionality is working properly
+  // Debug search state
+  console.log('Teachers render - searchTerm:', `"${searchTerm}"`);
   
   // Set up Add New options for teachers page
   useEffect(() => {
@@ -62,6 +63,10 @@ export default function Teachers() {
     
     return true;
   });
+  
+  // Debug info after filtering
+  const searchDebug = `Search: "${searchTerm}" | Total: ${teachers?.length} | Filtered: ${filteredTeachers?.length}`;
+  console.log('Teachers - filtered result:', searchDebug);
   
   return (
     <>
