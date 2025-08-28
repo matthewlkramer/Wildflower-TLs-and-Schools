@@ -81,6 +81,9 @@ function AppContent() {
   const [pageTitle, setPageTitle] = useState("");
   const [addNewOptions, setAddNewOptions] = useState<Array<{ label: string; onClick: () => void; }>>([]);
   
+  // Debug App state changes
+  console.log('App render - searchTerm state:', `"${searchTerm}"`);
+  
   
   // Listen to add new options changes
   useEffect(() => {
@@ -121,7 +124,11 @@ function AppContent() {
           <div className="min-h-screen bg-slate-50">
             <Header 
               searchTerm={searchTerm} 
-              onSearchChange={setSearchTerm}
+              onSearchChange={(value) => {
+                console.log('App - setSearchTerm called with:', `"${value}"`);
+                setSearchTerm(value);
+                console.log('App - searchTerm after set:', `"${searchTerm}"`);
+              }}
               addNewOptions={addNewOptions}
               setAddNewOptions={setAddNewOptions}
             />
