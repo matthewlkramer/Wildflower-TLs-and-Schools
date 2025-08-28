@@ -26,7 +26,7 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
 
   const handleOpen = (association: EducatorSchoolAssociation) => {
     console.log("Open association:", association);
-    // TODO: Navigate to school detail page
+    window.location.href = `/school/${association.schoolId}`;
   };
 
   const handleEdit = (association: EducatorSchoolAssociation) => {
@@ -136,7 +136,7 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
     return (
       <button
         className="text-blue-600 hover:text-blue-800 hover:underline text-left"
-        onClick={() => window.open(`/school-detail/${association.schoolId}`, '_blank')}
+        onClick={() => window.location.href = `/school/${association.schoolId}`}
         title="Open school detail page"
       >
         {schoolName}
