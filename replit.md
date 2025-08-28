@@ -1,239 +1,68 @@
 # Wildflower Schools Teacher Management System
 
 ## Overview
+The Wildflower Schools Teacher Management System is a comprehensive educational management platform designed for the Wildflower Schools network. Its primary purpose is to manage teachers, schools, charters, and integrate a full loan origination and management system. Key capabilities include managing educational records, tracking relationships between educators and schools, and handling the entire loan lifecycle from application to servicing. The system aims to provide robust support for educational operations and financial management within the network.
 
-This is a comprehensive educational management platform for the Wildflower Schools network. The system provides advanced functionality for managing teachers, schools, charters, and a complete loan origination and management system. Users can manage educational records, track relationships between educators and schools, and handle the full loan lifecycle from application to servicing.
+## User Preferences
+Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-### Frontend Architecture
+### Frontend
 - **Framework**: React 18 with TypeScript
-- **Routing**: Wouter (lightweight client-side router)
-- **State Management**: TanStack Query (React Query) for server state
-- **Styling**: Tailwind CSS with shadcn/ui component library
+- **Routing**: Wouter
+- **State Management**: TanStack Query
+- **Styling**: Tailwind CSS with shadcn/ui
 - **Form Handling**: React Hook Form with Zod validation
 - **Build Tool**: Vite
-- **Data Tables**: AG Grid Community Edition with custom utilities
+- **Data Tables**: AG Grid Community Edition
 
-### Backend Architecture
+### Backend
 - **Runtime**: Node.js with Express.js
 - **Language**: TypeScript
 - **Database**: PostgreSQL with Drizzle ORM
-- **Database Provider**: Neon Database (serverless PostgreSQL)
 - **Session Management**: PostgreSQL sessions with connect-pg-simple
-- **Development**: In-memory storage implementation for development/testing
 - **Caching**: Server-side in-memory cache with 5-minute TTL
-- **Error Handling**: Centralized error handling with custom error classes
+- **Error Handling**: Centralized error handling with custom classes
 
-### Code Organization (Refactored)
-- **Shared Constants**: `shared/constants.ts` - Centralized constants for tables, colors, errors
-- **Shared Utilities**: `shared/utils.ts` - Common utility functions
-- **AG Grid Utilities**: `client/src/utils/ag-grid-utils.ts` - Reusable grid configurations
-- **API Hooks**: `client/src/hooks/use-api-query.ts` - Consistent data fetching patterns
-- **Error Handler**: `server/error-handler.ts` - Centralized error handling
+### Code Organization
+- Centralized constants (`shared/constants.ts`) and utility functions (`shared/utils.ts`).
+- Reusable AG Grid configurations (`client/src/utils/ag-grid-utils.ts`).
+- Consistent API data fetching patterns (`client/src/hooks/use-api-query.ts`).
+- Centralized error handling (`server/error-handler.ts`).
 
 ### Database Schema
+- **Educational Data (Airtable)**: `teachers`, `schools`, `teacher_school_associations`, `charters`.
+- **Loan Management System (PostgreSQL)**: `borrowers`, `loan_applications`, `loans`, `loan_payments`, `loan_documents`, `loan_covenants`, `loan_committee_reviews`, `capital_sources`, `quarterly_reports`.
 
-#### Educational Data (Airtable)
-- **teachers**: Teacher profiles with personal and professional information
-- **schools**: School information including location and type
-- **teacher_school_associations**: Many-to-many relationship between teachers and schools
-- **charters**: Charter school information and management
+### Key Components
+- **Frontend**: Educational and Loan Management pages with shared components like data tables, modal forms, and navigation. Extensive use of shadcn/ui components.
+- **Backend**: RESTful API endpoints for both educational and loan data. Dual storage system (Airtable for educational, PostgreSQL for loan) with Drizzle ORM and Zod validation for all requests.
 
-#### Loan Management System (PostgreSQL)
-- **borrowers**: Borrower profiles and entity information
-- **loan_applications**: Loan application submissions and underwriting data
-- **loans**: Active loan records with terms and balances
-- **loan_payments**: Payment schedules and transaction history
-- **loan_documents**: Document management for loan files
-- **loan_covenants**: Covenant tracking and compliance monitoring
-- **loan_committee_reviews**: Committee approval workflow
-- **capital_sources**: Capital funding source management
-- **quarterly_reports**: Investor and regulatory reporting
+### Data Flow
+Client requests made via TanStack Query are handled by Express routes with validation. An abstract storage interface processes business logic, interacting with PostgreSQL via Drizzle ORM. JSON responses are sent back to the client.
 
-## Key Components
+### Deployment Strategy
+- **Development**: Node.js with tsx for server, Vite for client with proxy to backend.
+- **Production**: Client static assets built by Vite, server bundled by esbuild. Single Node.js process serves both API and static files.
 
-### Frontend Components
-- **Educational Pages**: Teachers list, Schools list, Charters list, Teacher detail, School detail, Charter detail
-- **Loan Management Pages**: Loan dashboard, Applications, Active loans, Borrower management, Reports
-- **Shared Components**: Header navigation, data tables, modal forms, delete confirmations
-- **UI Components**: Complete shadcn/ui component library implementation
-- **Form Components**: Add teacher/school modals with validation
-- **Loan Components**: Dashboard widgets, payment tracking, document management
-
-### Backend Components
-- **Educational Routes**: RESTful API endpoints for teachers, schools, charters, and associations
-- **Loan Management Routes**: Complete loan API including applications, origination, servicing, and reporting
-- **Storage Layer**: Dual storage system - Airtable for educational data, PostgreSQL for loan data
-- **Database Integration**: Drizzle ORM with PostgreSQL schema definitions for loan system
-- **Validation**: Zod schemas for request/response validation across all systems
-
-## Data Flow
-
-1. **Client Requests**: React components make API calls using TanStack Query
-2. **API Layer**: Express routes handle HTTP requests with validation
-3. **Storage Layer**: Abstract storage interface processes business logic
-4. **Database**: Drizzle ORM manages PostgreSQL queries and transactions
-5. **Response**: JSON responses sent back to client with proper error handling
+### Architecture Standards
+- **Schema-First Development**: Prioritizing alignment between TypeScript interfaces, Zod schemas, and Airtable field mappings.
+- **Field Mapping Consistency**: Ensuring identical field names for read and write operations.
+- **Component Type Matching**: Matching UI input types with underlying data types.
 
 ## External Dependencies
 
 ### Database
-- **Neon Database**: Serverless PostgreSQL provider
-- **Drizzle ORM**: Type-safe database toolkit
-- **Connection**: Uses DATABASE_URL environment variable
+- **Neon Database**: Serverless PostgreSQL provider.
+- **Drizzle ORM**: Type-safe database toolkit.
 
 ### UI Framework
-- **shadcn/ui**: Component library built on Radix UI primitives
-- **Tailwind CSS**: Utility-first CSS framework
-- **Radix UI**: Accessible component primitives
+- **shadcn/ui**: Component library built on Radix UI primitives.
+- **Tailwind CSS**: Utility-first CSS framework.
+- **Radix UI**: Accessible component primitives.
 
 ### Development Tools
-- **Vite**: Fast build tool with HMR
-- **TypeScript**: Static type checking
-- **ESLint**: Code linting (configured via package.json)
-
-## Deployment Strategy
-
-### Development
-- **Server**: Node.js with tsx for TypeScript execution
-- **Client**: Vite development server with proxy to backend
-- **Database**: Direct connection to Neon Database
-
-### Production
-- **Build Process**: 
-  - Client: Vite builds static assets to `dist/public`
-  - Server: esbuild bundles server code to `dist/index.js`
-- **Deployment**: Single Node.js process serving both API and static files
-- **Database**: Production Neon Database instance
-
-### Environment Variables
-- `DATABASE_URL`: PostgreSQL connection string (required)
-- `NODE_ENV`: Environment setting (development/production)
-
-## Changelog
-
-```
-Changelog:
-- July 03, 2025. Initial setup
-- July 03, 2025. Removed pagination from data grids - now shows full scrollable lists
-- July 03, 2025. Removed initials from name columns, replaced "Not specified" with blank cells
-- July 03, 2025. Improved layout: moved search to header, removed sub-headers, expanded horizontal space usage
-- July 03, 2025. Fixed Current TLs field mapping from Airtable and changed display to plain text
-- July 03, 2025. Fixed Stage_Status field mapping for both schools and teachers from Airtable
-- July 03, 2025. Implemented color-coded Stage/Status badges: red for closed states, green gradient for progression stages, gray for placeholders
-- July 03, 2025. Replaced AG Grid SetFilter with agTextColumnFilter for Community edition compatibility
-- July 04, 2025. Fixed "School not found" error by removing parseInt from Airtable ID handling
-- July 04, 2025. Implemented comprehensive school detail tabs: Summary, Details, Teachers, Locations, Guides, Governance
-- July 04, 2025. Added inline editing functionality for Teacher associations and Locations with CRUD operations
-- July 04, 2025. Created Teachers tab with inline editable start/end dates, roles, active status, "End Stint" and "Delete Stint" actions
-- July 04, 2025. Implemented Guides tab with guide assignments table showing guide short name, type, dates, and active status
-- July 04, 2025. Added full-width detail pages with breadcrumb navigation format ("Wildflower > [Entity Name]")
-- July 04, 2025. Added logo display area to school summary tab with proper Airtable field mapping and placeholder when no logo is present
-- July 04, 2025. Implemented horizontal scrolling tabs for mobile devices on both school and teacher detail pages to prevent tab cramming
-- July 04, 2025. Fixed location checkbox fields to use boolean values instead of strings for "Current Physical Address" and "Current Mailing Address"
-- July 04, 2025. Updated governance documents table name from "Governance documents" to "Governance docs" to match actual Airtable table name
-- July 04, 2025. Added improved error handling for missing or unauthorized Airtable tables with informative warning messages
-- July 04, 2025. Fixed governance documents field mappings to correctly extract "Document type", "Date", and "Document PDF" attachment filenames from Airtable
-- July 04, 2025. Updated guide assignments table name from "Guide assignments" to "Guides Assignments" to match actual Airtable table name
-- July 04, 2025. Fixed comprehensive schema and TypeScript errors by adding all missing properties to School and Educator interfaces, including SSJ data fields, systems fields, and additional contact information
-- July 04, 2025. Corrected checkbox field types from string to boolean for currentPhysicalAddress and currentMailingAddress properties
-- July 04, 2025. Migrated from "Teacher" to "Educator" terminology throughout the application for consistency with Wildflower Schools naming conventions, including component names, API endpoints, and form schemas while maintaining backward compatibility
-- July 05, 2025. Implemented Notes/Actions tab with two-column layout: School Notes table on left, Action Steps placeholder on right, matching Grants/Loans design pattern
-- July 05, 2025. Created separate Systems tab and moved all systems-related fields from Support tab to new dedicated Systems tab for better organization
-- July 05, 2025. Implemented Membership Fees tab with three-column layout: Membership Fee by Year table, Membership Fee Updates table with school year filtering, and Calculated Fields section
-- July 05, 2025. Reorganized school detail tabs by moving Contact Information and Legal Entity sections from Summary tab to Details tab for better information architecture
-- July 05, 2025. Enhanced Summary tab with Google Maps integration using latitude/longitude coordinates, current physical address display, Current Guide(s) field, SSJ Stage badges, risk factors and watchlist information, conditional SSJ Projected Open date for visioning/planning/startup stages, and conditional left network date/reason fields for schools that have exited the network
-- July 05, 2025. Updated Teacher demographics tab to remove name fields, add conditional "other" fields (gender other, race/ethnicity other, pronouns other) that only display when respective field is set to "other", and moved educational attainment field to demographics section
-- July 05, 2025. Implemented Email Addresses table in Teacher Contact Info tab with full AG Grid integration and Airtable backend support
-- July 06, 2025. Fixed all subtable filtering to use correct Airtable field names: {school_id} for school-related tables and {educator_id} for educator-related tables - email addresses functionality now working correctly
-- July 06, 2025. Implemented comprehensive early cultivation data tracking in Teacher detail Cultivation tab with 12 key data points including computed most recent fillout form date, geographic interest, SendGrid tracking, follow-up management, and organized layout with proper Airtable field mappings
-- July 06, 2025. Converted all static teacher tabs to dynamic filtered tables: Certs tab now shows MontessoriCertificationsTable, Events tab shows EventAttendanceTable, and Notes tab shows EducatorNotesTable - all filtered by educator_id following consistent AG Grid pattern
-- July 06, 2025. Successfully implemented dynamic data tables for teacher detail tabs: Notes tab and Events tab now working with real Airtable data, Certs tab has Airtable permission restrictions on "Montessori Certs" table that need to be resolved at the database access level
-- July 06, 2025. Implemented server-side caching system to optimize performance: added 5-minute TTL cache for educators and schools data, reducing Airtable API calls from ~6000ms to ~50ms for cached requests, created cache monitoring endpoint at /api/cache/stats for performance tracking
-- July 06, 2025. Major refactoring for code maintainability: created shared/constants.ts for centralized constants, shared/utils.ts for common utility functions, client/src/utils/ag-grid-utils.ts for reusable AG Grid configurations, client/src/hooks/use-api-query.ts for consistent data fetching patterns, server/error-handler.ts for centralized error handling
-- July 06, 2025. Comprehensive TypeScript error resolution: fixed missing interface implementation by adding all MembershipFeeUpdate methods, resolved property mapping errors for Grant, MontessoriCertification, EventAttendance, and MembershipFeeByYear interfaces, fixed client-side type issues in teachers.tsx and schools.tsx, removed invalid properties from object transformations to ensure type safety
-- July 06, 2025. Fixed Montessori certifications loading issue by creating missing subtable route in server/routes.ts to handle generic table queries with proper filtering parameters
-- July 06, 2025. Resolved Google Maps and current physical address display issues by adding missing field mappings (activeLatitude, activeLongitude, activePhysicalAddress) to school transformation and implementing fallback address display when coordinates unavailable
-- July 06, 2025. Updated school summary tab: removed city/state field, removed all section headers (Location, School Information), and fixed public funding to display linked multi-select publicFundingSources field instead of boolean publicFunding field, removed redundant school name display that appeared after the address field
-- July 06, 2025. Fixed critical Airtable filtering bug: corrected field names from {schoolId} to {school_id} in getGovernanceDocumentsBySchoolId, getGuideAssignmentsBySchoolId, getGrantsBySchoolId, getLoansBySchoolId, and getSchoolNotesBySchoolId methods - resolving empty tabs issue for governance docs, guides, grants, loans, and school notes
-- July 06, 2025. Created comprehensive "Add New" forms throughout application: implemented AddSchoolModal with validation and integrated into schools page with Add School button, leveraging existing AddEducatorModal for complete CRUD functionality
-- July 06, 2025. Provided 22 comprehensive UI improvement suggestions covering navigation, data presentation, forms, visual hierarchy, mobile responsiveness, and performance optimizations for enhanced user experience
-- July 06, 2025. Resolved Google Maps loading issue: identified that Airtable database lacks latitude/longitude coordinate data for schools, fixed address array formatting, updated Google Maps component to show informative address display with clear messaging about adding coordinates to Airtable for map functionality
-- July 07, 2025. Implemented AG Grid v34 Material Design theme across all data tables: migrated from legacy CSS themes to new Theming API using themeMaterial, removed old CSS imports and theme wrapper classes, achieved consistent Material Design v2 styling throughout application
-- July 07, 2025. Optimized table layout and spacing: reduced row heights from 35px to 30px (40px for notes tables), vertically centered all badges and pills in grid cells, removed redundant "Add School" button from schools page for cleaner interface
-- July 07, 2025. Enhanced data table visual consistency: applied Material theme to all 8 AG Grid components (teachers, schools, associations, certifications, events, notes, emails, forms), improved content alignment and spacing for better readability
-- July 07, 2025. Added four new logo fields to School schema: logoMainSquare, logoFlowerOnly, logoMainRectangle, logoUrl - mapped from new Airtable attachment fields "Logo - main square", "Logo - flower only", "Logo - main rectangle", and "Logo URL"
-- July 07, 2025. Enhanced Google Maps flower markers to prioritize logoFlowerOnly field when available, with fallback to original logo field for custom school branding on map markers
-- July 07, 2025. Updated school summary logo display to prioritize logoMainSquare field for better square format display in summary section, maintaining fallback chain for compatibility
-- July 07, 2025. Updated logo fallback logic per user preferences: Google Maps now uses logoFlowerOnly → logoMainSquare → logo; School summary now uses logoMainRectangle → logoMainSquare → logo for optimal display formats
-- July 07, 2025. Added Program Details section to school details tab with program focus, school calendar, school schedule, ages served, number of classrooms, and enrollment capacity fields
-- July 07, 2025. Added governance model field to Legal Entity section in school details tab
-- July 07, 2025. Enhanced Support tab with improved visual design: created Overview cards with gradient backgrounds, organized sections for Timeline & Milestones, Facility & Infrastructure, Funding & Financial Planning, and Albums & Cohorts with proper icons and structured layouts
-- July 07, 2025. Fixed membership fees API integration by updating table name from "Membership Fee by Year" to "Membership Fee overview" in Airtable configuration
-- July 07, 2025. Fixed membership fee updates API filtering by correcting field name from {school_id} to {Schools} for proper Airtable data retrieval
-- July 07, 2025. Resolved JSX syntax errors in school detail page by removing duplicate content sections and ensuring proper component structure
-- July 07, 2025. Fixed school notes table showing IDs instead of names by correcting createdBy field mapping to extract .name property from Airtable records
-- July 07, 2025. Implemented comprehensive inline editing for 990s table: created Tax990Row component with edit/delete actions, added API routes (PATCH/DELETE), and integrated delete confirmation modal
-- July 07, 2025. Enhanced governance documents table with open action: added external link button to open documents in new tab, completing the open/edit/delete action pattern
-- July 07, 2025. Standardized table actions across governance and financial tabs: 990s table sorted by year descending with edit/delete, governance docs sorted alphabetically by type with open/edit/delete
-- July 07, 2025. Redesigned governance documents and 990s tables for better UX: removed document name columns, made document type and year fields clickable links to open attachments directly, simplified table structure with cleaner inline editing experience
-- July 07, 2025. Enhanced multi-table tabs with improved Add New functionality: governance tab now has dropdown for "Add Governance Document" or "Add 990", updated column headers ("Governance documents", "990 year"), removed redundant subheaders and bottom Add button for cleaner interface
-- July 07, 2025. Improved Add New button behavior: grayed out button on summary, details, support, systems, and membership tabs where no creation functionality exists, providing clearer visual feedback for user interface state
-- July 07, 2025. Standardized governance documents table layout: matched row heights (h-8) and padding (py-1) with 990s table for consistent visual design across both tables in the governance tab
-- July 07, 2025. Fixed school notes table displaying IDs instead of names: successfully mapped to "Partner Short Name" field in Airtable, removed debugging code, cleaned up field transformation to properly display creator names instead of record IDs
-- July 07, 2025. Implemented live Action Steps table: replaced placeholder with fully functional table displaying real Airtable data including item descriptions, assignees, due dates, and status badges with smart sorting (incomplete items first, then by due date)
-- July 07, 2025. Fixed membership fees data source: updated to use correct Airtable table "Membership fee school x year" instead of "Membership Fee overview", added proper field mappings for fee amount, status, and due date
-- July 07, 2025. Fixed action steps not loading: discovered missing API route in server/routes.ts, added proper /api/action-steps/school/:schoolId endpoint to handle action steps requests
-- July 07, 2025. Implemented headline-based notes display system: added "Headline (Notes)" field to SchoolNote schema and Airtable mapping, updated Notes table to show headlines instead of full text, made headlines clickable to open detailed note modal, added open icon button for full record viewing, created comprehensive note view modal displaying all fields including headline, full notes, metadata, and record ID
-- July 07, 2025. Enhanced table layouts for mobile responsiveness: optimized both Notes and Action Steps tables with percentage-based column widths, added text truncation with hover tooltips, implemented table-fixed layout to prevent horizontal scrolling, added hover tooltips to all action icons explaining their functions (Edit, Open, Mark as private/complete, Delete)
-- July 07, 2025. Fixed critical runtime error: resolved React Query object rendering issue by ensuring all table cell content is properly converted to strings, preventing "Objects are not valid as a React child" errors
-- July 07, 2025. Fixed Airtable headline field object parsing: resolved "[object Object]" display issue by properly extracting value property from Airtable's generated field objects with structure {state, value, isStale}, headlines now display correctly as text strings
-- July 07, 2025. Enhanced Action Steps table with comprehensive functionality: added open icon for viewing full action step details in modal, implemented toggle complete/incomplete status with appropriate icons (checkmark for incomplete items, rotate icon for completed items), created detailed action step view modal showing all fields including description, dates, status, and record metadata
-- July 07, 2025. Fixed membership fees loading issue: corrected Airtable filtering to use proper "School" field array search instead of non-existent "school_id" or "Schools" fields, updated field mappings to use correct Airtable field names ("Initial fee", "Revised amount", "Current exemption status", etc.), implemented fallback manual filtering when Airtable FIND formula fails, successfully loading membership fee records for schools
-- July 08, 2025. Updated Montessori certifications table: corrected Airtable field mappings to use "Year Certified", "Abbreviation", and "Level" fields, reordered columns to show Year Certified, Level, Abbreviation, added Actions column with open, edit (inline), and delete functionality with hover tooltips
-- July 08, 2025. Implemented Charter functionality: created Charter interface with shortName, fullName, city, status fields, built Charters page as new homepage with AG Grid table, added /api/charters endpoint with caching, created Charter detail page with 10 tabs (summary, sites, staff/roles, application(s), contract, authorizer, reports, assessments, notes/action steps, linked emails/meetings), made Short Name column clickable to navigate to charter details
-- July 08, 2025. Built interactive tour guide with animated mascot "Flora": created comprehensive tour overlay system with element highlighting, 5-step guided walkthrough covering navigation and features, animated flower mascot with natural wildflower colors (soft purples, creams, pale yellows), floating tour launcher button, auto-launch for new users, tour controls with play/pause and progress tracking, local storage for tour completion status
-- July 08, 2025. Enhanced teachers table with combined role/school column: merged Current Role, Current School, and Stage/Status into single "Current role/school" column displaying format "Role(s) at School (Status)", removed pills and badges for plain text display, added abbreviations for "Emerging Teacher Leader" → "ETL" and "Teacher Leader" → "TL"
-- July 08, 2025. Updated charter schema and interface: replaced city field with initialTargetCommunity, projectedOpen, and initialTargetAges fields, updated Airtable field mapping to use lowercase "fullname" field, modified charters table columns to show new fields, added "Startup Process" tab to charter detail page positioned after Summary tab
-- July 08, 2025. Fixed charter data integration issues: corrected navigation alignment (app starts on Teachers page with proper tab highlighting), updated all charter storage methods to use charter_id field from Airtable, fixed table names to use shared tables (Governance docs, 990s, School notes, Action steps, Assessment data, Educators x Schools) with charter_id filtering, successfully tested charter API endpoints returning data
-- July 08, 2025. Completed charter data integration: all charter detail page API endpoints now working correctly (charter roles, applications, authorizer contacts, report submissions, governance documents, 990s, school notes, action steps, assessment data, educator school associations), resolved all table name and field mapping issues, charter detail pages now fully functional with proper data filtering
-- July 10, 2025. Enhanced school detail Teachers table: added boolean Founder column showing true/false if educator has Founder role, filtered "Founder" from roles column display to prevent duplication, updated email column to use school's "Current Primary Email" field instead of educator emails, removed complex email fetching logic for improved performance
-- July 10, 2025. Major tab reorganization: removed Systems tab entirely, renamed Support tab to "SSJ", moved Business Insurance and BillCom Account fields from removed Systems tab to Details tab in new "Business & Financial Systems" section
-- July 10, 2025. Removed eyeball/open action button from notes table for cleaner interface - headlines remain clickable to open note details
-- July 10, 2025. Enhanced school detail view with UI improvements: removed startup badge from upper right area, fixed open date field mapping to use "Opened" Airtable field instead of "SSJ Projected Open", enhanced Timeline & Milestones card with Open Date field display, split Albums & Cohorts section into separate cards for better organization, added membership status field to Program Details section for comprehensive school information management
-- July 10, 2025. Cleaned up school details form: removed school calendar and school schedule fields from Program Details section at user request, simplifying the details tab layout
-- July 10, 2025. Fixed school creation functionality: resolved Airtable field mapping issues by correcting "Email" → "School Email", "Phone" → "School Phone", updated membership status dropdown to use actual Airtable values ("Member school", "Affiliated non-member", "Membership terminated"), temporarily removed problematic SSJ Target City/State fields, successfully tested school creation with real backend integration
-- July 10, 2025. Major testing and debugging breakthrough: resolved AG Grid Enterprise filter compatibility by replacing agSetColumnFilter with agTextColumnFilter for Community edition, fixed case-sensitive sorting with custom comparators, implemented comprehensive search functionality across name/shortName/status/membership fields, verified complete data pipeline integrity from Airtable to frontend, removed unwanted row selection checkboxes, identified delete permission limitations in Airtable account
-- July 11, 2025. Comprehensive AG Grid warning resolution: eliminated all invalid gridOptions property warnings ('data-replit-metadata', 'data-component-name') across 16 AG Grid components by implementing proper context handling following v33+ best practices, achieved completely clean console output without any AG Grid configuration warnings, fixed final remaining components: ssj-fillout-forms-table, charter-notes-table, charter-action-steps-table
-- July 11, 2025. Major schema validation fix: resolved critical field update issues by conducting comprehensive Zod schema audit, discovered currentFYEnd and 25+ other critical fields were missing from schoolSchema causing validation to filter out valid data during updates, added all missing fields including logo variants, SSJ business/funding fields, program details, partner assignments, and metadata fields, eliminated "field not updating" issues across all school detail forms, cleaned up legacy file confusion by moving 8 duplicate/retired files to server/retired/ directory with comprehensive documentation
-- July 11, 2025. Completed comprehensive field testing and debugging: systematically tested all 26 Details tab fields, identified root cause was using invalid dropdown values instead of valid ones from metadata endpoint, achieved 91% success rate (21/23 fields working), corrected field validation patterns by using metadata endpoint to determine field types rather than assumptions, only 2 fields still failing due to Airtable permission restrictions
-- July 11, 2025. Implemented context-sensitive Add New functionality: created event emitter pattern (addNewEmitter) for component communication, header Add New button now dynamically shows dropdown options based on current page/tab context, school detail TLs tab displays "Create New Educator at This School" and "Assign Educator to This School" options, successfully replaced failed React Context approach with working event-driven architecture
-- July 11, 2025. Enhanced educator creation modal per user requirements: removed fullName field (calculated in database), added duplicate checking against educators table when first/last name entered, implemented confirmation popup for potential duplicates with options to switch to assign form or continue creating, added nonWildflowerEmail field to top section, made all fields optional except first/last name (no "optional" labels), integrated automatic modal switching functionality from create to assign when duplicate confirmed
-- July 11, 2025. Fixed critical association creation bug: resolved issue where educator records were created but association records (join table) were not being saved - corrected schema validation to require role and start date fields, added proper form validation with required field indicators, implemented comprehensive table refresh strategy with both invalidateQueries and refetchQueries plus delayed safety refetch to ensure tables update automatically after record creation
-- July 11, 2025. Enhanced assign educator functionality: implemented proper Airtable association creation using correct "Educator" and "School" field names, made role and start date optional fields (only educator selection required), improved autocomplete interface with real-time search filtering, added educator name display in TL tables instead of IDs, enhanced dropdown with email addresses for better educator identification, added visual feedback showing selected educator details
-- July 11, 2025. Fixed TL table navigation issues: corrected routing paths from `/teachers/:id` to `/teacher/:id` to match App.tsx route definitions, fixed clickable educator names in TL tables, updated open button to work correctly for both teacher and association records, eliminated navigation crashes when clicking on educator names or open buttons
-- July 11, 2025. Implemented "End stint" functionality: added missing PUT route for `/api/teacher-school-associations/:id` in server/routes.ts, added updateEducatorSchoolAssociation and updateTeacherSchoolAssociation methods to storage interface and implementation, implemented proper Airtable update logic to set end date to today's date and mark association as inactive, fixed missing backend infrastructure for association updates
-- July 11, 2025. Fixed locations functionality: replaced mock implementation with proper Airtable integration for createLocation, updateLocation, and deleteLocation methods in storage layer, implemented correct field mappings to "Locations" table including school_id link field, address, current physical/mailing address booleans, and start/end date fields, resolved issue where location creation appeared to work but table didn't refresh due to data not being persisted to Airtable
-- July 12, 2025. Major system expansion with comprehensive loan management platform: implemented complete loan origination and servicing system including database schema design with 9 loan-specific tables using Drizzle ORM and PostgreSQL, created full-featured loan management interface with dashboard, applications tracking, active loans management, borrower profiles, and reporting capabilities, built comprehensive API layer with 40+ endpoints covering loan applications, underwriting, committee reviews, document management, payment processing, covenant tracking, capital management, and quarterly reporting, added responsive loan dashboard with real-time metrics, payment tracking, and portfolio analytics
-- July 17, 2025. Real production data integration completed: successfully migrated from sample data to live Wildflower loan portfolio data, expanded database schema to accommodate comprehensive CDFI compliance tracking, school demographics (% LITP, % African American, % Latino), geographic census tract data, teacher leader characteristics, and charter school designations, imported 58 real loan records totaling $3,653,379 in principal with $3,388,100 outstanding balance spanning 2019-2025, created automated CSV import scripts with robust data parsing and validation for ongoing portfolio management, achieved full production readiness with authentic portfolio data for investor reporting and CDFI compliance monitoring
-```
-
-## Development Guidelines
-
-### Validation and Quality Assurance
-- **DEVELOPMENT_VALIDATION_GUIDE.md**: Comprehensive validation routines for preventing common field mapping, schema validation, and API integration errors
-- **Validation Routines**: Five systematic checks for data consistency, API integration, UI component validation, and metadata-to-implementation validation
-- **scripts/validate-metadata.sh**: Automated script to detect when implementation doesn't match Airtable structure
-- **Error Prevention**: Proactive validation approach that catches issues like 47 dropdown fields in Airtable but only 31 implemented (causing text inputs instead of dropdowns)
-
-### Architecture Standards
-- **Schema-First Development**: Always ensure TypeScript interfaces, Zod schemas, and Airtable field mappings align
-- **Field Mapping Consistency**: Read and write operations must use identical field names
-- **Component Type Matching**: UI input types must match underlying data types (text→Input, select→Select, etc.)
-
-## User Preferences
-
-```
-Preferred communication style: Simple, everyday language.
-```
+- **Vite**: Fast build tool.
+- **TypeScript**: Static type checking.
+- **ESLint**: Code linting.
