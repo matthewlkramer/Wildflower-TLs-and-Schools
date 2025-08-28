@@ -3,7 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useState, createContext, useContext, useEffect } from "react";
+import { useState, createContext, useContext, useEffect, useMemo } from "react";
 import { addNewEmitter } from "@/lib/add-new-emitter";
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
@@ -117,8 +117,15 @@ function AppContent() {
     setPrevLocation(location);
   }, [location, prevLocation]);
 
+  const searchContextValue = useMemo(() => ({ 
+    searchTerm, 
+    setSearchTerm 
+  }), [searchTerm]);
+
+  console.log('App - SearchContext value:', searchContextValue);
+
   return (
-    <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>
+    <SearchContext.Provider value={searchContextValue}>
       <PageTitleContext.Provider value={{ pageTitle, setPageTitle }}>
         <AddNewContext.Provider value={{ addNewOptions, setAddNewOptions }}>
           <div className="min-h-screen bg-slate-50">
