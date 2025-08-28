@@ -14,10 +14,7 @@ export default function Teachers() {
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
   
-  // Debug search term - only log when there's a search term
-  if (searchTerm) {
-    console.log('Teachers page - searchTerm:', searchTerm, 'teachers count:', teachers?.length);
-  }
+
   
   // Set up Add New options for teachers page
   useEffect(() => {
@@ -63,10 +60,7 @@ export default function Teachers() {
                          phone.toLowerCase().includes(searchText) ||
                          roles.toLowerCase().includes(searchText);
     
-    // Debug first few matches
-    if (searchText === 'kelly' && matchesSearch) {
-      console.log('Found matching teacher:', fullName);
-    }
+
     
     if (!matchesSearch) return false;
     
@@ -84,10 +78,7 @@ export default function Teachers() {
     return true;
   });
   
-  // Debug filtering results only when there's a search
-  if (searchTerm) {
-    console.log('Filtered teachers count:', filteredTeachers.length, 'for search term:', searchTerm);
-  }
+
 
   return (
     <>
