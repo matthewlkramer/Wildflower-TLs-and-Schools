@@ -14,6 +14,11 @@ export default function Teachers() {
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
   
+  // Debug search term - only log when there's a search term
+  if (searchTerm) {
+    console.log('Teachers page - searchTerm:', searchTerm, 'teachers count:', teachers?.length);
+  }
+  
   // Set up Add New options for teachers page
   useEffect(() => {
     const options = [
@@ -30,10 +35,27 @@ export default function Teachers() {
   const filteredTeachers = (teachers || []).filter((teacher: Teacher) => {
     if (!teacher) return false;
     
+    // If no search term, only apply user filter
+    if (!searchTerm.trim()) {
+      // Apply user filter if enabled
+      if (showOnlyMyRecords && currentUser) {
+        // Check if current user is an assigned partner
+        // For demo purposes, we'll check if any assigned partner contains 'demo'
+        // In a real app, this would be based on proper user authentication
+        const isMyRecord = teacher.assignedPartner && teacher.assignedPartner.length > 0 && 
+                          teacher.assignedPartner.some(partner => 
+                            partner && partner.toLowerCase().includes('demo')
+                          );
+        
+        return isMyRecord;
+      }
+      return true;
+    }
+    
     // Build searchable text from teacher properties
     const fullName = teacher.fullName || `${teacher.firstName || ''} ${teacher.lastName || ''}`.trim();
     const phone = teacher.primaryPhone || '';
-    const roles = teacher.currentRole ? teacher.currentRole.join(' ') : '';
+    const roles = teacher.currentRole && Array.isArray(teacher.currentRole) ? teacher.currentRole.join(' ') : '';
     
     // Check if search term matches any searchable field
     const searchText = searchTerm.toLowerCase();
@@ -41,13 +63,16 @@ export default function Teachers() {
                          phone.toLowerCase().includes(searchText) ||
                          roles.toLowerCase().includes(searchText);
     
+    // Debug first few matches
+    if (searchText === 'kelly' && matchesSearch) {
+      console.log('Found matching teacher:', fullName);
+    }
+    
     if (!matchesSearch) return false;
     
     // Apply user filter if enabled
     if (showOnlyMyRecords && currentUser) {
       // Check if current user is an assigned partner
-      // For demo purposes, we'll check if any assigned partner contains 'demo'
-      // In a real app, this would be based on proper user authentication
       const isMyRecord = teacher.assignedPartner && teacher.assignedPartner.length > 0 && 
                         teacher.assignedPartner.some(partner => 
                           partner && partner.toLowerCase().includes('demo')
@@ -58,6 +83,11 @@ export default function Teachers() {
     
     return true;
   });
+  
+  // Debug filtering results only when there's a search
+  if (searchTerm) {
+    console.log('Filtered teachers count:', filteredTeachers.length, 'for search term:', searchTerm);
+  }
 
   return (
     <>
