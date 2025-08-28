@@ -9,9 +9,9 @@ import { Link } from "wouter";
 import { ExternalLink, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { type Educator } from "@shared/schema";
+import { type Educator, type School } from "@shared/schema";
 import { getStatusColor } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
@@ -20,6 +20,28 @@ interface TeachersGridProps {
   teachers: Educator[];
   isLoading: boolean;
 }
+
+// School Link Component that finds school ID by name
+const SchoolLink = ({ schoolName }: { schoolName: string }) => {
+  const { data: schools } = useQuery<School[]>({
+    queryKey: ['/api/schools'],
+  });
+
+  const school = schools?.find(s => s.name === schoolName);
+  
+  if (!school) {
+    return <span>{schoolName}</span>;
+  }
+
+  return (
+    <Link 
+      href={`/school/${school.id}`} 
+      className="text-blue-600 hover:text-blue-800 hover:underline"
+    >
+      {schoolName}
+    </Link>
+  );
+};
 
 // Badge renderer for status fields (Discovery Status, Stage/Status, Montessori Certified)
 const BadgeRenderer = ({ value, field }: { value: string | string[]; field?: string }) => {
@@ -178,8 +200,7 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       field: "currentRoleSchool",
       filter: 'agTextColumnFilter',
       minWidth: 300,
-      valueGetter: (params) => {
-        const data = params.data;
+      cellRenderer: ({ data }: { data: Educator }) => {
         if (!data) return '';
 
         // Get current role(s) - join with commas if multiple
@@ -190,27 +211,31 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
         roleText = roleText.replace(/\bEmerging Teacher Leader\b/g, 'ETL');
         roleText = roleText.replace(/\bTeacher Leader\b/g, 'TL');
 
-        // Get school name
-        const school = data.activeSchool;
-        const schoolText = Array.isArray(school) ? school.join(', ') : (school || '');
+        // Get school data
+        const schools = data.activeSchool;
+        const schoolArray = Array.isArray(schools) ? schools : (schools ? [schools] : []);
 
         // Get stage/status
         const status = data.activeSchoolStageStatus;
         const statusText = Array.isArray(status) ? status.join(', ') : (status || '');
 
-        // Combine into format: "Role(s) at School (Status)"
-        let result = '';
-        if (roleText) {
-          result = roleText;
-        }
-        if (schoolText) {
-          result += (result ? ' at ' : '') + schoolText;
-        }
-        if (statusText) {
-          result += ` (${statusText})`;
-        }
-
-        return result || '';
+        return (
+          <div className="flex items-center gap-1">
+            {roleText && <span>{roleText}</span>}
+            {roleText && schoolArray.length > 0 && <span> at </span>}
+            {schoolArray.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {schoolArray.map((school, index) => (
+                  <span key={index}>
+                    <SchoolLink schoolName={school} />
+                    {index < schoolArray.length - 1 && ', '}
+                  </span>
+                ))}
+              </div>
+            )}
+            {statusText && <span> ({statusText})</span>}
+          </div>
+        );
       }
     },
     {
