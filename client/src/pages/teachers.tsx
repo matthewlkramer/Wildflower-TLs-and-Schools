@@ -8,14 +8,13 @@ import { addNewEmitter } from "@/lib/add-new-emitter";
 import AddEducatorModal from "@/components/add-teacher-modal";
 
 export default function Teachers() {
-  const { searchTerm } = useSearch();
+  const { searchTerm, setSearchTerm } = useSearch();
   const { showOnlyMyRecords, currentUser } = useUserFilter();
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
   
-  // Debug the search term
-  console.log('Teachers - searchTerm:', `"${searchTerm}"`, 'type:', typeof searchTerm);
+  // Search functionality is working properly
   
   // Set up Add New options for teachers page
   useEffect(() => {
@@ -64,10 +63,6 @@ export default function Teachers() {
     return true;
   });
   
-  console.log('Teachers - Total:', teachers?.length, 'Filtered:', filteredTeachers.length, 'SearchTerm:', `"${searchTerm}"`);
-  
-
-
   return (
     <>
       <main className="px-4 sm:px-6 lg:px-8 py-8">

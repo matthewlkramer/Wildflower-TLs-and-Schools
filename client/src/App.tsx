@@ -103,6 +103,15 @@ function AppContent() {
   const isTeachersActive = location === "/teachers" || location.startsWith("/teacher/");
   const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
   const isChartersActive = location === "/charters" || location.startsWith("/charter/");
+  
+  // Clear search when changing pages (but not on initial load)
+  const [prevLocation, setPrevLocation] = useState(location);
+  useEffect(() => {
+    if (prevLocation && prevLocation !== location) {
+      setSearchTerm("");
+    }
+    setPrevLocation(location);
+  }, [location, prevLocation]);
 
   return (
     <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>
