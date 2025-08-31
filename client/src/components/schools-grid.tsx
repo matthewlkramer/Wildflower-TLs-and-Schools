@@ -1,23 +1,26 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useMemo, useCallback, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef, GridReadyEvent, GridApi, themeMaterial } from "ag-grid-community";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-
-// Register AG Grid modules
-ModuleRegistry.registerModules([AllCommunityModule]);
 import { Link } from "wouter";
 import { ExternalLink, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type School } from "@shared/schema";
 import { getStatusColor } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
+import { GridBase } from "@/components/shared/GridBase";
+import { useAgGridFeatures } from "@/hooks/use-aggrid-features";
+import { STAGE_STATUS_ORDER, STAGE_STATUS_DEFAULT, MEMBERSHIP_STATUS_ORDER } from "@/constants/filters";
+import { SCHOOLS_OPTIONS_AGES_SERVED as AGES_SERVED_OPTIONS, SCHOOLS_OPTIONS_GOVERNANCE_MODEL as GOVERNANCE_MODEL_OPTIONS } from "@/constants/airtable-schema";
 import { useToast } from "@/hooks/use-toast";
+import { createTextFilter } from "@/utils/ag-grid-utils";
+import { useGridHeight } from "@/components/shared/use-grid-height";
 
 interface SchoolsGridProps {
   schools: School[];
   isLoading: boolean;
+  onFilteredCountChange?: (count: number) => void;
 }
 
 // Custom cell renderers
@@ -88,9 +91,19 @@ const CurrentTLsCellRenderer = (params: any) => {
   return <span className="text-slate-400">-</span>;
 };
 
-const ActionsCellRenderer = (params: any) => {
-  const school = params.data;
-  
+const ActionsCellRenderer = ({ data: school }: { data: School }) => {
+  const handleDelete = async () => {
+    const ok = window.confirm(`Are you sure you want to delete ${school.shortName || school.name}?`);
+    if (!ok) return;
+    try {
+      await apiRequest('PUT', `/api/schools/${school.id}`, { archived: true });
+      queryClient.invalidateQueries({ queryKey: ['/api/schools'] });
+    } catch (e) {
+      console.error('Failed to delete school', e);
+      alert('Failed to delete school. Please try again.');
+    }
+  };
+
   return (
     <div className="flex space-x-1">
       <Link href={`/school/${school.id}`}>
@@ -98,13 +111,11 @@ const ActionsCellRenderer = (params: any) => {
           <ExternalLink className="h-3 w-3" />
         </Button>
       </Link>
-      <Button 
-        variant="ghost" 
-        size="sm" 
+      <Button
+        variant="ghost"
+        size="sm"
         className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
-        onClick={() => {
-          console.log('Delete school:', school.id);
-        }}
+        onClick={handleDelete}
       >
         <Trash2 className="h-3 w-3" />
       </Button>
@@ -112,25 +123,10 @@ const ActionsCellRenderer = (params: any) => {
   );
 };
 
-export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
+export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange }: SchoolsGridProps) {
   const { toast } = useToast();
-  const [viewportHeight, setViewportHeight] = useState<number>(0);
-
-  // Handle viewport height changes for orientation changes
-  useEffect(() => {
-    const updateHeight = () => {
-      setViewportHeight(window.innerHeight);
-    };
-    
-    updateHeight();
-    window.addEventListener('resize', updateHeight);
-    window.addEventListener('orientationchange', updateHeight);
-    
-    return () => {
-      window.removeEventListener('resize', updateHeight);
-      window.removeEventListener('orientationchange', updateHeight);
-    };
-  }, []);
+  const gridHeight = useGridHeight();
+  const { entReady, filterForText } = useAgGridFeatures();
   
   const columnDefs: ColDef[] = [
     {
@@ -138,11 +134,7 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       headerName: "School Name",
       width: 200,
       cellRenderer: SchoolNameCellRenderer,
-      filter: "agTextColumnFilter",
-      filterParams: {
-        filterOptions: ["contains", "startsWith", "endsWith"],
-        suppressAndOrCondition: true,
-      },
+      ...createTextFilter(),
       valueGetter: (params) => params.data.shortName || params.data.name,
       comparator: (valueA: string, valueB: string) => {
         const a = (valueA || '').toLowerCase();
@@ -152,11 +144,15 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       sort: 'asc',
     },
     {
-      field: "status",
+      field: "stageStatus",
       headerName: "Stage/Status",
       width: 140,
       cellRenderer: StatusBadgeCellRenderer,
-      filter: "agTextColumnFilter",
+      // Prefer Enterprise Set Filter with ordered values; otherwise fall back to text filter
+      filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
+      filterParams: entReady 
+        ? ({ values: STAGE_STATUS_ORDER } as any)
+        : ({ textFormatter: (v: any) => String(v ?? '').trim().toLowerCase(), defaultOption: 'contains' } as any),
       comparator: (valueA: string, valueB: string) => {
         const a = (valueA || '').toLowerCase();
         const b = (valueB || '').toLowerCase();
@@ -168,7 +164,10 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       headerName: "Membership Status",
       width: 160,
       cellRenderer: MembershipStatusCellRenderer,
-      filter: "agTextColumnFilter",
+      filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
+      filterParams: entReady 
+        ? ({ values: MEMBERSHIP_STATUS_ORDER } as any)
+        : undefined,
       comparator: (valueA: string, valueB: string) => {
         const a = (valueA || '').toLowerCase();
         const b = (valueB || '').toLowerCase();
@@ -194,7 +193,8 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
       headerName: "Ages Served",
       width: 140,
       cellRenderer: MultiValueCellRenderer,
-      filter: "agTextColumnFilter",
+      filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
+      filterParams: entReady ? ({ values: AGES_SERVED_OPTIONS } as any) : { defaultOption: 'contains', debounceMs: 150 },
       valueFormatter: (params) => {
         if (Array.isArray(params.value)) {
           return params.value.join(', ');
@@ -218,7 +218,8 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
           </div>
         );
       },
-      filter: "agTextColumnFilter",
+      filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
+      filterParams: entReady ? ({ values: GOVERNANCE_MODEL_OPTIONS } as any) : { defaultOption: 'contains', debounceMs: 150 },
     },
 
     {
@@ -232,34 +233,16 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
     },
   ];
 
-  const defaultColDef: ColDef = {
-    sortable: true,
-    filter: true,
-    resizable: true,
-    floatingFilter: false,
-  };
+  const defaultColDef: ColDef = { ...DEFAULT_COL_DEF };
 
   const onGridReady = useCallback((params: GridReadyEvent) => {
     params.api.sizeColumnsToFit();
   }, []);
 
-  // Calculate appropriate height based on viewport
-  const getGridHeight = () => {
-    if (viewportHeight === 0) return 'calc(100vh - 200px)'; // Fallback
-    
-    // Mobile landscape mode (height < 500px)
-    if (viewportHeight < 500) {
-      return Math.max(viewportHeight - 120, 280) + 'px';
-    }
-    
-    // Regular desktop/tablet
-    return Math.min(viewportHeight - 200, 800) + 'px';
-  };
-
   if (isLoading) {
     return (
-      <div className="w-full min-h-[280px]" style={{ height: getGridHeight() }}>
-        <div className="ag-theme-alpine h-full">
+      <div className="w-full min-h-[280px]" style={{ height: gridHeight }}>
+        <div className="ag-theme-material h-full">
           <div className="flex items-center justify-center h-full">
             <div className="text-slate-500">Loading schools...</div>
           </div>
@@ -270,8 +253,8 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
 
   if (!schools || schools.length === 0) {
     return (
-      <div className="w-full min-h-[280px]" style={{ height: getGridHeight() }}>
-        <div className="ag-theme-alpine h-full">
+      <div className="w-full min-h-[280px]" style={{ height: gridHeight }}>
+        <div className="ag-theme-material h-full">
           <div className="flex items-center justify-center h-full">
             <div className="text-slate-500">No schools found</div>
           </div>
@@ -281,24 +264,45 @@ export default function SchoolsGrid({ schools, isLoading }: SchoolsGridProps) {
   }
 
   return (
-    <div className="w-full min-h-[280px]" style={{ height: getGridHeight() }}>
-      <div className="ag-theme-material h-full">
-        <AgGridReact
-          rowData={schools}
-          columnDefs={columnDefs}
-          defaultColDef={defaultColDef}
-          onGridReady={(params) => {
+    <div className="w-full min-h-[280px]" style={{ height: gridHeight }}>
+      <GridBase
+        rowData={schools}
+        columnDefs={columnDefs}
+        defaultColDefOverride={defaultColDef}
+        style={{ height: '100%' }}
+        gridProps={{
+          ...DEFAULT_GRID_PROPS,
+          onGridReady: (params: GridReadyEvent) => {
             params.api.sizeColumnsToFit();
-          }}
-          animateRows={true}
-          rowSelection={undefined}
-          enableBrowserTooltips={true}
-          rowHeight={30}
-          context={{
-            componentName: 'schools-grid'
-          }}
-        />
-      </div>
+          },
+          onFirstDataRendered: (ev: any) => {
+            try {
+              if (entReady) {
+                // Enterprise: preselect allowed set (ordered) including blanks
+                ev.api.setFilterModel({
+                  stageStatus: { filterType: 'set', values: STAGE_STATUS_DEFAULT } as any,
+                } as any);
+              } else {
+                // Community: fall back to text filter excluding Paused
+                ev.api.setFilterModel({
+                  stageStatus: { filterType: 'text', type: 'notEqual', filter: 'Paused' },
+                } as any);
+              }
+            } catch {}
+            try {
+              const count = ev.api.getDisplayedRowCount();
+              onFilteredCountChange?.(count);
+            } catch {}
+          },
+          onFilterChanged: (ev: any) => {
+            try {
+              const count = ev.api.getDisplayedRowCount();
+              onFilteredCountChange?.(count);
+            } catch {}
+          },
+          context: { componentName: 'schools-grid' },
+        }}
+      />
     </div>
   );
 }

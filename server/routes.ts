@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import { storage } from "./simple-storage";
 import { loanStorage } from "./loan-storage";
 import { cache } from "./cache";
+import { logger } from "./logger";
 import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema } from "@shared/schema";
 import { createInsertSchema } from "drizzle-zod";
 import { 
@@ -78,6 +79,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const educatorData = educatorSchema.parse(req.body);
       const educator = await storage.createEducator(educatorData);
+      cache.invalidate('educators');
+      cache.invalidate('teachers');
       res.status(201).json(educator);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -95,6 +98,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!educator) {
         return res.status(404).json({ message: "Educator not found" });
       }
+      cache.invalidate('educators');
+      cache.invalidate('teachers');
       res.json(educator);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -111,6 +116,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!deleted) {
         return res.status(404).json({ message: "Educator not found" });
       }
+      cache.invalidate('educators');
+      cache.invalidate('teachers');
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete educator" });
@@ -167,6 +174,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const teacherData = educatorSchema.parse(req.body);
       const teacher = await storage.createTeacher(teacherData);
+      cache.invalidate('teachers');
+      cache.invalidate('educators');
       res.status(201).json(teacher);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -184,6 +193,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!teacher) {
         return res.status(404).json({ message: "Teacher not found" });
       }
+      cache.invalidate('teachers');
+      cache.invalidate('educators');
       res.json(teacher);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -200,6 +211,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!success) {
         return res.status(404).json({ message: "Teacher not found" });
       }
+      cache.invalidate('teachers');
+      cache.invalidate('educators');
       res.json({ message: "Teacher deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete teacher" });
@@ -244,6 +257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const schoolData = schoolSchema.parse(req.body);
       const school = await storage.createSchool(schoolData);
+      cache.invalidate('schools');
       res.status(201).json(school);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -261,13 +275,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!school) {
         return res.status(404).json({ message: "School not found" });
       }
+      cache.invalidate('schools');
       res.json(school);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.log('Validation errors:', error.errors);
+        logger.log('Validation errors:', error.errors);
         return res.status(400).json({ message: "Invalid school data", errors: error.errors });
       }
-      console.error('School update error:', error);
+      logger.error('School update error:', error);
       res.status(500).json({ message: "Failed to update school" });
     }
   });
@@ -281,7 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Invalidate cache after successful deletion
-      cache.invalidate('schools:all');
+      cache.invalidate('schools');
       
       res.json({ message: "School deleted successfully" });
     } catch (error) {
@@ -333,6 +348,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const associationData = educatorSchoolAssociationSchema.parse(req.body);
       const association = await storage.createTeacherSchoolAssociation(associationData);
+      cache.invalidate('associations');
       res.status(201).json(association);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -350,6 +366,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!association) {
         return res.status(404).json({ message: "Association not found" });
       }
+      cache.invalidate('associations');
       res.json(association);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -366,6 +383,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!success) {
         return res.status(404).json({ message: "Association not found" });
       }
+      cache.invalidate('associations');
       res.json({ message: "Association deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete association" });
@@ -519,7 +537,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tax990s = await storage.getTax990sBySchoolId(schoolId);
       res.json(tax990s);
     } catch (error) {
-      console.error('Error fetching 990s:', error);
+      logger.error('Error fetching 990s:', error);
       res.status(500).json({ error: 'Failed to fetch 990s' });
     }
   });
@@ -534,7 +552,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(tax990);
     } catch (error) {
-      console.error("Error updating tax 990:", error);
+      logger.error("Error updating tax 990:", error);
       res.status(500).json({ message: "Failed to update tax 990" });
     }
   });
@@ -548,7 +566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json({ message: "Tax 990 deleted successfully" });
     } catch (error) {
-      console.error("Error deleting tax 990:", error);
+      logger.error("Error deleting tax 990:", error);
       res.status(500).json({ message: "Failed to delete tax 990" });
     }
   });
@@ -785,7 +803,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }))
       });
     } catch (error) {
-      console.error("Error fetching Airtable schema:", error);
+      logger.error("Error fetching Airtable schema:", error);
       res.status(500).json({ error: "Failed to fetch tables" });
     }
   });
@@ -820,6 +838,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(emailAddress);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch email address" });
+    }
+  });
+
+  app.post("/api/email-addresses", async (req, res) => {
+    try {
+      const data = emailAddressSchema.parse(req.body);
+      const created = await storage.createEmailAddress(data);
+      res.status(201).json(created);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid email address data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create email address" });
+    }
+  });
+
+  app.put("/api/email-addresses/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const data = emailAddressSchema.partial().parse(req.body);
+      const updated = await storage.updateEmailAddress(id, data);
+      if (!updated) {
+        return res.status(404).json({ message: "Email address not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid email address data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update email address" });
+    }
+  });
+
+  app.delete("/api/email-addresses/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const success = await storage.deleteEmailAddress(id);
+      if (!success) return res.status(404).json({ message: "Email address not found" });
+      res.json({ message: "Email address deleted" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete email address" });
+    }
+  });
+
+  // Convenience route: make an email the primary for its educator
+  app.post("/api/email-addresses/:id/make-primary", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const record = await storage.getEmailAddress(id);
+      if (!record) return res.status(404).json({ message: "Email address not found" });
+      const educatorId = record.educatorId;
+      if (educatorId) {
+        const all = await storage.getEmailAddressesByEducatorId(educatorId);
+        await Promise.all(
+          all.filter(e => e.id !== id && e.isPrimary).map(e => storage.updateEmailAddress(e.id, { isPrimary: false }))
+        );
+      }
+      const updated = await storage.updateEmailAddress(id, { isPrimary: true });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to set primary email" });
+    }
+  });
+
+  // Convenience route: inactivate an email
+  app.post("/api/email-addresses/:id/inactivate", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const updated = await storage.updateEmailAddress(id, { status: 'Inactive', isPrimary: false });
+      if (!updated) return res.status(404).json({ message: "Email address not found" });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to inactivate email" });
     }
   });
 
@@ -972,7 +1063,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(400).json({ message: "Missing required filter parameter" });
     } catch (error) {
-      console.error(`Error fetching subtable ${req.params.tableName}:`, error);
+      logger.error(`Error fetching subtable ${req.params.tableName}:`, error);
       res.status(500).json({ message: `Failed to fetch ${req.params.tableName}` });
     }
   });
@@ -1288,7 +1379,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             try {
               schoolData = await storage.getSchool(borrower.schoolId);
             } catch (error) {
-              console.error(`Failed to fetch school data for ${borrower.schoolId}:`, error);
+              logger.error(`Failed to fetch school data for ${borrower.schoolId}:`, error);
             }
           }
           
@@ -1305,7 +1396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(enrichedBorrowers);
     } catch (error) {
-      console.error('Error fetching borrowers school view:', error);
+      logger.error('Error fetching borrowers school view:', error);
       res.status(500).json({ message: "Failed to fetch borrowers with school data" });
     }
   });
@@ -1442,13 +1533,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Loan Origination Workflow Routes (must come before parameterized routes)
   app.get("/api/loans/origination-pipeline", async (req, res) => {
     try {
-      console.log("Fetching origination pipeline loans...");
+      logger.log("Fetching origination pipeline loans...");
       const loans = await loanStorage.getLoansInOrigination();
-      console.log("Found loans:", loans?.length || 0);
+      logger.log("Found loans:", loans?.length || 0);
       res.json(loans);
     } catch (error) {
-      console.error("Error fetching origination pipeline:", error);
-      console.error("Stack trace:", error.stack);
+      logger.error("Error fetching origination pipeline:", error);
+      logger.error("Stack trace:", error.stack);
       res.status(500).json({ message: "Failed to fetch origination pipeline", error: error.message });
     }
   });
@@ -1467,7 +1558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(loanWithBorrower);
     } catch (error) {
-      console.error("Error fetching loan:", error);
+      logger.error("Error fetching loan:", error);
       res.status(500).json({ message: "Failed to fetch loan" });
     }
   });
@@ -1555,7 +1646,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         setupIntent: setupIntent.id,
       });
     } catch (error) {
-      console.error("Error setting up ACH:", error);
+      logger.error("Error setting up ACH:", error);
       res.status(500).json({ message: "Failed to set up ACH" });
     }
   });
@@ -1568,7 +1659,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedLoan = await loanStorage.updateLoanOriginationStatus(loanId, status, updates);
       res.json(updatedLoan);
     } catch (error) {
-      console.error("Error updating origination status:", error);
+      logger.error("Error updating origination status:", error);
       res.status(500).json({ message: "Failed to update origination status" });
     }
   });
@@ -2020,9 +2111,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(template);
     } catch (error) {
-      console.error("Template update error:", error);
+      logger.error("Template update error:", error);
       if (error instanceof z.ZodError) {
-        console.error("Validation errors:", error.errors);
+        logger.error("Validation errors:", error.errors);
         return res.status(400).json({ message: "Invalid template data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to update template" });

@@ -1,5 +1,5 @@
 import { AlertTriangle } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 interface DeleteConfirmationModalProps {
@@ -29,7 +29,7 @@ export default function DeleteConfirmationModal({
             </div>
             <div>
               <DialogTitle>{title}</DialogTitle>
-              <p className="text-sm text-slate-600 mt-1">{description}</p>
+              <DialogDescription className="text-sm text-slate-600 mt-1">{description}</DialogDescription>
             </div>
           </div>
         </DialogHeader>

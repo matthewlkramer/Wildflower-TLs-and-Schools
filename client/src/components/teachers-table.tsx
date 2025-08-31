@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ResizableTable, ResizableTableHeader, ResizableTableBody, ResizableTableRow, ResizableTableHead, ResizableTableCell } from "./resizable-table";
 import { useMutation } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { type Teacher } from "@shared/schema";
@@ -118,10 +119,10 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
   return (
     <>
       <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-50">
-              <TableHead className="relative">
+        <ResizableTable>
+          <ResizableTableHeader>
+            <ResizableTableRow className="bg-slate-50">
+              <ResizableTableHead className="relative">
                 <div className="flex items-center justify-between">
                   <span>Full Name</span>
                   <ColumnFilter
@@ -132,7 +133,7 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
                     onFilterChange={handleFilterChange}
                   />
                 </div>
-              </TableHead>
+              </ResizableTableHead>
               <ResizableTableHead defaultWidth={180} minWidth={120} maxWidth={250}>
                 <div className="flex items-center justify-between">
                   <span>Current School</span>
@@ -324,25 +325,6 @@ export default function TeachersTable({ teachers, isLoading }: TeachersTableProp
             ))}
           </ResizableTableBody>
         </ResizableTable>
-      </div>
-
-      <div className="px-6 py-4 border-t border-slate-200">
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-slate-700">
-            Showing <span className="font-medium">1</span> to <span className="font-medium">{teachers.length}</span> of <span className="font-medium">{teachers.length}</span> results
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" disabled>
-              Previous
-            </Button>
-            <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700">
-              1
-            </Button>
-            <Button variant="outline" size="sm" disabled>
-              Next
-            </Button>
-          </div>
-        </div>
       </div>
 
       <DeleteConfirmationModal

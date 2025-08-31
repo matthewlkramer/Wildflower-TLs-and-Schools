@@ -127,6 +127,7 @@ export interface Educator {
   primaryPhone?: string;
   secondaryPhone?: string;
   homeAddress?: string;
+  currentPrimaryEmailAddress?: string;
 
 
   // Demographics
@@ -190,6 +191,7 @@ export interface Educator {
   created?: string;
   lastModified?: string;
   createdBy?: string;
+  archived?: boolean;
 }
 
 export interface School {
@@ -197,6 +199,8 @@ export interface School {
   name: string;
   shortName?: string;
   priorNames?: string;
+  assignedPartner?: string[];
+  charterId?: string;
   logo?: string;
   logoMainSquare?: string;
   logoFlowerOnly?: string;
@@ -246,6 +250,7 @@ export interface School {
   website?: string;
   instagram?: string;
   facebook?: string;
+  archived?: boolean;
 
 
   // Membership
@@ -354,6 +359,7 @@ export interface EducatorSchoolAssociation {
   stageStatus?: string;
   startDate?: string;
   endDate?: string;
+  emailAtSchool?: string;
   isActive?: boolean;
   created?: string;
   lastModified?: string;
@@ -524,6 +530,7 @@ export const educatorSchema = z.object({
   alsoAPartner: z.boolean().optional(),
   onSchoolBoard: z.string().optional(),
   everATLInAnOpenSchool: z.boolean().optional(),
+  archived: z.boolean().optional(),
 });
 
 export const schoolSchema = z.object({
@@ -549,6 +556,7 @@ export const schoolSchema = z.object({
   domain: z.string().optional(),
   instagram: z.string().optional(),
   facebook: z.string().optional(),
+  archived: z.boolean().optional(),
   narrative: z.string().optional(),
   institutionalPartner: z.string().optional(),
   opened: z.string().optional(),
@@ -696,12 +704,25 @@ export const educatorSchoolAssociationSchema = z.object({
 });
 
 export const locationSchema = z.object({
-  schoolId: z.string().min(1, "School ID is required"),
+  schoolId: z.string().optional(),
+  charterId: z.string().optional(),
   address: z.string().optional(),
   currentPhysicalAddress: z.boolean().optional(),
   currentMailingAddress: z.boolean().optional(),
+  locationType: z.string().optional(),
+  colocationType: z.string().optional(),
+  colocationPartner: z.string().optional(),
+  neighborhood: z.string().optional(),
+  sqFeet: z.number().optional(),
+  maxStudents: z.number().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
+  leaseEndDate: z.string().optional(),
+  lease: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  censusTract: z.string().optional(),
+  qualLICT: z.boolean().optional(),
 });
 
 export const guideAssignmentSchema = z.object({
@@ -715,7 +736,8 @@ export const guideAssignmentSchema = z.object({
 });
 
 export const governanceDocumentSchema = z.object({
-  schoolId: z.string().min(1, "School ID is required"),
+  schoolId: z.string().optional(),
+  charterId: z.string().optional(),
   docType: z.string().optional(),
   doc: z.string().optional(),
   dateEntered: z.string().optional(),
@@ -931,105 +953,17 @@ export type InsertMontessoriCertification = z.infer<typeof montessoriCertificati
 export type InsertEventAttendance = z.infer<typeof eventAttendanceSchema>;
 export type InsertEducatorNote = z.infer<typeof educatorNoteSchema>;
 
-// Charter-related types
-export interface CharterRole {
-  id: string;
-  charterId: string;
-  role: string;
-  name: string;
-  currentlyActive: boolean;
-  created: string;
-  lastModified: string;
-}
+// (Removed duplicate CharterRole/CharterApplication/CharterAuthorizerContact interfaces defined above)
 
-export interface CharterApplication {
-  id: string;
-  charterId: string;
-  applicationName: string;
-  targetOpen: string;
-  status: string;
-  submissionDate: string;
-  created: string;
-  lastModified: string;
-}
-
-export interface CharterAuthorizerContact {
-  id: string;
-  charterId: string;
-  name: string;
-  role: string;
-  email: string;
-  phone: string;
-  created: string;
-  lastModified: string;
-}
-
-export interface ReportSubmission {
-  id: string;
-  charterId: string;
-  reportName: string;
-  submissionDate: string;
-  status: string;
-  created: string;
-  lastModified: string;
-}
-
-export interface AssessmentData {
-  id: string;
-  charterId: string;
-  assessmentName: string;
-  assessmentDate: string;
-  score: string;
-  created: string;
-  lastModified: string;
-}
-
-export interface CharterNote {
-  id: string;
-  charterId: string;
-  dateCreated: string;
-  createdBy: string;
-  notes: string;
-  created: string;
-  lastModified: string;
-}
-
-export interface CharterActionStep {
-  id: string;
-  charterId: string;
-  description: string;
-  assignee: string;
-  dueDate: string;
-  status: string;
-  complete: boolean;
-  created: string;
-  lastModified: string;
-}
-
-export interface CharterGovernanceDocument {
-  id: string;
-  charterId: string;
-  documentType: string;
-  date: string;
-  attachment: string;
-  created: string;
-  lastModified: string;
-}
-
-export interface Charter990 {
-  id: string;
-  charterId: string;
-  year: string;
-  attachment: string;
-  created: string;
-  lastModified: string;
-}
+// (Removed duplicate Charter* and ReportSubmission/AssessmentData interfaces defined above)
 
 // Legacy types for backward compatibility
 export type Teacher = Educator;
 export type InsertTeacher = InsertEducator;
 export type TeacherSchoolAssociation = EducatorSchoolAssociation;
 export type InsertTeacherSchoolAssociation = InsertEducatorSchoolAssociation;
+export type ActionStep = CharterActionStep;
+export type Tax990 = Charter990;
 
 // Legacy schemas for backward compatibility
 export const insertTeacherSchema = educatorSchema;

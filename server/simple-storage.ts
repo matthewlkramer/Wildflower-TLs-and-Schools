@@ -48,8 +48,10 @@ import type {
   Teacher,
   TeacherSchoolAssociation,
   InsertTeacher,
-  InsertTeacherSchoolAssociation
+  InsertTeacherSchoolAssociation,
+  Tax990
 } from "@shared/schema";
+import { SCHOOLS_FIELDS as SF, EDUCATORS_FIELDS as EF, EDUCATORS_X_SCHOOLS_FIELDS as EXSF } from "@shared/airtable-schema";
 
 export interface IStorage {
   // Charter operations
@@ -280,7 +282,8 @@ export class SimpleAirtableStorage implements IStorage {
     
     return {
       id: record.id,
-      fullName: fields["Full Name"] || "",
+      currentPrimaryEmailAddress: fields[EF.Current_Primary_Email_Address] || fields["Current Primary Email"] || undefined,
+      fullName: fields["Full Name"] || undefined,
       firstName: fields["First Name"] || undefined,
       nickname: fields["Nickname"] || undefined,
       middleName: fields["Middle Name"] || undefined,
@@ -329,12 +332,11 @@ export class SimpleAirtableStorage implements IStorage {
       opsGuideReqPertinentInfo: fields['Ops Guide Request Pertinent Info'] || [],
       opsGuideSupportTypeNeeded: fields['Ops Guide Support Type Needed'] || [],
       opsGuideFundraisingOps: fields['Ops Guide Any fundraising opportunities?'] || '',
-      activeHolaspirit: fields["Active Holaspirit"] || false,
-      holaspiritMemberID: fields["Holaspirit memberID"] || undefined,
       tcUserID: fields["TC User ID"] || undefined,
       created: fields["Created"] || undefined,
       lastModified: fields["Last Modified"] || undefined,
       createdBy: fields["Created By"]?.name || undefined,
+      archived: fields['Archived'] === true,
     };
   }
 
@@ -345,23 +347,15 @@ export class SimpleAirtableStorage implements IStorage {
 
     return {
       id: record.id,
-      name: fields["Name"] || fields["School Name"] || "",
-      shortName: fields["Short Name"] || undefined,
+      name: fields[SF.Name] || fields["School Name"] || "",
+      shortName: fields[SF.Short_Name] || undefined,
       logo: fields["Logo"]?.[0]?.url || undefined,
       logoMainSquare: fields["Logo - main square"]?.[0]?.url || undefined,
       logoFlowerOnly: fields["Logo - flower only"]?.[0]?.url || undefined,
       logoMainRectangle: fields["Logo - main rectangle"]?.[0]?.url || undefined,
-      logoUrl: fields["Logo URL"] || undefined,
-      currentPhysicalAddress: fields['Current Physical Address?'] === true,
-      currentMailingAddress: fields['Current Mailing Address?'] === true,
-      activePhysicalAddress: Array.isArray(fields['Current Physical Address - Address']) 
-        ? fields['Current Physical Address - Address'].join(', ')
-        : fields['Current Physical Address - Address'] || 
-          (Array.isArray(fields['Current Physical Address']) 
-            ? fields['Current Physical Address'].join(', ')
-            : fields['Current Physical Address']),
-      activeLocationCity: fields['Current Physical Address - City'],
-      activeLocationState: fields['Current Physical Address - State'],
+      logoUrl: fields[SF.Logo_URL] || undefined,
+      currentPhysicalAddress: fields['Current Physical Address'] || undefined,
+      currentMailingAddress: fields['Current Mailing Address'] || undefined,
       activeLatitude: fields['activeLatitude'] ? parseFloat(fields['activeLatitude']) : undefined,
       activeLongitude: fields['activeLongitude'] ? parseFloat(fields['activeLongitude']) : undefined,
       ssjTargetCity: fields['SSJ - Target City'] || null,
@@ -371,34 +365,34 @@ export class SimpleAirtableStorage implements IStorage {
         : fields['SSJ - Target City']
           ? `${fields['SSJ - Target City']}${fields['SSJ - Target State'] ? ', ' + fields['SSJ - Target State'] : ''}`
           : ''),
-      phone: fields["School Phone"] || undefined,
-      email: fields["School Email"] || undefined,
-      website: fields["Website"] || undefined,
-      instagram: fields["Instagram"] || undefined,
-      facebook: fields["Facebook"] || undefined,
+      phone: fields[SF.School_Phone] || undefined,
+      email: fields[SF.School_Email] || undefined,
+      website: fields[SF.Website] || undefined,
+      instagram: fields[SF.Instagram] || undefined,
+      facebook: fields[SF.Facebook] || undefined,
+      archived: fields['Archived'] === true,
       priorNames: fields['Prior Names'] || '',
       narrative: fields['Narrative'] || '',
       institutionalPartner: fields['Institutional partner'] || null,
-      membershipStatus: fields['Membership Status'] || '',
+      membershipStatus: fields[SF.Membership_Status] || '',
       founders: fields['Founders'] || [],
       membershipAgreementDate: fields['Membership Agreement date'] || '',
       signedMembershipAgreement: fields['Signed Membership Agreement'] || '',
       agreementVersion: fields['Agreement Version'] || '',
       about: fields['About'] || '',
       aboutSpanish: fields['About Spanish'] || '',
-      agesServed: fields["Ages served"] || undefined,
-      governanceModel: fields["Governance Model"] || undefined,
-      status: fields["Stage_Status"] || undefined,
+      agesServed: fields[SF.Ages_served] || undefined,
+      governanceModel: fields[SF.Governance_Model] || undefined,
+      status: fields["School Status"] || undefined,
       stageStatus: fields["Stage_Status"] || undefined,
-      openDate: fields["Opened"] || fields["Open Date"] || fields["SSJ - Original Projected Open Date"] || fields["Entered Startup Date"] || undefined,
-      enrollmentCap: fields["Enrollment at Full Capacity"] || undefined,
+      openDate: fields[SF.Opened] || undefined,
+      enrollmentCap: fields[SF.Enrollment_at_Full_Capacity] || undefined,
       lastModified: fields["Last Modified"] || undefined,
       currentTLs: fields["Current TLs"] || undefined,
       currentGuides: fields["Current Guide(s)"] || [],
-      currentEnrollment: fields["Current Enrollment"] || undefined,
       publicFundingSources: fields["Public Funding Sources"] || [],
-      programFocus: fields["Program Focus"] || undefined,
-      numberOfClassrooms: fields["Number of classrooms"] || undefined,
+      programFocus: fields[SF.Program_Focus] || undefined,
+      numberOfClassrooms: fields[SF.Number_of_classrooms] || undefined,
       leftNetworkDate: fields["Left Network Date"] || undefined,
       leftNetworkReason: fields["Left Network Reason"] || undefined,
       membershipFeeStatus: fields["Membership Fee Status"] || undefined,
@@ -448,8 +442,6 @@ export class SimpleAirtableStorage implements IStorage {
       activeAssignedPartnerEmail: fields['Active Assigned Partner Email'] || '',
       activeAssignedPartnerOverride: fields['Active Assigned Partner Override'] || '',
       activeAssignedPartnerShortName: fields['Active Assigned Partner Short Name'] || '',
-      selfReflection: fields['Self-reflection'] || '',
-      inactiveFlag: fields['Inactive Flag'] || '',
       createdTime: record.createdTime,
       
       // --- Legal Entity Fields ---
@@ -505,7 +497,7 @@ export class SimpleAirtableStorage implements IStorage {
   async getEducatorByEmail(email: string): Promise<Educator | undefined> {
     try {
       const records = await base("Educators").select({
-        filterByFormula: `{Primary email} = "${email}"`
+        filterByFormula: `{${EF.Current_Primary_Email_Address}} = "${email}"`
       }).all();
       
       if (records.length > 0) {
@@ -539,6 +531,7 @@ export class SimpleAirtableStorage implements IStorage {
       if (educator.firstName !== undefined) updateFields["First Name"] = educator.firstName;
       if (educator.lastName !== undefined) updateFields["Last Name"] = educator.lastName;
       if (educator.fullName !== undefined) updateFields["Full Name"] = educator.fullName;
+      if (educator.archived !== undefined) updateFields["Archived"] = educator.archived;
 
       const record = await base("Educators").update(id, updateFields);
       return this.transformEducatorRecord(record);
@@ -550,10 +543,11 @@ export class SimpleAirtableStorage implements IStorage {
 
   async deleteEducator(id: string): Promise<boolean> {
     try {
-      await base("Educators").destroy(id);
+      await base("Educators").update(id, { Archived: true } as any);
+      try { cache.invalidate('educators:all'); } catch {}
       return true;
     } catch (error) {
-      console.error(`Error deleting educator ${id} from Airtable:`, error);
+      console.error(`Error soft-deleting educator ${id}:`, error);
       return false;
     }
   }
@@ -662,36 +656,37 @@ export class SimpleAirtableStorage implements IStorage {
       };
       
       // Only map fields with actual values - exclude empty strings and empty arrays
-      if (hasValue(school.name)) updateFields["Name"] = school.name;
-      if (hasValue(school.shortName)) updateFields["Short Name"] = school.shortName;
-      if (hasValue(school.phone)) updateFields["School Phone"] = school.phone;
-      if (hasValue(school.email)) updateFields["School Email"] = school.email;
-      if (hasValue(school.website)) updateFields["Website"] = school.website;
-      if (hasValue(school.instagram)) updateFields["Instagram"] = school.instagram;
-      if (hasValue(school.facebook)) updateFields["Facebook"] = school.facebook;
-      if (hasValue(school.membershipStatus)) updateFields["Membership Status"] = school.membershipStatus;
-      if (hasValue(school.agesServed)) updateFields["Ages served"] = school.agesServed;
-      if (hasValue(school.governanceModel)) updateFields["Governance Model"] = school.governanceModel;
-      if (hasValue(school.programFocus)) updateFields["Program Focus"] = school.programFocus;
-      if (hasValue(school.numberOfClassrooms)) updateFields["Number of classrooms"] = school.numberOfClassrooms;
-      if (hasValue(school.legalStructure)) updateFields["Legal structure"] = school.legalStructure;
-      if (hasValue(school.EIN)) updateFields["EIN"] = school.EIN;
-      if (hasValue(school.legalName)) updateFields["Legal Name"] = school.legalName;
-      if (hasValue(school.incorporationDate)) updateFields["Incorporation Date"] = school.incorporationDate;
-      if (hasValue(school.nonprofitStatus)) updateFields["Nonprofit status"] = school.nonprofitStatus;
+      if (hasValue(school.name)) updateFields[SF.Name] = school.name;
+      if (hasValue(school.shortName)) updateFields[SF.Short_Name] = school.shortName;
+      if (hasValue(school.phone)) updateFields[SF.School_Phone] = school.phone;
+      if (hasValue(school.email)) updateFields[SF.School_Email] = school.email;
+      if (hasValue(school.website)) updateFields[SF.Website] = school.website;
+      if (hasValue(school.instagram)) updateFields[SF.Instagram] = school.instagram;
+      if (hasValue(school.facebook)) updateFields[SF.Facebook] = school.facebook;
+      if (hasValue(school.membershipStatus)) updateFields[SF.Membership_Status] = school.membershipStatus;
+      if (hasValue(school.agesServed)) updateFields[SF.Ages_served] = school.agesServed as any;
+      if (hasValue(school.governanceModel)) updateFields[SF.Governance_Model] = school.governanceModel;
+      if (school.archived !== undefined) updateFields["Archived"] = school.archived;
+      if (hasValue(school.programFocus)) updateFields[SF.Program_Focus] = school.programFocus as any;
+      if (hasValue(school.numberOfClassrooms)) updateFields[SF.Number_of_classrooms] = school.numberOfClassrooms as any;
+      if (hasValue(school.legalStructure)) updateFields[SF.Legal_structure] = school.legalStructure;
+      if (hasValue(school.EIN)) updateFields[SF.EIN] = school.EIN;
+      if (hasValue(school.legalName)) updateFields[SF.Legal_Name] = school.legalName;
+      if (hasValue(school.incorporationDate)) updateFields[SF.Incorporation_Date] = school.incorporationDate;
+      if (hasValue(school.nonprofitStatus)) updateFields[SF.Nonprofit_status] = school.nonprofitStatus;
       // Note: dateReceivedGroupExemption and dateWithdrawnGroupExemption are legacy fields, using groupExemptionDateGranted and groupExemptionDateWithdrawn instead
-      if (hasValue(school.currentFYEnd)) updateFields["Current FY end"] = school.currentFYEnd;
-      if (hasValue(school.groupExemptionStatus)) updateFields["Group exemption status"] = school.groupExemptionStatus;
-      if (hasValue(school.groupExemptionDateGranted)) updateFields["Date received group exemption"] = school.groupExemptionDateGranted;
-      if (hasValue(school.groupExemptionDateWithdrawn)) updateFields["Date withdrawn from Group Exemption"] = school.groupExemptionDateWithdrawn;
-      if (hasValue(school.businessInsurance)) updateFields["Business Insurance"] = school.businessInsurance;
-      if (hasValue(school.billComAccount)) updateFields["Bill.com account"] = school.billComAccount;
+      if (hasValue(school.currentFYEnd)) updateFields[SF.Current_FY_end] = school.currentFYEnd;
+      if (hasValue(school.groupExemptionStatus)) updateFields[SF.Group_exemption_status] = school.groupExemptionStatus;
+      if (hasValue(school.groupExemptionDateGranted)) updateFields[SF.Date_received_group_exemption] = school.groupExemptionDateGranted;
+      if (hasValue(school.groupExemptionDateWithdrawn)) updateFields[SF.Date_withdrawn_from_Group_Exemption] = school.groupExemptionDateWithdrawn;
+      if (hasValue(school.businessInsurance)) updateFields[SF.Business_Insurance] = school.businessInsurance;
+      if (hasValue(school.billComAccount)) updateFields[SF.Bill_com_account] = school.billComAccount;
       
       // Handle enrollment capacity with number conversion
       if (school.enrollmentCap !== undefined && school.enrollmentCap !== '') {
         const enrollmentNum = parseInt(school.enrollmentCap.toString());
         if (!isNaN(enrollmentNum)) {
-          updateFields["Enrollment at Full Capacity"] = enrollmentNum;
+          updateFields[SF.Enrollment_at_Full_Capacity] = enrollmentNum;
         }
       }
 
@@ -706,10 +701,11 @@ export class SimpleAirtableStorage implements IStorage {
 
   async deleteSchool(id: string): Promise<boolean> {
     try {
-      await base("Schools").destroy(id);
+      await base("Schools").update(id, { Archived: true } as any);
+      try { cache.invalidate('schools:all'); } catch {}
       return true;
     } catch (error) {
-      console.error(`Error deleting school ${id} from Airtable:`, error);
+      console.error(`Error soft-deleting school ${id}:`, error);
       return false;
     }
   }
@@ -731,7 +727,9 @@ export class SimpleAirtableStorage implements IStorage {
     // Field options extracted from actual Airtable metadata (47 dropdown fields total)
     const fieldOptions = {
       // Status fields
-      status: ["Visioning", "Planning", "Startup", "Open", "Closed", "Left Network"],
+      status: ["Emerging","Open","Paused","Closing","Permanently Closed","Disaffiliating", "Disaffiliated", "Placeholder"],
+      ssjStage: ["Visioning", "Planning", "Startup", "Year 1", "Complete"],
+      stageStatus: ["Visioning","Planning","Startup", "Year 1", "Open", "Permanently Closed", "Disaffiliated", "Paused"],
       membershipStatus: ["Member school", "Affiliated non-member", "Membership terminated"],
       
       // Governance and Legal  
@@ -779,7 +777,9 @@ export class SimpleAirtableStorage implements IStorage {
       
       // Staff and Professional
       logoDesigner: ["WF Design Team", "External", "School-created"],
-      bookkeeper: ["WF Bookkeeper", "External Bookkeeper", "School Managed"]
+      bookkeeper: ["WF Bookkeeper", "External Bookkeeper", "School Managed"],
+
+      archived: ["True", "False"]
     };
 
     cache.set(cacheKey, fieldOptions, 60 * 60 * 1000); // 1 hour cache
@@ -872,6 +872,7 @@ export class SimpleAirtableStorage implements IStorage {
         status: String(record.fields["Stage_Status"] || ''),
         startDate: String(record.fields["Start Date"] || ''),
         endDate: String(record.fields["End Date"] || ''),
+        emailAtSchool: String(record.fields["Email at School"] || record.fields["Email At School"] || ''),
         isActive: record.fields["Currently Active"] === true || record.fields["Currently Active"] === "true",
         created: String(record.fields["Created"] || new Date().toISOString()),
         lastModified: String(record.fields["Created"] || new Date().toISOString()),
@@ -1082,7 +1083,8 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       // Query locations filtered by School field (correct field name from Airtable)
       const records = await base("Locations").select({
-        filterByFormula: `FIND('${schoolId}', {School}) > 0`
+        // Linked record field; search within ARRAYJOIN to match record id text
+        filterByFormula: `FIND('${schoolId}', ARRAYJOIN({School})) > 0`
       }).all();
       
       return records.map(record => {
@@ -1160,7 +1162,7 @@ export class SimpleAirtableStorage implements IStorage {
       
       return {
         id: record.id,
-        schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0] || '') : String(record.fields["school_id"] || ''),
+        schoolId: Array.isArray(record.fields["School"]) ? String((record.fields["School"] as any[])[0] || '') : String(record.fields["School"] || ''),
         address: String(record.fields["Address"] || ''),
         currentPhysicalAddress: Boolean(record.fields["Current physical address?"]),
         currentMailingAddress: Boolean(record.fields["Current mailing address?"]),
@@ -1610,18 +1612,19 @@ export class SimpleAirtableStorage implements IStorage {
       // Extract school IDs from guide assignments
       const schoolIds = new Set<string>();
       guideAssignments.forEach(record => {
-        const schoolField = record.fields["School"];
-        if (Array.isArray(schoolId) && schoolId[0]) {
-          schoolIds.add(schoolId[0]);
-        } else if (schoolId) {
-          schoolIds.add(String(schoolId));
+        const schoolField = record.fields["School"] as any;
+        if (Array.isArray(schoolField) && schoolField[0]) {
+          schoolIds.add(String(schoolField[0]));
+        } else if (schoolField) {
+          schoolIds.add(String(schoolField));
         }
       });
       
       // Also get schools where user is the assigned partner
       const allSchools = await this.getSchools();
       allSchools.forEach(school => {
-        if (school.assignedPartner === userId) {
+        const ap = school.assignedPartner;
+        if (Array.isArray(ap) && ap.includes(userId)) {
           schoolIds.add(school.id);
         }
       });
@@ -2771,10 +2774,13 @@ export class SimpleAirtableStorage implements IStorage {
         schoolId: String(record.fields["school_id"] || ''),
         educatorName: String(record.fields["Educator Name"] || ''),
         schoolName: String(record.fields["School Name"] || ''),
-        role: String(record.fields["Role"] || ''),
+        role: String(record.fields["Role"] || '')
+          .split(',')
+          .map((s: string) => s.trim())
+          .filter(Boolean),
         startDate: String(record.fields["Start Date"] || ''),
         endDate: String(record.fields["End Date"] || ''),
-        active: Boolean(record.fields["Active"]),
+        isActive: Boolean(record.fields["Active"]),
         created: String(record.fields["Created"] || new Date().toISOString()),
         lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
       }));

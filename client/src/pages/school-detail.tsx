@@ -21,9 +21,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AgGridReact } from "ag-grid-react";
+import type { ICellEditorReactComp } from "ag-grid-react";
+import type { ColDef, ICellEditorParams, ICellRendererParams, RowValueChangedEvent } from "ag-grid-community";
+import { themeMaterial } from "ag-grid-community";
+import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
+import { isAgGridEnterpriseEnabled } from "@/lib/ag-grid-enterprise";
 
 import { Link } from "wouter";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { RoleMultiSelectInline } from "@/components/shared/grid/RoleMultiSelectInline";
+import { YesNoSelectInline } from "@/components/shared/grid/YesNoSelectInline";
+import { ActiveBadge } from "@/components/shared/grid/ActiveBadge";
+import { DateInputInline } from "@/components/shared/grid/DateInputInline";
+import { GridBase } from "@/components/shared/GridBase";
+import { TL_ROLE_OPTIONS } from "@/constants/roles";
+import { useAgGridFeatures } from "@/hooks/use-aggrid-features";
 import { insertSchoolSchema, type School, type Teacher, type TeacherSchoolAssociation, type Location, type GuideAssignment, type GovernanceDocument, type SchoolNote, type Grant, type Loan, type MembershipFeeByYear, type MembershipFeeUpdate, type ActionStep, type Tax990 } from "@shared/schema";
 import { getInitials, getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -32,10 +45,639 @@ import { addNewEmitter } from "@/lib/add-new-emitter";
 
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
 import { GoogleMap } from "@/components/google-map";
+import { EntityCard } from "@/components/shared/EntityCard";
+import { DetailGrid } from "@/components/shared/DetailGrid";
 import AssignEducatorModal from "@/components/assign-educator-modal";
 import CreateAndAssignEducatorModal from "@/components/create-and-assign-educator-modal";
+import { TableCard } from "@/components/shared/TableCard";
 import { useTableRefresh, refreshSchoolData } from "@/hooks/use-table-refresh";
 
+// AG Grid for TLs tab
+function SchoolTLsGrid({
+  school,
+  associations,
+  teachers,
+  onUpdateAssociation,
+  onEndStint,
+  onDeleteAssociation,
+}: {
+  school: School;
+  associations: TeacherSchoolAssociation[];
+  teachers: Teacher[];
+  onUpdateAssociation: (associationId: string, data: any) => void;
+  onEndStint: (associationId: string) => void;
+  onDeleteAssociation: (associationId: string) => void;
+}) {
+  const { entReady, filterForText } = useAgGridFeatures();
+  type TLRow = {
+    id: string;
+    educatorId: string;
+    name: string;
+    emailAtSchool: string;
+    phone: string;
+    roles: string[];
+    founder: boolean;
+    startDate?: string;
+    endDate?: string;
+    isActive?: boolean;
+  };
+
+  const [editingRowId, setEditingRowId] = useState<string | null>(null);
+  const [drafts, setDrafts] = useState<Record<string, TLRow>>({});
+  const getDraft = (row: TLRow) => drafts[row.id] || row;
+
+  // Explicit role options (excluding Founder which is its own field)
+  const roleOptions: string[] = [
+    'Teacher Leader',
+    'Emerging Teacher Leader',
+    'Classroom Staff',
+    'Fellow',
+    'Other',
+  ];
+
+  const rows: TLRow[] = (associations || []).map((a) => {
+    const t = teachers?.find((x) => x.id === a.educatorId);
+    const rolesArr = Array.isArray(a.role)
+      ? a.role.flatMap((s: any) => String(s).split(',').map((r: string) => r.trim()).filter(Boolean))
+      : String(a.role || '')
+          .split(',')
+          .map((r) => r.trim())
+          .filter(Boolean);
+    const isFounder = rolesArr.includes('Founder');
+    const cleanRoles = rolesArr.filter((r) => r !== 'Founder');
+    return {
+      id: a.id,
+      educatorId: a.educatorId,
+      name: t?.fullName || ((t?.firstName && t?.lastName) ? `${t.firstName} ${t.lastName}` : (a.educatorName || a.educatorId)),
+      emailAtSchool: (a as any)?.emailAtSchool || '',
+      phone: t?.primaryPhone || '',
+      roles: cleanRoles,
+      founder: isFounder,
+      startDate: a.startDate || '',
+      endDate: a.endDate || '',
+      isActive: !!a.isActive,
+    };
+  });
+
+  const RolesCellRenderer = (params: ICellRendererParams<TLRow, string[]>) => {
+    const row = params.data as TLRow;
+    const draft = getDraft(row);
+    if (editingRowId === row.id) {
+      const values = Array.isArray(draft.roles)
+        ? draft.roles
+        : (typeof draft.roles === 'string' ? draft.roles.split(',').map(s => s.trim()).filter(Boolean) : []);
+      return (
+        <RoleMultiSelectInline
+          options={roleOptions}
+          value={values}
+          onChange={(next) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, roles: next } }))}
+        />
+      );
+    }
+    const valuesArr: string[] = Array.isArray(draft.roles)
+      ? draft.roles
+      : (typeof draft.roles === 'string' ? draft.roles.split(',').map(s => s.trim()).filter(Boolean) : []);
+    if (!valuesArr || valuesArr.length === 0) return '-';
+    return (
+      <div className="flex flex-wrap gap-1">
+        {valuesArr.map((role, idx) => (
+          <Badge key={idx} variant="secondary" className="text-[10px] py-0.5 px-1.5">
+            {role}
+          </Badge>
+        ))}
+      </div>
+    );
+  };
+
+  const FounderCellRenderer = (params: ICellRendererParams<TLRow, boolean>) => {
+    const row = params.data as TLRow;
+    const draft = getDraft(row);
+    const isFounder = !!draft.founder;
+    if (editingRowId === row.id) {
+      const val = isFounder ? 'Yes' : 'No';
+      return (
+        <YesNoSelectInline
+          value={isFounder}
+          onChange={(next) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, founder: next } }))}
+        />
+      );
+    }
+    return (
+      <Badge className={isFounder ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+        {isFounder ? 'Yes' : 'No'}
+      </Badge>
+    );
+  };
+
+  // Inline multi-select roles editor using native <select multiple>
+  const RolesCellEditor = React.forwardRef<ICellEditorReactComp, ICellEditorParams<TLRow, string[]>>((props, ref) => {
+    const startVals: string[] = Array.isArray(props.value) ? props.value : [];
+    const [values, setValues] = useState<string[]>(startVals);
+    const selectRef = React.useRef<HTMLSelectElement | null>(null);
+    React.useImperativeHandle(ref, () => ({ getValue: () => values }));
+    useEffect(() => { try { selectRef.current?.focus(); } catch {} }, []);
+    return (
+      <select
+        ref={selectRef}
+        multiple
+        className="w-full h-20 text-xs border rounded px-1 py-1"
+        value={values}
+        onChange={(e) => {
+          const next = Array.from(e.currentTarget.selectedOptions).map(o => o.value);
+          setValues(next);
+        }}
+      >
+        {roleOptions.map((opt) => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+      </select>
+    );
+  });
+
+  // Inline date editor
+  const DateCellEditor = React.forwardRef<ICellEditorReactComp, ICellEditorParams<TLRow, string>>((props, ref) => {
+    const [val, setVal] = useState<string>(props.value || '');
+    const inputRef = React.useRef<HTMLInputElement | null>(null);
+    React.useImperativeHandle(ref, () => ({ getValue: () => val }));
+    useEffect(() => { try { inputRef.current?.focus(); } catch {} }, []);
+    return (
+      <input
+        ref={inputRef}
+        type="date"
+        className="h-7 w-full px-2 border rounded"
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+      />
+    );
+  });
+
+  const NameCellRenderer = (params: ICellRendererParams<TLRow, string>) => {
+    const id = params.data?.educatorId;
+    const name = params.value;
+    if (!id) return name || '';
+    return (
+      <a
+        href={`/teacher/${id}`}
+        className="text-wildflower-blue hover:underline"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {name}
+      </a>
+    );
+  };
+
+  const ActionsCellRenderer = (params: ICellRendererParams<TLRow>) => {
+    const row = params.data as TLRow;
+    const isRowEditing = editingRowId === row.id;
+    return (
+      <div className="flex gap-1">
+        {!isRowEditing ? (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 w-7 p-0"
+            title="Edit row"
+            onClick={(e) => {
+              e.preventDefault(); e.stopPropagation();
+              setDrafts(prev => ({ ...prev, [row.id]: { ...row } }));
+              setEditingRowId(row.id);
+              try { params.api.refreshCells({ force: true, rowNodes: [params.node!] }); } catch {}
+            }}
+          >
+            <Edit className="h-3.5 w-3.5" />
+          </Button>
+        ) : (
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 w-7 p-0 text-green-700"
+              title="Save row"
+              onClick={async (e) => {
+                e.preventDefault(); e.stopPropagation();
+                const draft = drafts[row.id];
+                if (!draft) return;
+                const baseRoles = Array.isArray(draft.roles) ? draft.roles : [];
+                const role = draft.founder ? Array.from(new Set([...baseRoles, 'Founder'])) : baseRoles.filter((r) => r !== 'Founder');
+                onUpdateAssociation(row.id, {
+                  role,
+                  startDate: draft.startDate || '',
+                  endDate: draft.endDate || '',
+                  isActive: !!draft.isActive,
+                  emailAtSchool: draft.emailAtSchool || ''
+                });
+                try {
+                  if (draft.educatorId && typeof draft.phone === 'string') {
+                    await apiRequest('PUT', `/api/educators/${draft.educatorId}`, { primaryPhone: draft.phone });
+                    queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+                    queryClient.invalidateQueries({ queryKey: [`/api/teachers/${draft.educatorId}`] });
+                  }
+                } catch {}
+                setEditingRowId(null);
+                setDrafts(prev => { const cp = { ...prev }; delete cp[row.id]; return cp; });
+                try { params.api.refreshCells({ force: true, rowNodes: [params.node!] }); } catch {}
+              }}
+            >
+              <Check className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 w-7 p-0 text-slate-700"
+              title="Cancel edit"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingRowId(null); setDrafts(prev => { const cp = { ...prev }; delete cp[row.id]; return cp; }); try { params.api.refreshCells({ force: true, rowNodes: [params.node!] }); } catch {} }}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </>
+        )}
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 w-7 p-0"
+          title="Open"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (row.educatorId) window.location.assign(`/teacher/${row.educatorId}`); }}
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 w-7 p-0 text-orange-600 hover:text-orange-700"
+          title="End stint"
+          onClick={() => onEndStint(row.id)}
+        >
+          <UserMinus className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
+          title="Delete stint"
+          onClick={() => onDeleteAssociation(row.id)}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+    );
+  };
+
+  const columnDefs: ColDef<TLRow>[] = [
+    { headerName: 'Name', field: 'name', flex: 2, filter: filterForText, editable: false, cellRenderer: NameCellRenderer },
+    { headerName: 'Role(s)', field: 'roles', flex: 2, filter: filterForText, editable: false, cellRenderer: RolesCellRenderer,
+      valueGetter: (p) => Array.isArray(p.data?.roles) ? (p.data?.roles as string[]).join(', ') : (p.data?.roles as any || ''),
+    },
+    { headerName: 'Founder', field: 'founder', width: 120, editable: false, cellRenderer: FounderCellRenderer, 
+      filter: filterForText,
+      valueGetter: (p) => (p.data?.founder ? 'Yes' : 'No'),
+    },
+    { headerName: 'School email', field: 'emailAtSchool', flex: 2, filter: filterForText, editable: false,
+      cellRenderer: (p: ICellRendererParams<TLRow>) => {
+        const row = p.data as TLRow; const draft = getDraft(row);
+        if (editingRowId === row.id) {
+          return (
+            <input
+              type="email"
+              className="h-7 w-full px-2 border rounded text-sm"
+              value={draft.emailAtSchool || ''}
+              onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, emailAtSchool: e.target.value } }))}
+            />
+          );
+        }
+        return (draft.emailAtSchool || '-');
+      }
+    },
+    { headerName: 'Phone', field: 'phone', width: 160, editable: false, filter: filterForText,
+      cellRenderer: (p: ICellRendererParams<TLRow>) => {
+        const row = p.data as TLRow; const draft = getDraft(row);
+        if (editingRowId === row.id) {
+          return (
+            <input
+              type="text"
+              className="h-7 w-full px-2 border rounded text-sm"
+              value={draft.phone || ''}
+              onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, phone: e.target.value } }))}
+            />
+          );
+        }
+        return (draft.phone || '-');
+      }
+    },
+    { headerName: 'Start Date', field: 'startDate', width: 140, editable: false, filter: filterForText,
+      cellRenderer: (p: ICellRendererParams<TLRow>) => {
+        const row = p.data as TLRow; const draft = getDraft(row);
+        if (editingRowId === row.id) {
+          return (
+            <input type="date" className="h-7 w-full px-2 border rounded text-sm" value={draft.startDate || ''}
+              onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, startDate: e.target.value } }))} />
+          );
+        }
+        return (draft.startDate || '-');
+      }
+    },
+    { headerName: 'End Date', field: 'endDate', width: 140, editable: false, filter: filterForText,
+      cellRenderer: (p: ICellRendererParams<TLRow>) => {
+        const row = p.data as TLRow; const draft = getDraft(row);
+        if (editingRowId === row.id) {
+          return (
+            <input type="date" className="h-7 w-full px-2 border rounded text-sm" value={draft.endDate || ''}
+              onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, endDate: e.target.value } }))} />
+          );
+        }
+        return (draft.endDate || '-');
+      }
+    },
+    { headerName: 'Currently Active', field: 'isActive', width: 150, editable: false, filter: filterForText,
+      valueGetter: (p) => (p.data?.isActive ? 'Active' : 'Inactive'),
+      cellRenderer: (p: ICellRendererParams<TLRow, any>) => {
+        const row = p.data as TLRow; const draft = getDraft(row);
+        if (editingRowId === row.id) {
+          const val = draft.isActive ? 'Active' : 'Inactive';
+          return (
+            <select className="w-full h-7 text-xs border rounded px-1" value={val}
+              onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, isActive: e.target.value === 'Active' } }))}>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          );
+        }
+        return (
+          <Badge className={p.data?.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+            {p.data?.isActive ? 'Active' : 'Inactive'}
+          </Badge>
+        );
+      }
+    },
+    { headerName: 'Actions', field: 'id', width: 180, sortable: false, filter: false, resizable: false, cellRenderer: ActionsCellRenderer },
+  ];
+
+  return (
+    <div className="w-full">
+      <div className="ag-theme-material w-full">
+        <AgGridReact<TLRow>
+          { ...DEFAULT_GRID_PROPS }
+          rowData={rows}
+          columnDefs={columnDefs}
+          defaultColDef={{ ...DEFAULT_COL_DEF }}
+          domLayout="autoHeight"
+          suppressRowClickSelection={true}
+          
+          singleClickEdit={false}
+          stopEditingWhenCellsLoseFocus={false}
+          getRowHeight={(p) => (editingRowId && p.data && p.data.id === editingRowId ? 120 : (DEFAULT_GRID_PROPS.rowHeight as number))}
+        />
+      </div>
+    </div>
+  );
+}
+
+// AG Grid for Locations tab
+function LocationsGrid({
+  locations,
+  onUpdate,
+  onDelete,
+}: {
+  locations: Location[];
+  onUpdate: (id: string, data: any) => void;
+  onDelete: (id: string) => void;
+}) {
+  type LocRow = {
+    id: string;
+    address?: string;
+    currentPhysicalAddress?: boolean;
+    currentMailingAddress?: boolean;
+    startDate?: string;
+    endDate?: string;
+  };
+  const rows: LocRow[] = (locations || []).map(l => ({
+    id: l.id,
+    address: l.address || '',
+    currentPhysicalAddress: !!l.currentPhysicalAddress,
+    currentMailingAddress: !!l.currentMailingAddress,
+    startDate: l.startDate || '',
+    endDate: l.endDate || '',
+  }));
+
+  const [editingRowId, setEditingRowId] = useState<string | null>(null);
+  const [drafts, setDrafts] = useState<Record<string, LocRow>>({});
+  const getDraft = (r: LocRow) => drafts[r.id] || r;
+
+  const columnDefs: ColDef<LocRow>[] = [
+    { headerName: 'Address', field: 'address', flex: 2, filter: 'agTextColumnFilter',
+      cellRenderer: (p: ICellRendererParams<LocRow>) => {
+        const row = p.data as LocRow; const d = getDraft(row);
+        if (editingRowId === row.id) {
+          return (
+            <Input className="h-7" value={d.address || ''} onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...d, address: e.target.value } }))} />
+          );
+        }
+        return d.address || '-';
+      }
+    },
+    { headerName: 'Current Physical', field: 'currentPhysicalAddress', width: 150, filter: 'agSetColumnFilter',
+      valueGetter: (p) => (p.data?.currentPhysicalAddress ? 'Yes' : 'No'),
+      cellRenderer: (p: ICellRendererParams<LocRow>) => {
+        const row = p.data as LocRow; const d = getDraft(row);
+        if (editingRowId === row.id) {
+          return (
+            <YesNoSelectInline value={!!d.currentPhysicalAddress} onChange={(next) => setDrafts(prev => ({ ...prev, [row.id]: { ...d, currentPhysicalAddress: next } }))} />
+          );
+        }
+        return <ActiveBadge active={!!row.currentPhysicalAddress} />;
+      }
+    },
+    { headerName: 'Current Mailing', field: 'currentMailingAddress', width: 150, filter: 'agSetColumnFilter',
+      valueGetter: (p) => (p.data?.currentMailingAddress ? 'Yes' : 'No'),
+      cellRenderer: (p: ICellRendererParams<LocRow>) => {
+        const row = p.data as LocRow; const d = getDraft(row);
+        if (editingRowId === row.id) {
+          return (
+            <YesNoSelectInline value={!!d.currentMailingAddress} onChange={(next) => setDrafts(prev => ({ ...prev, [row.id]: { ...d, currentMailingAddress: next } }))} />
+          );
+        }
+        return <ActiveBadge active={!!row.currentMailingAddress} />;
+      }
+    },
+    { headerName: 'Start Date', field: 'startDate', width: 140, filter: 'agDateColumnFilter',
+      cellRenderer: (p: ICellRendererParams<LocRow>) => {
+        const row = p.data as LocRow; const d = getDraft(row);
+        if (editingRowId === row.id) {
+          return <DateInputInline value={d.startDate || ''} onChange={(v) => setDrafts(prev => ({ ...prev, [row.id]: { ...d, startDate: v } }))} />
+        }
+        return d.startDate || '-';
+      }
+    },
+    { headerName: 'End Date', field: 'endDate', width: 140, filter: 'agDateColumnFilter',
+      cellRenderer: (p: ICellRendererParams<LocRow>) => {
+        const row = p.data as LocRow; const d = getDraft(row);
+        if (editingRowId === row.id) {
+          return <DateInputInline value={d.endDate || ''} onChange={(v) => setDrafts(prev => ({ ...prev, [row.id]: { ...d, endDate: v } }))} />
+        }
+        return d.endDate || '-';
+      }
+    },
+    { headerName: 'Actions', field: 'id', width: 140, sortable: false, filter: false,
+      cellRenderer: (p: ICellRendererParams<LocRow>) => {
+        const row = p.data as LocRow;
+        const isEditing = editingRowId === row.id;
+        return (
+          <div className="flex gap-1">
+            {!isEditing ? (
+              <Button size="sm" variant="outline" className="h-7 w-7 p-0" title="Edit" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDrafts(prev => ({ ...prev, [row.id]: { ...row } })); setEditingRowId(row.id); }}>
+                <Edit className="h-3.5 w-3.5" />
+              </Button>
+            ) : (
+              <>
+                <Button size="sm" variant="outline" className="h-7 w-7 p-0 text-green-700" title="Save" onClick={(e) => { e.preventDefault(); e.stopPropagation(); const d = drafts[row.id]; if (d) { onUpdate(row.id, { address: d.address, currentPhysicalAddress: !!d.currentPhysicalAddress, currentMailingAddress: !!d.currentMailingAddress, startDate: d.startDate || '', endDate: d.endDate || '' }); setEditingRowId(null); setDrafts(prev => { const cp={...prev}; delete cp[row.id]; return cp; }); } }}>
+                  <Check className="h-3.5 w-3.5" />
+                </Button>
+                <Button size="sm" variant="outline" className="h-7 w-7 p-0" title="Cancel" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingRowId(null); setDrafts(prev => { const cp={...prev}; delete cp[row.id]; return cp; }); }}>
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              </>
+            )}
+            <Button size="sm" variant="outline" className="h-7 w-7 p-0 text-red-600 hover:text-red-700" title="Delete" onClick={() => onDelete(row.id)}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        );
+      }
+    },
+  ];
+
+  return (
+    <div className="border rounded-lg p-3">
+      <GridBase
+        rowData={rows}
+        columnDefs={columnDefs}
+        defaultColDefOverride={{ sortable: true, filter: true, resizable: true }}
+        gridProps={{
+          domLayout: 'autoHeight',
+          singleClickEdit: false,
+          stopEditingWhenCellsLoseFocus: false,
+          getRowHeight: (p: any) => (editingRowId && p.data && p.data.id === editingRowId ? 80 : (DEFAULT_GRID_PROPS.rowHeight as number)),
+        }}
+      />
+    </div>
+  );
+}
+
+// AG Grid for Guides tab
+function GuidesGrid({
+  assignments,
+  onUpdate,
+  onDelete,
+}: {
+  assignments: GuideAssignment[];
+  onUpdate: (id: string, data: any) => void;
+  onDelete: (id: string) => void;
+}) {
+  type GuideRow = {
+    id: string;
+    guideShortName?: string;
+    type?: string;
+    startDate?: string;
+    endDate?: string;
+    isActive?: boolean;
+  };
+
+  const rows: GuideRow[] = (assignments || []).map((g) => ({
+    id: g.id,
+    guideShortName: g.guideShortName || g.guideId,
+    type: g.type || '',
+    startDate: g.startDate || '',
+    endDate: g.endDate || '',
+    isActive: !!g.isActive,
+  }));
+
+  const [editingRowId, setEditingRowId] = useState<string | null>(null);
+  const [drafts, setDrafts] = useState<Record<string, GuideRow>>({});
+  const getDraft = (r: GuideRow) => drafts[r.id] || r;
+
+  const columnDefs: ColDef<GuideRow>[] = [
+    { headerName: 'Guide', field: 'guideShortName', flex: 1, filter: 'agTextColumnFilter' },
+    { headerName: 'Type', field: 'type', flex: 1, filter: 'agTextColumnFilter',
+      cellRenderer: (p: ICellRendererParams<GuideRow>) => {
+        const row = p.data as GuideRow; const d = getDraft(row);
+        if (editingRowId === row.id) {
+          return <Input className="h-7" value={d.type || ''} onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...d, type: e.target.value } }))} />
+        }
+        return d.type || '-';
+      }
+    },
+    { headerName: 'Start Date', field: 'startDate', width: 140, filter: 'agDateColumnFilter',
+      cellRenderer: (p: ICellRendererParams<GuideRow>) => {
+        const row = p.data as GuideRow; const d = getDraft(row);
+        if (editingRowId === row.id) {
+          return <DateInputInline value={d.startDate || ''} onChange={(v) => setDrafts(prev => ({ ...prev, [row.id]: { ...d, startDate: v } }))} />
+        }
+        return d.startDate || '-';
+      }
+    },
+    { headerName: 'End Date', field: 'endDate', width: 140, filter: 'agDateColumnFilter',
+      cellRenderer: (p: ICellRendererParams<GuideRow>) => {
+        const row = p.data as GuideRow; const d = getDraft(row);
+        if (editingRowId === row.id) {
+          return <DateInputInline value={d.endDate || ''} onChange={(v) => setDrafts(prev => ({ ...prev, [row.id]: { ...d, endDate: v } }))} />
+        }
+        return d.endDate || '-';
+      }
+    },
+    { headerName: 'Active', field: 'isActive', width: 110, filter: 'agSetColumnFilter',
+      valueGetter: (p) => (p.data?.isActive ? 'Yes' : 'No'),
+      cellRenderer: (p: ICellRendererParams<GuideRow>) => {
+        const row = p.data as GuideRow; const d = getDraft(row);
+        if (editingRowId === row.id) {
+          return <YesNoSelectInline value={!!d.isActive} onChange={(next) => setDrafts(prev => ({ ...prev, [row.id]: { ...d, isActive: next } }))} />
+        }
+        return <ActiveBadge active={!!row.isActive} />;
+      }
+    },
+    { headerName: 'Actions', field: 'id', width: 140, sortable: false, filter: false,
+      cellRenderer: (p: ICellRendererParams<GuideRow>) => {
+        const row = p.data as GuideRow;
+        const isEditing = editingRowId === row.id;
+        return (
+          <div className="flex gap-1">
+            {!isEditing ? (
+              <Button size="sm" variant="outline" className="h-7 w-7 p-0" title="Edit" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDrafts(prev => ({ ...prev, [row.id]: { ...row } })); setEditingRowId(row.id); }}>
+                <Edit className="h-3.5 w-3.5" />
+              </Button>
+            ) : (
+              <>
+                <Button size="sm" variant="outline" className="h-7 w-7 p-0 text-green-700" title="Save" onClick={(e) => { e.preventDefault(); e.stopPropagation(); const d = drafts[row.id]; if (d) { onUpdate(row.id, { type: d.type || '', startDate: d.startDate || '', endDate: d.endDate || '', isActive: !!d.isActive }); setEditingRowId(null); setDrafts(prev => { const cp={...prev}; delete cp[row.id]; return cp; }); } }}>
+                  <Check className="h-3.5 w-3.5" />
+                </Button>
+                <Button size="sm" variant="outline" className="h-7 w-7 p-0" title="Cancel" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingRowId(null); setDrafts(prev => { const cp={...prev}; delete cp[row.id]; return cp; }); }}>
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              </>
+            )}
+            <Button size="sm" variant="outline" className="h-7 w-7 p-0 text-red-600 hover:text-red-700" title="Delete" onClick={() => onDelete(row.id)}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        );
+      }
+    },
+  ];
+
+  return (
+    <div className="border rounded-lg p-3">
+      <GridBase
+        rowData={rows}
+        columnDefs={columnDefs}
+        defaultColDefOverride={{ sortable: true, filter: true, resizable: true }}
+        gridProps={{
+          domLayout: 'autoHeight',
+          singleClickEdit: false,
+          stopEditingWhenCellsLoseFocus: false,
+          getRowHeight: (p: any) => (editingRowId && p.data && p.data.id === editingRowId ? 80 : (DEFAULT_GRID_PROPS.rowHeight as number)),
+        }}
+      />
+    </div>
+  );
+}
 // TeacherAssociationRow component for inline editing
 function TeacherAssociationRow({ 
   association, 
@@ -101,24 +743,50 @@ function TeacherAssociationRow({
           )}
         </TableCell>
         <TableCell>
-          <Input
-            value={editData.role}
-            onChange={(e) => setEditData(prev => ({ ...prev, role: e.target.value }))}
-            placeholder="Role"
-            className="h-8"
-          />
+          <div className="flex flex-wrap gap-2">
+            {(Array.isArray((school as any)?.fieldOptions?.roles) ? (school as any).fieldOptions.roles : ['TL','ETL','Guide','Founder'])
+              .map((opt: string) => {
+                const rolesArr: string[] = Array.isArray(editData.role)
+                  ? editData.role
+                  : String(editData.role || '').split(',').map((s) => s.trim()).filter(Boolean);
+                const checked = rolesArr.includes(opt);
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      const next = checked ? rolesArr.filter(r => r !== opt) : Array.from(new Set([...rolesArr, opt]));
+                      setEditData(prev => ({ ...prev, role: next }));
+                    }}
+                    className={`px-2 py-1 rounded border text-xs ${checked ? 'bg-blue-100 border-blue-300 text-blue-800' : 'bg-white border-slate-300 text-slate-700'}`}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+          </div>
         </TableCell>
         <TableCell>
-          <Badge 
-            variant={association.role?.toString().includes('Founder') ? "default" : "secondary"}
-            className={association.role?.toString().includes('Founder') ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
-          >
-            {association.role?.toString().includes('Founder') ? 'Yes' : 'No'}
-          </Badge>
+          <label className="inline-flex items-center gap-2 text-xs">
+            <input
+              type="checkbox"
+              checked={(Array.isArray(editData.role) ? editData.role : String(editData.role||'').split(',')).some((r: any) => String(r).trim() === 'Founder')}
+              onChange={(e) => {
+                const rolesArr: string[] = Array.isArray(editData.role)
+                  ? editData.role
+                  : String(editData.role || '').split(',').map((s) => s.trim()).filter(Boolean);
+                const next = e.target.checked
+                  ? Array.from(new Set([...rolesArr, 'Founder']))
+                  : rolesArr.filter(r => r !== 'Founder');
+                setEditData(prev => ({ ...prev, role: next }));
+              }}
+            />
+            <span>Founder</span>
+          </label>
         </TableCell>
         <TableCell>
           <Input
-            value={school.email || ''}
+            value={(teacher as any)?.currentPrimaryEmailAddress || ''}
             disabled
             placeholder="Email"
             className="h-8 bg-gray-50"
@@ -126,10 +794,10 @@ function TeacherAssociationRow({
         </TableCell>
         <TableCell>
           <Input
-            value={school.phone || ''}
-            disabled
+            value={teacher?.primaryPhone || ''}
+            onChange={(e) => setEditData(prev => ({ ...prev, primaryPhone: e.target.value }))}
             placeholder="Phone"
-            className="h-8 bg-gray-50"
+            className="h-8"
           />
         </TableCell>
         <TableCell>
@@ -245,7 +913,7 @@ function TeacherAssociationRow({
         )}
       </TableCell>
       <TableCell>
-        {/* Check if roles include Founder and display as badge */}
+        {}
         <Badge 
           variant={
             association.role ? (
@@ -274,10 +942,10 @@ function TeacherAssociationRow({
         </Badge>
       </TableCell>
       <TableCell>
-        {school.email || '-'}
+        {(teacher as any)?.currentPrimaryEmailAddress || '-'}
       </TableCell>
       <TableCell>
-        {school.phone || '-'}
+        {teacher?.primaryPhone || '-'}
       </TableCell>
       <TableCell>{association.startDate || '-'}</TableCell>
       <TableCell>{association.endDate || '-'}</TableCell>
@@ -1289,6 +1957,8 @@ export default function SchoolDetail() {
   const [editingSupportFunding, setEditingSupportFunding] = useState(false);
   const [editingDetailsProgram, setEditingDetailsProgram] = useState(false);
   const [editingDetailsLegal, setEditingDetailsLegal] = useState(false);
+  // Toggle for About language (English vs Spanish)
+  const [aboutLang, setAboutLang] = useState<'en' | 'es'>('en');
   const [editingDetailsContact, setEditingDetailsContact] = useState(false);
   
   // Form data for editing
@@ -1450,7 +2120,7 @@ export default function SchoolDetail() {
         case "notes":
           return [
             { label: "Add Note", onClick: () => setIsCreatingNote(true) },
-            { label: "Add Action Step", onClick: () => console.log("Add Action Step - to be implemented") }
+            { label: "Add Action Step", onClick: () => console.log("Add Action Step clicked - Modal not implemented yet") }
           ];
         case "grants":
           return [
@@ -2115,7 +2785,7 @@ export default function SchoolDetail() {
   if (isLoading) {
     return (
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
+                  <div className="space-y-6">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-96 w-full" />
         </div>
@@ -2231,19 +2901,42 @@ export default function SchoolDetail() {
                               <p className="text-sm font-medium text-gray-900 mt-1">{school.membershipStatus || 'Not specified'}</p>
                             </div>
                           </div>
-                          {school.about && (
+                          {(school.about || school.aboutSpanish) && (
                             <div className="mt-4 pt-4 border-t border-gray-200">
-                              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">About</p>
-                              <p className="text-sm text-gray-700 leading-relaxed">{school.about}</p>
+                              <div className="flex items-center gap-2 mb-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setAboutLang('en')}
+                                  className={`text-xs uppercase tracking-wider ${aboutLang === 'en' ? 'text-gray-700 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                  About
+                                </button>
+                                {school.aboutSpanish && (
+                                  <>
+                                    <span className="text-gray-300">•</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => setAboutLang('es')}
+                                      className={`text-xs uppercase tracking-wider ${aboutLang === 'es' ? 'text-gray-700 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                                    >
+                                      descripción
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                              <p className="text-sm text-gray-700 leading-relaxed">
+                                {aboutLang === 'es' && school.aboutSpanish ? school.aboutSpanish : (school.about || '')}
+                              </p>
                             </div>
                           )}
                         </div>
                       </div>
                     </div>
 
-                    {/* Map, Support, and Contact Info Section */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      <Card className="overflow-hidden shadow-sm">
+                    {/* Summary EntityCards Section */}
+                    <DetailGrid>
+                      {/* Location */}
+                      <EntityCard title="Location" fields={[]} editable={false} showDivider={false}>
                         <GoogleMap 
                           latitude={school.activeLatitude} 
                           longitude={school.activeLongitude} 
@@ -2252,636 +2945,212 @@ export default function SchoolDetail() {
                           fallbackAddress={school.activePhysicalAddress}
                           schoolLogo={school.logoFlowerOnly || school.logoMainSquare || school.logo}
                         />
-                      </Card>
-                      <Card className="shadow-sm">
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg">Support</CardTitle>
-                            <div className="flex gap-2 text-sm">
-                              <span className={school.status && ['planning', 'startup', 'visioning'].includes(school.status.toLowerCase()) ? 'font-bold text-gray-900' : 'text-gray-400'}>
-                                SSJ
-                              </span>
-                              <span className={school.status && ['open', 'year 1'].includes(school.status.toLowerCase()) ? 'font-bold text-gray-900' : 'text-gray-400'}>
-                                Open
-                              </span>
-                              <span className={school.status && ['disaffiliated', 'permanently closed'].includes(school.status.toLowerCase()) ? 'font-bold text-gray-900' : 'text-gray-400'}>
-                                Closed
-                              </span>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          {/* SSJ status fields */}
-                          {school.status && ['planning', 'startup', 'visioning'].includes(school.status.toLowerCase()) && (
-                            <>
-                              <div>
-                                <p className="text-xs text-gray-500 uppercase tracking-wider">SSJ Stage</p>
-                                <p className="text-sm font-medium text-gray-900 mt-1">{school.ssjStage || school.status || 'Not specified'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-500 uppercase tracking-wider">Current Guides</p>
-                                <p className="text-sm font-medium text-gray-900 mt-1">
-                                  {school.currentGuides && school.currentGuides.length > 0 
-                                    ? school.currentGuides.join(', ')
-                                    : 'None assigned'
-                                  }
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-500 uppercase tracking-wider">SSJ Projected Open</p>
-                                <p className="text-sm font-medium text-gray-900 mt-1">{school.ssjProjectedOpen || 'Not specified'}</p>
-                              </div>
-                            </>
-                          )}
-                          
-                          {/* Closed/Disaffiliated status fields */}
-                          {school.status && (
-                            school.status.toLowerCase() === 'disaffiliated' || 
-                            school.status.toLowerCase() === 'permanently closed'
-                          ) && (
-                            <>
-                              <div>
-                                <p className="text-xs text-gray-500 uppercase tracking-wider">Left Network Date</p>
-                                <p className="text-sm font-medium text-gray-900 mt-1">{school.leftNetworkDate || 'Not specified'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-500 uppercase tracking-wider">Left Network Reason</p>
-                                <p className="text-sm font-medium text-gray-900 mt-1">{school.leftNetworkReason || 'Not specified'}</p>
-                              </div>
-                            </>
-                          )}
-                          
-                          {/* Open or Year 1 status - blank for now */}
-                          {school.status && ['open', 'year 1'].includes(school.status.toLowerCase()) && (
-                            <div className="text-center py-4">
-                              <p className="text-sm text-gray-400">No support information to display</p>
-                            </div>
-                          )}
-                          
-                          {/* No status */}
-                          {!school.status && (
-                            <div className="text-center py-4">
-                              <p className="text-sm text-gray-400">No support information to display</p>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                      
-                      {/* Contact Info Card */}
-                      <Card className="shadow-sm">
-                        <CardHeader>
-                          <CardTitle className="text-lg">School General Contact Info</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Email</p>
-                            {school.email ? (
-                              <a href={`mailto:${school.email}`} className="text-sm font-medium text-blue-600 hover:underline mt-1 block">
-                                {school.email}
-                              </a>
-                            ) : (
-                              <p className="text-sm font-medium text-gray-400 mt-1">Not specified</p>
-                            )}
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Phone</p>
-                            {school.phone ? (
-                              <a href={`tel:${school.phone}`} className="text-sm font-medium text-blue-600 hover:underline mt-1 block">
-                                {school.phone}
-                              </a>
-                            ) : (
-                              <p className="text-sm font-medium text-gray-400 mt-1">Not specified</p>
-                            )}
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Website</p>
-                            {school.website ? (
-                              <a href={school.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-600 hover:underline mt-1 block">
-                                {school.website}
-                              </a>
-                            ) : (
-                              <p className="text-sm font-medium text-gray-400 mt-1">Not specified</p>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
+                      </EntityCard>
 
-                    {/* Key Information Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {/* Leadership Card */}
-                      <Card className="shadow-sm">
-                        <CardHeader className="pb-3">
-                          <CardTitle className="text-lg flex items-center gap-2">
-                            <User className="w-4 h-4 text-blue-600" />
-                            Leadership
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Founders</p>
-                            <p className="text-sm font-medium text-gray-900 mt-1">
-                              {school.founders && school.founders.length > 0 
-                                ? school.founders.join(', ')
-                                : 'Not specified'
-                              }
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Current TLs</p>
-                            <p className="text-sm font-medium text-gray-900 mt-1">
-                              {typeof school.currentTLs === 'string' 
-                                ? school.currentTLs
-                                : school.currentTLs && Array.isArray(school.currentTLs) && school.currentTLs.length > 0 
-                                  ? school.currentTLs.join(', ')
-                                  : 'None assigned'
-                              }
-                            </p>
-                          </div>
-
-                        </CardContent>
-                      </Card>
-
-                      {/* School Details Card */}
-                      <Card className="shadow-sm">
-                        <CardHeader className="pb-3">
-                          <CardTitle className="text-lg flex items-center gap-2">
-                            <School2 className="w-4 h-4 text-green-600" />
-                            School Details
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Enrollment Capacity</p>
-                            <p className="text-sm font-medium text-gray-900 mt-1">{school.enrollmentCap || 'Not set'}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Number of Classrooms</p>
-                            <p className="text-sm font-medium text-gray-900 mt-1">{school.numberOfClassrooms || 'Not specified'}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Program Focus</p>
-                            <p className="text-sm font-medium text-gray-900 mt-1">{school.programFocus || 'Not specified'}</p>
-                          </div>
-
-                        </CardContent>
-                      </Card>
-
-                      {/* Status & Monitoring Card */}
-                      <Card className="shadow-sm">
-                        <CardHeader className="pb-3">
-                          <CardTitle className="text-lg flex items-center gap-2">
-                            <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Status & Monitoring
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Risk Factors</p>
-                            {school.riskFactors && school.riskFactors.length > 0 ? (
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {school.riskFactors.map((factor, idx) => (
-                                  <Badge key={idx} variant="destructive" className="text-xs">
-                                    {factor}
-                                  </Badge>
+                      {/* Support - Current Operations Guide */}
+                      <EntityCard
+                        title="Support"
+                        columns={1}
+                        editable={false}
+                        showDivider={false}
+                        fields={[{
+                          key: 'ssjOpsGuideTrack',
+                          label: 'Ops Guide Track',
+                          type: 'readonly',
+                          value: Array.isArray(school?.ssjOpsGuideTrack) ? school.ssjOpsGuideTrack : (school?.ssjOpsGuideTrack ? [school.ssjOpsGuideTrack as any] : []),
+                          render: (v) => (
+                            v && Array.isArray(v) && v.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {v.map((track: string, idx: number) => (
+                                  <Badge key={idx} variant="secondary" className="text-xs">{track}</Badge>
                                 ))}
                               </div>
-                            ) : (
-                              <p className="text-sm text-gray-400 mt-1">None</p>
-                            )}
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Watchlist</p>
-                            {school.watchlist && school.watchlist.length > 0 ? (
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {school.watchlist.map((item, idx) => (
-                                  <Badge key={idx} variant="outline" className="text-xs border-orange-300 text-orange-700">
-                                    {item}
-                                  </Badge>
-                                ))}
-                              </div>
-                            ) : (
-                              <p className="text-sm text-gray-400 mt-1">None</p>
-                            )}
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">Errors</p>
-                            {school.errors && school.errors.length > 0 ? (
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {school.errors.map((error, idx) => (
-                                  <Badge key={idx} variant="destructive" className="text-xs">
-                                    {error}
-                                  </Badge>
-                                ))}
-                              </div>
-                            ) : (
-                              <p className="text-sm text-gray-400 mt-1">None</p>
-                            )}
-                          </div>
-                          {school.leftNetworkDate && (
-                            <div className="border-t pt-3">
-                              <p className="text-xs text-red-600 uppercase tracking-wider">Left Network</p>
-                              <p className="text-sm font-medium text-gray-900 mt-1">{school.leftNetworkDate}</p>
-                              {school.leftNetworkReason && (
-                                <p className="text-xs text-gray-600 mt-1">Reason: {school.leftNetworkReason}</p>
-                              )}
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </div>
+                            ) : <span className="text-slate-400">-</span>
+                          )
+                        }]} 
+                      />
+
+                      {/* School Contact Info */}
+                      <EntityCard
+                        title="School Contact Info"
+                        columns={1}
+                        editable={false}
+                        showDivider={false}
+                        fields={[
+                          { key: 'email', label: 'Email', type: 'readonly', value: school?.email ?? '', render: (val) => val ? (<a href={`mailto:${val}`} className="text-blue-600 hover:underline">{val}</a>) : <span className="text-slate-400">-</span> },
+                          { key: 'phone', label: 'Phone', type: 'readonly', value: school?.phone ?? '', render: (val) => val ? (<a href={`tel:${val}`} className="text-blue-600 hover:underline">{val}</a>) : <span className="text-slate-400">-</span> },
+                          { key: 'website', label: 'Website', type: 'readonly', value: school?.website ?? '', render: () => {
+                            const url = school?.website || school?.facebook || school?.instagram || '';
+                            const label = school?.website || school?.facebook || school?.instagram || '';
+                            return url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{label}</a>) : (<span className="text-slate-400">-</span>);
+                          } },
+                        ]}
+                      />
+
+                      {/* Leadership (summary) */}
+                      <EntityCard
+                        title="Leadership"
+                        columns={1}
+                        editable={false}
+                        showDivider={false}
+                        fields={[
+                          { key: 'founders', label: 'Founders', type: 'readonly', value: school?.founders ?? [], render: (v) => (v && v.length ? v.join(', ') : <span className="text-slate-400">Not specified</span>) },
+                          { key: 'currentTLs', label: 'Current TLs', type: 'readonly', value: school?.currentTLs ?? [], render: () => {
+                            const v = school?.currentTLs;
+                            if (typeof v === 'string') return v || <span className="text-slate-400">None assigned</span>;
+                            if (Array.isArray(v) && v.length > 0) return v.join(', ');
+                            return <span className="text-slate-400">None assigned</span>;
+                          } },
+                        ]}
+                      />
+
+                      {/* Size and Program (summary) */}
+                      <EntityCard
+                        title="Size and Program"
+                        columns={1}
+                        editable={false}
+                        showDivider={false}
+                        fields={[
+                          { key: 'enrollmentCap', label: 'Enrollment Capacity', type: 'readonly', value: school?.enrollmentCap ?? '' },
+                          { key: 'numberOfClassrooms', label: 'Number of Classrooms', type: 'readonly', value: school?.numberOfClassrooms ?? '' },
+                          { key: 'programFocus', label: 'Program Focus', type: 'readonly', value: Array.isArray(school?.programFocus) ? school.programFocus.join(', ') : (school?.programFocus || '') },
+                        ]}
+                      />
+
+                      {/* Status and Monitoring (summary) */}
+                      <EntityCard
+                        title="Status and Monitoring"
+                        columns={1}
+                        editable={false}
+                        showDivider={false}
+                        fields={[
+                          { key: 'riskFactors', label: 'Risk Factors', type: 'readonly', value: school?.riskFactors ?? [], render: (v) => v && v.length ? (
+                            <div className="flex flex-wrap gap-1">{v.map((x: string, i: number) => <Badge key={i} variant="destructive" className="text-xs">{x}</Badge>)}</div>
+                          ) : <span className="text-slate-400">None</span> },
+                          { key: 'watchlist', label: 'Watchlist', type: 'readonly', value: school?.watchlist ?? [], render: (v) => v && v.length ? (
+                            <div className="flex flex-wrap gap-1">{v.map((x: string, i: number) => <Badge key={i} variant="outline" className="text-xs border-orange-300 text-orange-700">{x}</Badge>)}</div>
+                          ) : <span className="text-slate-400">None</span> },
+                          { key: 'errors', label: 'Errors', type: 'readonly', value: school?.errors ?? [], render: (v) => v && v.length ? (
+                            <div className="flex flex-wrap gap-1">{v.map((x: string, i: number) => <Badge key={i} variant="destructive" className="text-xs">{x}</Badge>)}</div>
+                          ) : <span className="text-slate-400">None</span> },
+                        ]}
+                      />
+                    </DetailGrid>
+
+                    {/* End Summary Cards */}
                   </div>
                 </TabsContent>
 
-                <TabsContent value="details" className="mt-0">
-                  <div className="space-y-6">
+                 <TabsContent value="details" className="mt-0">
+                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                      {/* Name Card (standardized new component) */}
+                        <EntityCard
+                          title="Name"
+                          showDivider={false}
+                          fields={[
+                            { key: 'name', label: 'Name', type: 'text', value: school?.name ?? '', editable: true },
+                            { key: 'shortName', label: 'Short Name', type: 'text', value: school?.shortName ?? '', editable: true },
+                            { key: 'priorNames', label: 'Prior Names', type: 'textarea', value: school?.priorNames ?? '', editable: true },
+                          ]}
+                          onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
+                        />
+                        <EntityCard
+                          title="Program Details"
+                          showDivider={false}
+                          fields={[
+                            { key: 'programFocus', label: 'Program Focus', type: 'textarea', value: Array.isArray(school?.programFocus) ? (school?.programFocus || []).join(', ') : (school?.programFocus || ''), editable: true },
+                            { key: 'agesServed', label: 'Ages Served', type: 'multiselect', value: Array.isArray(school?.agesServed) ? (school?.agesServed || []) : (school?.agesServed ? [school?.agesServed] : []), editable: true, options: (fieldOptions?.agesServed || []).filter((o: string) => o && o.trim() !== '').map((o: string) => ({ label: o, value: o })) },
+                            { key: 'numberOfClassrooms', label: 'Number of Classrooms', type: 'number', value: school?.numberOfClassrooms ?? '', editable: true },
+                            { key: 'enrollmentCap', label: 'Enrollment Capacity', type: 'number', value: school?.enrollmentCap ?? '', editable: true },
+                          ]}
+                          onSave={(vals) => {
+                            const v: any = vals || {};
+                            const formatted: any = {};
+                            if (v.programFocus !== undefined) {
+                              formatted.programFocus = Array.isArray(v.programFocus)
+                                ? v.programFocus
+                                : String(v.programFocus)
+                                    .split(',')
+                                    .map((s) => s.trim())
+                                    .filter(Boolean);
+                            }
+                            if (v.agesServed !== undefined) {
+                              formatted.agesServed = Array.isArray(v.agesServed)
+                                ? v.agesServed
+                                : String(v.agesServed)
+                                    .split(',')
+                                    .map((s) => s.trim())
+                                    .filter(Boolean);
+                            }
+                            if (v.numberOfClassrooms !== undefined && v.numberOfClassrooms !== '') {
+                              formatted.numberOfClassrooms = Number(v.numberOfClassrooms);
+                            }
+                            if (v.enrollmentCap !== undefined && v.enrollmentCap !== '') {
+                              formatted.enrollmentCap = Number(v.enrollmentCap);
+                            }
+                            updateSchoolDetailsMutation.mutate(formatted);
+                          }}
+                        />
 
 
-                    {/* Name Section */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-slate-900">Name</h3>
-                        {isEditingDetails ? (
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              onClick={() => {
-                                // Helper function to filter out empty values (but keep currentFYEnd and arrays)
-                                const filterEmptyValues = (obj: any) => {
-                                  const filtered: any = {};
-                                  Object.entries(obj).forEach(([key, value]) => {
-                                    // Always include currentFYEnd even if empty (dropdown selection)
-                                    // Always include programFocus arrays (even if empty to clear the field)
-                                    if (key === 'currentFYEnd' || key === 'programFocus' || (value !== undefined && value !== null && value !== '')) {
-                                      if (Array.isArray(value) && value.length === 0 && key !== 'programFocus') return;
-                                      filtered[key] = value;
-                                    }
-                                  });
-                                  return filtered;
-                                };
+                    {/* Legal Entity Structure + Nonprofit Status (new cards) */}
+                      <EntityCard
+                        title="Legal Entity Structure"
+                        showDivider={false}
+                        fields={[
+                          { key: 'governanceModel', label: 'Governance Model', type: 'text', value: school?.governanceModel ?? '' },
+                          { key: 'legalStructure', label: 'Legal Structure', type: 'text', value: school?.legalStructure ?? '' },
+                          { key: 'EIN', label: 'EIN', type: 'text', value: school?.EIN ?? '' },
+                          { key: 'legalName', label: 'Legal Name', type: 'text', value: school?.legalName ?? '' },
+                          { key: 'incorporationDate', label: 'Incorporation Date', type: 'date', value: school?.incorporationDate ?? '' },
+                          { key: 'currentFYEnd', label: 'Current FY End', type: 'text', value: school?.currentFYEnd ?? '' },
+                        ]}
+                        onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
+                      />
+                      <EntityCard
+                         title="Nonprofit Status"
+                        showDivider={false}
+                        fields={[
+                          { key: 'nonprofitStatus', label: 'Nonprofit Status', type: 'text', value: school?.nonprofitStatus ?? '' },
+                          { key: 'groupExemptionStatus', label: 'Group Exemption Status', type: 'text', value: school?.groupExemptionStatus ?? '' },
+                          { key: 'groupExemptionDateGranted', label: 'Date Granted', type: 'date', value: school?.groupExemptionDateGranted ?? '' },
+                          { key: 'groupExemptionDateWithdrawn', label: 'Date Withdrawn', type: 'date', value: school?.groupExemptionDateWithdrawn ?? '' },
+                        ]}
+                        onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
+                      />
 
-                                // Convert numeric fields and filter empty values
-                                const formattedData = filterEmptyValues({
-                                  ...editedDetails,
-                                  enrollmentCap: editedDetails.enrollmentCap && editedDetails.enrollmentCap !== '' ? Number(editedDetails.enrollmentCap) : undefined,
-                                  numberOfClassrooms: editedDetails.numberOfClassrooms && editedDetails.numberOfClassrooms !== '' ? Number(editedDetails.numberOfClassrooms) : undefined
-                                });
-                                updateSchoolDetailsMutation.mutate(formattedData);
-                              }}
-                              disabled={updateSchoolDetailsMutation.isPending}
-                            >
-                              Save Changes
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setIsEditingDetails(false);
-                                setEditedDetails(null);
-                              }}
-                              disabled={updateSchoolDetailsMutation.isPending}
-                            >
-                              Cancel
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setIsEditingDetails(true);
-                              setEditedDetails({
-                                name: school?.name || '',
-                                shortName: school?.shortName || '',
-                                priorNames: school?.priorNames || '',
-                                programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
-                                agesServed: school?.agesServed || [],
-                                numberOfClassrooms: school?.numberOfClassrooms || '',
-                                enrollmentCap: school?.enrollmentCap || '',
-                                membershipStatus: school?.membershipStatus || '',
-                                legalStructure: school?.legalStructure || '',
-                                EIN: school?.EIN || '',
-                                legalName: school?.legalName || '',
-                                incorporationDate: school?.incorporationDate || '',
-                                nonprofitStatus: school?.nonprofitStatus || '',
-                                currentFYEnd: school?.currentFYEnd || '',
-                                governanceModel: school?.governanceModel || '',
-                                groupExemptionStatus: school?.groupExemptionStatus || '',
-                                groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
-                                groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
-                                businessInsurance: school?.businessInsurance || '',
-                                billComAccount: school?.billComAccount || '',
-                                email: school?.email || '',
-                                phone: school?.phone || '',
-                                website: school?.website || '',
-                                instagram: school?.instagram || '',
-                                facebook: school?.facebook || ''
-                              });
-                            }}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </Button>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">School Name</label>
-                          {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
-                              value={editedDetails?.name || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, name: e.target.value })}
-                            />
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.name || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Short Name</label>
-                          {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
-                              value={editedDetails?.shortName || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, shortName: e.target.value })}
-                            />
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.shortName || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Prior Names</label>
-                          {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
-                              value={editedDetails?.priorNames || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, priorNames: e.target.value })}
-                              placeholder="Comma-separated list of names"
-                            />
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.priorNames || '-'}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    {/* Business & Financial Systems, School Contact, Online Presence (new cards) */}
+                      <EntityCard
+                        title="Business & Financial Systems"
+                        showDivider={false}
+                        fields={[
+                          { key: 'businessInsurance', label: 'Business Insurance', type: 'text', value: school?.businessInsurance ?? '' },
+                          { key: 'billComAccount', label: 'Bill.com Account', type: 'text', value: school?.billComAccount ?? '' },
+                        ]}
+                        onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
+                      />
+                      <EntityCard
+                         title="School Contact Information"
+                        showDivider={false}
+                        fields={[
+                          { key: 'email', label: 'School Email', type: 'text', value: school?.email ?? '' },
+                          { key: 'phone', label: 'School Phone', type: 'text', value: school?.phone ?? '' },
+                        ]}
+                        onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
+                      />
+                      <EntityCard
+                         title="Online Presence"
+                        showDivider={false}
+                        fields={[
+                          { key: 'website', label: 'Website', type: 'text', value: school?.website ?? '' },
+                          { key: 'facebook', label: 'Facebook', type: 'text', value: school?.facebook ?? '' },
+                          { key: 'instagram', label: 'Instagram', type: 'text', value: school?.instagram ?? '' },
+                        ]}
+                        onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
+                      />
 
-                    {/* Program Details Section */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-slate-900">Program Details</h3>
-                        {!isEditingDetails && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setIsEditingDetails(true);
-                              setEditedDetails({
-                                name: school?.name || '',
-                                shortName: school?.shortName || '',
-                                priorNames: school?.priorNames || '',
-                                programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
-                                agesServed: school?.agesServed || [],
-                                numberOfClassrooms: school?.numberOfClassrooms || '',
-                                enrollmentCap: school?.enrollmentCap || '',
-                                membershipStatus: school?.membershipStatus || '',
-                                legalStructure: school?.legalStructure || '',
-                                EIN: school?.EIN || '',
-                                legalName: school?.legalName || '',
-                                incorporationDate: school?.incorporationDate || '',
-                                nonprofitStatus: school?.nonprofitStatus || '',
-                                currentFYEnd: school?.currentFYEnd || '',
-                                governanceModel: school?.governanceModel || '',
-                                groupExemptionStatus: school?.groupExemptionStatus || '',
-                                groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
-                                groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
-                                businessInsurance: school?.businessInsurance || '',
-                                billComAccount: school?.billComAccount || '',
-                                email: school?.email || '',
-                                phone: school?.phone || '',
-                                website: school?.website || '',
-                                instagram: school?.instagram || '',
-                                facebook: school?.facebook || ''
-                              });
-                            }}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </Button>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Program Focus</label>
-                          {isEditingDetails ? (
-                            <div className="mt-1">
-                              <label className="text-xs text-slate-500 mb-2 block">Select multiple options</label>
-                              <div className="flex flex-wrap gap-2">
-                                {fieldOptions?.programFocus?.filter((option: string) => option && option.trim() !== '').map((option: string) => {
-                                  const isSelected = editedDetails?.programFocus?.includes(option) || false;
-                                  return (
-                                    <button
-                                      key={option}
-                                      type="button"
-                                      onClick={() => {
-                                        const currentFocus = editedDetails?.programFocus || [];
-                                        if (isSelected) {
-                                          // Remove from array
-                                          setEditedDetails({
-                                            ...editedDetails,
-                                            programFocus: currentFocus.filter(f => f !== option)
-                                          });
-                                        } else {
-                                          // Add to array
-                                          setEditedDetails({
-                                            ...editedDetails,
-                                            programFocus: [...currentFocus, option]
-                                          });
-                                        }
-                                      }}
-                                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                                        isSelected 
-                                          ? 'bg-blue-100 text-blue-800 border-blue-300' 
-                                          : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-                                      }`}
-                                    >
-                                      {option}
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="mt-1">
-                              {school.programFocus && school.programFocus.length > 0 ? (
-                                <div className="flex flex-wrap gap-1">
-                                  {school.programFocus.map((focus, idx) => (
-                                    <Badge key={idx} variant="secondary" className="text-xs">
-                                      {focus}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              ) : (
-                                <p className="text-sm text-slate-400">-</p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Ages Served</label>
-                          {isEditingDetails ? (
-                            <Select
-                              value={editedDetails?.agesServed?.[0] || ''}
-                              onValueChange={(value) => setEditedDetails({ 
-                                ...editedDetails, 
-                                agesServed: value ? [value] : [] 
-                              })}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue placeholder="Select age range" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {fieldOptions?.agesServed?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <div className="mt-1">
-                              {school.agesServed && school.agesServed.length > 0 ? (
-                                <div className="flex flex-wrap gap-1">
-                                  {school.agesServed.map((age, idx) => (
-                                    <Badge key={idx} variant="secondary" className="text-xs">
-                                      {age}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              ) : (
-                                <p className="text-sm text-slate-400">-</p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Number of Classrooms</label>
-                          {isEditingDetails ? (
-                            <div className="relative">
-                              <Input
-                                type="number"
-                                className={`mt-1 ${getFieldErrorStyle('numberOfClassrooms')}`}
-                                value={editedDetails?.numberOfClassrooms || ''}
-                                onChange={(e) => handleFieldChange('numberOfClassrooms', e.target.value)}
-                              />
-                              {hasValidationError('numberOfClassrooms') && (
-                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                  <div className="h-4 w-4 text-red-500">⚠</div>
-                                </div>
-                              )}
-                              {hasValidationError('numberOfClassrooms') && (
-                                <p className="mt-1 text-xs text-red-600">{validationErrors.numberOfClassrooms}</p>
-                              )}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.numberOfClassrooms || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Enrollment Capacity</label>
-                          {isEditingDetails ? (
-                            <div className="relative">
-                              <Input
-                                type="number"
-                                className={`mt-1 ${getFieldErrorStyle('enrollmentCap')}`}
-                                value={editedDetails?.enrollmentCap || ''}
-                                onChange={(e) => handleFieldChange('enrollmentCap', e.target.value)}
-                              />
-                              {hasValidationError('enrollmentCap') && (
-                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                  <div className="h-4 w-4 text-red-500">⚠</div>
-                                </div>
-                              )}
-                              {hasValidationError('enrollmentCap') && (
-                                <p className="mt-1 text-xs text-red-600">{validationErrors.enrollmentCap}</p>
-                              )}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.enrollmentCap || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Membership Status</label>
-                          {isEditingDetails ? (
-                            <Select
-                              value={editedDetails?.membershipStatus || ''}
-                              onValueChange={(value) => setEditedDetails({ ...editedDetails, membershipStatus: value })}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue placeholder="Select membership status" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {fieldOptions?.membershipStatus?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.membershipStatus || '-'}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Legal Entity Section */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-slate-900">Legal Entity</h3>
-                        {!isEditingDetails && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setIsEditingDetails(true);
-                              setEditedDetails({
-                                name: school?.name || '',
-                                shortName: school?.shortName || '',
-                                priorNames: school?.priorNames || '',
-                                programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
-                                agesServed: school?.agesServed || [],
-                                numberOfClassrooms: school?.numberOfClassrooms || '',
-                                enrollmentCap: school?.enrollmentCap || '',
-                                membershipStatus: school?.membershipStatus || '',
-                                legalStructure: school?.legalStructure || '',
-                                EIN: school?.EIN || '',
-                                legalName: school?.legalName || '',
-                                incorporationDate: school?.incorporationDate || '',
-                                nonprofitStatus: school?.nonprofitStatus || '',
-                                currentFYEnd: school?.currentFYEnd || '',
-                                governanceModel: school?.governanceModel || '',
-                                groupExemptionStatus: school?.groupExemptionStatus || '',
-                                groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
-                                groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
-                                businessInsurance: school?.businessInsurance || '',
-                                billComAccount: school?.billComAccount || '',
-                                email: school?.email || '',
-                                phone: school?.phone || '',
-                                website: school?.website || '',
-                                instagram: school?.instagram || '',
-                                facebook: school?.facebook || ''
-                              });
-                            }}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </Button>
-                        )}
+                    {/* 
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
@@ -3043,6 +3312,7 @@ export default function SchoolDetail() {
                           )}
                         </div>
                       </div>
+                      */}
                       {/* Group Exemption Fields - Always show */}
                       <div className="border-t border-gray-200 mt-4 pt-4">
                         <h4 className="text-sm font-medium text-slate-700 mb-3">Group Exemption Information</h4>
@@ -3119,325 +3389,65 @@ export default function SchoolDetail() {
                       </div>
                     </div>
 
-                    {/* Business & Financial Systems Section */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-slate-900">Business & Financial Systems</h3>
-                        {!isEditingDetails && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setIsEditingDetails(true);
-                              setEditedDetails({
-                                name: school?.name || '',
-                                shortName: school?.shortName || '',
-                                priorNames: school?.priorNames || '',
-                                programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
-                                agesServed: school?.agesServed || [],
-                                numberOfClassrooms: school?.numberOfClassrooms || '',
-                                enrollmentCap: school?.enrollmentCap || '',
-                                membershipStatus: school?.membershipStatus || '',
-                                legalStructure: school?.legalStructure || '',
-                                EIN: school?.EIN || '',
-                                legalName: school?.legalName || '',
-                                incorporationDate: school?.incorporationDate || '',
-                                nonprofitStatus: school?.nonprofitStatus || '',
-                                currentFYEnd: school?.currentFYEnd || '',
-                                governanceModel: school?.governanceModel || '',
-                                groupExemptionStatus: school?.groupExemptionStatus || '',
-                                groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
-                                groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
-                                businessInsurance: school?.businessInsurance || '',
-                                billComAccount: school?.billComAccount || '',
-                                email: school?.email || '',
-                                phone: school?.phone || '',
-                                website: school?.website || '',
-                                instagram: school?.instagram || '',
-                                facebook: school?.facebook || ''
-                              });
-                            }}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </Button>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Business Insurance</label>
-                          {isEditingDetails ? (
-                            <Select
-                              value={editedDetails?.businessInsurance || ''}
-                              onValueChange={(value) => setEditedDetails({ ...editedDetails, businessInsurance: value })}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue placeholder="Select business insurance" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {fieldOptions?.businessInsurance?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.businessInsurance || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">BillCom Account</label>
-                          {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className="mt-1"
-                              value={editedDetails?.billComAccount || ''}
-                              onChange={(e) => setEditedDetails({ ...editedDetails, billComAccount: e.target.value })}
-                            />
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.billComAccount || '-'}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Contact Information & Communications Section */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-slate-900">School Contact Information & Communications</h3>
-                        {!isEditingDetails && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setIsEditingDetails(true);
-                              setEditedDetails({
-                                name: school?.name || '',
-                                shortName: school?.shortName || '',
-                                priorNames: school?.priorNames || '',
-                                programFocus: Array.isArray(school?.programFocus) ? school.programFocus : (school?.programFocus ? [school.programFocus] : []),
-                                agesServed: school?.agesServed || [],
-                                numberOfClassrooms: school?.numberOfClassrooms || '',
-                                enrollmentCap: school?.enrollmentCap || '',
-                                membershipStatus: school?.membershipStatus || '',
-                                legalStructure: school?.legalStructure || '',
-                                EIN: school?.EIN || '',
-                                legalName: school?.legalName || '',
-                                incorporationDate: school?.incorporationDate || '',
-                                nonprofitStatus: school?.nonprofitStatus || '',
-                                currentFYEnd: school?.currentFYEnd || '',
-                                governanceModel: school?.governanceModel || '',
-                                groupExemptionStatus: school?.groupExemptionStatus || '',
-                                groupExemptionDateGranted: school?.groupExemptionDateGranted || '',
-                                groupExemptionDateWithdrawn: school?.groupExemptionDateWithdrawn || '',
-                                businessInsurance: school?.businessInsurance || '',
-                                billComAccount: school?.billComAccount || '',
-                                email: school?.email || '',
-                                phone: school?.phone || '',
-                                website: school?.website || '',
-                                instagram: school?.instagram || '',
-                                facebook: school?.facebook || ''
-                              });
-                            }}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </Button>
-                        )}
-                      </div>
-                      
-                      {/* Primary Contact */}
-                      <div className="mb-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">General School Email</label>
-                            {isEditingDetails ? (
-                              <div className="relative">
-                                <Input
-                                  type="email"
-                                  className={`mt-1 ${getFieldErrorStyle('email')}`}
-                                  value={editedDetails?.email || ''}
-                                  onChange={(e) => handleFieldChange('email', e.target.value)}
-                                />
-                                {hasValidationError('email') && (
-                                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                    <div className="h-4 w-4 text-red-500">⚠</div>
-                                  </div>
-                                )}
-                                {hasValidationError('email') && (
-                                  <p className="mt-1 text-xs text-red-600">{validationErrors.email}</p>
-                                )}
-                              </div>
-                            ) : (
-                              <p className="text-sm text-slate-900 mt-1">{school.email || '-'}</p>
-                            )}
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Phone</label>
-                            {isEditingDetails ? (
-                              <Input
-                                type="tel"
-                                className="mt-1"
-                                value={editedDetails?.phone || ''}
-                                onChange={(e) => setEditedDetails({ ...editedDetails, phone: e.target.value })}
-                              />
-                            ) : (
-                              <p className="text-sm text-slate-900 mt-1">{school.phone || '-'}</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Online Presence */}
-                      <div className="border-t border-gray-200 pt-4">
-                        <h4 className="text-sm font-medium text-slate-700 mb-3">Online Presence</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                              <svg className="inline-block w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" />
-                              </svg>
-                              Website
-                            </label>
-                            {isEditingDetails ? (
-                              <Input
-                                type="url"
-                                className="mt-1"
-                                value={editedDetails?.website || ''}
-                                onChange={(e) => setEditedDetails({ ...editedDetails, website: e.target.value })}
-                                placeholder="https://example.com"
-                              />
-                            ) : (
-                              school.website ? (
-                                <a href={school.website} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline block mt-1">
-                                  {school.website}
-                                </a>
-                              ) : (
-                                <p className="text-sm text-slate-400 mt-1">-</p>
-                              )
-                            )}
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                              <svg className="inline-block w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                              </svg>
-                              Facebook
-                            </label>
-                            {isEditingDetails ? (
-                              <Input
-                                type="text"
-                                className="mt-1"
-                                value={editedDetails?.facebook || ''}
-                                onChange={(e) => setEditedDetails({ ...editedDetails, facebook: e.target.value })}
-                                placeholder="facebook.com/yourpage"
-                              />
-                            ) : (
-                              school.facebook ? (
-                                <a href={school.facebook.startsWith('http') ? school.facebook : `https://facebook.com/${school.facebook}`} 
-                                   target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline block mt-1">
-                                  {school.facebook}
-                                </a>
-                              ) : (
-                                <p className="text-sm text-slate-400 mt-1">-</p>
-                              )
-                            )}
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                              <svg className="inline-block w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
-                              </svg>
-                              Instagram
-                            </label>
-                            {isEditingDetails ? (
-                              <Input
-                                type="text"
-                                className="mt-1"
-                                value={editedDetails?.instagram || ''}
-                                onChange={(e) => setEditedDetails({ ...editedDetails, instagram: e.target.value })}
-                                placeholder="@yourhandle"
-                              />
-                            ) : (
-                              school.instagram ? (
-                                <a href={school.instagram.startsWith('http') ? school.instagram : `https://instagram.com/${school.instagram}`} 
-                                   target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline block mt-1">
-                                  {school.instagram}
-                                </a>
-                              ) : (
-                                <p className="text-sm text-slate-400 mt-1">-</p>
-                              )
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </TabsContent>
 
                 <TabsContent value="tls" className="mt-0">
-                  <div className="space-y-4">
-                    
-                    {associationsLoading ? (
-                      <div className="space-y-3">
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-8 w-full" />
-                      </div>
-                    ) : associations && associations.length > 0 ? (
-                      <div className="border rounded-lg">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Name</TableHead>
-                              <TableHead>Role(s)</TableHead>
-                              <TableHead>Founder</TableHead>
-                              <TableHead>Email</TableHead>
-                              <TableHead>Phone</TableHead>
-                              <TableHead>Start Date</TableHead>
-                              <TableHead>End Date</TableHead>
-                              <TableHead>Currently Active</TableHead>
-                              <TableHead className="w-[200px]">Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {associations.map((association) => {
-                              const teacher = teachers?.find(t => t.id === association.educatorId);
-                              return (
-                                <TeacherAssociationRow
-                                  key={association.id}
-                                  association={association}
-                                  teacher={teacher}
-                                  school={school}
-                                  isEditing={editingAssociationId === association.id}
-                                  onEdit={() => setEditingAssociationId(association.id)}
-                                  onSave={(data) => updateAssociationMutation.mutate({ associationId: association.id, data })}
-                                  onCancel={() => setEditingAssociationId(null)}
-                                  onDelete={() => {
-                                    setDeletingAssociationId(association.id);
-                                    setAssociationDeleteModalOpen(true);
-                                  }}
-                                  onEndStint={() => endStintMutation.mutate(association.id)}
-                                  isSaving={updateAssociationMutation.isPending}
-                                />
-                              );
-                            })}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-slate-500">
-                        <p>No teachers found for this school.</p>
-                        <p className="text-sm mt-2">Use the buttons above to create educators or associate existing educators with this school.</p>
-                      </div>
-                    )}
-                  </div>
+                  {associationsLoading ? (
+                    <div className="space-y-3">
+                      <Skeleton className="h-8 w-full" />
+                      <Skeleton className="h-8 w-full" />
+                      <Skeleton className="h-8 w-full" />
+                    </div>
+                  ) : associations && associations.length > 0 ? (
+                    <div className="border rounded-lg p-3">
+                      <SchoolTLsGrid 
+                        school={school} 
+                        associations={associations}
+                        teachers={teachers || []}
+                        onUpdateAssociation={(associationId: string, data: any) => updateAssociationMutation.mutate({ associationId, data })}
+                        onEndStint={(associationId: string) => endStintMutation.mutate(associationId)}
+                        onDeleteAssociation={(associationId: string) => { setDeletingAssociationId(associationId); setAssociationDeleteModalOpen(true); }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-slate-500">
+                      <p>No teachers found for this school.</p>
+                      <p className="text-sm mt-2">Use the Add menu or modals to create or assign educators.</p>
+                    </div>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="locations" className="mt-0">
                   <div className="space-y-4">
-                    
+                    {isCreatingLocation && (
+                      <div className="flex flex-wrap items-end gap-2 p-3 border rounded-md bg-slate-50">
+                        <div className="flex-1 min-w-[240px]">
+                          <label className="block text-xs text-slate-600">Address</label>
+                          <Input value={newLocation.address} onChange={(e) => setNewLocation({ ...newLocation, address: e.target.value })} className="h-8" />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-slate-600">Current Physical</label>
+                          <input type="checkbox" checked={newLocation.currentPhysicalAddress} onChange={(e) => setNewLocation({ ...newLocation, currentPhysicalAddress: e.target.checked })} className="h-4 w-4 mt-2" />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-slate-600">Current Mailing</label>
+                          <input type="checkbox" checked={newLocation.currentMailingAddress} onChange={(e) => setNewLocation({ ...newLocation, currentMailingAddress: e.target.checked })} className="h-4 w-4 mt-2" />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-slate-600">Start Date</label>
+                          <Input type="date" value={newLocation.startDate} onChange={(e) => setNewLocation({ ...newLocation, startDate: e.target.value })} className="h-8" />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-slate-600">End Date</label>
+                          <Input type="date" value={newLocation.endDate} onChange={(e) => setNewLocation({ ...newLocation, endDate: e.target.value })} className="h-8" />
+                        </div>
+                        <div className="ml-auto flex gap-2">
+                          <Button size="sm" onClick={() => createLocationMutation.mutate(newLocation)} disabled={createLocationMutation.isPending}>Save</Button>
+                          <Button size="sm" variant="outline" onClick={() => { setIsCreatingLocation(false); setNewLocation({ address: "", currentPhysicalAddress: false, currentMailingAddress: false, startDate: "", endDate: "" }); }}>Cancel</Button>
+                        </div>
+                      </div>
+                    )}
+
                     {locationsLoading ? (
                       <div className="space-y-3">
                         <Skeleton className="h-8 w-full" />
@@ -3445,123 +3455,11 @@ export default function SchoolDetail() {
                         <Skeleton className="h-8 w-full" />
                       </div>
                     ) : (
-                      <div className="border rounded-lg">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Address</TableHead>
-                              <TableHead>Current Physical Address</TableHead>
-                              <TableHead>Current Mailing Address</TableHead>
-                              <TableHead>Start Date</TableHead>
-                              <TableHead>End Date</TableHead>
-                              <TableHead className="w-[100px]">Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {/* Create new location row */}
-                            {isCreatingLocation && (
-                              <TableRow>
-                                <TableCell>
-                                  <Input
-                                    value={newLocation.address}
-                                    onChange={(e) => setNewLocation({...newLocation, address: e.target.value})}
-                                    placeholder="Enter address"
-                                    className="h-8"
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <input
-                                    type="checkbox"
-                                    checked={newLocation.currentPhysicalAddress}
-                                    onChange={(e) => setNewLocation({...newLocation, currentPhysicalAddress: e.target.checked})}
-                                    className="h-4 w-4"
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <input
-                                    type="checkbox"
-                                    checked={newLocation.currentMailingAddress}
-                                    onChange={(e) => setNewLocation({...newLocation, currentMailingAddress: e.target.checked})}
-                                    className="h-4 w-4"
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <Input
-                                    type="date"
-                                    value={newLocation.startDate}
-                                    onChange={(e) => setNewLocation({...newLocation, startDate: e.target.value})}
-                                    className="h-8"
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <Input
-                                    type="date"
-                                    value={newLocation.endDate}
-                                    onChange={(e) => setNewLocation({...newLocation, endDate: e.target.value})}
-                                    className="h-8"
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <div className="flex gap-1">
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => createLocationMutation.mutate(newLocation)}
-                                      disabled={createLocationMutation.isPending}
-                                      className="h-8 w-8 p-0"
-                                    >
-                                      ✓
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => {
-                                        setIsCreatingLocation(false);
-                                        setNewLocation({
-                                          address: "",
-                                          currentPhysicalAddress: false,
-                                          currentMailingAddress: false,
-                                          startDate: "",
-                                          endDate: "",
-                                        });
-                                      }}
-                                      className="h-8 w-8 p-0"
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            )}
-                            
-                            {/* Existing locations */}
-                            {locations && locations.map((location) => (
-                              <LocationRow
-                                key={location.id}
-                                location={location}
-                                isEditing={editingLocationId === location.id}
-                                onEdit={() => setEditingLocationId(location.id)}
-                                onSave={(data) => updateLocationMutation.mutate({ locationId: location.id, data })}
-                                onCancel={() => setEditingLocationId(null)}
-                                onDelete={() => {
-                                  setDeletingLocationId(location.id);
-                                  setLocationDeleteModalOpen(true);
-                                }}
-                                isSaving={updateLocationMutation.isPending}
-                              />
-                            ))}
-                            
-                            {!locations?.length && !isCreatingLocation && (
-                              <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8 text-slate-500">
-                                  <p>No locations found for this school.</p>
-                                  <p className="text-sm mt-2">Click "Add Location" to create the first location entry.</p>
-                                </TableCell>
-                              </TableRow>
-                            )}
-                          </TableBody>
-                        </Table>
-                      </div>
+                      <LocationsGrid
+                        locations={locations || []}
+                        onUpdate={(id, data) => updateLocationMutation.mutate({ locationId: id, data })}
+                        onDelete={(id) => { setDeletingLocationId(id); setLocationDeleteModalOpen(true); }}
+                      />
                     )}
                   </div>
                 </TabsContent>
@@ -3696,7 +3594,6 @@ export default function SchoolDetail() {
                                       size="sm"
                                       onClick={() => {
                                         // TODO: Implement create 990 API call
-                                        console.log("Creating 990:", new990);
                                         setIsCreating990(false);
                                         setNew990({ year: "", attachment: "", attachmentUrl: "" });
                                       }}
@@ -3764,45 +3661,18 @@ export default function SchoolDetail() {
 
                 <TabsContent value="guides" className="mt-0">
                   <div className="space-y-4">
-                    
                     {guidesLoading ? (
                       <div className="space-y-3">
                         <Skeleton className="h-8 w-full" />
                         <Skeleton className="h-8 w-full" />
                         <Skeleton className="h-8 w-full" />
                       </div>
-                    ) : guideAssignments && guideAssignments.length > 0 ? (
-                      <div className="border rounded-lg">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Name</TableHead>
-                              <TableHead>Type</TableHead>
-                              <TableHead>Start Date</TableHead>
-                              <TableHead>End Date</TableHead>
-                              <TableHead>Currently Active</TableHead>
-                              <TableHead className="w-[100px]">Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {guideAssignments.map((assignment) => (
-                              <GuideAssignmentRow
-                                key={assignment.id}
-                                assignment={assignment}
-                                isEditing={editingGuideId === assignment.id}
-                                onEdit={() => setEditingGuideId(assignment.id)}
-                                onSave={(data) => updateGuideAssignmentMutation.mutate({ guideId: assignment.id, data })}
-                                onCancel={() => setEditingGuideId(null)}
-                                onDelete={() => {
-                                  setDeletingGuideId(assignment.id);
-                                  setGuideDeleteModalOpen(true);
-                                }}
-                                isSaving={updateGuideAssignmentMutation.isPending}
-                              />
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
+                    ) : (guideAssignments && guideAssignments.length > 0) ? (
+                      <GuidesGrid
+                        assignments={guideAssignments}
+                        onUpdate={(id, data) => updateGuideAssignmentMutation.mutate({ guideId: id, data })}
+                        onDelete={(id) => { setDeletingGuideId(id); setGuideDeleteModalOpen(true); }}
+                      />
                     ) : (
                       <div className="text-center py-8 text-slate-500">
                         <p>No guide assignments found for this school.</p>
@@ -3813,132 +3683,67 @@ export default function SchoolDetail() {
                 </TabsContent>
 
                 <TabsContent value="support" className="mt-0">
-                  <div className="space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* High Priority Fields */}
+                    <EntityCard
+                      title="High Priority Fields"
+                      columns={3}
+                      fields={[
+                        { key: 'ssjStage', label: 'SSJ Stage', type: 'text', value: school?.ssjStage ?? '' },
+                        { key: 'status', label: 'School Status', type: 'text', value: school?.status ?? '' },
+                        { key: 'ssjProjectedOpen', label: 'Projected Open Date', type: 'date', value: school?.ssjProjectedOpen ?? '' },
+                        { key: 'ssjReadinessRating', label: 'Readiness to Open', type: 'text', value: school?.ssjReadinessRating ?? '' },
+                      ]}
+                      onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
+                    />
                     {/* Timeline & Milestones */}
-
-                    {/* Timeline & Milestones */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Timeline & Milestones
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Original Projected Open Date</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjOriginalProjectedOpenDate || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Projected Open School Year</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjProjOpenSchoolYear || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Projected Open Date</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjProjectedOpen || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Entered Visioning Date</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.enteredVisioningDate || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Entered Planning Date</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.enteredPlanningDate || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Entered Startup Date</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.enteredStartupDate || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Open Date</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.openDate || '-'}</p>
-                        </div>
-                      </div>
-                    </div>
+                    <EntityCard
+                      title="Timeline & Milestones"
+                      columns={3}
+                      fields={[
+                        { key: 'ssjOriginalProjectedOpenDate', label: 'Original Projected Open Date', type: 'date', value: school?.ssjOriginalProjectedOpenDate ?? '' },
+                        { key: 'ssjProjectedOpen', label: 'Projected Open Date', type: 'date', value: school?.ssjProjectedOpen ?? '' },
+                        { key: 'openDate', label: 'Open Date', type: 'date', value: school?.openDate ?? '' },
+                        { key: 'enteredVisioningDate', label: 'Entered Visioning', type: 'date', value: school?.enteredVisioningDate ?? '' },
+                        { key: 'enteredPlanningDate', label: 'Entered Planning', type: 'date', value: school?.enteredPlanningDate ?? '' },
+                        { key: 'enteredStartupDate', label: 'Entered Startup', type: 'date', value: school?.enteredStartupDate ?? '' },
+                      ]}
+                      onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
+                    />
 
                     
 
                     {/* Funding & Financial */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Funding & Financial Planning
-                      </h3>
-                      <div className="grid grid-cols-1 gap-4">
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Budget Link</label>
-                          {school.budgetLink ? (
-                            <a href={school.budgetLink} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline mt-1 block">
-                              {school.budgetLink}
-                            </a>
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">-</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    <EntityCard
+                      title="Funding & Financial Planning"
+                      columns={1}
+                      fields={[
+                        { key: 'budgetLink', label: 'Budget Link', type: 'text', value: school?.budgetLink ?? '' },
+                      ]}
+                      onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
+                    />
 
                     {/* Albums */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                        Albums
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Planning Album</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.planningAlbum || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Visioning Album</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.visioningAlbum || '-'}</p>
-                        </div>
-                      </div>
-                    </div>
+                    <EntityCard
+                      title="Albums"
+                      columns={2}
+                      fields={[
+                        { key: 'planningAlbum', label: 'Planning Album', type: 'text', value: school?.planningAlbum ?? '' },
+                        { key: 'visioningAlbum', label: 'Visioning Album', type: 'text', value: school?.visioningAlbum ?? '' },
+                      ]}
+                      onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
+                    />
 
                     {/* Cohorts */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        Cohorts
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Stage</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.ssjStage || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Ops Guide Track</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.opsGuideTrack || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Readiness Rating</label>
-                          <p className="text-sm text-slate-900 mt-1">{school.readinessRating || '-'}</p>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Cohorts</label>
-                          <div className="mt-1">
-                            {school.cohorts && school.cohorts.length > 0 ? (
-                              <div className="flex flex-wrap gap-1">
-                                {school.cohorts.map((cohort, idx) => (
-                                  <Badge key={idx} variant="outline" className="text-xs">
-                                    {cohort}
-                                  </Badge>
-                                ))}
-                              </div>
-                            ) : (
-                              <p className="text-sm text-slate-400">-</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <EntityCard
+                      title="Cohorts"
+                      columns={2}
+                      fields={[
+                        { key: 'cohorts', label: 'Cohorts', type: 'multiselect', value: school?.cohorts ?? [], placeholder: 'Comma separated list' },
+                        { key: 'ssjOpsGuideTrack', label: 'Ops Guide Track', type: 'multiselect', value: school?.ssjOpsGuideTrack ?? [], placeholder: 'Comma separated list' },
+                      ]}
+                      onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
+                    />
                   </div>
                 </TabsContent>
 
@@ -4185,7 +3990,7 @@ export default function SchoolDetail() {
                                   <TableRow 
                                     key={fee.id}
                                     className="cursor-pointer hover:bg-slate-50"
-                                    onClick={() => console.log("Row selected", fee)}
+                                    onClick={() => console.log("Button clicked - Handler not implemented")}
                                   >
                                     <TableCell>{fee.schoolYear || '-'}</TableCell>
                                     <TableCell>{fee.feeAmount ? `$${fee.feeAmount.toLocaleString()}` : '-'}</TableCell>
@@ -4784,3 +4589,7 @@ export default function SchoolDetail() {
     </>
   );
 }
+
+
+
+

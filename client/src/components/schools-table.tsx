@@ -104,7 +104,6 @@ export default function SchoolsTable({ schools, isLoading }: SchoolsTableProps) 
                 {/* Current TLs (Teacher Leaders) */}
                 <TableCell>
                   <div className="text-sm text-slate-900">
-                    {/* TODO: Get current TLs from educator-school associations */}
                     TL data pending
                   </div>
                 </TableCell>
@@ -160,25 +159,6 @@ export default function SchoolsTable({ schools, isLoading }: SchoolsTableProps) 
             ))}
           </TableBody>
         </Table>
-      </div>
-
-      <div className="px-6 py-4 border-t border-slate-200">
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-slate-700">
-            Showing <span className="font-medium">1</span> to <span className="font-medium">{schools.length}</span> of <span className="font-medium">{schools.length}</span> results
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" disabled>
-              Previous
-            </Button>
-            <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700">
-              1
-            </Button>
-            <Button variant="outline" size="sm" disabled>
-              Next
-            </Button>
-          </div>
-        </div>
       </div>
 
       <DeleteConfirmationModal

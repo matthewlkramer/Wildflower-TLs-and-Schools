@@ -36,7 +36,7 @@ export function Charter990sTable({ charterId }: Charter990sTableProps) {
     console.log("Delete 990:", tax990);
   };
 
-  const columnDefs: ColDef<Charter990>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "990 Year",
       field: "year",
@@ -128,7 +128,6 @@ export function Charter990sTable({ charterId }: Charter990sTableProps) {
         rowData={sorted990s}
         columnDefs={columnDefs}
         animateRows={true}
-        rowSelection="none"
         suppressRowClickSelection={true}
         domLayout="normal"
         headerHeight={40}

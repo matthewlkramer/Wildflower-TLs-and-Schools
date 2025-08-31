@@ -36,7 +36,7 @@ export function CharterGovernanceDocumentsTable({ charterId }: CharterGovernance
     console.log("Delete document:", document);
   };
 
-  const columnDefs: ColDef<CharterGovernanceDocument>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Document Type",
       field: "docType",
@@ -126,7 +126,6 @@ export function CharterGovernanceDocumentsTable({ charterId }: CharterGovernance
         rowData={sortedDocuments}
         columnDefs={columnDefs}
         animateRows={true}
-        rowSelection="none"
         suppressRowClickSelection={true}
         domLayout="normal"
         headerHeight={40}

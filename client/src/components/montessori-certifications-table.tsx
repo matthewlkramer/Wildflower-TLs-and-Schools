@@ -34,7 +34,7 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
     },
   });
 
-  const columnDefs: ColDef<MontessoriCertification>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Year Certified",
       field: "dateReceived",
@@ -125,7 +125,6 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
           rowData={certifications}
           columnDefs={columnDefs}
           animateRows={true}
-          rowSelection="none"
           suppressRowClickSelection={true}
           domLayout="autoHeight"
           headerHeight={40}

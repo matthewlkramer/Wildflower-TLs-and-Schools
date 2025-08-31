@@ -150,8 +150,8 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
                                 <span className="font-medium">
                                   {educator.fullName || `${educator.firstName} ${educator.lastName}`}
                                 </span>
-                                {educator.primaryEmail && (
-                                  <span className="text-sm text-gray-500">{educator.primaryEmail}</span>
+                                {educator.currentPrimaryEmailAddress && (
+                                  <span className="text-sm text-gray-500">{educator.currentPrimaryEmailAddress}</span>
                                 )}
                               </div>
                             </SelectItem>
@@ -161,7 +161,7 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
                       {selectedEducator && (
                         <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
                           <strong>Selected:</strong> {selectedEducator.fullName || `${selectedEducator.firstName} ${selectedEducator.lastName}`}
-                          {selectedEducator.primaryEmail && <span className="ml-2">({selectedEducator.primaryEmail})</span>}
+                          {selectedEducator.currentPrimaryEmailAddress && <span className="ml-2">({selectedEducator.currentPrimaryEmailAddress})</span>}
                         </div>
                       )}
                     </div>

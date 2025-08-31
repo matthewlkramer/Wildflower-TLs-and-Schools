@@ -11,13 +11,21 @@ import { Shield, CreditCard, CheckCircle, AlertCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { Elements, useStripe, useElements, ElementsConsumer } from "@stripe/react-stripe-js";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
-// Initialize Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+// Initialize Stripe lazily to avoid evaluating at import time for unrelated routes
+let _stripePromise: Promise<Stripe | null> | null = null;
+function getStripePromise(): Promise<Stripe | null> | null {
+  const key = (import.meta as any)?.env?.VITE_STRIPE_PUBLIC_KEY as string | undefined;
+  if (!key) return null;
+  if (!_stripePromise) {
+    _stripePromise = loadStripe(key);
+  }
+  return _stripePromise;
+}
 
 const achSetupSchema = z.object({
   accountHolderName: z.string().min(1, "Account holder name is required"),
@@ -336,6 +344,7 @@ function ACHSetupContent({ loanId }: { loanId: string }) {
 export default function ACHSetup() {
   const [, params] = useLocation();
   const loanId = params?.split('/')[2]; // Extract loan ID from URL like /ach-setup/123
+  const stripePromise = getStripePromise();
 
   if (!loanId) {
     return (
@@ -347,6 +356,24 @@ export default function ACHSetup() {
               <h2 className="text-xl font-semibold mb-2">Invalid Request</h2>
               <p className="text-muted-foreground">
                 No loan ID provided for ACH setup.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!stripePromise) {
+    return (
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 mx-auto mb-4 text-red-500" />
+              <h2 className="text-xl font-semibold mb-2">Payments Not Configured</h2>
+              <p className="text-muted-foreground">
+                Stripe is not configured. Please set VITE_STRIPE_PUBLIC_KEY to enable ACH setup.
               </p>
             </div>
           </CardContent>

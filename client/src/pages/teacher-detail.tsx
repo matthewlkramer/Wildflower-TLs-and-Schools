@@ -1,5 +1,5 @@
 import { useParams } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { type Teacher, type SSJFilloutForm } from "@shared/schema";
+import { EntityCard } from "@/components/shared/EntityCard";
+import { DetailGrid } from "@/components/shared/DetailGrid";
+import { TableCard } from "@/components/shared/TableCard";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { getStatusColor } from "@/lib/utils";
 import { EmailAddressesTable } from "@/components/email-addresses-table";
 import { EducatorSchoolAssociationsTable } from "@/components/educator-school-associations-table";
@@ -21,6 +26,8 @@ import { addNewEmitter } from "@/lib/add-new-emitter";
 export default function TeacherDetail() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState("summary");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const { toast } = useToast();
 
   const { data: teacher, isLoading } = useQuery<Teacher>({
     queryKey: ["/api/teachers", id],
@@ -65,23 +72,23 @@ export default function TeacherDetail() {
     switch (activeTab) {
       case "schools":
         options = [
-          { label: "Create New School", onClick: () => console.log("Create new school - to be implemented") },
-          { label: "Assign TL to Existing School", onClick: () => console.log("Assign TL to existing school - to be implemented") }
+          { label: "Create New School", onClick: () => setShowAddModal(true) },
+          { label: "Assign TL to Existing School", onClick: () => setShowAddModal(true) }
         ];
         break;
       case "certs":
         options = [
-          { label: "Add Certification", onClick: () => console.log("Add certification - to be implemented") }
+          { label: "Add Certification", onClick: () => setShowAddModal(true) }
         ];
         break;
       case "events":
         options = [
-          { label: "Add Event", onClick: () => console.log("Add event - to be implemented") }
+          { label: "Add Event", onClick: () => setShowAddModal(true) }
         ];
         break;
       case "notes":
         options = [
-          { label: "Add Note", onClick: () => console.log("Add note - to be implemented") }
+          { label: "Add Note", onClick: () => setShowAddModal(true) }
         ];
         break;
       default:
@@ -94,6 +101,23 @@ export default function TeacherDetail() {
       addNewEmitter.setOptions([]);
     };
   }, [activeTab]);
+
+  // Mutation to update educator details
+  const updateTeacherDetailsMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest("PUT", `/api/teachers/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teachers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/teachers", id] });
+      toast({ title: "Success", description: "Educator details updated" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update educator", variant: "destructive" });
+    },
+  });
+
+  const normalizeArray = (v: any): string[] => Array.isArray(v) ? v : (v ? String(v).split(',').map(s => s.trim()).filter(Boolean) : []);
 
 
 
@@ -194,53 +218,98 @@ export default function TeacherDetail() {
               </TabsContent>
 
               <TabsContent value="demographics" className="mt-0">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2 text-sm">
-                      <p><span className="text-slate-600">Pronouns:</span> {teacher.pronouns || '-'}</p>
-                      {/* Conditional Pronouns Other */}
-                      {teacher.pronouns?.toLowerCase() === 'other' && (
-                        <p><span className="text-slate-600">Pronouns (Other):</span> {teacher.pronounsOther || '-'}</p>
-                      )}
-                      <p><span className="text-slate-600">Gender:</span> {teacher.gender || '-'}</p>
-                      {/* Conditional Gender Other */}
-                      {teacher.gender?.toLowerCase() === 'other' && (
-                        <p><span className="text-slate-600">Gender (Other):</span> {teacher.genderOther || '-'}</p>
-                      )}
-                      <p><span className="text-slate-600">Race/Ethnicity:</span> {teacher.raceEthnicity ? (Array.isArray(teacher.raceEthnicity) ? teacher.raceEthnicity.join(', ') : teacher.raceEthnicity) : '-'}</p>
-                      {/* Conditional Race/Ethnicity Other */}
-                      {teacher.raceEthnicity && (Array.isArray(teacher.raceEthnicity) ? teacher.raceEthnicity.some(re => re.toLowerCase().includes('other')) : teacher.raceEthnicity.toLowerCase().includes('other')) && (
-                        <p><span className="text-slate-600">Race/Ethnicity (Other):</span> {teacher.raceEthnicityOther || '-'}</p>
-                      )}
-                    </div>
-                    <div className="space-y-2 text-sm">
-                      <p><span className="text-slate-600">Primary Language:</span> {teacher.primaryLanguage ? (Array.isArray(teacher.primaryLanguage) ? teacher.primaryLanguage.join(', ') : teacher.primaryLanguage) : '-'}</p>
-                      <p><span className="text-slate-600">Other Languages:</span> {teacher.otherLanguages ? (Array.isArray(teacher.otherLanguages) ? teacher.otherLanguages.join(', ') : teacher.otherLanguages) : '-'}</p>
-                      <p><span className="text-slate-600">Household Income:</span> {teacher.householdIncome || '-'}</p>
-                      <p><span className="text-slate-600">Income Background:</span> {teacher.incomeBackground || '-'}</p>
-                      <p><span className="text-slate-600">Educational Attainment:</span> {teacher.educationalAttainment || '-'}</p>
-                    </div>
-                  </div>
-                </div>
+                <DetailGrid>
+                  <EntityCard
+                    title="Gender"
+                    columns={2}
+                    fields={[
+                      { key: 'gender', label: 'Gender', type: 'text', value: teacher?.gender ?? '' },
+                      { key: 'genderOther', label: 'Gender (Other)', type: 'text', value: teacher?.genderOther ?? '' },
+                      { key: 'pronouns', label: 'Pronouns', type: 'text', value: teacher?.pronouns ?? '' },
+                      { key: 'pronounsOther', label: 'Pronouns (Other)', type: 'text', value: teacher?.pronounsOther ?? '' },
+                    ]}
+                    onSave={(vals) => updateTeacherDetailsMutation.mutate(vals)}
+                  />
+
+                  <EntityCard
+                    title="Race/Ethnicity"
+                    columns={2}
+                    fields={[
+                      { key: 'raceEthnicity', label: 'Race/Ethnicity', type: 'multiselect', value: Array.isArray(teacher?.raceEthnicity) ? teacher?.raceEthnicity : (teacher?.raceEthnicity ? [teacher.raceEthnicity as unknown as string] : []) },
+                      { key: 'raceEthnicityOther', label: 'Race/Ethnicity (Other)', type: 'text', value: teacher?.raceEthnicityOther ?? '' },
+                    ]}
+                    onSave={(vals) => updateTeacherDetailsMutation.mutate({
+                      ...vals,
+                      ...(vals.raceEthnicity !== undefined ? { raceEthnicity: normalizeArray(vals.raceEthnicity) } : {}),
+                    })}
+                  />
+
+                  <EntityCard
+                    title="Income"
+                    columns={2}
+                    fields={[
+                      { key: 'householdIncome', label: 'Household Income', type: 'text', value: teacher?.householdIncome ?? '' },
+                      { key: 'incomeBackground', label: 'Income Background', type: 'text', value: teacher?.incomeBackground ?? '' },
+                    ]}
+                    onSave={(vals) => updateTeacherDetailsMutation.mutate(vals)}
+                  />
+
+                  <EntityCard
+                    title="Languages"
+                    columns={2}
+                    fields={[
+                      { key: 'primaryLanguage', label: 'Primary Language', type: 'multiselect', value: Array.isArray(teacher?.primaryLanguage) ? teacher?.primaryLanguage : (teacher?.primaryLanguage ? [teacher.primaryLanguage as unknown as string] : []) },
+                      { key: 'otherLanguages', label: 'Other Languages', type: 'multiselect', value: Array.isArray(teacher?.otherLanguages) ? teacher?.otherLanguages : (teacher?.otherLanguages ? [teacher.otherLanguages as unknown as string] : []) },
+                    ]}
+                    onSave={(vals) => updateTeacherDetailsMutation.mutate({
+                      ...vals,
+                      ...(vals.primaryLanguage !== undefined ? { primaryLanguage: normalizeArray(vals.primaryLanguage) } : {}),
+                      ...(vals.otherLanguages !== undefined ? { otherLanguages: normalizeArray(vals.otherLanguages) } : {}),
+                    })}
+                  />
+
+                  <EntityCard
+                    title="Educational Attainment"
+                    columns={1}
+                    fields={[
+                      { key: 'educationalAttainment', label: 'Educational Attainment', type: 'text', value: teacher?.educationalAttainment ?? '' },
+                    ]}
+                    onSave={(vals) => updateTeacherDetailsMutation.mutate(vals)}
+                  />
+                </DetailGrid>
               </TabsContent>
 
               <TabsContent value="contact" className="mt-0">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-4 md:col-span-1">
-                      <h4 className="font-medium text-slate-900">Contact Information</h4>
-                      <div className="space-y-2 text-sm">
-                        <p><span className="text-slate-600">Primary Phone:</span> {teacher.primaryPhone || '-'}</p>
-                        <p><span className="text-slate-600">Secondary Phone:</span> {teacher.secondaryPhone || '-'}</p>
-                        <p><span className="text-slate-600">Home Address:</span> {teacher.homeAddress || '-'}</p>
-                      </div>
-                    </div>
-                    <div className="space-y-4 md:col-span-2">
-                      <h4 className="font-medium text-slate-900">Email Addresses</h4>
-                      <EmailAddressesTable educatorId={teacher.id} />
-                    </div>
-                  </div>
-                </div>
+                {/* Tables default to full width */}
+                <TableCard title="Email Addresses">
+                  <EmailAddressesTable educatorId={teacher.id} />
+                </TableCard>
+
+                {/* EntityCards use the 2-column DetailGrid */}
+                <DetailGrid className="mt-6">
+                  {/* Phone numbers */}
+                  <EntityCard
+                    title="Phone"
+                    columns={1}
+                    showDivider={false}
+                    fields={[
+                      { key: 'primaryPhone', label: 'Primary Phone', type: 'text', value: teacher?.primaryPhone ?? '' },
+                      { key: 'secondaryPhone', label: 'Secondary Phone', type: 'text', value: teacher?.secondaryPhone ?? '' },
+                    ]}
+                    onSave={(vals) => updateTeacherDetailsMutation.mutate(vals)}
+                  />
+
+                  {/* Address */}
+                  <EntityCard
+                    title="Address"
+                    columns={1}
+                    showDivider={false}
+                    fields={[
+                      { key: 'homeAddress', label: 'Home Address', type: 'textarea', value: teacher?.homeAddress ?? '' },
+                    ]}
+                    onSave={(vals) => updateTeacherDetailsMutation.mutate(vals)}
+                  />
+                </DetailGrid>
               </TabsContent>
 
               <TabsContent value="schools" className="mt-0">

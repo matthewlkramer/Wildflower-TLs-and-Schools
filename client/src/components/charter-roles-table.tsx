@@ -30,7 +30,7 @@ export function CharterRolesTable({ charterId }: CharterRolesTableProps) {
     console.log("Delete role:", role);
   };
 
-  const columnDefs: ColDef<CharterRole>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Role",
       field: "role",
@@ -106,7 +106,6 @@ export function CharterRolesTable({ charterId }: CharterRolesTableProps) {
         rowData={roles}
         columnDefs={columnDefs}
         animateRows={true}
-        rowSelection="none"
         suppressRowClickSelection={true}
         domLayout="normal"
         headerHeight={40}

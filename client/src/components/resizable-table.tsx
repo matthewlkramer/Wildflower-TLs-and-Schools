@@ -61,36 +61,34 @@ export function ResizableTableHead({
   const startXRef = useRef(0);
   const startWidthRef = useRef(0);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsResizing(true);
-    startXRef.current = e.clientX;
-    startWidthRef.current = width;
-    
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - startXRef.current;
+      const newWidth = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
+      setWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-    e.preventDefault();
-  };
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isResizing) return;
-    
-    const deltaX = e.clientX - startXRef.current;
-    const newWidth = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
-    setWidth(newWidth);
-  };
-
-  const handleMouseUp = () => {
-    setIsResizing(false);
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  };
-
-  useEffect(() => {
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, []);
+  }, [isResizing, minWidth, maxWidth]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsResizing(true);
+    startXRef.current = e.clientX;
+    startWidthRef.current = width;
+    e.preventDefault();
+  };
 
   return (
     <th

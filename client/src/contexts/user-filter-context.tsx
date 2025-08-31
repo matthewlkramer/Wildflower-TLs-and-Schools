@@ -1,17 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './auth-context';
 
 interface UserFilterContextType {
   showOnlyMyRecords: boolean;
   setShowOnlyMyRecords: (value: boolean) => void;
   currentUser: string | null;
-  setCurrentUser: (user: string | null) => void;
 }
 
 const UserFilterContext = createContext<UserFilterContextType>({
   showOnlyMyRecords: false,
   setShowOnlyMyRecords: () => {},
   currentUser: null,
-  setCurrentUser: () => {},
 });
 
 export const useUserFilter = () => {
@@ -27,8 +26,8 @@ interface UserFilterProviderProps {
 }
 
 export const UserFilterProvider: React.FC<UserFilterProviderProps> = ({ children }) => {
+  const { user } = useAuth();
   const [showOnlyMyRecords, setShowOnlyMyRecords] = useState(false);
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
 
   // Load user filter preference from localStorage
   useEffect(() => {
@@ -36,11 +35,6 @@ export const UserFilterProvider: React.FC<UserFilterProviderProps> = ({ children
     if (saved) {
       setShowOnlyMyRecords(JSON.parse(saved));
     }
-
-    // For demo purposes, set a default user
-    // In a real app, this would come from authentication
-    const savedUser = localStorage.getItem('currentUser');
-    setCurrentUser(savedUser || 'demo-user');
   }, []);
 
   // Save user filter preference to localStorage
@@ -51,8 +45,7 @@ export const UserFilterProvider: React.FC<UserFilterProviderProps> = ({ children
   const value = {
     showOnlyMyRecords,
     setShowOnlyMyRecords,
-    currentUser,
-    setCurrentUser,
+    currentUser: user?.email || null,
   };
 
   return (

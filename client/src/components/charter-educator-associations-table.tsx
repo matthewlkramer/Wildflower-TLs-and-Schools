@@ -37,7 +37,7 @@ export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorA
     console.log("Delete association:", association);
   };
 
-  const columnDefs: ColDef<EducatorSchoolAssociation>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Educator",
       field: "educatorName",
@@ -160,7 +160,6 @@ export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorA
         rowData={associations}
         columnDefs={columnDefs}
         animateRows={true}
-        rowSelection="none"
         suppressRowClickSelection={true}
         domLayout="normal"
         headerHeight={40}

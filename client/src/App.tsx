@@ -3,11 +3,13 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useState, createContext, useContext, useEffect, useMemo } from "react";
+import { useState, createContext, useEffect, useMemo, useContext } from "react";
 import { addNewEmitter } from "@/lib/add-new-emitter";
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
+import { AuthProvider } from "@/contexts/auth-context";
 import { UserFilterProvider } from "@/contexts/user-filter-context";
+import { initAgGridEnterprise } from "@/lib/ag-grid-enterprise";
 
 import Dashboard from "@/pages/dashboard";
 import Teachers from "@/pages/teachers";
@@ -23,14 +25,8 @@ import SchoolDetail from "@/pages/school-detail";
 import CharterDetail from "@/pages/charter-detail";
 import NotFound from "@/pages/not-found";
 
-// Create a context for search functionality
-const SearchContext = createContext<{
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-}>({
-  searchTerm: "",
-  setSearchTerm: () => {},
-});
+// Use a shared search context to avoid module duplication issues
+import { SearchContext } from "@/contexts/search-context";
 
 // Create a context for page title functionality
 const PageTitleContext = createContext<{
@@ -50,7 +46,6 @@ const AddNewContext = createContext<{
   setAddNewOptions: () => {},
 });
 
-export const useSearch = () => useContext(SearchContext);
 export const usePageTitle = () => useContext(PageTitleContext);
 export const useAddNew = () => useContext(AddNewContext);
 
@@ -76,13 +71,13 @@ function Router() {
 }
 
 function AppContent() {
+  // Initialize AG Grid Enterprise (license + modules) if available
+  initAgGridEnterprise();
   const [location] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [pageTitle, setPageTitle] = useState("");
   const [addNewOptions, setAddNewOptions] = useState<Array<{ label: string; onClick: () => void; }>>([]);
   
-  // Debug App state changes
-  console.log('App render - searchTerm state:', `"${searchTerm}"`);
   
   
   // Listen to add new options changes
@@ -102,27 +97,53 @@ function AppContent() {
   
 
 
-  // Reset search when navigating between pages
-  const isDashboardActive = location === "/" || location === "/dashboard";
-  const isTeachersActive = location === "/teachers" || location.startsWith("/teacher/");
-  const isSchoolsActive = location === "/schools" || location.startsWith("/school/");
-  const isChartersActive = location === "/charters" || location.startsWith("/charter/");
-  
-  // Clear search when changing pages (but not on initial load)
-  const [prevLocation, setPrevLocation] = useState(location);
+  // Helpers to determine top-level section (dashboard/teachers/schools/charters/loans)
+  const sectionFor = (path: string) => {
+    if (path === "/" || path.startsWith("/dashboard")) return "dashboard";
+    if (path.startsWith("/teachers") || path.startsWith("/teacher/")) return "teachers";
+    if (path.startsWith("/schools") || path.startsWith("/school/")) return "schools";
+    if (path.startsWith("/charters") || path.startsWith("/charter/")) return "charters";
+    if (path.startsWith("/loans") || path.startsWith("/loan/")) return "loans";
+    return "other";
+  };
+
+  // Clear search only when switching between top-level sections
+  const [prevSection, setPrevSection] = useState(sectionFor(location));
   useEffect(() => {
-    if (prevLocation && prevLocation !== location) {
+    const currentSection = sectionFor(location);
+    if (prevSection && prevSection !== currentSection) {
       setSearchTerm("");
     }
-    setPrevLocation(location);
-  }, [location, prevLocation]);
+    setPrevSection(currentSection);
+  }, [location, prevSection]);
 
   const searchContextValue = useMemo(() => ({ 
     searchTerm, 
     setSearchTerm 
   }), [searchTerm]);
 
-  console.log('App - SearchContext value:', searchContextValue);
+  // Debug search term changes reliably
+  useEffect(() => {
+    try { console.log('[App] searchTerm:', searchTerm); } catch {}
+  }, [searchTerm]);
+
+  // Debug section changes and resets
+  useEffect(() => {
+    try { console.log('[App] location:', location); } catch {}
+  }, [location]);
+
+  // Prefetch core datasets on app start for snappiness
+  useEffect(() => {
+    const keys = [
+      ['/api/teachers'],
+      ['/api/schools'],
+      ['/api/charters'],
+    ] as const;
+    keys.forEach(([k]) => {
+      queryClient.prefetchQuery({ queryKey: [k] });
+    });
+  }, []);
+
 
   return (
     <SearchContext.Provider value={searchContextValue}>
@@ -132,15 +153,14 @@ function AppContent() {
             <Header 
               searchTerm={searchTerm} 
               onSearchChange={(value) => {
-                console.log('App - setSearchTerm called with:', `"${value}"`);
                 setSearchTerm(value);
-                console.log('App - searchTerm after set:', `"${searchTerm}"`);
+                try { console.log('[App] onSearchChange ->', value); } catch {}
               }}
               addNewOptions={addNewOptions}
               setAddNewOptions={setAddNewOptions}
             />
             <Router />
-            <TourLauncher />
+            {import.meta.env.VITE_TOUR_ENABLED === 'true' && <TourLauncher />}
             <Toaster />
           </div>
         </AddNewContext.Provider>
@@ -153,9 +173,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <UserFilterProvider>
-          <AppContent />
-        </UserFilterProvider>
+        <AuthProvider>
+          <UserFilterProvider>
+            <AppContent />
+          </UserFilterProvider>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

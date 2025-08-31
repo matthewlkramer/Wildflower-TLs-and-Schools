@@ -30,7 +30,7 @@ export function CharterAssessmentsTable({ charterId }: CharterAssessmentsTablePr
     console.log("Delete assessment:", assessment);
   };
 
-  const columnDefs: ColDef<AssessmentData>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Assessment Type",
       field: "assessmentType",
@@ -102,7 +102,6 @@ export function CharterAssessmentsTable({ charterId }: CharterAssessmentsTablePr
         rowData={assessments}
         columnDefs={columnDefs}
         animateRows={true}
-        rowSelection="none"
         suppressRowClickSelection={true}
         domLayout="normal"
         headerHeight={40}

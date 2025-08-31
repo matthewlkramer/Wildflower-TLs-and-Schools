@@ -700,7 +700,6 @@ export default function LoansPage() {
                       columnDefs={loansColumnDefs}
                       domLayout="normal"
                       animateRows={true}
-                      rowSelection="none"
                       suppressRowClickSelection={true}
                       headerHeight={40}
                       rowHeight={35}

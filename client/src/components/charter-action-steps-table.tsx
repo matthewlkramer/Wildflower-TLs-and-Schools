@@ -56,7 +56,7 @@ export function CharterActionStepsTable({ charterId }: CharterActionStepsTablePr
     console.log("Delete action step:", actionStep);
   };
 
-  const columnDefs: ColDef<CharterActionStep>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Description",
       field: "description",
@@ -177,7 +177,6 @@ export function CharterActionStepsTable({ charterId }: CharterActionStepsTablePr
           rowData={sortedActionSteps}
           columnDefs={columnDefs}
           animateRows={true}
-          rowSelection="none"
           suppressRowClickSelection={true}
           domLayout="normal"
           headerHeight={40}

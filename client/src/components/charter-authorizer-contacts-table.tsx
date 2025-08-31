@@ -30,7 +30,7 @@ export function CharterAuthorizerContactsTable({ charterId }: CharterAuthorizerC
     console.log("Delete contact:", contact);
   };
 
-  const columnDefs: ColDef<CharterAuthorizerContact>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Name",
       field: "name",
@@ -134,7 +134,6 @@ export function CharterAuthorizerContactsTable({ charterId }: CharterAuthorizerC
         rowData={contacts}
         columnDefs={columnDefs}
         animateRows={true}
-        rowSelection="none"
         suppressRowClickSelection={true}
         domLayout="normal"
         headerHeight={40}

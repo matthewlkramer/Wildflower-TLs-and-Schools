@@ -44,7 +44,7 @@ export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
     console.log("Delete note:", note);
   };
 
-  const columnDefs: ColDef<CharterNote>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Headline",
       field: "headline",
@@ -154,7 +154,6 @@ export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
           rowData={notes}
           columnDefs={columnDefs}
           animateRows={true}
-          rowSelection="none"
           suppressRowClickSelection={true}
           domLayout="normal"
           headerHeight={40}

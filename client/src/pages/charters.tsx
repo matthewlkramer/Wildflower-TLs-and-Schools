@@ -1,16 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
 import type { Charter } from "@shared/schema";
-import { useSearch, usePageTitle } from "@/App";
+import { useSearch } from "@/contexts/search-context";
+import { usePageTitle } from "@/App";
 import { useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { getStatusColor } from "@/lib/utils";
 import { useUserFilter } from "@/contexts/user-filter-context";
 import { addNewEmitter } from "@/lib/add-new-emitter";
+import { logger } from "@/lib/logger";
+import { queryClient } from "@/lib/queryClient";
+import { Button } from "@/components/ui/button";
+import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
+import { useGridHeight } from "@/components/shared/use-grid-height";
 
 export default function Charters() {
+  const gridHeight = useGridHeight();
   const { searchTerm } = useSearch();
   const { showOnlyMyRecords, currentUser } = useUserFilter();
   const { setPageTitle } = usePageTitle();
@@ -68,6 +74,11 @@ export default function Charters() {
     
     return filtered;
   }, [charters, searchTerm, showOnlyMyRecords, currentUser]);
+
+  // Debug info similar to Teachers page
+  const searchDebug = `Search: "${searchTerm}" | Total: ${charters?.length} | Filtered (user-filter): ${filteredCharters?.length}`;
+  logger.log('Charters - filtered result:', searchDebug);
+  try { console.log('[Charters] debug:', searchDebug); } catch {}
 
   const columnDefs: ColDef<Charter>[] = [
     {
@@ -165,25 +176,25 @@ export default function Charters() {
   return (
     <main className="px-4 sm:px-6 lg:px-8 py-8">
       <div className="w-full bg-white rounded-lg border border-slate-200">
-        <div style={{ height: "calc(100vh - 200px)", width: "100%" }}>
+        <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3">
+          <span>Search:</span>
+          <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
+          <span>Showing {filteredCharters?.length ?? 0} of {charters?.length ?? 0}</span>
+          <Button size="xs" variant="outline" className="ml-auto" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/charters'] })}>
+            Refresh
+          </Button>
+        </div>
+        <div style={{ height: gridHeight, width: "100%" }}>
           <AgGridReact
-            theme={themeMaterial}
+            { ...DEFAULT_GRID_PROPS }
             rowData={filteredCharters}
             columnDefs={columnDefs}
-            animateRows={true}
-            rowSelection="none"
-            suppressRowClickSelection={true}
             domLayout="normal"
             headerHeight={40}
-            rowHeight={30}
             context={{
               componentName: 'charters-grid'
             }}
-            defaultColDef={{
-              sortable: true,
-              resizable: true,
-              filter: true,
-            }}
+            defaultColDef={DEFAULT_COL_DEF}
           />
         </div>
       </div>

@@ -91,7 +91,7 @@ const MapComponent = ({ center, zoom, schoolName, shortName, currentAddress, add
       // If we have an address but no coordinates, geocode the address
       else if (address) {
         const geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode({ address }, (results, status) => {
+        geocoder.geocode({ address }, (results: any, status: any) => {
           if (status === 'OK' && results && results[0] && ref.current) {
             const location = results[0].geometry.location;
             const newMap = new window.google.maps.Map(ref.current, {

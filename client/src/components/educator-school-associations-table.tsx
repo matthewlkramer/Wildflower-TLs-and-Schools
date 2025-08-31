@@ -144,7 +144,7 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
     );
   };
 
-  const columnDefs: ColDef<EducatorSchoolAssociation>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "School",
       field: "schoolShortName",
@@ -193,7 +193,6 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
       sortable: false,
       filter: false,
       resizable: false,
-      suppressMenu: true,
     },
   ];
 
@@ -225,7 +224,6 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
           rowData={associations}
           columnDefs={columnDefs}
           animateRows={true}
-          rowSelection="none"
           suppressRowClickSelection={true}
           domLayout="autoHeight"
           headerHeight={40}

@@ -31,7 +31,7 @@ export function CharterReportsTable({ charterId }: CharterReportsTableProps) {
     console.log("Delete report:", report);
   };
 
-  const columnDefs: ColDef<ReportSubmission>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Report Type",
       field: "reportType",
@@ -112,7 +112,6 @@ export function CharterReportsTable({ charterId }: CharterReportsTableProps) {
         rowData={reports}
         columnDefs={columnDefs}
         animateRows={true}
-        rowSelection="none"
         suppressRowClickSelection={true}
         domLayout="normal"
         headerHeight={40}

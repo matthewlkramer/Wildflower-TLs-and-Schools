@@ -88,3 +88,18 @@
     background-color: var(--wildflower-red);
   }
 }
+
+/* Global AG Grid tweaks */
+/* Make selection checkboxes smaller across all grids */
+.ag-root-wrapper, .ag-theme-material, .ag-theme-alpine, .ag-theme-balham, .ag-theme-quartz {
+  --ag-icon-size: 12px;
+}
+
+/* Keep all AG Grid instances consistent via shared defaults; no per-grid overrides here. */
+
+/* Remove blue focus/selection outline on cells */
+.ag-theme-material .ag-cell-focus,
+.ag-theme-material .ag-cell:focus {
+  outline: none !important;
+  border: none !important;
+}

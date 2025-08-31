@@ -1,10 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef, GridReadyEvent, GridApi, themeMaterial } from "ag-grid-community";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-
-// Register AG Grid modules
-ModuleRegistry.registerModules([AllCommunityModule]);
+// Modules are registered in initAgGridEnterprise at app startup
 import { Link } from "wouter";
 import { ExternalLink, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +12,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
+import { useAgGridFeatures } from "@/hooks/use-aggrid-features";
+import { GridBase } from "@/components/shared/GridBase";
+import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
+import { useGridHeight } from "@/components/shared/use-grid-height";
 
 interface TeachersGridProps {
   teachers: Educator[];
@@ -112,7 +113,28 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/teachers/${id}`, 'DELETE'),
+    mutationFn: (id: string) => apiRequest('PUT', `/api/teachers/${id}`, { archived: true }),
+    onMutate: async (id: string) => {
+      // Optimistically remove from cache
+      const key = ['/api/teachers'];
+      await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData<Educator[]>(key);
+      if (previous) {
+        queryClient.setQueryData<Educator[]>(key, previous.filter(t => t.id !== id));
+      }
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      // Roll back cache
+      if (context?.previous) {
+        queryClient.setQueryData(['/api/teachers'], context.previous);
+      }
+      toast({
+        title: "Error",
+        description: "Failed to delete educator. Please try again.",
+        variant: "destructive",
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
       toast({
@@ -120,13 +142,9 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
         description: "The educator has been successfully deleted.",
       });
     },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete educator. Please try again.",
-        variant: "destructive",
-      });
-    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+    }
   });
 
   return (
@@ -164,30 +182,24 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
 
 export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps) {
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
-  const [viewportHeight, setViewportHeight] = useState<number>(0);
+  const gridHeight = useGridHeight();
+  const { entReady, filterForText } = useAgGridFeatures();
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Handle viewport height changes for orientation changes
-  useEffect(() => {
-    const updateHeight = () => {
-      setViewportHeight(window.innerHeight);
-    };
-    
-    updateHeight();
-    window.addEventListener('resize', updateHeight);
-    window.addEventListener('orientationchange', updateHeight);
-    
-    return () => {
-      window.removeEventListener('resize', updateHeight);
-      window.removeEventListener('orientationchange', updateHeight);
-    };
-  }, []);
+  // Height managed by shared hook
 
   const columnDefs: ColDef[] = useMemo(() => [
     {
       headerName: "Educator Name",
       field: "fullName",
       filter: 'agTextColumnFilter',
+      filterParams: { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 200,
+      comparator: (a: string, b: string) => {
+        const an = (a || '').trim();
+        const bn = (b || '').trim();
+        return an.localeCompare(bn, undefined, { sensitivity: 'base' });
+      },
       cellRenderer: ({ data: teacher }: { data: Educator }) => (
         <Link href={`/teacher/${teacher.id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
           {teacher.fullName}
@@ -198,8 +210,23 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
     {
       headerName: "Current role/school",
       field: "currentRoleSchool",
+      // Text filter with contains logic similar to Google Sheets
       filter: 'agTextColumnFilter',
+      filterParams: { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 300,
+      valueGetter: ({ data }: { data: Educator }) => {
+        if (!data) return '';
+        const roles = data.currentRole;
+        let roleText = Array.isArray(roles) ? roles.join(', ') : (roles || '');
+        roleText = roleText.replace(/\bEmerging Teacher Leader\b/g, 'ETL');
+        roleText = roleText.replace(/\bTeacher Leader\b/g, 'TL');
+        const schools = data.activeSchool;
+        const schoolArray = Array.isArray(schools) ? schools : (schools ? [schools] : []);
+        const status = data.activeSchoolStageStatus;
+        const statusText = Array.isArray(status) ? status.join(', ') : (status || '');
+        const schoolText = schoolArray.join(', ');
+        return [roleText, schoolText, statusText].filter(Boolean).join(' ');
+      },
       cellRenderer: ({ data }: { data: Educator }) => {
         if (!data) return '';
 
@@ -241,17 +268,23 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
     {
       headerName: "Montessori Certified",
       field: "montessoriCertified",
-      filter: 'agTextColumnFilter',
+      filter: entReady ? 'agSetColumnFilter' : filterForText,
+      filterParams: entReady ? ({ values: ['Yes', 'No', null] } as any) : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 160,
+      valueGetter: ({ data }: { data: Educator }) => (
+        data?.montessoriCertified === true ? 'Yes' : (data?.montessoriCertified === false ? 'No' : '')
+      ),
       cellRenderer: ({ data }: { data: Educator }) => (
-        <BadgeRenderer value={String(data.montessoriCertified || 'No')} field="montessoriCertified" />
+        <BadgeRenderer value={data?.montessoriCertified === true ? 'Yes' : (data?.montessoriCertified === false ? 'No' : '')} field="montessoriCertified" />
       )
     },
     {
       headerName: "Race/Ethnicity",
       field: "raceEthnicity",
-      filter: 'agTextColumnFilter',
+      filter: entReady ? 'agSetColumnFilter' : filterForText,
+      filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 140,
+      valueGetter: ({ data }: { data: Educator }) => (Array.isArray(data?.raceEthnicity) ? data.raceEthnicity.join(', ') : (data?.raceEthnicity || '')),
       cellRenderer: ({ data }: { data: Educator }) => (
         <PillRenderer value={data.raceEthnicity || []} />
       )
@@ -259,7 +292,8 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
     {
       headerName: "Discovery Status",
       field: "discoveryStatus",
-      filter: 'agTextColumnFilter',
+      filter: entReady ? 'agSetColumnFilter' : filterForText,
+      filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 140,
       cellRenderer: ({ data }: { data: Educator }) => (
         <BadgeRenderer value={data.discoveryStatus || ''} field="discoveryStatus" />
@@ -268,8 +302,10 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
     {
       headerName: "Type",
       field: "individualType",
-      filter: 'agTextColumnFilter',
+      filter: entReady ? 'agSetColumnFilter' : filterForText,
+      filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 120,
+      valueGetter: ({ data }: { data: Educator }) => data?.individualType || '',
       cellRenderer: ({ data }: { data: Educator }) => (
         <PillRenderer value={data.individualType || ''} />
       )
@@ -283,20 +319,19 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
       width: 100,
       pinned: 'right'
     }
-  ], []);
+  ], [filterForText]);
 
-  const defaultColDef: ColDef = useMemo(() => ({
-    sortable: true,
-    resizable: true,
-    flex: 1,
-    minWidth: 100,
-  }), []);
+  const defaultColDef: ColDef = useMemo(() => ({ ...DEFAULT_COL_DEF }), []);
 
   const onGridReady = useCallback((params: GridReadyEvent) => {
     setGridApi(params.api);
     // Auto-size columns to fit content
     params.api.sizeColumnsToFit();
   }, []);
+  // Enterprise readiness handled by useAgGridFeatures
+
+  // Note: Quick filter is handled at the page level to avoid
+  // inconsistencies when the grid re-initializes.
 
   if (isLoading) {
     return (
@@ -306,38 +341,19 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
     );
   }
 
-  // Calculate appropriate height based on viewport
-  const getGridHeight = () => {
-    if (viewportHeight === 0) return 'calc(100vh - 200px)'; // Fallback
-    
-    // Mobile landscape mode (height < 500px)
-    if (viewportHeight < 500) {
-      return Math.max(viewportHeight - 120, 280) + 'px';
-    }
-    
-    // Regular desktop/tablet
-    return Math.min(viewportHeight - 200, 800) + 'px';
-  };
-
   return (
-    <div className="w-full min-h-[280px]" style={{ height: getGridHeight() }}>
-      <div className="h-full">
-        <AgGridReact
-          theme={themeMaterial}
-          rowData={teachers}
-          columnDefs={columnDefs}
-          defaultColDef={defaultColDef}
-          onGridReady={onGridReady}
-          rowSelection="multiple"
-          suppressRowClickSelection={false}
-          animateRows={true}
-          pagination={false}
-          rowHeight={30}
-          context={{
-            componentName: 'teachers-grid'
-          }}
-        />
-      </div>
+    <div className="w-full min-h-[280px]" style={{ height: gridHeight }}>
+      <GridBase
+        rowData={teachers}
+        columnDefs={columnDefs}
+        defaultColDefOverride={defaultColDef}
+        style={{ height: '100%' }}
+        gridProps={{
+          ...DEFAULT_GRID_PROPS,
+          onGridReady,
+          context: { componentName: 'teachers-grid' },
+        }}
+      />
     </div>
   );
 }

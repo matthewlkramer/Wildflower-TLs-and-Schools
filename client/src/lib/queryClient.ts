@@ -47,10 +47,12 @@ export const queryClient = new QueryClient({
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
       refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      placeholderData: (prev: any) => prev,
       // Data stays fresh for 5 minutes
-      staleTime: 5 * 60 * 1000,
+      staleTime: 30 * 60 * 1000,
       // Keep cached data for 30 minutes even when component unmounts
-      gcTime: 30 * 60 * 1000,
+      gcTime: 2 * 60 * 60 * 1000,
       retry: false,
     },
     mutations: {

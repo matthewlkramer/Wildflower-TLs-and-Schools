@@ -32,7 +32,7 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
     setIsViewModalOpen(true);
   };
 
-  const columnDefs: ColDef<SSJFilloutForm>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Form Type",
       field: "formType",
@@ -114,7 +114,6 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
             rowData={forms}
             columnDefs={columnDefs}
             animateRows={true}
-            rowSelection="none"
             suppressRowClickSelection={true}
             domLayout="autoHeight"
             headerHeight={40}

@@ -5,11 +5,12 @@ import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AddEducatorModal from "./add-teacher-modal";
 import AddSchoolModal from "./add-school-modal";
 import { WildflowerLogo } from "./wildflower-logo";
 import { useUserFilter } from "@/contexts/user-filter-context";
+import { logger } from "@/lib/logger";
 
 interface HeaderProps {
   searchTerm?: string;
@@ -27,9 +28,8 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const { showOnlyMyRecords, setShowOnlyMyRecords } = useUserFilter();
+  const inputRef = useRef<HTMLInputElement | null>(null);
   
-  // Debug: Log when header renders
-  // console.log("Header RENDER: addNewOptions =", addNewOptions, "location =", location);
 
 
 
@@ -56,6 +56,57 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
     if (isChartersActive) return "Search charters...";
     return "Search...";
   };
+
+  // Global type-to-search behavior on main list pages
+  useEffect(() => {
+    if (!onSearchChange) return;
+    const isListPage = isTeachersActive || isSchoolsActive || isChartersActive || isLoansActive;
+    if (!isListPage) return;
+
+    const isEditableTarget = (el: EventTarget | null) => {
+      const node = el as HTMLElement | null;
+      if (!node) return false;
+      const tag = node.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return true;
+      if ((node as any).isContentEditable) return true;
+      return false;
+    };
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (isEditableTarget(e.target)) return;
+
+      const key = e.key;
+      const printable = key.length === 1; // letters, numbers, punctuation, including space
+      const special = key === 'Backspace' || key === 'Delete';
+      const clear = key === 'Escape';
+      if (!printable && !special && !clear) return;
+
+      // Focus the header search input
+      try { inputRef.current?.focus(); } catch {}
+
+      if (clear) {
+        e.preventDefault();
+        onSearchChange('');
+        return;
+      }
+
+      if (special) {
+        e.preventDefault();
+        const next = key === 'Backspace' ? (searchTerm || '').slice(0, -1) : '';
+        onSearchChange(next);
+        return;
+      }
+
+      if (printable) {
+        e.preventDefault();
+        onSearchChange((searchTerm || '') + key);
+      }
+    };
+
+    window.addEventListener('keydown', handler, { capture: true });
+    return () => window.removeEventListener('keydown', handler, { capture: true } as any);
+  }, [onSearchChange, isTeachersActive, isSchoolsActive, isChartersActive, isLoansActive, searchTerm]);
 
 
 
@@ -115,11 +166,14 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                 {onSearchChange && (
                   <div className="relative">
                     <Input
+                      ref={inputRef}
                       type="text"
                       placeholder={getSearchPlaceholder()}
                       value={searchTerm}
                       onChange={(e) => {
-                        console.log('Header input onChange:', e.target.value);
+                        // Log via both logger and console for reliability in dev
+                        logger.log('Header input onChange:', e.target.value);
+                        try { console.log('[Header] onChange', e.target.value); } catch {}
                         onSearchChange(e.target.value);
                       }}
                       className="w-32 sm:w-48 lg:w-64 pl-10"

@@ -7,10 +7,16 @@ export function useCachedEducators() {
   
   const query = useQuery({
     queryKey: ["/api/teachers"],
-    // Keep data fresh for 5 minutes
-    staleTime: 5 * 60 * 1000,
-    // Keep in cache for 30 minutes
-    gcTime: 30 * 60 * 1000,
+    select: (data: any) => {
+      const arr = Array.isArray(data) ? data : [];
+      return arr.filter((e: any) => !e?.archived);
+    },
+    // Align with app defaults for stability/snappiness
+    staleTime: 30 * 60 * 1000,
+    gcTime: 2 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    placeholderData: (prev: any) => prev,
   });
 
   // Prefetch educator details when hovering over a row
@@ -32,10 +38,15 @@ export function useCachedSchools() {
   
   const query = useQuery({
     queryKey: ["/api/schools"],
-    staleTime: 0, // Force fresh data every time
-    gcTime: 0, // Don't cache
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    select: (data: any) => {
+      const arr = Array.isArray(data) ? data : [];
+      return arr.filter((s: any) => !s?.archived);
+    },
+    staleTime: 30 * 60 * 1000,
+    gcTime: 2 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    placeholderData: (prev: any) => prev,
   });
 
   // Prefetch school details when hovering over a row
@@ -73,4 +84,21 @@ export function useCachedSubtable<T>(endpoint: string, parentId: string | undefi
     staleTime: 2 * 60 * 1000, // Shorter stale time for subtables
     gcTime: 15 * 60 * 1000,
   });
+}
+
+export function useCachedCharters() {
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
+    queryKey: ["/api/charters"],
+    staleTime: 30 * 60 * 1000,
+    gcTime: 2 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    placeholderData: (prev: any) => prev,
+  });
+
+  return {
+    ...query,
+  };
 }

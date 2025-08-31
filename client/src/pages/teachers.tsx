@@ -1,23 +1,26 @@
 import TeachersGrid from "@/components/teachers-grid";
 import { type Teacher } from "@shared/schema";
-import { useSearch } from "@/App";
+import { useSearch } from "@/contexts/search-context";
 import { useCachedEducators } from "@/hooks/use-cached-data";
 import { useUserFilter } from "@/contexts/user-filter-context";
 import { useEffect, useState } from "react";
 import { addNewEmitter } from "@/lib/add-new-emitter";
 import AddEducatorModal from "@/components/add-teacher-modal";
+import { logger } from "@/lib/logger";
+import { queryClient } from "@/lib/queryClient";
+import { Button } from "@/components/ui/button";
 
 export default function Teachers() {
   const searchContext = useSearch();
   const { searchTerm, setSearchTerm } = searchContext;
-  console.log('Teachers - useSearch context result:', searchContext);
+  logger.log('Teachers - useSearch context result:', searchContext);
   const { showOnlyMyRecords, currentUser } = useUserFilter();
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
   
   // Debug search state
-  console.log('Teachers render - searchTerm:', `"${searchTerm}"`);
+  logger.log('Teachers render - searchTerm:', `"${searchTerm}"`);;
   
   // Set up Add New options for teachers page
   useEffect(() => {
@@ -32,48 +35,58 @@ export default function Teachers() {
     };
   }, []);
 
+  // Apply text search + user filter
   const filteredTeachers = (teachers || []).filter((teacher: Teacher) => {
     if (!teacher) return false;
-    
-    // Build searchable text from teacher properties
-    const fullName = teacher.fullName || `${teacher.firstName || ''} ${teacher.lastName || ''}`.trim();
-    const phone = teacher.primaryPhone || '';
-    const roles = teacher.currentRole && Array.isArray(teacher.currentRole) ? teacher.currentRole.join(' ') : '';
-    
-    // Apply search filter if there's a search term
-    if (searchTerm && searchTerm.trim()) {
-      const searchText = searchTerm.toLowerCase();
-      const matchesSearch = fullName.toLowerCase().includes(searchText) ||
-                           phone.toLowerCase().includes(searchText) ||
-                           roles.toLowerCase().includes(searchText);
-      
+    // Text search across common fields (fallback in case AG Grid Quick Filter is unavailable)
+    const term = (searchTerm || "").trim().toLowerCase();
+    if (term) {
+      const haystacks: string[] = [];
+      // Name and types
+      haystacks.push(teacher.fullName || "");
+      haystacks.push(teacher.individualType || "");
+      haystacks.push(teacher.discoveryStatus || "");
+      // Roles with standard abbreviations (match the grid's valueGetter)
+      if (Array.isArray(teacher.currentRole)) {
+        const roleText = teacher.currentRole.join(", ")
+          .replace(/\bEmerging Teacher Leader\b/g, 'ETL')
+          .replace(/\bTeacher Leader\b/g, 'TL');
+        haystacks.push(roleText);
+      }
+      // Active school names
+      if (Array.isArray(teacher.activeSchool)) haystacks.push(teacher.activeSchool.join(", "));
+      // Stage/Status for active school association
+      if (Array.isArray(teacher.activeSchoolStageStatus)) haystacks.push(teacher.activeSchoolStageStatus.join(", "));
+      // Demographics and assignments
+      if (Array.isArray(teacher.raceEthnicity)) haystacks.push(teacher.raceEthnicity.join(", "));
+      if (Array.isArray(teacher.assignedPartner)) haystacks.push(teacher.assignedPartner.join(", "));
+      if (Array.isArray(teacher.assignedPartnerEmail)) haystacks.push(teacher.assignedPartnerEmail.join(", "));
+      const matchesSearch = haystacks.some(v => (v || "").toLowerCase().includes(term));
       if (!matchesSearch) return false;
     }
-    
-    // Apply user filter if enabled
     if (showOnlyMyRecords && currentUser) {
-      // Check if current user is an assigned partner
-      // For demo purposes, we'll check if any assigned partner contains 'demo'
-      // In a real app, this would be based on proper user authentication
-      const isMyRecord = teacher.assignedPartner && teacher.assignedPartner.length > 0 && 
-                        teacher.assignedPartner.some(partner => 
-                          partner && partner.toLowerCase().includes('demo')
-                        );
-      
+      const isMyRecord = teacher.assignedPartner && teacher.assignedPartner.length > 0 &&
+        teacher.assignedPartner.some(partner => partner && partner.toLowerCase().includes((currentUser || '').toLowerCase()));
       return isMyRecord;
     }
-    
     return true;
   });
   
   // Debug info after filtering
-  const searchDebug = `Search: "${searchTerm}" | Total: ${teachers?.length} | Filtered: ${filteredTeachers?.length}`;
-  console.log('Teachers - filtered result:', searchDebug);
+  const searchDebug = `Search: "${searchTerm}" | Total: ${teachers?.length} | Filtered (user-filter): ${filteredTeachers?.length}`;
+  logger.log('Teachers - filtered result:', searchDebug);
+  try { console.log('[Teachers] debug:', searchDebug); } catch {}
   
   return (
     <>
       <main className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-sm border border-slate-200">
+          <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3">
+            <span>Search:</span>
+            <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
+            <span>Showing {filteredTeachers?.length ?? 0} of {teachers?.length ?? 0}</span>
+          {/* Removed manual refresh button; rely on React Query behaviors */}
+          </div>
           <TeachersGrid 
             teachers={filteredTeachers || []} 
             isLoading={isLoading}

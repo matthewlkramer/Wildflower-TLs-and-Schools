@@ -25,7 +25,7 @@ export function CharterSchoolsTable({ charterId }: CharterSchoolsTableProps) {
     enabled: !!charterId,
   });
 
-  const columnDefs: ColDef<School>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "School Name",
       field: "name",
@@ -104,7 +104,6 @@ export function CharterSchoolsTable({ charterId }: CharterSchoolsTableProps) {
         rowData={schools}
         columnDefs={columnDefs}
         animateRows={true}
-        rowSelection="none"
         suppressRowClickSelection={true}
         domLayout="normal"
         headerHeight={40}

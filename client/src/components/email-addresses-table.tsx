@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { themeMaterial } from "ag-grid-community";
@@ -22,24 +23,48 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     },
   });
 
-  const handleEdit = (emailAddress: EmailAddress) => {
-    console.log("Edit email address:", emailAddress);
-    // TODO: Implement edit functionality
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["/api/email-addresses/educator", educatorId] });
   };
 
-  const handleDelete = (emailAddress: EmailAddress) => {
-    console.log("Delete email address:", emailAddress);
-    // TODO: Implement delete functionality
+  const handleEdit = async (emailAddress: EmailAddress) => {
+    const nextEmail = window.prompt("Update email", emailAddress.email || "");
+    if (nextEmail === null) return;
+    const nextType = window.prompt("Update type", emailAddress.type || "");
+    try {
+      await apiRequest("PUT", `/api/email-addresses/${emailAddress.id}`, { email: nextEmail, type: nextType || undefined });
+      refresh();
+    } catch (err) {
+      console.error("Failed to update email address", err);
+    }
   };
 
-  const handleInactivate = (emailAddress: EmailAddress) => {
-    console.log("Inactivate email address:", emailAddress);
-    // TODO: Implement inactivate functionality
+  const handleDelete = async (emailAddress: EmailAddress) => {
+    if (!window.confirm("Delete this email address?")) return;
+    try {
+      await apiRequest("DELETE", `/api/email-addresses/${emailAddress.id}`);
+      refresh();
+    } catch (err) {
+      console.error("Failed to delete email address", err);
+    }
   };
 
-  const handleMakePrimary = (emailAddress: EmailAddress) => {
-    console.log("Make primary:", emailAddress);
-    // TODO: Implement make primary functionality
+  const handleInactivate = async (emailAddress: EmailAddress) => {
+    try {
+      await apiRequest("POST", `/api/email-addresses/${emailAddress.id}/inactivate`);
+      refresh();
+    } catch (err) {
+      console.error("Failed to inactivate email address", err);
+    }
+  };
+
+  const handleMakePrimary = async (emailAddress: EmailAddress) => {
+    try {
+      await apiRequest("POST", `/api/email-addresses/${emailAddress.id}/make-primary`);
+      refresh();
+    } catch (err) {
+      console.error("Failed to make email primary", err);
+    }
   };
 
   const ActionsCellRenderer = (params: ICellRendererParams<EmailAddress>) => {
@@ -90,7 +115,7 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     );
   };
 
-  const columnDefs: ColDef<EmailAddress>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Email",
       field: "email",
@@ -124,7 +149,6 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
       sortable: false,
       filter: false,
       resizable: false,
-      suppressMenu: true,
     },
   ];
 
@@ -156,7 +180,6 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
           rowData={emailAddresses}
           columnDefs={columnDefs}
           animateRows={true}
-          rowSelection="none"
           suppressRowClickSelection={true}
           domLayout="autoHeight"
           headerHeight={40}
