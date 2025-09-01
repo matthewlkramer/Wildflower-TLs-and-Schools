@@ -51,7 +51,7 @@ import type {
   InsertTeacherSchoolAssociation,
   Tax990
 } from "@shared/schema";
-import { SCHOOLS_FIELDS as SF, EDUCATORS_FIELDS as EF, EDUCATORS_X_SCHOOLS_FIELDS as EXSF } from "@shared/airtable-schema";
+import { SCHOOLS_FIELDS as SF, EDUCATORS_FIELDS as EF, EDUCATORS_X_SCHOOLS_FIELDS as EXSF, LOCATIONS_FIELDS as LF } from "@shared/airtable-schema";
 
 export interface IStorage {
   // Charter operations
@@ -1055,17 +1055,17 @@ export class SimpleAirtableStorage implements IStorage {
       }
       
       return records.map(record => {
-        const schoolId = record.fields["school_id"] || record.fields["School"] || record.fields["Schools"];
+        const schoolId = record.fields[LF.school_id] || record.fields[LF.School] || record.fields["Schools"];
         return {
           id: record.id,
-          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
-          address: String(record.fields["Address"] || ''),
-          currentPhysicalAddress: Boolean(record.fields["Current physical address?"]),
-          currentMailingAddress: Boolean(record.fields["Current mailing address?"]),
-          startDate: String(record.fields["Start of time at location"] || ''),
-          endDate: String(record.fields["End of time at location"] || ''),
-          created: String(record.fields["Created"] || new Date().toISOString()),
-          lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+          schoolId: Array.isArray(schoolId) ? String((schoolId as any[])[0] || '') : String(schoolId || ''),
+          address: String(record.fields[LF.Address] || ''),
+          currentPhysicalAddress: Boolean(record.fields[LF.Current_physical_address_]),
+          currentMailingAddress: Boolean(record.fields[LF.Current_mailing_address_]),
+          startDate: String(record.fields[LF.Start_of_time_at_location] || ''),
+          endDate: String(record.fields[LF.End_of_time_at_location] || ''),
+          created: String(record.fields[LF.Created] || new Date().toISOString()),
+          lastModified: String(record.fields[LF.Last_Modified] || new Date().toISOString()),
         };
       });
     } catch (error) {
@@ -1081,13 +1081,36 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getLocationsBySchoolId(schoolId: string): Promise<Location[]> {
     try {
-      // Query locations filtered by School field (correct field name from Airtable)
-      const records = await base("Locations").select({
-        // Linked record field; search within ARRAYJOIN to match record id text
-        filterByFormula: `FIND('${schoolId}', ARRAYJOIN({School})) > 0`
-      }).all();
-      
-      return records.map(record => {
+      // Fetch school for additional matching keys (Short Name, Name) and fallback address
+      let schoolName: string | undefined;
+      let schoolShortName: string | undefined;
+      let schoolActiveAddress: string | undefined;
+      let schoolCreated: string | undefined;
+      let schoolLastModified: string | undefined;
+      try {
+        const srec = await base("Schools").find(schoolId);
+        schoolName = String(srec.fields["Name"] || '');
+        schoolShortName = String(srec.fields["Short Name"] || '');
+        schoolActiveAddress = String(srec.fields["Current Physical Address"] || srec.fields["Current Mailing Address"] || srec.fields["Current Physical Address"] || '');
+        schoolCreated = String(srec.fields["Created"] || '');
+        schoolLastModified = String(srec.fields["Last Modified"] || '');
+      } catch {}
+
+      // Fetch and filter in code to reliably match linked record IDs or lookups
+      const records = await base("Locations").select().all();
+      const filtered = records.filter((record: any) => {
+        const link = record.fields["School"]; // linked record ids or names
+        const sid = record.fields["school_id"]; // optional text id
+        const locShort = record.fields["Short Name"]; // lookup of school's Short Name
+        const locName = record.fields["School Name"] || record.fields["Name"]; // if present
+        const linkMatches = Array.isArray(link) ? link.includes(schoolId) : (String(link) === String(schoolId));
+        const idMatches = (sid && String(sid) === String(schoolId));
+        const shortMatches = schoolShortName && String(locShort || '') === schoolShortName;
+        const nameMatches = schoolName && String(locName || '') === schoolName;
+        return Boolean(linkMatches || idMatches || shortMatches || nameMatches);
+      });
+
+      const mapped = filtered.map(record => {
         const schoolField = record.fields["School"];
         const address = record.fields["Address"];
         const currentPhysical = record.fields["Current physical address?"];
@@ -1109,6 +1132,22 @@ export class SimpleAirtableStorage implements IStorage {
           lastModified: String(lastModified || new Date().toISOString()),
         };
       });
+
+      // Fallback: if no rows found, synthesize a single location from School summary fields
+      if (mapped.length === 0 && schoolActiveAddress) {
+        return [{
+          id: `school-${schoolId}-active-location`,
+          schoolId,
+          address: schoolActiveAddress,
+          currentPhysicalAddress: true,
+          currentMailingAddress: false,
+          startDate: '',
+          endDate: '',
+          created: schoolCreated || new Date().toISOString(),
+          lastModified: schoolLastModified || new Date().toISOString(),
+        }];
+      }
+      return mapped;
     } catch (error) {
       console.error(`Error fetching locations for ${schoolId}:`, error);
       return [];
