@@ -1,3 +1,7 @@
+/**
+ * Demographics tab lays out gender, pronouns, background, and language fields
+ * for the educator in grouped entity cards.
+ */
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import { EntityCard } from "@/components/shared/EntityCard";
 import type { Teacher } from "@shared/schema";

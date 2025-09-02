@@ -1,3 +1,8 @@
+/**
+ * Internal toast state management used by the UI toast component. Provides
+ * hooks and reducer logic for showing, updating, and dismissing toasts with a
+ * small queue and long removal delay.
+ */
 import * as React from "react"
 
 import type {

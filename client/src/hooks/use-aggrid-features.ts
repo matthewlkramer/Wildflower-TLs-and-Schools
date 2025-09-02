@@ -1,3 +1,8 @@
+/**
+ * Hook that exposes whether AG Grid enterprise modules have been loaded and
+ * provides the appropriate text filter type. It polls until enterprise features
+ * are ready so grids can safely reference set filters.
+ */
 import { useEffect, useState } from "react";
 import { isAgGridEnterpriseEnabled } from "@/lib/ag-grid-enterprise";
 

@@ -1,10 +1,11 @@
+/**
+ * Hook to force periodic refetching of React Query tables when their queries
+ * have been invalidated, ensuring grid views reflect recent mutations.
+ * Returns a manual `refreshTables` helper.
+ */
 import { useEffect } from 'react';
 import { queryClient } from '@/lib/queryClient';
 
-/**
- * Custom hook to ensure table data refreshes after mutations
- * This solves the persistent issue of tables not updating after record creation
- */
 export function useTableRefresh(queryKeys: string[], dependencies: any[] = []) {
   useEffect(() => {
     // Set up an interval to periodically check for stale data

@@ -1,3 +1,7 @@
+/**
+ * Fallback page for unmatched routes. Shows a simple 404 message prompting
+ * developers to ensure the route is registered.
+ */
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 

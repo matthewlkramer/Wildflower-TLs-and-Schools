@@ -1,5 +1,8 @@
-// Custom hook for consistent API data fetching with error handling
-
+/**
+ * Utility hooks wrapping React Query for standardized API calls and mutations
+ * with typed error handling. Exposes `useApiQuery` and `useApiMutation` helpers
+ * that automatically include credentials and parse error responses.
+ */
 import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { getErrorMessage } from "@shared/utils";

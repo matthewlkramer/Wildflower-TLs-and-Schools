@@ -1,3 +1,8 @@
+/**
+ * Loans page provides a multi-tab interface for loan summary metrics, loan
+ * lists, applications, payments, and document tracking. It allows creating
+ * loan applications via a dialog and toggling between card and table views.
+ */
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePageTitle } from "@/App";

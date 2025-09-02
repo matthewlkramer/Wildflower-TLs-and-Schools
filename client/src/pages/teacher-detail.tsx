@@ -1,3 +1,10 @@
+/**
+ * Teacher detail view. Loads a single educator record and presents multiple
+ * tabs (summary, schools, forms, certifications, events, notes, linked
+ * systems). Each tab delegates to a component under `components/teacher/tabs`.
+ * The page supports editing of educator details via React Query mutation and
+ * invalidates cached queries on save.
+ */
 import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";

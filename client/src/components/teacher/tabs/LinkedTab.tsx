@@ -1,3 +1,7 @@
+/**
+ * Linked tab displays whether the educator is connected to external systems
+ * like Holaspirit or Teacher Credentials and shows related identifiers.
+ */
 import type { Teacher } from "@shared/schema";
 
 export function LinkedTab({ teacher }: { teacher: Teacher }) {

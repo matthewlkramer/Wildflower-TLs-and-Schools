@@ -1,3 +1,10 @@
+/**
+ * Charter detail page. Fetches a single charter record and presents multiple
+ * tabs showing related schools, roles, educator associations, applications,
+ * authorizer contacts, reports, assessments, governance documents, 990 filings,
+ * notes, and action steps. Tabs primarily render specialized table components
+ * for each dataset.
+ */
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";

@@ -1,3 +1,8 @@
+/**
+ * Locations tab tracks historical and current addresses for a school. An AG
+ * Grid provides inline editing for address fields, current flags, and start/end
+ * dates, with save and delete actions per row.
+ */
 import React from 'react';
 import type { Location } from '@shared/schema';
 import { GridBase } from '@/components/shared/GridBase';

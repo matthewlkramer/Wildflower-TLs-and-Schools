@@ -1,3 +1,8 @@
+/**
+ * Helper hook that displays contextual toasts when the application is in test
+ * mode. Provides functions to show success or warning messages instead of
+ * executing real operations.
+ */
 import { useToast } from '@/hooks/use-toast';
 import { getTestMode } from '@/components/TestModeToggle';
 

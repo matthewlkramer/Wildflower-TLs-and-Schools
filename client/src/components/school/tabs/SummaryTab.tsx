@@ -1,3 +1,8 @@
+/**
+ * Summary tab for a school detail page. Highlights key school information
+ * such as logos, governance, age levels, membership, and an "about" section,
+ * along with map coordinates and other entity cards.
+ */
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { EntityCard } from '@/components/shared/EntityCard';

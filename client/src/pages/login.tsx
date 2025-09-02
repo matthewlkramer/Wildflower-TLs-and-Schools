@@ -1,3 +1,7 @@
+/**
+ * Login page initiating Supabase Google SSO. Redirects authenticated users to
+ * the home page and otherwise displays a single "Continue with Google" button.
+ */
 import { useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';

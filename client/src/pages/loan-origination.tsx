@@ -1,3 +1,8 @@
+/**
+ * Loan origination pipeline page. Shows each loan's progress through steps
+ * like promissory note signing, ACH setup, and fund distribution, highlighting
+ * next required actions.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

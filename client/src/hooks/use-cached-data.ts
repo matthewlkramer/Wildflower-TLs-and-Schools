@@ -1,3 +1,9 @@
+/**
+ * Collection of React Query helpers for caching and prefetching common
+ * datasets (educators, schools, charters, and detail/subtable records). These
+ * hooks centralize caching strategy and expose convenience prefetch methods for
+ * hover interactions.
+ */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 

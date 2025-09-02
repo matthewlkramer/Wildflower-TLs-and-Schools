@@ -1,3 +1,9 @@
+/**
+ * Charters page lists charter organizations in an AG Grid with search and
+ * optional user scoping. Data is fetched via React Query and filtered by the
+ * global search term and "My records" toggle. It hooks into the page title and
+ * exposes an "Add New" option for creating charters.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";

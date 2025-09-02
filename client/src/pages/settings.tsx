@@ -1,3 +1,8 @@
+/**
+ * User settings page. Currently offers a button to trigger a Supabase password
+ * reset email and placeholders for future appearance and notification settings.
+ * Sets the page title on mount and shows the signed‑in user's email.
+ */
 import { useEffect, useState } from "react";
 import { usePageTitle } from "@/App";
 import { Button } from "@/components/ui/button";

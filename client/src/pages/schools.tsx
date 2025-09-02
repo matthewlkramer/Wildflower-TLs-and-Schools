@@ -1,3 +1,10 @@
+/**
+ * Lists schools in a searchable grid and wires the header's "Add New" control
+ * to open a creation modal. Records are fetched with `useCachedSchools` and
+ * filtered client-side by the global search term and the optional user filter
+ * which restricts to schools guided or assigned to the current user. Debug
+ * logging tracks filtered counts and grid state.
+ */
 import { useState, useEffect } from "react";
 import SchoolsGrid from "@/components/schools-grid";
 import AddSchoolModal from "@/components/add-school-modal";

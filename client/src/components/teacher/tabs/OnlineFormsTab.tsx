@@ -1,3 +1,8 @@
+/**
+ * Online Forms tab lists SSJ Fillout form submissions for the educator. It
+ * fetches forms with React Query, derives the most recent submission date, and
+ * renders the results in `SSJFilloutFormsTable`.
+ */
 import { SSJFilloutFormsTable } from "@/components/ssj-fillout-forms-table";
 import { useQuery } from "@tanstack/react-query";
 import type { SSJFilloutForm } from "@shared/schema";

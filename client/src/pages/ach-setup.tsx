@@ -1,3 +1,8 @@
+/**
+ * ACH setup page for loan borrowers. Collects bank account information and
+ * authorization, creates a Stripe ACH payment method, and updates the server.
+ * On success it redirects to a confirmation page.
+ */
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";

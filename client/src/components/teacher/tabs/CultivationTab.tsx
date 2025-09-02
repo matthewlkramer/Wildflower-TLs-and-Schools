@@ -1,3 +1,8 @@
+/**
+ * Cultivation tab summarizes early outreach data for a prospective teacher.
+ * It references SSJ Fillout forms to show the most recent submission date and
+ * displays partner assignments and interest notes.
+ */
 import type { SSJFilloutForm, Teacher } from "@shared/schema";
 
 function mostRecentFilloutDate(ssjForms: SSJFilloutForm[]) {

@@ -1,3 +1,8 @@
+/**
+ * Summary tab for the teacher detail page. Presents a quick snapshot of
+ * educator basics, education and certification status, and current school
+ * connection using simple fields and colored status badges.
+ */
 import { Badge } from "@/components/ui/badge";
 import { getStatusColor } from "@/lib/utils";
 import type { Teacher } from "@shared/schema";

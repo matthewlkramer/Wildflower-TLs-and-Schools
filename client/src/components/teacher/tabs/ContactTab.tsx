@@ -1,3 +1,8 @@
+/**
+ * Contact tab provides email, phone, and address information for the educator.
+ * Email addresses are managed via `EmailAddressesTable` while other fields are
+ * rendered using `EntityCard` within a detail grid layout.
+ */
 import { TableCard } from "@/components/shared/TableCard";
 import { EmailAddressesTable } from "@/components/email-addresses-table";
 import { DetailGrid } from "@/components/shared/DetailGrid";

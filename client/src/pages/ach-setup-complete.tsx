@@ -1,3 +1,7 @@
+/**
+ * Confirmation page shown after a borrower completes ACH setup. Provides a
+ * summary of next steps and links back to the loan dashboard.
+ */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowRight, Shield, CreditCard } from "lucide-react";

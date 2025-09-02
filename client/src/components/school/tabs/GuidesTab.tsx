@@ -1,3 +1,8 @@
+/**
+ * Guides tab manages assignments of Wildflower guides to the school. Rows in
+ * an AG Grid list guide name, type, dates, and active status with inline
+ * editing and deletion actions.
+ */
 import React from 'react';
 import type { GuideAssignment } from '@shared/schema';
 import { GridBase } from '@/components/shared/GridBase';

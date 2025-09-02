@@ -1,3 +1,8 @@
+/**
+ * Password reset page used after Supabase sends a recovery link. Parses tokens
+ * from the URL hash, allows the user to enter a new password, updates the
+ * Supabase session, and redirects to the login page on success.
+ */
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';

@@ -1,3 +1,9 @@
+/**
+ * School detail view. Fetches a school record and supports editing of core
+ * fields, locations, guides, notes, and related entities. The page includes
+ * tabs (Summary, Locations, Guides) rendered from `components/school/tabs` and
+ * integrates modals for assigning educators or creating records.
+ */
 import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";

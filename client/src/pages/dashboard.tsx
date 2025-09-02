@@ -1,3 +1,10 @@
+/**
+ * Dashboard landing page that summarizes upcoming action steps and recently
+ * related schools for the selected user. It fetches action step and school
+ * data via React Query, applies relative date helpers for due statuses, and
+ * wires the global "Add New" menu to creation modals for teachers and schools.
+ * Cards and lists link out to respective detail pages.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";

@@ -1,3 +1,10 @@
+/**
+ * Displays all educator records in an AG Grid table with text search and
+ * optional user scoping. Data is loaded via `useCachedEducators`, then
+ * filtered on the client by the global search box and the "My records" toggle
+ * from `useUserFilter`. The page registers "Add New" options to open a modal
+ * for creating a teacher and prefetches detail records as rows are hovered.
+ */
 import TeachersGrid from "@/components/teachers-grid";
 import { type Teacher } from "@shared/schema";
 import { useSearch } from "@/contexts/search-context";

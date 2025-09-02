@@ -1,3 +1,7 @@
+/**
+ * Hook to detect whether the viewport is below the mobile breakpoint. Returns
+ * a boolean updated via a media query listener.
+ */
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768

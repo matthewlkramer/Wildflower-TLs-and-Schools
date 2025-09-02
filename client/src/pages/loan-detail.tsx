@@ -1,3 +1,9 @@
+/**
+ * Loan detail page loads a single loan (with borrower info) and displays
+ * summary metrics and several tabs for timeline, payments, documents, and
+ * related entities. Utilizes React Query for fetching and formats currency and
+ * dates for readability.
+ */
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
@@ -7,11 +13,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   ArrowLeft,
-  DollarSign, 
-  Calendar, 
-  TrendingUp, 
+  DollarSign,
+  Calendar,
+  TrendingUp,
   Building2,
   MapPin,
   Users,

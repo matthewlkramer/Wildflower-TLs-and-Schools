@@ -1,3 +1,7 @@
+/**
+ * Notes tab lists and edits free‑form notes linked to the educator. The
+ * `EducatorNotesTable` component handles fetching, sorting, and persistence.
+ */
 import { EducatorNotesTable } from "@/components/educator-notes-table";
 
 export function NotesTab({ educatorId }: { educatorId: string }) {
