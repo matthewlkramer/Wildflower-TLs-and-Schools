@@ -1,3 +1,11 @@
+/**
+ * Educator “Summary” tab. A snapshot view composed of three cards: basic info
+ * (name, current role, discovery status), education & certification (currently
+ * only a Montessori certified yes/no badge), and school connection (whether the
+ * educator is active at a school, the name of the school, and the
+ * stage/status). Badges are colored via `getStatusColor` for quick visual cues.
+ * All data is read from the `teacher` object and displayed read‑only.
+ */
 import { Badge } from "@/components/ui/badge";
 import { getStatusColor } from "@/lib/utils";
 import type { Teacher } from "@shared/schema";

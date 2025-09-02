@@ -1,3 +1,12 @@
+/**
+ * Borrower-facing form to connect a bank account for automatic loan payments.
+ * It loads basic loan info, collects routing/account numbers and authorization
+ * checkboxes, creates a Stripe `us_bank_account` payment method, and posts the
+ * resulting id to the server via `/api/loans/:id/ach-setup`. React Hook Form +
+ * zod handle validation. Success shows a toast, invalidates the loan query, and
+ * navigates to `/ach-setup-complete`; failure shows an error toast. Includes
+ * loading and “loan not found” states.
+ */
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";

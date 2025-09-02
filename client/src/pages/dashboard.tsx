@@ -1,3 +1,11 @@
+/**
+ * Application landing page. For the user selected in the header it loads action
+ * steps (`/api/action-steps/user/:id`) and schools (`/api/schools/user/:id`). It
+ * surfaces the top five incomplete tasks (overdue first) with human‑friendly due
+ * date labels and shows associated schools. An “Add New” menu registers creation
+ * modals for schools and teachers plus placeholders for charters/tasks. Each
+ * card links to the relevant detail screen.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";

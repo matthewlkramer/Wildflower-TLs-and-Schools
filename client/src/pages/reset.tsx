@@ -1,3 +1,10 @@
+/**
+ * Handles Supabase password reset links. On mount it looks for access and
+ * refresh tokens in `window.location.hash`, sets the session, and cleans the URL.
+ * Once ready, it shows a form with new password + confirmation fields. Submit
+ * validates length and equality, calls `supabase.auth.updateUser`, signs the
+ * user out, and redirects to `/login`. Errors surface via toasts.
+ */
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';

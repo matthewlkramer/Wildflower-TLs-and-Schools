@@ -1,3 +1,10 @@
+/**
+ * Educator “Online Forms” tab. Uses React Query to fetch all SSJ Fillout form
+ * submissions for the given educator id. Before rendering the table it computes
+ * the most recent submission date for quick reference. The tab shows that date
+ * above an `SSJFilloutFormsTable` which presents each submission and supports
+ * viewing form details. Loading state is handled by React Query’s `isLoading`.
+ */
 import { SSJFilloutFormsTable } from "@/components/ssj-fillout-forms-table";
 import { useQuery } from "@tanstack/react-query";
 import type { SSJFilloutForm } from "@shared/schema";

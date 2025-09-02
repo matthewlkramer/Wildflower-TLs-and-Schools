@@ -1,3 +1,10 @@
+/**
+ * Standalone confirmation screen displayed after a borrower finishes entering
+ * bank info for ACH payments. It shows a success icon, outlines the three-step
+ * follow‑up process (verification deposits, fund distribution, automatic
+ * payments), lists payment method details, and offers navigation back to the
+ * loan dashboard or main app. No data is fetched; everything is static copy.
+ */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowRight, Shield, CreditCard } from "lucide-react";

@@ -1,3 +1,13 @@
+/**
+ * Educator “Cultivation” tab. Used primarily for prospects, it aggregates data
+ * from initial interest forms and partner outreach. The tab shows the date of the
+ * most recent SSJ Fillout form submission by scanning all provided `ssjForms`.
+ * Additional fields pulled from the teacher record include source of contact,
+ * stated interests, assigned partner, meeting preferences, support types needed,
+ * routing information, one‑on‑one scheduling status, and whether a personal email
+ * was sent. All content is read‑only, organized in three responsive columns so
+ * staff can quickly gauge the prospect’s current state.
+ */
 import type { SSJFilloutForm, Teacher } from "@shared/schema";
 
 function mostRecentFilloutDate(ssjForms: SSJFilloutForm[]) {

@@ -1,3 +1,10 @@
+/**
+ * Educator “Linked” tab. Summarizes connections to external systems. Current
+ * fields include a boolean for whether the educator has an active Holaspirit
+ * account, the Holaspirit member id, and the Teacher Credentials (TC) user id.
+ * The tab renders these values in a simple two‑column layout and does not allow
+ * editing; it is purely informational for cross‑system audits.
+ */
 import type { Teacher } from "@shared/schema";
 
 export function LinkedTab({ teacher }: { teacher: Teacher }) {

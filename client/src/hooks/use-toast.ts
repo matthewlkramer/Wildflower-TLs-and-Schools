@@ -1,3 +1,11 @@
+/**
+ * Minimal toast manager used by the shadcn‑styled toast component. Maintains a
+ * global queue (limit 1) with manual reducer logic for add/update/dismiss. Each
+ * toast auto‑closes by dispatching `REMOVE_TOAST` after a long delay, and
+ * callers receive a handle with `dismiss` and `update` helpers. `useToast`
+ * subscribes React components to the internal state so they can render the UI
+ * and trigger dismissal.
+ */
 import * as React from "react"
 
 import type {

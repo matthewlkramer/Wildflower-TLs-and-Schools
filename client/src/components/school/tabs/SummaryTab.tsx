@@ -1,3 +1,17 @@
+/**
+ * School “Summary” tab. This is the landing view when opening a school detail.
+ * The top card shows branding: the school logo (several possible Airtable
+ * fields are checked), the full and short name, governance model, ages served,
+ * open date, and membership status. If the Airtable `about` or
+ * `aboutSpanish` fields are populated, an About/Descripción toggle is rendered
+ * allowing language switching without leaving the page. Below the hero card a
+ * `DetailGrid` organizes read‑only `EntityCard` sections for a map, contact
+ * information, and leadership. The map uses the school’s active latitude and
+ * longitude and falls back to the active physical address when coordinates are
+ * missing. Contact info lists phone, email, and website (hyperlinked). The
+ * leadership card lists founders and current teacher leaders. Everything in this
+ * tab is display‑only; there is no editing or server interaction here.
+ */
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { EntityCard } from '@/components/shared/EntityCard';

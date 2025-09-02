@@ -1,3 +1,9 @@
+/**
+ * Public route for authentication. If `useAuth` reports the user is already
+ * signed in it immediately redirects to `/`. Otherwise it shows a card with a
+ * single “Continue with Google” button that calls `loginWithGoogle` which kicks
+ * off the Supabase OAuth flow restricted to `@wildflowerschools.org` domains.
+ */
 import { useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';

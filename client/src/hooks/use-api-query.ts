@@ -1,5 +1,12 @@
-// Custom hook for consistent API data fetching with error handling
-
+/**
+ * Wrapper around React Query that standardizes how the app talks to the Express
+ * API. `useApiQuery` performs GET requests with `credentials: 'include'`, parses
+ * error payloads, and sets default cache times (5‑minute stale, 10‑minute gc).
+ * `useApiMutation` generalizes POST/PUT/PATCH/DELETE calls, automatically
+ * serializing the body and returning JSON when present. Both helpers surface
+ * typed `ApiError`s so callers can rely on `message`, `statusCode`, and `code`.
+ * The file also exports `invalidateQueries` to manually bust caches by key.
+ */
 import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { getErrorMessage } from "@shared/utils";

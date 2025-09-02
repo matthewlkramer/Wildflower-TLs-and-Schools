@@ -1,3 +1,13 @@
+/**
+ * Centralized cache helpers built on React Query. The hooks here fetch and cache
+ * high‑traffic datasets (teachers, schools, charters) with long stale times so
+ * repeated navigation stays snappy. `useCachedEducators` and `useCachedSchools`
+ * additionally expose `prefetchEducator`/`prefetchSchool` functions to warm up
+ * detail queries on hover. `useCachedDetail` and `useCachedSubtable` provide a
+ * consistent pattern for detail pages and nested tables with appropriate cache
+ * durations. Using these hooks keeps data fetching strategy uniform across the
+ * app.
+ */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 

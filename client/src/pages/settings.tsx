@@ -1,3 +1,10 @@
+/**
+ * User settings page. On mount sets the page title. Currently displays the
+ * signed‑in user’s email, placeholders for appearance and notification
+ * preferences, and a button that calls `supabase.auth.resetPasswordForEmail`
+ * to send a password reset link (redirecting to `/reset`). Future settings can
+ * expand within the grid layout.
+ */
 import { useEffect, useState } from "react";
 import { usePageTitle } from "@/App";
 import { Button } from "@/components/ui/button";

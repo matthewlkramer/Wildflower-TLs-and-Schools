@@ -1,3 +1,13 @@
+/**
+ * Full detail view for a charter organization. Fetches the charter by id and
+ * sets the app header to include the charter’s short name. The page is tabbed:
+ * summary information in a static grid, plus child tabs for startup process,
+ * sites, staff roles, educator associations, applications, contract documents,
+ * authorizer contacts, reports, assessments, governance docs, 990 filings,
+ * notes/action steps, and emails/meetings. Each tab mounts a specialized table
+ * component responsible for its own CRUD operations. No “Add New” options are
+ * registered from this page.
+ */
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";

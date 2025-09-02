@@ -1,3 +1,12 @@
+/**
+ * Detail screen for a single loan. Fetches `/api/loans/:id` to obtain loan and
+ * borrower data, sets the page title to include the loan number, and formats
+ * currency/percentage/date values for display. The layout shows a summary card
+ * of principal, rate, term, etc. followed by tabs (timeline, payments,
+ * documents, related entities) which each render their own components. Status
+ * badges are color‑coded based on loan status. Loading and error states are
+ * handled before rendering content.
+ */
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
@@ -7,11 +16,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   ArrowLeft,
-  DollarSign, 
-  Calendar, 
-  TrendingUp, 
+  DollarSign,
+  Calendar,
+  TrendingUp,
   Building2,
   MapPin,
   Users,

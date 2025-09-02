@@ -1,3 +1,8 @@
+/**
+ * Generic 404 page. Rendered when `wouter` cannot match a route. Displays an
+ * error icon, “404 Page Not Found” heading, and a reminder to register the
+ * route. No navigation controls are included.
+ */
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 
