@@ -1,0 +1,81 @@
+          </Link>
+        )}
+      </TableCell>
+      <TableCell>
+        {association.role ? (
+          <div className="flex flex-wrap gap-1">
+            {Array.isArray(association.role) ? (
+              association.role.flatMap((roleString, arrayIndex) => 
+                roleString.split(',').map((role, roleIndex) => {
+                  const trimmedRole = role.trim();
+                  // Filter out Founder role from display
+                  if (trimmedRole === 'Founder') return null;
+                  return (
+                    <Badge key={`${arrayIndex}-${roleIndex}`} variant="secondary" className="text-xs">
+                      {trimmedRole}
+                    </Badge>
+                  );
+                }).filter(Boolean)
+              )
+            ) : typeof association.role === 'string' ? (
+              association.role.split(',').map((role, index) => {
+                const trimmedRole = role.trim();
+                // Filter out Founder role from display
+                if (trimmedRole === 'Founder') return null;
+                return (
+                  <Badge key={index} variant="secondary" className="text-xs">
+                    {trimmedRole}
+                  </Badge>
+                );
+              }).filter(Boolean)
+            ) : (
+              // Handle non-string roles, but still check if it's Founder
+              (String(association.role) !== 'Founder' ? (<Badge variant="secondary" className="text-xs">
+                {String(association.role)}
+              </Badge>) : null)
+            )}
+          </div>
+        ) : (
+          '-'
+        )}
+      </TableCell>
+      <TableCell>
+        {}
+        <Badge 
+          variant={
+            association.role ? (
+              Array.isArray(association.role) 
+                ? association.role.some(roleStr => roleStr.includes('Founder'))
+                : association.role.toString().includes('Founder')
+            ) ? "default" : "secondary" : "secondary"
+          }
+          className={
+            association.role ? (
+              Array.isArray(association.role) 
+                ? association.role.some(roleStr => roleStr.includes('Founder'))
+                : association.role.toString().includes('Founder')
+            ) ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800" : "bg-gray-100 text-gray-800"
+          }
+        >
+          {association.role ? (
+            Array.isArray(association.role) 
+              ? association.role.some(roleStr => roleStr.includes('Founder')) 
+                ? 'Yes' 
+                : 'No'
+              : association.role.toString().includes('Founder') 
+                ? 'Yes' 
+                : 'No'
+          ) : 'No'}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        {(teacher as any)?.currentPrimaryEmailAddress || '-'}
+      </TableCell>
+      <TableCell>
+        {teacher?.primaryPhone || '-'}
+      </TableCell>
+      <TableCell>{association.startDate || '-'}</TableCell>
+      <TableCell>{association.endDate || '-'}</TableCell>
+      <TableCell>
+        <Badge 
+          variant={association.isActive ? "default" : "secondary"}

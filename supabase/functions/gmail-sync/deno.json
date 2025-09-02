@@ -1,0 +1,10 @@
+{
+  "imports": { "@shared/": "../_shared/" },
+  "compilerOptions": {
+    "strict": true,
+    "useUnknownInCatchVariables": true
+  },
+  "fmt": { "useTabs": false, "lineWidth": 100, "semiColons": true },
+  "lint": { "rules": { "tags": ["recommended"] } }
+}
+

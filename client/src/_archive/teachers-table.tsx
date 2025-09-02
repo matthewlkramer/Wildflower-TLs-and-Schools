@@ -1,3 +1,4 @@
+// ARCHIVED: superseded by teachers-grid. Kept for reference.
 import { Link } from "wouter";
 import { Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";

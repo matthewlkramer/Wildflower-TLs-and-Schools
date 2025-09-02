@@ -1,10 +1,11 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./simple-storage";
 import { loanStorage } from "./loan-storage";
 import { cache } from "./cache";
 import { logger } from "./logger";
+import { requireAuth } from "./auth";
 import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema } from "@shared/schema";
 import { createInsertSchema } from "drizzle-zod";
 import { 
@@ -52,6 +53,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Require authentication for all /api routes except /api/auth/*
+  app.use("/api", (req: Request, res: Response, next: NextFunction) => {
+    if (req.path.startsWith("/auth")) return next();
+    return requireAuth(req, res, next);
+  });
   // Educator routes (primary)
   app.get("/api/educators", async (req, res) => {
     try {
@@ -838,6 +844,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(emailAddress);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch email address" });
+    }
+  });
+
+  app.post("/api/action-steps", async (req, res) => {
+    try {
+      const { schoolId, item, assignee, dueDate, status } = req.body || {};
+      if (!schoolId || !item) {
+        return res.status(400).json({ message: "Missing required fields: schoolId and item" });
+      }
+      const created = await storage.createActionStep(String(schoolId), {
+        item: String(item),
+        assignee: assignee ? String(assignee) : undefined,
+        dueDate: dueDate ? String(dueDate) : undefined,
+        status: status ? String(status) : undefined,
+      });
+      res.status(201).json(created);
+    } catch (error) {
+      console.error('Failed to create action step', error);
+      res.status(500).json({ message: "Failed to create action step" });
     }
   });
 

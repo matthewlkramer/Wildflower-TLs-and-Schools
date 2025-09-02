@@ -4,29 +4,32 @@ import { useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "wouter";
 import { type Teacher, type SSJFilloutForm } from "@shared/schema";
 import { EntityCard } from "@/components/shared/EntityCard";
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import { TableCard } from "@/components/shared/TableCard";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { EmailAddress } from "@shared/schema";
+import { GridTableCard } from "@/components/shared/GridTableCard";
+import type { ColDef } from "ag-grid-community";
+import { Button } from "@/components/ui/button";
+import { Edit3, Trash2, UserCheck, UserX } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getStatusColor } from "@/lib/utils";
-import { EmailAddressesTable } from "@/components/email-addresses-table";
-import { EducatorSchoolAssociationsTable } from "@/components/educator-school-associations-table";
-import { SSJFilloutFormsTable } from "@/components/ssj-fillout-forms-table";
-import { MontessoriCertificationsTable } from "@/components/montessori-certifications-table";
-import { EventAttendanceTable } from "@/components/event-attendance-table";
-import { EducatorNotesTable } from "@/components/educator-notes-table";
-import { addNewEmitter } from "@/lib/add-new-emitter";
+// Replaced EmailAddressesTable with GridTableCard
+import { SummaryTab } from "@/components/teacher/tabs/SummaryTab";
+import { SchoolsTab } from "@/components/teacher/tabs/SchoolsTab";
+import { OnlineFormsTab } from "@/components/teacher/tabs/OnlineFormsTab";
+import { CertsTab } from "@/components/teacher/tabs/CertsTab";
+import { EventsTab } from "@/components/teacher/tabs/EventsTab";
+import { NotesTab } from "@/components/teacher/tabs/NotesTab";
+import { LinkedTab } from "@/components/teacher/tabs/LinkedTab";
+// add-new options handled elsewhere; none on this page for now
 
 
 export default function TeacherDetail() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState("summary");
-  const [showAddModal, setShowAddModal] = useState(false);
   const { toast } = useToast();
 
   const { data: teacher, isLoading } = useQuery<Teacher>({
@@ -37,70 +40,6 @@ export default function TeacherDetail() {
       return response.json();
     },
   });
-
-  const { data: ssjForms = [] } = useQuery<SSJFilloutForm[]>({
-    queryKey: ["/api/ssj-fillout-forms/educator", id],
-    queryFn: async () => {
-      const response = await fetch(`/api/ssj-fillout-forms/educator/${id}`, { 
-        credentials: "include" 
-      });
-      if (!response.ok) throw new Error("Failed to fetch SSJ fillout forms");
-      return response.json();
-    },
-    enabled: !!id,
-  });
-
-  const computeMostRecentFilloutDate = () => {
-    if (!ssjForms || ssjForms.length === 0) return null;
-    
-    const dates = ssjForms
-      .map(form => form.dateSubmitted)
-      .filter(Boolean)
-      .map(date => new Date(date as string))
-      .filter(date => !isNaN(date.getTime()));
-    
-    if (dates.length === 0) return null;
-    
-    const mostRecentDate = new Date(Math.max(...dates.map(date => date.getTime())));
-    return mostRecentDate.toLocaleDateString();
-  };
-
-  // Set up Add New options based on active tab
-  useEffect(() => {
-    let options: Array<{ label: string; onClick: () => void }> = [];
-    
-    switch (activeTab) {
-      case "schools":
-        options = [
-          { label: "Create New School", onClick: () => setShowAddModal(true) },
-          { label: "Assign TL to Existing School", onClick: () => setShowAddModal(true) }
-        ];
-        break;
-      case "certs":
-        options = [
-          { label: "Add Certification", onClick: () => setShowAddModal(true) }
-        ];
-        break;
-      case "events":
-        options = [
-          { label: "Add Event", onClick: () => setShowAddModal(true) }
-        ];
-        break;
-      case "notes":
-        options = [
-          { label: "Add Note", onClick: () => setShowAddModal(true) }
-        ];
-        break;
-      default:
-        options = [];
-    }
-    
-    addNewEmitter.setOptions(options);
-    
-    return () => {
-      addNewEmitter.setOptions([]);
-    };
-  }, [activeTab]);
 
   // Mutation to update educator details
   const updateTeacherDetailsMutation = useMutation({
@@ -118,6 +57,63 @@ export default function TeacherDetail() {
   });
 
   const normalizeArray = (v: any): string[] => Array.isArray(v) ? v : (v ? String(v).split(',').map(s => s.trim()).filter(Boolean) : []);
+
+  // Columns for Email Addresses (GridTableCard)
+  const emailColumns: ColDef<EmailAddress>[] = [
+    { headerName: 'Email', field: 'email', flex: 2, filter: 'agTextColumnFilter' },
+    { headerName: 'Type', field: 'type', flex: 1, filter: 'agTextColumnFilter' },
+    { headerName: 'Primary', field: 'isPrimary', flex: 1, filter: 'agTextColumnFilter', valueGetter: p => (p.data?.isPrimary ? 'Yes' : 'No') },
+    { headerName: 'Status', field: 'status', flex: 1, filter: 'agTextColumnFilter' },
+    { headerName: 'Actions', field: 'actions', width: 160, sortable: false, filter: false, resizable: false,
+      cellRenderer: (params: any) => {
+        const row: EmailAddress = params.data;
+        if (!row) return null;
+        const refresh = () => params?.context?.refresh?.();
+        const onEdit = async () => {
+          const nextEmail = window.prompt('Update email', row.email || '');
+          if (nextEmail === null) return;
+          const nextType = window.prompt('Update type', row.type || '');
+          await apiRequest('PUT', `/api/email-addresses/${row.id}`, { email: nextEmail, type: nextType || undefined });
+          queryClient.invalidateQueries({ queryKey: ["/api/email-addresses/educator", teacher.id] });
+          refresh();
+        };
+        const onMakePrimary = async () => {
+          await apiRequest('POST', `/api/email-addresses/${row.id}/make-primary`);
+          queryClient.invalidateQueries({ queryKey: ["/api/email-addresses/educator", teacher.id] });
+          refresh();
+        };
+        const onInactivate = async () => {
+          await apiRequest('POST', `/api/email-addresses/${row.id}/inactivate`);
+          queryClient.invalidateQueries({ queryKey: ["/api/email-addresses/educator", teacher.id] });
+          refresh();
+        };
+        const onDelete = async () => {
+          if (!window.confirm('Delete this email address?')) return;
+          await apiRequest('DELETE', `/api/email-addresses/${row.id}`);
+          queryClient.invalidateQueries({ queryKey: ["/api/email-addresses/educator", teacher.id] });
+          refresh();
+        };
+        return (
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-blue-50" onClick={onEdit} title="Edit email">
+              <Edit3 className="h-3 w-3 text-blue-600" />
+            </Button>
+            {!row.isPrimary && (
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-green-50" onClick={onMakePrimary} title="Make primary">
+                <UserCheck className="h-3 w-3 text-green-600" />
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-yellow-50" onClick={onInactivate} title="Inactivate">
+              <UserX className="h-3 w-3 text-yellow-600" />
+            </Button>
+            <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-red-50" onClick={onDelete} title="Delete">
+              <Trash2 className="h-3 w-3 text-red-600" />
+            </Button>
+          </div>
+        );
+      }
+    }
+  ];
 
 
 
@@ -189,32 +185,7 @@ export default function TeacherDetail() {
 
             <div className="p-6">
               <TabsContent value="summary" className="mt-0">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="bg-slate-50 rounded-lg p-4">
-                      <h4 className="font-medium text-slate-900 mb-2">Basic Info</h4>
-                      <div className="space-y-1 text-sm">
-                        <p><span className="text-slate-600">Name:</span> {teacher.fullName}</p>
-                        <p><span className="text-slate-600">Current Role:</span> {teacher.currentRole ? (Array.isArray(teacher.currentRole) ? teacher.currentRole.join(', ') : teacher.currentRole) : '-'}</p>
-                        <div><span className="text-slate-600">Discovery Status:</span> <Badge className={getStatusColor(teacher.discoveryStatus || '')}>{teacher.discoveryStatus || '-'}</Badge></div>
-                      </div>
-                    </div>
-                    <div className="bg-slate-50 rounded-lg p-4">
-                      <h4 className="font-medium text-slate-900 mb-2">Education & Certs</h4>
-                      <div className="space-y-1 text-sm">
-                        <div><span className="text-slate-600">Montessori Certified:</span> <Badge className={teacher.montessoriCertified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>{teacher.montessoriCertified ? 'Yes' : 'No'}</Badge></div>
-                      </div>
-                    </div>
-                    <div className="bg-slate-50 rounded-lg p-4">
-                      <h4 className="font-medium text-slate-900 mb-2">School Connection</h4>
-                      <div className="space-y-1 text-sm">
-                        <p><span className="text-slate-600">Currently Active:</span> {teacher.currentlyActiveAtSchool ? 'Yes' : 'No'}</p>
-                        <p><span className="text-slate-600">Current School:</span> {teacher.activeSchool ? (Array.isArray(teacher.activeSchool) ? teacher.activeSchool.join(', ') : teacher.activeSchool) : '-'}</p>
-                        <div><span className="text-slate-600">Stage/Status:</span> <Badge className={getStatusColor(teacher.activeSchoolStageStatus ? (Array.isArray(teacher.activeSchoolStageStatus) ? teacher.activeSchoolStageStatus[0] : teacher.activeSchoolStageStatus) : '')}>{teacher.activeSchoolStageStatus ? (Array.isArray(teacher.activeSchoolStageStatus) ? teacher.activeSchoolStageStatus.join(', ') : teacher.activeSchoolStageStatus) : '-'}</Badge></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <SummaryTab teacher={teacher} />
               </TabsContent>
 
               <TabsContent value="demographics" className="mt-0">
@@ -281,9 +252,13 @@ export default function TeacherDetail() {
 
               <TabsContent value="contact" className="mt-0">
                 {/* Tables default to full width */}
-                <TableCard title="Email Addresses">
-                  <EmailAddressesTable educatorId={teacher.id} />
-                </TableCard>
+                <GridTableCard<EmailAddress>
+                  title="Email Addresses"
+                  queryKey={["/api/email-addresses/educator", teacher.id]}
+                  fetchUrl={`/api/email-addresses/educator/${teacher.id}`}
+                  columns={emailColumns}
+                  emptyText="No email addresses found for this educator."
+                />
 
                 {/* EntityCards use the 2-column DetailGrid */}
                 <DetailGrid className="mt-6">
@@ -313,15 +288,11 @@ export default function TeacherDetail() {
               </TabsContent>
 
               <TabsContent value="schools" className="mt-0">
-                <div className="space-y-4">
-                  <EducatorSchoolAssociationsTable educatorId={teacher.id} />
-                </div>
+                <SchoolsTab educatorId={teacher.id} />
               </TabsContent>
 
               <TabsContent value="online-forms" className="mt-0">
-                <div className="space-y-4">
-                  <SSJFilloutFormsTable educatorId={teacher.id} />
-                </div>
+                <OnlineFormsTab educatorId={teacher.id} />
               </TabsContent>
 
               <TabsContent value="cultivation" className="mt-0">
@@ -331,7 +302,6 @@ export default function TeacherDetail() {
                     <h4 className="font-medium text-slate-900 mb-4">Early Cultivation Data</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       <div className="space-y-2 text-sm">
-                        <p><span className="text-slate-600">Date of Most Recent Fillout Form:</span> {computeMostRecentFilloutDate() || '-'}</p>
                         <p><span className="text-slate-600">Geographic Interest:</span> {[teacher.targetCity, teacher.targetState].filter(Boolean).join(', ') || '-'}</p>
                         <p><span className="text-slate-600">Primary Language:</span> {teacher.primaryLanguage ? (Array.isArray(teacher.primaryLanguage) ? teacher.primaryLanguage.join(', ') : teacher.primaryLanguage) : '-'}</p>
                         <p><span className="text-slate-600">Source:</span> {teacher.source || '-'}</p>
@@ -369,34 +339,19 @@ export default function TeacherDetail() {
               </TabsContent>
 
               <TabsContent value="certs" className="mt-0">
-                <div className="space-y-4">
-                  <MontessoriCertificationsTable educatorId={teacher.id} />
-                </div>
+                <CertsTab educatorId={teacher.id} />
               </TabsContent>
 
               <TabsContent value="events" className="mt-0">
-                <div className="space-y-4">
-                  <EventAttendanceTable educatorId={teacher.id} />
-                </div>
+                <EventsTab educatorId={teacher.id} />
               </TabsContent>
 
               <TabsContent value="notes" className="mt-0">
-                <div className="space-y-4">
-                  <EducatorNotesTable educatorId={teacher.id} />
-                </div>
+                <NotesTab educatorId={teacher.id} />
               </TabsContent>
 
               <TabsContent value="linked" className="mt-0">
-                <div className="space-y-4">
-                  <h4 className="font-medium text-slate-900">Linked Email & Meetings</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2 text-sm">
-                      <p><span className="text-slate-600">Active Holaspirit:</span> {teacher.activeHolaspirit ? 'Yes' : 'No'}</p>
-                      <p><span className="text-slate-600">Holaspirit Member ID:</span> {teacher.holaspiritMemberID || '-'}</p>
-                      <p><span className="text-slate-600">TC User ID:</span> {teacher.tcUserID || '-'}</p>
-                    </div>
-                  </div>
-                </div>
+                <LinkedTab teacher={teacher} />
               </TabsContent>
             </div>
           </Tabs>

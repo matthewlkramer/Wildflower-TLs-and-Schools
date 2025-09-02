@@ -1,0 +1,41 @@
+                    onClick={() => {
+                      const next = checked ? rolesArr.filter(r => r !== opt) : Array.from(new Set([...rolesArr, opt]));
+                      setEditData(prev => ({ ...prev, role: next }));
+                    }}
+                    className={`px-2 py-1 rounded border text-xs ${checked ? 'bg-blue-100 border-blue-300 text-blue-800' : 'bg-white border-slate-300 text-slate-700'}`}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+          </div>
+        </TableCell>
+        <TableCell>
+          <label className="inline-flex items-center gap-2 text-xs">
+            <input
+              type="checkbox"
+              checked={(Array.isArray(editData.role) ? editData.role : String(editData.role||'').split(',')).some((r: any) => String(r).trim() === 'Founder')}
+              onChange={(e) => {
+                const rolesArr: string[] = Array.isArray(editData.role)
+                  ? editData.role
+                  : String(editData.role || '').split(',').map((s) => s.trim()).filter(Boolean);
+                const next = e.target.checked
+                  ? Array.from(new Set([...rolesArr, 'Founder']))
+                  : rolesArr.filter(r => r !== 'Founder');
+                setEditData(prev => ({ ...prev, role: next }));
+              }}
+            />
+            <span>Founder</span>
+          </label>
+        </TableCell>
+        <TableCell>
+          <Input
+            value={(teacher as any)?.currentPrimaryEmailAddress || ''}
+            disabled
+            placeholder="Email"
+            className="h-8 bg-gray-50"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            value={teacher?.primaryPhone || ''}

@@ -167,14 +167,11 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
   };
 
   const roleOptions = [
-    "Teacher Leader",
-    "Teacher",
-    "Founder",
-    "Board Member",
-    "Director",
-    "Assistant Teacher",
-    "Guide",
-    "Emerging Teacher Leader"
+    "TL",
+    "ETL",
+    "Classroom Staff",
+    "Fellow",
+    "Other",
   ];
 
   return (

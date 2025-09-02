@@ -189,6 +189,7 @@ export interface IStorage {
   // Action Step operations
   getActionStepsBySchoolId(schoolId: string): Promise<ActionStep[]>;
   getActionStepsByUserId(userId: string): Promise<ActionStep[]>;
+  createActionStep(schoolId: string, data: { item: string; assignee?: string; dueDate?: string; status?: string }): Promise<ActionStep>;
   getSchoolsByUserId(userId: string): Promise<School[]>;
 
   // Legacy methods for backward compatibility
@@ -375,7 +376,8 @@ export class SimpleAirtableStorage implements IStorage {
       narrative: fields['Narrative'] || '',
       institutionalPartner: fields['Institutional partner'] || null,
       membershipStatus: fields[SF.Membership_Status] || '',
-      founders: fields['Founders'] || [],
+      founders: fields['Founders List'] || [],
+      foundersFullNames: fields['Full Name (from Founders List)'] || [],
       membershipAgreementDate: fields['Membership Agreement date'] || '',
       signedMembershipAgreement: fields['Signed Membership Agreement'] || '',
       agreementVersion: fields['Agreement Version'] || '',
@@ -1638,6 +1640,28 @@ export class SimpleAirtableStorage implements IStorage {
       console.error(`ERROR in action steps for user ${userId}:`, error);
       return [];
     }
+  }
+
+  async createActionStep(schoolId: string, data: { item: string; assignee?: string; dueDate?: string; status?: string }): Promise<ActionStep> {
+    const fields: any = {
+      Item: data.item,
+      Status: data.status || 'Pending',
+      'Due date': data.dueDate || undefined,
+      Schools: [schoolId],
+      school_id: [schoolId],
+    };
+    if (data.assignee) fields['Assignee Short Name'] = data.assignee;
+    const record = await base('Action steps').create(fields);
+    return {
+      id: record.id,
+      schoolId,
+      assignedDate: String(record.fields['Assigned date'] || ''),
+      assignee: String(record.fields['Assignee Short Name'] || data.assignee || ''),
+      item: String(record.fields['Item'] || data.item || ''),
+      status: String(record.fields['Status'] || data.status || 'Pending'),
+      dueDate: String(record.fields['Due date'] || data.dueDate || ''),
+      isCompleted: (record.fields['Status'] as any) === 'Completed',
+    };
   }
 
   // User-specific schools for dashboard

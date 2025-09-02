@@ -27,7 +27,7 @@ export const SCHOOLS_FIELDS = {
   Logo: "Logo",
   TC_school_ID: "TC school ID",
   Educators_x_Schools: "Educators x Schools",
-  Founders: "Founders",
+  Founders: "Founders List",
   Current_TLs: "Current TLs",
   Planning_album: "Planning album",
   Guide_assignments: "Guide assignments",

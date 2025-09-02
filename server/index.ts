@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
+import { setupAuth } from "./auth";
 import { storage } from "./simple-storage";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -39,6 +40,7 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  await setupAuth(app);
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -52,6 +54,13 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
+  // Redirect unauthenticated root requests to client login route
+  app.get('/', (req, res, next) => {
+    const user = (req.session as any)?.user;
+    if (!user) return res.redirect('/api/auth/login');
+    next();
+  });
+
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {

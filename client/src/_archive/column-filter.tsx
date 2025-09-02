@@ -154,3 +154,4 @@ export default function ColumnFilter({
     </Popover>
   );
 }
+// ARCHIVED: replaced by grid column filters or dedicated UIs.

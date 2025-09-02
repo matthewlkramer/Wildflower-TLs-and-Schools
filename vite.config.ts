@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 
 export default defineConfig({
+  // Read env from repo root so Vite (rooted in client/) picks up .env
+  envDir: path.resolve(import.meta.dirname),
   plugins: [
     react(),
     ...(process.env.REPL_ID !== undefined

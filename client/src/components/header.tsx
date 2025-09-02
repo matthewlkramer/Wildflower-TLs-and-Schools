@@ -11,6 +11,7 @@ import AddSchoolModal from "./add-school-modal";
 import { WildflowerLogo } from "./wildflower-logo";
 import { useUserFilter } from "@/contexts/user-filter-context";
 import { logger } from "@/lib/logger";
+import { useAuth } from "@/contexts/auth-context";
 
 interface HeaderProps {
   searchTerm?: string;
@@ -29,6 +30,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const { showOnlyMyRecords, setShowOnlyMyRecords } = useUserFilter();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const { isAuthenticated, user, loginWithGoogle, logout } = useAuth();
   
 
 
@@ -244,9 +246,29 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                   </Label>
                 </div>
                 
-                <div className="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="h-4 w-4 text-slate-600" />
-                </div>
+                {!isAuthenticated ? (
+                  <Button onClick={() => loginWithGoogle()} size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white flex-shrink-0">
+                    Sign in with Google
+                  </Button>
+                ) : (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="flex items-center gap-2">
+                        <div className="w-6 h-6 bg-slate-300 rounded-full flex items-center justify-center">
+                          <User className="h-4 w-4 text-slate-600" />
+                        </div>
+                        <span className="max-w-[160px] truncate text-slate-700">{user?.email}</span>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link href="/settings">Settings</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => logout()}>Sign out</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
             </div>
           </div>

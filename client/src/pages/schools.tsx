@@ -70,7 +70,6 @@ export default function Schools() {
           <span>Search:</span>
           <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
           <span>Showing {gridFilteredCount ?? totalAfterSearch} of {totalAfterSearch}</span>
-          {/* Removed manual refresh button; rely on React Query behaviors */}
         </div>
         <SchoolsGrid 
           schools={filteredSchools || []} 

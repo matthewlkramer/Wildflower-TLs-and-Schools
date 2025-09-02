@@ -85,7 +85,6 @@ export default function Teachers() {
             <span>Search:</span>
             <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
             <span>Showing {filteredTeachers?.length ?? 0} of {teachers?.length ?? 0}</span>
-          {/* Removed manual refresh button; rely on React Query behaviors */}
           </div>
           <TeachersGrid 
             teachers={filteredTeachers || []} 

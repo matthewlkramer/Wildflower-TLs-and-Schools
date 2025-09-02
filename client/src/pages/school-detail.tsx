@@ -29,7 +29,7 @@ import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid
 import { isAgGridEnterpriseEnabled } from "@/lib/ag-grid-enterprise";
 
 import { Link } from "wouter";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { RoleMultiSelectInline } from "@/components/shared/grid/RoleMultiSelectInline";
 import { YesNoSelectInline } from "@/components/shared/grid/YesNoSelectInline";
 import { ActiveBadge } from "@/components/shared/grid/ActiveBadge";
@@ -49,389 +49,12 @@ import { EntityCard } from "@/components/shared/EntityCard";
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import AssignEducatorModal from "@/components/assign-educator-modal";
 import CreateAndAssignEducatorModal from "@/components/create-and-assign-educator-modal";
+import { SchoolTLsAssociationGrid } from "@/components/school/SchoolTLsAssociationGrid";
 import { TableCard } from "@/components/shared/TableCard";
+import { SummaryTab } from "@/components/school/tabs/SummaryTab";
+import { LocationsTab } from "@/components/school/tabs/LocationsTab";
+import { GuidesTab } from "@/components/school/tabs/GuidesTab";
 import { useTableRefresh, refreshSchoolData } from "@/hooks/use-table-refresh";
-
-// AG Grid for TLs tab
-function SchoolTLsGrid({
-  school,
-  associations,
-  teachers,
-  onUpdateAssociation,
-  onEndStint,
-  onDeleteAssociation,
-}: {
-  school: School;
-  associations: TeacherSchoolAssociation[];
-  teachers: Teacher[];
-  onUpdateAssociation: (associationId: string, data: any) => void;
-  onEndStint: (associationId: string) => void;
-  onDeleteAssociation: (associationId: string) => void;
-}) {
-  const { entReady, filterForText } = useAgGridFeatures();
-  type TLRow = {
-    id: string;
-    educatorId: string;
-    name: string;
-    emailAtSchool: string;
-    phone: string;
-    roles: string[];
-    founder: boolean;
-    startDate?: string;
-    endDate?: string;
-    isActive?: boolean;
-  };
-
-  const [editingRowId, setEditingRowId] = useState<string | null>(null);
-  const [drafts, setDrafts] = useState<Record<string, TLRow>>({});
-  const getDraft = (row: TLRow) => drafts[row.id] || row;
-
-  // Explicit role options (excluding Founder which is its own field)
-  const roleOptions: string[] = [
-    'Teacher Leader',
-    'Emerging Teacher Leader',
-    'Classroom Staff',
-    'Fellow',
-    'Other',
-  ];
-
-  const rows: TLRow[] = (associations || []).map((a) => {
-    const t = teachers?.find((x) => x.id === a.educatorId);
-    const rolesArr = Array.isArray(a.role)
-      ? a.role.flatMap((s: any) => String(s).split(',').map((r: string) => r.trim()).filter(Boolean))
-      : String(a.role || '')
-          .split(',')
-          .map((r) => r.trim())
-          .filter(Boolean);
-    const isFounder = rolesArr.includes('Founder');
-    const cleanRoles = rolesArr.filter((r) => r !== 'Founder');
-    return {
-      id: a.id,
-      educatorId: a.educatorId,
-      name: t?.fullName || ((t?.firstName && t?.lastName) ? `${t.firstName} ${t.lastName}` : (a.educatorName || a.educatorId)),
-      emailAtSchool: (a as any)?.emailAtSchool || '',
-      phone: t?.primaryPhone || '',
-      roles: cleanRoles,
-      founder: isFounder,
-      startDate: a.startDate || '',
-      endDate: a.endDate || '',
-      isActive: !!a.isActive,
-    };
-  });
-
-  const RolesCellRenderer = (params: ICellRendererParams<TLRow, string[]>) => {
-    const row = params.data as TLRow;
-    const draft = getDraft(row);
-    if (editingRowId === row.id) {
-      const values = Array.isArray(draft.roles)
-        ? draft.roles
-        : (typeof draft.roles === 'string' ? draft.roles.split(',').map(s => s.trim()).filter(Boolean) : []);
-      return (
-        <RoleMultiSelectInline
-          options={roleOptions}
-          value={values}
-          onChange={(next) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, roles: next } }))}
-        />
-      );
-    }
-    const valuesArr: string[] = Array.isArray(draft.roles)
-      ? draft.roles
-      : (typeof draft.roles === 'string' ? draft.roles.split(',').map(s => s.trim()).filter(Boolean) : []);
-    if (!valuesArr || valuesArr.length === 0) return '-';
-    return (
-      <div className="flex flex-wrap gap-1">
-        {valuesArr.map((role, idx) => (
-          <Badge key={idx} variant="secondary" className="text-[10px] py-0.5 px-1.5">
-            {role}
-          </Badge>
-        ))}
-      </div>
-    );
-  };
-
-  const FounderCellRenderer = (params: ICellRendererParams<TLRow, boolean>) => {
-    const row = params.data as TLRow;
-    const draft = getDraft(row);
-    const isFounder = !!draft.founder;
-    if (editingRowId === row.id) {
-      const val = isFounder ? 'Yes' : 'No';
-      return (
-        <YesNoSelectInline
-          value={isFounder}
-          onChange={(next) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, founder: next } }))}
-        />
-      );
-    }
-    return (
-      <Badge className={isFounder ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
-        {isFounder ? 'Yes' : 'No'}
-      </Badge>
-    );
-  };
-
-  // Inline multi-select roles editor using native <select multiple>
-  const RolesCellEditor = React.forwardRef<ICellEditorReactComp, ICellEditorParams<TLRow, string[]>>((props, ref) => {
-    const startVals: string[] = Array.isArray(props.value) ? props.value : [];
-    const [values, setValues] = useState<string[]>(startVals);
-    const selectRef = React.useRef<HTMLSelectElement | null>(null);
-    React.useImperativeHandle(ref, () => ({ getValue: () => values }));
-    useEffect(() => { try { selectRef.current?.focus(); } catch {} }, []);
-    return (
-      <select
-        ref={selectRef}
-        multiple
-        className="w-full h-20 text-xs border rounded px-1 py-1"
-        value={values}
-        onChange={(e) => {
-          const next = Array.from(e.currentTarget.selectedOptions).map(o => o.value);
-          setValues(next);
-        }}
-      >
-        {roleOptions.map((opt) => (
-          <option key={opt} value={opt}>{opt}</option>
-        ))}
-      </select>
-    );
-  });
-
-  // Inline date editor
-  const DateCellEditor = React.forwardRef<ICellEditorReactComp, ICellEditorParams<TLRow, string>>((props, ref) => {
-    const [val, setVal] = useState<string>(props.value || '');
-    const inputRef = React.useRef<HTMLInputElement | null>(null);
-    React.useImperativeHandle(ref, () => ({ getValue: () => val }));
-    useEffect(() => { try { inputRef.current?.focus(); } catch {} }, []);
-    return (
-      <input
-        ref={inputRef}
-        type="date"
-        className="h-7 w-full px-2 border rounded"
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
-      />
-    );
-  });
-
-  const NameCellRenderer = (params: ICellRendererParams<TLRow, string>) => {
-    const id = params.data?.educatorId;
-    const name = params.value;
-    if (!id) return name || '';
-    return (
-      <a
-        href={`/teacher/${id}`}
-        className="text-wildflower-blue hover:underline"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {name}
-      </a>
-    );
-  };
-
-  const ActionsCellRenderer = (params: ICellRendererParams<TLRow>) => {
-    const row = params.data as TLRow;
-    const isRowEditing = editingRowId === row.id;
-    return (
-      <div className="flex gap-1">
-        {!isRowEditing ? (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 w-7 p-0"
-            title="Edit row"
-            onClick={(e) => {
-              e.preventDefault(); e.stopPropagation();
-              setDrafts(prev => ({ ...prev, [row.id]: { ...row } }));
-              setEditingRowId(row.id);
-              try { params.api.refreshCells({ force: true, rowNodes: [params.node!] }); } catch {}
-            }}
-          >
-            <Edit className="h-3.5 w-3.5" />
-          </Button>
-        ) : (
-          <>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 w-7 p-0 text-green-700"
-              title="Save row"
-              onClick={async (e) => {
-                e.preventDefault(); e.stopPropagation();
-                const draft = drafts[row.id];
-                if (!draft) return;
-                const baseRoles = Array.isArray(draft.roles) ? draft.roles : [];
-                const role = draft.founder ? Array.from(new Set([...baseRoles, 'Founder'])) : baseRoles.filter((r) => r !== 'Founder');
-                onUpdateAssociation(row.id, {
-                  role,
-                  startDate: draft.startDate || '',
-                  endDate: draft.endDate || '',
-                  isActive: !!draft.isActive,
-                  emailAtSchool: draft.emailAtSchool || ''
-                });
-                try {
-                  if (draft.educatorId && typeof draft.phone === 'string') {
-                    await apiRequest('PUT', `/api/educators/${draft.educatorId}`, { primaryPhone: draft.phone });
-                    queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
-                    queryClient.invalidateQueries({ queryKey: [`/api/teachers/${draft.educatorId}`] });
-                  }
-                } catch {}
-                setEditingRowId(null);
-                setDrafts(prev => { const cp = { ...prev }; delete cp[row.id]; return cp; });
-                try { params.api.refreshCells({ force: true, rowNodes: [params.node!] }); } catch {}
-              }}
-            >
-              <Check className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 w-7 p-0 text-slate-700"
-              title="Cancel edit"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingRowId(null); setDrafts(prev => { const cp = { ...prev }; delete cp[row.id]; return cp; }); try { params.api.refreshCells({ force: true, rowNodes: [params.node!] }); } catch {} }}
-            >
-              <X className="h-3.5 w-3.5" />
-            </Button>
-          </>
-        )}
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-7 w-7 p-0"
-          title="Open"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (row.educatorId) window.location.assign(`/teacher/${row.educatorId}`); }}
-        >
-          <ExternalLink className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-7 w-7 p-0 text-orange-600 hover:text-orange-700"
-          title="End stint"
-          onClick={() => onEndStint(row.id)}
-        >
-          <UserMinus className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
-          title="Delete stint"
-          onClick={() => onDeleteAssociation(row.id)}
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
-      </div>
-    );
-  };
-
-  const columnDefs: ColDef<TLRow>[] = [
-    { headerName: 'Name', field: 'name', flex: 2, filter: filterForText, editable: false, cellRenderer: NameCellRenderer },
-    { headerName: 'Role(s)', field: 'roles', flex: 2, filter: filterForText, editable: false, cellRenderer: RolesCellRenderer,
-      valueGetter: (p) => Array.isArray(p.data?.roles) ? (p.data?.roles as string[]).join(', ') : (p.data?.roles as any || ''),
-    },
-    { headerName: 'Founder', field: 'founder', width: 120, editable: false, cellRenderer: FounderCellRenderer, 
-      filter: filterForText,
-      valueGetter: (p) => (p.data?.founder ? 'Yes' : 'No'),
-    },
-    { headerName: 'School email', field: 'emailAtSchool', flex: 2, filter: filterForText, editable: false,
-      cellRenderer: (p: ICellRendererParams<TLRow>) => {
-        const row = p.data as TLRow; const draft = getDraft(row);
-        if (editingRowId === row.id) {
-          return (
-            <input
-              type="email"
-              className="h-7 w-full px-2 border rounded text-sm"
-              value={draft.emailAtSchool || ''}
-              onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, emailAtSchool: e.target.value } }))}
-            />
-          );
-        }
-        return (draft.emailAtSchool || '-');
-      }
-    },
-    { headerName: 'Phone', field: 'phone', width: 160, editable: false, filter: filterForText,
-      cellRenderer: (p: ICellRendererParams<TLRow>) => {
-        const row = p.data as TLRow; const draft = getDraft(row);
-        if (editingRowId === row.id) {
-          return (
-            <input
-              type="text"
-              className="h-7 w-full px-2 border rounded text-sm"
-              value={draft.phone || ''}
-              onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, phone: e.target.value } }))}
-            />
-          );
-        }
-        return (draft.phone || '-');
-      }
-    },
-    { headerName: 'Start Date', field: 'startDate', width: 140, editable: false, filter: filterForText,
-      cellRenderer: (p: ICellRendererParams<TLRow>) => {
-        const row = p.data as TLRow; const draft = getDraft(row);
-        if (editingRowId === row.id) {
-          return (
-            <input type="date" className="h-7 w-full px-2 border rounded text-sm" value={draft.startDate || ''}
-              onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, startDate: e.target.value } }))} />
-          );
-        }
-        return (draft.startDate || '-');
-      }
-    },
-    { headerName: 'End Date', field: 'endDate', width: 140, editable: false, filter: filterForText,
-      cellRenderer: (p: ICellRendererParams<TLRow>) => {
-        const row = p.data as TLRow; const draft = getDraft(row);
-        if (editingRowId === row.id) {
-          return (
-            <input type="date" className="h-7 w-full px-2 border rounded text-sm" value={draft.endDate || ''}
-              onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, endDate: e.target.value } }))} />
-          );
-        }
-        return (draft.endDate || '-');
-      }
-    },
-    { headerName: 'Currently Active', field: 'isActive', width: 150, editable: false, filter: filterForText,
-      valueGetter: (p) => (p.data?.isActive ? 'Active' : 'Inactive'),
-      cellRenderer: (p: ICellRendererParams<TLRow, any>) => {
-        const row = p.data as TLRow; const draft = getDraft(row);
-        if (editingRowId === row.id) {
-          const val = draft.isActive ? 'Active' : 'Inactive';
-          return (
-            <select className="w-full h-7 text-xs border rounded px-1" value={val}
-              onChange={(e) => setDrafts(prev => ({ ...prev, [row.id]: { ...draft, isActive: e.target.value === 'Active' } }))}>
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          );
-        }
-        return (
-          <Badge className={p.data?.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
-            {p.data?.isActive ? 'Active' : 'Inactive'}
-          </Badge>
-        );
-      }
-    },
-    { headerName: 'Actions', field: 'id', width: 180, sortable: false, filter: false, resizable: false, cellRenderer: ActionsCellRenderer },
-  ];
-
-  return (
-    <div className="w-full">
-      <div className="ag-theme-material w-full">
-        <AgGridReact<TLRow>
-          { ...DEFAULT_GRID_PROPS }
-          rowData={rows}
-          columnDefs={columnDefs}
-          defaultColDef={{ ...DEFAULT_COL_DEF }}
-          domLayout="autoHeight"
-          suppressRowClickSelection={true}
-          
-          singleClickEdit={false}
-          stopEditingWhenCellsLoseFocus={false}
-          getRowHeight={(p) => (editingRowId && p.data && p.data.id === editingRowId ? 120 : (DEFAULT_GRID_PROPS.rowHeight as number))}
-        />
-      </div>
-    </div>
-  );
-}
-
-// AG Grid for Locations tab
 function LocationsGrid({
   locations,
   onUpdate,
@@ -461,6 +84,8 @@ function LocationsGrid({
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, LocRow>>({});
   const getDraft = (r: LocRow) => drafts[r.id] || r;
+
+  // Use Enterprise Set Filter for booleans
 
   const columnDefs: ColDef<LocRow>[] = [
     { headerName: 'Address', field: 'address', flex: 2, filter: 'agTextColumnFilter',
@@ -593,6 +218,8 @@ function GuidesGrid({
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, GuideRow>>({});
   const getDraft = (r: GuideRow) => drafts[r.id] || r;
+
+  // Use Enterprise Set Filter for booleans
 
   const columnDefs: ColDef<GuideRow>[] = [
     { headerName: 'Guide', field: 'guideShortName', flex: 1, filter: 'agTextColumnFilter' },
@@ -744,7 +371,7 @@ function TeacherAssociationRow({
         </TableCell>
         <TableCell>
           <div className="flex flex-wrap gap-2">
-            {(Array.isArray((school as any)?.fieldOptions?.roles) ? (school as any).fieldOptions.roles : ['TL','ETL','Guide','Founder'])
+            {(Array.isArray((school as any)?.fieldOptions?.roles) ? (school as any).fieldOptions.roles : ['TL','ETL','Classroom Staff','Fellow','Other'])
               .map((opt: string) => {
                 const rolesArr: string[] = Array.isArray(editData.role)
                   ? editData.role
@@ -766,24 +393,7 @@ function TeacherAssociationRow({
               })}
           </div>
         </TableCell>
-        <TableCell>
-          <label className="inline-flex items-center gap-2 text-xs">
-            <input
-              type="checkbox"
-              checked={(Array.isArray(editData.role) ? editData.role : String(editData.role||'').split(',')).some((r: any) => String(r).trim() === 'Founder')}
-              onChange={(e) => {
-                const rolesArr: string[] = Array.isArray(editData.role)
-                  ? editData.role
-                  : String(editData.role || '').split(',').map((s) => s.trim()).filter(Boolean);
-                const next = e.target.checked
-                  ? Array.from(new Set([...rolesArr, 'Founder']))
-                  : rolesArr.filter(r => r !== 'Founder');
-                setEditData(prev => ({ ...prev, role: next }));
-              }}
-            />
-            <span>Founder</span>
-          </label>
-        </TableCell>
+        
         <TableCell>
           <Input
             value={(teacher as any)?.currentPrimaryEmailAddress || ''}
@@ -881,8 +491,7 @@ function TeacherAssociationRow({
               association.role.flatMap((roleString, arrayIndex) => 
                 roleString.split(',').map((role, roleIndex) => {
                   const trimmedRole = role.trim();
-                  // Filter out Founder role from display
-                  if (trimmedRole === 'Founder') return null;
+                  // No special-casing of roles
                   return (
                     <Badge key={`${arrayIndex}-${roleIndex}`} variant="secondary" className="text-xs">
                       {trimmedRole}
@@ -893,8 +502,7 @@ function TeacherAssociationRow({
             ) : typeof association.role === 'string' ? (
               association.role.split(',').map((role, index) => {
                 const trimmedRole = role.trim();
-                // Filter out Founder role from display
-                if (trimmedRole === 'Founder') return null;
+                // No special-casing of roles
                 return (
                   <Badge key={index} variant="secondary" className="text-xs">
                     {trimmedRole}
@@ -902,10 +510,10 @@ function TeacherAssociationRow({
                 );
               }).filter(Boolean)
             ) : (
-              // Handle non-string roles, but still check if it's Founder
-              (String(association.role) !== 'Founder' ? (<Badge variant="secondary" className="text-xs">
+              // Handle non-string roles
+              (<Badge variant="secondary" className="text-xs">
                 {String(association.role)}
-              </Badge>) : null)
+              </Badge>)
             )}
           </div>
         ) : (
@@ -914,32 +522,7 @@ function TeacherAssociationRow({
       </TableCell>
       <TableCell>
         {}
-        <Badge 
-          variant={
-            association.role ? (
-              Array.isArray(association.role) 
-                ? association.role.some(roleStr => roleStr.includes('Founder'))
-                : association.role.toString().includes('Founder')
-            ) ? "default" : "secondary" : "secondary"
-          }
-          className={
-            association.role ? (
-              Array.isArray(association.role) 
-                ? association.role.some(roleStr => roleStr.includes('Founder'))
-                : association.role.toString().includes('Founder')
-            ) ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800" : "bg-gray-100 text-gray-800"
-          }
-        >
-          {association.role ? (
-            Array.isArray(association.role) 
-              ? association.role.some(roleStr => roleStr.includes('Founder')) 
-                ? 'Yes' 
-                : 'No'
-              : association.role.toString().includes('Founder') 
-                ? 'Yes' 
-                : 'No'
-          ) : 'No'}
-        </Badge>
+        {/* Founder flag removed */}
       </TableCell>
       <TableCell>
         {(teacher as any)?.currentPrimaryEmailAddress || '-'}
@@ -2689,6 +2272,51 @@ export default function SchoolDetail() {
     },
   });
 
+  // Sort grants by issuedDate (newest first)
+  const sortedGrants = useMemo(() => {
+    const list = Array.isArray(grants) ? [...grants] : [];
+    list.sort((a, b) => {
+      const da = a?.issuedDate ? Date.parse(a.issuedDate) : 0;
+      const db = b?.issuedDate ? Date.parse(b.issuedDate) : 0;
+      return db - da; // descending: newest first
+    });
+    return list;
+  }, [grants]);
+
+  // Create Action Step state and mutation
+  const [isCreatingAction, setIsCreatingAction] = useState(false);
+  const [newAction, setNewAction] = useState<{ item: string; assignee: string; dueDate: string; status: string }>({ item: "", assignee: "", dueDate: "", status: "Pending" });
+  const createActionStepMutation = useMutation({
+    mutationFn: async (data: { item: string; assignee: string; dueDate: string; status: string }) => {
+      return await apiRequest("POST", "/api/action-steps", { ...data, schoolId: id });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/action-steps/school/${id}`] });
+      setIsCreatingAction(false);
+      setNewAction({ item: "", assignee: "", dueDate: "", status: "Pending" });
+      toast({ title: "Success", description: "Action step created" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to create action step", variant: "destructive" });
+    }
+  });
+
+  // Grant mutations
+  const createGrantMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest("POST", "/api/grants", { ...data, schoolId: id });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/grants/school/${id}`] });
+      setIsCreatingGrant(false);
+      setNewGrant({ amount: 0, issuedDate: "", issuedBy: "", status: "" });
+      toast({ title: "Success", description: "Grant created successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to create grant", variant: "destructive" });
+    },
+  });
+
   const onSubmit = (data: any) => {
     updateSchoolMutation.mutate(data);
   };
@@ -2855,540 +2483,57 @@ export default function SchoolDetail() {
 
               <div className="p-6">
                 <TabsContent value="summary" className="mt-0">
-                  <div className="space-y-6">
-                    {/* Header Section with Logo and Key Info */}
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 shadow-sm">
-                      <div className="flex items-start gap-6">
-                        <div className="flex-shrink-0">
-                          <div className="w-24 h-24 bg-white rounded-2xl shadow-md overflow-hidden flex items-center justify-center">
-                            {(school.logoMainRectangle || school.logoMainSquare || school.logo) ? (
-                              <img 
-                                src={school.logoMainRectangle || school.logoMainSquare || school.logo} 
-                                alt={`${school.name} logo`}
-                                className="w-full h-full object-contain p-2"
-                              />
-                            ) : (
-                              <div className="text-center">
-                                <svg className="w-10 h-10 mx-auto text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <h2 className="text-2xl font-semibold text-gray-900">{school.name}</h2>
-                              <p className="text-lg text-gray-600 mt-1">{school.shortName}</p>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase tracking-wider">Governance</p>
-                              <p className="text-sm font-medium text-gray-900 mt-1">{school.governanceModel || 'Not specified'}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase tracking-wider">Ages Served</p>
-                              <p className="text-sm font-medium text-gray-900 mt-1">{school.agesServed?.join(', ') || 'Not specified'}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase tracking-wider">Open Date</p>
-                              <p className="text-sm font-medium text-gray-900 mt-1">{school.openDate || 'Not specified'}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase tracking-wider">Membership</p>
-                              <p className="text-sm font-medium text-gray-900 mt-1">{school.membershipStatus || 'Not specified'}</p>
-                            </div>
-                          </div>
-                          {(school.about || school.aboutSpanish) && (
-                            <div className="mt-4 pt-4 border-t border-gray-200">
-                              <div className="flex items-center gap-2 mb-2">
-                                <button
-                                  type="button"
-                                  onClick={() => setAboutLang('en')}
-                                  className={`text-xs uppercase tracking-wider ${aboutLang === 'en' ? 'text-gray-700 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
-                                >
-                                  About
-                                </button>
-                                {school.aboutSpanish && (
-                                  <>
-                                    <span className="text-gray-300">•</span>
-                                    <button
-                                      type="button"
-                                      onClick={() => setAboutLang('es')}
-                                      className={`text-xs uppercase tracking-wider ${aboutLang === 'es' ? 'text-gray-700 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
-                                    >
-                                      descripción
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                              <p className="text-sm text-gray-700 leading-relaxed">
-                                {aboutLang === 'es' && school.aboutSpanish ? school.aboutSpanish : (school.about || '')}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Summary EntityCards Section */}
-                    <DetailGrid>
-                      {/* Location */}
-                      <EntityCard title="Location" fields={[]} editable={false} showDivider={false}>
-                        <GoogleMap 
-                          latitude={school.activeLatitude} 
-                          longitude={school.activeLongitude} 
-                          schoolName={school.name}
-                          shortName={school.shortName}
-                          fallbackAddress={school.activePhysicalAddress}
-                          schoolLogo={school.logoFlowerOnly || school.logoMainSquare || school.logo}
-                        />
-                      </EntityCard>
-
-                      {/* Support - Current Operations Guide */}
-                      <EntityCard
-                        title="Support"
-                        columns={1}
-                        editable={false}
-                        showDivider={false}
-                        fields={[{
-                          key: 'ssjOpsGuideTrack',
-                          label: 'Ops Guide Track',
-                          type: 'readonly',
-                          value: Array.isArray(school?.ssjOpsGuideTrack) ? school.ssjOpsGuideTrack : (school?.ssjOpsGuideTrack ? [school.ssjOpsGuideTrack as any] : []),
-                          render: (v) => (
-                            v && Array.isArray(v) && v.length > 0 ? (
-                              <div className="flex flex-wrap gap-1">
-                                {v.map((track: string, idx: number) => (
-                                  <Badge key={idx} variant="secondary" className="text-xs">{track}</Badge>
-                                ))}
-                              </div>
-                            ) : <span className="text-slate-400">-</span>
-                          )
-                        }]} 
-                      />
-
-                      {/* School Contact Info */}
-                      <EntityCard
-                        title="School Contact Info"
-                        columns={1}
-                        editable={false}
-                        showDivider={false}
-                        fields={[
-                          { key: 'email', label: 'Email', type: 'readonly', value: school?.email ?? '', render: (val) => val ? (<a href={`mailto:${val}`} className="text-blue-600 hover:underline">{val}</a>) : <span className="text-slate-400">-</span> },
-                          { key: 'phone', label: 'Phone', type: 'readonly', value: school?.phone ?? '', render: (val) => val ? (<a href={`tel:${val}`} className="text-blue-600 hover:underline">{val}</a>) : <span className="text-slate-400">-</span> },
-                          { key: 'website', label: 'Website', type: 'readonly', value: school?.website ?? '', render: () => {
-                            const url = school?.website || school?.facebook || school?.instagram || '';
-                            const label = school?.website || school?.facebook || school?.instagram || '';
-                            return url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{label}</a>) : (<span className="text-slate-400">-</span>);
-                          } },
-                        ]}
-                      />
-
-                      {/* Leadership (summary) */}
-                      <EntityCard
-                        title="Leadership"
-                        columns={1}
-                        editable={false}
-                        showDivider={false}
-                        fields={[
-                          { key: 'founders', label: 'Founders', type: 'readonly', value: school?.founders ?? [], render: (v) => (v && v.length ? v.join(', ') : <span className="text-slate-400">Not specified</span>) },
-                          { key: 'currentTLs', label: 'Current TLs', type: 'readonly', value: school?.currentTLs ?? [], render: () => {
-                            const v = school?.currentTLs;
-                            if (typeof v === 'string') return v || <span className="text-slate-400">None assigned</span>;
-                            if (Array.isArray(v) && v.length > 0) return v.join(', ');
-                            return <span className="text-slate-400">None assigned</span>;
-                          } },
-                        ]}
-                      />
-
-                      {/* Size and Program (summary) */}
-                      <EntityCard
-                        title="Size and Program"
-                        columns={1}
-                        editable={false}
-                        showDivider={false}
-                        fields={[
-                          { key: 'enrollmentCap', label: 'Enrollment Capacity', type: 'readonly', value: school?.enrollmentCap ?? '' },
-                          { key: 'numberOfClassrooms', label: 'Number of Classrooms', type: 'readonly', value: school?.numberOfClassrooms ?? '' },
-                          { key: 'programFocus', label: 'Program Focus', type: 'readonly', value: Array.isArray(school?.programFocus) ? school.programFocus.join(', ') : (school?.programFocus || '') },
-                        ]}
-                      />
-
-                      {/* Status and Monitoring (summary) */}
-                      <EntityCard
-                        title="Status and Monitoring"
-                        columns={1}
-                        editable={false}
-                        showDivider={false}
-                        fields={[
-                          { key: 'riskFactors', label: 'Risk Factors', type: 'readonly', value: school?.riskFactors ?? [], render: (v) => v && v.length ? (
-                            <div className="flex flex-wrap gap-1">{v.map((x: string, i: number) => <Badge key={i} variant="destructive" className="text-xs">{x}</Badge>)}</div>
-                          ) : <span className="text-slate-400">None</span> },
-                          { key: 'watchlist', label: 'Watchlist', type: 'readonly', value: school?.watchlist ?? [], render: (v) => v && v.length ? (
-                            <div className="flex flex-wrap gap-1">{v.map((x: string, i: number) => <Badge key={i} variant="outline" className="text-xs border-orange-300 text-orange-700">{x}</Badge>)}</div>
-                          ) : <span className="text-slate-400">None</span> },
-                          { key: 'errors', label: 'Errors', type: 'readonly', value: school?.errors ?? [], render: (v) => v && v.length ? (
-                            <div className="flex flex-wrap gap-1">{v.map((x: string, i: number) => <Badge key={i} variant="destructive" className="text-xs">{x}</Badge>)}</div>
-                          ) : <span className="text-slate-400">None</span> },
-                        ]}
-                      />
-                    </DetailGrid>
-
-                    {/* End Summary Cards */}
-                  </div>
+                  <SummaryTab school={school} />
                 </TabsContent>
 
-                 <TabsContent value="details" className="mt-0">
-                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Details */}
+                {/* Details */}
+                <TabsContent value="details" className="mt-0">
+                  <DetailGrid>
+                    <EntityCard title="Name" columns={1} editable={false} showDivider={false} fields={[
+                      { key: 'name', label: 'School Name', type: 'readonly', value: school.name },
+                      { key: 'shortName', label: 'Short Name', type: 'readonly', value: school.shortName || '' },
+                      { key: 'priorNames', label: 'Prior Names', type: 'readonly', value: (school as any).priorNames || '' },
+                    ]} />
 
-                      {/* Name Card (standardized new component) */}
-                        <EntityCard
-                          title="Name"
-                          showDivider={false}
-                          fields={[
-                            { key: 'name', label: 'Name', type: 'text', value: school?.name ?? '', editable: true },
-                            { key: 'shortName', label: 'Short Name', type: 'text', value: school?.shortName ?? '', editable: true },
-                            { key: 'priorNames', label: 'Prior Names', type: 'textarea', value: school?.priorNames ?? '', editable: true },
-                          ]}
-                          onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
-                        />
-                        <EntityCard
-                          title="Program Details"
-                          showDivider={false}
-                          fields={[
-                            { key: 'programFocus', label: 'Program Focus', type: 'textarea', value: Array.isArray(school?.programFocus) ? (school?.programFocus || []).join(', ') : (school?.programFocus || ''), editable: true },
-                            { key: 'agesServed', label: 'Ages Served', type: 'multiselect', value: Array.isArray(school?.agesServed) ? (school?.agesServed || []) : (school?.agesServed ? [school?.agesServed] : []), editable: true, options: (fieldOptions?.agesServed || []).filter((o: string) => o && o.trim() !== '').map((o: string) => ({ label: o, value: o })) },
-                            { key: 'numberOfClassrooms', label: 'Number of Classrooms', type: 'number', value: school?.numberOfClassrooms ?? '', editable: true },
-                            { key: 'enrollmentCap', label: 'Enrollment Capacity', type: 'number', value: school?.enrollmentCap ?? '', editable: true },
-                          ]}
-                          onSave={(vals) => {
-                            const v: any = vals || {};
-                            const formatted: any = {};
-                            if (v.programFocus !== undefined) {
-                              formatted.programFocus = Array.isArray(v.programFocus)
-                                ? v.programFocus
-                                : String(v.programFocus)
-                                    .split(',')
-                                    .map((s) => s.trim())
-                                    .filter(Boolean);
-                            }
-                            if (v.agesServed !== undefined) {
-                              formatted.agesServed = Array.isArray(v.agesServed)
-                                ? v.agesServed
-                                : String(v.agesServed)
-                                    .split(',')
-                                    .map((s) => s.trim())
-                                    .filter(Boolean);
-                            }
-                            if (v.numberOfClassrooms !== undefined && v.numberOfClassrooms !== '') {
-                              formatted.numberOfClassrooms = Number(v.numberOfClassrooms);
-                            }
-                            if (v.enrollmentCap !== undefined && v.enrollmentCap !== '') {
-                              formatted.enrollmentCap = Number(v.enrollmentCap);
-                            }
-                            updateSchoolDetailsMutation.mutate(formatted);
-                          }}
-                        />
+                    <EntityCard title="Program Details" columns={1} editable={false} showDivider={false} fields={[
+                      { key: 'governanceModel', label: 'Governance', type: 'readonly', value: school.governanceModel || '' },
+                      { key: 'agesServed', label: 'Ages Served', type: 'readonly', value: school.agesServed?.join(', ') || '' },
+                      { key: 'programFocus', label: 'Program Focus', type: 'readonly', value: Array.isArray(school.programFocus) ? school.programFocus.join(', ') : (school.programFocus || '') },
+                      { key: 'numberOfClassrooms', label: 'Number of Classrooms', type: 'readonly', value: (school as any).numberOfClassrooms ?? '' },
+                      { key: 'enrollmentCap', label: 'Enrollment Capacity', type: 'readonly', value: (school as any).enrollmentCap ?? '' },
+                      { key: 'currentEnrollment', label: 'Current Enrollment', type: 'readonly', value: (school as any).currentEnrollment ?? '' },
+                      { key: 'status', label: 'School Status', type: 'readonly', value: (school as any).status || '' },
+                      { key: 'stageStatus', label: 'Stage/Status', type: 'readonly', value: (school as any).stageStatus || '' },
+                      { key: 'openDate', label: 'Open Date', type: 'readonly', value: school.openDate || '' },
+                    ]} />
 
+                    <EntityCard title="Legal Entity Structure" columns={1} editable={false} showDivider={false} fields={[
+                      { key: 'institutionalPartner', label: 'Institutional Partner', type: 'readonly', value: (school as any).institutionalPartner || '' },
+                      { key: 'charterId', label: 'Charter ID', type: 'readonly', value: (school as any).charterId || '' },
+                    ]} />
 
-                    {/* Legal Entity Structure + Nonprofit Status (new cards) */}
-                      <EntityCard
-                        title="Legal Entity Structure"
-                        showDivider={false}
-                        fields={[
-                          { key: 'governanceModel', label: 'Governance Model', type: 'text', value: school?.governanceModel ?? '' },
-                          { key: 'legalStructure', label: 'Legal Structure', type: 'text', value: school?.legalStructure ?? '' },
-                          { key: 'EIN', label: 'EIN', type: 'text', value: school?.EIN ?? '' },
-                          { key: 'legalName', label: 'Legal Name', type: 'text', value: school?.legalName ?? '' },
-                          { key: 'incorporationDate', label: 'Incorporation Date', type: 'date', value: school?.incorporationDate ?? '' },
-                          { key: 'currentFYEnd', label: 'Current FY End', type: 'text', value: school?.currentFYEnd ?? '' },
-                        ]}
-                        onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
-                      />
-                      <EntityCard
-                         title="Nonprofit Status"
-                        showDivider={false}
-                        fields={[
-                          { key: 'nonprofitStatus', label: 'Nonprofit Status', type: 'text', value: school?.nonprofitStatus ?? '' },
-                          { key: 'groupExemptionStatus', label: 'Group Exemption Status', type: 'text', value: school?.groupExemptionStatus ?? '' },
-                          { key: 'groupExemptionDateGranted', label: 'Date Granted', type: 'date', value: school?.groupExemptionDateGranted ?? '' },
-                          { key: 'groupExemptionDateWithdrawn', label: 'Date Withdrawn', type: 'date', value: school?.groupExemptionDateWithdrawn ?? '' },
-                        ]}
-                        onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
-                      />
+                    <EntityCard title="Nonprofit Status" columns={1} editable={false} showDivider={false} fields={[
+                      { key: 'membershipStatus', label: 'Membership Status', type: 'readonly', value: (school as any).membershipStatus || '' },
+                      { key: 'groupExemptionStatus', label: 'Group Exemption Status', type: 'readonly', value: (school as any).groupExemptionStatus || '' },
+                      { key: 'groupExemptionDateGranted', label: 'Date Granted', type: 'readonly', value: (school as any).groupExemptionDateGranted || '' },
+                      { key: 'groupExemptionDateWithdrawn', label: 'Date Withdrawn', type: 'readonly', value: (school as any).groupExemptionDateWithdrawn || '' },
+                      { key: 'leftNetworkDate', label: 'Left Network Date', type: 'readonly', value: (school as any).leftNetworkDate || '' },
+                      { key: 'leftNetworkReason', label: 'Left Network Reason', type: 'readonly', value: (school as any).leftNetworkReason || '' },
+                    ]} />
 
-                    {/* Business & Financial Systems, School Contact, Online Presence (new cards) */}
-                      <EntityCard
-                        title="Business & Financial Systems"
-                        showDivider={false}
-                        fields={[
-                          { key: 'businessInsurance', label: 'Business Insurance', type: 'text', value: school?.businessInsurance ?? '' },
-                          { key: 'billComAccount', label: 'Bill.com Account', type: 'text', value: school?.billComAccount ?? '' },
-                        ]}
-                        onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
-                      />
-                      <EntityCard
-                         title="School Contact Information"
-                        showDivider={false}
-                        fields={[
-                          { key: 'email', label: 'School Email', type: 'text', value: school?.email ?? '' },
-                          { key: 'phone', label: 'School Phone', type: 'text', value: school?.phone ?? '' },
-                        ]}
-                        onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
-                      />
-                      <EntityCard
-                         title="Online Presence"
-                        showDivider={false}
-                        fields={[
-                          { key: 'website', label: 'Website', type: 'text', value: school?.website ?? '' },
-                          { key: 'facebook', label: 'Facebook', type: 'text', value: school?.facebook ?? '' },
-                          { key: 'instagram', label: 'Instagram', type: 'text', value: school?.instagram ?? '' },
-                        ]}
-                        onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)}
-                      />
+                    <EntityCard title="School Contact Information" columns={1} editable={false} showDivider={false} fields={[
+                      { key: 'phone', label: 'School Phone', type: 'readonly', value: (school as any).phone || '' },
+                      { key: 'email', label: 'School Email', type: 'readonly', value: (school as any).email || '' },
+                      { key: 'activePhysicalAddress', label: 'Address', type: 'readonly', value: (school as any).activePhysicalAddress || '' },
+                    ]} />
 
-                    {/* 
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">EIN</label>
-                          {isEditingDetails ? (
-                            <div className="relative">
-                              <Input
-                                type="text"
-                                className={`mt-1 ${getFieldErrorStyle('EIN')}`}
-                                placeholder="XX-XXXXXXX"
-                                value={editedDetails?.EIN || ''}
-                                onChange={(e) => {
-                                  let value = e.target.value.replace(/[^\d-]/g, ''); // Only allow digits and hyphens
-                                  // Auto-format: add hyphen after 2 digits if not present
-                                  if (value.length === 2 && !value.includes('-')) {
-                                    value = value + '-';
-                                  }
-                                  // Limit length to 10 characters (XX-XXXXXXX)
-                                  if (value.length <= 10) {
-                                    handleFieldChange('EIN', value);
-                                  }
-                                }}
-                              />
-                              {hasValidationError('EIN') && (
-                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                  <div className="h-4 w-4 text-red-500">⚠</div>
-                                </div>
-                              )}
-                              {hasValidationError('EIN') && (
-                                <p className="mt-1 text-xs text-red-600">{validationErrors.EIN}</p>
-                              )}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.EIN || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Legal Name</label>
-                          {isEditingDetails ? (
-                            <Input
-                              type="text"
-                              className={`mt-1 ${getFieldErrorStyle('legalName')}`}
-                              value={editedDetails?.legalName || ''}
-                              onChange={(e) => handleFieldChange('legalName', e.target.value)}
-                            />
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.legalName || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Legal Structure</label>
-                          {isEditingDetails ? (
-                            <Select
-                              value={editedDetails?.legalStructure || ''}
-                              onValueChange={(value) => setEditedDetails({ ...editedDetails, legalStructure: value })}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue placeholder="Select legal structure" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {fieldOptions?.legalStructure?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.legalStructure || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Incorporation Date</label>
-                          {isEditingDetails ? (
-                            <div className="relative">
-                              <Input
-                                type="date"
-                                className={`mt-1 ${getFieldErrorStyle('incorporationDate')}`}
-                                value={editedDetails?.incorporationDate || ''}
-                                onChange={(e) => handleFieldChange('incorporationDate', e.target.value)}
-                              />
-                              {hasValidationError('incorporationDate') && (
-                                <div className="absolute inset-y-0 right-8 pr-3 flex items-center pointer-events-none">
-                                  <div className="h-4 w-4 text-red-500">⚠</div>
-                                </div>
-                              )}
-                              {hasValidationError('incorporationDate') && (
-                                <p className="mt-1 text-xs text-red-600">{validationErrors.incorporationDate}</p>
-                              )}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.incorporationDate || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Nonprofit Status</label>
-                          {isEditingDetails ? (
-                            <Select
-                              value={editedDetails?.nonprofitStatus || ''}
-                              onValueChange={(value) => setEditedDetails({ ...editedDetails, nonprofitStatus: value })}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue placeholder="Select nonprofit status" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {fieldOptions?.nonprofitStatus?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.nonprofitStatus || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Current FY End</label>
-                          {isEditingDetails ? (
-                            <Select
-                              value={editedDetails?.currentFYEnd || ''}
-                              onValueChange={(value) => setEditedDetails({ ...editedDetails, currentFYEnd: value })}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue placeholder="Select FY end date" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {fieldOptions?.currentFYEnd?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.currentFYEnd || '-'}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Governance Model</label>
-                          {isEditingDetails ? (
-                            <Select
-                              value={editedDetails?.governanceModel || ''}
-                              onValueChange={(value) => setEditedDetails({ ...editedDetails, governanceModel: value })}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue placeholder="Select governance model" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {fieldOptions?.governanceModel?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <p className="text-sm text-slate-900 mt-1">{school.governanceModel || '-'}</p>
-                          )}
-                        </div>
-                      </div>
-                      */}
-                      {/* Group Exemption Fields - Always show */}
-                      <div className="border-t border-gray-200 mt-4 pt-4">
-                        <h4 className="text-sm font-medium text-slate-700 mb-3">Group Exemption Information</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Group Exemption Status</label>
-                            {isEditingDetails ? (
-                              <Select
-                                value={editedDetails?.groupExemptionStatus || ''}
-                                onValueChange={(value) => setEditedDetails({ ...editedDetails, groupExemptionStatus: value })}
-                              >
-                                <SelectTrigger className="mt-1">
-                                  <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {fieldOptions?.groupExemptionStatus?.filter((option: string) => option && option.trim() !== '').map((option: string) => (
-                                    <SelectItem key={option} value={option}>
-                                      {option}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            ) : (
-                              <p className="text-sm text-slate-900 mt-1">{school.groupExemptionStatus || '-'}</p>
-                            )}
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Date Granted</label>
-                            {isEditingDetails ? (
-                              <Input
-                                type="date"
-                                className={`mt-1 ${
-                                  editedDetails?.groupExemptionStatus === 'Applying' || 
-                                  editedDetails?.groupExemptionStatus === 'Other - Not part of exemption'
-                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''
-                                }`}
-                                value={editedDetails?.groupExemptionDateGranted || ''}
-                                onChange={(e) => setEditedDetails({ ...editedDetails, groupExemptionDateGranted: e.target.value })}
-                                disabled={
-                                  editedDetails?.groupExemptionStatus === 'Applying' || 
-                                  editedDetails?.groupExemptionStatus === 'Other - Not part of exemption'
-                                }
-                              />
-                            ) : (
-                              <p className="text-sm text-slate-900 mt-1">{school.groupExemptionDateGranted || '-'}</p>
-                            )}
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Date Withdrawn</label>
-                            {isEditingDetails ? (
-                              <Input
-                                type="date"
-                                className={`mt-1 ${
-                                  editedDetails?.groupExemptionStatus === 'Applying' || 
-                                  editedDetails?.groupExemptionStatus === 'Other - Not part of exemption' ||
-                                  editedDetails?.groupExemptionStatus === 'Active' ||
-                                  editedDetails?.groupExemptionStatus === 'Issues'
-                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''
-                                }`}
-                                value={editedDetails?.groupExemptionDateWithdrawn || ''}
-                                onChange={(e) => setEditedDetails({ ...editedDetails, groupExemptionDateWithdrawn: e.target.value })}
-                                disabled={
-                                  editedDetails?.groupExemptionStatus === 'Applying' || 
-                                  editedDetails?.groupExemptionStatus === 'Other - Not part of exemption' ||
-                                  editedDetails?.groupExemptionStatus === 'Active' ||
-                                  editedDetails?.groupExemptionStatus === 'Issues'
-                                }
-                              />
-                            ) : (
-                              <p className="text-sm text-slate-900 mt-1">{school.groupExemptionDateWithdrawn || '-'}</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
+                    <EntityCard title="Online Presence" columns={1} editable={false} showDivider={false} fields={[
+                      { key: 'website', label: 'Website', type: 'readonly', value: (school as any).website || '', render: (url: string) => url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{url}</a>) : (<span className="text-slate-400">-</span>) },
+                      { key: 'instagram', label: 'Instagram', type: 'readonly', value: (school as any).instagram || '', render: (url: string) => url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{url}</a>) : (<span className="text-slate-400">-</span>) },
+                      { key: 'facebook', label: 'Facebook', type: 'readonly', value: (school as any).facebook || '', render: (url: string) => url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{url}</a>) : (<span className="text-slate-400">-</span>) },
+                    ]} />
+                  </DetailGrid>
                 </TabsContent>
 
                 <TabsContent value="tls" className="mt-0">
@@ -3400,7 +2545,7 @@ export default function SchoolDetail() {
                     </div>
                   ) : associations && associations.length > 0 ? (
                     <div className="border rounded-lg p-3">
-                      <SchoolTLsGrid 
+                      <SchoolTLsAssociationGrid 
                         school={school} 
                         associations={associations}
                         teachers={teachers || []}
@@ -3455,7 +2600,7 @@ export default function SchoolDetail() {
                         <Skeleton className="h-8 w-full" />
                       </div>
                     ) : (
-                      <LocationsGrid
+                      <LocationsTab
                         locations={locations || []}
                         onUpdate={(id, data) => updateLocationMutation.mutate({ locationId: id, data })}
                         onDelete={(id) => { setDeletingLocationId(id); setLocationDeleteModalOpen(true); }}
@@ -3475,12 +2620,18 @@ export default function SchoolDetail() {
                           <Skeleton className="h-8 w-full" />
                         </div>
                       ) : (
-                        <>
-                          <div className="border rounded-lg">
-                            <Table>
+                        <TableCard
+                          title="Governance Documents"
+                          actionsRight={
+                            <Button size="sm" onClick={() => setIsCreatingDocument(true)}>
+                              Add Document
+                            </Button>
+                          }
+                        >
+                          <Table>
                               <TableHeader>
                                 <TableRow className="h-8">
-                                  <TableHead className="h-8 py-1">Governance documents</TableHead>
+                                  <TableHead className="h-8 py-1">Document title</TableHead>
                                   <TableHead className="h-8 py-1">Date</TableHead>
                                   <TableHead className="h-8 py-1 w-16">Actions</TableHead>
                                 </TableRow>
@@ -3562,18 +2713,20 @@ export default function SchoolDetail() {
                                 )}
                               </TableBody>
                             </Table>
-                          </div>
-                        </>
+                        </TableCard>
                       )}
                     </div>
 
                     {/* 990s - Right Column */}
                     <div className="space-y-4">
-                      <div className="border rounded-lg">
+                      <TableCard
+                        title="990s"
+                        actionsRight={<Button size="sm" onClick={() => setIsCreating990(true)}>Add 990</Button>}
+                      >
                         <Table>
                           <TableHeader>
                             <TableRow className="h-8">
-                              <TableHead className="h-8 py-1">990 year</TableHead>
+                              <TableHead className="h-8 py-1">Year</TableHead>
                               <TableHead className="h-8 py-1 w-16">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
@@ -3654,7 +2807,7 @@ export default function SchoolDetail() {
                             )}
                           </TableBody>
                         </Table>
-                      </div>
+                      </TableCard>
                     </div>
                   </div>
                 </TabsContent>
@@ -3668,7 +2821,7 @@ export default function SchoolDetail() {
                         <Skeleton className="h-8 w-full" />
                       </div>
                     ) : (guideAssignments && guideAssignments.length > 0) ? (
-                      <GuidesGrid
+                      <GuidesTab
                         assignments={guideAssignments}
                         onUpdate={(id, data) => updateGuideAssignmentMutation.mutate({ guideId: id, data })}
                         onDelete={(id) => { setDeletingGuideId(id); setGuideDeleteModalOpen(true); }}
@@ -3688,6 +2841,7 @@ export default function SchoolDetail() {
                     <EntityCard
                       title="High Priority Fields"
                       columns={3}
+                      showDivider={false}
                       fields={[
                         { key: 'ssjStage', label: 'SSJ Stage', type: 'text', value: school?.ssjStage ?? '' },
                         { key: 'status', label: 'School Status', type: 'text', value: school?.status ?? '' },
@@ -3700,6 +2854,7 @@ export default function SchoolDetail() {
                     <EntityCard
                       title="Timeline & Milestones"
                       columns={3}
+                      showDivider={false}
                       fields={[
                         { key: 'ssjOriginalProjectedOpenDate', label: 'Original Projected Open Date', type: 'date', value: school?.ssjOriginalProjectedOpenDate ?? '' },
                         { key: 'ssjProjectedOpen', label: 'Projected Open Date', type: 'date', value: school?.ssjProjectedOpen ?? '' },
@@ -3717,6 +2872,7 @@ export default function SchoolDetail() {
                     <EntityCard
                       title="Funding & Financial Planning"
                       columns={1}
+                      showDivider={false}
                       fields={[
                         { key: 'budgetLink', label: 'Budget Link', type: 'text', value: school?.budgetLink ?? '' },
                       ]}
@@ -3727,6 +2883,7 @@ export default function SchoolDetail() {
                     <EntityCard
                       title="Albums"
                       columns={2}
+                      showDivider={false}
                       fields={[
                         { key: 'planningAlbum', label: 'Planning Album', type: 'text', value: school?.planningAlbum ?? '' },
                         { key: 'visioningAlbum', label: 'Visioning Album', type: 'text', value: school?.visioningAlbum ?? '' },
@@ -3738,6 +2895,7 @@ export default function SchoolDetail() {
                     <EntityCard
                       title="Cohorts"
                       columns={2}
+                      showDivider={false}
                       fields={[
                         { key: 'cohorts', label: 'Cohorts', type: 'multiselect', value: school?.cohorts ?? [], placeholder: 'Comma separated list' },
                         { key: 'ssjOpsGuideTrack', label: 'Ops Guide Track', type: 'multiselect', value: school?.ssjOpsGuideTrack ?? [], placeholder: 'Comma separated list' },
@@ -3753,20 +2911,29 @@ export default function SchoolDetail() {
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* Grants Table */}
-                      <div className="space-y-4">
-                        
+                      <TableCard
+                        title="Grants"
+                        actionsRight={
+                          <div className="flex items-center gap-2">
+                            {!isCreatingGrant && (
+                              <Button size="sm" onClick={() => setIsCreatingGrant(true)}>
+                                Add Grant
+                              </Button>
+                            )}
+                          </div>
+                        }
+                      >
                         {grantsLoading ? (
-                          <div className="space-y-3">
+                          <div className="space-y-3 p-3">
                             <Skeleton className="h-8 w-full" />
                             <Skeleton className="h-8 w-full" />
                             <Skeleton className="h-8 w-full" />
                           </div>
-                        ) : grants && grants.length > 0 || isCreatingGrant ? (
-                          <div className="border rounded-lg">
-                            <Table>
+                        ) : (grants && grants.length > 0) || isCreatingGrant ? (
+                          <Table>
                               <TableHeader>
                                 <TableRow>
-                                  <TableHead>Grant Amount</TableHead>
+                                <TableHead>Amount</TableHead>
                                   <TableHead>Issued Date</TableHead>
                                   <TableHead>Issued By</TableHead>
                                   <TableHead>Status</TableHead>
@@ -3811,13 +2978,13 @@ export default function SchoolDetail() {
                                     </TableCell>
                                     <TableCell>
                                       <div className="flex gap-1">
-                                        <Button
-                                          size="sm"
-                                          onClick={() => {/* grant mutation here */}}
-                                          className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
-                                        >
-                                          Save
-                                        </Button>
+                                       <Button
+                                         size="sm"
+                                         onClick={() => createGrantMutation.mutate(newGrant)}
+                                         className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+                                       >
+                                         Save
+                                       </Button>
                                         <Button
                                           size="sm"
                                           variant="outline"
@@ -3833,9 +3000,9 @@ export default function SchoolDetail() {
                                     </TableCell>
                                   </TableRow>
                                 )}
-                                {grants?.map((grant) => (
-                                  <GrantRow
-                                    key={grant.id}
+                               {sortedGrants.map((grant) => (
+                                 <GrantRow
+                                   key={grant.id}
                                     grant={grant}
                                     isEditing={editingGrantId === grant.id}
                                     onEdit={() => setEditingGrantId(grant.id)}
@@ -3849,28 +3016,25 @@ export default function SchoolDetail() {
                                   />
                                 ))}
                               </TableBody>
-                            </Table>
-                          </div>
+                          </Table>
                         ) : (
                           <div className="text-center py-8 text-slate-500">
                             <p>No grants found for this school.</p>
                             <p className="text-sm mt-2">Use the "Add Grant" button above to create grants.</p>
                           </div>
                         )}
-                      </div>
+                      </TableCard>
 
                       {/* Loans Table */}
-                      <div className="space-y-4">
-                        
+                      <TableCard title="Loans">
                         {loansLoading ? (
-                          <div className="space-y-3">
+                          <div className="space-y-3 p-3">
                             <Skeleton className="h-8 w-full" />
                             <Skeleton className="h-8 w-full" />
                             <Skeleton className="h-8 w-full" />
                           </div>
-                        ) : loans && loans.length > 0 || isCreatingLoan ? (
-                          <div className="border rounded-lg">
-                            <Table>
+                        ) : (loans && loans.length > 0) || isCreatingLoan ? (
+                          <Table>
                               <TableHeader>
                                 <TableRow>
                                   <TableHead>Loan Amount</TableHead>
@@ -3949,15 +3113,14 @@ export default function SchoolDetail() {
                                   />
                                 ))}
                               </TableBody>
-                            </Table>
-                          </div>
+                          </Table>
                         ) : (
                           <div className="text-center py-8 text-slate-500">
                             <p>No loans found for this school.</p>
                             <p className="text-sm mt-2">Use the "Add Loan" button above to create loans.</p>
                           </div>
                         )}
-                      </div>
+                      </TableCard>
                     </div>
                   </div>
                 </TabsContent>
@@ -4115,7 +3278,7 @@ export default function SchoolDetail() {
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* School Notes Table */}
-                      <div className="space-y-4">
+                      <TableCard title="Notes" actionsRight={<Button size="sm" onClick={() => setIsCreatingNote(true)}>Add Note</Button>}>
                         {notesLoading ? (
                           <div className="space-y-3">
                             <Skeleton className="h-8 w-full" />
@@ -4123,8 +3286,7 @@ export default function SchoolDetail() {
                             <Skeleton className="h-8 w-full" />
                           </div>
                         ) : schoolNotes && schoolNotes.length > 0 || isCreatingNote ? (
-                          <div className="border rounded-lg overflow-hidden">
-                            <Table className="table-fixed w-full">
+                          <Table className="table-fixed w-full">
                               <TableHeader>
                                 <TableRow>
                                   <TableHead className="w-[15%]">Date</TableHead>
@@ -4235,17 +3397,16 @@ export default function SchoolDetail() {
                                 ))}
                               </TableBody>
                             </Table>
-                          </div>
                         ) : (
                           <div className="text-center py-8 text-slate-500">
                             <p>No notes found for this school.</p>
                             <p className="text-sm mt-2">Use the "Add Note" button above to create notes.</p>
                           </div>
                         )}
-                      </div>
+                      </TableCard>
 
                       {/* Action Steps Table */}
-                      <div className="space-y-4">
+                      <TableCard title="Action Steps" actionsRight={<Button size="sm" onClick={() => setIsCreatingAction(true)}>Add Action</Button>}>
                         {actionStepsLoading ? (
                           <div className="space-y-3">
                             <Skeleton className="h-8 w-full" />
@@ -4253,18 +3414,49 @@ export default function SchoolDetail() {
                             <Skeleton className="h-8 w-full" />
                           </div>
                         ) : actionSteps && actionSteps.length > 0 ? (
-                          <div className="border rounded-lg overflow-hidden">
-                            <Table className="table-fixed w-full">
-                              <TableHeader>
+                          <Table className="table-fixed w-full">
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead className="w-[35%]">Action item</TableHead>
+                                <TableHead className="w-[15%]">Assignee</TableHead>
+                                <TableHead className="w-[15%]">Due Date</TableHead>
+                                <TableHead className="w-[15%]">Status</TableHead>
+                                <TableHead className="w-[20%]">Actions</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {isCreatingAction && (
                                 <TableRow>
-                                  <TableHead className="w-[35%]">Action item</TableHead>
-                                  <TableHead className="w-[15%]">Assignee</TableHead>
-                                  <TableHead className="w-[15%]">Due Date</TableHead>
-                                  <TableHead className="w-[15%]">Status</TableHead>
-                                  <TableHead className="w-[20%]">Actions</TableHead>
+                                  <TableCell className="py-1 text-sm">
+                                    <Input value={newAction.item} onChange={(e) => setNewAction({ ...newAction, item: e.target.value })} placeholder="Action item" className="h-8" />
+                                  </TableCell>
+                                  <TableCell className="py-1 text-sm">
+                                    <Input value={newAction.assignee} onChange={(e) => setNewAction({ ...newAction, assignee: e.target.value })} placeholder="Assignee" className="h-8" />
+                                  </TableCell>
+                                  <TableCell className="py-1 text-sm">
+                                    <Input type="date" value={newAction.dueDate} onChange={(e) => setNewAction({ ...newAction, dueDate: e.target.value })} className="h-8" />
+                                  </TableCell>
+                                  <TableCell className="py-1 text-sm">
+                                    <Select value={newAction.status} onValueChange={(v) => setNewAction({ ...newAction, status: v })}>
+                                      <SelectTrigger className="h-8">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="Pending">Pending</SelectItem>
+                                        <SelectItem value="In Progress">In Progress</SelectItem>
+                                        <SelectItem value="Overdue">Overdue</SelectItem>
+                                        <SelectItem value="Completed">Completed</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </TableCell>
+                                  <TableCell className="py-1">
+                                    <div className="flex gap-1">
+                                      <Button size="sm" className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white" onClick={() => createActionStepMutation.mutate(newAction)}>Save</Button>
+                                      <Button size="sm" variant="outline" className="h-8 px-2" onClick={() => { setIsCreatingAction(false); setNewAction({ item: "", assignee: "", dueDate: "", status: "Pending" }); }}>Cancel</Button>
+                                    </div>
+                                  </TableCell>
                                 </TableRow>
-                              </TableHeader>
-                              <TableBody>
+                              )}
                                 {actionSteps
                                   .sort((a, b) => {
                                     // Sort by status (incomplete first) then by due date
@@ -4345,14 +3537,13 @@ export default function SchoolDetail() {
                                 ))}
                               </TableBody>
                             </Table>
-                          </div>
                         ) : (
                           <div className="text-center py-8 text-slate-500">
                             <p>No action steps found for this school.</p>
                             <p className="text-sm mt-2">Action items will appear here when assigned.</p>
                           </div>
                         )}
-                      </div>
+                      </TableCard>
                     </div>
                   </div>
                 </TabsContent>

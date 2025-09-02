@@ -14,7 +14,7 @@ export const DEFAULT_GRID_PROPS = {
   pagination: false,
   rowHeight: 30,
   headerHeight: 40 as number,
-  domLayout: 'normal' as const,
+  domLayout: 'autoHeight' as const,
   enableBrowserTooltips: true,
   sideBar: undefined as any,
   rowSelection: {

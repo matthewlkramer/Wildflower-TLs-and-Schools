@@ -19,20 +19,39 @@ interface MapComponentProps {
   currentAddress?: string;
   address?: string;
   schoolLogo?: string;
+  mapId?: string;
 }
 
-const MapComponent = ({ center, zoom, schoolName, shortName, currentAddress, address, schoolLogo }: MapComponentProps) => {
+const MapComponent = ({ center, zoom, schoolName, shortName, currentAddress, address, schoolLogo, mapId }: MapComponentProps) => {
   const ref = React.useRef<HTMLDivElement>(null);
   const [map, setMap] = React.useState<google.maps.Map>();
 
-  // Create custom flower icon
-  const createFlowerIcon = React.useCallback((logoUrl: string) => {
+  // Create custom marker content for AdvancedMarkerElement
+  const createMarkerContent = React.useCallback((logoUrl: string) => {
+    const img = document.createElement('img');
+    img.src = logoUrl;
+    img.alt = 'School marker';
+    img.style.width = '40px';
+    img.style.height = '40px';
+    img.style.borderRadius = '50%';
+    img.style.objectFit = 'cover';
+
+    // Center the marker visually similar to the old anchor (20,20)
+    const container = document.createElement('div');
+    container.style.position = 'relative';
+    container.style.transform = 'translate(-50%, -50%)';
+    container.appendChild(img);
+    return container;
+  }, []);
+
+  // Fallback icon for legacy Marker when Advanced Markers cannot be used
+  const createLegacyIcon = React.useCallback((logoUrl: string) => {
     return {
       url: logoUrl,
       scaledSize: new window.google.maps.Size(40, 40),
       anchor: new window.google.maps.Point(20, 20),
       origin: new window.google.maps.Point(0, 0),
-    };
+    } as google.maps.Icon;
   }, []);
 
   // Create info window content
@@ -62,16 +81,25 @@ const MapComponent = ({ center, zoom, schoolName, shortName, currentAddress, add
           mapTypeControl: false,
           streetViewControl: false,
           fullscreenControl: false,
+          ...(mapId ? { mapId } : {}),
         });
         
-        // Create custom marker with flower icon - prioritize flower-only logo
-        const icon = createFlowerIcon(schoolLogo || logoImage);
-        const marker = new window.google.maps.Marker({
-          position: center,
-          map: newMap,
-          title: schoolName || "School Location",
-          icon: icon,
-        });
+        // Create marker
+        const AdvancedMarker = (window.google.maps as any).marker?.AdvancedMarkerElement;
+        const canUseAdvanced = !!AdvancedMarker && !!mapId;
+        const marker = canUseAdvanced
+          ? new AdvancedMarker({
+              position: center,
+              map: newMap,
+              title: schoolName || "School Location",
+              content: createMarkerContent(schoolLogo || logoImage),
+            })
+          : new window.google.maps.Marker({
+              position: center,
+              map: newMap,
+              title: schoolName || "School Location",
+              icon: createLegacyIcon(schoolLogo || logoImage),
+            });
 
         // Create info window
         const infoWindow = new window.google.maps.InfoWindow({
@@ -79,12 +107,22 @@ const MapComponent = ({ center, zoom, schoolName, shortName, currentAddress, add
         });
 
         // Open info window by default
-        infoWindow.open(newMap, marker);
+        if (canUseAdvanced) {
+          infoWindow.open({ map: newMap, anchor: marker });
+        } else {
+          infoWindow.open(newMap, marker as google.maps.Marker);
+        }
 
         // Add click listener to marker
-        marker.addListener('click', () => {
-          infoWindow.open(newMap, marker);
-        });
+        if (canUseAdvanced) {
+          marker.addListener('gmp-click', () => {
+            infoWindow.open({ map: newMap, anchor: marker });
+          });
+        } else {
+          (marker as google.maps.Marker).addListener('click', () => {
+            infoWindow.open(newMap, marker as google.maps.Marker);
+          });
+        }
         
         setMap(newMap);
       } 
@@ -100,16 +138,25 @@ const MapComponent = ({ center, zoom, schoolName, shortName, currentAddress, add
               mapTypeControl: false,
               streetViewControl: false,
               fullscreenControl: false,
+              ...(mapId ? { mapId } : {}),
             });
 
-            // Create custom marker with flower icon
-            const icon = createFlowerIcon(schoolLogo || logoImage);
-            const marker = new window.google.maps.Marker({
-              position: location,
-              map: newMap,
-              title: schoolName || "School Location",
-              icon: icon,
-            });
+            // Create marker
+            const AdvancedMarker = (window.google.maps as any).marker?.AdvancedMarkerElement;
+            const canUseAdvanced = !!AdvancedMarker && !!mapId;
+            const marker = canUseAdvanced
+              ? new AdvancedMarker({
+                  position: location,
+                  map: newMap,
+                  title: schoolName || "School Location",
+                  content: createMarkerContent(schoolLogo || logoImage),
+                })
+              : new window.google.maps.Marker({
+                  position: location,
+                  map: newMap,
+                  title: schoolName || "School Location",
+                  icon: createLegacyIcon(schoolLogo || logoImage),
+                });
 
             // Create info window
             const infoWindow = new window.google.maps.InfoWindow({
@@ -117,12 +164,22 @@ const MapComponent = ({ center, zoom, schoolName, shortName, currentAddress, add
             });
 
             // Open info window by default
-            infoWindow.open(newMap, marker);
+            if (canUseAdvanced) {
+              infoWindow.open({ map: newMap, anchor: marker });
+            } else {
+              infoWindow.open(newMap, marker as google.maps.Marker);
+            }
 
             // Add click listener to marker
-            marker.addListener('click', () => {
-              infoWindow.open(newMap, marker);
-            });
+            if (canUseAdvanced) {
+              marker.addListener('gmp-click', () => {
+                infoWindow.open({ map: newMap, anchor: marker });
+              });
+            } else {
+              (marker as google.maps.Marker).addListener('click', () => {
+                infoWindow.open(newMap, marker as google.maps.Marker);
+              });
+            }
             
             setMap(newMap);
           } else {
@@ -141,7 +198,7 @@ const MapComponent = ({ center, zoom, schoolName, shortName, currentAddress, add
         });
       }
     }
-  }, [ref, map, center, zoom, schoolName, shortName, currentAddress, address, schoolLogo, createFlowerIcon, createInfoWindowContent]);
+  }, [ref, map, center, zoom, schoolName, shortName, currentAddress, address, schoolLogo, mapId, createMarkerContent, createLegacyIcon, createInfoWindowContent]);
 
   React.useEffect(() => {
     if (map && center) {
@@ -206,6 +263,7 @@ export function GoogleMap({ latitude, longitude, schoolName, shortName, fallback
   
   // Check if API key is available
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID as string | undefined;
   
   if (!apiKey) {
     return (
@@ -232,7 +290,8 @@ export function GoogleMap({ latitude, longitude, schoolName, shortName, fallback
       schoolName, 
       shortName, 
       currentAddress: addressText, 
-      schoolLogo 
+      schoolLogo,
+      mapId,
     };
     
     return (
@@ -254,7 +313,8 @@ export function GoogleMap({ latitude, longitude, schoolName, shortName, fallback
       shortName, 
       address: addressText, 
       currentAddress: addressText, 
-      schoolLogo 
+      schoolLogo,
+      mapId,
     };
     
     return (

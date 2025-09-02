@@ -213,6 +213,7 @@ export interface School {
   leftNetworkReason?: string;
   membershipStatus?: string;
   founders?: string[];
+  foundersFullNames?: string[]; // Derived full names from Founders List
   currentTLs?: string[];
   currentGuides?: string[];
   narrative?: string;

@@ -7,7 +7,7 @@ import { useState, createContext, useEffect, useMemo, useContext } from "react";
 import { addNewEmitter } from "@/lib/add-new-emitter";
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
-import { AuthProvider } from "@/contexts/auth-context";
+import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import { UserFilterProvider } from "@/contexts/user-filter-context";
 import { initAgGridEnterprise } from "@/lib/ag-grid-enterprise";
 
@@ -24,6 +24,10 @@ import TeacherDetail from "@/pages/teacher-detail";
 import SchoolDetail from "@/pages/school-detail";
 import CharterDetail from "@/pages/charter-detail";
 import NotFound from "@/pages/not-found";
+import Settings from "@/pages/settings";
+import GoogleSyncPage from "@/pages/google-sync";
+import LoginPage from "@/pages/login";
+import ResetPasswordPage from "@/pages/reset";
 
 // Use a shared search context to avoid module duplication issues
 import { SearchContext } from "@/contexts/search-context";
@@ -50,8 +54,32 @@ export const usePageTitle = () => useContext(PageTitleContext);
 export const useAddNew = () => useContext(AddNewContext);
 
 function Router() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const [loc, navigate] = useLocation();
+  const isAuthFree = loc === '/login' || loc.startsWith('/reset');
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (!isAuthenticated && !isAuthFree) navigate('/login', { replace: true });
+    if (isAuthenticated && loc === '/login') navigate('/', { replace: true });
+  }, [isAuthenticated, isLoading, loc, navigate, isAuthFree]);
+
+  // During auth check, or when redirecting unauthenticated users, avoid rendering target routes
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-slate-600">
+        Loading...
+      </div>
+    );
+  }
+  if (!isAuthenticated && !isAuthFree) {
+    return <LoginPage />;
+  }
+
   return (
     <Switch>
+      <Route path="/login" component={LoginPage} />
+      <Route path="/reset" component={ResetPasswordPage} />
       <Route path="/" component={Dashboard} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/teachers" component={Teachers} />
@@ -63,6 +91,8 @@ function Router() {
       <Route path="/loans" component={LoansPage} />
       <Route path="/loans/:id" component={LoanDetail} />
       <Route path="/loan-origination" component={LoanOrigination} />
+      <Route path="/settings" component={Settings} />
+      <Route path="/google-sync" component={GoogleSyncPage} />
       <Route path="/ach-setup/:loanId" component={ACHSetup} />
       <Route path="/ach-setup-complete" component={ACHSetupComplete} />
       <Route component={NotFound} />
@@ -73,6 +103,7 @@ function Router() {
 function AppContent() {
   // Initialize AG Grid Enterprise (license + modules) if available
   initAgGridEnterprise();
+  const { isAuthenticated } = useAuth();
   const [location] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [pageTitle, setPageTitle] = useState("");
@@ -132,8 +163,9 @@ function AppContent() {
     try { console.log('[App] location:', location); } catch {}
   }, [location]);
 
-  // Prefetch core datasets on app start for snappiness
+  // Prefetch core datasets only when authenticated
   useEffect(() => {
+    if (!isAuthenticated) return;
     const keys = [
       ['/api/teachers'],
       ['/api/schools'],
@@ -142,7 +174,7 @@ function AppContent() {
     keys.forEach(([k]) => {
       queryClient.prefetchQuery({ queryKey: [k] });
     });
-  }, []);
+  }, [isAuthenticated]);
 
 
   return (
@@ -150,17 +182,19 @@ function AppContent() {
       <PageTitleContext.Provider value={{ pageTitle, setPageTitle }}>
         <AddNewContext.Provider value={{ addNewOptions, setAddNewOptions }}>
           <div className="min-h-screen bg-slate-50">
-            <Header 
-              searchTerm={searchTerm} 
-              onSearchChange={(value) => {
-                setSearchTerm(value);
-                try { console.log('[App] onSearchChange ->', value); } catch {}
-              }}
-              addNewOptions={addNewOptions}
-              setAddNewOptions={setAddNewOptions}
-            />
+            {isAuthenticated && location !== '/login' && !location.startsWith('/reset') && (
+              <Header 
+                searchTerm={searchTerm} 
+                onSearchChange={(value) => {
+                  setSearchTerm(value);
+                  try { console.log('[App] onSearchChange ->', value); } catch {}
+                }}
+                addNewOptions={addNewOptions}
+                setAddNewOptions={setAddNewOptions}
+              />
+            )}
             <Router />
-            {import.meta.env.VITE_TOUR_ENABLED === 'true' && <TourLauncher />}
+            {isAuthenticated && import.meta.env.VITE_TOUR_ENABLED === 'true' && <TourLauncher />}
             <Toaster />
           </div>
         </AddNewContext.Provider>

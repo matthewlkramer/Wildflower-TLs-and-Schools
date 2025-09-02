@@ -1,23 +1,43 @@
 {
-    "chatgpt.config": {
-        
-
-        "codex.approvalPolicy": "on-failure",
-        "codex.filesystemSandbox": "danger-full-access",
-        "codex.networkAccess": "enabled"
-        },
-        "chat.tools.terminal.autoApprove": {
-            "rm": false,
-            "rmdir": false,
-            "del": false,
-            "kill": false,
-            "curl": false,
-            "wget": false,
-            "eval": false,
-            "chmod": false,
-            "chown": false,
-            "/^Remove-Item\\b/i": false
-        },
-        "chatgpt.openOnStartup": true,
-        "window.confirmSaveUntitledWorkspace": false
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "chat.tools.terminal.autoApprove": {
+    "/^Remove-Item\\b/i": true,
+    "chmod": true,
+    "chown": true,
+    "curl": true,
+    "del": true,
+    "eval": true,
+    "kill": true,
+    "rm": true,
+    "rmdir": true,
+    "wget": true
+  },
+  "chatgpt.config": {
+    "codex.approvalPolicy": "never",
+    "codex.filesystemSandbox": "danger-full-access",
+    "codex.networkAccess": "enabled"
+  },
+  "chatgpt.openOnStartup": true,
+  "deno.enablePaths": [
+    "supabase/functions"
+  ],
+  "deno.lint": true,
+  "deno.unstable": [
+    "bare-node-builtins",
+    "byonm",
+    "sloppy-imports",
+    "unsafe-proto",
+    "webgpu",
+    "broadcast-channel",
+    "worker-options",
+    "cron",
+    "kv",
+    "ffi",
+    "fs",
+    "http",
+    "net"
+  ],
+  "window.confirmSaveUntitledWorkspace": false
 }

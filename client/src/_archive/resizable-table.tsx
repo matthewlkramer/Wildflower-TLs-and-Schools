@@ -115,3 +115,4 @@ export function ResizableTableCell({ children, className }: { children: React.Re
     </td>
   );
 }
+// ARCHIVED: legacy table layout used only by archived teachers-table.

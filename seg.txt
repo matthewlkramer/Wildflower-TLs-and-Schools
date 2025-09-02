@@ -1,0 +1,101 @@
+  app.get("/api/educator-school-associations", async (req, res) => {
+    try {
+      const associations = await storage.getEducatorSchoolAssociations();
+      res.json(associations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch educator school associations" });
+    }
+  });
+
+  app.get("/api/educator-school-associations/educator/:educatorId", async (req, res) => {
+    try {
+      const educatorId = req.params.educatorId;
+      const associations = await storage.getEducatorAssociations(educatorId);
+      res.json(associations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch educator associations" });
+    }
+  });
+
+  app.post("/api/teacher-school-associations", async (req, res) => {
+    try {
+      const associationData = educatorSchoolAssociationSchema.parse(req.body);
+      const association = await storage.createTeacherSchoolAssociation(associationData);
+      cache.invalidate('associations');
+      res.status(201).json(association);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid association data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create association" });
+    }
+  });
+
+  app.put("/api/teacher-school-associations/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const associationData = educatorSchoolAssociationSchema.partial().parse(req.body);
+      const association = await storage.updateTeacherSchoolAssociation(id, associationData);
+      if (!association) {
+        return res.status(404).json({ message: "Association not found" });
+      }
+      cache.invalidate('associations');
+      res.json(association);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid association data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update association" });
+    }
+  });
+
+  app.delete("/api/teacher-school-associations/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const success = await storage.deleteTeacherSchoolAssociation(id);
+      if (!success) {
+        return res.status(404).json({ message: "Association not found" });
+      }
+      cache.invalidate('associations');
+      res.json({ message: "Association deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete association" });
+    }
+  });
+
+  // Location routes
+  app.get("/api/locations", async (req, res) => {
+    try {
+      const locations = await storage.getLocations();
+      res.json(locations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch locations" });
+    }
+  });
+
+  app.get("/api/locations/school/:schoolId", async (req, res) => {
+    try {
+      const schoolId = req.params.schoolId;
+      const locations = await storage.getLocationsBySchoolId(schoolId);
+      res.json(locations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch school locations" });
+    }
+  });
+
+  app.get("/api/locations/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const location = await storage.getLocation(id);
+      if (!location) {
+        return res.status(404).json({ message: "Location not found" });
+      }
+      res.json(location);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch location" });
+    }
+  });
+
+  app.post("/api/locations", async (req, res) => {
+    try {
+      const locationData = locationSchema.parse(req.body);

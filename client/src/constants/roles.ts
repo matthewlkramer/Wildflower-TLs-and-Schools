@@ -1,8 +1,7 @@
 export const TL_ROLE_OPTIONS: string[] = [
-  'Teacher Leader',
-  'Emerging Teacher Leader',
+  'TL',
+  'ETL',
   'Classroom Staff',
   'Fellow',
   'Other',
 ];
-

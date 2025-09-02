@@ -271,3 +271,4 @@ export function DataTable<T extends { id: string }>({
     </div>
   );
 }
+// ARCHIVED: not used; ag-grid based tables are standard.

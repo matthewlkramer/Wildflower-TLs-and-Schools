@@ -2,7 +2,7 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 
 // Using dynamic import so the app runs even if enterprise package is not installed.
 // If present, we register enterprise modules and set the license.
-export function initAgGridEnterprise() {
+export async function initAgGridEnterprise(): Promise<void> {
   // Avoid double registration
   if (typeof window !== 'undefined' && (window as any).__AG_GRID_ENTERPRISE_INIT__) return;
 
@@ -13,11 +13,10 @@ export function initAgGridEnterprise() {
     // ignore
   }
 
-  // Only enable enterprise if explicitly turned on and a license key is provided
-  const mode = (import.meta as any)?.env?.MODE || (import.meta as any)?.env?.NODE_ENV || '';
-  const enabled = (import.meta as any)?.env?.VITE_AG_GRID_ENTERPRISE_ENABLED === 'true' && String(mode).toLowerCase() === 'production';
+  // Enable enterprise when explicitly turned on; apply license if provided
+  const enabled = (import.meta as any)?.env?.VITE_AG_GRID_ENTERPRISE_ENABLED === 'true';
   const licenseKey = (import.meta as any)?.env?.VITE_AG_GRID_LICENSE_KEY || '';
-  if (!enabled || !licenseKey) {
+  if (!enabled) {
     if (typeof window !== 'undefined') {
       (window as any).__AG_GRID_ENTERPRISE__ = false;
       (window as any).__AG_GRID_LICENSE_SET__ = false;
@@ -27,9 +26,9 @@ export function initAgGridEnterprise() {
   }
 
   // Attempt to load enterprise modules; fall back gracefully if not present
-  import('ag-grid-enterprise')
-    .then((ent) => {
-      try {
+  try {
+    const ent = await import('ag-grid-enterprise');
+    try {
         const {
           LicenseManager,
           SetFilterModule,
@@ -39,10 +38,12 @@ export function initAgGridEnterprise() {
           MenuModule,
         } = ent as any;
 
-        // Set license key from Vite env
+        // Set license key from Vite env, if provided
         if (licenseKey && LicenseManager?.setLicenseKey) {
           LicenseManager.setLicenseKey(licenseKey);
           try { (window as any).__AG_GRID_LICENSE_SET__ = true; } catch {}
+        } else {
+          try { (window as any).__AG_GRID_LICENSE_SET__ = false; } catch {}
         }
 
         ModuleRegistry.registerModules([
@@ -56,26 +57,24 @@ export function initAgGridEnterprise() {
         if (typeof window !== 'undefined') {
           (window as any).__AG_GRID_ENTERPRISE__ = true;
         }
-      } catch (e) {
-        console.warn('AG Grid Enterprise modules present but failed to register:', e);
-        if (typeof window !== 'undefined') {
-          (window as any).__AG_GRID_ENTERPRISE__ = false;
-          (window as any).__AG_GRID_LICENSE_SET__ = false;
-        }
-      }
-    })
-    .catch(() => {
-      // Enterprise bundle not installed; continue without it
+    } catch (e) {
+      console.warn('AG Grid Enterprise modules present but failed to register:', e);
       if (typeof window !== 'undefined') {
         (window as any).__AG_GRID_ENTERPRISE__ = false;
         (window as any).__AG_GRID_LICENSE_SET__ = false;
       }
-    })
-    .finally(() => {
-      if (typeof window !== 'undefined') {
-        (window as any).__AG_GRID_ENTERPRISE_INIT__ = true;
-      }
-    });
+    }
+  } catch {
+    // Enterprise bundle not installed; continue without it
+    if (typeof window !== 'undefined') {
+      (window as any).__AG_GRID_ENTERPRISE__ = false;
+      (window as any).__AG_GRID_LICENSE_SET__ = false;
+    }
+  } finally {
+    if (typeof window !== 'undefined') {
+      (window as any).__AG_GRID_ENTERPRISE_INIT__ = true;
+    }
+  }
 }
 
 export function isAgGridEnterpriseEnabled(): boolean {
