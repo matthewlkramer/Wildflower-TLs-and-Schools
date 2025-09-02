@@ -1,3 +1,11 @@
+/**
+ * Index of schools. Uses `useCachedSchools` to load all non‑archived schools,
+ * filters them in memory based on the global search term and the “My records”
+ * toggle (matches current guides or assigned partner), and renders the result in
+ * `SchoolsGrid`. The page registers an Add New option opening `AddSchoolModal`,
+ * logs debug information about filtering, and tracks the grid’s internal
+ * filtered row count via callback.
+ */
 import { useState, useEffect } from "react";
 import SchoolsGrid from "@/components/schools-grid";
 import AddSchoolModal from "@/components/add-school-modal";

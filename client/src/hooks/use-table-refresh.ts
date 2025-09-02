@@ -1,10 +1,14 @@
+/**
+ * Keeps AG‑Grid views in sync after mutations. `useTableRefresh` accepts an
+ * array of query keys and sets up a 1‑second interval that checks whether each
+ * query has been invalidated in React Query; if so, it triggers a refetch. It
+ * also returns a `refreshTables` function that forces invalidation and refetch
+ * immediately. `refreshSchoolData` is a helper that targets all queries related
+ * to a specific school id.
+ */
 import { useEffect } from 'react';
 import { queryClient } from '@/lib/queryClient';
 
-/**
- * Custom hook to ensure table data refreshes after mutations
- * This solves the persistent issue of tables not updating after record creation
- */
 export function useTableRefresh(queryKeys: string[], dependencies: any[] = []) {
   useEffect(() => {
     // Set up an interval to periodically check for stale data

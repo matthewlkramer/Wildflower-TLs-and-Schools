@@ -1,3 +1,10 @@
+/**
+ * Pipeline view for loans that haven’t been fully funded. Fetches
+ * `/api/loans/origination-pipeline` and, for each loan, displays status badges
+ * and determines next steps based on flags for promissory note, ACH setup, and
+ * fund distribution. Pending loans are listed in cards with urgent actions
+ * surfaced first; when there are no pending loans a placeholder card is shown.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

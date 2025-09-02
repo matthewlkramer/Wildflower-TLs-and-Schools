@@ -1,3 +1,11 @@
+/**
+ * Main hub for loan management. Contains tabs for a dashboard overview, loan
+ * list, applications, payments, documents, and settings. The dashboard tab shows
+ * summary metrics pulled from various endpoints. The loans tab can toggle
+ * between card and AG‑Grid table view. A dialog allows creating loan
+ * applications using a zod‑validated form that posts to `/api/loan-applications`.
+ * Utility components track promissory notes and quarterly reports.
+ */
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePageTitle } from "@/App";

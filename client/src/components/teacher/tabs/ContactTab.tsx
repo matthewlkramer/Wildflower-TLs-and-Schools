@@ -1,3 +1,13 @@
+/**
+ * Educator “Contact” tab. Displays all communication channels for the teacher.
+ * The first card is an `EmailAddressesTable` tied to the educator id which lets
+ * users add or remove multiple email addresses with inline actions. Beneath it a
+ * `DetailGrid` renders an `EntityCard` titled “Phone & Address” with three
+ * read‑write fields: primary phone, secondary phone, and home address. Values are
+ * passed directly from the `teacher` object and saved back through the card’s
+ * built‑in editing controls. The layout uses two columns so phone numbers sit
+ * side by side above the multiline address field.
+ */
 import { TableCard } from "@/components/shared/TableCard";
 import { EmailAddressesTable } from "@/components/email-addresses-table";
 import { DetailGrid } from "@/components/shared/DetailGrid";

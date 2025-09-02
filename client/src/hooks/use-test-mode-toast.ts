@@ -1,3 +1,10 @@
+/**
+ * Shows orange “test mode” toasts in place of real operations. The returned
+ * `showTestModeSuccess` and `showTestModeWarning` helpers check the global test
+ * mode flag (via `getTestMode`). If enabled they emit contextual toast messages
+ * and return `true` so callers can bypass actual network calls. In production
+ * they no‑op and return `false`.
+ */
 import { useToast } from '@/hooks/use-toast';
 import { getTestMode } from '@/components/TestModeToggle';
 

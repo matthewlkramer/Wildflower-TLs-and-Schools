@@ -1,3 +1,13 @@
+/**
+ * Comprehensive detail page for a school. Loads the school record by id and sets
+ * up forms for editing core fields using `react-hook-form` with zod validation.
+ * Multiple tabs break out related data: Summary (branding + map), Locations, and
+ * Guides, each delegating to the tab components in `components/school/tabs`.
+ * The page wires Add New options to modals for assigning existing educators or
+ * creating-and-assigning new ones. It also exposes various grids (e.g., TL
+ * associations) and uses `useTableRefresh` to keep subtable data fresh after
+ * mutations.
+ */
 import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";

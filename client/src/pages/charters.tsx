@@ -1,3 +1,11 @@
+/**
+ * Lists charter organizations in an AG‑Grid table. Records are fetched from
+ * `/api/charters` and kept in React Query cache. Client‑side filters apply the
+ * global search term and optional “My records” user filter. Clicking a short
+ * name navigates to the charter detail page. The page sets its title to
+ * “Charters” and registers an Add New option (currently a stub) through
+ * `addNewEmitter`.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";

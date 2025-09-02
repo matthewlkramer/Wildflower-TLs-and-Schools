@@ -1,3 +1,14 @@
+/**
+ * School “Locations” tab. Receives an array of location records and displays
+ * them in an AG‑Grid table. Each row represents a physical or mailing address
+ * with flags for whether it is currently active as the physical or mailing
+ * address. The grid allows full inline editing: clicking the edit action turns
+ * the row into an editable form where address text, yes/no flags, and start/end
+ * dates can be changed. Saves call `onUpdate` with the row id and updated
+ * fields; deletes call `onDelete`. Filters and sorting are enabled for every
+ * column so history can be searched, and row height/behavior mirrors
+ * `DEFAULT_GRID_PROPS` to match other grids.
+ */
 import React from 'react';
 import type { Location } from '@shared/schema';
 import { GridBase } from '@/components/shared/GridBase';

@@ -1,3 +1,11 @@
+/**
+ * Detailed view for a single educator. Fetches `/api/teachers/:id` and renders
+ * tabbed content for summary info, school associations, online forms,
+ * certifications, events, notes, and linked systems via tab components under
+ * `components/teacher/tabs`. The page also manages inline editing for email
+ * addresses using a `GridTableCard` and exposes a mutation to update top-level
+ * educator fields, invalidating React Query caches after save.
+ */
 import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";

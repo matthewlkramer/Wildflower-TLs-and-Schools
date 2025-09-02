@@ -1,3 +1,11 @@
+/**
+ * Educator “Demographics” tab. Groups demographic information into several
+ * `EntityCard` sections within a `DetailGrid`. Sections cover gender identity,
+ * pronouns, racial/ethnic background (including LGBTQIA flag), and language &
+ * education. Array fields are joined with commas for readability. All fields are
+ * editable via the `EntityCard` component which handles saving changes back to
+ * the teacher record.
+ */
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import { EntityCard } from "@/components/shared/EntityCard";
 import type { Teacher } from "@shared/schema";

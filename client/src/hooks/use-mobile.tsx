@@ -1,3 +1,9 @@
+/**
+ * Watches the viewport width and reports whether it falls below the app’s
+ * mobile breakpoint (768px). A `matchMedia` listener keeps the `isMobile` state
+ * in sync on resize. Components can call `useIsMobile()` to switch layouts
+ * responsively without directly querying window size.
+ */
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768

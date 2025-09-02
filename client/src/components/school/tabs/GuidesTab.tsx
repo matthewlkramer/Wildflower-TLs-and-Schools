@@ -1,3 +1,16 @@
+/**
+ * School “Guides” tab. It accepts an array of guide assignment records and
+ * renders them in an AG‑Grid table. Each row shows the guide’s short name,
+ * assignment type, start/end dates, and whether the assignment is currently
+ * active. Every cell is filterable and sortable. Actions in the last column
+ * allow inline editing of a single row at a time: clicking “Edit” switches the
+ * row into draft mode where dates are edited via `DateInputInline` components
+ * and type/active fields are editable through the `drafts` state. “Save” passes
+ * the draft to `onUpdate` and clears editing state; “Cancel” reverts the draft;
+ * “Delete” invokes `onDelete`. Row height is fixed by `DEFAULT_GRID_PROPS` and
+ * grid behavior (auto height, no single‑click edit, etc.) is specified in
+ * `gridProps` so a new engineer can recreate the grid exactly.
+ */
 import React from 'react';
 import type { GuideAssignment } from '@shared/schema';
 import { GridBase } from '@/components/shared/GridBase';

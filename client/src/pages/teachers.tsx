@@ -1,3 +1,18 @@
+/**
+ * Full Teachers index. This screen pulls all educator records from Airtable via
+ * `useCachedEducators` which wraps a React Query cache. Once loaded, records are
+ * filtered entirely on the client: first by the global search term coming from
+ * `useSearch`, then optionally by the “My records” toggle from
+ * `useUserFilter` which keeps only rows where the current user is listed as an
+ * assigned partner. The derived list feeds an `AG Grid` instance rendered by
+ * `TeachersGrid`. Rows are prefetched with `prefetchEducator` so that hovering a
+ * row loads its detail data in React Query ahead of navigation. The page also
+ * registers an “Add New” action through `addNewEmitter`; selecting this opens the
+ * `AddEducatorModal` for inline creation. A small debug header shows the active
+ * search term and how many rows remain after filtering so that QA can verify the
+ * query logic. No server calls occur for filtering; all transformations happen
+ * in-memory after the initial fetch.
+ */
 import TeachersGrid from "@/components/teachers-grid";
 import { type Teacher } from "@shared/schema";
 import { useSearch } from "@/contexts/search-context";
