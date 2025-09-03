@@ -118,6 +118,24 @@ export function GoogleSyncDashboard() {
   useEffect(() => {
     let mounted = true;
     const load = async () => {
+      // Handle OAuth return: exchange ?code for tokens
+      try {
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get('code');
+        const state = url.searchParams.get('state');
+        if (code) {
+          const headers = await authHeaders();
+          const fn = state === 'gcal-sync' ? CAL_FN : GMAIL_FN;
+          await supabase.functions.invoke(fn, { body: { action: 'exchange_code', code, redirectUri: window.location.origin + '/google-sync' }, headers });
+          // Clean URL
+          url.searchParams.delete('code');
+          url.searchParams.delete('state');
+          window.history.replaceState({}, document.title, url.pathname + (url.search ? '?' + url.searchParams.toString() : ''));
+          setConnected(true);
+        }
+      } catch (e) {
+        console.warn('[OAuth] exchange_code failed', e);
+      }
       await checkConnection();
       await refreshGmailStatus();
       await refreshCalStatus();
@@ -305,13 +323,23 @@ export function GoogleSyncDashboard() {
   };
 
   const connectGoogle = async () => {
+    setConnecting(true);
     try {
-      setConnecting(true);
-      const headers = await authHeaders();
-      const { data } = await supabase.functions.invoke(GMAIL_FN, { body: { action: "get_auth_url" }, headers });
-      const url = data?.auth_url; if (!url) throw new Error('No auth_url');
+      const headers = await authHeaders().catch(() => { throw new Error('You must be signed in to connect Google'); });
+      const redirectUri = `${window.location.origin}/google-sync`;
+      const { data, error } = await supabase.functions.invoke(GMAIL_FN, {
+        body: { action: "get_auth_url", redirectUri },
+        headers,
+      });
+      if (error) throw new Error(error.message || 'Failed to request authorization URL');
+      const url = data?.auth_url;
+      if (!url) throw new Error(data?.error || 'No authorization URL returned. Check server secrets and redirect URI.');
       window.location.href = url;
-    } finally { setConnecting(false); }
+    } catch (e: any) {
+      toast({ title: 'Google connect failed', description: e?.message || String(e), variant: 'destructive' });
+    } finally {
+      setConnecting(false);
+    }
   };
 
   return (
@@ -338,11 +366,44 @@ export function GoogleSyncDashboard() {
             {gmailSyncedThrough && <div className="text-xs text-muted-foreground">Synced through {gmailSyncedThrough}</div>}
           </div>
           <div className="flex gap-2">
-            <Button onClick={async()=>{ const headers = await authHeaders(); await supabase.functions.invoke(GMAIL_FN, { body: { action: 'start_sync' }, headers }); }} disabled={!connected || gmailRunning}>{gmailRunning ? 'Running...' : 'Start'}</Button>
-            <Button onClick={async()=>{ const headers = await authHeaders(); await supabase.functions.invoke(GMAIL_FN, { body: { action: 'pause_sync' }, headers }); }} variant="secondary" disabled={!gmailRunning}>Pause</Button>
+            <Button
+              onClick={async()=>{
+                try {
+                  setGmailStarting(true);
+                  const headers = await authHeaders();
+                  const { data, error } = await supabase.functions.invoke(GMAIL_FN, { body: { action: 'start_sync' }, headers });
+                  if (error) throw new Error(error.message || 'Failed to start Gmail sync');
+                  toast({ title: 'Gmail sync started', description: data?.message || 'Processing…' });
+                  // brief delay then refresh status
+                  setTimeout(() => { refreshGmailStatus(); }, 300);
+                } catch (e: any) {
+                  toast({ title: 'Gmail start failed', description: e?.message || String(e), variant: 'destructive' });
+                } finally {
+                  setGmailStarting(false);
+                }
+              }}
+              disabled={!connected || gmailRunning || gmailStarting}
+            >{gmailRunning ? 'Running…' : (gmailStarting ? 'Starting…' : 'Start')}</Button>
+            <Button
+              onClick={async()=>{
+                try {
+                  setGmailPausing(true);
+                  const headers = await authHeaders();
+                  const { error } = await supabase.functions.invoke(GMAIL_FN, { body: { action: 'pause_sync' }, headers });
+                  if (error) throw new Error(error.message || 'Failed to pause Gmail');
+                  setTimeout(() => { refreshGmailStatus(); }, 300);
+                } catch (e: any) {
+                  toast({ title: 'Gmail pause failed', description: e?.message || String(e), variant: 'destructive' });
+                } finally {
+                  setGmailPausing(false);
+                }
+              }}
+              variant="secondary"
+              disabled={!gmailRunning || gmailPausing}
+            >{gmailPausing ? 'Pausing…' : 'Pause'}</Button>
           </div>
           <div className="h-48 overflow-auto bg-muted/30 rounded p-2 text-xs font-mono">
-            {consoleRows.filter(r=>consoleFilter==='all'||r.service===consoleFilter).map(r=> (<div key={r.id}>{r.message}</div>))}
+            {consoleRows.filter(r=>r.service==='gmail').map(r=> (<div key={r.id}>{r.message}</div>))}
             <div ref={consoleEndRef} />
           </div>
         </Card>
@@ -354,11 +415,43 @@ export function GoogleSyncDashboard() {
             {calSyncedThrough && <div className="text-xs text-muted-foreground">Synced through {calSyncedThrough}</div>}
           </div>
           <div className="flex gap-2">
-            <Button onClick={async()=>{ const headers = await authHeaders(); await supabase.functions.invoke(CAL_FN, { body: { action: 'start_sync' }, headers }); }} disabled={!connected || calRunning}>{calRunning ? 'Running...' : 'Start'}</Button>
-            <Button onClick={async()=>{ const headers = await authHeaders(); await supabase.functions.invoke(CAL_FN, { body: { action: 'pause_sync' }, headers }); }} variant="secondary" disabled={!calRunning}>Pause</Button>
+            <Button
+              onClick={async()=>{
+                try {
+                  setCalStarting(true);
+                  const headers = await authHeaders();
+                  const { data, error } = await supabase.functions.invoke(CAL_FN, { body: { action: 'start_sync' }, headers });
+                  if (error) throw new Error(error.message || 'Failed to start Calendar sync');
+                  toast({ title: 'Calendar sync started', description: data?.message || 'Processing…' });
+                  setTimeout(() => { refreshCalStatus(); }, 300);
+                } catch (e: any) {
+                  toast({ title: 'Calendar start failed', description: e?.message || String(e), variant: 'destructive' });
+                } finally {
+                  setCalStarting(false);
+                }
+              }}
+              disabled={!connected || calRunning || calStarting}
+            >{calRunning ? 'Running…' : (calStarting ? 'Starting…' : 'Start')}</Button>
+            <Button
+              onClick={async()=>{
+                try {
+                  setCalPausing(true);
+                  const headers = await authHeaders();
+                  const { error } = await supabase.functions.invoke(CAL_FN, { body: { action: 'pause_sync' }, headers });
+                  if (error) throw new Error(error.message || 'Failed to pause Calendar');
+                  setTimeout(() => { refreshCalStatus(); }, 300);
+                } catch (e: any) {
+                  toast({ title: 'Calendar pause failed', description: e?.message || String(e), variant: 'destructive' });
+                } finally {
+                  setCalPausing(false);
+                }
+              }}
+              variant="secondary"
+              disabled={!calRunning || calPausing}
+            >{calPausing ? 'Pausing…' : 'Pause'}</Button>
           </div>
           <div className="h-48 overflow-auto bg-muted/30 rounded p-2 text-xs font-mono">
-            {consoleRows.filter(r=>consoleFilter==='all'||r.service===consoleFilter).map(r=> (<div key={r.id}>{r.message}</div>))}
+            {consoleRows.filter(r=>r.service==='calendar').map(r=> (<div key={r.id}>{r.message}</div>))}
             <div ref={consoleEndRef} />
           </div>
         </Card>
@@ -368,4 +461,3 @@ export function GoogleSyncDashboard() {
 }
 
 export default GoogleSyncDashboard;
-

@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import { ColDef, GridReadyEvent, GridApi, themeMaterial } from "ag-grid-community";
 // Modules are registered in initAgGridEnterprise at app startup
 import { Link } from "wouter";
-import { ExternalLink, Trash2 } from "lucide-react";
+import { ExternalLink, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type Educator, type School } from "@shared/schema";
@@ -20,6 +20,8 @@ import { useGridHeight } from "@/components/shared/use-grid-height";
 interface TeachersGridProps {
   teachers: Educator[];
   isLoading: boolean;
+  onFilteredCountChange?: (count: number) => void;
+  onAddTeacher?: () => void;
 }
 
 // School Link Component that finds school ID by name
@@ -180,7 +182,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
   );
 };
 
-export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps) {
+export default function TeachersGrid({ teachers, isLoading, onFilteredCountChange, onAddTeacher }: TeachersGridProps) {
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const gridHeight = useGridHeight();
   const { entReady, filterForText } = useAgGridFeatures();
@@ -348,12 +350,52 @@ export default function TeachersGrid({ teachers, isLoading }: TeachersGridProps)
         columnDefs={columnDefs}
         defaultColDefOverride={defaultColDef}
         style={{ height: '100%' }}
-        gridProps={{
-          ...DEFAULT_GRID_PROPS,
-          onGridReady,
-          context: { componentName: 'teachers-grid' },
-        }}
-      />
+      >
+        <div className="relative h-full w-full">
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
+            <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => onAddTeacher?.()}>
+              <Plus className="h-4 w-4 mr-1" />
+              Add Teacher
+            </Button>
+          </div>
+          <AgGridReact
+            {...DEFAULT_GRID_PROPS}
+            onGridReady={onGridReady}
+            rowData={teachers}
+            columnDefs={columnDefs}
+            defaultColDef={{ ...DEFAULT_COL_DEF, ...(defaultColDef || {}) }}
+            onFirstDataRendered={(ev: any) => {
+              try {
+                const model: any = {};
+                model.currentRoleSchool = { filterType: 'text', type: 'notContains', filter: 'Paused' };
+                if (entReady) {
+                  const all = Array.from(new Set((teachers || []).map(t => t?.discoveryStatus).filter(Boolean)));
+                  model.discoveryStatus = { filterType: 'set', values: all.filter(v => String(v) !== 'Paused') };
+                } else {
+                  model.discoveryStatus = { filterType: 'text', type: 'notEqual', filter: 'Paused' };
+                }
+                if (entReady) {
+                  const allTypes = Array.from(new Set((teachers || []).map(t => t?.individualType).filter(Boolean)));
+                  model.individualType = { filterType: 'set', values: allTypes.filter(v => String(v) !== 'Community Member') };
+                } else {
+                  model.individualType = { filterType: 'text', type: 'notEqual', filter: 'Community Member' };
+                }
+                ev.api.setFilterModel(model);
+                ev.api.onFilterChanged();
+                const count = ev.api.getDisplayedRowCount();
+                onFilteredCountChange?.(count);
+              } catch {}
+            }}
+            onFilterChanged={(ev: any) => {
+              try {
+                const count = ev.api.getDisplayedRowCount();
+                onFilteredCountChange?.(count);
+              } catch {}
+            }}
+            context={{ componentName: 'teachers-grid' }}
+          />
+        </div>
+      </GridBase>
     </div>
   );
 }

@@ -3,6 +3,16 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Borrowers (minimal shim for compatibility)
+export const borrowers = pgTable("borrowers", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  primaryContactEmail: text("primary_contact_email"),
+  primaryContactName: text("primary_contact_name"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Loan Applications - Initial loan requests
 export const loanApplications = pgTable("loan_applications", {
   id: serial("id").primaryKey(),
@@ -431,3 +441,9 @@ export const insertGeneratedDocumentSchema = createInsertSchema(generatedDocumen
 export const selectGeneratedDocumentSchema = createSelectSchema(generatedDocuments);
 export type InsertGeneratedDocument = z.infer<typeof insertGeneratedDocumentSchema>;
 export type GeneratedDocument = z.infer<typeof selectGeneratedDocumentSchema>;
+
+// Borrower schemas and types
+export const insertBorrowerSchema = createInsertSchema(borrowers);
+export const selectBorrowerSchema = createSelectSchema(borrowers);
+export type InsertBorrower = z.infer<typeof insertBorrowerSchema>;
+export type Borrower = z.infer<typeof selectBorrowerSchema>;

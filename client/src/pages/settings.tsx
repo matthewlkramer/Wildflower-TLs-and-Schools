@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { GoogleSyncDashboard } from "@/components/google/GoogleSyncDashboard";
 
 export default function Settings() {
   const { setPageTitle } = usePageTitle();
@@ -63,6 +64,12 @@ export default function Settings() {
               <p className="text-xs text-slate-500 mt-2">If you sign in with Google, manage your password via your Google account.</p>
             </div>
           </section>
+        </div>
+        <div className="mt-8">
+          <h2 className="text-sm font-medium text-slate-700 mb-2">Google Sync</h2>
+          <div className="border border-slate-200 rounded">
+            <GoogleSyncDashboard />
+          </div>
         </div>
       </div>
     </main>

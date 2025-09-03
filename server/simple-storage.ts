@@ -1,6 +1,12 @@
 import { base } from "./airtable-schema";
+import { firstId, toStringArray, toNumber, toYesBool, createdAt, updatedAt, firstAttachment, ffEq } from "./storage/util";
+import { transformLocationRecord } from "./storage/locations";
+import { transformEXSRecord } from "./storage/exs";
+import { transformGovernanceDocument, transformCharterGovernanceDocument, transformCharter990, transformTax990, transformCharterNote } from "./storage/governance";
+import { transformActionStepRecord } from "./storage/action-steps";
 import { cache } from "./cache";
 import { handleError } from "./error-handler";
+import { AIRTABLE_TABLES as AT } from "@shared/airtable-tables";
 import type { 
   Charter,
   Educator, 
@@ -12,8 +18,8 @@ import type {
   SchoolNote,
   Grant,
   Loan,
-  MembershipFeeByYear,
-  MembershipFeeUpdate,
+//  MembershipFeeByYear,
+//  MembershipFeeUpdate,
   EmailAddress,
   ActionStep,
   CharterRole,
@@ -34,8 +40,8 @@ import type {
   InsertSchoolNote,
   InsertGrant,
   InsertLoan,
-  InsertMembershipFeeByYear,
-  InsertMembershipFeeUpdate,
+//  InsertMembershipFeeByYear,
+//  InsertMembershipFeeUpdate,
   InsertEmailAddress,
   SSJFilloutForm,
   InsertSSJFilloutForm,
@@ -51,7 +57,32 @@ import type {
   InsertTeacherSchoolAssociation,
   Tax990
 } from "@shared/schema";
-import { SCHOOLS_FIELDS as SF, EDUCATORS_FIELDS as EF, EDUCATORS_X_SCHOOLS_FIELDS as EXSF, LOCATIONS_FIELDS as LF } from "@shared/airtable-schema";
+import {
+  SCHOOLS_FIELDS as SF,
+  EDUCATORS_FIELDS as EF,
+  CHARTERS_FIELDS as CHF,
+  EDUCATORS_X_SCHOOLS_FIELDS as EXSF,
+  LOCATIONS_FIELDS as LF,
+  GUIDES_ASSIGNMENTS_FIELDS as GASF,
+  GRANTS_FIELDS as GF,
+  LOANS_FIELDS as LNF,
+  GOVERNANCE_DOCS_FIELDS as GDF,
+  SCHOOL_NOTES_FIELDS as SNF,
+  _990S_FIELDS as N9F,
+  ACTION_STEPS_FIELDS as ASF,
+  EMAIL_ADDRESSES_FIELDS as EAF,
+  MONTESSORI_CERTS_FIELDS as MCF,
+  MONTESSORI_CERTIFIERS_FIELDS as MCFI,
+  EVENT_ATTENDANCE_FIELDS as EATF,
+  EVENTS_FIELDS as EVF,
+  EDUCATOR_NOTES_FIELDS as ENF,
+  SSJ_FILLOUT_FORMS_FIELDS as SJF,
+  CHARTER_ROLES_FIELDS as CRF,
+  CHARTER_APPLICATIONS_FIELDS as CAF,
+  CHARTER_AUTHORIZERS_AND_CONTACTS_FIELDS as CACF,
+  REPORTS_AND_SUBMISSIONS_FIELDS as RSF,
+  ASSESSMENT_DATA_FIELDS as ADF,
+} from "@shared/airtable-schema";
 
 export interface IStorage {
   // Charter operations
@@ -129,6 +160,7 @@ export interface IStorage {
   updateLoan(id: string, loan: Partial<InsertLoan>): Promise<Loan | undefined>;
   deleteLoan(id: string): Promise<boolean>;
 
+  /*
   // Membership fee by year operations
   getMembershipFeesByYear(): Promise<MembershipFeeByYear[]>;
   getMembershipFeeByYear(id: string): Promise<MembershipFeeByYear | undefined>;
@@ -145,7 +177,7 @@ export interface IStorage {
   createMembershipFeeUpdate(update: InsertMembershipFeeUpdate): Promise<MembershipFeeUpdate>;
   updateMembershipFeeUpdate(id: string, update: Partial<InsertMembershipFeeUpdate>): Promise<MembershipFeeUpdate | undefined>;
   deleteMembershipFeeUpdate(id: string): Promise<boolean>;
-
+*/
   // Email address operations
   getEmailAddresses(): Promise<EmailAddress[]>;
   getEmailAddress(id: string): Promise<EmailAddress | undefined>;
@@ -190,6 +222,8 @@ export interface IStorage {
   getActionStepsBySchoolId(schoolId: string): Promise<ActionStep[]>;
   getActionStepsByUserId(userId: string): Promise<ActionStep[]>;
   createActionStep(schoolId: string, data: { item: string; assignee?: string; dueDate?: string; status?: string }): Promise<ActionStep>;
+  updateActionStep(id: string, data: { item?: string; assignee?: string; dueDate?: string; status?: string }): Promise<ActionStep | undefined>;
+  deleteActionStep(id: string): Promise<boolean>;
   getSchoolsByUserId(userId: string): Promise<School[]>;
 
   // Legacy methods for backward compatibility
@@ -224,18 +258,22 @@ export interface IStorage {
 }
 
 export class SimpleAirtableStorage implements IStorage {
+  // --------------------
+  // Shared helpers (DRY)
+  // --------------------
+  // helpers moved to server/storage/util.ts
   // Helper method to transform Airtable record to Charter
   private transformCharterRecord(record: any): Charter {
     const fields = record.fields;
     
     return {
       id: record.id,
-      shortName: fields["Short Name"] || fields["Shortname"] || undefined,
-      fullName: fields["Full name"] || fields["fullname"] || fields["Full Name"] || fields["Name"] || undefined,
-      initialTargetCommunity: fields["Initial target community"] || undefined,
-      projectedOpen: fields["Projected open"] || undefined,
-      initialTargetAges: fields["Initial target ages"] || undefined,
-      status: fields["Status"] || undefined,
+      shortName: fields[CHF.Short_Name] || undefined,
+      fullName: fields[CHF.Full_name] || undefined,
+      initialTargetCommunity: fields[CHF.Initial_target_community] || undefined,
+      projectedOpen: fields[CHF.Projected_open] || undefined,
+      initialTargetAges: fields[CHF.Initial_target_ages] || undefined,
+      status: fields[CHF.Status] || undefined,
       created: fields["Created"] || fields["Created time"] || undefined,
       lastModified: fields["Last Modified"] || fields["Last modified"] || undefined,
     };
@@ -252,7 +290,7 @@ export class SimpleAirtableStorage implements IStorage {
     }
 
     try {
-      const records = await base("Charters").select().all();
+      const records = await base(AT.CHARTERS).select().all();
       const charters = records.map(record => this.transformCharterRecord(record));
       
       // Cache the results
@@ -269,7 +307,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getCharter(id: string): Promise<Charter | undefined> {
     try {
-      const record = await base("Charters").find(id);
+      const record = await base(AT.CHARTERS).find(id);
       return this.transformCharterRecord(record);
     } catch (error) {
       console.error(`Error fetching charter ${id} from Airtable:`, error);
@@ -283,61 +321,83 @@ export class SimpleAirtableStorage implements IStorage {
     
     return {
       id: record.id,
-      currentPrimaryEmailAddress: fields[EF.Current_Primary_Email_Address] || fields["Current Primary Email"] || undefined,
-      fullName: fields["Full Name"] || undefined,
-      firstName: fields["First Name"] || undefined,
-      nickname: fields["Nickname"] || undefined,
-      middleName: fields["Middle Name"] || undefined,
-      lastName: fields["Last Name"] || undefined,
-      primaryPhone: fields["Primary phone"] || fields["Primary Phone"] || fields["Phone"] || undefined,
-      secondaryPhone: fields["Secondary phone"] || fields["Secondary Phone"] || fields["Phone 2"] || undefined,
-      homeAddress: fields["Home Address"] || undefined,
-      pronouns: fields["Pronouns"] || undefined,
-      pronounsOther: fields["Pronouns - Other"] || undefined,
-      gender: fields["Gender"] || undefined,
-      genderOther: fields["Gender - Other"] || undefined,
-      raceEthnicity: fields["Race & Ethnicity"] || undefined,
-      raceEthnicityOther: fields["Race & Ethnicity - Other"] || undefined,
-      primaryLanguage: fields["Primary Language"] || undefined,
-      otherLanguages: fields["Other languages"] || undefined,
-      educationalAttainment: fields["Educational Attainment"] || undefined,
-      montessoriCertified: fields["Montessori Certified"] || false,
-      montessoriLeadGuideTrainings: fields["Montessori lead guide trainings"] || undefined,
-      currentRole: fields["Current Role"] || undefined,
-      discoveryStatus: fields["Discovery status"] || undefined,
-      assignedPartner: fields["Assigned Partner"] || undefined,
-      assignedPartnerEmail: fields["Assigned Partner Email"] || undefined,
-      householdIncome: fields["Household Income"] || undefined,
-      incomeBackground: fields["Income Background"] || undefined,
-      individualType: fields["Individual Type"] || undefined,
-      activeSchool: fields["Currently Active School"] || undefined,
-      activeSchoolStageStatus: fields["Stage_Status for Active School"] || undefined,
-      firstContactRelocate: fields['First Contact - Willingness to Relocate'] || '',
-      firstContactGovernance: fields['First Contact - Initial Interest in Governance Model'] || '',
-      firstContactNotesOnPreWildflowerEmployment: fields['First Contact - Notes on pre-Wildflower Employment'] || '',
-      firstContactWFSchoolEmploymentStatus: fields['First Contact - WF School Employment Status'] || '',
-      firstContactAges: fields['First Contact - initial interest in ages'] || [],
-      firstContactInterests: fields['First Contact - Initial Interests'] || '',
+      fullName: fields[EF.Full_Name] || undefined,
+      firstName: fields[EF.First_Name] || undefined,
+      nickname: fields[EF.Nickname] || undefined,
+      middleName: fields[EF.Middle_Name] || undefined,
+      lastName: fields[EF.Last_Name] || undefined,
+      primaryPhone: fields[EF.Primary_phone] || undefined,
+      secondaryPhone: fields[EF.Secondary_phone] || undefined,
+      currentPrimaryEmailAddress: fields[EF.Current_Primary_Email_Address] || undefined,  
+      homeAddress: fields[EF.Home_Address] || undefined,
+      pronouns: fields[EF.Pronouns] || undefined,
+      pronounsOther: fields[EF.Pronouns___Other] || undefined,
+      gender: fields[EF.Gender] || undefined,
+      genderOther: fields[EF.Gender___Other] || undefined,
+      raceEthnicity: fields[EF.Race___Ethnicity] || undefined,
+      raceEthnicityOther: fields[EF.Race___Ethnicity___Other] || undefined,
+      lgbtqia: fields[EF.LGBTQIA] === 'Yes' || fields[EF.LGBTQIA] === true,
+      primaryLanguage: toStringArray(fields[EF.Primary_Language]),
+      otherLanguages: toStringArray(fields[EF.Other_languages]),
+      householdIncome: fields[EF.Household_Income] || undefined,
+      incomeBackground: fields[EF.Income_Background] || undefined,
+      individualType: fields[EF.Individual_Type] || undefined,
+
+      educationalAttainment: fields[EF.Educational_Attainment] || undefined,
+      montessoriCertified: toYesBool(fields[EF.Montessori_Certified]),
+      montessoriLeadGuideTrainings: toStringArray(fields[EF.Montessori_lead_guide_trainings]),
+
+      currentRole: toStringArray(fields[EF.Current_Role]),
+      activeSchool: toStringArray(fields[EF.Currently_Active_School]),
+      activeSchoolStageStatus: toStringArray(fields[EF.Stage_Status_for_Active_School]),
+      discoveryStatus: fields[EF.Discovery_status] || undefined,
+
+      assignedPartner: toStringArray(fields[EF.Assigned_Partner]),
+      assignedPartnerEmail: toStringArray(fields[EF.Assigned_Partner_Email]),
+      personResponsibleForFollowUp: fields[EF.Person_responsible_for_follow_up] || undefined,
+
+      firstContactRelocate: fields[EF.First_contact___Willingness_to_relocate] || '',
+      firstContactGovernance: fields[EF.First_contact___Initial_Interest_in_Governance_Model] || '',
+      firstContactNotesOnPreWildflowerEmployment: fields[EF.First_contact___Notes_on_pre_Wildflower_employment] || '',
+      firstContactWFSchoolEmploymentStatus: fields[EF.First_contact___WF_School_employment_status] || '',
+      firstContactAges: toStringArray(fields[EF.First_contact___initial_interest_in_ages]) || [],
+      firstContactInterests: fields[EF.First_contact___initial_interests] || '',
+
+      targetCity: fields[EF.Target_city] || undefined,
+      targetState: fields[EF.Target_state] || undefined,
+      targetGeoCombined: fields[EF.Target_geo_combined] || undefined,
+      targetIntl: fields[EF.Target___international] || undefined,
+
       // Early Cultivation Data - Updated field mappings based on SSJ form data
-      source: fields['Source'] || undefined,
-      sendgridTemplateSelected: fields['SendGrid template id'] || fields['SendGrid Template Selected'] || undefined,
-      sendgridSendDate: fields['SendGrid sent date'] || fields['SendGrid Send Date'] || undefined,
-      routedTo: fields['Routed To'] || undefined,
-      assignedPartnerOverride: fields['Assigned Partner Override'] || undefined,
-      personalEmailSent: fields['Email sent by Initial Outreacher?'] === 'Yes' || fields['Personal Email Sent'] === true,
-      personalEmailSentDate: fields['Personal Email Sent Date'] || undefined,
-      personResponsibleForFollowUp: fields['Person responsible for follow up'] || fields['Person Responsible for Follow Up'] || undefined,
-      oneOnOneSchedulingStatus: fields['One on One Scheduling Status'] || undefined,
-      opsGuideMeetingPrefTime: fields['Ops Guide Meeting Preferrence Time'] || '',
-      opsGuideSpecificsChecklist: fields['Ops Guide Specifics Checklist'] || [],
-      opsGuideReqPertinentInfo: fields['Ops Guide Request Pertinent Info'] || [],
-      opsGuideSupportTypeNeeded: fields['Ops Guide Support Type Needed'] || [],
-      opsGuideFundraisingOps: fields['Ops Guide Any fundraising opportunities?'] || '',
-      tcUserID: fields["TC User ID"] || undefined,
-      created: fields["Created"] || undefined,
-      lastModified: fields["Last Modified"] || undefined,
-      createdBy: fields["Created By"]?.name || undefined,
-      archived: fields['Archived'] === true,
+    //  source: fields[EF.Source] || undefined,
+    //  sendgridTemplateSelected: fields[EF.SendGrid_template_id] || undefined,
+    //  sendgridSendDate: fields[EF.SendGrid_sent_date] || undefined,
+    //  routedTo: fields[EF.Routed_To] || undefined,
+    //  assignedPartnerOverride: fields[EF.Assigned_Partner_Override] || undefined,
+    //  personalEmailSent: fields[EF.Email_sent_by_Initial_Outreacher_] === 'Yes',
+    //  personalEmailSentDate: undefined,
+    //  personResponsibleForFollowUp: fields[EF.Person_responsible_for_follow_up] || undefined,
+    //  oneOnOneSchedulingStatus: undefined,
+      opsGuideMeetingPrefTime: fields[EF.Ops_Guide_Meeting_Preference_Time] || '',
+      opsGuideSpecificsChecklist: fields[EF.Ops_Guide_Specifics_Checklist] || [],
+      opsGuideReqPertinentInfo: fields[EF.Ops_Guide_Request_Pertinent_Info] || [],
+      opsGuideSupportTypeNeeded: fields[EF.Ops_Guide_Support_Type_Needed] || [],
+      opsGuideFundraisingOps: fields[EF.Ops_Guide_Any_fundraising_opportunities_] || '',
+      tcUserID: fields[EF.TC_User_ID] || undefined,
+      inactiveFlag: fields[EF.Inactive_Flag] === true,
+      created: fields[EF.Created] || undefined,
+      lastModified: fields[EF.Last_Modified] || undefined,
+      createdBy: fields[EF.Created_By]?.name || undefined,
+      archived: fields[EF.Archived] === true,
+      assignedPartnerShortName: fields[EF.Assigned_Partner_Short_Name] || undefined,
+      boardService: fields[EF.Board_Service] || undefined,
+      cohorts: fields[EF.Cohorts] || undefined,
+      excludeFromEmailLogging: fields[EF.Exclude_from_email_logging] === true,
+      onSchoolBoard: fields[EF.On_school_board] === true,
+      pronunciation: fields[EF.Pronunciation] || undefined,
+      raceAndEthnicity: fields[EF.Race_and_Ethnicity] || undefined,
+      selfReflection: fields[EF.Self_reflection] || undefined,
+      sourceOther: fields[EF.Source___other] || undefined,
     };
   }
 
@@ -348,115 +408,207 @@ export class SimpleAirtableStorage implements IStorage {
 
     return {
       id: record.id,
-      name: fields[SF.Name] || fields["School Name"] || "",
+      name: fields[SF.Name] || "",
       shortName: fields[SF.Short_Name] || undefined,
-      logo: fields["Logo"]?.[0]?.url || undefined,
-      logoMainSquare: fields["Logo - main square"]?.[0]?.url || undefined,
-      logoFlowerOnly: fields["Logo - flower only"]?.[0]?.url || undefined,
-      logoMainRectangle: fields["Logo - main rectangle"]?.[0]?.url || undefined,
+      logo: fields[SF.Logo]?.[0]?.url || undefined,
+      logoMainSquare: fields[SF.Logo___main_square]?.[0]?.url || undefined,
+      logoFlowerOnly: fields[SF.Logo___flower_only]?.[0]?.url || undefined,
+      logoMainRectangle: fields[SF.Logo___main_rectangle]?.[0]?.url || undefined,
       logoUrl: fields[SF.Logo_URL] || undefined,
-      currentPhysicalAddress: fields['Current Physical Address'] || undefined,
-      currentMailingAddress: fields['Current Mailing Address'] || undefined,
-      activeLatitude: fields['activeLatitude'] ? parseFloat(fields['activeLatitude']) : undefined,
-      activeLongitude: fields['activeLongitude'] ? parseFloat(fields['activeLongitude']) : undefined,
-      ssjTargetCity: fields['SSJ - Target City'] || null,
-      ssjTargetState: fields['SSJ - Target State'] || null,
-      locality: (fields['Current Physical Address - City']
-        ? `${fields['Current Physical Address - City']}${fields['Current Physical Address - State'] ? ', ' + fields['Current Physical Address - State'] : ''}`
-        : fields['SSJ - Target City']
-          ? `${fields['SSJ - Target City']}${fields['SSJ - Target State'] ? ', ' + fields['SSJ - Target State'] : ''}`
+      currentPhysicalAddress: fields[SF.Current_Physical_Address] || undefined,
+      currentMailingAddress: fields[SF.Current_Mailing_Address] || undefined,
+      activeLatitude: fields[SF.activeLatitude] ? parseFloat(String(fields[SF.activeLatitude])) : undefined,
+      activeLongitude: fields[SF.activeLongitude] ? parseFloat(String(fields[SF.activeLongitude])) : undefined,
+      ssjTargetCity: fields[SF.SSJ___Target_City] || null,
+      ssjTargetState: fields[SF.SSJ___Target_State] || null,
+      locality: (fields[SF.Current_Physical_Address___City]
+        ? `${fields[SF.Current_Physical_Address___City]}${fields[SF.Current_Physical_Address___State] ? ', ' + fields[SF.Current_Physical_Address___State] : ''}`
+        : fields[SF.SSJ___Target_City]
+          ? `${fields[SF.SSJ___Target_City]}${fields[SF.SSJ___Target_State] ? ', ' + fields[SF.SSJ___Target_State] : ''}`
           : ''),
       phone: fields[SF.School_Phone] || undefined,
       email: fields[SF.School_Email] || undefined,
+      emailDomain: fields[SF.Email_Domain] || undefined,
+      domainName: fields[SF.Domain_Name] || undefined,
       website: fields[SF.Website] || undefined,
       instagram: fields[SF.Instagram] || undefined,
       facebook: fields[SF.Facebook] || undefined,
-      archived: fields['Archived'] === true,
-      priorNames: fields['Prior Names'] || '',
-      narrative: fields['Narrative'] || '',
-      institutionalPartner: fields['Institutional partner'] || null,
+      archived: fields[SF.Archived] === true,
+      priorNames: fields[SF.Prior_Names] || '',
+      narrative: fields[SF.Narrative] || '',
+      institutionalPartner: fields[SF.Institutional_partner] || null,
       membershipStatus: fields[SF.Membership_Status] || '',
-      founders: fields['Founders List'] || [],
-      foundersFullNames: fields['Full Name (from Founders List)'] || [],
-      membershipAgreementDate: fields['Membership Agreement date'] || '',
-      signedMembershipAgreement: fields['Signed Membership Agreement'] || '',
-      agreementVersion: fields['Agreement Version'] || '',
-      about: fields['About'] || '',
-      aboutSpanish: fields['About Spanish'] || '',
+      founders: fields[SF.Founders] || [],
+      foundersFullNames: fields[SF.Founders_Full_Names] || [],
+      membershipAgreementDate: fields[SF.Membership_Agreement_date] || '',
+      signedMembershipAgreement: fields[SF.Signed_Membership_Agreement] || '',
+      agreementVersion: fields[SF.Agreement_Version_] || '',
+      membershipTerminationLetter: fields[SF.Membership_termination_letter] || '',
+      primaryContactEmail: fields[SF.Primary_Contact_Email] || '',
+      about: fields[SF.About] || '',
+      aboutSpanish: fields[SF.About_Spanish] || '',
       agesServed: fields[SF.Ages_served] || undefined,
       governanceModel: fields[SF.Governance_Model] || undefined,
-      status: fields["School Status"] || undefined,
-      stageStatus: fields["Stage_Status"] || undefined,
+      status: fields[SF.School_Status] || undefined,
+      stageStatus: fields[SF.Stage_Status] || undefined,
       openDate: fields[SF.Opened] || undefined,
       enrollmentCap: fields[SF.Enrollment_at_Full_Capacity] || undefined,
-      lastModified: fields["Last Modified"] || undefined,
-      currentTLs: fields["Current TLs"] || undefined,
-      currentGuides: fields["Current Guide(s)"] || [],
-      publicFundingSources: fields["Public Funding Sources"] || [],
+      lastModified: fields[SF.Last_Modified] || undefined,
+      currentTLs: fields[SF.Current_TLs] || undefined,
+      currentGuides: fields[SF.Current_Guides] || [],
+      publicFundingSources: fields[SF.Public_funding_sources] || [],
       programFocus: fields[SF.Program_Focus] || undefined,
       numberOfClassrooms: fields[SF.Number_of_classrooms] || undefined,
-      leftNetworkDate: fields["Left Network Date"] || undefined,
-      leftNetworkReason: fields["Left Network Reason"] || undefined,
-      membershipFeeStatus: fields["Membership Fee Status"] || undefined,
+      leftNetworkDate: fields[SF.Left_Network_Date] || undefined,
+      leftNetworkReason: fields[SF.Left_Network_Reason] || undefined,
+      schoolCalendar: fields[SF.School_calendar] || undefined,
+      schoolSchedule: fields[SF.School_schedule] || undefined,
+
+      // membershipFeeStatus: fields["Membership Fee Status"] || undefined,
+
       // --- SSJ/OSS Data ---
-      ssjStage: fields['SSJ Stage'] || '',
-      ssjOriginalProjectedOpenDate: fields['SSJ - Original Projected Open Date'] || '',
-      ssjProjOpenSchoolYear: fields['SSJ - Proj Open School Year'] || '',
-      ssjProjectedOpen: fields['SSJ - Projected Open'] || '',
-      riskFactors: fields['Risk Factors'] || [],
-      watchlist: fields['Watchlist'] || [],
-      errors: fields['Errors'] || [],
-      groupExemptionStatus: fields['Group exemption status'] || '',
-      groupExemptionDateGranted: fields['Date received group exemption'] || '',
-      groupExemptionDateWithdrawn: fields['Date withdrawn from Group Exemption'] || '',
-      ssjBoardDevelopment: fields['SSJ - Board development'] || '',
-      enteredVisioningDate: fields['Entered Visioning Date'] || '',
-      enteredPlanningDate: fields['Entered Planning Date'] || '',
-      enteredStartupDate: fields['Entered Startup Date'] || '',
-      ssjHasETLPartner: fields['SSJ - Has the ETL identified a partner?'] || '',
-      ssjOpsGuideTrack: fields['SSJ - Ops Guide Support Track'] || [],
-      ssjReadinessRating: fields['SSJ - Readiness to Open Rating'] || '',
-      ssjFacility: fields['SSJ - Facility'] || '',
-      building4GoodFirm: fields['Building4Good Firm & Attorney'] || '',
-      ssjTotalStartupFundingReq: fields['SSJ - Total Startup Funding Needed'] || '',
-      ssjFundraisingNarrative: fields['SSJ - Fundraising narrative'] || '',
-      planningAlbum: fields['Planning Album'] || '',
-      activePodMember: fields['Active Pod Member'] || '',
-      cohorts: fields['Cohorts'] || [],
+      ssjStage: fields[SF.SSJ_Stage] || '',
+      ssjOriginalProjectedOpenDate: fields[SF.SSJ___Original_Projected_Open_Date] || '',
+      ssjProjOpenSchoolYear: fields[SF.SSJ___Proj_Open_School_Year] || '',
+      ssjProjectedOpen: fields[SF.SSJ___Projected_Open] || '',
+     
+      riskFactors: fields[SF.Risk_Factors] || [],
+      watchlist: fields[SF.Watchlist] || [],
+      errors: fields[SF.Errors] || [],
+  
+      // Nonprofit status
+      groupExemptionStatus: fields[SF.Group_exemption_status] || '',
+      dateReceivedGroupExemption: fields[SF.Date_received_group_exemption] || '',
+      dateWithdrawnGroupExemption: fields[SF.Date_withdrawn_from_Group_Exemption] || '',
+      nondiscriminationOnApplication: fields[SF.Nondiscrimination_Policy_on_Application] || '',
+      nondiscriminationOnWebsite: fields[SF.Nondiscrimination_Policy_on_Website] || '',
+      onNationalWebsite: fields[SF.On_national_website] === true || String(fields[SF.On_national_website] || '').toLowerCase() === 'yes',
+      ssjTool: fields[SF.SSJ___SSJ_Tool] || '',
+      tcSchoolId: fields[SF.TC_school_ID] || '',
+      createdBy: fields[SF.Created_By]?.name || fields[SF.Created_By] || undefined,
+      charterId: (Array.isArray(fields[SF.charter_id]) ? String((fields[SF.charter_id] as any[])[0] || '') : String(fields[SF.charter_id] || '')) || undefined,
+
+      ssjFacility: fields[SF.SSJ___Facility] || '',
+      ssjB4GStatus: fields[SF.SSJ___Building4Good_Status] || '',
+      ssjDateSharedWithN4G: fields[SF.SSJ___Date_shared_with_N4G__from_SSJ_Process_Details_] || '',
+      building4GoodFirm: fields[SF.Building4Good_Firm___Attorney] || '',
+      ssjFundingGap: fields[SF.SSJ___Gap_in_Funding] || '',
+      ssjAmountRaised: fields[SF.SSJ___Amount_raised] || '',
+      ssjLoanApprovedAmount: fields[SF.SSJ___Loan_approved_amt] || '',
+      ssjLoanEligibility: fields[SF.SSJ___Loan_eligibility] || '',
+      ssjViableFundingPath: fields[SF.SSJ___Does_the_school_have_a_viable_pathway_to_funding_] || '',
+      ssjHasETLPartner: fields[SF.SSJ___Has_the_ETL_identified_a_partner_] || '',
+      ssjOpsGuideTrack: fields[SF.SSJ___Ops_Guide_Support_Track] || [],
+      ssjReadinessRating: fields[SF.SSJ___Readiness_to_Open_Rating] || '',
+      ssjTotalStartupFundingReq: fields[SF.SSJ___Total_Startup_Funding_Needed] || '',
+      ssjFundraisingNarrative: fields[SF.SSJ___Fundraising_narrative] || '',
+      ssjPlanningForWFFunding: fields[SF.SSJ___Is_the_school_planning_to_apply_for_internal_Wildflower_funding_] || '',
+
+      ssjBudgetReady: fields[SF.SSJ___Is_the_budget_at_a_stage_that_will_allow_the_ETL_s__to_take_their_next_steps_] || '',
+      ssjEnrollmentOnTrack: fields[SF.SSJ___Is_the_team_on_track_for_their_enrollment_goals_] || '',
+      ssjCohortStatus: fields[SF.SSJ___Cohort_Status] || '',
+      ssjBoardDevelopment: fields[SF.SSJ___Board_development] || '',
+      ssjNameReserved: fields[SF.SSJ___Name_Reserved] || '',
+      ssjNextBigDecision: fields[SF.SSJ___What_is_the_next_big_decision_or_action_this_school_is_working_on_] || '',
+
+      enteredVisioningDate: fields[SF.Entered_Visioning_Date] || '',
+      enteredPlanningDate: fields[SF.Entered_Planning_Date] || '',
+      enteredStartupDate: fields[SF.Entered_Startup_Date] || '',
+
+      planningAlbum: fields[SF.Planning_album] || '',
+      visioningAlbum: fields[SF.Visioning_album] || '',
+      visioningAlbumComplete: fields[SF.Visioning_album_complete] || '',
+//      activePodMember: '',
+      cohorts: fields[SF.Cohorts] || [],
+
       // --- Systems ---
-      googleVoice: fields['Google Voice'] || '',
-      budgetUtility: fields['Budget Utility'] || '',
-      admissionsSystem: fields['Admissions System'] || '',
-      qbo: fields['QBO'] || '',
-      websiteTool: fields['Website tool'] || '',
-      logoDesigner: fields['Logo designer'] || '',
-      transparentClassroom: fields['Transparent Classroom'] || '',
-      tcAdmissions: fields['TC Admissions'] || '',
-      tcRecordkeeping: fields['TC Recordkeeping'] || '',
-      gusto: fields['Gusto'] || '',
-      businessInsurance: fields['Business Insurance'] || '',
-      nameSelectionProposal: fields['Name Selection Proposal'] || '',
-      trademarkFiled: fields['Trademark Filed'] || '',
-      billComAccount: fields['Bill.com account'] || '',
-      googleWorkspacePath: fields['Google Workspace Org Unit Path'] || '',
-      budgetLink: fields['Budget Link'] || '',
-      bookkeeper: fields['Bookkeeper / Accountant'] || '',
-      activeAssignedPartnerEmail: fields['Active Assigned Partner Email'] || '',
-      activeAssignedPartnerOverride: fields['Active Assigned Partner Override'] || '',
-      activeAssignedPartnerShortName: fields['Active Assigned Partner Short Name'] || '',
+      googleVoice: fields[SF.Google_Voice] || '',
+      budgetUtility: fields[SF.Budget_Utility] || '',
+      admissionsSystem: fields[SF.Admissions_System] || '',
+      qbo: fields[SF.QBO] || '',
+      websiteTool: fields[SF.Website_tool] || '',
+      logoDesigner: fields[SF.Logo_designer] || '',
+      transparentClassroom: fields[SF.Transparent_Classroom] || '',
+      tcAdmissions: fields[SF.TC_Admissions] || '',
+      tcRecordkeeping: fields[SF.TC_Recordkeeping] || '',
+      gusto: fields[SF.Gusto] || '',
+      businessInsurance: fields[SF.Business_Insurance] || '',
+      nameSelectionProposal: fields[SF.Name_Selection_Proposal] || '',
+      trademarkFiled: fields[SF.Trademark_filed] || '',
+      billComAccount: fields[SF.Bill_com_account] || '',
+      googleWorkspacePath: fields[SF.Google_Workspace_Org_Unit_Path] || '',
+      budgetLink: fields[SF.Budget_Link] || '',
+      bookkeeper: fields[SF.Bookkeeper___Accountant] || '',
       createdTime: record.createdTime,
       
       // --- Legal Entity Fields ---
-      legalStructure: fields['Legal structure'] || undefined,
-      currentFYEnd: fields['Current FY end'] || undefined,
-      EIN: fields['EIN'] || undefined,
-      legalName: fields['Legal Name'] || undefined,
-      incorporationDate: fields['Incorporation Date'] || undefined,
-      nonprofitStatus: fields['Nonprofit status'] || undefined,
-      dateReceivedGroupExemption: fields['Date received group exemption'] || undefined,
-      dateWithdrawnGroupExemption: fields['Date withdrawn from Group Exemption'] || undefined
+      legalStructure: fields[SF.Legal_structure] || undefined,
+      currentFYEnd: fields[SF.Current_FY_end] || undefined,
+      EIN: fields[SF.EIN] || undefined,
+      legalName: fields[SF.Legal_Name] || undefined,
+      incorporationDate: fields[SF.Incorporation_Date] || undefined,
+      nonprofitStatus: fields[SF.Nonprofit_status] || undefined,
+    };
+  }
 
-      
+  // Reusable transformer for Locations
+  private transformLocationRecord(record: any): Location {
+    const f = record.fields;
+    const schoolId = firstId(f[LF.school_id] ?? f[LF.School]);
+    return {
+      id: record.id,
+      schoolId: schoolId || '',
+      charterId: firstId(f[LF.charter_id]),
+      address: String(f[LF.Address] || ''),
+      city: String(f[LF.City] || ''),
+      state: String(f[LF.State] || ''),
+      postalCode: String(f[LF.Postal_code] || ''),
+      country: String(f[LF.Country] || ''),
+      neighborhood: String(f[LF.Neighborhood] || ''),
+      sqFt: toNumber(f[LF.Square_feet]),
+      maxOccupancy: toNumber(f[LF.Max_Students_Licensed_For]),
+      latitude: toNumber(f[LF.Latitude]),
+      longitude: toNumber(f[LF.Longitude]),
+      currentPhysicalAddress: Boolean(f[LF.Current_physical_address_]),
+      currentMailingAddress: Boolean(f[LF.Current_mailing_address_]),
+      locationType: String(f[LF.Location_type] || ''),
+      startDate: String(f[LF.Start_of_time_at_location] || ''),
+      endDate: String(f[LF.End_of_time_at_location] || ''),
+      coLocationType: String(f[LF.Co_Location_Type] || ''),
+      coLocationPartner: String(f[LF.Co_Location_Partner_] || ''),
+      censusTract: String(f[LF.Census_Tract] || ''),
+      qualLICT: toYesBool(f[LF.Qualified_Low_Income_Census_Tract]),
+      leaseEndDate: String(f[LF.Lease_End_Date] || ''),
+      lease: String(f[LF.Lease] || ''),
+      timeZone: String(f[LF.Time_Zone] || ''),
+      created: createdAt(f),
+      lastModified: updatedAt(f),
+    };
+  }
+
+  // Reusable transformer for Educators x Schools associations
+  private transformEXSRecord(
+    record: any,
+    opts?: { schoolMap?: Map<string, string>; educatorMap?: Map<string, string> }
+  ): EducatorSchoolAssociation {
+    const f = record.fields;
+    const educatorId = firstId(f[EXSF.educator_id]) || '';
+    const schoolId = firstId(f[EXSF.school_id]) || '';
+    const role = f[EXSF.Roles] ? [String(f[EXSF.Roles])] : [];
+    return {
+      id: record.id,
+      educatorId,
+      schoolId,
+      schoolShortName: opts?.schoolMap?.get(schoolId) || '',
+      educatorName: opts?.educatorMap?.get(educatorId) || '',
+      role,
+      status: String(f[EXSF.Stage_Status] || ''),
+      startDate: String(f[EXSF.Start_Date] || ''),
+      endDate: String(f[EXSF.End_Date] || ''),
+      emailAtSchool: String(f[EXSF.Email_at_School] || ''),
+      isActive: f[EXSF.Currently_Active] === true || f[EXSF.Currently_Active] === 'true',
+      created: String(f[EXSF.Created] || new Date().toISOString()),
+      lastModified: String(f[EXSF.Created] || new Date().toISOString()),
     };
   }
 
@@ -471,7 +623,7 @@ export class SimpleAirtableStorage implements IStorage {
     }
 
     try {
-      const records = await base("Educators").select().all();
+      const records = await base(AT.EDUCATORS).select().all();
       const educators = records.map(record => this.transformEducatorRecord(record));
       
       // Cache the results
@@ -488,7 +640,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getEducator(id: string): Promise<Educator | undefined> {
     try {
-      const record = await base("Educators").find(id);
+      const record = await base(AT.EDUCATORS).find(id);
       return this.transformEducatorRecord(record);
     } catch (error) {
       console.error(`Error fetching educator ${id} from Airtable:`, error);
@@ -498,7 +650,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getEducatorByEmail(email: string): Promise<Educator | undefined> {
     try {
-      const records = await base("Educators").select({
+      const records = await base(AT.EDUCATORS).select({
         filterByFormula: `{${EF.Current_Primary_Email_Address}} = "${email}"`
       }).all();
       
@@ -514,9 +666,9 @@ export class SimpleAirtableStorage implements IStorage {
 
   async createEducator(educator: InsertEducator): Promise<Educator> {
     try {
-      const record = await base("Educators").create({
-        "First Name": educator.firstName,
-        "Last Name": educator.lastName
+      const record = await base(AT.EDUCATORS).create({
+        [EF.First_Name]: educator.firstName,
+        [EF.Last_Name]: educator.lastName
       });
       
       return this.transformEducatorRecord(record);
@@ -530,12 +682,12 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const updateFields: any = {};
       
-      if (educator.firstName !== undefined) updateFields["First Name"] = educator.firstName;
-      if (educator.lastName !== undefined) updateFields["Last Name"] = educator.lastName;
-      if (educator.fullName !== undefined) updateFields["Full Name"] = educator.fullName;
-      if (educator.archived !== undefined) updateFields["Archived"] = educator.archived;
+      if (educator.firstName !== undefined) updateFields[EF.First_Name] = educator.firstName;
+      if (educator.lastName !== undefined) updateFields[EF.Last_Name] = educator.lastName;
+      if (educator.fullName !== undefined) updateFields[EF.Full_Name] = educator.fullName;
+      if (educator.archived !== undefined) updateFields[EF.Archived] = educator.archived;
 
-      const record = await base("Educators").update(id, updateFields);
+      const record = await base(AT.EDUCATORS).update(id, updateFields);
       return this.transformEducatorRecord(record);
     } catch (error) {
       console.error(`Error updating educator ${id} in Airtable:`, error);
@@ -545,7 +697,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async deleteEducator(id: string): Promise<boolean> {
     try {
-      await base("Educators").update(id, { Archived: true } as any);
+      await base(AT.EDUCATORS).update(id, { [EF.Archived]: true } as any);
       try { cache.invalidate('educators:all'); } catch {}
       return true;
     } catch (error) {
@@ -565,18 +717,18 @@ export class SimpleAirtableStorage implements IStorage {
     }
 
     try {
-      const records = await base("Schools").select().all();
+      const records = await base(AT.SCHOOLS).select().all();
       
       const schools = records.map(record => {
         try {
           return this.transformSchoolRecord(record);
         } catch (error) {
-          console.error(`Error transforming school ${record.id} (${record.fields["Name"]}):`, error);
+          console.error(`Error transforming school ${record.id} (${record.fields[SF.Name]}):`, error);
           // Return a minimal school object to prevent dropping
           return {
             id: record.id,
-            name: record.fields["Name"] || "Unknown",
-            shortName: record.fields["Short Name"] || undefined,
+            name: record.fields[SF.Name] || "Unknown",
+            shortName: record.fields[SF.Short_Name] || undefined,
             locality: "",
             membershipStatus: "",
             status: "",
@@ -606,7 +758,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getSchool(id: string): Promise<School | undefined> {
     try {
-      const record = await base("Schools").find(id);
+      const record = await base(AT.SCHOOLS).find(id);
       return this.transformSchoolRecord(record);
     } catch (error) {
       console.error(`Error fetching school ${id} from Airtable:`, error);
@@ -633,7 +785,7 @@ export class SimpleAirtableStorage implements IStorage {
       // if (school.ssjTargetCity) createFields["SSJ Target City"] = school.ssjTargetCity;
       // if (school.ssjTargetState) createFields["SSJ Target State"] = school.ssjTargetState;
       
-      const record = await base("Schools").create(createFields);
+      const record = await base(AT.SCHOOLS).create(createFields);
       
       // Invalidate cache immediately after creation
       cache.invalidate('schools:all');
@@ -676,11 +828,10 @@ export class SimpleAirtableStorage implements IStorage {
       if (hasValue(school.legalName)) updateFields[SF.Legal_Name] = school.legalName;
       if (hasValue(school.incorporationDate)) updateFields[SF.Incorporation_Date] = school.incorporationDate;
       if (hasValue(school.nonprofitStatus)) updateFields[SF.Nonprofit_status] = school.nonprofitStatus;
-      // Note: dateReceivedGroupExemption and dateWithdrawnGroupExemption are legacy fields, using groupExemptionDateGranted and groupExemptionDateWithdrawn instead
       if (hasValue(school.currentFYEnd)) updateFields[SF.Current_FY_end] = school.currentFYEnd;
       if (hasValue(school.groupExemptionStatus)) updateFields[SF.Group_exemption_status] = school.groupExemptionStatus;
-      if (hasValue(school.groupExemptionDateGranted)) updateFields[SF.Date_received_group_exemption] = school.groupExemptionDateGranted;
-      if (hasValue(school.groupExemptionDateWithdrawn)) updateFields[SF.Date_withdrawn_from_Group_Exemption] = school.groupExemptionDateWithdrawn;
+      if (hasValue(school.dateReceivedGroupExemption)) updateFields[SF.Date_received_group_exemption] = school.dateReceivedGroupExemption;
+      if (hasValue(school.dateWithdrawnGroupExemption)) updateFields[SF.Date_withdrawn_from_Group_Exemption] = school.dateWithdrawnGroupExemption;
       if (hasValue(school.businessInsurance)) updateFields[SF.Business_Insurance] = school.businessInsurance;
       if (hasValue(school.billComAccount)) updateFields[SF.Bill_com_account] = school.billComAccount;
       
@@ -693,7 +844,7 @@ export class SimpleAirtableStorage implements IStorage {
       }
 
       console.log('Sending to Airtable:', Object.keys(updateFields));
-      const record = await base("Schools").update(id, updateFields);
+      const record = await base(AT.SCHOOLS).update(id, updateFields);
       return this.transformSchoolRecord(record);
     } catch (error) {
       console.error(`Error updating school ${id} in Airtable:`, error);
@@ -703,7 +854,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async deleteSchool(id: string): Promise<boolean> {
     try {
-      await base("Schools").update(id, { Archived: true } as any);
+      await base(AT.SCHOOLS).update(id, { Archived: true } as any);
       try { cache.invalidate('schools:all'); } catch {}
       return true;
     } catch (error) {
@@ -714,8 +865,27 @@ export class SimpleAirtableStorage implements IStorage {
 
   // Metadata operations
   async getMetadata(): Promise<any[]> {
-    // Since we can't access the Metadata table, return field options based on our schema
-    return [];
+    // Return Airtable base schema (tables + fields) via Meta API
+    try {
+      const { getAirtableSchema } = await import('./airtable-schema');
+      const data: any = await getAirtableSchema();
+      const tables = Array.isArray(data?.tables) ? data.tables : [];
+      return tables.map((t: any) => ({
+        id: t.id,
+        name: t.name,
+        fields: Array.isArray(t.fields)
+          ? t.fields.map((f: any) => ({
+              id: f.id,
+              name: f.name,
+              type: f.type,
+              options: f.options || undefined,
+            }))
+          : [],
+      }));
+    } catch (error) {
+      console.warn('Warning: Unable to fetch Airtable metadata:', error);
+      return [];
+    }
   }
 
   async getSchoolFieldOptions(): Promise<any> {
@@ -793,26 +963,9 @@ export class SimpleAirtableStorage implements IStorage {
   async getEducatorSchoolAssociations(): Promise<EducatorSchoolAssociation[]> {
     try {
       // Query the "Educators x Schools" table
-      const records = await base("Educators x Schools").select().all();
+      const records = await base(AT.EDUCATORS_X_SCHOOLS).select().all();
       
-      return records.map(record => {
-        const educatorId = record.fields["educator_id"];
-        const schoolId = record.fields["school_id"];
-        const roles = record.fields["Roles"];
-        const created = record.fields["Created"];
-        
-        return {
-          id: record.id,
-          educatorId: Array.isArray(educatorId) ? String(educatorId[0] || '') : String(educatorId || ''),
-          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
-          role: roles ? [String(roles)] : [], // Changed to array to match interface
-          startDate: '', // Not available in this table
-          endDate: '', // Not available in this table
-          isActive: true, // Assume active if record exists
-          created: String(created || new Date().toISOString()),
-          lastModified: String(created || new Date().toISOString()),
-        };
-      });
+      return records.map(record => this.transformEXSRecord(record));
     } catch (error) {
       console.error('Error fetching educator school associations:', error);
       return [];
@@ -822,27 +975,15 @@ export class SimpleAirtableStorage implements IStorage {
   async getEducatorAssociations(educatorId: string): Promise<EducatorSchoolAssociation[]> {
     try {
       // Query the "Educators x Schools" table filtered by educator_id field
-      const records = await base("Educators x Schools").select({
-        filterByFormula: `{educator_id} = '${educatorId}'`
+      const records = await base(AT.EDUCATORS_X_SCHOOLS).select({
+        filterByFormula: `{${EXSF.educator_id}} = '${educatorId}'`
       }).all();
       
       // Get all schools to map school IDs to short names
       const schools = await this.getSchools();
       const schoolMap = new Map(schools.map(school => [school.id, school.shortName || school.name]));
       
-      return records.map(record => ({
-        id: record.id,
-        educatorId: Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || ''),
-        schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
-        schoolShortName: schoolMap.get(Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || '')) || '',
-        role: record.fields["Roles"] ? [String(record.fields["Roles"])] : [], // Changed to array
-        status: String(record.fields["Stage_Status"] || ''),
-        startDate: String(record.fields["Start Date"] || ''),
-        endDate: String(record.fields["End Date"] || ''),
-        isActive: record.fields["Currently Active"] === true || record.fields["Currently Active"] === "true",
-        created: String(record.fields["Created"] || new Date().toISOString()),
-        lastModified: String(record.fields["Created"] || new Date().toISOString()),
-      }));
+      return records.map(record => this.transformEXSRecord(record, { schoolMap }));
     } catch (error) {
       console.error(`Error fetching educator associations for ${educatorId}:`, error);
       return [];
@@ -851,9 +992,9 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getSchoolAssociations(schoolId: string): Promise<EducatorSchoolAssociation[]> {
     try {
-      // Query the "Educators x Schools" table filtered by school_id field
-      const records = await base("Educators x Schools").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+      // Query the "Educators x Schools" table filtered by school_id (lookup-safe)
+      const records = await base(AT.EDUCATORS_X_SCHOOLS).select({
+        filterByFormula: `FIND('${schoolId}', ARRAYJOIN({${EXSF.school_id}}))`
       }).all();
       
       // Get all schools to map school IDs to short names
@@ -864,21 +1005,7 @@ export class SimpleAirtableStorage implements IStorage {
       const educators = await this.getEducators();
       const educatorMap = new Map(educators.map(educator => [educator.id, educator.fullName || `${educator.firstName} ${educator.lastName}`]));
       
-      return records.map(record => ({
-        id: record.id,
-        educatorId: Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || ''),
-        schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
-        schoolShortName: schoolMap.get(Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || '')) || '',
-        educatorName: educatorMap.get(Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || '')) || '',
-        role: record.fields["Roles"] ? [String(record.fields["Roles"])] : [], // Changed to array
-        status: String(record.fields["Stage_Status"] || ''),
-        startDate: String(record.fields["Start Date"] || ''),
-        endDate: String(record.fields["End Date"] || ''),
-        emailAtSchool: String(record.fields["Email at School"] || record.fields["Email At School"] || ''),
-        isActive: record.fields["Currently Active"] === true || record.fields["Currently Active"] === "true",
-        created: String(record.fields["Created"] || new Date().toISOString()),
-        lastModified: String(record.fields["Created"] || new Date().toISOString()),
-      }));
+      return records.map(record => this.transformEXSRecord(record, { schoolMap, educatorMap }));
     } catch (error) {
       console.error(`Error fetching school associations for ${schoolId}:`, error);
       return [];
@@ -891,15 +1018,15 @@ export class SimpleAirtableStorage implements IStorage {
       
       // Try different field names for the link fields
       // Common patterns: "Educator", "School", "Educators", "Schools"
-      const record = await base("Educators x Schools").create([{
+      const record = await base(AT.EDUCATORS_X_SCHOOLS).create([{
         fields: {
-          "Educator": [association.educatorId], // Try "Educator" as link field
-          "School": [association.schoolId],     // Try "School" as link field
-          "Roles": association.role && association.role.length > 0 ? association.role[0] : undefined,
-          "Start Date": association.startDate || undefined,
-          "End Date": association.endDate || undefined,
-          "Currently Active": association.isActive !== undefined ? association.isActive : true,
-          "Email at School": association.emailAtSchool || undefined,
+          [EXSF.Educator]: [association.educatorId],
+          [EXSF.School]: [association.schoolId],
+          [EXSF.Roles]: association.role && association.role.length > 0 ? association.role[0] : undefined,
+          [EXSF.Start_Date]: association.startDate || undefined,
+          [EXSF.End_Date]: association.endDate || undefined,
+          [EXSF.Currently_Active]: association.isActive !== undefined ? association.isActive : true,
+          [EXSF.Email_at_School]: association.emailAtSchool || undefined,
         }
       }]);
       
@@ -925,7 +1052,7 @@ export class SimpleAirtableStorage implements IStorage {
       if (error.message && error.message.includes('cannot accept a value')) {
         try {
           console.log("Trying alternative field names...");
-          const record = await base("Educators x Schools").create([{
+          const record = await base(AT.EDUCATORS_X_SCHOOLS).create([{
             fields: {
               "Educators": [association.educatorId], // Try "Educators" as link field
               "Schools": [association.schoolId],     // Try "Schools" as link field
@@ -967,27 +1094,27 @@ export class SimpleAirtableStorage implements IStorage {
       
       const updateFields: any = {};
       
-      if (association.role !== undefined) updateFields["Roles"] = association.role && association.role.length > 0 ? association.role[0] : undefined;
-      if (association.startDate !== undefined) updateFields["Start Date"] = association.startDate;
-      if (association.endDate !== undefined) updateFields["End Date"] = association.endDate;
-      if (association.isActive !== undefined) updateFields["Currently Active"] = association.isActive;
-      if (association.emailAtSchool !== undefined) updateFields["Email at School"] = association.emailAtSchool;
+      if (association.role !== undefined) updateFields[EXSF.Roles] = association.role && association.role.length > 0 ? association.role[0] : undefined;
+      if (association.startDate !== undefined) updateFields[EXSF.Start_Date] = association.startDate;
+      if (association.endDate !== undefined) updateFields[EXSF.End_Date] = association.endDate;
+      if (association.isActive !== undefined) updateFields[EXSF.Currently_Active] = association.isActive;
+      if (association.emailAtSchool !== undefined) updateFields[EXSF.Email_at_School] = association.emailAtSchool;
       
-      const record = await base("Educators x Schools").update(id, updateFields);
+      const record = await base(AT.EDUCATORS_X_SCHOOLS).update(id, updateFields);
       console.log("Association updated successfully:", record.id);
       
       // Return the updated association
       return {
         id: record.id,
-        educatorId: Array.isArray(record.fields["educator_id"]) ? String(record.fields["educator_id"][0]) : String(record.fields["educator_id"] || ''),
-        schoolId: Array.isArray(record.fields["school_id"]) ? String(record.fields["school_id"][0]) : String(record.fields["school_id"] || ''),
-        role: record.fields["Roles"] ? [String(record.fields["Roles"])] : [],
-        startDate: String(record.fields["Start Date"] || ''),
-        endDate: String(record.fields["End Date"] || ''),
-        isActive: record.fields["Currently Active"] === true || record.fields["Currently Active"] === "true",
-        emailAtSchool: String(record.fields["Email at School"] || ''),
-        created: String(record.fields["Created"] || new Date().toISOString()),
-        lastModified: String(record.fields["Created"] || new Date().toISOString()),
+        educatorId: Array.isArray(record.fields[EXSF.educator_id]) ? String((record.fields[EXSF.educator_id] as any[])[0]) : String(record.fields[EXSF.educator_id] || ''),
+        schoolId: Array.isArray(record.fields[EXSF.school_id]) ? String((record.fields[EXSF.school_id] as any[])[0]) : String(record.fields[EXSF.school_id] || ''),
+        role: record.fields[EXSF.Roles] ? [String(record.fields[EXSF.Roles])] : [],
+        startDate: String(record.fields[EXSF.Start_Date] || ''),
+        endDate: String(record.fields[EXSF.End_Date] || ''),
+        isActive: record.fields[EXSF.Currently_Active] === true || record.fields[EXSF.Currently_Active] === "true",
+        emailAtSchool: String(record.fields[EXSF.Email_at_School] || ''),
+        created: String(record.fields[EXSF.Created] || new Date().toISOString()),
+        lastModified: String(record.fields[EXSF.Created] || new Date().toISOString()),
       };
     } catch (error) {
       console.error("Error updating educator school association:", error);
@@ -996,7 +1123,13 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async deleteEducatorSchoolAssociation(id: string): Promise<boolean> {
-    return false;
+    try {
+      await base(AT.EDUCATORS_X_SCHOOLS).destroy(id);
+      return true;
+    } catch (error) {
+      console.error(`Error deleting educator-school association ${id}:`, error);
+      return false;
+    }
   }
 
   // Legacy methods for backward compatibility
@@ -1048,7 +1181,7 @@ export class SimpleAirtableStorage implements IStorage {
   async getLocations(): Promise<Location[]> {
     try {
       console.log("Fetching all locations from Airtable...");
-      const records = await base("Locations").select().all();
+      const records = await base(AT.LOCATIONS).select().all();
       console.log(`Found ${records.length} location records`);
       
       if (records.length > 0) {
@@ -1057,15 +1190,33 @@ export class SimpleAirtableStorage implements IStorage {
       }
       
       return records.map(record => {
-        const schoolId = record.fields[LF.school_id] || record.fields[LF.School] || record.fields["Schools"];
+        const schoolId = record.fields[LF.school_id] || record.fields[LF.School];
         return {
           id: record.id,
           schoolId: Array.isArray(schoolId) ? String((schoolId as any[])[0] || '') : String(schoolId || ''),
           address: String(record.fields[LF.Address] || ''),
+          city: String(record.fields[LF.City] || ''),
+          state: String(record.fields[LF.State] || ''),
+          postalCode: String(record.fields[LF.Postal_code] || ''),
+          country: String(record.fields[LF.Country] || ''),
+          neighborhood: String(record.fields[LF.Neighborhood] || ''),
+          sqFt: record.fields[LF.Square_feet] ? Number(record.fields[LF.Square_feet]) : undefined,
+          maxOccupancy: record.fields[LF.Max_Students_Licensed_For] ? Number(record.fields[LF.Max_Students_Licensed_For]) : undefined,
+          latitude: record.fields[LF.Latitude] ? Number(record.fields[LF.Latitude]) : undefined,
+          longitude: record.fields[LF.Longitude] ? Number(record.fields[LF.Longitude]) : undefined,
           currentPhysicalAddress: Boolean(record.fields[LF.Current_physical_address_]),
           currentMailingAddress: Boolean(record.fields[LF.Current_mailing_address_]),
+          locationType: String(record.fields[LF.Location_type] || ''),
           startDate: String(record.fields[LF.Start_of_time_at_location] || ''),
           endDate: String(record.fields[LF.End_of_time_at_location] || ''),
+          coLocationType: String(record.fields[LF.Co_Location_Type] || ''),
+          coLocationPartner: String(record.fields[LF.Co_Location_Partner_] || ''),
+          censusTract: String(record.fields[LF.Census_Tract] || ''),
+          qualLICT: String(record.fields[LF.Qualified_Low_Income_Census_Tract] || '').toUpperCase() === 'YES',
+          leaseEndDate: String(record.fields[LF.Lease_End_Date] || ''),
+          lease: String(record.fields[LF.Lease] || ''),
+          timeZone: String(record.fields[LF.Time_Zone] || ''),
+          charterId: Array.isArray(record.fields[LF.charter_id]) ? String((record.fields[LF.charter_id] as any[])[0] || '') : String(record.fields[LF.charter_id] || ''),
           created: String(record.fields[LF.Created] || new Date().toISOString()),
           lastModified: String(record.fields[LF.Last_Modified] || new Date().toISOString()),
         };
@@ -1090,21 +1241,21 @@ export class SimpleAirtableStorage implements IStorage {
       let schoolCreated: string | undefined;
       let schoolLastModified: string | undefined;
       try {
-        const srec = await base("Schools").find(schoolId);
-        schoolName = String(srec.fields["Name"] || '');
-        schoolShortName = String(srec.fields["Short Name"] || '');
-        schoolActiveAddress = String(srec.fields["Current Physical Address"] || srec.fields["Current Mailing Address"] || srec.fields["Current Physical Address"] || '');
-        schoolCreated = String(srec.fields["Created"] || '');
-        schoolLastModified = String(srec.fields["Last Modified"] || '');
+        const srec = await base(AT.SCHOOLS).find(schoolId);
+        schoolName = String(srec.fields[SF.Name] || '');
+        schoolShortName = String(srec.fields[SF.Short_Name] || '');
+        schoolActiveAddress = String(srec.fields[SF.Current_Physical_Address] || srec.fields[SF.Current_Mailing_Address] || srec.fields[SF.Current_Physical_Address] || '');
+        schoolCreated = String(srec.fields[SF.Created] || '');
+        schoolLastModified = String(srec.fields[SF.Last_Modified] || '');
       } catch {}
 
       // Fetch and filter in code to reliably match linked record IDs or lookups
-      const records = await base("Locations").select().all();
+      const records = await base(AT.LOCATIONS).select().all();
       const filtered = records.filter((record: any) => {
-        const link = record.fields["School"]; // linked record ids or names
-        const sid = record.fields["school_id"]; // optional text id
-        const locShort = record.fields["Short Name"]; // lookup of school's Short Name
-        const locName = record.fields["School Name"] || record.fields["Name"]; // if present
+        const link = record.fields[LF.School];
+        const sid = record.fields[LF.school_id];
+        const locShort = record.fields[LF.Short_Name];
+        const locName = record.fields[SF.Name];
         const linkMatches = Array.isArray(link) ? link.includes(schoolId) : (String(link) === String(schoolId));
         const idMatches = (sid && String(sid) === String(schoolId));
         const shortMatches = schoolShortName && String(locShort || '') === schoolShortName;
@@ -1113,23 +1264,41 @@ export class SimpleAirtableStorage implements IStorage {
       });
 
       const mapped = filtered.map(record => {
-        const schoolField = record.fields["School"];
-        const address = record.fields["Address"];
-        const currentPhysical = record.fields["Current physical address?"];
-        const currentMailing = record.fields["Current mailing address?"];
-        const startDate = record.fields["Start of time at location"];
-        const endDate = record.fields["End of time at location"];
-        const created = record.fields["Created"];
-        const lastModified = record.fields["Last Modified"];
+        const schoolField = record.fields[LF.School];
+        const address = record.fields[LF.Address];
+        const currentPhysical = record.fields[LF.Current_physical_address_];
+        const currentMailing = record.fields[LF.Current_mailing_address_];
+        const startDate = record.fields[LF.Start_of_time_at_location];
+        const endDate = record.fields[LF.End_of_time_at_location];
+        const created = record.fields[LF.Created];
+        const lastModified = record.fields[LF.Last_Modified];
         
         return {
           id: record.id,
           schoolId: Array.isArray(schoolField) ? String(schoolField[0] || '') : String(schoolField || ''),
           address: String(address || ''),
+          city: String(record.fields[LF.City] || ''),
+          state: String(record.fields[LF.State] || ''),
+          postalCode: String(record.fields[LF.Postal_code] || ''),
+          country: String(record.fields[LF.Country] || ''),
+          neighborhood: String(record.fields[LF.Neighborhood] || ''),
+          sqFt: record.fields[LF.Square_feet] ? Number(record.fields[LF.Square_feet]) : undefined,
+          maxOccupancy: record.fields[LF.Max_Students_Licensed_For] ? Number(record.fields[LF.Max_Students_Licensed_For]) : undefined,
+          latitude: record.fields[LF.Latitude] ? Number(record.fields[LF.Latitude]) : undefined,
+          longitude: record.fields[LF.Longitude] ? Number(record.fields[LF.Longitude]) : undefined,
           currentPhysicalAddress: Boolean(currentPhysical),
           currentMailingAddress: Boolean(currentMailing),
+          locationType: String(record.fields[LF.Location_type] || ''),
           startDate: String(startDate || ''),
           endDate: String(endDate || ''),
+          coLocationType: String(record.fields[LF.Co_Location_Type] || ''),
+          coLocationPartner: String(record.fields[LF.Co_Location_Partner_] || ''),
+          censusTract: String(record.fields[LF.Census_Tract] || ''),
+          qualLICT: String(record.fields[LF.Qualified_Low_Income_Census_Tract] || '').toUpperCase() === 'YES',
+          leaseEndDate: String(record.fields[LF.Lease_End_Date] || ''),
+          lease: String(record.fields[LF.Lease] || ''),
+          timeZone: String(record.fields[LF.Time_Zone] || ''),
+          charterId: Array.isArray(record.fields[LF.charter_id]) ? String((record.fields[LF.charter_id] as any[])[0] || '') : String(record.fields[LF.charter_id] || ''),
           created: String(created || new Date().toISOString()),
           lastModified: String(lastModified || new Date().toISOString()),
         };
@@ -1160,11 +1329,11 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       console.log("Creating location in Airtable:", location);
       
-      const record = await base("Locations").create({
-        "School": [location.schoolId], // Correct field name from Airtable structure
-        "Address": location.address,
-        "Start of time at location": location.startDate || undefined,
-        "End of time at location": location.endDate || undefined,
+      const record = await base(AT.LOCATIONS).create({
+        [LF.School]: [location.schoolId],
+        [LF.Address]: location.address,
+        [LF.Start_of_time_at_location]: location.startDate || undefined,
+        [LF.End_of_time_at_location]: location.endDate || undefined,
       });
       
       console.log("Location created successfully with school link:", record.id);
@@ -1192,25 +1361,25 @@ export class SimpleAirtableStorage implements IStorage {
       
       const updateFields: any = {};
       
-      if (location.address !== undefined) updateFields["Address"] = location.address;
-      if (location.currentPhysicalAddress !== undefined) updateFields["Current physical address?"] = location.currentPhysicalAddress;
-      if (location.currentMailingAddress !== undefined) updateFields["Current mailing address?"] = location.currentMailingAddress;
-      if (location.startDate !== undefined) updateFields["Start of time at location"] = location.startDate || undefined;
-      if (location.endDate !== undefined) updateFields["End of time at location"] = location.endDate || undefined;
+      if (location.address !== undefined) updateFields[LF.Address] = location.address;
+      if (location.currentPhysicalAddress !== undefined) updateFields[LF.Current_physical_address_] = location.currentPhysicalAddress;
+      if (location.currentMailingAddress !== undefined) updateFields[LF.Current_mailing_address_] = location.currentMailingAddress;
+      if (location.startDate !== undefined) updateFields[LF.Start_of_time_at_location] = location.startDate || undefined;
+      if (location.endDate !== undefined) updateFields[LF.End_of_time_at_location] = location.endDate || undefined;
       
-      const record = await base("Locations").update(id, updateFields);
+      const record = await base(AT.LOCATIONS).update(id, updateFields);
       console.log("Location updated successfully:", record.id);
       
       return {
         id: record.id,
-        schoolId: Array.isArray(record.fields["School"]) ? String((record.fields["School"] as any[])[0] || '') : String(record.fields["School"] || ''),
-        address: String(record.fields["Address"] || ''),
-        currentPhysicalAddress: Boolean(record.fields["Current physical address?"]),
-        currentMailingAddress: Boolean(record.fields["Current mailing address?"]),
-        startDate: String(record.fields["Start of time at location"] || ''),
-        endDate: String(record.fields["End of time at location"] || ''),
-        created: String(record.fields["Created"] || new Date().toISOString()),
-        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+        schoolId: Array.isArray(record.fields[LF.School]) ? String((record.fields[LF.School] as any[])[0] || '') : String(record.fields[LF.School] || ''),
+        address: String(record.fields[LF.Address] || ''),
+        currentPhysicalAddress: Boolean(record.fields[LF.Current_physical_address_]),
+        currentMailingAddress: Boolean(record.fields[LF.Current_mailing_address_]),
+        startDate: String(record.fields[LF.Start_of_time_at_location] || ''),
+        endDate: String(record.fields[LF.End_of_time_at_location] || ''),
+        created: String(record.fields[LF.Created] || new Date().toISOString()),
+        lastModified: String(record.fields[LF.Last_Modified] || new Date().toISOString()),
       };
     } catch (error) {
       console.error("Error updating location:", error);
@@ -1222,7 +1391,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       console.log("Deleting location from Airtable:", id);
       
-      await base("Locations").destroy(id);
+      await base(AT.LOCATIONS).destroy(id);
       console.log("Location deleted successfully:", id);
       
       return true;
@@ -1234,57 +1403,68 @@ export class SimpleAirtableStorage implements IStorage {
 
   // Guide assignment operations
   async getGuideAssignments(): Promise<GuideAssignment[]> {
-    const schools = await this.getSchools();
-    if (schools.length === 0) return [];
-    
-    return [
-      {
-        id: 'guide_1',
-        schoolId: schools[0]?.id || 'mock_school_1',
-        guideId: 'guide_math_001',
-        guideShortName: 'Elementary Math',
-        type: 'Academic',
-        startDate: '2023-09-01',
-        endDate: '2024-06-30',
-        isActive: true,
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      },
-      {
-        id: 'guide_2',
-        schoolId: schools[0]?.id || 'mock_school_1',
-        guideId: 'guide_reading_002',
-        guideShortName: 'Reading Fundamentals',
-        type: 'Language Arts',
-        startDate: '2023-09-01',
-        endDate: undefined,
-        isActive: true,
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      }
-    ];
+    try {
+      const records = await base(AT.GUIDES_ASSIGNMENTS).select().all();
+      return records.map(record => {
+        const schoolId = record.fields[GASF.school_id] || record.fields[GASF.School];
+        const guideId = record.fields[GASF.Partner] || record.fields[GASF.Guide_short_name];
+        return {
+          id: record.id,
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+          guideId: String(guideId || ''),
+          guideShortName: String(record.fields[GASF.Guide_short_name] || ''),
+          type: String(record.fields[GASF.Type] || ''),
+          startDate: String(record.fields[GASF.Start_date] || ''),
+          endDate: String(record.fields[GASF.End_date] || ''),
+          isActive: Boolean(record.fields[GASF.Currently_active]),
+          created: String(record.fields["Created"] || new Date().toISOString()),
+          lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching guide assignments:', error);
+      return [];
+    }
   }
 
   async getGuideAssignment(id: string): Promise<GuideAssignment | undefined> {
-    const assignments = await this.getGuideAssignments();
-    return assignments.find(assignment => assignment.id === id);
+    try {
+      const record = await base(AT.GUIDES_ASSIGNMENTS).find(id);
+      const schoolId = record.fields[GASF.school_id] || record.fields[GASF.School];
+      const guideId = record.fields[GASF.Partner] || record.fields[GASF.Guide_short_name];
+      return {
+        id: record.id,
+        schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+        guideId: String(guideId || ''),
+        guideShortName: String(record.fields[GASF.Guide_short_name] || ''),
+        type: String(record.fields[GASF.Type] || ''),
+        startDate: String(record.fields[GASF.Start_date] || ''),
+        endDate: String(record.fields[GASF.End_date] || ''),
+        isActive: Boolean(record.fields[GASF.Currently_active]),
+        created: String(record.fields["Created"] || new Date().toISOString()),
+        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
+      };
+    } catch (error) {
+      console.error('Error fetching guide assignment:', error);
+      return undefined;
+    }
   }
 
   async getGuideAssignmentsBySchoolId(schoolId: string): Promise<GuideAssignment[]> {
     try {
       // Try to query the "Guides Assignments" table filtered by schoolId
-      const records = await base("Guides Assignments").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+      const records = await base(AT.GUIDES_ASSIGNMENTS).select({
+        filterByFormula: `{${GASF.school_id}} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
-        const schoolId = record.fields["school_id"];
-        const guideId = record.fields["Guide ID"];
-        const guideShortName = record.fields["Guide short name"];
-        const type = record.fields["Type"];
-        const startDate = record.fields["Start date"];
-        const endDate = record.fields["End date"];
-        const isActive = record.fields["Is active"];
+        const schoolId = record.fields[GASF.school_id];
+        const guideId = record.fields[GASF.Partner] || record.fields[GASF.Guide_short_name];
+        const guideShortName = record.fields[GASF.Guide_short_name];
+        const type = record.fields[GASF.Type];
+        const startDate = record.fields[GASF.Start_date];
+        const endDate = record.fields[GASF.End_date];
+        const isActive = record.fields[GASF.Currently_active];
         const created = record.fields["Created"];
         const lastModified = record.fields["Last Modified"];
         
@@ -1312,110 +1492,65 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async createGuideAssignment(assignment: InsertGuideAssignment): Promise<GuideAssignment> {
-    // Mock implementation - in reality this would create in Airtable
-    const newAssignment: GuideAssignment = {
-      id: `mock_guide_${Date.now()}`,
-      schoolId: assignment.schoolId,
-      guideId: assignment.guideId,
-      guideShortName: assignment.guideShortName,
-      type: assignment.type,
-      startDate: assignment.startDate,
-      endDate: assignment.endDate,
-      isActive: assignment.isActive,
-      created: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-    };
-    return newAssignment;
+    const recs = await base(AT.GUIDES_ASSIGNMENTS).create([{
+      fields: {
+        [GASF.School]: [assignment.schoolId],
+        [GASF.Partner]: assignment.guideId,
+        [GASF.Guide_short_name]: assignment.guideShortName,
+        [GASF.Type]: assignment.type,
+        [GASF.Start_date]: assignment.startDate || undefined,
+        [GASF.End_date]: assignment.endDate || undefined,
+        [GASF.Currently_active]: assignment.isActive ?? true,
+      }
+    }]);
+    const record = recs[0];
+    return (await this.getGuideAssignment(record.id))!;
   }
 
   async updateGuideAssignment(id: string, assignment: Partial<InsertGuideAssignment>): Promise<GuideAssignment | undefined> {
-    // Mock implementation - in reality this would update in Airtable
-    const existing = await this.getGuideAssignment(id);
-    if (!existing) return undefined;
-    
-    return {
-      ...existing,
-      ...assignment,
-      lastModified: new Date().toISOString(),
-    };
+    const fields: any = {};
+    if (assignment.schoolId !== undefined) fields[GASF.School] = [assignment.schoolId];
+    if (assignment.guideId !== undefined) fields[GASF.Partner] = assignment.guideId;
+    if (assignment.guideShortName !== undefined) fields[GASF.Guide_short_name] = assignment.guideShortName;
+    if (assignment.type !== undefined) fields[GASF.Type] = assignment.type;
+    if (assignment.startDate !== undefined) fields[GASF.Start_date] = assignment.startDate || undefined;
+    if (assignment.endDate !== undefined) fields[GASF.End_date] = assignment.endDate || undefined;
+    if (assignment.isActive !== undefined) fields[GASF.Currently_active] = assignment.isActive;
+    const record = await base(AT.GUIDES_ASSIGNMENTS).update(id, fields);
+    return (await this.getGuideAssignment(record.id))!;
   }
 
   async deleteGuideAssignment(id: string): Promise<boolean> {
-    // Mock implementation - in reality this would delete from Airtable
+    await base(AT.GUIDES_ASSIGNMENTS).destroy(id);
     return true;
   }
 
   // Governance document operations
   async getGovernanceDocuments(): Promise<GovernanceDocument[]> {
-    const schools = await this.getSchools();
-    if (schools.length === 0) return [];
-    
-    return [
-      {
-        id: 'doc_1',
-        schoolId: schools[0]?.id || 'mock_school_1',
-        docType: 'Bylaws',
-        doc: 'School Bylaws 2023.pdf',
-        dateEntered: '2023-01-15',
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      },
-      {
-        id: 'doc_2',
-        schoolId: schools[0]?.id || 'mock_school_1',
-        docType: 'Policy',
-        doc: 'Student Handbook.pdf',
-        dateEntered: '2023-08-30',
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      }
-    ];
+    try {
+      const records = await base(AT.GOVERNANCE_DOCS).select().all();
+      return records.map(transformGovernanceDocument);
+    } catch (error) {
+      console.error('Error fetching governance documents:', error);
+      return [];
+    }
   }
 
   async getGovernanceDocument(id: string): Promise<GovernanceDocument | undefined> {
-    const documents = await this.getGovernanceDocuments();
-    return documents.find(doc => doc.id === id);
+    try {
+      const record = await base(AT.GOVERNANCE_DOCS).find(id);
+      return transformGovernanceDocument(record);
+    } catch (error) {
+      console.error('Error fetching governance document:', error);
+      return undefined;
+    }
   }
 
   async getGovernanceDocumentsBySchoolId(schoolId: string): Promise<GovernanceDocument[]> {
     try {
-      // Try to query the "Governance docs" table filtered by schoolId
-      const records = await base("Governance docs").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
-      }).all();
-      
-      return records.map(record => {
-        const schoolId = record.fields["school_id"];
-        const docType = record.fields["Document type"];
-        const dateEntered = record.fields["Date"];
-        const created = record.fields["Created"];
-        
-        // Handle Document PDF attachment field - extract filename and URL
-        const documentPDFField = record.fields["Document PDF"];
-        let doc = "";
-        let docUrl = "";
-        if (Array.isArray(documentPDFField) && documentPDFField.length > 0) {
-          try {
-            const attachment = documentPDFField[0];
-            // Access filename and URL properties directly
-            doc = attachment?.filename || "Document";
-            docUrl = attachment?.url || "";
-          } catch (e) {
-            doc = "Document";
-          }
-        }
-        
-        return {
-          id: record.id,
-          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
-          docType: String(docType || ''),
-          doc: String(doc),
-          docUrl: String(docUrl),
-          dateEntered: String(dateEntered || ''),
-          created: String(created || new Date().toISOString()),
-          lastModified: String(created || new Date().toISOString()),
-        };
-      });
+      const formula = `FIND('${schoolId}', ARRAYJOIN({${GDF.school_id}}))`;
+      const records = await base(AT.GOVERNANCE_DOCS).select({ filterByFormula: formula }).all();
+      return records.map(transformGovernanceDocument);
     } catch (error) {
       const errorInfo = handleError(error);
       if (errorInfo.statusCode === 403) {
@@ -1428,33 +1563,30 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async createGovernanceDocument(document: InsertGovernanceDocument): Promise<GovernanceDocument> {
-    // Mock implementation - in reality this would create in Airtable
-    const newDocument: GovernanceDocument = {
-      id: `mock_doc_${Date.now()}`,
-      schoolId: document.schoolId,
-      docType: document.docType,
-      doc: document.doc,
-      dateEntered: document.dateEntered,
-      created: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-    };
-    return newDocument;
+    const recs = await base(AT.GOVERNANCE_DOCS).create([{
+      fields: {
+        [GDF.School]: [document.schoolId],
+        [GDF.Document_type]: document.docType,
+        [GDF.Date]: document.dateEntered || undefined,
+        [GDF.Doc_Link]: document.doc || undefined,
+      }
+    }]);
+    const record = recs[0];
+    return transformGovernanceDocument(record);
   }
 
   async updateGovernanceDocument(id: string, document: Partial<InsertGovernanceDocument>): Promise<GovernanceDocument | undefined> {
-    // Mock implementation - in reality this would update in Airtable
-    const existing = await this.getGovernanceDocument(id);
-    if (!existing) return undefined;
-    
-    return {
-      ...existing,
-      ...document,
-      lastModified: new Date().toISOString(),
-    };
+    const fields: any = {};
+    if (document.schoolId !== undefined) fields[GDF.School] = [document.schoolId];
+    if (document.docType !== undefined) fields[GDF.Document_type] = document.docType;
+    if (document.dateEntered !== undefined) fields[GDF.Date] = document.dateEntered || undefined;
+    if (document.doc !== undefined) fields[GDF.Doc_Link] = document.doc || undefined;
+    const record = await base(AT.GOVERNANCE_DOCS).update(id, fields);
+    return transformGovernanceDocument(record);
   }
 
   async deleteGovernanceDocument(id: string): Promise<boolean> {
-    // Mock implementation - in reality this would delete from Airtable
+    await base(AT.GOVERNANCE_DOCS).destroy(id);
     return true;
   }
 
@@ -1479,7 +1611,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('School Notes');
       const records = await table.select({
-        filterByFormula: `{school_id} = "${schoolId}"`
+        filterByFormula: `{${SNF.school_id}} = "${schoolId}"`
       }).all();
       return records.map(record => this.transformSchoolNoteRecord(record));
     } catch (error) {
@@ -1503,9 +1635,9 @@ export class SimpleAirtableStorage implements IStorage {
         
         // Debug all records to see which schools they belong to
         allRecords.forEach((record, index) => {
-          const schools = record.fields["Schools"];
-          const schoolShortName = record.fields["School Short Name"];
-          const item = record.fields["Item"];
+          const schools = record.fields[ASF.Schools];
+          const schoolShortName = record.fields[ASF.School_Short_Name];
+          const item = record.fields[ASF.Item];
           console.log(`Record ${index + 1}: Schools=${JSON.stringify(schools)}, Short Name=${JSON.stringify(schoolShortName)}, Item="${String(item).substring(0, 50)}..."`);
         });
       } else {
@@ -1520,7 +1652,7 @@ export class SimpleAirtableStorage implements IStorage {
         // 1. Direct Schools field match
         console.log(`Trying direct Schools field filter for ${schoolId}`);
         records = await base("Action steps").select({
-          filterByFormula: `{Schools} = '${schoolId}'`
+          filterByFormula: `{${ASF.Schools}} = '${schoolId}'`
         }).all();
         console.log(`Found ${records.length} records using direct Schools field`);
         
@@ -1528,7 +1660,7 @@ export class SimpleAirtableStorage implements IStorage {
         if (records.length === 0) {
           console.log(`Trying FIND function for ${schoolId}`);
           records = await base("Action steps").select({
-            filterByFormula: `FIND('${schoolId}', ARRAYJOIN({Schools})) > 0`
+            filterByFormula: `FIND('${schoolId}', ARRAYJOIN({${ASF.Schools}})) > 0`
           }).all();
           console.log(`Found ${records.length} records using FIND with Schools field`);
         }
@@ -1537,7 +1669,7 @@ export class SimpleAirtableStorage implements IStorage {
         if (records.length === 0) {
           console.log(`Trying school_id field filter for ${schoolId}`);
           records = await base("Action steps").select({
-            filterByFormula: `FIND('${schoolId}', ARRAYJOIN({school_id})) > 0`
+            filterByFormula: `FIND('${schoolId}', ARRAYJOIN({${ASF.school_id}})) > 0`
           }).all();
           console.log(`Found ${records.length} records using school_id field`);
         }
@@ -1549,8 +1681,8 @@ export class SimpleAirtableStorage implements IStorage {
           console.log(`Total action steps in database: ${allActionSteps.length}`);
           
           records = allActionSteps.filter(record => {
-            const schools = record.fields["Schools"];
-            const schoolIds = record.fields["school_id"];
+            const schools = record.fields[ASF.Schools];
+            const schoolIds = record.fields[ASF.school_id];
             
             // Check if this record is associated with our school
             if (Array.isArray(schools) && schools.includes(schoolId)) {
@@ -1571,25 +1703,7 @@ export class SimpleAirtableStorage implements IStorage {
       
       console.log(`Final result: ${records.length} action steps found for school ${schoolId}`);
       
-      return records.map(record => {
-        const schoolIdField = record.fields["Schools"] || record.fields["school_id"] || record.fields["School"];
-        const assignedDate = record.fields["Assigned date"];
-        const assignee = record.fields["Assignee Short Name"];
-        const item = record.fields["Item"];
-        const status = record.fields["Status"];
-        const dueDate = record.fields["Due date"];
-        
-        return {
-          id: record.id,
-          schoolId: Array.isArray(schoolIdField) ? String(schoolIdField[0] || '') : String(schoolIdField || ''),
-          assignedDate: String(assignedDate || ''),
-          assignee: String(assignee || ''),
-          item: String(item || ''),
-          status: String(status || ''),
-          dueDate: String(dueDate || ''),
-          isCompleted: status === 'Completed' || status === 'Done',
-        };
-      });
+      return records.map(transformActionStepRecord);
     } catch (error) {
       console.error(`ERROR in action steps for ${schoolId}:`, error);
       return [];
@@ -1604,8 +1718,8 @@ export class SimpleAirtableStorage implements IStorage {
       
       // Filter records where the user is the assignee
       const userActionSteps = allActionSteps.filter(record => {
-        const assigneeField = record.fields["Assignee"];
-        const assigneeShortName = record.fields["Assignee Short Name"];
+        const assigneeField = record.fields[ASF.Assignee];
+        const assigneeShortName = record.fields[ASF.Assignee_Short_Name];
         
         // Check if user ID matches in either assignee field
         if (Array.isArray(assigneeField) && assigneeField.includes(userId)) {
@@ -1617,25 +1731,7 @@ export class SimpleAirtableStorage implements IStorage {
         return false;
       });
       
-      return userActionSteps.map(record => {
-        const schoolIdField = record.fields["Schools"] || record.fields["school_id"] || record.fields["School"];
-        const assignedDate = record.fields["Assigned date"];
-        const assignee = record.fields["Assignee Short Name"];
-        const item = record.fields["Item"];
-        const status = record.fields["Status"];
-        const dueDate = record.fields["Due date"];
-        
-        return {
-          id: record.id,
-          schoolId: Array.isArray(schoolIdField) ? String(schoolIdField[0] || '') : String(schoolIdField || ''),
-          assignedDate: String(assignedDate || ''),
-          assignee: String(assignee || ''),
-          item: String(item || ''),
-          status: String(status || ''),
-          dueDate: String(dueDate || ''),
-          isCompleted: status === 'Completed' || status === 'Done',
-        };
-      });
+      return userActionSteps.map(transformActionStepRecord);
     } catch (error) {
       console.error(`ERROR in action steps for user ${userId}:`, error);
       return [];
@@ -1644,38 +1740,38 @@ export class SimpleAirtableStorage implements IStorage {
 
   async createActionStep(schoolId: string, data: { item: string; assignee?: string; dueDate?: string; status?: string }): Promise<ActionStep> {
     const fields: any = {
-      Item: data.item,
-      Status: data.status || 'Pending',
-      'Due date': data.dueDate || undefined,
-      Schools: [schoolId],
-      school_id: [schoolId],
+      [ASF.Item]: data.item,
+      [ASF.Status]: data.status || 'Pending',
+      [ASF.Due_date]: data.dueDate || undefined,
+      [ASF.Schools]: [schoolId],
+      [ASF.school_id]: [schoolId],
     };
-    if (data.assignee) fields['Assignee Short Name'] = data.assignee;
+    if (data.assignee) fields[ASF.Assignee_Short_Name] = data.assignee;
     const record = await base('Action steps').create(fields);
     return {
       id: record.id,
       schoolId,
-      assignedDate: String(record.fields['Assigned date'] || ''),
-      assignee: String(record.fields['Assignee Short Name'] || data.assignee || ''),
-      item: String(record.fields['Item'] || data.item || ''),
-      status: String(record.fields['Status'] || data.status || 'Pending'),
-      dueDate: String(record.fields['Due date'] || data.dueDate || ''),
-      isCompleted: (record.fields['Status'] as any) === 'Completed',
+      assignedDate: String(record.fields[ASF.Assigned_date] || ''),
+      assignee: String(record.fields[ASF.Assignee_Short_Name] || data.assignee || ''),
+      item: String(record.fields[ASF.Item] || data.item || ''),
+      status: String(record.fields[ASF.Status] || data.status || 'Pending'),
+      dueDate: String(record.fields[ASF.Due_date] || data.dueDate || ''),
+      isCompleted: (record.fields[ASF.Status] as any) === 'Completed',
     };
   }
 
   // User-specific schools for dashboard
   async getSchoolsByUserId(userId: string): Promise<School[]> {
     try {
-      // Get all guide assignments to find schools where user is an active guide
+      // Get all guide assignments (past or current) where user is a guide
       const guideAssignments = await base("Guides Assignments").select({
-        filterByFormula: `AND({Guide} = '${userId}', {Active} = TRUE())`
+        filterByFormula: `{${GASF.Partner}} = '${userId}'`
       }).all();
       
       // Extract school IDs from guide assignments
       const schoolIds = new Set<string>();
       guideAssignments.forEach(record => {
-        const schoolField = record.fields["School"] as any;
+        const schoolField = record.fields[GASF.School] as any;
         if (Array.isArray(schoolField) && schoolField[0]) {
           schoolIds.add(String(schoolField[0]));
         } else if (schoolField) {
@@ -1700,82 +1796,161 @@ export class SimpleAirtableStorage implements IStorage {
     }
   }
 
+  // ETLs/TLs for user: educators meeting TL role criteria at user's schools (past/current guide assignments)
+  // OR where user is assigned partner or person responsible for follow up
+  async getTlsByUserId(userId: string): Promise<Educator[]> {
+    try {
+      // 1) Collect schools where user has past or current guide assignments
+      const guideAssignments = await base("Guides Assignments").select({
+        filterByFormula: `{${GASF.Partner}} = '${userId}'`
+      }).all();
+      const schoolIds = new Set<string>();
+      guideAssignments.forEach(rec => {
+        const s = rec.fields[GASF.School] as any;
+        if (Array.isArray(s) && s[0]) schoolIds.add(String(s[0]));
+        else if (s) schoolIds.add(String(s));
+      });
+
+      // 2) Build educatorId -> set of schoolIds via associations
+      const associations = await this.getEducatorSchoolAssociations();
+      const eduToSchools = new Map<string, Set<string>>();
+      for (const a of associations) {
+        if (!a.educatorId || !a.schoolId) continue;
+        let set = eduToSchools.get(a.educatorId);
+        if (!set) { set = new Set<string>(); eduToSchools.set(a.educatorId, set); }
+        set.add(a.schoolId);
+      }
+
+      // 3) Fetch all educators and filter per rules
+      const allEducators = await this.getEducators();
+      const result: Educator[] = [];
+      const seen = new Set<string>();
+      const isTlRole = (roles?: string[] | string) => {
+        const arr = Array.isArray(roles) ? roles : (roles ? [roles] : []);
+        return arr.some(r => String(r).includes('Teacher Leader') || String(r).includes('Emerging Teacher Leader'));
+      };
+      for (const e of allEducators) {
+        if (!e || !e.id) continue;
+        let include = false;
+        // A) TL role at user's schools
+        if (isTlRole(e.currentRole)) {
+          const set = eduToSchools.get(e.id);
+          if (set && Array.from(set).some(id => schoolIds.has(id))) include = true;
+        }
+        // B) User is assigned partner or person responsible for follow up
+        const assigned = Array.isArray(e.assignedPartner) ? e.assignedPartner : (e.assignedPartner ? [e.assignedPartner] : []);
+        if (assigned.includes(userId)) include = true;
+        const pr = (e as any).personResponsibleForFollowUp;
+        if (pr && String(pr) === String(userId)) include = true;
+
+        if (include && !seen.has(e.id)) { seen.add(e.id); result.push(e); }
+      }
+      return result;
+    } catch (error) {
+      console.error(`ERROR fetching TLs for user ${userId}:`, error);
+      return [];
+    }
+  }
+
   async createSchoolNote(note: InsertSchoolNote): Promise<SchoolNote> {
-    // Mock implementation - in reality this would create in Airtable
-    const newNote: SchoolNote = {
-      id: `mock_note_${Date.now()}`,
-      schoolId: note.schoolId,
-      dateCreated: note.dateCreated,
-      createdBy: note.createdBy,
-      notes: note.notes,
-      lastModified: new Date().toISOString(),
-    };
-    return newNote;
+    const recs = await base('School notes').create([{
+      fields: {
+        [SNF.school_id]: note.schoolId,
+        [SNF.Notes]: note.notes,
+        [SNF.Date_created]: note.dateCreated || undefined,
+        [SNF.Created_by]: note.createdBy || undefined,
+      }
+    }]);
+    return this.transformSchoolNoteRecord(recs[0]);
+  }
+
+  async updateActionStep(id: string, data: { item?: string; assignee?: string; dueDate?: string; status?: string }): Promise<ActionStep | undefined> {
+    const fields: any = {};
+    if (data.item !== undefined) fields[ASF.Item] = data.item;
+    if (data.status !== undefined) fields[ASF.Status] = data.status;
+    if (data.dueDate !== undefined) fields[ASF.Due_date] = data.dueDate || undefined;
+    if (data.assignee !== undefined) fields[ASF.Assignee_Short_Name] = data.assignee || undefined;
+    const record = await base('Action steps').update(id, fields);
+    return transformActionStepRecord(record);
+  }
+
+  async deleteActionStep(id: string): Promise<boolean> {
+    await base('Action steps').destroy(id);
+    return true;
   }
 
   async updateSchoolNote(id: string, note: Partial<InsertSchoolNote>): Promise<SchoolNote | undefined> {
-    // Mock implementation - in reality this would update in Airtable
-    const existing = await this.getSchoolNote(id);
-    if (!existing) return undefined;
-    
-    return {
-      ...existing,
-      ...note,
-      lastModified: new Date().toISOString(),
-    };
+    const fields: any = {};
+    if (note.schoolId !== undefined) fields[SNF.school_id] = note.schoolId;
+    if (note.notes !== undefined) fields[SNF.Notes] = note.notes;
+    if (note.dateCreated !== undefined) fields[SNF.Date_created] = note.dateCreated || undefined;
+    if (note.createdBy !== undefined) fields[SNF.Created_by] = note.createdBy || undefined;
+    const record = await base('School notes').update(id, fields);
+    return this.transformSchoolNoteRecord(record);
   }
 
   async deleteSchoolNote(id: string): Promise<boolean> {
-    // Mock implementation - in reality this would delete from Airtable
+    await base('School notes').destroy(id);
     return true;
   }
 
   // Grant operations
   async getGrants(): Promise<Grant[]> {
-    const schools = await this.getSchools();
-    if (schools.length === 0) return [];
-    
-    return [
-      {
-        id: 'grant_1',
-        schoolId: schools[0]?.id || 'mock_school_1',
-        amount: 50000,
-        issuedDate: '2023-07-01',
-        status: 'Active',
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      },
-      {
-        id: 'grant_2',
-        schoolId: schools[0]?.id || 'mock_school_1',
-        amount: 25000,
-        issuedDate: '2024-01-15',
-        status: 'Pending',
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      }
-    ];
+    try {
+      const records = await base(AT.GRANTS).select().all();
+      return records.map(record => {
+        const schoolId = record.fields[GF.school_id] || record.fields[GF.School];
+        return {
+          id: record.id,
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+          amount: Number(record.fields[GF.Amount] || 0),
+          issuedDate: String(record.fields[GF.Issue_Date] || ''),
+          issuedByShortName: String(record.fields[GF.Issued_by_Short_Name] || ''),
+          status: String(record.fields[GF.Grant_Status] || ''),
+          created: String(record.fields['Created'] || new Date().toISOString()),
+          lastModified: String(record.fields['Last Modified'] || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching grants:', error);
+      return [];
+    }
   }
 
   async getGrant(id: string): Promise<Grant | undefined> {
-    const grants = await this.getGrants();
-    return grants.find(grant => grant.id === id);
+    try {
+      const record = await base(AT.GRANTS).find(id);
+      const schoolId = record.fields[GF.school_id] || record.fields[GF.School];
+      return {
+        id: record.id,
+        schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+        amount: Number(record.fields[GF.Amount] || 0),
+        issuedDate: String(record.fields[GF.Issue_Date] || ''),
+        issuedByShortName: String(record.fields[GF.Issued_by_Short_Name] || ''),
+        status: String(record.fields[GF.Grant_Status] || ''),
+        created: String(record.fields['Created'] || new Date().toISOString()),
+        lastModified: String(record.fields['Last Modified'] || new Date().toISOString()),
+      };
+    } catch (error) {
+      console.error('Error fetching grant:', error);
+      return undefined;
+    }
   }
 
   async getGrantsBySchoolId(schoolId: string): Promise<Grant[]> {
     try {
       // Query the "Grants" table filtered by schoolId
       const records = await base("Grants").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+        filterByFormula: `{${GF.school_id}} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
-        const schoolId = record.fields["school_id"];
-        const amount = record.fields["Amount"];
-        const issueDate = record.fields["Issue Date"];
-        const status = record.fields["Grant Status"];
-        const created = record.fields["Created"];
-        const lastModified = record.fields["Last Modified"];
+        const schoolId = record.fields[GF.school_id];
+        const amount = record.fields[GF.Amount];
+        const issueDate = record.fields[GF.Issue_Date];
+        const status = record.fields[GF.Grant_Status];
+        const created = record.fields["Created"]; // not enumerated in constants
+        const lastModified = record.fields["Last Modified"]; // not enumerated in constants
         
         return {
           id: record.id,
@@ -1795,82 +1970,87 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async createGrant(grant: InsertGrant): Promise<Grant> {
-    // Mock implementation - in reality this would create in Airtable
-    const newGrant: Grant = {
-      id: `mock_grant_${Date.now()}`,
-      schoolId: grant.schoolId,
-      amount: grant.amount,
-      issuedDate: grant.issuedDate,
-      status: grant.status,
-      created: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-    };
-    return newGrant;
+    const recs = await base(AT.GRANTS).create([{
+      fields: {
+        [GF.school_id]: grant.schoolId,
+        [GF.Amount]: grant.amount,
+        [GF.Issue_Date]: grant.issuedDate || undefined,
+        [GF.Grant_Status]: grant.status || undefined,
+      }
+    }]);
+    return (await this.getGrant(recs[0].id))!;
   }
 
   async updateGrant(id: string, grant: Partial<InsertGrant>): Promise<Grant | undefined> {
-    // Mock implementation - in reality this would update in Airtable
-    const existing = await this.getGrant(id);
-    if (!existing) return undefined;
-    
-    return {
-      ...existing,
-      ...grant,
-      lastModified: new Date().toISOString(),
-    };
+    const fields: any = {};
+    if (grant.schoolId !== undefined) fields[GF.school_id] = grant.schoolId;
+    if (grant.amount !== undefined) fields[GF.Amount] = grant.amount;
+    if (grant.issuedDate !== undefined) fields[GF.Issue_Date] = grant.issuedDate || undefined;
+    if (grant.status !== undefined) fields[GF.Grant_Status] = grant.status || undefined;
+    const record = await base(AT.GRANTS).update(id, fields);
+    return (await this.getGrant(record.id))!;
   }
 
   async deleteGrant(id: string): Promise<boolean> {
-    // Mock implementation - in reality this would delete from Airtable
+    await base(AT.GRANTS).destroy(id);
     return true;
   }
 
   // Loan operations
   async getLoans(): Promise<Loan[]> {
-    const schools = await this.getSchools();
-    if (schools.length === 0) return [];
-    
-    return [
-      {
-        id: 'loan_1',
-        schoolId: schools[0]?.id || 'mock_school_1',
-        amount: 100000,
-        status: 'Active',
-        interestRate: 3.5,
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      },
-      {
-        id: 'loan_2',
-        schoolId: schools[0]?.id || 'mock_school_1',
-        amount: 75000,
-        status: 'Paid',
-        interestRate: 2.8,
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      }
-    ];
+    try {
+      const records = await base(AT.LOANS).select().all();
+      return records.map(record => {
+        const schoolId = record.fields[LNF.school_id] || record.fields[LNF.School];
+        return {
+          id: record.id,
+          schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+          amount: Number(record.fields[LNF.Amount_Issued] || 0),
+          status: String(record.fields[LNF.Loan_Status] || ''),
+          interestRate: Number(record.fields[LNF.Interest_Rate] || 0),
+          created: String(record.fields['Created'] || record.fields[LNF.Effective_Issue_Date] || new Date().toISOString()),
+          lastModified: String(record.fields['Last Modified'] || new Date().toISOString()),
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching loans:', error);
+      return [];
+    }
   }
 
   async getLoan(id: string): Promise<Loan | undefined> {
-    const loans = await this.getLoans();
-    return loans.find(loan => loan.id === id);
+    try {
+      const record = await base(AT.LOANS).find(id);
+      const schoolId = record.fields[LNF.school_id] || record.fields[LNF.School];
+      return {
+        id: record.id,
+        schoolId: Array.isArray(schoolId) ? String(schoolId[0] || '') : String(schoolId || ''),
+        amount: Number(record.fields[LNF.Amount_Issued] || 0),
+        status: String(record.fields[LNF.Loan_Status] || ''),
+        interestRate: Number(record.fields[LNF.Interest_Rate] || 0),
+        created: String(record.fields['Created'] || record.fields[LNF.Effective_Issue_Date] || new Date().toISOString()),
+        lastModified: String(record.fields['Last Modified'] || new Date().toISOString()),
+      };
+    } catch (error) {
+      console.error('Error fetching loan:', error);
+      return undefined;
+    }
   }
 
   async getLoansBySchoolId(schoolId: string): Promise<Loan[]> {
     try {
       // Query the "Loans" table filtered by schoolId
       const records = await base("Loans").select({
-        filterByFormula: `{school_id} = '${schoolId}'`
+        filterByFormula: `{${LNF.school_id}} = '${schoolId}'`
       }).all();
       
       return records.map(record => {
-        const schoolId = record.fields["school_id"];
-        const amount = record.fields["Amount Issued"];
-        const status = record.fields["Loan Status"];
-        const issueDate = record.fields["Effective Issue Date"];
-        const created = record.fields["Created"];
-        const lastModified = record.fields["Last Modified"];
+        const schoolId = record.fields[LNF.school_id];
+        const amount = record.fields[LNF.Amount_Issued];
+        const status = record.fields[LNF.Loan_Status];
+        const issueDate = record.fields[LNF.Effective_Issue_Date];
+        const created = record.fields["Created"]; // not enumerated
+        const lastModified = record.fields["Last Modified"]; // not enumerated
         
         return {
           id: record.id,
@@ -1889,33 +2069,29 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async createLoan(loan: InsertLoan): Promise<Loan> {
-    // Mock implementation - in reality this would create in Airtable
-    const newLoan: Loan = {
-      id: `mock_loan_${Date.now()}`,
-      schoolId: loan.schoolId,
-      amount: loan.amount,
-      status: loan.status,
-      interestRate: loan.interestRate,
-      created: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-    };
-    return newLoan;
+    const recs = await base(AT.LOANS).create([{
+      fields: {
+        [LNF.school_id]: loan.schoolId,
+        [LNF.Amount_Issued]: loan.amount,
+        [LNF.Loan_Status]: loan.status || undefined,
+        [LNF.Interest_Rate]: loan.interestRate || undefined,
+      }
+    }]);
+    return (await this.getLoan(recs[0].id))!;
   }
 
   async updateLoan(id: string, loan: Partial<InsertLoan>): Promise<Loan | undefined> {
-    // Mock implementation - in reality this would update in Airtable
-    const existing = await this.getLoan(id);
-    if (!existing) return undefined;
-    
-    return {
-      ...existing,
-      ...loan,
-      lastModified: new Date().toISOString(),
-    };
+    const fields: any = {};
+    if (loan.schoolId !== undefined) fields[LNF.school_id] = loan.schoolId;
+    if (loan.amount !== undefined) fields[LNF.Amount_Issued] = loan.amount;
+    if (loan.status !== undefined) fields[LNF.Loan_Status] = loan.status || undefined;
+    if (loan.interestRate !== undefined) fields[LNF.Interest_Rate] = loan.interestRate || undefined;
+    const record = await base(AT.LOANS).update(id, fields);
+    return (await this.getLoan(record.id))!;
   }
 
   async deleteLoan(id: string): Promise<boolean> {
-    // Mock implementation - in reality this would delete from Airtable
+    await base(AT.LOANS).destroy(id);
     return true;
   }
 
@@ -1943,7 +2119,7 @@ export class SimpleAirtableStorage implements IStorage {
   async getEmailAddressesByEducatorId(educatorId: string): Promise<EmailAddress[]> {
     try {
       const records = await base('Email Addresses').select({
-        filterByFormula: `{educator_id} = '${educatorId}'`
+        filterByFormula: `{${EAF.educator_id}} = '${educatorId}'`
       }).all();
       
       return records.map(record => this.transformEmailAddressRecord(record));
@@ -1954,36 +2130,31 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async createEmailAddress(emailAddress: InsertEmailAddress): Promise<EmailAddress> {
-    const newEmailAddress: EmailAddress = {
-      id: `temp_${Date.now()}`,
-      educatorId: emailAddress.educatorId,
-      email: emailAddress.email,
-      type: emailAddress.type,
-      isPrimary: emailAddress.isPrimary,
-      status: emailAddress.status,
-      notes: emailAddress.notes,
-      created: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-    };
-
-    // Mock implementation - in reality this would create in Airtable
-    return newEmailAddress;
+    const recs = await base('Email Addresses').create([{
+      fields: {
+        [EAF.educator_id]: emailAddress.educatorId,
+        [EAF.Email_Address]: emailAddress.email,
+        [EAF.Email_Type]: emailAddress.type || 'Personal',
+        [EAF.Current_Primary_Email]: emailAddress.isPrimary || false,
+        [EAF.Active_]: true,
+      }
+    }]);
+    return this.transformEmailAddressRecord(recs[0]);
   }
 
   async updateEmailAddress(id: string, emailAddress: Partial<InsertEmailAddress>): Promise<EmailAddress | undefined> {
-    // Mock implementation - in reality this would update in Airtable
-    const existing = await this.getEmailAddress(id);
-    if (!existing) return undefined;
-    
-    return {
-      ...existing,
-      ...emailAddress,
-      lastModified: new Date().toISOString(),
-    };
+    const fields: any = {};
+    if (emailAddress.educatorId !== undefined) fields[EAF.educator_id] = emailAddress.educatorId;
+    if (emailAddress.email !== undefined) fields[EAF.Email_Address] = emailAddress.email;
+    if (emailAddress.type !== undefined) fields[EAF.Email_Type] = emailAddress.type;
+    if (emailAddress.isPrimary !== undefined) fields[EAF.Current_Primary_Email] = emailAddress.isPrimary;
+    if (emailAddress.isActive !== undefined) fields[EAF.Active_] = emailAddress.isActive;
+    const record = await base('Email Addresses').update(id, fields);
+    return this.transformEmailAddressRecord(record);
   }
 
   async deleteEmailAddress(id: string): Promise<boolean> {
-    // Mock implementation - in reality this would delete from Airtable
+    await base('Email Addresses').destroy(id);
     return true;
   }
 
@@ -2016,38 +2187,16 @@ export class SimpleAirtableStorage implements IStorage {
     }
   }
 
-  async createSSJFilloutForm(form: InsertSSJFilloutForm): Promise<SSJFilloutForm> {
-    const newForm: SSJFilloutForm = {
-      id: `ssj_${Date.now()}`,
-      educatorId: form.educatorId,
-      formName: form.formName,
-      formType: form.formType,
-      dateSubmitted: form.dateSubmitted,
-      status: form.status,
-      submissionId: form.submissionId,
-      responseData: form.responseData,
-      notes: form.notes,
-      created: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-    };
-    return newForm;
+  async createSSJFilloutForm(_form: InsertSSJFilloutForm): Promise<SSJFilloutForm> {
+    throw new Error('SSJ Fillout Forms are view-only; creation not supported');
   }
 
-  async updateSSJFilloutForm(id: string, form: Partial<InsertSSJFilloutForm>): Promise<SSJFilloutForm | undefined> {
-    // Mock implementation - in reality this would update in Airtable
-    const existing = await this.getSSJFilloutForm(id);
-    if (!existing) return undefined;
-    
-    return {
-      ...existing,
-      ...form,
-      lastModified: new Date().toISOString(),
-    };
+  async updateSSJFilloutForm(_id: string, _form: Partial<InsertSSJFilloutForm>): Promise<SSJFilloutForm | undefined> {
+    throw new Error('SSJ Fillout Forms are view-only; updates not supported');
   }
 
-  async deleteSSJFilloutForm(id: string): Promise<boolean> {
-    // Mock implementation - in reality this would delete from Airtable
-    return true;
+  async deleteSSJFilloutForm(_id: string): Promise<boolean> {
+    throw new Error('SSJ Fillout Forms are view-only; deletion not supported');
   }
 
   private transformSSJFilloutFormRecord(record: any): SSJFilloutForm {
@@ -2057,15 +2206,94 @@ export class SimpleAirtableStorage implements IStorage {
     
     return {
       id: record.id,
-      educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
-      formName: fields["SSJ FIllout Form key"] || fields["Form Name"] || fields["Full Name"] || 'Unknown Form',
-      formType: fields["Form version"] || fields["Contact Type"] || fields["Form Type"] || 'Contact Form',
-      dateSubmitted: fields["Entry Date"] || fields["SendGrid sent date"] || fields["Date Submitted"] || undefined,
-      status: fields["Status of Processing Montessori Certs"] || fields["Contact Type standardized"] || fields["Status"] || 'Processing',
-      submissionId: fields["ssj_fillout_form_id"] || fields["Submission ID"] || undefined,
-      responseData: fields["Message"] || fields["Response Data"] || undefined,
+      educatorId: fields[SJF.educator_id] || undefined,
+      formVersion: fields[SJF.Form_version] || 'Get Involved',
+      dateSubmitted: fields[SJF.Entry_Date] || undefined,
+      firstName: fields[SJF.First_Name] || undefined,
+      lastName: fields[SJF.Last_Name] || undefined,
+      fullName: fields[SJF.Full_Name] || undefined,
+      email: fields[SJF.Email] || undefined,
+      raceEthnicity: fields[SJF.Socio_Economic__Race___Ethnicity] || undefined,
+      raceEthnicityOther: fields[SJF.Socio_Economic__Race___Ethnicity_Other] || undefined,
+      lgbtqia: fields[SJF.Socio_Economic__LGBTQIA_Identifying__from_Email_] || undefined,
+      pronouns: fields[SJF.Socio_Economic__Pronouns] || undefined,
+      pronounsOther: fields[SJF.Socio_Economic__Pronouns_Other] || undefined,
+      gender: fields[SJF.Socio_Economic__Gender] || undefined,
+      genderStandardized: fields[SJF.Gender_standardized] || undefined,
+      genderOther: fields[SJF.Socio_Economic__Gender_Other] || undefined,
+      hhIncome: fields[SJF.Socio_Economic__Household_Income] || undefined,
+      primaryLanguage: fields[SJF.Primary_Language] || undefined,
+      primaryLanguageOther: fields[SJF.Primary_Language_Other] || undefined,
+      message: fields[SJF.Message] || undefined,
+      isInterestedinCharter: fields[SJF.Is_Interested_in_Charter] || undefined,
+      contactType: fields[SJF.Contact_Type] || undefined,
+      contactTypeStandardized: fields[SJF.Contact_Type_Standardized] || undefined,
+      montessoriCertQuestion: fields[SJF.Montessori_Cert_Question] || undefined,
+      certProcessingStatus: fields[SJF.Status_of_Processing_Montessori_Certs] || undefined,
+      isMontessoriCertified: fields[SJF.Is_Montessori_Certified] || undefined,
+      isSeekingMontessoriCertification: fields[SJF.Is_Seeking_Montessori_Certification] || undefined,
+      temp1Cert: fields[SJF.Temp___M_Cert_Cert_1] || undefined,
+      temp2Cert: fields[SJF.Temp___M_Cert_Cert_2] || undefined,
+      temp3Cert: fields[SJF.Temp___M_Cert_Cert_3] || undefined,
+      temp4Cert: fields[SJF.Temp___M_Cert_Cert_4] || undefined,
+      temp1Level: fields[SJF.Temp___M_Cert_Level_1] || undefined,
+      temp2Level: fields[SJF.Temp___M_Cert_Level_2] || undefined,
+      temp3Level: fields[SJF.Temp___M_Cert_Level_3] || undefined,
+      temp4Level: fields[SJF.Temp___M_Cert_Level_4] || undefined,
+      temp1Year: fields[SJF.Temp___M_Cert_Year_1] || undefined,
+      temp2Year: fields[SJF.Temp___M_Cert_Year_2] || undefined,
+      temp3Year: fields[SJF.Temp___M_Cert_Year_3] || undefined,
+      temp4Year: fields[SJF.Temp___M_Cert_Year_4] || undefined,
+      montCert1Cert: fields[SJF.Montessori_Certification_Certifier_1] || undefined,
+      montCert2Cert: fields[SJF.Montessori_Certification_Certifier_2] || undefined,
+      montCert3Cert: fields[SJF.Montessori_Certification_Certifier_3] || undefined,
+      montCert4Cert: fields[SJF.Montessori_Certification_Certifier_4] || undefined,
+      montCert1Level: fields[SJF.Montessori_Certification_Level_1] || undefined,
+      montCert2Level: fields[SJF.Montessori_Certification_Level_2] || undefined,
+      montCert3Level: fields[SJF.Montessori_Certification_Level_3] || undefined,
+      montCert4Level: fields[SJF.Montessori_Certification_Level_4] || undefined,
+      montCert1Year: fields[SJF.Montessori_Certification_Year_1] || undefined,
+      montCert2Year: fields[SJF.Montessori_Certification_Year_2] || undefined,
+      montCert3Year: fields[SJF.Montessori_Certification_Year_3] || undefined,
+      montCert4Year: fields[SJF.Montessori_Certification_Year_4] || undefined,
+      city: fields[SJF.City] || undefined,
+      cityStandardized: fields[SJF.City_Standardized] || undefined,
+      state: fields[SJF.State] || undefined,
+      stateStandardized: fields[SJF.State_Standardized] || undefined,
+      country: fields[SJF.Country] || undefined,
+      city2: fields[SJF.City_2] || undefined,
+      state2: fields[SJF.State_2] || undefined,
+      country2: fields[SJF.Country_2] || undefined,
+      targetGeo: fields[SJF.Age_Classrooms_Interested_In_Offering] || undefined,
+      initialEdInterestsAge: fields[SJF.Age_Classrooms_Interested_In_Offering] || undefined,
+      initialEdInterestsEducators: fields[SJF.Educator_Interests] || undefined,
+      initialEdInterestsEducatorsOther: fields[SJF.Educator_Interests_Other] || undefined,
+      commMemInterests: fields[SJF.Community_Member_Interest] || undefined,
+      commMemInterestsOther: fields[SJF.Community_Member_Community_Info] || undefined,
+      commMemSupportFindingTeachers: fields[SJF.Community_Member_Support_Finding_Teachers] || undefined,
+      commMemCommunityInfo: fields[SJF.Community_Member_Community_Info] || undefined,
+      commMemSelfInfo: fields[SJF.Community_Member_Self_Info] || undefined,
+      receiveComms: fields[SJF.Receive_Communications] || undefined,
+      source: fields[SJF.Source] || undefined,
+      sourceOther: fields[SJF.Source___other] || undefined,
+      mktgSource: fields[SJF.Marketing_Source] || undefined,
+      mktgSourceCampaign: fields[SJF.Marketing_Campaign] || undefined,
+      initialEdInterestCharter: fields[SJF.Interested_in_charter] || undefined,
+      assignedPartner: fields[SJF.Assigned_Partner__from_Educators_] || undefined,
+      sendGridTemplateId: fields[SJF.SendGrid_template_id] || undefined,
+      sendGridSentDate: fields[SJF.SendGrid_sent_date] || undefined,
+      routedTo: fields[SJF.Routed_To] || undefined,
+      assignedPartnerOverride: fields[SJF.Assigned_Partner_Override] || undefined,
+      emailSentByInitOutreacher: fields[SJF.Email_sent_by_Initial_Outreacher_] || undefined,
+      oneOnOneStatus: fields[SJF.One_on_one_status] || undefined,
+      initialOutreacher: fields[SJF.Initial_Outreacher] || undefined,
+      personResponsibleForFollowUp: fields[SJF.Person_responsible_for_follow_up] || undefined,
+      sourceForNonTLs: fields[SJF.Source_for_non_TLs] || undefined,
+      dateSubmitted: fields[SJF.Entry_Date] || undefined,
+      certProcessingStatus: fields[SJF.Status_of_Processing_Montessori_Certs] || undefined,
+      responseData: fields[SJF.Message] || fields["Response Data"] || undefined,
       notes: fields["Notes"] || fields["notes"] || undefined,
-      created: fields["Entry Date"] || fields["Created time"] || new Date().toISOString(),
+      created: fields[SJF.Entry_Date] || fields["Created time"] || new Date().toISOString(),
       lastModified: fields["Last Modified"] || fields["Last modified time"] || new Date().toISOString(),
     };
   }
@@ -2073,18 +2301,13 @@ export class SimpleAirtableStorage implements IStorage {
   private transformEmailAddressRecord(record: any): EmailAddress {
     const fields = record.fields;
     
-
-    
     return {
       id: record.id,
-      educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
-      email: fields["Email"] || fields["Email Address"] || fields["email"] || undefined,
-      type: fields["Type"] || fields["Email Type"] || fields["type"] || fields["Category"] || 'Personal',
-      isPrimary: fields["Primary"] === true || fields["Primary"] === "true" || fields["Is Primary"] === true,
-      status: fields["Status"] || fields["Active"] || fields["status"] || 'Active',
-      notes: fields["Notes"] || undefined,
-      created: fields["Created"] || fields["Created time"] || undefined,
-      lastModified: fields["Last Modified"] || fields["Last modified time"] || undefined,
+      educatorId: fields[EAF.educator_id] || undefined,
+      email: fields[EAF.Email_Address] || fields["email"] || undefined,
+      type: fields[EAF.Email_Type] || fields["type"] || fields["Category"] || 'Personal',
+      isPrimary: fields[EAF.Current_Primary_Email] === true,
+      isActive: fields[EAF.Active_] || undefined
     };
   }
 
@@ -2115,9 +2338,29 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Montessori Certs');
       const records = await table.select({
-        filterByFormula: `{educator_id} = "${educatorId}"`
+        filterByFormula: `{${MCF.educator_id}} = "${educatorId}"`
       }).all();
-      return records.map(record => this.transformMontessoriCertificationRecord(record));
+      const certifiersTable = base('Montessori Certifiers');
+      const oldCertifiersTable = base('Montessori Certifiers - old list');
+      const result = await Promise.all(records.map(async (record) => {
+        const baseCert = this.transformMontessoriCertificationRecord(record);
+        const link = record.fields[MCF.Certifier];
+        const certifierId = Array.isArray(link) ? link[0] : link;
+        let abbreviation: string | undefined = undefined;
+        if (certifierId) {
+          try {
+            const certRec = await certifiersTable.find(certifierId);
+            abbreviation = certRec?.fields?.[MCFI.Abbreviation] || undefined;
+          } catch (e) {
+            try {
+              const oldRec = await oldCertifiersTable.find(certifierId);
+              abbreviation = oldRec?.fields?.[MCFI.Abbreviation] || undefined;
+            } catch {}
+          }
+        }
+        return { ...baseCert, certifier: abbreviation ?? baseCert.certifier };
+      }));
+      return result;
     } catch (error) {
       console.warn('Error fetching Montessori Certifications by educator ID:', error);
       return [];
@@ -2155,21 +2398,16 @@ export class SimpleAirtableStorage implements IStorage {
   private transformMontessoriCertificationRecord(record: any): MontessoriCertification {
     const fields = record.fields;
     
-
-    
     return {
       id: record.id,
-      educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
-      certificationLevel: fields["Level"] || undefined,
-      certificationStatus: fields["Status"] || undefined,
-      certifier: fields["Abbreviation"] || undefined,
-      trainingProgram: fields["Training Program"] || undefined,
-      dateReceived: fields["Year Certified"] || undefined,
-      expirationDate: fields["Expiration Date"] || fields["expiration_date"] || undefined,
-      certificationNumber: fields["Certification Number"] || fields["Cert Number"] || fields["certification_number"] || undefined,
-      notes: fields["Notes"] || fields["notes"] || undefined,
-      created: fields["Created"] || fields["Created time"] || undefined,
-      lastModified: fields["Last Modified"] || fields["Last modified time"] || undefined,
+      educatorId: Array.isArray(fields[MCF.educator_id]) ? (fields[MCF.educator_id] as any[])[0] : fields[MCF.educator_id] || undefined,
+      certificationLevel: fields[MCF.Level] || undefined,
+      certificationStatus: fields[MCF.Certification_Status] || undefined,
+      certificationLevels: fields[MCF.Certification_Levels] || undefined,
+      certifier: fields[MCF.Certifier] || fields[MCF.Abbreviation] || undefined,
+      certifierOther: fields[MCF.Certifier___Other] || undefined,
+      yearReceived: fields[MCF.Year_Certified] || undefined,
+      created: fields[MCF.Created] || fields["Created time"] || undefined,
     };
   }
 
@@ -2178,7 +2416,38 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Event attendance');
       const records = await table.select().all();
-      return records.map(record => this.transformEventAttendanceRecord(record));
+
+      const eventsTable = base('Events');
+      const result = await Promise.all(records.map(async (record) => {
+        const baseAtt = this.transformEventAttendanceRecord(record);
+        const link = record.fields[EATF.Event];
+        const eventId = Array.isArray(link) ? link[0] : link;
+        let eventName: string | undefined = undefined;
+        let eventDate: string | undefined = undefined;
+        if (eventId) {
+          try {
+            const ev = await eventsTable.find(eventId);
+            eventName = ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId;
+            eventDate = ev.fields[EVF.Date] || undefined;
+          } catch (e) {
+            try {
+              const fallback = await eventsTable.select({ filterByFormula: `RECORD_ID() = "${eventId}"` }).firstPage();
+              const ev = fallback?.[0];
+              if (ev) {
+                eventName = ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId;
+                eventDate = ev.fields[EVF.Date] || undefined;
+              } else {
+                eventName = eventId;
+              }
+            } catch {
+              eventName = eventId;
+            }
+          }
+        }
+        return { ...baseAtt, eventName, eventDate } as EventAttendance;
+      }));
+
+      return result;
     } catch (error) {
       console.warn('Event attendance table not accessible:', error);
       return [];
@@ -2189,7 +2458,33 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Event attendance');
       const record = await table.find(id);
-      return this.transformEventAttendanceRecord(record);
+      const baseAtt = this.transformEventAttendanceRecord(record);
+      const eventsTable = base('Events');
+      const link = record.fields[EATF.Event];
+      const eventId = Array.isArray(link) ? link[0] : link;
+      let eventName: string | undefined = undefined;
+      let eventDate: string | undefined = undefined;
+      if (eventId) {
+        try {
+          const ev = await eventsTable.find(eventId);
+          eventName = ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId;
+          eventDate = ev.fields[EVF.Date] || undefined;
+        } catch (e) {
+          try {
+            const fallback = await eventsTable.select({ filterByFormula: `RECORD_ID() = "${eventId}"` }).firstPage();
+            const ev = fallback?.[0];
+            if (ev) {
+              eventName = ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId;
+              eventDate = ev.fields[EVF.Date] || undefined;
+            } else {
+              eventName = eventId;
+            }
+          } catch {
+            eventName = eventId;
+          }
+        }
+      }
+      return { ...baseAtt, eventName, eventDate } as EventAttendance;
     } catch (error) {
       console.warn('Event attendance record not found:', error);
       return undefined;
@@ -2200,9 +2495,40 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Event attendance');
       const records = await table.select({
-        filterByFormula: `{educator_id} = "${educatorId}"`
+        filterByFormula: `{${EATF.educator_id}} = "${educatorId}"`
       }).all();
-      return records.map(record => this.transformEventAttendanceRecord(record));
+
+      const eventsTable = base('Events');
+      const result = await Promise.all(records.map(async (record) => {
+        const baseAtt = this.transformEventAttendanceRecord(record);
+        const link = record.fields[EATF.Event];
+        const eventId = Array.isArray(link) ? link[0] : link;
+        let eventName: string | undefined = undefined;
+        let eventDate: string | undefined = undefined;
+        if (eventId) {
+          try {
+            const ev = await eventsTable.find(eventId);
+            eventName = ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId;
+            eventDate = ev.fields[EVF.Date] || undefined;
+          } catch (e) {
+            try {
+              const fallback = await eventsTable.select({ filterByFormula: `RECORD_ID() = "${eventId}"` }).firstPage();
+              const ev = fallback?.[0];
+              if (ev) {
+                eventName = ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId;
+                eventDate = ev.fields[EVF.Date] || undefined;
+              } else {
+                eventName = eventId;
+              }
+            } catch {
+              eventName = eventId;
+            }
+          }
+        }
+        return { ...baseAtt, eventName, eventDate } as EventAttendance;
+      }));
+
+      return result;
     } catch (error) {
       console.warn('Error fetching Event Attendance by educator ID:', error);
       return [];
@@ -2215,11 +2541,9 @@ export class SimpleAirtableStorage implements IStorage {
       educatorId: attendance.educatorId,
       eventName: attendance.eventName,
       eventDate: attendance.eventDate,
-      eventType: attendance.eventType,
-      attendanceStatus: attendance.attendanceStatus,
-      notes: attendance.notes,
-      created: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
+      attended: attendance.attended,
+      registered: attendance.registered,
+      registrationDate: attendance.registrationDate,
     };
     return newAttendance;
   }
@@ -2243,14 +2567,11 @@ export class SimpleAirtableStorage implements IStorage {
     const fields = record.fields;
     return {
       id: record.id,
-      educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
-      eventName: fields["Event Name"] || fields["Event"] || undefined,
-      eventDate: fields["Event Date"] || fields["Date"] || undefined,
-      eventType: fields["Event Type"] || fields["Type"] || undefined,
-      attendanceStatus: fields["Attendance Status"] || fields["Status"] || undefined,
-      notes: fields["Notes"] || undefined,
-      created: fields["Created"] || record.get('Created'),
-      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+      educatorId: fields[EATF.educator_id] || undefined,
+      // Event name/date will be populated by join in callers
+      attended: fields[EATF.Attended] || undefined,
+      registered: fields[EATF.Registered] || undefined,
+      registrationDate: fields[EATF.Registration_Date] || undefined,
     };
   }
 
@@ -2281,7 +2602,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('Educator notes');
       const records = await table.select({
-        filterByFormula: `{educator_id} = "${educatorId}"`
+        filterByFormula: `{${ENF.educator_id}} = "${educatorId}"`
       }).all();
       return records.map(record => this.transformEducatorNoteRecord(record));
     } catch (error) {
@@ -2291,32 +2612,31 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async createEducatorNote(note: InsertEducatorNote): Promise<EducatorNote> {
-    const newNote: EducatorNote = {
-      id: `note_${Date.now()}`,
-      educatorId: note.educatorId || '',
-      dateCreated: note.dateCreated || new Date().toISOString(),
-      createdBy: note.createdBy,
-      notes: note.notes,
-      category: note.category,
-      priority: note.priority,
-      created: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-    };
-    return newNote;
+    const recs = await base('Educator notes').create([{
+      fields: {
+        [ENF.educator_id]: note.educatorId,
+        [ENF.Date]: note.dateCreated || new Date().toISOString(),
+        [ENF.Created_by]: note.createdBy || undefined,
+        [ENF.Notes]: note.notes,
+        [ENF.Private]: note.isPrivate || false,
+      }
+    }]);
+    return this.transformEducatorNoteRecord(recs[0]);
   }
 
   async updateEducatorNote(id: string, note: Partial<InsertEducatorNote>): Promise<EducatorNote | undefined> {
-    const existing = await this.getEducatorNote(id);
-    if (!existing) return undefined;
-    
-    return {
-      ...existing,
-      ...note,
-      lastModified: new Date().toISOString(),
-    };
+    const fields: any = {};
+    if (note.educatorId !== undefined) fields[ENF.educator_id] = note.educatorId;
+    if (note.dateCreated !== undefined) fields[ENF.Date] = note.dateCreated || undefined;
+    if (note.createdBy !== undefined) fields[ENF.Created_by] = note.createdBy || undefined;
+    if (note.notes !== undefined) fields[ENF.Notes] = note.notes;
+    if (note.isPrivate !== undefined) fields[ENF.Private] = note.isPrivate;
+    const record = await base('Educator notes').update(id, fields);
+    return this.transformEducatorNoteRecord(record);
   }
 
   async deleteEducatorNote(id: string): Promise<boolean> {
+    await base('Educator notes').destroy(id);
     return true;
   }
 
@@ -2324,18 +2644,15 @@ export class SimpleAirtableStorage implements IStorage {
     const fields = record.fields;
     return {
       id: record.id,
-      educatorId: Array.isArray(fields["educator_id"]) ? fields["educator_id"][0] : fields["educator_id"] || undefined,
-      dateCreated: fields["Date Created"] || fields["Date"] || undefined,
-      createdBy: fields["Created By"] || fields["Author"] || undefined,
-      notes: fields["Notes"] || fields["Note"] || undefined,
-      category: fields["Category"] || undefined,
-      priority: fields["Priority"] || undefined,
-      created: fields["Created"] || record.get('Created'),
-      lastModified: fields["Last Modified"] || record.get('Last Modified'),
+      educatorId: fields[ENF.educator_id] || undefined,
+      dateCreated: fields[ENF.Date] || undefined,
+      createdBy: fields[ENF.Created_by] || undefined,
+      notes: fields[ENF.Notes] || undefined,
+      isPrivate: fields[ENF.Private] || undefined,
     };
   }
-
-  // Missing membership fee methods - stub implementations
+  /*
+  // Membership fee methods (read-only)
   async getMembershipFeesByYear(): Promise<MembershipFeeByYear[]> {
     try {
       const table = base('Membership fee school x year');
@@ -2348,7 +2665,14 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async getMembershipFeeByYear(id: string): Promise<MembershipFeeByYear | undefined> {
-    return undefined;
+    try {
+      const table = base('Membership fee school x year');
+      const record = await table.find(id);
+      return this.transformMembershipFeeByYearRecord(record);
+    } catch (error) {
+      console.warn('Membership fee record not found or inaccessible:', error);
+      return undefined;
+    }
   }
 
   async getMembershipFeesBySchoolId(schoolId: string): Promise<MembershipFeeByYear[]> {
@@ -2382,16 +2706,16 @@ export class SimpleAirtableStorage implements IStorage {
     }
   }
 
-  async createMembershipFeeByYear(fee: InsertMembershipFeeByYear): Promise<MembershipFeeByYear> {
-    throw new Error('Not implemented');
+  async createMembershipFeeByYear(_fee: InsertMembershipFeeByYear): Promise<MembershipFeeByYear> {
+    throw new Error('Create membership fee not supported via API');
   }
 
-  async updateMembershipFeeByYear(id: string, fee: Partial<InsertMembershipFeeByYear>): Promise<MembershipFeeByYear | undefined> {
-    return undefined;
+  async updateMembershipFeeByYear(_id: string, _fee: Partial<InsertMembershipFeeByYear>): Promise<MembershipFeeByYear | undefined> {
+    throw new Error('Update membership fee not supported via API');
   }
 
-  async deleteMembershipFeeByYear(id: string): Promise<boolean> {
-    return false;
+  async deleteMembershipFeeByYear(_id: string): Promise<boolean> {
+    throw new Error('Delete membership fee not supported via API');
   }
 
   private transformMembershipFeeByYearRecord(record: any): MembershipFeeByYear {
@@ -2515,10 +2839,10 @@ export class SimpleAirtableStorage implements IStorage {
       notes: undefined,
     };
   }
-
+  */
   private transformSchoolNoteRecord(record: any): SchoolNote {
     const fields = record.fields;
-    
+/*    
     // Extract headline properly - Airtable returns objects with structure { state: 'generated', value: 'text', isStale: false }
     let headline = fields["Headline (Notes)"];
     if (headline && typeof headline === 'object') {
@@ -2531,15 +2855,13 @@ export class SimpleAirtableStorage implements IStorage {
         headline = headline.value || headline.text || JSON.stringify(headline);
       }
     }
-    
+*/
     return {
       id: record.id,
-      schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
-      dateCreated: fields["Date created"] || undefined,
-      createdBy: fields["Partner Short Name"] || undefined,
-      notes: fields["Notes"] || undefined,
-      headline: headline || undefined,
-      lastModified: fields["Last Modified"] || undefined,
+      schoolId: fields[SNF.school_id] || undefined,
+      dateCreated: fields[SNF.Date_created] || undefined,
+      createdBy: fields[SNF.Partner_Short_Name] || undefined,
+      notes: fields[SNF.Notes] || undefined,
     };
   }
 
@@ -2547,7 +2869,7 @@ export class SimpleAirtableStorage implements IStorage {
     try {
       const table = base('990s');
       const records = await table.select({
-        filterByFormula: `{school_id} = "${schoolId}"`
+        filterByFormula: `{${N9F.school_id}} = "${schoolId}"`
       }).all();
       return records.map(record => this.transformTax990Record(record));
     } catch (error) {
@@ -2558,13 +2880,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   private transformTax990Record(record: any): Tax990 {
     const fields = record.fields;
-    
-    // Use correct field names from Airtable
-    const year = fields["990 Reporting Year"];
-    const pdfField = fields["PDF"];
-    
-
-    
+    const pdfField = fields[N9F.PDF];
     let attachment = "";
     let attachmentUrl = "";
     
@@ -2580,8 +2896,8 @@ export class SimpleAirtableStorage implements IStorage {
     
     return {
       id: record.id,
-      schoolId: Array.isArray(fields["school_id"]) ? fields["school_id"][0] : fields["school_id"] || undefined,
-      year: year,
+      schoolId: fields[N9F.school_id] || undefined,
+      year: fields[N9F._990_Reporting_Year] || undefined,
       attachment: attachment || undefined,
       attachmentUrl: attachmentUrl || undefined,
     };
@@ -2601,15 +2917,15 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharterRolesByCharterId(charterId: string): Promise<CharterRole[]> {
     try {
       const records = await base("Charter roles").select({
-        filterByFormula: `{charter_id} = '${charterId}'`
+        filterByFormula: `{${CRF.charter_id}} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: String(record.fields["charter_id"] || ''),
-        role: String(record.fields["Role"] || ''),
-        name: String(record.fields["Name"] || ''),
-        currentlyActive: Boolean(record.fields["Currently Active"]),
+        charterId: String(record.fields[CRF.charter_id] || ''),
+        role: String(record.fields[CRF.Role] || ''),
+        name: String(record.fields[CRF.Name] || ''),
+        currentlyActive: Boolean(record.fields[CRF.Currently_active]),
         created: String(record.fields["Created"] || new Date().toISOString()),
         lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
       }));
@@ -2622,15 +2938,15 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharterApplicationsByCharterId(charterId: string): Promise<CharterApplication[]> {
     try {
       const records = await base("Charter applications").select({
-        filterByFormula: `{charter_id} = '${charterId}'`
+        filterByFormula: `{${CAF.charter_id}} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: String(record.fields["charter_id"] || ''),
-        applicationName: String(record.fields["Application Name"] || ''),
-        targetOpen: String(record.fields["Target Open"] || ''),
-        status: String(record.fields["Status"] || ''),
+        charterId: String(record.fields[CAF.charter_id] || ''),
+        applicationName: String(record.fields[CAF.Full_Name] || ''),
+        targetOpen: String(record.fields[CAF.Target_open] || ''),
+        status: String(record.fields[CAF.Status] || ''),
         submissionDate: String(record.fields["Submission Date"] || ''),
         created: String(record.fields["Created"] || new Date().toISOString()),
         lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
@@ -2644,17 +2960,19 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharterAuthorizerContactsByCharterId(charterId: string): Promise<CharterAuthorizerContact[]> {
     try {
       const records = await base("Charter authorizers and contacts").select({
-        filterByFormula: `{charter_id} = '${charterId}'`
+        filterByFormula: `{${CACF.charter_id}} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: String(record.fields["charter_id"] || ''),
-        name: String(record.fields["Name"] || ''),
+        charterId: String(record.fields[CACF.charter_id] || ''),
+        name: String(record.fields[CACF.Contact] || record.fields[CACF.Authorizer] || ''),
         organization: String(record.fields["Organization"] || ''),
-        email: String(record.fields["Email"] || ''),
-        phone: String(record.fields["Phone"] || ''),
-        role: String(record.fields["Role"] || ''),
+        email: String(record.fields[CACF.Email] || ''),
+        phone: String(record.fields[CACF.Phone] || ''),
+        role: String(record.fields[CRF.Role] || ''),
+        title: String(record.fields[CACF.Title] || ''),
+        currentlyActive: Boolean(record.fields[CACF.Currently_active]),
         created: String(record.fields["Created"] || new Date().toISOString()),
         lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
       }));
@@ -2667,16 +2985,18 @@ export class SimpleAirtableStorage implements IStorage {
   async getReportSubmissionsByCharterId(charterId: string): Promise<ReportSubmission[]> {
     try {
       const records = await base("Reports and submissions").select({
-        filterByFormula: `{charter_id} = '${charterId}'`
+        filterByFormula: `{${RSF.charter_id}} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: String(record.fields["charter_id"] || ''),
-        reportType: String(record.fields["Report Type"] || ''),
+        charterId: String(record.fields[RSF.charter_id] || ''),
+        reportType: String(record.fields[RSF.Report_type] || ''),
         dueDate: String(record.fields["Due Date"] || ''),
         submissionDate: String(record.fields["Submission Date"] || ''),
         status: String(record.fields["Status"] || ''),
+        schoolYear: String(record.fields[RSF.School_year] || ''),
+        attachments: Array.isArray(record.fields[RSF.Attachments]) ? (record.fields[RSF.Attachments] as any[]).map(a => a?.url || a?.name || String(a)) : [],
         created: String(record.fields["Created"] || new Date().toISOString()),
         lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
       }));
@@ -2689,16 +3009,18 @@ export class SimpleAirtableStorage implements IStorage {
   async getAssessmentDataByCharterId(charterId: string): Promise<AssessmentData[]> {
     try {
       const records = await base("Assessment data").select({
-        filterByFormula: `{charter_id} = '${charterId}'`
+        filterByFormula: `{${ADF.charter_id}} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: String(record.fields["charter_id"] || ''),
-        assessmentType: String(record.fields["Assessment Type"] || ''),
-        testDate: String(record.fields["Test Date"] || ''),
-        results: String(record.fields["Results"] || ''),
+        charterId: String(record.fields[ADF.charter_id] || ''),
+        assessmentType: String(record.fields[ADF.Assessment] || record.fields["Assessment Type"] || ''),
+        testDate: String(record.fields[ADF.Year] || record.fields["Test Date"] || ''),
+        results: String(record.fields[ADF.Other_data] || record.fields["Results"] || ''),
         grade: String(record.fields["Grade"] || ''),
+        schoolId: String(record.fields[ADF.school_id] || ''),
+        numberAssessed: Number(record.fields[ADF.Number_assessed] || 0),
         created: String(record.fields["Created"] || new Date().toISOString()),
         lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
       }));
@@ -2711,20 +3033,9 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharterNotesByCharterId(charterId: string): Promise<CharterNote[]> {
     try {
       const records = await base("School notes").select({
-        filterByFormula: `{charter_id} = '${charterId}'`
+        filterByFormula: `{${SNF.charter_id}} = '${charterId}'`
       }).all();
-      
-      return records.map(record => ({
-        id: record.id,
-        charterId: String(record.fields["charter_id"] || ''),
-        headline: String(record.fields["Headline (Notes)"] || ''),
-        notes: String(record.fields["Notes"] || ''),
-        createdBy: String(record.fields["Created By"] || ''),
-        dateEntered: String(record.fields["Date Entered"] || ''),
-        private: Boolean(record.fields["Private"]),
-        created: String(record.fields["Created"] || new Date().toISOString()),
-        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
-      }));
+      return records.map(transformCharterNote);
     } catch (error) {
       console.error('Error fetching charter notes:', error);
       return [];
@@ -2734,17 +3045,18 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharterActionStepsByCharterId(charterId: string): Promise<CharterActionStep[]> {
     try {
       const records = await base("Action steps").select({
-        filterByFormula: `{charter_id} = '${charterId}'`
+        filterByFormula: `{${ASF.charter_id}} = '${charterId}'`
       }).all();
       
       return records.map(record => ({
         id: record.id,
-        charterId: String(record.fields["charter_id"] || ''),
-        description: String(record.fields["Description"] || ''),
-        assignee: String(record.fields["Assignee"] || ''),
-        dueDate: String(record.fields["Due Date"] || ''),
-        status: String(record.fields["Status"] || ''),
-        complete: Boolean(record.fields["Complete"]),
+        charterId: String(record.fields[ASF.charter_id] || ''),
+        description: String(record.fields[ASF.Item] || ''),
+        assignee: String(record.fields[ASF.Assignee_Short_Name] || ''),
+        dueDate: String(record.fields[ASF.Due_date] || ''),
+        completedDate: String(record.fields[ASF.Completed_date] || ''),
+        status: String(record.fields[ASF.Status] || ''),
+        complete: String(record.fields[ASF.Status] || '').toLowerCase() === 'complete',
         created: String(record.fields["Created"] || new Date().toISOString()),
         lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
       }));
@@ -2756,35 +3068,10 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getCharterGovernanceDocumentsByCharterId(charterId: string): Promise<CharterGovernanceDocument[]> {
     try {
-      const records = await base("Governance docs").select({
-        filterByFormula: `{charter_id} = '${charterId}'`
+      const records = await base(AT.GOVERNANCE_DOCS).select({
+        filterByFormula: `{${GDF.charter_id}} = '${charterId}'`
       }).all();
-      
-      return records.map(record => {
-        const documentPDFField = record.fields["Document PDF"];
-        let doc = "";
-        let docUrl = "";
-        if (Array.isArray(documentPDFField) && documentPDFField.length > 0) {
-          try {
-            const attachment = documentPDFField[0];
-            doc = attachment?.filename || "Document";
-            docUrl = attachment?.url || "";
-          } catch (e) {
-            doc = "Document";
-          }
-        }
-        
-        return {
-          id: record.id,
-          charterId: String(record.fields["charter_id"] || ''),
-          docType: String(record.fields["Document type"] || ''),
-          doc: String(doc),
-          docUrl: String(docUrl),
-          dateEntered: String(record.fields["Date"] || ''),
-          created: String(record.fields["Created"] || new Date().toISOString()),
-          lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
-        };
-      });
+      return records.map(transformCharterGovernanceDocument);
     } catch (error) {
       console.error('Error fetching charter governance documents:', error);
       return [];
@@ -2794,31 +3081,9 @@ export class SimpleAirtableStorage implements IStorage {
   async getCharter990sByCharterId(charterId: string): Promise<Charter990[]> {
     try {
       const records = await base("990s").select({
-        filterByFormula: `{charter_id} = '${charterId}'`
+        filterByFormula: `{${N9F.charter_id}} = '${charterId}'`
       }).all();
-      
-      return records.map(record => {
-        const documentPDFField = record.fields["Document PDF"];
-        let docUrl = "";
-        if (Array.isArray(documentPDFField) && documentPDFField.length > 0) {
-          try {
-            const attachment = documentPDFField[0];
-            docUrl = attachment?.url || "";
-          } catch (e) {
-            docUrl = "";
-          }
-        }
-        
-        return {
-          id: record.id,
-          charterId: String(record.fields["charter_id"] || ''),
-          year: String(record.fields["Year"] || ''),
-          docUrl: String(docUrl),
-          dateEntered: String(record.fields["Date Entered"] || ''),
-          created: String(record.fields["Created"] || new Date().toISOString()),
-          lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
-        };
-      });
+      return records.map(transformCharter990);
     } catch (error) {
       console.error('Error fetching charter 990s:', error);
       return [];
@@ -2828,25 +3093,10 @@ export class SimpleAirtableStorage implements IStorage {
   async getEducatorSchoolAssociationsByCharterId(charterId: string): Promise<EducatorSchoolAssociation[]> {
     try {
       const records = await base("Educators x Schools").select({
-        filterByFormula: `{charter_id} = '${charterId}'`
+        filterByFormula: `{${EXSF.charter_id}} = '${charterId}'`
       }).all();
       
-      return records.map(record => ({
-        id: record.id,
-        educatorId: String(record.fields["educator_id"] || ''),
-        schoolId: String(record.fields["school_id"] || ''),
-        educatorName: String(record.fields["Educator Name"] || ''),
-        schoolName: String(record.fields["School Name"] || ''),
-        role: String(record.fields["Role"] || '')
-          .split(',')
-          .map((s: string) => s.trim())
-          .filter(Boolean),
-        startDate: String(record.fields["Start Date"] || ''),
-        endDate: String(record.fields["End Date"] || ''),
-        isActive: Boolean(record.fields["Active"]),
-        created: String(record.fields["Created"] || new Date().toISOString()),
-        lastModified: String(record.fields["Last Modified"] || new Date().toISOString()),
-      }));
+      return records.map(record => this.transformEXSRecord(record));
     } catch (error) {
       console.error('Error fetching educator school associations by charter ID:', error);
       return [];
@@ -2855,3 +3105,4 @@ export class SimpleAirtableStorage implements IStorage {
 }
 
 export const storage = new SimpleAirtableStorage();
+

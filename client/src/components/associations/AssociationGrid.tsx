@@ -1,11 +1,9 @@
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit3, UserMinus, Trash2 } from "lucide-react";
+import { ExternalLink, Edit3, UserMinus, Trash2, Check, X } from "lucide-react";
 import { RoleMultiSelectInline } from "@/components/shared/grid/RoleMultiSelectInline";
 import { YesNoSelectInline } from "@/components/shared/grid/YesNoSelectInline";
 import { DateInputInline } from "@/components/shared/grid/DateInputInline";
@@ -24,13 +22,13 @@ export type AssociationRow = {
   endDate?: string | null;
   stageStatus?: string | null;
   emailAtSchool?: string | null;
-  phone?: string | null;
 };
 
 type Props = {
   mode: 'byEducator' | 'bySchool';
   rows: AssociationRow[];
   loading?: boolean;
+  editable?: boolean;
   onOpen?: (row: AssociationRow) => void;
   onEdit?: (row: AssociationRow) => void;
   onEndStint?: (row: AssociationRow) => void;
@@ -52,7 +50,45 @@ const RolesCell = ({ value }: ICellRendererParams<AssociationRow, any>) => {
   );
 };
 
-export function AssociationGrid({ mode, rows, loading, onOpen, onEdit, onEndStint, onDelete, onChangeRow }: Props) {
+export function AssociationGrid({ mode, rows, loading, editable = false, onOpen, onEdit, onEndStint, onDelete, onChangeRow }: Props) {
+  const [editingRowId, setEditingRowId] = React.useState<string | null>(null);
+  const [draft, setDraft] = React.useState<Record<string, Partial<AssociationRow>>>({});
+  const isEditingRow = (rowId?: string) => Boolean(editable || (rowId && editingRowId === rowId));
+
+  const beginEdit = (row: AssociationRow) => {
+    setEditingRowId(row.id);
+    setDraft((prev) => ({
+      ...prev,
+      [row.id]: {
+        roles: Array.isArray(row.roles)
+          ? row.roles
+          : (row.roles ? String(row.roles).split(',').map(s=>s.trim()).filter(Boolean) : []),
+        startDate: row.startDate || null,
+        endDate: row.endDate || null,
+        isActive: !!row.isActive,
+      },
+    }));
+  };
+
+  const cancelEdit = (rowId: string) => {
+    setEditingRowId((id) => (id === rowId ? null : id));
+    setDraft((prev) => {
+      const n = { ...prev };
+      delete n[rowId];
+      return n;
+    });
+  };
+
+  const saveEdit = (rowId: string) => {
+    const d = draft[rowId] || {};
+    onChangeRow?.(rowId, {
+      roles: (d.roles as string[]) || undefined,
+      startDate: (d.startDate as string | null) ?? undefined,
+      endDate: (d.endDate as string | null) ?? undefined,
+      isActive: typeof d.isActive === 'boolean' ? d.isActive : undefined,
+    });
+    cancelEdit(rowId);
+  };
   const columns: ColDef<AssociationRow>[] = React.useMemo(() => {
     const base: ColDef<AssociationRow>[] = [];
     if (mode === 'byEducator') {
@@ -67,26 +103,52 @@ export function AssociationGrid({ mode, rows, loading, onOpen, onEdit, onEndStin
             );
           }
         },
-        { headerName: 'Roles', field: 'roles', flex: 2, cellRenderer: (p) => {
+        { headerName: 'Roles', field: 'roles', flex: 2, valueFormatter: (p) => {
+          const v = (p as any).value;
+          const arr = Array.isArray(v) ? v : (v ? String(v).split(',').map((s: string) => s.trim()).filter(Boolean) : []);
+          return arr.join(', ');
+        }, cellRenderer: (p) => {
+          if (!isEditingRow(p.data?.id)) {
+            const v = (p as any).value;
+            const arr = Array.isArray(v) ? v : (v ? String(v).split(',').map((s: string) => s.trim()).filter(Boolean) : []);
+            return <span>{arr.join(', ') || '-'}</span> as any;
+          }
           const row = p.data!;
-          const values = Array.isArray(row.roles) ? row.roles : (row.roles ? String(row.roles).split(',').map(s=>s.trim()).filter(Boolean) : []);
+          const d = draft[row.id] || {};
+          const values = Array.isArray(d.roles) ? (d.roles as string[]) : (Array.isArray(row.roles) ? row.roles : (row.roles ? String(row.roles).split(',').map(s=>s.trim()).filter(Boolean) : []));
           return (
             <RoleMultiSelectInline
               options={TL_ROLE_OPTIONS}
               value={values}
-              onChange={(next) => onChangeRow?.(row.id, { roles: next })}
+              onChange={(next) => setDraft((prev) => ({ ...prev, [row.id]: { ...(prev[row.id] || {}), roles: next } }))}
             />
           );
         }},
-        { headerName: 'Start Date', field: 'startDate', width: 140, cellRenderer: (p) => (
-          <DateInputInline value={p.value || ''} onChange={(v) => onChangeRow?.(p.data!.id, { startDate: v || null })} />
-        )},
-        { headerName: 'End Date', field: 'endDate', width: 140, cellRenderer: (p) => (
-          <DateInputInline value={p.value || ''} onChange={(v) => onChangeRow?.(p.data!.id, { endDate: v || null })} />
-        )},
-        { headerName: 'Active', field: 'isActive', width: 110, cellRenderer: (p) => (
-          <YesNoSelectInline value={!!p.value} onChange={(next) => onChangeRow?.(p.data!.id, { isActive: next })} />
-        )},
+        { headerName: 'Start Date', field: 'startDate', width: 140, cellRenderer: (p) => {
+          if (!isEditingRow(p.data?.id)) return <span>{p.value || '-'}</span> as any;
+          const row = p.data!;
+          const d = draft[row.id] || {};
+          return (
+            <DateInputInline value={(d.startDate as string) || (row.startDate || '')} onChange={(v) => setDraft((prev) => ({ ...prev, [row.id]: { ...(prev[row.id] || {}), startDate: v || null } }))} />
+          );
+        } },
+        { headerName: 'End Date', field: 'endDate', width: 140, cellRenderer: (p) => {
+          if (!isEditingRow(p.data?.id)) return <span>{p.value || '-'}</span> as any;
+          const row = p.data!;
+          const d = draft[row.id] || {};
+          return (
+            <DateInputInline value={(d.endDate as string) || (row.endDate || '')} onChange={(v) => setDraft((prev) => ({ ...prev, [row.id]: { ...(prev[row.id] || {}), endDate: v || null } }))} />
+          );
+        } },
+        { headerName: 'Active', field: 'isActive', width: 110, valueFormatter: (p) => (p.value ? 'Yes' : 'No'), cellRenderer: (p) => {
+          if (!isEditingRow(p.data?.id)) return <span>{p.value ? 'Yes' : 'No'}</span> as any;
+          const row = p.data!;
+          const d = draft[row.id] || {};
+          const val = typeof d.isActive === 'boolean' ? d.isActive : !!row.isActive;
+          return (
+            <YesNoSelectInline value={val} onChange={(next) => setDraft((prev) => ({ ...prev, [row.id]: { ...(prev[row.id] || {}), isActive: next } }))} />
+          );
+        } },
         { headerName: 'Stage/Status', field: 'stageStatus', flex: 1, cellRenderer: (p) => (
           <Badge variant="secondary">{p.value || '-'}</Badge>
         )},
@@ -103,28 +165,53 @@ export function AssociationGrid({ mode, rows, loading, onOpen, onEdit, onEndStin
             );
           }
         },
-        { headerName: 'Roles', field: 'roles', flex: 2, cellRenderer: (p) => {
+        { headerName: 'Roles', field: 'roles', flex: 2, valueFormatter: (p) => {
+          const v = (p as any).value;
+          const arr = Array.isArray(v) ? v : (v ? String(v).split(',').map((s: string) => s.trim()).filter(Boolean) : []);
+          return arr.join(', ');
+        }, cellRenderer: (p) => {
+          if (!isEditingRow(p.data?.id)) {
+            const v = (p as any).value;
+            const arr = Array.isArray(v) ? v : (v ? String(v).split(',').map((s: string) => s.trim()).filter(Boolean) : []);
+            return <span>{arr.join(', ') || '-'}</span> as any;
+          }
           const row = p.data!;
-          const values = Array.isArray(row.roles) ? row.roles : (row.roles ? String(row.roles).split(',').map(s=>s.trim()).filter(Boolean) : []);
+          const d = draft[row.id] || {};
+          const values = Array.isArray(d.roles) ? (d.roles as string[]) : (Array.isArray(row.roles) ? row.roles : (row.roles ? String(row.roles).split(',').map(s=>s.trim()).filter(Boolean) : []));
           return (
             <RoleMultiSelectInline
               options={TL_ROLE_OPTIONS}
               value={values}
-              onChange={(next) => onChangeRow?.(row.id, { roles: next })}
+              onChange={(next) => setDraft((prev) => ({ ...prev, [row.id]: { ...(prev[row.id] || {}), roles: next } }))}
             />
           );
         }},
         { headerName: 'School email', field: 'emailAtSchool', flex: 2 },
-        { headerName: 'Phone', field: 'phone', width: 160 },
-        { headerName: 'Start Date', field: 'startDate', width: 140, cellRenderer: (p) => (
-          <DateInputInline value={p.value || ''} onChange={(v) => onChangeRow?.(p.data!.id, { startDate: v || null })} />
-        )},
-        { headerName: 'End Date', field: 'endDate', width: 140, cellRenderer: (p) => (
-          <DateInputInline value={p.value || ''} onChange={(v) => onChangeRow?.(p.data!.id, { endDate: v || null })} />
-        )},
-        { headerName: 'Active', field: 'isActive', width: 110, cellRenderer: (p) => (
-          <YesNoSelectInline value={!!p.value} onChange={(next) => onChangeRow?.(p.data!.id, { isActive: next })} />
-        )},
+        { headerName: 'Start Date', field: 'startDate', width: 140, cellRenderer: (p) => {
+          if (!isEditingRow(p.data?.id)) return <span>{p.value || '-'}</span> as any;
+          const row = p.data!;
+          const d = draft[row.id] || {};
+          return (
+            <DateInputInline value={(d.startDate as string) || (row.startDate || '')} onChange={(v) => setDraft((prev) => ({ ...prev, [row.id]: { ...(prev[row.id] || {}), startDate: v || null } }))} />
+          );
+        } },
+        { headerName: 'End Date', field: 'endDate', width: 140, cellRenderer: (p) => {
+          if (!isEditingRow(p.data?.id)) return <span>{p.value || '-'}</span> as any;
+          const row = p.data!;
+          const d = draft[row.id] || {};
+          return (
+            <DateInputInline value={(d.endDate as string) || (row.endDate || '')} onChange={(v) => setDraft((prev) => ({ ...prev, [row.id]: { ...(prev[row.id] || {}), endDate: v || null } }))} />
+          );
+        } },
+        { headerName: 'Active', field: 'isActive', width: 110, valueFormatter: (p) => (p.value ? 'Yes' : 'No'), cellRenderer: (p) => {
+          if (!isEditingRow(p.data?.id)) return <span>{p.value ? 'Yes' : 'No'}</span> as any;
+          const row = p.data!;
+          const d = draft[row.id] || {};
+          const val = typeof d.isActive === 'boolean' ? d.isActive : !!row.isActive;
+          return (
+            <YesNoSelectInline value={val} onChange={(next) => setDraft((prev) => ({ ...prev, [row.id]: { ...(prev[row.id] || {}), isActive: next } }))} />
+          );
+        } },
       );
     }
 
@@ -133,6 +220,7 @@ export function AssociationGrid({ mode, rows, loading, onOpen, onEdit, onEndStin
         headerName: 'Actions', field: 'actions', width: 180, sortable: false, filter: false, resizable: false,
         cellRenderer: (p: ICellRendererParams<AssociationRow>) => {
           const row = p.data!;
+          const rowIsEditing = isEditingRow(row.id);
           return (
             <div className="flex items-center gap-1">
               {onOpen && (
@@ -140,8 +228,35 @@ export function AssociationGrid({ mode, rows, loading, onOpen, onEdit, onEndStin
                   <ExternalLink className="h-3 w-3 text-blue-600" />
                 </Button>
               )}
-              {onEdit && (
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-green-50" title="Edit" onClick={() => onEdit(row)}>
+              {rowIsEditing ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 hover:bg-green-50"
+                    title="Save"
+                    onClick={() => saveEdit(row.id)}
+                  >
+                    <Check className="h-3 w-3 text-green-600" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 hover:bg-gray-50"
+                    title="Cancel"
+                    onClick={() => cancelEdit(row.id)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 hover:bg-green-50"
+                  title="Edit"
+                  onClick={() => { beginEdit(row); onEdit?.(row); }}
+                >
                   <Edit3 className="h-3 w-3 text-green-600" />
                 </Button>
               )}
@@ -165,8 +280,16 @@ export function AssociationGrid({ mode, rows, loading, onOpen, onEdit, onEndStin
   }, [mode, onOpen, onEdit, onEndStint, onDelete]);
 
   return (
-    <GridBase theme={themeMaterial} defaultColDef={DEFAULT_COL_DEF} gridProps={{ ...DEFAULT_GRID_PROPS, domLayout: 'autoHeight' }}>
-      <AgGridReact rowData={rows} columnDefs={columns} loadingOverlayComponentParams={{ loadingMessage: 'Loading...' }} overlayLoadingTemplate={loading ? '<span class="ag-overlay-loading-center">Loading…</span>' : undefined} />
-    </GridBase>
+    <GridBase
+      rowData={rows}
+      columnDefs={columns}
+      defaultColDefOverride={DEFAULT_COL_DEF}
+      gridProps={{
+        ...DEFAULT_GRID_PROPS,
+        domLayout: 'autoHeight',
+        loadingOverlayComponentParams: { loadingMessage: 'Loading...' },
+        overlayLoadingTemplate: loading ? '<span class="ag-overlay-loading-center">Loading.</span>' : undefined,
+      }}
+    />
   );
 }

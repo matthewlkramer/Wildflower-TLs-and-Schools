@@ -3,8 +3,8 @@
  * `/api/charters` and kept in React Query cache. Client‑side filters apply the
  * global search term and optional “My records” user filter. Clicking a short
  * name navigates to the charter detail page. The page sets its title to
- * “Charters” and registers an Add New option (currently a stub) through
- * `addNewEmitter`.
+ * "Charters". The header Add menu is fixed; this page also includes a local
+ * Add Charter button in the search row.
  */
 import { useQuery } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
@@ -16,7 +16,6 @@ import { useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { getStatusColor } from "@/lib/utils";
 import { useUserFilter } from "@/contexts/user-filter-context";
-import { addNewEmitter } from "@/lib/add-new-emitter";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -32,16 +31,6 @@ export default function Charters() {
 
   useEffect(() => {
     setPageTitle("Charters");
-    
-    const options = [
-      { label: "Create New Charter", onClick: () => console.log("Create Charter - to be implemented") }
-    ];
-    
-    addNewEmitter.setOptions(options);
-    
-    return () => {
-      addNewEmitter.setOptions([]);
-    };
   }, [setPageTitle]);
 
   const { data: charters = [], isLoading } = useQuery<Charter[]>({
@@ -188,9 +177,14 @@ export default function Charters() {
           <span>Search:</span>
           <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
           <span>Showing {filteredCharters?.length ?? 0} of {charters?.length ?? 0}</span>
-          <Button size="xs" variant="outline" className="ml-auto" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/charters'] })}>
-            Refresh
-          </Button>
+          <div className="ml-auto flex items-center gap-2">
+            <Button size="xs" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => { try { console.log('Create Charter - to be implemented'); } catch {} }}>
+              Add Charter
+            </Button>
+            <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/charters'] })}>
+              Refresh
+            </Button>
+          </div>
         </div>
         <div style={{ height: gridHeight, width: "100%" }}>
           <AgGridReact

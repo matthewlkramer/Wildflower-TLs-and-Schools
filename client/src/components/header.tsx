@@ -19,12 +19,9 @@ interface HeaderProps {
   searchPlaceholder?: string;
   showFilters?: boolean;
   onToggleFilters?: () => void;
-  onAddNew?: () => void;
-  addNewOptions?: Array<{ label: string; onClick: () => void; }>;
-  setAddNewOptions?: (options: Array<{ label: string; onClick: () => void; }>) => void;
 }
 
-export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder, showFilters = false, onToggleFilters, onAddNew, addNewOptions, setAddNewOptions }: HeaderProps) {
+export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder, showFilters = false, onToggleFilters }: HeaderProps) {
   const [location] = useLocation();
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -41,15 +38,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const isChartersActive = location === "/charters" || location.startsWith("/charter/");
   const isLoansActive = location === "/loans" || location.startsWith("/loan/");
 
-  const handleAddNew = () => {
-    if (onAddNew) {
-      onAddNew();
-    } else if (isTeachersActive) {
-      setShowAddEducatorModal(true);
-    } else if (isSchoolsActive) {
-      setShowAddSchoolModal(true);
-    }
-  };
+  // Header Add menu is fixed and not context-dependent
 
   const getSearchPlaceholder = () => {
     if (searchPlaceholder) return searchPlaceholder;
@@ -115,15 +104,15 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   return (
     <>
       <header className="bg-white shadow-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
             {/* Logo - Always visible and protected from overlap */}
             <div className="flex-shrink-0 flex items-center min-w-0 mr-4">
               <WildflowerLogo className="h-10 w-auto" />
             </div>
             
-            {/* Right side content - allow horizontal overflow on mobile */}
-            <div className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6 ml-auto overflow-x-auto">
+            {/* Right side content */}
+            <div className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6 ml-auto">
               {/* Navigation - always visible, compact on mobile */}
               <nav className="flex items-center space-x-3 sm:space-x-4 lg:space-x-8 flex-shrink-0">
                 <Link href="/dashboard" className={`px-2 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
@@ -184,54 +173,29 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                   </div>
                 )}
 
-                {addNewOptions && addNewOptions.length > 1 ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        className="bg-wildflower-blue hover:bg-blue-700 text-white flex-shrink-0"
-                        size="sm"
-                      >
-                        <Plus className="h-4 w-4 sm:mr-2" />
-                        <span className="hidden sm:inline">Add New</span>
-                        <ChevronDown className="h-4 w-4 ml-1" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {addNewOptions.map((option, index) => (
-                        <DropdownMenuItem key={index} onClick={option.onClick}>
-                          {option.label}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : addNewOptions && addNewOptions.length === 1 ? (
-                  <Button 
-                    onClick={addNewOptions[0].onClick}
-                    className="bg-wildflower-blue hover:bg-blue-700 text-white flex-shrink-0"
-                    size="sm"
-                  >
-                    <Plus className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline">{addNewOptions[0].label}</span>
-                  </Button>
-                ) : addNewOptions && addNewOptions.length === 0 ? (
-                  <Button 
-                    disabled
-                    className="bg-gray-400 text-white flex-shrink-0 cursor-not-allowed"
-                    size="sm"
-                  >
-                    <Plus className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Add New</span>
-                  </Button>
-                ) : (
-                  <Button 
-                    onClick={handleAddNew}
-                    className="bg-wildflower-blue hover:bg-blue-700 text-white flex-shrink-0"
-                    size="sm"
-                  >
-                    <Plus className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Add New</span>
-                  </Button>
-                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      className="bg-wildflower-blue hover:bg-blue-700 text-white flex-shrink-0"
+                      size="sm"
+                    >
+                      <Plus className="h-4 w-4 sm:mr-2" />
+                      <span className="hidden sm:inline">Add</span>
+                      <ChevronDown className="h-4 w-4 ml-1" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setShowAddEducatorModal(true)}>
+                      Create Teacher
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setShowAddSchoolModal(true)}>
+                      Create School
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => { try { console.log('Create Charter - to be implemented'); } catch {} }}>
+                      Create Charter
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 
                 {/* User Filter Toggle */}
                 <div className="flex items-center space-x-2 flex-shrink-0">

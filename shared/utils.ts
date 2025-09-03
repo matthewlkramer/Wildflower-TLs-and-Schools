@@ -1,32 +1,31 @@
 // Utility functions for the Wildflower application
 
-import { STATUS_TYPES, STATUS_COLORS } from './constants';
+import { STATUS_COLORS } from './constants';
+import { SCHOOLS_OPTIONS_SCHOOL_STATUS as SCHOOL_STATUSES } from './airtable-schema';
 
 /**
  * Get the appropriate color class for a status badge
  */
 export function getStatusColor(status: string): string {
-  const normalizedStatus = status?.toLowerCase();
-  
-  if (STATUS_TYPES.CLOSED.some(s => normalizedStatus?.includes(s.toLowerCase()))) {
-    return STATUS_COLORS.red;
+  const normalized = (status || '').toLowerCase();
+
+  // Map known school statuses from generated schema to colors.
+  // Fallback to default if unknown.
+  if (normalized.includes('permanently closed')) return STATUS_COLORS.red;
+  if (normalized.includes('closing')) return STATUS_COLORS.orange;
+  if (normalized.includes('open')) return STATUS_COLORS.green;
+  if (normalized.includes('emerging')) return STATUS_COLORS.yellow;
+  if (normalized.includes('paused')) return STATUS_COLORS.orange;
+  if (normalized.includes('disaffiliating')) return STATUS_COLORS.orange;
+  if (normalized.includes('disaffiliated')) return STATUS_COLORS.gray;
+  if (normalized.includes('placeholder')) return STATUS_COLORS.gray;
+
+  // As a safety net, recognize any value in the schema list
+  // and keep default for unknown/other custom values.
+  if (Array.isArray(SCHOOL_STATUSES)) {
+    const inSchema = SCHOOL_STATUSES.some(s => normalized === s.toLowerCase());
+    if (inSchema) return STATUS_COLORS.default;
   }
-  if (STATUS_TYPES.VISIONING.some(s => normalizedStatus?.includes(s.toLowerCase()))) {
-    return STATUS_COLORS.orange;
-  }
-  if (STATUS_TYPES.PLANNING.some(s => normalizedStatus?.includes(s.toLowerCase()))) {
-    return STATUS_COLORS.yellow;
-  }
-  if (STATUS_TYPES.STARTUP.some(s => normalizedStatus?.includes(s.toLowerCase()))) {
-    return STATUS_COLORS.green;
-  }
-  if (STATUS_TYPES.OPEN.some(s => normalizedStatus?.includes(s.toLowerCase()))) {
-    return STATUS_COLORS.green;
-  }
-  if (STATUS_TYPES.PLACEHOLDER.some(s => normalizedStatus?.includes(s.toLowerCase()))) {
-    return STATUS_COLORS.gray;
-  }
-  
   return STATUS_COLORS.default;
 }
 

@@ -18,6 +18,8 @@
     "supabase:db:push": "npx supabase db push",
     "supabase:functions:deploy": "npx supabase functions deploy gmail-sync gcal-sync",
     "sync:email-filter": "tsx scripts/sync-email-filter-to-supabase.ts"
+  ,
+    "schema:validate": "tsx scripts/validate-schema-alignment.ts"
   },
   "dependencies": {
     "@googlemaps/react-wrapper": "^1.2.0",

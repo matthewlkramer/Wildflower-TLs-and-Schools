@@ -1,10 +1,7 @@
 {
-  "imports": { "@shared/": "../_shared/" },
+  "importMap": "../import_map.json",
   "compilerOptions": {
-    "strict": true,
-    "useUnknownInCatchVariables": true
-  },
-  "fmt": { "useTabs": false, "lineWidth": 100, "semiColons": true },
-  "lint": { "rules": { "tags": ["recommended"] } }
+    "experimentalDecorators": true
+  }
 }
 

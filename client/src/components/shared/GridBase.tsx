@@ -18,16 +18,21 @@ export function GridBase({
   style,
   defaultColDefOverride,
   gridProps = {},
-}: GridBaseProps) {
+  children,
+}: GridBaseProps & { children?: React.ReactNode }) {
   return (
     <div className={`ag-theme-material w-full ${className || ''}`.trim()} style={style}>
-      <AgGridReact
-        {...DEFAULT_GRID_PROPS}
-        {...gridProps}
-        rowData={rowData}
-        columnDefs={columnDefs}
-        defaultColDef={{ ...DEFAULT_COL_DEF, ...(defaultColDefOverride || {}) }}
-      />
+      {children ? (
+        children
+      ) : (
+        <AgGridReact
+          {...DEFAULT_GRID_PROPS}
+          {...gridProps}
+          rowData={rowData}
+          columnDefs={columnDefs}
+          defaultColDef={{ ...DEFAULT_COL_DEF, ...(defaultColDefOverride || {}) }}
+        />
+      )}
     </div>
   );
 }

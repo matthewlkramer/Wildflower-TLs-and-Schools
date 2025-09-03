@@ -1,0 +1,169 @@
+
+// === Membership fee change log ===
+export const MEMBERSHIP_FEE_CHANGE_LOG_FIELDS = {
+  Change_ID: "Change ID",
+  School_x_Year: "School x Year",
+  Reason: "Reason",
+  Date_of_change: "Date of change",
+  Month_to_change: "Month to change",
+  Old_amount: "Old amount",
+  New_amount: "New amount",
+  Type: "Type",
+} as const;
+export const MEMBERSHIP_FEE_CHANGE_LOG_OPTIONS_MONTH_TO_CHANGE: string[] = [
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June"
+];
+export const MEMBERSHIP_FEE_CHANGE_LOG_OPTIONS_TYPE: string[] = [
+  "Initial",
+  "Change"
+];
+
+// === Membership fee billing schedules ===
+export const MEMBERSHIP_FEE_BILLING_SCHEDULES_FIELDS = {
+  Name: "Name",
+  Months_to_bill: "Months to bill",
+  Amount_per_bill: "Amount per bill",
+  Membership_fee_records: "Membership fee records",
+} as const;
+export const MEMBERSHIP_FEE_BILLING_SCHEDULES_OPTIONS_MONTHS_TO_BILL: string[] = [
+  "September",
+  "October",
+  "November",
+  "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August"
+];
+
+// === Membership fee credits ===
+export const MEMBERSHIP_FEE_CREDITS_FIELDS = {
+  Payment_ID: "Payment ID",
+  School_x_Year: "School x Year",
+  Amount: "Amount",
+  Date_received: "Date received",
+  Type: "Type",
+  Exemption_explanation: "Exemption explanation",
+  Attachments: "Attachments",
+  School_text_from_QBO: "School text from QBO",
+  Year_text_from_QBO: "Year text from QBO",
+  ai: "ai",
+  Customer_ID_from_QBO: "Customer ID from QBO",
+  School_Name_in_QBO__from_Customer_ID_from_QBO_: "School Name in QBO (from Customer ID from QBO)",
+  School_x_Year_formula_text: "School x Year formula text",
+} as const;
+export const MEMBERSHIP_FEE_CREDITS_OPTIONS_TYPE: string[] = [
+  "Payment",
+  "Exemption"
+];
+
+// === Membership fee invoices ===
+export const MEMBERSHIP_FEE_INVOICES_FIELDS = {
+  Invoice_ID: "Invoice ID",
+  School_x_Year: "School x Year",
+  Invoice_amount: "Invoice amount",
+  Date: "Date",
+  School_Year_from_QBO: "School Year from QBO",
+  School_from_QBO: "School from QBO",
+  Customer_ID_from_QBO: "Customer ID from QBO",
+  Schools__from_Customer_ID_from_QBO_: "Schools (from Customer ID from QBO)",
+  School_x_Year_formula_text: "School x Year formula text",
+} as const;
+
+// === Membership fee - generate invoices ===
+export const MEMBERSHIP_FEE___GENERATE_INVOICES_FIELDS = {
+  Invoice_ID: "Invoice ID",
+  School_x_Year: "School x Year",
+  Invoice_amount: "Invoice amount",
+  Invoice_Date: "Invoice Date",
+  Open_URL: "Open URL",
+  QBO_School_Codes__from_School___from_School_x_Year_: "QBO School Codes (from School) (from School x Year)",
+  Due_date: "Due date",
+  School_year__from_School_x_Year_: "School year (from School x Year)",
+} as const;
+
+// === Membership fee school x year ===
+export const MEMBERSHIP_FEE_SCHOOL_X_YEAR_FIELDS = {
+  Membership_fee_annual_record_key: "Membership fee annual record key",
+  School: "School",
+  School_year_link: "School year link",
+  School_history_status: "School history status",
+  _990: "990",
+  Revenue: "Revenue",
+  Fee_level_as_a_share_of_revenue__from_School_year_: "Fee level as a share of revenue (from School year)",
+  New_school_fee_amount__from_School_year_: "New school fee amount (from School year)",
+  Initial_fee: "Initial fee",
+  Membership_fee_updates: "Membership fee updates",
+  Opened__from_Schools_: "Opened (from Schools)",
+  nth_year: "nth year",
+  Initial_exemption_status: "Initial exemption status",
+  Likelihood_of_paying: "Likelihood of paying",
+  Revised_amount: "Revised amount",
+  Payments: "Payments",
+  Amount_receivable: "Amount receivable",
+  Projection: "Projection",
+  AI_Derived_EOY_Date__from_990_: "AI Derived EOY Date (from 990)",
+  AI_Derived_Revenue__from_990_: "AI Derived Revenue (from 990)",
+  _990_Reporting_Year__from_990_: "990 Reporting Year (from 990)",
+  End_date__from_School_year_: "End date (from School year)",
+  Charter: "Charter",
+  Current_exemption_status: "Current exemption status",
+  mem_fee_annual_id: "mem_fee_annual_id",
+  school_id__from_School_: "school_id (from School)",
+  School_year: "School year",
+} as const;
+export const MEMBERSHIP_FEE_SCHOOL_X_YEAR_OPTIONS_SCHOOL_HISTORY_STATUS: string[] = [
+  "Emerging",
+  "Open"
+];
+export const MEMBERSHIP_FEE_SCHOOL_X_YEAR_OPTIONS_INITIAL_EXEMPTION_STATUS: string[] = [
+  "Exempt",
+  "Non-exempt"
+];
+
+// === Membership fee updates ===
+export const MEMBERSHIP_FEE_UPDATES_FIELDS = {
+  mem_fee_update_id: "mem_fee_update_id",
+  Fee_Record: "Fee Record",
+  Update_type: "Update type",
+  Explanation: "Explanation",
+  Attachment: "Attachment",
+  Amount_paid: "Amount paid",
+  Date: "Date",
+  New_percent: "New percent",
+  Revised_fee_amount: "Revised fee amount",
+  New_exemption_status: "New exemption status",
+  Attachment_link: "Attachment link",
+} as const;
+export const MEMBERSHIP_FEE_UPDATES_OPTIONS_UPDATE_TYPE: string[] = [
+  "Change in fee",
+  "Payment received",
+  "Change likelihood of payment",
+  "Change in exemption status"
+];
+export const MEMBERSHIP_FEE_UPDATES_OPTIONS_NEW_PERCENT: string[] = [
+  "100%",
+  "75%",
+  "50%",
+  "25%",
+  "0%"
+];
+export const MEMBERSHIP_FEE_UPDATES_OPTIONS_NEW_EXEMPTION_STATUS: string[] = [
+  "Non-exempt",
+  "Exempt"
+];

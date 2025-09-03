@@ -1,0 +1,86 @@
+
+
+// === Platform Educators & Partners ===
+export const PLATFORM_EDUCATORS___PARTNERS_FIELDS = {
+  first_name: "first_name",
+  middle_name: "middle_name",
+  last_name: "last_name",
+  email: "email",
+  raw_address: "raw_address",
+  hub: "hub",
+  pod: "pod",
+  tc_user_id: "tc_user_id",
+  prosperworks_id: "prosperworks_id",
+  willing_to_relocate: "willing_to_relocate",
+  primary_language: "primary_language",
+  race_ethnicity_other: "race_ethnicity_other",
+  household_income: "household_income",
+  income_background: "income_background",
+  gender: "gender",
+  gender_other: "gender_other",
+  lgbtqia: "lgbtqia",
+  pronouns: "pronouns",
+  pronouns_other: "pronouns_other",
+  original_record_id: "original_record_id",
+  stage: "stage",
+  montessori_certified: "montessori_certified",
+  languages: "languages",
+  race_ethnicity: "race_ethnicity",
+  roles: "roles",
+  Platform_Educators_x_Schools: "Platform Educators x Schools",
+  phone: "phone",
+  montessori_certified_year: "montessori_certified_year",
+} as const;
+
+// === Platform School ===
+export const PLATFORM_SCHOOL_FIELDS = {
+  name: "name",
+  hub: "hub",
+  pod: "pod",
+  status: "status",
+  website: "website",
+  phone: "phone",
+  email: "email",
+  email_domain: "email_domain",
+  governance_model: "governance_model",
+  calendar: "calendar",
+  enrollment_at_full_capacity: "enrollment_at_full_capacity",
+  facebook: "facebook",
+  instagram: "instagram",
+  logo_url: "logo_url",
+  time_zone: "time_zone",
+  address: "address",
+  opened_on: "opened_on",
+  original_record_id: "original_record_id",
+  charter: "charter",
+  about: "about",
+  about_es: "about_es",
+  hero_image_url: "hero_image_url",
+  hero_image2_url: "hero_image2_url",
+  URL: "URL",
+  affiliation_date: "affiliation_date",
+  number_of_classrooms: "number_of_classrooms",
+  Platform_Educators_x_Schools: "Platform Educators x Schools",
+  Schools_copy: "Schools copy",
+} as const;
+export const PLATFORM_SCHOOL_OPTIONS_STATUS: string[] = [
+  "Paused",
+  "Placeholder",
+  "Emerging",
+  "Open",
+  "Permanently Closed",
+  "Disaffiliated",
+  "Abandoned"
+];
+
+// === Platform Educators x Schools ===
+export const PLATFORM_EDUCATORS_X_SCHOOLS_FIELDS = {
+  name: "name",
+  platform_school_record_id: "platform_school_record_id",
+  platform_person_record_id: "platform_person_record_id",
+  start_date: "start_date",
+  end_date: "end_date",
+  original_record_id: "original_record_id",
+  Educators_x_Schools_copy: "Educators x Schools copy",
+  roles: "roles",
+} as const;

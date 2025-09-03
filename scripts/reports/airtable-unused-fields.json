@@ -1,0 +1,1234 @@
+[
+  {
+    "group": "ASSESSMENT_DATA_FIELDS",
+    "alias": "ADF",
+    "totals": {
+      "used": 4,
+      "total": 19
+    },
+    "used": [
+      "Assessment",
+      "charter_id",
+      "Other_data",
+      "Year"
+    ],
+    "unused": [
+      "assessment_data_id", 
+      "Assessment_Data_key",
+      "Charter",
+      "Met_or_exceeds___all",
+      "Met_or_exceeds___BIPOC",
+      "Met_or_exceeds___ELL",
+      "Met_or_exceeds___FRL",
+      "Met_or_exceeds___SPED",
+      "Number_assessed", xx
+      "Number_assessed___BIPOC",
+      "Number_assessed___ELL",
+      "Number_assessed___FRL",
+      "Number_assessed___SPED",
+      "School", 
+      "school_id" xx
+    ]
+  },
+  {
+    "group": "ACTION_STEPS_FIELDS",
+    "alias": "ASF",
+    "totals": {
+      "used": 11,
+      "total": 15
+    },
+    "used": [
+      "Assigned_date",
+      "Assignee",
+      "Assignee_Short_Name",
+      "charter_id",
+      "Due_date",
+      "Item",
+      "School",
+      "school_id",
+      "School_Short_Name",
+      "Schools",
+      "Status"
+    ],
+    "unused": [
+      "action_step_id", 
+      "Completed_date", xx
+      "Partners_copy",
+      "School_Status",
+      "SSJ_Stage"
+    ]
+  },
+  {
+    "group": "CHARTER_AUTHORIZERS_AND_CONTACTS_FIELDS",
+    "alias": "CACF",
+    "totals": {
+      "used": 5,
+      "total": 9
+    },
+    "used": [
+      "Authorizer",
+      "charter_id",
+      "Contact",
+      "Email",
+      "Phone"
+    ],
+    "unused": [
+      "Charter",
+      "Charter_authorizer_key",
+      "Currently_active", xx
+      "Title" xx
+    ]
+  },
+  {
+    "group": "CHARTER_APPLICATIONS_FIELDS",
+    "alias": "CAF",
+    "totals": {
+      "used": 4,
+      "total": 59
+    },
+    "used": [
+      "charter_id",
+      "Full_Name",
+      "Status",
+      "Target_open"
+    ],
+    "unused": [
+      "__of_students",
+      "App_submission_deadline",
+      "App_submitted",
+      "Application_window",
+      "Authorizer",
+      "Authorizer_decision",
+      "Authorizer_decision_expected_date",
+      "Authorizer_decision_rec_d",
+      "Beginning_age",
+      "Board_members",
+      "Board_membership_agreement_signed",
+      "Budget_planning_exercises",
+      "Capacity_Interview_Complete",
+      "Capacity_Interview_Projected_Date",
+      "Capacity_interview_training_complete",
+      "Charter",
+      "charter_app_id",
+      "Charter_App_key",
+      "Charter_app_project_mgmt_plan_complete",
+      "Charter_app_roles_ID_d",
+      "Charter_app_walkthrough",
+      "Charter_design",
+      "Charter_Design_Advice_Session_Complete",
+      "Charter_level_membership_agreement_signed",
+      "Cohorts__from_Charter_",
+      "Community_engagement_plan_launched",
+      "Current_TL_discovery_status",
+      "Current_TLs__from_Schools___from_Charter_",
+      "Ending_age",
+      "Expected_decision",
+      "Final_budget",
+      "Grades",
+      "Internal_WF_support_launch_meeting",
+      "Joint_kickoff_meeting",
+      "Joint_kickoff_meeting_complete",
+      "Key_dates",
+      "Landscape_analysis__from_Charter_",
+      "Letter_of_Intent_deadline",
+      "Letter_of_Intent_req_d",
+      "Likelihood_of_authorization",
+      "Likelihood_of_opening_on_time",
+      "Logic_model_complete",
+      "LOI",
+      "LOI_submitted",
+      "Membership_status_of_schools",
+      "Milestones",
+      "Most_recent_application",
+      "Nonprofit_status",
+      "Opportunities_and_challenges",
+      "Short_Name",
+      "Support_timeline",
+      "Target_community__from_Charter_",
+      "Team_members",
+      "Team_members__excl__board_",
+      "TL_membership_agreement_signed"
+    ]
+  },
+  {
+    "group": "CHARTERS_FIELDS",
+    "alias": "CHF",
+    "totals": {
+      "used": 6,
+      "total": 59
+    },
+    "used": [
+      "Full_name",
+      "Initial_target_ages",
+      "Initial_target_community",
+      "Projected_open",
+      "Short_Name",
+      "Status"
+    ],
+    "unused": [
+      "_990_Record_ID__from_990s_",
+      "_990s",
+      "Annual_enrollment_and_demographics",
+      "Application",
+      "Authorized",
+      "Charter_applications",
+      "charter_assessment_id",
+      "Charter_assessments",
+      "Charter_authorizers_and_contacts",
+      "charter_id",
+      "Charter_key",
+      "Charter_level_membership_agreement",
+      "Charter_level_membership_agreement_signed",
+      "Cohorts",
+      "Contact_Email__from_External_Initiator_s__",
+      "Current_FY_end",
+      "Current_TLs__from_Schools_",
+      "Currently_active__from_Non_TL_roles_",
+      "Date_received_group_exemption",
+      "Doc_ID__from_School_governance_documents_",
+      "EIN",
+      "First_site_opened",
+      "Group_Exemption_Status",
+      "GuideStar_Listing_Requested_",
+      "Incorporation_Date",
+      "Initial_target_ages_link",
+      "Landscape_analysis",
+      "Linked_Schools",
+      "Location_ID__from_Locations_",
+      "Locations",
+      "Membership_fee_school_x_year",
+      "Membership_status_of_schools",
+      "Name__from_Non_TL_roles_",
+      "Non_TL_roles",
+      "Nondiscrimination_Policy_on_Website",
+      "Nonprofit_status",
+      "Partnership_with_WF_started",
+      "recID__from_Charter_applications_",
+      "recId__from_Charter_authorizers_and_contacts_",
+      "recID__from_Membership_fee_school_x_year_",
+      "RecID__from_School_reports_",
+      "Record_ID__from_Schools_",
+      "Role__from_Non_TL_roles_",
+      "School_governance_documents",
+      "School_provided_with_1023_recordkeeping_requirements",
+      "School_reports",
+      "Schools",
+      "Support_timeline",
+      "Target_open__from_Charter_applications_",
+      "TL_discovery_status",
+      "Total_Emerging_Schools__from_Schools_",
+      "Total_Open_Schools__from_Schools_",
+      "Website"
+    ]
+  },
+  {
+    "group": "CHARTER_ROLES_FIELDS",
+    "alias": "CRF",
+    "totals": {
+      "used": 4,
+      "total": 18
+    },
+    "used": [
+      "charter_id",
+      "Currently_active",
+      "Name",
+      "Role"
+    ],
+    "unused": [
+      "Charter",
+      "Charter_applications",
+      "Charter_applications_2",
+      "charter_role_id",
+      "Charter_role_key",
+      "Current_Primary_Email_Address__from_Educator_record_",
+      "Educator_record",
+      "Email",
+      "End_date",
+      "Phone",
+      "Race___Ethnicity__from_Educator_record_",
+      "Start_date",
+      "Status__from_Charter_",
+      "Title"
+    ]
+  },
+  {
+    "group": "EMAIL_ADDRESSES_FIELDS",
+    "alias": "EAF",
+    "totals": {
+      "used": 5,
+      "total": 7
+    },
+    "used": [
+      "Active_",
+      "Current_Primary_Email",
+      "educator_id",
+      "Email_Address",
+      "Email_Type"
+    ],
+    "unused": [
+      "Educator",
+      "email_address_id"
+    ]
+  },
+  {
+    "group": "EVENT_ATTENDANCE_FIELDS",
+    "alias": "EATF",
+    "totals": {
+      "used": 5,
+      "total": 70
+    },
+    "used": [
+      "Attended",
+      "educator_id",
+      "Event",
+      "Registered",
+      "Registration_Date"
+    ],
+    "unused": [
+      "Age_Classrooms_Interested_in_Offering__from_Event_Participant_",
+      "Age_Classrooms_Interested_in_Offering__from_Event_Participant__2",
+      "Assigned_Partner__from_Event_Participant_",
+      "Assigned_Partner__from_Event_Participant__2",
+      "CountofLoggedDiscover__from_Event_Participant_",
+      "CountofLoggedPlannings__from_Event_Participant_",
+      "CountofLoggedVisioning__from_Event_Participant_",
+      "Created__from_Event_Participant_",
+      "Created__from_Event_Participant__2",
+      "Created_date",
+      "Current_School__from_Event_Participant_",
+      "Current_School__from_Event_Participant__2",
+      "Educator_record_created",
+      "Educators_at_Schools__from_Event_Participant_",
+      "Educators_at_Schools__from_Event_Participant__2",
+      "Entry_Date__from_Start_a_School_form___from_Educators_",
+      "Event_Attendance_key",
+      "Event_Name",
+      "Event_Participant",
+      "Event_Type",
+      "Field_10",
+      "Field_11",
+      "Field_12",
+      "Field_13",
+      "Field_15",
+      "Field_16",
+      "Field_17",
+      "Field_18",
+      "First_visioning__from_Event_Participant_",
+      "First_visioning__from_Event_Participant__2",
+      "Full_Name__from_Event_Participant_",
+      "Household_Income__from_Event_Participant_",
+      "Household_Income__from_Event_Participant__2",
+      "Hub__from_Event_Participant_",
+      "Hub__from_Event_Participant__2",
+      "Hub_Name__from_Event_Participant_",
+      "Income_Background__from_Event_Participant_",
+      "Income_Background__from_Event_Participant__2",
+      "Marketing_source",
+      "Montessori_Certifications__from_Event_Participant_",
+      "Montessori_Certified__from_Event_Participant_",
+      "needs_spanish_translation",
+      "Network",
+      "Phone",
+      "Race___Ethnicity__from_Event_Participant_",
+      "Race___Ethnicity__from_Event_Participant__2",
+      "School_Status__from_Event_Participant_",
+      "School_Status__from_Event_Participant__2",
+      "Source__from_SSJ_Typeforms__Start_a_School___from_Event_Participant_",
+      "SSJ_Typeforms__Start_a_School",
+      "SSJ_Typeforms__Start_a_School__from_Event_Participant_",
+      "Stage__from_Event_Participant_",
+      "Stage__from_Event_Participant__2",
+      "Stage_change_from_Discovery_to_Visioning__from_Event_Participant_",
+      "Stage_change_from_visioning_to_planning__from_Event_Participant_",
+      "Started_SSJ___completed_SSJ_typeform_",
+      "Status__from_Event_Participant_",
+      "Status__from_Event_Participant__2",
+      "Time_at_event",
+      "TL_Stories_Q1",
+      "TL_Stories_Q2",
+      "TL_Stories_Race",
+      "TL_Stories_School_Target",
+      "TL_Stories_Type",
+      "When_did_they_switch_to_visioning"
+    ]
+  },
+  {
+    "group": "EDUCATORS_FIELDS",
+    "alias": "EF",
+    "totals": {
+      "used": 58,
+      "total": 117
+    },
+    "used": [
+      "Archived",
+      "Assigned_Partner",
+      "Assigned_Partner_Email",
+      "Assigned_Partner_Override",
+      "Created",
+      "Created_By",
+      "Current_Primary_Email_Address",
+      "Current_Role",
+      "Currently_Active_School",
+      "Discovery_status",
+      "Educational_Attainment",
+      "Email_sent_by_Initial_Outreacher_",
+      "First_contact___initial_interest_in_ages",
+      "First_contact___Initial_Interest_in_Governance_Model",
+      "First_contact___initial_interests",
+      "First_contact___Notes_on_pre_Wildflower_employment",
+      "First_contact___WF_School_employment_status",
+      "First_contact___Willingness_to_relocate",
+      "First_Name",
+      "Full_Name",
+      "Gender",
+      "Gender___Other",
+      "Home_Address",
+      "Household_Income",
+      "Inactive_Flag",
+      "Income_Background",
+      "Individual_Type",
+      "Last_Modified",
+      "Last_Name",
+      "LGBTQIA",
+      "Middle_Name",
+      "Montessori_Certified",
+      "Montessori_lead_guide_trainings",
+      "Nickname",
+      "Ops_Guide_Any_fundraising_opportunities_",
+      "Ops_Guide_Meeting_Preference_Time",
+      "Ops_Guide_Request_Pertinent_Info",
+      "Ops_Guide_Specifics_Checklist",
+      "Ops_Guide_Support_Type_Needed",
+      "Other_languages",
+      "Person_responsible_for_follow_up",
+      "Primary_Language",
+      "Primary_phone",
+      "Pronouns",
+      "Pronouns___Other",
+      "Race___Ethnicity",
+      "Race___Ethnicity___Other",
+      "Routed_To",
+      "Secondary_phone",
+      "SendGrid_sent_date",
+      "SendGrid_template_id",
+      "Source",
+      "Stage_Status_for_Active_School",
+      "Target___international",
+      "Target_city",
+      "Target_geo_combined",
+      "Target_state",
+      "TC_User_ID"
+    ],
+    "unused": [
+      "Active_Holaspirit",
+      "Active_School_Affiliation_Status",
+      "Active_School_Record_ID",
+      "All_Schools",
+      "Also_a_partner",
+      "Assigned_Partner_Override__from_SSJ_Fillout_Forms_",
+      "Assigned_Partner_Short_Name", xx
+      "Automations",
+      "Board_Service", xx
+      "Certification_Levels__from_Montessori_Certifications_",
+      "Certifier__from_Montessori_Certifications_",
+      "Charter_admin_roles",
+      "Cohorts", xx
+      "Contact_Form_Details__from_SSJ_data_on_educators_",
+      "Count_of_Get_Involved_Forms",
+      "CountofLinkedSchools",
+      "Create_stint_for_existing_school",
+      "Currently_Active_at_a_School_",
+      "Dedupe_with",
+      "educator_id",
+      "Educator_notes",
+      "educator_notes_id",
+      "Educators_at_Schools",
+      "educatorsXschools_id",
+      "Email_Addresses",
+      "email_id",
+      "emails",
+      "Entry_Date__from_SSJ_Fillout_Forms_",
+      "Errors",
+      "Events_attended",
+      "Ever_a_TL_in_an_open_school",
+      "Exclude_from_email_logging", xx
+      "FormerlyActive",
+      "Holaspirit_memberID",
+      "Last_Modified_Trigger",
+      "meeting_id",
+      "Meetings",
+      "Message__from_SSJ_Fillout_Forms_",
+      "montessori_cert_id",
+      "Montessori_Certifications",
+      "Most_recent_fillout_form",
+      "Newsletter_and_Group_Subscriptions",
+      "Notes__from_Educator_notes_",
+      "On_school_board",xx
+      "Onboarding_Experience",
+      "Open_educator_interface",
+      "Partners_copy",
+      "Platform_Educators___Partners",
+      "Primary_contact_for",
+      "Pronunciation",xx
+      "Race_and_Ethnicity",xx
+      "School_Address",
+      "School_Statuses",
+      "Schools",
+      "Self_reflection",xx
+      "Source___other",xx
+      "ssj_fillout_form_id",
+      "SSJ_Fillout_Forms",
+      "ssj_old_start_a_school_id",
+      "SSJ_Typeforms__Start_a_School__from_SSJ_data_on_educators_",
+      "Startup_Stage_for_Active_School",
+      "Status_for_Active_School",
+      "survey___2022_Wildflower_Network_Survey",
+      "Tags",
+      "Training_Grants"
+    ]
+  },
+  {
+    "group": "EDUCATOR_NOTES_FIELDS",
+    "alias": "ENF",
+    "totals": {
+      "used": 5,
+      "total": 11
+    },
+    "used": [
+      "Created_by",
+      "Date",
+      "educator_id",
+      "Notes",
+      "Private"
+    ],
+    "unused": [
+      "Contact_email__from_Educator_",
+      "Educator",
+      "Educator_Note_Key",
+      "educator_notes_id",
+      "Full_Name__from_Educator_",
+      "Partners_copy"
+    ]
+  },
+  {
+    "group": "EDUCATORS_X_SCHOOLS_FIELDS",
+    "alias": "EXSF",
+    "totals": {
+      "used": 13,
+      "total": 67
+    },
+    "used": [
+      "Created",
+      "Currently_Active",
+      "Educator",
+      "Educator_Full_Name",
+      "educator_id",
+      "Email_at_School",
+      "End_Date",
+      "Roles",
+      "School",
+      "school_id",
+      "School_Name",
+      "Stage_Status",
+      "Start_Date"
+    ],
+    "unused": [
+      "_21_22_Completed_Demographic_Info_",
+      "Ages_served",
+      "Charter__from_School_",
+      "charter_id",
+      "Create_educator_record",
+      "Current_Physical_Address___State__from_School_",
+      "Current_Physical_Address___State__from_School__2",
+      "educatorsXschools_id",
+      "edXschool_key",
+      "Email_Status",
+      "Entered_Planning",
+      "Entered_Startup",
+      "Entered_Visioning__from_School_",
+      "First_Name__from_Educator_",
+      "Gender__from_socio_economic_background_",
+      "Governance_Model__from_School_",
+      "GSuite_Roles",
+      "Income_background",
+      "Invited_to_2024_Refresher",
+      "LGBTQIA__from_Socio_economic_Background___from_Educator_",
+      "Loan__from_Loans___Issue_Method___from_School_",
+      "Loan_Fund_",
+      "Loans",
+      "Membership_Agreement_date__from_School_",
+      "Membership_Status",
+      "Montessori_Cert_Levels",
+      "Montessori_Certifications",
+      "Montessori_Certified_",
+      "Montessori_Certs__from_Montessori_Cert_Levels_",
+      "On_Connected",
+      "On_National_Website",
+      "On_Slack",
+      "On_Teacher_Leader_Google_Group",
+      "On_Wildflower_Directory",
+      "Open_school_interface",
+      "Open_TL_interface",
+      "Opened__from_School_",
+      "Platform_Educators_x_Schools",
+      "Primary_Language__from_languages___socio_economic_background_",
+      "Race___Ethnicity__from_Educator_",
+      "School_Address",
+      "School_Cohort",
+      "School_Short_Name",
+      "School_Status",
+      "Schools",
+      "Signed_TL_Acknowledgement___Commitment_to_Membership",
+      "SSJ___Projected_Open__from_School_",
+      "SSJ___Projected_Open__from_Schools_",
+      "SSJ___Target_State__from_School_",
+      "SSJ___Target_State__from_Schools_",
+      "SSJ_Stage",
+      "TL_discovery_status",
+      "TL_Gift_2022",
+      "Who_initiated_E_TL_removal_"
+    ]
+  },
+  {
+    "group": "GUIDES_ASSIGNMENTS_FIELDS",
+    "alias": "GASF",
+    "totals": {
+      "used": 8,
+      "total": 11
+    },
+    "used": [
+      "Currently_active",
+      "End_date",
+      "Guide_short_name",
+      "Partner",
+      "School",
+      "school_id",
+      "Start_date",
+      "Type"
+    ],
+    "unused": [
+      "guide_assignment_id",
+      "Guide_Assignment_key",
+      "School_Short_Name"
+    ]
+  },
+  {
+    "group": "GOVERNANCE_DOCS_FIELDS",
+    "alias": "GDF",
+    "totals": {
+      "used": 6,
+      "total": 16
+    },
+    "used": [
+      "charter_id",
+      "Created",
+      "Date",
+      "Document_PDF",
+      "Document_type",
+      "School"
+    ],
+    "unused": [
+      "Charter",
+      "Doc_Key",
+      "Doc_Link",
+      "Doc_notes",xx
+      "EIN__from_School_",
+      "govdoc_id",
+      "Publication_link",
+      "school_id",xx
+      "Short_Name__from_School_",
+      "url___pdf_extension_formula"
+    ]
+  },
+  {
+    "group": "GRANTS_FIELDS",
+    "alias": "GF",
+    "totals": {
+      "used": 4,
+      "total": 68
+    },
+    "used": [
+      "Amount",
+      "Grant_Status",
+      "Issue_Date",
+      "school_id"
+    ],
+    "unused": [
+      "Accounting_Notes",xx
+      "Advice_window__1_week__closed",xx
+      "Automation_step_trigger",xx
+      "Bill_com",xx
+      "Count_of_Active_Mailing_Addresses__from_School_",xx
+      "Current_Mailing_Address__from_School_",xx
+      "Current_TLs",
+      "Current_TLs_first_names",
+      "Days_since_full_advice_request",xx
+      "Days_since_prelim_advice_request",xx
+      "EIN",
+      "EIN_at_time_of_grant",xx
+      "Full_Advice_Open_Objections",xx
+      "Full_Advice_Open_Questions",xx
+      "Full_advice_request_time",xx
+      "Full_Advice_Status_Rollup__from_Grants_Advice_Log_",xx
+      "Full_Advice_Yeses",xx
+      "Funding_Hub",
+      "Funding_period__for_grant_agreement_",xx
+      "Funding_purpose__for_grant_agreement_",xx
+      "Funding_Source",xx
+      "grant_id",
+      "Grant_Key",
+      "Grants_Advice_Log",
+      "GuideEntrepreneur_Short_Name",
+      "Have_data_to_issue_grant_letter",xx
+      "Initiate_grant_process",xx
+      "Issued_by",xx
+      "Issued_by_Name",
+      "Issued_by_Short_Name",xx
+      "Label",
+      "Legal_Name_at_time_of_grant",xx
+      "Legal_Name_of_School",xx
+      "Logo__from_School_",
+      "Mailing_address",xx
+      "Mailing_address_at_time_of_grant",xx
+      "Membership_Status__from_School_",
+      "Membership_status_at_time_of_grant",xx
+      "Nonprofit_status",
+      "Nonprofit_status_at_time_of_grant",xx
+      "Notes",xx
+      "Open_grant",
+      "Partners_copy",
+      "Prelim_Advice_Pauses",xx
+      "Prelim_advice_request_time",xx
+      "Prelim_Advice_Status_Rollup",xx
+      "Prelim_Advice_Yes_Names",xx
+      "Prelim_Advice_Yeses",xx
+      "Primary_Contact_Email__from_School_",
+      "Primary_Contacts__from_School_",
+      "Proof_of_501_c_3_status_at_time_of_grant",xx
+      "QBO__",xx
+      "Ready_to_accept_grant__501c3___EIN_",xx
+      "Recipient_name_from_QBO",
+      "School",
+      "School_Contact_Emails__from_School_",
+      "School_Grant_Name",
+      "School_Short_Name",
+      "Signed_Grant_Agreement",xx
+      "Text_for_ledger_entry",xx
+      "TL_emails",
+      "TL_emails_at_time_of_grant",xx
+      "TLs_at_time_of_grant",xx
+      "Unsigned_Grant_Agreement"xx
+    ]
+  },
+  {
+    "group": "LOCATIONS_FIELDS",
+    "alias": "LF",
+    "totals": {
+      "used": 10,
+      "total": 35
+    },
+    "used": [
+      "Address",
+      "Created",
+      "Current_mailing_address_",
+      "Current_physical_address_",
+      "End_of_time_at_location",
+      "Last_Modified",
+      "School",
+      "school_id",
+      "Short_Name",
+      "Start_of_time_at_location"
+    ],
+    "unused": [
+      "Census_Tract",xx
+      "Charter",
+      "charter_id",xx
+      "City",xx
+      "Co_Location_Partner_",xx
+      "Co_Location_Type",xx
+      "Country",xx
+      "Geocode_Automation_Last_Run_At",
+      "Inactive_without_end_date__or_active_with_end_date",
+      "Latitude",xx
+      "Lease",xx
+      "Lease_End_Date",xx
+      "location_id",
+      "Location_Key",
+      "Location_type",xx
+      "Longitude",xx
+      "Max_Students_Licensed_For",xx
+      "Neighborhood",xx
+      "Postal_code",xx
+      "Qualified_Low_Income_Census_Tract",xx
+      "School_Status__from_School_",
+      "Square_feet",xx
+      "State",xx
+      "Street",xx
+      "Time_Zone"xx
+    ]
+  },
+  {
+    "group": "LOANS_FIELDS",
+    "alias": "LNF",
+    "totals": {
+      "used": 4,
+      "total": 18
+    },
+    "used": [
+      "Amount_Issued",
+      "Effective_Issue_Date",
+      "Loan_Status",
+      "school_id"
+    ],
+    "unused": [
+      "Approximate_Outstanding_Amount",
+      "Contact_email__from_Educator___from_Educators_x_Schools___from_School_",
+      "Educators_x_Schools",
+      "Interest_Rate",
+      "Issue_Method",
+      "Loan_Contact_Email_1",
+      "Loan_Contact_Email_2",
+      "loan_id",
+      "Loan_Key",
+      "Loan_paperwork",
+      "Maturity",
+      "Notes",
+      "School",
+      "Use_of_Proceeds"
+    ]
+  },
+  {
+    "group": "MONTESSORI_CERTS_FIELDS",
+    "alias": "MCF",
+    "totals": {
+      "used": 6,
+      "total": 13
+    },
+    "used": [
+      "Abbreviation",
+      "Certification_Status",
+      "Created",
+      "educator_id",
+      "Level",
+      "Year_Certified"
+    ],
+    "unused": [
+      "Certification_Levels",xx
+      "Certifier",xx
+      "Certifier___Other",xx
+      "Educator",
+      "Field_12",
+      "montessori_cert_id",
+      "Montessori_Cert_key"
+    ]
+  },
+  {
+    "group": "_990S_FIELDS",
+    "alias": "N9F",
+    "totals": {
+      "used": 3,
+      "total": 21
+    },
+    "used": [
+      "_990_Reporting_Year",
+      "PDF",
+      "school_id"
+    ],
+    "unused": [
+      "_990_key",
+      "AI_Derived_EOY_Date",
+      "AI_Derived_Revenue",
+      "charter_id",xx
+      "Charter_key",
+      "EIN",
+      "Group_Exemption",
+      "Incorporation_Date__from_School_ID_",
+      "Legal_structure__from_School_",
+      "link",
+      "Membership_fee_school_x_year",
+      "nine_ninety_id",
+      "Notes",xx
+      "School",
+      "short_name",xx
+      "Short_Name__from_School_ID_",
+      "supabase_id",
+      "url___pdf_extension_formula"
+    ]
+  },
+  {
+    "group": "REPORTS_AND_SUBMISSIONS_FIELDS",
+    "alias": "RSF",
+    "totals": {
+      "used": 2,
+      "total": 6
+    },
+    "used": [
+      "charter_id",
+      "Report_type"
+    ],
+    "unused": [
+      "Attachments",xx
+      "Charter",
+      "reports_id",
+      "School_year"xx
+    ]
+  },
+  {
+    "group": "SCHOOLS_FIELDS",
+    "alias": "SF",
+    "totals": {
+      "used": 110,
+      "total": 219
+    },
+    "used": [
+      "About",
+      "About_Spanish",
+      "activeLatitude",
+      "activeLongitude",
+      "Admissions_System",
+      "Ages_served",
+      "Agreement_Version_",
+      "Bill_com_account",
+      "Bookkeeper___Accountant",
+      "Budget_Link",
+      "Budget_Utility",
+      "Building4Good_Firm___Attorney",
+      "Business_Insurance",
+      "Cohorts",
+      "Created",
+      "Current_FY_end",
+      "Current_Guides",
+      "Current_Mailing_Address",
+      "Current_Physical_Address",
+      "Current_Physical_Address___City",
+      "Current_Physical_Address___State",
+      "Current_TLs",
+      "Date_received_group_exemption",
+      "Date_withdrawn_from_Group_Exemption",
+      "EIN",
+      "Enrollment_at_Full_Capacity",
+      "Entered_Planning_Date",
+      "Entered_Startup_Date",
+      "Entered_Visioning_Date",
+      "Errors",
+      "Facebook",
+      "Founders",
+      "Google_Voice",
+      "Google_Workspace_Org_Unit_Path",
+      "Governance_Model",
+      "Group_exemption_status",
+      "Gusto",
+      "Incorporation_Date",
+      "Instagram",
+      "Institutional_partner",
+      "Last_Modified",
+      "Left_Network_Date",
+      "Left_Network_Reason",
+      "Legal_Name",
+      "Legal_structure",
+      "Logo",
+      "Logo___flower_only",
+      "Logo___main_rectangle",
+      "Logo___main_square",
+      "Logo_designer",
+      "Logo_URL",
+      "Membership_Agreement_date",
+      "Membership_Status",
+      "Membership_termination_letter",
+      "Name",
+      "Name_Selection_Proposal",
+      "Narrative",
+      "Nonprofit_status",
+      "Number_of_classrooms",
+      "Opened",
+      "Planning_album",
+      "Prior_Names",
+      "Program_Focus",
+      "Public_funding_sources",
+      "QBO",
+      "Risk_Factors",
+      "School_calendar",
+      "School_Email",
+      "School_Phone",
+      "School_schedule",
+      "School_Status",
+      "Self_reflection",
+      "Short_Name",
+      "Signed_Membership_Agreement",
+      "SSJ___Amount_raised",
+      "SSJ___Board_development",
+      "SSJ___Building4Good_Status",
+      "SSJ___Cohort_Status",
+      "SSJ___Date_shared_with_N4G__from_SSJ_Process_Details_",
+      "SSJ___Does_the_school_have_a_viable_pathway_to_funding_",
+      "SSJ___Facility",
+      "SSJ___Fundraising_narrative",
+      "SSJ___Gap_in_Funding",
+      "SSJ___Has_the_ETL_identified_a_partner_",
+      "SSJ___Is_the_budget_at_a_stage_that_will_allow_the_ETL_s__to_take_their_next_steps_",
+      "SSJ___Is_the_school_planning_to_apply_for_internal_Wildflower_funding_",
+      "SSJ___Is_the_team_on_track_for_their_enrollment_goals_",
+      "SSJ___Loan_approved_amt",
+      "SSJ___Loan_eligibility",
+      "SSJ___Name_Reserved",
+      "SSJ___Ops_Guide_Support_Track",
+      "SSJ___Original_Projected_Open_Date",
+      "SSJ___Proj_Open_School_Year",
+      "SSJ___Projected_Open",
+      "SSJ___Readiness_to_Open_Rating",
+      "SSJ___Target_City",
+      "SSJ___Target_State",
+      "SSJ___Total_Startup_Funding_Needed",
+      "SSJ___What_is_the_next_big_decision_or_action_this_school_is_working_on_",
+      "SSJ_Stage",
+      "Stage_Status",
+      "TC_Admissions",
+      "TC_Recordkeeping",
+      "Trademark_filed",
+      "Transparent_Classroom",
+      "Visioning_album",
+      "Visioning_album_complete",
+      "Watchlist",
+      "Website",
+      "Website_tool"
+    ],
+    "unused": [
+      "__of_African_American_students",
+      "__of_Asian_American_students",
+      "__of_forms_sent",
+      "__of_Students",
+      "_2022_990_present_",
+      "_990_attachment",
+      "_990s",
+      "action_step_id",
+      "Action_steps",
+      "Active_guides",
+      "Active_Pod_Member",
+      "Annual_enrollment_and_demographics",
+      "Archived",xx
+      "Automation_notes",
+      "Board_Service",
+      "Charter",
+      "Charter_assessments",
+      "charter_id",xx
+      "Charter_Short_Name",
+      "Count_of_Active_Mailing_Addresses",
+      "Count_of_Active_Physical_Addresses",
+      "CountofActiveGuides",
+      "Create_guide_assignment",
+      "Create_stint_for_existing_educator_at_school",
+      "Create_termination_record",
+      "Created_By",xx
+      "Cumulative_membership_fees_outstanding",
+      "Cumulative_membership_fees_paid",
+      "Current_TLs_discovery_status",
+      "Current_TLs_first_names",
+      "Current_year_fee",
+      "Dedupe_school_with",
+      "Domain_Name",xx
+      "Educators",
+      "Educators_x_Schools",
+      "Educators_x_Schools_2",
+      "educatorsXschools_id",
+      "Email_at_School__from_Educators_x_Schools_",
+      "Email_Domain",xx
+      "Emails",
+      "Family_Survey",
+      "Family_survey___schools",
+      "family_survey_id",
+      "Family_survey_non_TC_data_2021_22",
+      "Fill_in_left_network_details",
+      "Flexible_Tuition_Model",
+      "Founding_Documents",
+      "FRL",
+      "global_majority",
+      "grant_id",
+      "Grants__WF_",
+      "Guide_assignment",
+      "guide_assignment_id",
+      "Guide_assignments",
+      "Guide_email",
+      "GuideStar_Listing_Requested_",
+      "Hero_Image_2_Url",
+      "Hero_Image_Url",
+      "High_Income__from_Family_Survey_",
+      "Is_there_a_2022_990_",
+      "Last_Modified_By",
+      "Last_Modified_Trigger",
+      "Latinx__from_Family_Survey_",
+      "Lease",
+      "Lease_End_Date",
+      "Loan__from_Loans___Issue_Method_",
+      "loan_id",
+      "Loan_payments",
+      "Loan_Report_Name",
+      "Loans",
+      "location_id",
+      "Locations",
+      "Low_Income",
+      "Medium_Income",
+      "Meetings",
+      "Membership_fee_records",
+      "Membership_fee_recs",
+      "Membership_termination_steps",
+      "Middle_Eastern",
+      "Native_American__from_Family_Survey_",
+      "nine_ninety_id",
+      "Nondiscrimination_Policy_on_Application",xx
+      "Nondiscrimination_Policy_on_Website",xx
+      "On_national_website",xx
+      "Open_grants_interface",
+      "Open_grants_link",
+      "Open_S_S__details",
+      "Open_school_interface",
+      "Open_school_link",
+      "Open_SSJ_details",
+      "Pacific_Islander__from_Family_Survey_",
+      "Partners_copy",
+      "Platform_School",
+      "Pod",
+      "Primary_Contact_Email",xx
+      "Primary_Contact_ID",
+      "Primary_Contacts",
+      "QBO_School_Codes",
+      "Race___Ethnicity__from_Educator___via_Educators_x_Schools_",
+      "School_Contact_Emails",
+      "School_governance_documents",
+      "school_id",
+      "school_note_id",
+      "School_notes",
+      "SSJ___Advice_Givers__Partners_",
+      "SSJ___Advice_Givers__TLs_",
+      "SSJ___Proj_Open_School_Year___Backup",
+      "SSJ___SSJ_Tool",xx
+      "TC_school_ID",xx
+      "White__from_Family_Survey_"
+    ]
+  },
+  {
+    "group": "SSJ_FILLOUT_FORMS_FIELDS",
+    "alias": "SJF",
+    "totals": {
+      "used": 81,
+      "total": 88
+    },
+    "used": [
+      "Age_Classrooms_Interested_In_Offering",
+      "Assigned_Partner__from_Educators_",
+      "Assigned_Partner_Override",
+      "City",
+      "City_2",
+      "City_Standardized",
+      "Community_Member_Community_Info",
+      "Community_Member_Interest",
+      "Community_Member_Self_Info",
+      "Community_Member_Support_Finding_Teachers",
+      "Contact_Type",
+      "Contact_Type_Standardized",
+      "Country",
+      "Country_2",
+      "educator_id",
+      "Educator_Interests",
+      "Educator_Interests_Other",
+      "Email",
+      "Email_sent_by_Initial_Outreacher_",
+      "Entry_Date",
+      "First_Name",
+      "Form_version",
+      "Full_Name",
+      "Gender_standardized",
+      "Initial_Outreacher",
+      "Interested_in_charter",
+      "Is_Interested_in_Charter",
+      "Is_Montessori_Certified",
+      "Is_Seeking_Montessori_Certification",
+      "Last_Name",
+      "Marketing_Campaign",
+      "Marketing_Source",
+      "Message",
+      "Montessori_Cert_Question",
+      "Montessori_Certification_Certifier_1",
+      "Montessori_Certification_Certifier_2",
+      "Montessori_Certification_Certifier_3",
+      "Montessori_Certification_Certifier_4",
+      "Montessori_Certification_Level_1",
+      "Montessori_Certification_Level_2",
+      "Montessori_Certification_Level_3",
+      "Montessori_Certification_Level_4",
+      "Montessori_Certification_Year_1",
+      "Montessori_Certification_Year_2",
+      "Montessori_Certification_Year_3",
+      "Montessori_Certification_Year_4",
+      "One_on_one_status",
+      "Person_responsible_for_follow_up",
+      "Primary_Language",
+      "Primary_Language_Other",
+      "Receive_Communications",
+      "Routed_To",
+      "SendGrid_sent_date",
+      "SendGrid_template_id",
+      "Socio_Economic__Gender",
+      "Socio_Economic__Gender_Other",
+      "Socio_Economic__Household_Income",
+      "Socio_Economic__LGBTQIA_Identifying__from_Email_",
+      "Socio_Economic__Pronouns",
+      "Socio_Economic__Pronouns_Other",
+      "Socio_Economic__Race___Ethnicity",
+      "Socio_Economic__Race___Ethnicity_Other",
+      "Source",
+      "Source___other",
+      "Source_for_non_TLs",
+      "State",
+      "State_2",
+      "State_Standardized",
+      "Status_of_Processing_Montessori_Certs",
+      "Temp___M_Cert_Cert_1",
+      "Temp___M_Cert_Cert_2",
+      "Temp___M_Cert_Cert_3",
+      "Temp___M_Cert_Cert_4",
+      "Temp___M_Cert_Level_1",
+      "Temp___M_Cert_Level_2",
+      "Temp___M_Cert_Level_3",
+      "Temp___M_Cert_Level_4",
+      "Temp___M_Cert_Year_1",
+      "Temp___M_Cert_Year_2",
+      "Temp___M_Cert_Year_3",
+      "Temp___M_Cert_Year_4"
+    ],
+    "unused": [
+      "Educators",
+      "Is_Interested_in_Charter__from_Email_",
+      "Link_to_Start_a_School",
+      "Manual__type__run__",
+      "Montessori_Cert_Q",xx
+      "Month__for_leads_per_month_report_",
+      "ssj_fillout_form_id",
+      "SSJ_FIllout_Form_key",
+      "Target_Geography"xx
+    ]
+  },
+  {
+    "group": "SCHOOL_NOTES_FIELDS",
+    "alias": "SNF",
+    "totals": {
+      "used": 8,
+      "total": 12
+    },
+    "used": [
+      "charter_id",
+      "Created_by",
+      "Date_created",
+      "Headline__Notes_",
+      "Notes",
+      "Partner_Short_Name",
+      "Private",
+      "school_id"
+    ],
+    "unused": [
+      "Partners_copy",
+      "School",
+      "school_note_id",
+      "School_Note_Key"
+    ]
+  }
+]

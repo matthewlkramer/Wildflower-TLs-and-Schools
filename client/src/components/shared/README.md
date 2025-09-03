@@ -1,10 +1,10 @@
 Reusable building blocks for detail pages
 
-- EntityCard: A card that displays labeled fields, with an Edit toggle for inline editing (text, textarea, number, date, toggle, select). Call onSave(values) to persist.
+- InfoCard: A card that displays labeled fields, with an Edit toggle for inline editing (text, textarea, number, date, toggle, select). Call onSave(values) to persist.
 
   Example:
 
-  <EntityCard
+  <InfoCard
     title="School Overview"
     description="Key identifiers"
     fields={[
@@ -37,4 +37,3 @@ Reusable building blocks for detail pages
 - Grid defaults & layout:
   - DEFAULT_GRID_PROPS and DEFAULT_COL_DEF unify grid appearance and behavior.
   - useGridHeight gives a consistent responsive height across pages.
-

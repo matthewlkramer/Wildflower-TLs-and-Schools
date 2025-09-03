@@ -34,10 +34,18 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
 
   const columnDefs: ColDef<any>[] = [
     {
+      headerName: "Form Name",
+      field: "formName",
+      flex: 1,
+      filter: "agTextColumnFilter",
+      valueFormatter: (p) => String(p.value || ''),
+    },
+    {
       headerName: "Form Type",
       field: "formType",
       flex: 1,
       filter: "agTextColumnFilter",
+      valueFormatter: (p) => String(p.value || ''),
     },
     {
       headerName: "Date Submitted",
@@ -59,6 +67,7 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
       field: "status",
       flex: 1,
       filter: "agTextColumnFilter",
+      valueFormatter: (p) => String(p.value || ''),
     },
     {
       headerName: "Actions",
@@ -144,6 +153,10 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
                   <p className="text-sm mt-1">{selectedForm.formType || '-'}</p>
                 </div>
                 <div>
+                  <label className="text-sm font-medium text-slate-600">Form Name</label>
+                  <p className="text-sm mt-1">{(selectedForm as any).formName || '-'}</p>
+                </div>
+                <div>
                   <label className="text-sm font-medium text-slate-600">Date Submitted</label>
                   <p className="text-sm mt-1">
                     {selectedForm.dateSubmitted ? new Date(selectedForm.dateSubmitted).toLocaleDateString() : '-'}
@@ -191,6 +204,11 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
               <div className="pt-2 border-t border-slate-200">
                 <label className="text-sm font-medium text-slate-600">Record ID</label>
                 <p className="text-xs mt-1 text-slate-400 font-mono">{selectedForm.id}</p>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200">
+                <label className="text-sm font-medium text-slate-600">All Fields</label>
+                <pre className="text-xs mt-1 text-slate-600 bg-slate-50 p-2 rounded overflow-x-auto">{JSON.stringify(selectedForm, null, 2)}</pre>
               </div>
             </div>
           )}

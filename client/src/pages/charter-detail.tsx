@@ -12,7 +12,7 @@ import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import type { Charter } from "@shared/schema";
-import { usePageTitle, useAddNew } from "@/App";
+import { usePageTitle } from "@/App";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getStatusColor } from "@/lib/utils";
 import { CharterSchoolsTable } from "@/components/charter-schools-table";
@@ -30,7 +30,6 @@ import { CharterActionStepsTable } from "@/components/charter-action-steps-table
 export default function CharterDetail() {
   const { id } = useParams<{ id: string }>();
   const { setPageTitle } = usePageTitle();
-  const { setAddNewOptions } = useAddNew();
 
   const { data: charter, isLoading } = useQuery<Charter>({
     queryKey: ["/api/charters", id],
@@ -46,8 +45,7 @@ export default function CharterDetail() {
     if (charter) {
       setPageTitle(`Wildflower > ${charter.shortName || charter.fullName || 'Charter'}`);
     }
-    setAddNewOptions([]);
-  }, [charter, setPageTitle, setAddNewOptions]);
+  }, [charter, setPageTitle]);
 
   if (isLoading) {
     return (

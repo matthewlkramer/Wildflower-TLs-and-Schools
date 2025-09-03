@@ -5,7 +5,7 @@
  * open date, and membership status. If the Airtable `about` or
  * `aboutSpanish` fields are populated, an About/Descripción toggle is rendered
  * allowing language switching without leaving the page. Below the hero card a
- * `DetailGrid` organizes read‑only `EntityCard` sections for a map, contact
+ * `DetailGrid` organizes read‑only `InfoCard` sections for a map, contact
  * information, and leadership. The map uses the school’s active latitude and
  * longitude and falls back to the active physical address when coordinates are
  * missing. Contact info lists phone, email, and website (hyperlinked). The
@@ -14,7 +14,7 @@
  */
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { EntityCard } from '@/components/shared/EntityCard';
+import { InfoCard } from '@/components/shared/InfoCard';
 import { DetailGrid } from '@/components/shared/DetailGrid';
 import type { School } from '@shared/schema';
 import { GoogleMap } from '@/components/google-map';
@@ -88,34 +88,10 @@ export function SummaryTab({ school }: { school: School }) {
       </div>
 
       <DetailGrid>
-        <EntityCard title="Location" columns={1} editable={false} showDivider={false} fields={[]}> 
-          <GoogleMap 
-            latitude={(school as any).activeLatitude}
-            longitude={(school as any).activeLongitude}
-            schoolName={school.name}
-            shortName={school.shortName}
-            fallbackAddress={(school as any).activePhysicalAddress}
-            schoolLogo={(school as any).logoFlowerOnly || (school as any).logoMainSquare || (school as any).logo}
-          />
-        </EntityCard>
-
-        <EntityCard
-          title="Contact Info"
-          columns={1}
-          editable={false}
-          showDivider={false}
-          fields={[
-            { key: 'phone', label: 'School Phone', type: 'readonly', value: (school as any)?.phone || '' },
-            { key: 'email', label: 'School Email', type: 'readonly', value: (school as any)?.email || '' },
-            { key: 'website', label: 'Website', type: 'readonly', value: (school as any)?.website || '', render: (url) => url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{url}</a>) : (<span className="text-slate-400">-</span>) },
-          ]}
-        />
-
-        <EntityCard
+        <InfoCard
           title="Leadership"
           columns={1}
           editable={false}
-          showDivider={false}
           fields={[
             { key: 'founders', label: 'Founders', type: 'readonly', value: (school as any)?.foundersFullNames ?? (school as any)?.founders ?? [], render: (v: any[]) => (v && v.length ? v.join(', ') : <span className="text-slate-400">Not specified</span>) },
             { key: 'currentTLs', label: 'Current TLs', type: 'readonly', value: (school as any)?.currentTLs ?? [], render: () => {
@@ -127,11 +103,10 @@ export function SummaryTab({ school }: { school: School }) {
           ]}
         />
 
-        <EntityCard
+        <InfoCard
           title="Size and Program"
           columns={1}
           editable={false}
-          showDivider={false}
           fields={[
             { key: 'enrollmentCap', label: 'Enrollment Capacity', type: 'readonly', value: (school as any)?.enrollmentCap ?? '' },
             { key: 'numberOfClassrooms', label: 'Number of Classrooms', type: 'readonly', value: (school as any)?.numberOfClassrooms ?? '' },
@@ -139,11 +114,41 @@ export function SummaryTab({ school }: { school: School }) {
           ]}
         />
 
-        <EntityCard
+        <InfoCard title="Location" columns={1} editable={false} fields={[]}> 
+          <GoogleMap 
+            latitude={(school as any).activeLatitude}
+            longitude={(school as any).activeLongitude}
+            schoolName={school.name}
+            shortName={school.shortName}
+            fallbackAddress={(school as any).activePhysicalAddress}
+            schoolLogo={(school as any).logoFlowerOnly || (school as any).logoMainSquare || (school as any).logo}
+          />
+        </InfoCard>
+        <InfoCard
+          title="Contact Info"
+          columns={1}
+          editable={false}
+          fields={[
+            { key: 'phone', label: 'School Phone', type: 'readonly', value: (school as any)?.phone || '' },
+            { key: 'email', label: 'School Email', type: 'readonly', value: (school as any)?.email || '' },
+            { key: 'website', label: 'Website', type: 'readonly', value: (school as any)?.website || '', render: (url) => url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{url}</a>) : (<span className="text-slate-400">-</span>) },
+          ]}
+        />
+        <InfoCard
+          title="Support"
+          columns={1}
+          editable={false}
+          fields={[]}
+          // fields={[
+          //   { key: 'supportContact', label: 'Support Contact', type: 'readonly', value: (school as any)?.supportContact || '' },
+          //  { key: 'supportEmail', label: 'Support Email', type: 'readonly', value: (school as any)?.supportEmail || '' },
+          //]}
+        />
+
+        <InfoCard
           title="Status and Monitoring"
           columns={1}
           editable={false}
-          showDivider={false}
           fields={[
             { key: 'riskFactors', label: 'Risk Factors', type: 'readonly', value: (school as any)?.riskFactors ?? [], render: (v: any[]) => v && v.length ? (
               <div className="flex flex-wrap gap-1">{v.map((x: string, i: number) => <Badge key={i} variant="destructive" className="text-xs">{x}</Badge>)}</div>
@@ -161,3 +166,4 @@ export function SummaryTab({ school }: { school: School }) {
     </div>
   );
 }
+

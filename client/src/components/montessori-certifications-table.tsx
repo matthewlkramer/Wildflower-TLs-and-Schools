@@ -37,21 +37,24 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
   const columnDefs: ColDef<any>[] = [
     {
       headerName: "Year Certified",
-      field: "dateReceived",
+      field: "yearReceived",
       width: 150,
       filter: "agTextColumnFilter",
+      valueFormatter: (p) => String(p.value || ''),
     },
     {
       headerName: "Level",
       field: "certificationLevel",
       width: 150,
       filter: "agTextColumnFilter",
+      valueFormatter: (p) => String(p.value || ''),
     },
     {
       headerName: "Abbreviation",
       field: "certifier",
       width: 150,
       filter: "agTextColumnFilter",
+      valueFormatter: (p) => String(p.value || ''),
     },
     {
       headerName: "Actions",

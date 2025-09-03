@@ -4,7 +4,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState, createContext, useEffect, useMemo, useContext } from "react";
-import { addNewEmitter } from "@/lib/add-new-emitter";
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
@@ -41,17 +40,8 @@ const PageTitleContext = createContext<{
   setPageTitle: () => {},
 });
 
-// Create a context for Add New functionality
-const AddNewContext = createContext<{
-  addNewOptions: Array<{ label: string; onClick: () => void; }>;
-  setAddNewOptions: (options: Array<{ label: string; onClick: () => void; }>) => void;
-}>({
-  addNewOptions: [],
-  setAddNewOptions: () => {},
-});
-
 export const usePageTitle = () => useContext(PageTitleContext);
-export const useAddNew = () => useContext(AddNewContext);
+// Removed Add New context; header shows a fixed Add menu.
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -107,22 +97,7 @@ function AppContent() {
   const [location] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [pageTitle, setPageTitle] = useState("");
-  const [addNewOptions, setAddNewOptions] = useState<Array<{ label: string; onClick: () => void; }>>([]);
   
-  
-  
-  // Listen to add new options changes
-  useEffect(() => {
-    const handleOptionsChanged = (e: CustomEvent) => {
-      setAddNewOptions(e.detail);
-    };
-    
-    addNewEmitter.addEventListener('optionsChanged', handleOptionsChanged as EventListener);
-    
-    return () => {
-      addNewEmitter.removeEventListener('optionsChanged', handleOptionsChanged as EventListener);
-    };
-  }, []);
   
 
   
@@ -180,7 +155,6 @@ function AppContent() {
   return (
     <SearchContext.Provider value={searchContextValue}>
       <PageTitleContext.Provider value={{ pageTitle, setPageTitle }}>
-        <AddNewContext.Provider value={{ addNewOptions, setAddNewOptions }}>
           <div className="min-h-screen bg-slate-50">
             {isAuthenticated && location !== '/login' && !location.startsWith('/reset') && (
               <Header 
@@ -189,15 +163,12 @@ function AppContent() {
                   setSearchTerm(value);
                   try { console.log('[App] onSearchChange ->', value); } catch {}
                 }}
-                addNewOptions={addNewOptions}
-                setAddNewOptions={setAddNewOptions}
               />
             )}
             <Router />
             {isAuthenticated && import.meta.env.VITE_TOUR_ENABLED === 'true' && <TourLauncher />}
             <Toaster />
           </div>
-        </AddNewContext.Provider>
       </PageTitleContext.Provider>
     </SearchContext.Provider>
   );

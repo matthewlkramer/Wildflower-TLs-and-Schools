@@ -6,7 +6,8 @@ import { loanStorage } from "./loan-storage";
 import { cache } from "./cache";
 import { logger } from "./logger";
 import { requireAuth } from "./auth";
-import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema } from "@shared/schema";
+import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema, eventAttendanceSchema } from "@shared/schema";
+import { EVENTS_FIELDS as EVF } from "@shared/airtable-schema";
 import { createInsertSchema } from "drizzle-zod";
 import { 
   borrowers,
@@ -328,6 +329,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(associations);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch school associations" });
+    }
+  });
+
+  // User-specific TLs/ETLs for dashboard
+  app.get("/api/tls/user/:userId", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const tls = await storage.getTlsByUserId(userId);
+      res.json(tls);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user TLs" });
     }
   });
 
@@ -866,6 +878,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/action-steps/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const { item, assignee, dueDate, status } = req.body || {};
+      const updated = await storage.updateActionStep(id, {
+        item: item ? String(item) : undefined,
+        assignee: assignee ? String(assignee) : undefined,
+        dueDate: dueDate ? String(dueDate) : undefined,
+        status: status ? String(status) : undefined,
+      });
+      if (!updated) return res.status(404).json({ message: 'Action step not found' });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update action step" });
+    }
+  });
+
+  app.delete("/api/action-steps/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const ok = await storage.deleteActionStep(id);
+      if (!ok) return res.status(404).json({ message: 'Action step not found' });
+      res.json({ message: 'Action step deleted' });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete action step" });
+    }
+  });
+
   app.post("/api/email-addresses", async (req, res) => {
     try {
       const data = emailAddressSchema.parse(req.body);
@@ -994,6 +1034,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Events lookup route (for creating attendance)
+  app.get("/api/events", async (req, res) => {
+    try {
+      const { base } = await import('./airtable-schema');
+      const table = base('Events');
+      const search = (req.query.search as string | undefined)?.trim();
+      const filterByFormula = search
+        ? `SEARCH(LOWER("${search.replace(/"/g, '\\"')}` + `"), LOWER({${EVF.Event_Name}}))`
+        : undefined;
+      const records = await table.select({
+        fields: [EVF.Event_Name, EVF.Date],
+        maxRecords: 50,
+        ...(filterByFormula ? { filterByFormula } : {}),
+      }).all();
+      const events = records.map((r: any) => ({
+        id: r.id,
+        name: r.fields?.[EVF.Event_Name] || r.fields?.['Name'] || '',
+        date: r.fields?.[EVF.Date] || ''
+      }));
+      res.json(events);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch events" });
+    }
+  });
+
+  app.post("/api/event-attendance", async (req, res) => {
+    try {
+      const data = eventAttendanceSchema.parse(req.body);
+      const created = await storage.createEventAttendance(data);
+      res.status(201).json(created);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid event attendance data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create event attendance" });
+    }
+  });
+
+  app.put("/api/event-attendance/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const data = eventAttendanceSchema.partial().parse(req.body);
+      const updated = await storage.updateEventAttendance(id, data);
+      if (!updated) {
+        return res.status(404).json({ message: "Event attendance not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid event attendance data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update event attendance" });
+    }
+  });
+
+  app.delete("/api/event-attendance/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const ok = await storage.deleteEventAttendance(id);
+      if (!ok) {
+        return res.status(404).json({ message: "Event attendance not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete event attendance" });
+    }
+  });
+
   // Educator Notes routes
   app.get("/api/educator-notes/educator/:educatorId", async (req, res) => {
     try {
@@ -1080,6 +1188,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (queryParams.school_id) {
             const notes = await storage.getSchoolNotesBySchoolId(queryParams.school_id as string);
             return res.json(notes);
+          }
+          break;
+        case "Public funding":
+        case "Public%20funding":
+          if (queryParams.school_id) {
+            // Return public funding rows linked to this school; include name/id
+            try {
+              const { base } = await import('./airtable-schema');
+              const { PUBLIC_FUNDING_FIELDS: PFF } = await import('@shared/airtable-schema');
+              const records = await base('Public funding').select().all();
+              const filtered = records.filter(r => {
+                const schools = r.fields[PFF.Schools] as any;
+                return Array.isArray(schools) && schools.includes(String(queryParams.school_id));
+              });
+              return res.json(filtered.map(r => ({ id: r.id, name: String(r.fields[PFF.Name] || '') })));
+            } catch (e) {
+              logger.error('Error fetching Public funding subtable:', e);
+              return res.status(500).json({ message: 'Failed to fetch Public funding' });
+            }
           }
           break;
         default:

@@ -51,15 +51,8 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  // Redirect unauthenticated root requests to client login route
-  app.get('/', (req, res, next) => {
-    const user = (req.session as any)?.user;
-    if (!user) return res.redirect('/api/auth/login');
-    next();
-  });
+  // Let the client app (Supabase Auth) control authentication and routing.
+  // Do not force a server-side auth redirect on '/'.
 
   if (app.get("env") === "development") {
     await setupVite(app, server);
@@ -68,7 +61,7 @@ app.use((req, res, next) => {
   }
 
   // Prefer PORT/HOST from environment, fallback to 5000/localhost
-  const port = Number(process.env.PORT) || 5000;
+  let port = Number(process.env.PORT) || 5000;
   const host = process.env.HOST || "localhost";
 
   // Warm core datasets into in-memory cache for first-user snappiness
@@ -86,16 +79,31 @@ app.use((req, res, next) => {
     }
   })();
 
-  server.on("error", (err: any) => {
-    if (err && (err.code === "EADDRINUSE" || err.errno === -4091)) {
-      log(
-        `Port ${port} is already in use on ${host}. Set PORT to a free port, e.g. PORT=5001, then re-run.`
-      );
-    }
-    throw err;
-  });
+  const startListening = (startPort: number) => {
+    return new Promise<void>((resolve, reject) => {
+      const tryListen = (p: number) => {
+        const onError = (err: any) => {
+          if (err && (err.code === "EADDRINUSE" || err.errno === -4091)) {
+            log(`port ${p} in use, trying ${p + 1}`, "express");
+            server.off("error", onError);
+            tryListen(p + 1);
+          } else {
+            reject(err);
+          }
+        };
 
-  server.listen(port, host, () => {
-    log(`serving on http://${host}:${port}`);
-  });
+        server.once("error", onError);
+        server.listen(p, host, () => {
+          server.off("error", onError);
+          port = p;
+          log(`serving on http://${host}:${p}`);
+          resolve();
+        });
+      };
+
+      tryListen(startPort);
+    });
+  };
+
+  await startListening(port);
 })();

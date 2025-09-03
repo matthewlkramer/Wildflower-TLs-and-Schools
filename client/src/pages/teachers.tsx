@@ -7,7 +7,7 @@
  * assigned partner. The derived list feeds an `AG Grid` instance rendered by
  * `TeachersGrid`. Rows are prefetched with `prefetchEducator` so that hovering a
  * row loads its detail data in React Query ahead of navigation. The page also
- * registers an “Add New” action through `addNewEmitter`; selecting this opens the
+ * includes an inline Add Teacher button and opens the
  * `AddEducatorModal` for inline creation. A small debug header shows the active
  * search term and how many rows remain after filtering so that QA can verify the
  * query logic. No server calls occur for filtering; all transformations happen
@@ -19,7 +19,6 @@ import { useSearch } from "@/contexts/search-context";
 import { useCachedEducators } from "@/hooks/use-cached-data";
 import { useUserFilter } from "@/contexts/user-filter-context";
 import { useEffect, useState } from "react";
-import { addNewEmitter } from "@/lib/add-new-emitter";
 import AddEducatorModal from "@/components/add-teacher-modal";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
@@ -33,22 +32,12 @@ export default function Teachers() {
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
+  const [gridFilteredCount, setGridFilteredCount] = useState<number | null>(null);
   
   // Debug search state
   logger.log('Teachers render - searchTerm:', `"${searchTerm}"`);;
   
-  // Set up Add New options for teachers page
-  useEffect(() => {
-    const options = [
-      { label: "Create New Teacher", onClick: () => setShowAddEducatorModal(true) }
-    ];
-    
-    addNewEmitter.setOptions(options);
-    
-    return () => {
-      addNewEmitter.setOptions([]);
-    };
-  }, []);
+  // No header AddNew wiring; header shows a fixed Add menu.
 
   // Apply text search + user filter
   const filteredTeachers = (teachers || []).filter((teacher: Teacher) => {
@@ -87,8 +76,10 @@ export default function Teachers() {
     return true;
   });
   
-  // Debug info after filtering
-  const searchDebug = `Search: "${searchTerm}" | Total: ${teachers?.length} | Filtered (user-filter): ${filteredTeachers?.length}`;
+  // Debug info after filtering (prefer grid-displayed count when available)
+  const showing = gridFilteredCount ?? (filteredTeachers?.length ?? 0);
+  const total = teachers?.length ?? 0;
+  const searchDebug = `Search: "${searchTerm}" | Total: ${total} | Filtered (user-filter/grid): ${showing}`;
   logger.log('Teachers - filtered result:', searchDebug);
   try { console.log('[Teachers] debug:', searchDebug); } catch {}
   
@@ -99,11 +90,13 @@ export default function Teachers() {
           <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3">
             <span>Search:</span>
             <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
-            <span>Showing {filteredTeachers?.length ?? 0} of {teachers?.length ?? 0}</span>
+            <span>Showing {showing} of {total}</span>
           </div>
           <TeachersGrid 
             teachers={filteredTeachers || []} 
             isLoading={isLoading}
+            onFilteredCountChange={(count)=>setGridFilteredCount(count)}
+            onAddTeacher={() => setShowAddEducatorModal(true)}
           />
         </div>
       </main>

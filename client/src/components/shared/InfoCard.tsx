@@ -22,21 +22,20 @@ export interface EntityField {
   render?: (value: any) => React.ReactNode; // custom read render
 }
 
-interface EntityCardProps {
+interface InfoCardProps {
   title: string;
   description?: string;
   fields: EntityField[];
   columns?: 1 | 2 | 3; // grid columns for fields
   onSave?: (values: Record<string, any>) => Promise<void> | void;
   actionsRight?: React.ReactNode; // extra header actions
-  showDivider?: boolean; // show header bottom border
   children?: React.ReactNode; // optional extra content below fields
   editable?: boolean; // globally toggle editing off
   className?: string; // allow grid-span styling from pages
   fullWidth?: boolean; // span both columns in DetailGrid
 }
 
-export function EntityCard({ title, description, fields, columns = 2, onSave, actionsRight, showDivider = true, children, editable = true, className = "", fullWidth = false }: EntityCardProps) {
+export function InfoCard({ title, description, fields, columns = 2, onSave, actionsRight, children, editable = true, className = "", fullWidth = false }: InfoCardProps) {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const initialValues = useMemo(() => Object.fromEntries(fields.map(f => [f.key, f.value])), [fields]);
@@ -138,7 +137,7 @@ export function EntityCard({ title, description, fields, columns = 2, onSave, ac
 
   return (
     <Card className={`${fullWidth ? 'lg:col-span-2' : ''} ${className}`.trim()}>
-      <div className={`flex items-center justify-between px-4 py-3 ${showDivider ? 'border-b border-slate-200' : ''}`}>
+      <div className="flex items-center justify-between px-4 py-3">
         <div>
           <h3 className="text-base font-semibold text-slate-900">{title}</h3>
           {description && <p className="text-xs text-slate-500 mt-0.5">{description}</p>}
@@ -161,7 +160,7 @@ export function EntityCard({ title, description, fields, columns = 2, onSave, ac
                 disabled={saving}
                 className="bg-wildflower-blue hover:bg-blue-700 text-white"
               >
-                {saving ? 'Saving…' : 'Save'}
+                {saving ? 'Saving.' : 'Save'}
               </Button>
             </>
           ) : (
@@ -190,3 +189,4 @@ export function EntityCard({ title, description, fields, columns = 2, onSave, ac
     </Card>
   );
 }
+

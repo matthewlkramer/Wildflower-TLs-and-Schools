@@ -10,13 +10,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Calendar, CheckSquare, Building2, Users, ChevronRight } from "lucide-react";
+import { CheckSquare, Building2, Users, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 import { format, parseISO, isToday, isTomorrow, isPast, differenceInDays } from "date-fns";
 import { useUserFilter } from "@/contexts/user-filter-context";
-import { ActionStep, School } from "@/lib/schema";
+import { type ActionStep, type School, type Educator } from "@shared/schema";
 import { useEffect, useState } from "react";
-import { addNewEmitter } from "@/lib/add-new-emitter";
 import AddEducatorModal from "@/components/add-teacher-modal";
 import AddSchoolModal from "@/components/add-school-modal";
 
@@ -58,21 +57,7 @@ export default function Dashboard() {
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   
-  // Set up Add New options for dashboard
-  useEffect(() => {
-    const options = [
-      { label: "Create New School", onClick: () => setShowAddSchoolModal(true) },
-      { label: "Create New Teacher", onClick: () => setShowAddEducatorModal(true) },
-      { label: "Create New Charter", onClick: () => console.log("Create Charter - to be implemented") },
-      { label: "Create New Task", onClick: () => console.log("Create Task - to be implemented") }
-    ];
-    
-    addNewEmitter.setOptions(options);
-    
-    return () => {
-      addNewEmitter.setOptions([]);
-    };
-  }, []);
+  // No header AddNew wiring; header shows a fixed Add menu.
 
   // Fetch user's action steps
   const { data: actionSteps = [], isLoading: actionStepsLoading } = useQuery<ActionStep[]>({
@@ -86,9 +71,11 @@ export default function Dashboard() {
     enabled: !!selectedUser,
   });
 
-  // For now, meetings will be a placeholder
-  const meetings = [];
-  const meetingsLoading = false;
+  // Fetch user's TLs/ETLs
+  const { data: tls = [], isLoading: tlsLoading } = useQuery<Educator[]>({
+    queryKey: ['/api/tls/user', selectedUser],
+    enabled: !!selectedUser,
+  });
 
   // Filter incomplete action steps and sort by priority (overdue first, then by due date)
   const incompleteTasks = actionSteps
@@ -251,41 +238,55 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* My Meetings Card */}
+        {/* My ETLs/TLs Card */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                My Meetings
+                <Users className="h-5 w-5" />
+                My ETLs/TLs
               </CardTitle>
               <CardDescription>
-                {meetingsLoading ? (
+                {tlsLoading ? (
                   <Skeleton className="h-4 w-16" />
                 ) : (
-                  `${meetings.length} upcoming`
+                  `${tls.length} total`
                 )}
               </CardDescription>
             </div>
           </CardHeader>
           <CardContent>
-            {meetingsLoading ? (
+            {tlsLoading ? (
               <div className="space-y-3">
                 <Skeleton className="h-12 w-full" />
                 <Skeleton className="h-12 w-full" />
                 <Skeleton className="h-12 w-full" />
               </div>
-            ) : meetings.length > 0 ? (
+            ) : tls.length > 0 ? (
               <div className="space-y-3">
-                {/* Meetings will be implemented later */}
+                {tls.slice(0, 6).map((e) => (
+                  <Link key={e.id} href={`/teacher/${e.id}`}>
+                    <div className="border-l-2 border-gray-200 pl-3 py-1 hover:bg-gray-50 cursor-pointer">
+                      <p className="text-sm font-medium text-gray-900">{e.fullName}</p>
+                      <div className="text-xs text-gray-500">
+                        {Array.isArray(e.currentRole) ? e.currentRole.join(', ') : (e.currentRole || '')}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+                {tls.length > 6 && (
+                  <Link href="/teachers">
+                    <Button variant="ghost" size="sm" className="w-full mt-2">
+                      View all teachers
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </Link>
+                )}
               </div>
             ) : (
               <div className="text-center py-4">
                 <p className="text-sm text-gray-500">
-                  No upcoming meetings
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Meeting integration coming soon
+                  No TLs found
                 </p>
               </div>
             )}

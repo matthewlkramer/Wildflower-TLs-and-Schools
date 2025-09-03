@@ -2,8 +2,8 @@
  * Index of schools. Uses `useCachedSchools` to load all non‑archived schools,
  * filters them in memory based on the global search term and the “My records”
  * toggle (matches current guides or assigned partner), and renders the result in
- * `SchoolsGrid`. The page registers an Add New option opening `AddSchoolModal`,
- * logs debug information about filtering, and tracks the grid’s internal
+ * `SchoolsGrid`. The page shows an Add School action and logs debug information
+ * about filtering, and tracks the grid's internal
  * filtered row count via callback.
  */
 import { useState, useEffect } from "react";
@@ -15,7 +15,6 @@ import { type School } from "@shared/schema";
 import { useSearch } from "@/contexts/search-context";
 import { useCachedSchools } from "@/hooks/use-cached-data";
 import { useUserFilter } from "@/contexts/user-filter-context";
-import { addNewEmitter } from "@/lib/add-new-emitter";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
 
@@ -26,18 +25,7 @@ export default function Schools() {
 
   const { data: schools, isLoading, prefetchSchool } = useCachedSchools();
 
-  // Set up Add New button in header
-  useEffect(() => {
-    const options = [
-      { label: "Create New School", onClick: () => setAddSchoolModalOpen(true) }
-    ];
-    
-    addNewEmitter.setOptions(options);
-    
-    return () => {
-      addNewEmitter.setOptions([]);
-    };
-  }, []);
+  // No header AddNew wiring; header shows a fixed Add menu.
 
   const filteredSchools = (schools || []).filter((school: School) => {
     const searchTermLower = searchTerm.toLowerCase();
@@ -78,6 +66,15 @@ export default function Schools() {
           <span>Search:</span>
           <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
           <span>Showing {gridFilteredCount ?? totalAfterSearch} of {totalAfterSearch}</span>
+          <div className="ml-auto flex items-center gap-2">
+            <Button size="xs" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
+              <Plus className="h-3 w-3 mr-1" />
+              Add School
+            </Button>
+            <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/schools'] })}>
+              Refresh
+            </Button>
+          </div>
         </div>
         <SchoolsGrid 
           schools={filteredSchools || []} 

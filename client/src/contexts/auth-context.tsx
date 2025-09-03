@@ -45,14 +45,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let mounted = true;
+    async function syncServerSessionFromSupabase() {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const access = sessionData.session?.access_token;
+        if (!access) return;
+        await fetch('/api/auth/supabase-session', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${access}` },
+          credentials: 'include',
+        });
+      } catch {}
+    }
     (async () => {
       try {
-        const { data } = await supabase.auth.getSession();
+        // Guard against hanging network calls by timing out the initial session fetch
+        const sessionResult = await Promise.race([
+          supabase.auth.getSession(),
+          new Promise<{ data: { session: any | null } }>((resolve) =>
+            setTimeout(() => resolve({ data: { session: null } }), 5000)
+          ),
+        ]);
+        const { data } = sessionResult as { data: { session: any | null } };
         if (data.session?.user) {
           const ok = await enforceDomain();
           if (!mounted) return;
           if (ok) {
             setUser({ id: data.session.user.id, email: data.session.user.email || '', name: data.session.user.user_metadata?.name });
+            await syncServerSessionFromSupabase();
           } else {
             setUser(null);
           }
@@ -68,11 +88,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const ok = await enforceDomain();
         if (ok) {
           setUser({ id: session.user.id, email: session.user.email || '', name: session.user.user_metadata?.name });
+          try {
+            await fetch('/api/auth/supabase-session', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${session.access_token}` },
+              credentials: 'include',
+            });
+          } catch {}
         } else {
           setUser(null);
         }
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
+        try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch {}
       }
     });
     return () => { mounted = false; sub.subscription.unsubscribe(); };

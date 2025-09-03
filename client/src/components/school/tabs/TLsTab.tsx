@@ -1,0 +1,103 @@
+import React from 'react';
+import type { School, Teacher, TeacherSchoolAssociation } from '@shared/schema';
+import { Skeleton } from '@/components/ui/skeleton';
+import { SchoolTLsAssociationGrid } from '@/components/school/SchoolTLsAssociationGrid';
+import DeleteConfirmationModal from '@/components/delete-confirmation-modal';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { Button } from '@/components/ui/button';
+import CreateAndAssignEducatorModal from '@/components/create-and-assign-educator-modal';
+import AssignEducatorModal from '@/components/assign-educator-modal';
+
+export function TLsTab({ school, schoolId }: { school: School; schoolId: string }) {
+  const { data: associations = [], isLoading: associationsLoading, refetch } = useQuery<TeacherSchoolAssociation[]>({
+    queryKey: [`/api/school-associations/${schoolId}`],
+    queryFn: async () => {
+      const res = await fetch(`/api/school-associations/${schoolId}`, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch associations');
+      return res.json();
+    },
+    enabled: !!schoolId,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: teachers = [] } = useQuery<Teacher[]>({ queryKey: ['/api/teachers'] });
+
+  const updateAssociation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => apiRequest('PUT', `/api/teacher-school-associations/${id}`, data),
+    onSuccess: () => refetch(),
+  });
+
+  const deleteAssociation = useMutation({
+    mutationFn: async (id: string) => apiRequest('DELETE', `/api/teacher-school-associations/${id}`),
+    onSuccess: () => refetch(),
+  });
+
+  const [pendingDeleteId, setPendingDeleteId] = React.useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [createAssignOpen, setCreateAssignOpen] = React.useState(false);
+  const [assignExistingOpen, setAssignExistingOpen] = React.useState(false);
+
+  return (
+    <>
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-sm text-slate-700">Teacher Leaders and Educator assignments</div>
+        <div className="flex gap-2">
+          <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setCreateAssignOpen(true)}>
+            Add New Educator & Assign
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setAssignExistingOpen(true)}>
+            Assign Existing Educator
+          </Button>
+        </div>
+      </div>
+
+      {associationsLoading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+        </div>
+      ) : associations && associations.length > 0 ? (
+        <div className="border rounded-lg p-3">
+          <SchoolTLsAssociationGrid
+            school={school}
+            associations={associations}
+            teachers={teachers || []}
+            onUpdateAssociation={(id, data) => updateAssociation.mutate({ id, data })}
+            onEndStint={(id) => updateAssociation.mutate({ id, data: { endDate: new Date().toISOString().slice(0, 10) } })}
+            onDeleteAssociation={(id) => { setPendingDeleteId(id); setConfirmOpen(true); }}
+          />
+        </div>
+      ) : (
+        <div className="text-center py-8 text-slate-500">
+          <p>No teachers found for this school.</p>
+          <p className="text-sm mt-2">Use the Add menu or modals to create or assign educators.</p>
+        </div>
+      )}
+
+      <DeleteConfirmationModal
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        onConfirm={() => { if (pendingDeleteId) deleteAssociation.mutate(pendingDeleteId); }}
+        title="Delete Teacher Stint"
+        description="Are you sure you want to delete this teacher stint? This action cannot be undone."
+        isLoading={false}
+      />
+
+      <CreateAndAssignEducatorModal
+        open={createAssignOpen}
+        onOpenChange={setCreateAssignOpen}
+        schoolId={schoolId}
+        onSwitchToAssign={() => { setCreateAssignOpen(false); setAssignExistingOpen(true); }}
+      />
+
+      <AssignEducatorModal
+        open={assignExistingOpen}
+        onOpenChange={setAssignExistingOpen}
+        schoolId={schoolId}
+      />
+    </>
+  );
+}
