@@ -36,6 +36,7 @@ This document orients contributors and automation/AI agents to work safely and e
 - Requirements: Node 18+, pnpm/npm, Supabase CLI (via `npx supabase`).
 - Run dev server: `npm run dev` (Express + Vite middleware).
 - Build: `npm run build` (builds client and bundles server into `dist/`).
+- Server bundle: If you change files in `server/` or `shared/`, run `node api/build-server.mjs` (or `npm run build:vercel`) before committing so `api/_server` stays current.
 - Start prod build: `npm run start`.
 
 ## Environments & Secrets
