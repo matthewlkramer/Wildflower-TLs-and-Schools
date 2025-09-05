@@ -4,8 +4,10 @@ import url from 'node:url';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-const root = path.resolve(__dirname, '..');
-const serverDir = path.resolve(root, 'server');
+// Use cwd to be robust within Vercel's build sandboxes
+const projectRoot = process.cwd(); // points to repoRoot/api when Root Directory=api
+const repoRoot = path.resolve(projectRoot, '..');
+const serverDir = path.resolve(repoRoot, 'server');
 const outDir = path.resolve(__dirname, '_server');
 
 const common = {
@@ -17,7 +19,7 @@ const common = {
   external: [],
   loader: { '.ts': 'ts' },
   alias: {
-    '@shared': path.resolve(root, 'shared')
+    '@shared': path.resolve(repoRoot, 'shared')
   }
 };
 
@@ -32,4 +34,3 @@ await build({
 });
 
 console.log('Bundled server into api/_server');
-
