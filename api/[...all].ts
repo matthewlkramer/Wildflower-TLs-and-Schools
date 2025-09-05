@@ -9,6 +9,11 @@ async function buildApp(): Promise<express.Express> {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
+  // Early probe route to verify this catch-all function is mounted
+  app.get('/api/_probe', (_req, res) => {
+    res.status(200).json({ ok: true, from: 'catch-all', note: 'probe before bundle load' });
+  });
+
   // Debug: log incoming API requests (can be removed later)
   app.use((req, _res, next) => {
     try {
@@ -30,17 +35,26 @@ async function buildApp(): Promise<express.Express> {
     next();
   });
 
-  // CommonJS interop: import default and/or named
-  const authMod = await import('./_server/auth.cjs');
-  const routesMod = await import('./_server/routes.cjs');
-  const setupAuth = (authMod as any).setupAuth || (authMod as any).default?.setupAuth;
-  const registerRoutes = (routesMod as any).registerRoutes || (routesMod as any).default?.registerRoutes;
-  if (typeof setupAuth !== 'function' || typeof registerRoutes !== 'function') {
-    console.error('Failed to load server bundles: setupAuth/registerRoutes not found');
-    throw new Error('Server bundles missing exports');
+  try {
+    // CommonJS interop: import default and/or named
+    const authMod = await import('./_server/auth.cjs');
+    const routesMod = await import('./_server/routes.cjs');
+    const setupAuth = (authMod as any).setupAuth || (authMod as any).default?.setupAuth;
+    const registerRoutes = (routesMod as any).registerRoutes || (routesMod as any).default?.registerRoutes;
+    if (typeof setupAuth !== 'function' || typeof registerRoutes !== 'function') {
+      console.error('Failed to load server bundles: setupAuth/registerRoutes not found');
+      throw new Error('Server bundles missing exports');
+    }
+    await setupAuth(app as any);
+    await registerRoutes(app as any);
+  } catch (e: any) {
+    console.error('Error initializing bundled server:', e);
+    // Expose error via debug endpoint even if bundles fail
+    app.get('/api/_debug/routes', (_req, res) => {
+      res.status(500).json({ ok: false, error: String(e?.message || e) });
+    });
+    return app;
   }
-  await setupAuth(app as any);
-  await registerRoutes(app as any);
 
   // DEBUG: list registered routes to verify mounting works in serverless
   app.get('/api/_debug/routes', (_req, res) => {
