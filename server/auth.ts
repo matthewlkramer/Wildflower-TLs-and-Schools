@@ -37,95 +37,99 @@ export async function setupAuth(app: Express) {
   const AUTH_BASE_URL =
     AUTH_BASE_URL_ENV || `http://${process.env.HOST || 'localhost'}:${process.env.PORT || 5000}`;
 
-  if (!SECRET) throw new Error('Missing COOKIE_SECRET or SESSION_SECRET');
-  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) throw new Error('Missing Google OAuth env vars');
+  const hasSecret = !!SECRET;
+  const hasGoogle = !!GOOGLE_CLIENT_ID && !!GOOGLE_CLIENT_SECRET;
 
   const MemoryStore = MemoryStoreFactory(session);
 
-  app.use(
-    session({
-      secret: SECRET,
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: NODE_ENV === 'production',
-      },
-      store: new MemoryStore({ checkPeriod: 1000 * 60 * 60 }),
-    })
-  );
+  if (hasSecret) {
+    app.use(
+      session({
+        secret: SECRET!,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+          httpOnly: true,
+          sameSite: 'lax',
+          secure: NODE_ENV === 'production',
+        },
+        store: new MemoryStore({ checkPeriod: 1000 * 60 * 60 }),
+      })
+    );
+  }
 
   // Discover Google's OpenID configuration and initialize client configuration
-  oidcConfig = await discovery(new URL('https://accounts.google.com'), GOOGLE_CLIENT_ID!, GOOGLE_CLIENT_SECRET);
+  if (hasGoogle) {
+    oidcConfig = await discovery(new URL('https://accounts.google.com'), GOOGLE_CLIENT_ID!, GOOGLE_CLIENT_SECRET);
+  }
 
   // Initiate login via Google
-  app.get('/api/auth/login', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const codeVerifier = randomPKCECodeVerifier();
-      const codeChallenge = await calculatePKCECodeChallenge(codeVerifier);
-      const state = randomState();
-      const nonce = randomNonce();
+  if (hasGoogle && hasSecret) {
+    app.get('/api/auth/login', async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const codeVerifier = randomPKCECodeVerifier();
+        const codeChallenge = await calculatePKCECodeChallenge(codeVerifier);
+        const state = randomState();
+        const nonce = randomNonce();
 
-      // Keep verifier/nonce/state for callback validation (keyed by state)
-      codeStore.set(state, JSON.stringify({ codeVerifier, nonce }));
+        codeStore.set(state, JSON.stringify({ codeVerifier, nonce }));
 
-      const authUrl = buildAuthorizationUrl(oidcConfig!, {
-        redirect_uri: `${AUTH_BASE_URL}/api/auth/callback`,
-        scope: 'openid email profile',
-        code_challenge: codeChallenge,
-        code_challenge_method: 'S256',
-        state,
-        nonce,
-        hd: ALLOWED_GOOGLE_DOMAIN,
-        prompt: 'select_account',
-      });
+        const authUrl = buildAuthorizationUrl(oidcConfig!, {
+          redirect_uri: `${AUTH_BASE_URL}/api/auth/callback`,
+          scope: 'openid email profile',
+          code_challenge: codeChallenge,
+          code_challenge_method: 'S256',
+          state,
+          nonce,
+          hd: ALLOWED_GOOGLE_DOMAIN,
+          prompt: 'select_account',
+        });
 
-      res.redirect(authUrl.toString());
-    } catch (err) {
-      next(err);
-    }
-  });
+        res.redirect(authUrl.toString());
+      } catch (err) {
+        next(err);
+      }
+    });
+  }
 
   // OAuth2 callback
-  app.get('/api/auth/callback', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const state = (req.query.state as string) || '';
-      const stored = codeStore.get(state);
-      if (!stored) return res.status(400).send('Invalid state');
-      const { codeVerifier, nonce } = JSON.parse(stored);
-      codeStore.delete(state);
+  if (hasGoogle && hasSecret) {
+    app.get('/api/auth/callback', async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const state = (req.query.state as string) || '';
+        const stored = codeStore.get(state);
+        if (!stored) return res.status(400).send('Invalid state');
+        const { codeVerifier, nonce } = JSON.parse(stored);
+        codeStore.delete(state);
 
-      const currentUrl = new URL(req.originalUrl, AUTH_BASE_URL);
-      const tokens = await authorizationCodeGrant(oidcConfig!, currentUrl, {
-        pkceCodeVerifier: codeVerifier,
-        expectedNonce: nonce,
-        expectedState: state,
-      });
+        const currentUrl = new URL(req.originalUrl, AUTH_BASE_URL);
+        const tokens = await authorizationCodeGrant(oidcConfig!, currentUrl, {
+          pkceCodeVerifier: codeVerifier,
+          expectedNonce: nonce,
+          expectedState: state,
+        });
 
-      const claims = tokens.claims?.() || {};
-      const email = (claims.email as string) || '';
-      const name = (claims.name as string) || '';
-      const sub = (claims.sub as string) || '';
-      const hd = (claims.hd as string) || undefined;
+        const claims = tokens.claims?.() || {};
+        const email = (claims.email as string) || '';
+        const name = (claims.name as string) || '';
+        const sub = (claims.sub as string) || '';
+        const hd = (claims.hd as string) || undefined;
 
-      const allowedDomain = (process.env.ALLOWED_GOOGLE_DOMAIN || 'wildflowerschools.org').toLowerCase();
-      const emailDomain = email.split('@')[1]?.toLowerCase();
+        const allowedDomain = (process.env.ALLOWED_GOOGLE_DOMAIN || 'wildflowerschools.org').toLowerCase();
+        const emailDomain = email.split('@')[1]?.toLowerCase();
 
-      if (!email || emailDomain !== allowedDomain || (hd && hd.toLowerCase() !== allowedDomain)) {
-        return res.status(403).send('Only wildflowerschools.org accounts may sign in.');
+        if (!email || emailDomain !== allowedDomain || (hd && hd.toLowerCase() !== allowedDomain)) {
+          return res.status(403).send('Only wildflowerschools.org accounts may sign in.');
+        }
+
+        const sessionUser: SessionUser = { id: sub, email, name, role: 'user' };
+        try { (req.session as any).user = sessionUser; } catch {}
+        res.redirect('/');
+      } catch (err) {
+        next(err);
       }
-
-      // Persist minimal user in session
-      const sessionUser: SessionUser = { id: sub, email, name, role: 'user' };
-      (req.session as any).user = sessionUser;
-
-      // Redirect back to app root
-      res.redirect('/');
-    } catch (err) {
-      next(err);
-    }
-  });
+    });
+  }
 
   // Establish a server session using a Supabase JWT from the client.
   // This lets the SPA authenticate via Supabase and still use cookie-based
@@ -157,7 +161,7 @@ export async function setupAuth(app: Express) {
       }
 
       const sessionUser: SessionUser = { id: sub, email, name, role: 'user' };
-      (req.session as any).user = sessionUser;
+      try { (req.session as any).user = sessionUser; } catch {}
 
       // Initialize per-user Google sync start date if not present
       try {
@@ -204,10 +208,16 @@ export async function setupAuth(app: Express) {
 
   // Logout
   app.post('/api/auth/logout', (req: Request, res: Response) => {
-    req.session.destroy(() => {
-      res.clearCookie('connect.sid');
-      res.status(200).json({ ok: true });
-    });
+    try {
+      if ((req.session as any)?.destroy) {
+        req.session.destroy(() => {
+          try { res.clearCookie('connect.sid'); } catch {}
+          res.status(200).json({ ok: true });
+        });
+        return;
+      }
+    } catch {}
+    res.status(200).json({ ok: true });
   });
 }
 
