@@ -1,7 +1,6 @@
 import express from 'express';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { registerRoutes } from './_server/routes.js';
-import { setupAuth } from './_server/auth.js';
+// Defer loading bundled server code to runtime (CJS bundles)
 
 let appPromise: Promise<express.Express> | null = null;
 
@@ -21,8 +20,10 @@ async function buildApp(): Promise<express.Express> {
     next();
   });
 
-  await setupAuth(app);
-  await registerRoutes(app);
+  const { setupAuth } = await import('./_server/auth.cjs');
+  const { registerRoutes } = await import('./_server/routes.cjs');
+  await setupAuth(app as any);
+  await registerRoutes(app as any);
 
   return app;
 }

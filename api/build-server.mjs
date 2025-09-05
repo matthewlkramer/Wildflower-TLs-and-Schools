@@ -26,10 +26,11 @@ const outDir = path.resolve(__dirname, '_server');
 
 const common = {
   platform: 'node',
-  format: 'esm',
+  format: 'cjs',
   bundle: true,
   sourcemap: false,
   outdir: outDir,
+  outExtension: { '.js': '.cjs' },
   external: [],
   loader: { '.ts': 'ts' },
   alias: {
