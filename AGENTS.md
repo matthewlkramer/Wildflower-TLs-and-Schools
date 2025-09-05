@@ -81,7 +81,7 @@ CLI secrets:
 - Loans:
   - Includes applications, payments, documents, covenants, committee reviews, templates, and generated documents (see `server/routes.ts`).
 
-## AG Grid
+## AG Grid 
 
 - Initialization: Centralized in `client/src/lib/ag-grid-enterprise.ts:5` via `initAgGridEnterprise()`; called once at app start in `client/src/App.tsx:74`.
 - Community module: Always registers `AllCommunityModule` so community features work everywhere.
