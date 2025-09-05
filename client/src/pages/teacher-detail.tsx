@@ -42,9 +42,9 @@ export default function TeacherDetail() {
   const { toast } = useToast();
 
   const { data: teacher, isLoading } = useQuery<Teacher>({
-    queryKey: ["/api/teachers", id],
+    queryKey: ["/api/educators", id],
     queryFn: async () => {
-      const response = await fetch(`/api/teachers/${id}`, { credentials: "include" });
+      const response = await fetch(`/api/educators/${id}`, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch teacher");
       return response.json();
     },
@@ -53,11 +53,11 @@ export default function TeacherDetail() {
   // Mutation to update educator details
   const updateTeacherDetailsMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("PUT", `/api/teachers/${id}`, data);
+      return await apiRequest("PUT", `/api/educators/${id}`, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/teachers"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/teachers", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/educators"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/educators", id] });
       toast({ title: "Success", description: "Educator details updated" });
     },
     onError: () => {
