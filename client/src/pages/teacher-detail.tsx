@@ -8,6 +8,7 @@
  */
 import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useCachedEducators } from "@/hooks/use-cached-data";
 import { useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,14 +42,20 @@ export default function TeacherDetail() {
   const [activeTab, setActiveTab] = useState("summary");
   const { toast } = useToast();
 
-  const { data: teacher, isLoading } = useQuery<Teacher>({
+  const { data: cachedList = [], isLoading: listLoading } = useCachedEducators();
+  const cached = (cachedList as any[]).find((e) => e?.id === id) as Teacher | undefined;
+
+  const { data: fetched, isLoading: fetchLoading } = useQuery<Teacher>({
     queryKey: ["/api/educators", id],
+    enabled: !!id && !cached,
     queryFn: async () => {
       const response = await fetch(`/api/educators/${id}`, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch teacher");
       return response.json();
     },
   });
+  const teacher = cached || fetched;
+  const isLoading = listLoading || (!cached && fetchLoading);
 
   // Mutation to update educator details
   const updateTeacherDetailsMutation = useMutation({
