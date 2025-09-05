@@ -4,7 +4,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { registerRoutes } from './_server/routes.js';
 import { setupAuth } from './_server/auth.js';
 
-export const config = { runtime: 'nodejs20.x' };
+export const config = { runtime: 'nodejs22.x' };
 
 let appPromise: Promise<express.Express> | null = null;
 
