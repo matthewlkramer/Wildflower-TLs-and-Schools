@@ -152,7 +152,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
 
   return (
     <>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" className="h-7 w-7 p-0" asChild>
           <Link href={`/teacher/${teacher.id}`}>
             <ExternalLink className="h-3 w-3" />
