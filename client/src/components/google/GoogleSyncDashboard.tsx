@@ -4,14 +4,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Wifi, WifiOff, Mail, Calendar as CalendarIcon,
-  AlertCircle, Play, Pause, Square
-} from "lucide-react";
+import { Wifi, WifiOff, Mail, Calendar as CalendarIcon } from "lucide-react";
 
 const GMAIL_FN = "gmail-sync";
 const CAL_FN = "gcal-sync";
@@ -76,10 +72,12 @@ export function GoogleSyncDashboard() {
   const [gmailRow, setGmailRow] = useState<GmailProgressRow | null>(null);
   const gmailRunId = gmailRow?.current_run_id ?? gmailRow?.run_id ?? null;
   const gmailRunning = gmailRow?.sync_status === "running";
+  // Keep minimal state to satisfy hidden Start/Pause controls (now unused)
   const [gmailStarting, setGmailStarting] = useState(false);
   const [gmailPausing, setGmailPausing] = useState(false);
   const [gmailUserPaused, setGmailUserPaused] = useState(false);
   const [gmailSyncedThrough, setGmailSyncedThrough] = useState<string>("");
+  const [gmailMostRecent, setGmailMostRecent] = useState<string>("");
 
   const [calRow, setCalRow] = useState<CalendarProgressRow | null>(null);
   const calRunId = calRow?.current_run_id ?? calRow?.run_id ?? null;
@@ -88,6 +86,7 @@ export function GoogleSyncDashboard() {
   const [calPausing, setCalPausing] = useState(false);
   const [calUserPaused, setCalUserPaused] = useState(false);
   const [calSyncedThrough, setCalSyncedThrough] = useState<string>("");
+  const [calMostRecent, setCalMostRecent] = useState<string>("");
 
   const [consoleRows, setConsoleRows] = useState<ConsoleRow[]>([]);
   const [consoleFilter, setConsoleFilter] = useState<ConsoleFilter>("all");
@@ -278,6 +277,7 @@ export function GoogleSyncDashboard() {
       .order("updated_at", { ascending: false, nullsFirst: false })
       .limit(1);
     setGmailRow(rows?.[0] ?? null);
+    await loadSyncedThroughBadges();
   };
 
   const refreshCalStatus = async () => {
@@ -291,6 +291,7 @@ export function GoogleSyncDashboard() {
       .order("updated_at", { ascending: false, nullsFirst: false })
       .limit(1);
     setCalRow(rows?.[0] ?? null);
+    await loadSyncedThroughBadges();
   };
 
   const loadSyncedThroughBadges = async () => {
@@ -298,27 +299,44 @@ export function GoogleSyncDashboard() {
     const uid = u.user?.id; if (!uid) return;
     const { data: w } = await supabase
       .from(GMAIL_WEEKLY_TABLE)
-      .select("year, week, completed_at")
+      .select("year, week, completed_at, updated_at")
       .eq("user_id", uid)
       .eq("sync_status", "completed")
       .order("year", { ascending: false })
       .order("week", { ascending: false })
       .limit(1);
-    if (w?.[0]?.completed_at) {
-      const date = new Date(w[0].completed_at);
-      setGmailSyncedThrough(date.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }));
+    if (w?.[0]) {
+      const y = w[0].year;
+      const wk = w[0].week;
+      // Compute ISO week start (Monday)
+      const base = new Date(Date.UTC(y, 0, 1 + (wk - 1) * 7));
+      const dow = base.getUTCDay() || 7;
+      const weekStart = new Date(base);
+      if (dow <= 4) weekStart.setUTCDate(base.getUTCDate() - base.getUTCDay() + 1);
+      else weekStart.setUTCDate(base.getUTCDate() + 8 - base.getUTCDay());
+      const weekEnd = new Date(weekStart);
+      weekEnd.setUTCDate(weekStart.getUTCDate() + 6); // Sunday
+      const fmt = (d: Date) => `${d.getUTCMonth() + 1}/${d.getUTCDate()}/${d.getUTCFullYear()}`;
+      setGmailSyncedThrough(fmt(weekEnd));
+      const mostRecent = w[0].updated_at || w[0].completed_at;
+      if (mostRecent) setGmailMostRecent(new Date(mostRecent).toLocaleString());
     }
     const { data: m } = await supabase
       .from(CAL_MONTHLY_TABLE)
-      .select("year, month, completed_at")
+      .select("year, month, completed_at, updated_at")
       .eq("user_id", uid)
       .eq("sync_status", "completed")
       .order("year", { ascending: false })
       .order("month", { ascending: false })
       .limit(1);
-    if (m?.[0]?.completed_at) {
-      const date = new Date(m[0].completed_at);
-      setCalSyncedThrough(date.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }));
+    if (m?.[0]) {
+      const y = m[0].year;
+      const mo = m[0].month; // 1..12
+      const monthEnd = new Date(Date.UTC(y, mo, 0));
+      const fmt = (d: Date) => `${d.getUTCMonth() + 1}/${d.getUTCDate()}/${d.getUTCFullYear()}`;
+      setCalSyncedThrough(fmt(monthEnd));
+      const mostRecent = m[0].updated_at || m[0].completed_at;
+      if (mostRecent) setCalMostRecent(new Date(mostRecent).toLocaleString());
     }
   };
 
@@ -361,11 +379,22 @@ export function GoogleSyncDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="p-4 space-y-3">
           <div className="flex items-center gap-2"><Mail size={18} /><div className="font-semibold">Gmail</div></div>
-          <div className="flex items-center gap-2">
-            <Badge variant={gmailRunning ? 'default' : 'secondary'}>{gmailRow?.sync_status ?? 'not_started'}</Badge>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="outline" onClick={async()=>{
+              try { const headers = await authHeaders(); await supabase.functions.invoke('gmail-sync', { body: { action: 'start_sync' }, headers }); addConsole('gmail','Started weekly sync'); } catch(e:any){ addConsole('gmail', 'Start failed: '+(e?.message||String(e))); }
+            }}>Run Week</Button>
+            <Button size="sm" variant="outline" onClick={async()=>{
+              try { const headers = await authHeaders(); await supabase.functions.invoke('gmail-sync', { body: { action: 'backfill_matched' }, headers }); addConsole('gmail','Backfill started (matched emails)'); } catch(e:any){ addConsole('gmail', 'Backfill failed: '+(e?.message||String(e))); }
+            }}>Backfill Bodies+Attachments</Button>
+            <Button size="sm" variant="outline" onClick={async()=>{
+              try { const headers = await authHeaders(); await supabase.rpc('refresh_g_emails_matches', { p_user_id: (await supabase.auth.getUser()).data.user?.id, p_since: null, p_merge: false }); addConsole('gmail','Refresh matches triggered'); } catch(e:any){ addConsole('gmail','Refresh failed: '+(e?.message||String(e))); }
+            }}>Refresh Matches</Button>
+          </div>
+          <div className="flex flex-col gap-1">
+            {gmailMostRecent && <div className="text-xs text-muted-foreground">Most recent sync: {gmailMostRecent}</div>}
             {gmailSyncedThrough && <div className="text-xs text-muted-foreground">Synced through {gmailSyncedThrough}</div>}
           </div>
-          <div className="flex gap-2">
+          <div className="hidden">
             <Button
               onClick={async()=>{
                 try {
@@ -410,11 +439,22 @@ export function GoogleSyncDashboard() {
 
         <Card className="p-4 space-y-3">
           <div className="flex items-center gap-2"><CalendarIcon size={18} /><div className="font-semibold">Calendar</div></div>
-          <div className="flex items-center gap-2">
-            <Badge variant={calRunning ? 'default' : 'secondary'}>{calRow?.sync_status ?? 'not_started'}</Badge>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="outline" onClick={async()=>{
+              try { const headers = await authHeaders(); await supabase.functions.invoke('gcal-sync', { body: { action: 'start_sync' }, headers }); addConsole('calendar','Started monthly sync'); } catch(e:any){ addConsole('calendar', 'Start failed: '+(e?.message||String(e))); }
+            }}>Run Month</Button>
+            <Button size="sm" variant="outline" onClick={async()=>{
+              try { const headers = await authHeaders(); await supabase.functions.invoke('gcal-sync', { body: { action: 'backfill_event_attachments' }, headers }); addConsole('calendar','Backfill attachments started'); } catch(e:any){ addConsole('calendar', 'Backfill failed: '+(e?.message||String(e))); }
+            }}>Backfill Attachments</Button>
+            <Button size="sm" variant="outline" onClick={async()=>{
+              try { const headers = await authHeaders(); await supabase.rpc('refresh_g_events_matches', { p_user_id: (await supabase.auth.getUser()).data.user?.id, p_since: null, p_merge: false }); addConsole('calendar','Refresh matches triggered'); } catch(e:any){ addConsole('calendar','Refresh failed: '+(e?.message||String(e))); }
+            }}>Refresh Matches</Button>
+          </div>
+          <div className="flex flex-col gap-1">
+            {calMostRecent && <div className="text-xs text-muted-foreground">Most recent sync: {calMostRecent}</div>}
             {calSyncedThrough && <div className="text-xs text-muted-foreground">Synced through {calSyncedThrough}</div>}
           </div>
-          <div className="flex gap-2">
+          <div className="hidden">
             <Button
               onClick={async()=>{
                 try {
@@ -456,6 +496,7 @@ export function GoogleSyncDashboard() {
           </div>
         </Card>
       </div>
+
     </div>
   );
 }

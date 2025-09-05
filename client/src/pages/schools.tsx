@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 import SchoolsGrid from "@/components/schools-grid";
 import AddSchoolModal from "@/components/add-school-modal";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Pencil, Mail, GitMerge } from "lucide-react";
 import { type School } from "@shared/schema";
 import { useSearch } from "@/contexts/search-context";
 import { useCachedSchools } from "@/hooks/use-cached-data";
@@ -22,6 +22,7 @@ export default function Schools() {
   const { searchTerm } = useSearch();
   const { showOnlyMyRecords, currentUser } = useUserFilter();
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
+  const [selected, setSelected] = useState<School[]>([] as any);
 
   const { data: schools, isLoading, prefetchSchool } = useCachedSchools();
 
@@ -63,23 +64,54 @@ export default function Schools() {
 
       <div className="bg-white rounded-lg shadow-sm border border-slate-200">
         <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3">
-          <span>Search:</span>
-          <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
-          <span>Showing {gridFilteredCount ?? totalAfterSearch} of {totalAfterSearch}</span>
-          <div className="ml-auto flex items-center gap-2">
-            <Button size="xs" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
-              <Plus className="h-3 w-3 mr-1" />
-              Add School
-            </Button>
-            <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/schools'] })}>
-              Refresh
-            </Button>
-          </div>
+          {selected.length > 0 ? (
+            <>
+              <span>Selected {selected.length} of {totalAfterSearch}</span>
+              <div className="flex flex-wrap items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-1.5 py-1 sm:flex-nowrap">
+                <Button size="xs" variant="outline" className="h-7 rounded-full shrink-0" onClick={() => {
+                  if (selected.length === 1) window.location.href = `/school/${(selected as any)[0].id}`; else alert('Bulk editing not implemented yet.');
+                }}>
+                  <Pencil className="h-3 w-3 mr-1" /> Edit
+                </Button>
+                <Button size="xs" className="h-7 rounded-full bg-wildflower-blue hover:bg-blue-700 text-white shrink-0" onClick={() => {
+                  alert('Emailing schools is not yet implemented (no clear recipient field).');
+                }}>
+                  <Mail className="h-3 w-3 mr-1" /> Email
+                </Button>
+                <Button size="xs" variant="outline" className="h-7 rounded-full shrink-0" disabled={selected.length < 2} onClick={() => alert('Merge wizard not implemented yet. Proposed: choose primary school, merge fields/relations, archive others.')}>
+                  <GitMerge className="h-3 w-3 mr-1" /> Merge
+                </Button>
+              </div>
+              <div className="ml-auto flex items-center gap-2">
+                <Button size="sm" className="rounded-full bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
+                  <Plus className="h-4 w-4 mr-1" /> Add School
+                </Button>
+                <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/schools'] })}>
+                  Refresh
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <span>Search:</span>
+              <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
+              <span>Showing {gridFilteredCount ?? totalAfterSearch} of {totalAfterSearch}</span>
+              <div className="ml-auto flex items-center gap-2">
+                <Button size="sm" className="rounded-full bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
+                  <Plus className="h-4 w-4 mr-1" /> Add School
+                </Button>
+                <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/schools'] })}>
+                  Refresh
+                </Button>
+              </div>
+            </>
+          )}
         </div>
         <SchoolsGrid 
           schools={filteredSchools || []} 
           isLoading={isLoading}
           onFilteredCountChange={setGridFilteredCount}
+          onSelectionChanged={(rows:any)=>setSelected(rows)}
         />
       </div>
 

@@ -12,7 +12,7 @@ import type { ColDef } from "ag-grid-community";
 import type { Charter } from "@shared/schema";
 import { useSearch } from "@/contexts/search-context";
 import { usePageTitle } from "@/App";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { getStatusColor } from "@/lib/utils";
 import { useUserFilter } from "@/contexts/user-filter-context";
@@ -174,17 +174,23 @@ export default function Charters() {
     <main className="px-4 sm:px-6 lg:px-8 py-8">
       <div className="w-full bg-white rounded-lg border border-slate-200">
         <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3">
-          <span>Search:</span>
-          <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
-          <span>Showing {filteredCharters?.length ?? 0} of {charters?.length ?? 0}</span>
-          <div className="ml-auto flex items-center gap-2">
-            <Button size="xs" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => { try { console.log('Create Charter - to be implemented'); } catch {} }}>
-              Add Charter
-            </Button>
-            <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/charters'] })}>
-              Refresh
-            </Button>
-          </div>
+          {false ? (
+            <></>
+          ) : (
+            <>
+              <span>Search:</span>
+              <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
+              <span>Showing {filteredCharters?.length ?? 0} of {charters?.length ?? 0}</span>
+              <div className="ml-auto flex items-center gap-2">
+                <Button size="xs" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => { try { console.log('Create Charter - to be implemented'); } catch {} }}>
+                  Add Charter
+                </Button>
+                <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/charters'] })}>
+                  Refresh
+                </Button>
+              </div>
+            </>
+          )}
         </div>
         <div style={{ height: gridHeight, width: "100%" }}>
           <AgGridReact
@@ -193,6 +199,9 @@ export default function Charters() {
             columnDefs={columnDefs}
             domLayout="normal"
             headerHeight={40}
+            onSelectionChanged={(ev: any) => {
+              // Selection bar UI can be added later when email recipients strategy is defined for charters
+            }}
             context={{
               componentName: 'charters-grid'
             }}

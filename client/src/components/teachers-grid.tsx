@@ -22,6 +22,7 @@ interface TeachersGridProps {
   isLoading: boolean;
   onFilteredCountChange?: (count: number) => void;
   onAddTeacher?: () => void;
+  onSelectionChanged?: (rows: Educator[]) => void;
 }
 
 // School Link Component that finds school ID by name
@@ -182,7 +183,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
   );
 };
 
-export default function TeachersGrid({ teachers, isLoading, onFilteredCountChange, onAddTeacher }: TeachersGridProps) {
+export default function TeachersGrid({ teachers, isLoading, onFilteredCountChange, onAddTeacher, onSelectionChanged }: TeachersGridProps) {
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const gridHeight = useGridHeight();
   const { entReady, filterForText } = useAgGridFeatures();
@@ -352,14 +353,9 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
         style={{ height: '100%' }}
       >
         <div className="relative h-full w-full">
-          <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
-            <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => onAddTeacher?.()}>
-              <Plus className="h-4 w-4 mr-1" />
-              Add Teacher
-            </Button>
-          </div>
           <AgGridReact
             {...DEFAULT_GRID_PROPS}
+            getRowId={(p:any)=>p?.data?.id}
             onGridReady={onGridReady}
             rowData={teachers}
             columnDefs={columnDefs}
@@ -390,6 +386,12 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
               try {
                 const count = ev.api.getDisplayedRowCount();
                 onFilteredCountChange?.(count);
+              } catch {}
+            }}
+            onSelectionChanged={(ev: any) => {
+              try {
+                const rows = ev.api.getSelectedRows?.() || [];
+                onSelectionChanged?.(rows as Educator[]);
               } catch {}
             }}
             context={{ componentName: 'teachers-grid' }}

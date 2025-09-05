@@ -332,6 +332,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Merge multiple educators into a primary educator
+  app.post("/api/teachers/merge", async (req, res) => {
+    try {
+      const { primaryId, duplicateIds } = req.body || {};
+      if (!primaryId || !Array.isArray(duplicateIds) || duplicateIds.length === 0) {
+        return res.status(400).json({ message: 'primaryId and duplicateIds are required' });
+      }
+      const primary = await storage.getEducator(primaryId);
+      if (!primary) return res.status(404).json({ message: 'Primary educator not found' });
+      // Copy simple fields from duplicates if missing on primary
+      const fieldsToConsider = ['fullName','firstName','nickname','lastName','currentPrimaryEmailAddress','primaryPhone','secondaryPhone','individualType','discoveryStatus'] as const;
+      const updates: any = {};
+      for (const f of fieldsToConsider) {
+        const pval = (primary as any)[f];
+        if (!pval) {
+          for (const dupId of duplicateIds) {
+            const dup = await storage.getEducator(dupId);
+            if (dup) {
+              const dval = (dup as any)[f];
+              if (dval) { updates[f] = dval; break; }
+            }
+          }
+        }
+      }
+      if (Object.keys(updates).length > 0) {
+        await storage.updateEducator(primaryId, updates);
+      }
+      // Archive duplicates
+      for (const dupId of duplicateIds) {
+        await storage.updateEducator(dupId, { archived: true } as any);
+      }
+      cache.invalidate('educators');
+      cache.invalidate('teachers');
+      return res.json({ ok: true, primaryId, archived: duplicateIds });
+    } catch (error: any) {
+      return res.status(500).json({ message: error?.message || 'Merge failed' });
+    }
+  });
+
   // User-specific TLs/ETLs for dashboard
   app.get("/api/tls/user/:userId", async (req, res) => {
     try {

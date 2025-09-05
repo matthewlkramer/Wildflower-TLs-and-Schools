@@ -21,6 +21,7 @@ interface SchoolsGridProps {
   schools: School[];
   isLoading: boolean;
   onFilteredCountChange?: (count: number) => void;
+  onSelectionChanged?: (rows: School[]) => void;
 }
 
 // Custom cell renderers
@@ -123,7 +124,7 @@ const ActionsCellRenderer = ({ data: school }: { data: School }) => {
   );
 };
 
-export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange }: SchoolsGridProps) {
+export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange, onSelectionChanged }: SchoolsGridProps) {
   const { toast } = useToast();
   const gridHeight = useGridHeight();
   const { entReady, filterForText } = useAgGridFeatures();
@@ -265,13 +266,14 @@ export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange 
 
   return (
     <div className="w-full min-h-[280px]" style={{ height: gridHeight }}>
-      <GridBase
-        rowData={schools}
-        columnDefs={columnDefs}
+      <GridBase 
+        rowData={schools} 
+        columnDefs={columnDefs} 
         defaultColDefOverride={defaultColDef}
         style={{ height: '100%' }}
         gridProps={{
           ...DEFAULT_GRID_PROPS,
+          getRowId: (p:any)=>p?.data?.id,
           onGridReady: (params: GridReadyEvent) => {
             params.api.sizeColumnsToFit();
           },
@@ -298,6 +300,12 @@ export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange 
             try {
               const count = ev.api.getDisplayedRowCount();
               onFilteredCountChange?.(count);
+            } catch {}
+          },
+          onSelectionChanged: (ev: any) => {
+            try {
+              const rows = ev.api.getSelectedRows?.() || [];
+              onSelectionChanged?.(rows as School[]);
             } catch {}
           },
           context: { componentName: 'schools-grid' },

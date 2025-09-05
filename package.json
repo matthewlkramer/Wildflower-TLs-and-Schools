@@ -16,7 +16,7 @@
     "airtable:update": "npm run airtable:schema:pull && npm run airtable:gen",
     "supabase:link": "npx supabase link",
     "supabase:db:push": "npx supabase db push",
-    "supabase:functions:deploy": "npx supabase functions deploy gmail-sync gcal-sync",
+    "supabase:functions:deploy": "npx supabase functions deploy gmail-sync gcal-sync daily-cron run-sync",
     "sync:email-filter": "tsx scripts/sync-email-filter-to-supabase.ts"
   ,
     "schema:validate": "tsx scripts/validate-schema-alignment.ts"

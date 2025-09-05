@@ -158,6 +158,15 @@ export async function setupAuth(app: Express) {
 
       const sessionUser: SessionUser = { id: sub, email, name, role: 'user' };
       (req.session as any).user = sessionUser;
+
+      // Initialize per-user Google sync start date if not present
+      try {
+        const { data: exists } = await supabase.from('google_sync_settings').select('user_id').eq('user_id', sub).single();
+        if (!exists) {
+          await supabase.from('google_sync_settings').upsert({ user_id: sub, sync_start_date: new Date().toISOString() } as any);
+        }
+      } catch {}
+
       return res.status(200).json({ ok: true });
     } catch (e) {
       return res.status(401).json({ message: 'Unauthorized' });

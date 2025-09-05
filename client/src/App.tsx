@@ -27,6 +27,7 @@ import Settings from "@/pages/settings";
 import GoogleSyncPage from "@/pages/google-sync";
 import LoginPage from "@/pages/login";
 import ResetPasswordPage from "@/pages/reset";
+import ComposeEmailPage from "@/pages/compose-email";
 
 // Use a shared search context to avoid module duplication issues
 import { SearchContext } from "@/contexts/search-context";
@@ -83,6 +84,7 @@ function Router() {
       <Route path="/loan-origination" component={LoanOrigination} />
       <Route path="/settings" component={Settings} />
       <Route path="/google-sync" component={GoogleSyncPage} />
+      <Route path="/compose-email" component={ComposeEmailPage} />
       <Route path="/ach-setup/:loanId" component={ACHSetup} />
       <Route path="/ach-setup-complete" component={ACHSetupComplete} />
       <Route component={NotFound} />
@@ -140,15 +142,21 @@ function AppContent() {
 
   // Prefetch core datasets only when authenticated
   useEffect(() => {
-    if (!isAuthenticated) return;
-    const keys = [
-      ['/api/teachers'],
-      ['/api/schools'],
-      ['/api/charters'],
-    ] as const;
-    keys.forEach(([k]) => {
-      queryClient.prefetchQuery({ queryKey: [k] });
-    });
+    (async () => {
+      if (!isAuthenticated) return;
+      try {
+        // Ensure server session cookie exists before prefetching
+        await fetch('/api/auth/me', { credentials: 'include' });
+      } catch {}
+      const keys = [
+        ['/api/teachers'],
+        ['/api/schools'],
+        ['/api/charters'],
+      ] as const;
+      keys.forEach(([k]) => {
+        queryClient.prefetchQuery({ queryKey: [k] });
+      });
+    })();
   }, [isAuthenticated]);
 
 

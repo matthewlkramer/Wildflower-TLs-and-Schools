@@ -58,12 +58,15 @@ export async function initAgGridEnterprise(): Promise<void> {
             const originalError = console.error.bind(console);
             console.error = (...args: any[]) => {
               const first = args?.[0];
-              if (typeof first === 'string' && (
-                first.includes('AG Grid Enterprise License') ||
-                first.includes('License Key Not Found') ||
-                first.includes('All AG Grid Enterprise features are unlocked for trial')
-              )) {
-                return; // swallow AG Grid license banner
+              const s = typeof first === 'string' ? first : '';
+              // Swallow known noisy AG Grid license/watermark banners in dev
+              if (
+                s.includes('AG Grid') ||
+                s.includes('AG Grid Enterprise') ||
+                s.includes('watermark') ||
+                s.startsWith('***')
+              ) {
+                return;
               }
               originalError(...args);
             };

@@ -1,5 +1,6 @@
 -- Core tables for Google OAuth, sync progress, console logs, emails and events
 create extension if not exists pgcrypto;
+
 -- Stores user OAuth tokens for Google
 create table if not exists public.google_auth_tokens (
   user_id uuid primary key,
@@ -8,6 +9,7 @@ create table if not exists public.google_auth_tokens (
   expires_at timestamptz not null,
   updated_at timestamptz not null default now()
 );
+
 -- Console/messages stream for the dashboard
 create table if not exists public.google_sync_messages (
   id uuid primary key default gen_random_uuid(),
@@ -19,6 +21,7 @@ create table if not exists public.google_sync_messages (
   created_at timestamptz not null default now()
 );
 create index if not exists google_sync_messages_user_created_idx on public.google_sync_messages(user_id, created_at desc);
+
 -- Gmail per-week progress
 create table if not exists public.g_email_sync_progress (
   user_id uuid not null,
@@ -34,6 +37,7 @@ create table if not exists public.g_email_sync_progress (
   current_run_id text,
   primary key (user_id, year, week)
 );
+
 -- Stored Gmail messages (subset of fields)
 create table if not exists public.g_emails (
   id uuid primary key default gen_random_uuid(),
@@ -52,6 +56,7 @@ create table if not exists public.g_emails (
   updated_at timestamptz not null default now()
 );
 create index if not exists g_emails_user_sent_idx on public.g_emails(user_id, sent_at desc nulls last);
+
 -- Calendar per-month progress
 create table if not exists public.g_event_sync_progress (
   user_id uuid not null,
@@ -69,6 +74,7 @@ create table if not exists public.g_event_sync_progress (
   current_run_id text,
   primary key (user_id, calendar_id, year, month)
 );
+
 -- Stored Calendar events (subset of fields)
 create table if not exists public.g_events (
   id uuid primary key default gen_random_uuid(),
@@ -88,8 +94,10 @@ create table if not exists public.g_events (
   unique (user_id, google_calendar_id, google_event_id)
 );
 create index if not exists g_events_user_start_idx on public.g_events(user_id, start_time desc nulls last);
+
 -- Optional: list of emails to match against (to be populated from Airtable)
 create table if not exists public.email_filter_addresses (
   email text primary key,
   last_synced_at timestamptz default now()
 );
+

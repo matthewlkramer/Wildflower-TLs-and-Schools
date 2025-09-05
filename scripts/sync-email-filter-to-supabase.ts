@@ -12,9 +12,16 @@ async function main() {
   const supabase = createClient(url, serviceKey);
 
   const emails = await storage.getEmailAddresses();
-  const unique = Array.from(new Set((emails || []).map(e => (e.email || '').trim().toLowerCase()).filter(Boolean)));
-  const rows = unique.map(email => ({ email }));
-  console.log(`Upserting ${rows.length} emails to email_filter_addresses...`);
+  // Keep the most recent educatorId seen per normalized email
+  const map = new Map<string, { email: string; educator_id: string | null }>();
+  for (const rec of (emails || [])) {
+    const email = (rec.email || '').trim().toLowerCase();
+    if (!email) continue;
+    const educator_id = rec.educatorId || null;
+    map.set(email, { email, educator_id });
+  }
+  const rows = Array.from(map.values());
+  console.log(`Upserting ${rows.length} emails to email_filter_addresses (with educator_id)...`);
   for (let i = 0; i < rows.length; i += 500) {
     const chunk = rows.slice(i, i + 500);
     const { error } = await supabase.from('email_filter_addresses').upsert(chunk, { onConflict: 'email' });
@@ -27,4 +34,3 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-

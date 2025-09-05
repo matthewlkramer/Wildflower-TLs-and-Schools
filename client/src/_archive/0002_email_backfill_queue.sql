@@ -10,3 +10,4 @@ create table if not exists public.g_email_backfill_queue (
   primary key (user_id, gmail_message_id)
 );
 create index if not exists g_email_backfill_queue_user_enqueued_idx on public.g_email_backfill_queue(user_id, enqueued_at asc);
+

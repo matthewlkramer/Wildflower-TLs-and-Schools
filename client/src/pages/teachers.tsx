@@ -23,6 +23,7 @@ import AddEducatorModal from "@/components/add-teacher-modal";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { Plus, Pencil, Mail, GitMerge } from "lucide-react";
 
 export default function Teachers() {
   const searchContext = useSearch();
@@ -30,6 +31,7 @@ export default function Teachers() {
   logger.log('Teachers - useSearch context result:', searchContext);
   const { showOnlyMyRecords, currentUser } = useUserFilter();
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
+  const [selected, setSelected] = useState<Teacher[]>([]);
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
   const [gridFilteredCount, setGridFilteredCount] = useState<number | null>(null);
@@ -88,14 +90,68 @@ export default function Teachers() {
       <main className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-sm border border-slate-200">
           <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3">
-            <span>Search:</span>
-            <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
-            <span>Showing {showing} of {total}</span>
+            {selected.length > 0 ? (
+              <>
+                <span>Selected {selected.length} of {total}</span>
+                <div className="flex flex-wrap items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-1.5 py-1 sm:flex-nowrap">
+                  <Button size="xs" variant="outline" className="h-7 rounded-full shrink-0" onClick={() => {
+                    if (selected.length === 1) {
+                      window.location.href = `/teacher/${selected[0].id}`;
+                    } else {
+                      alert('Bulk editing is not implemented yet.');
+                    }
+                  }}>
+                    <Pencil className="h-3 w-3 mr-1" /> Edit
+                  </Button>
+                  <Button size="xs" className="h-7 rounded-full bg-wildflower-blue hover:bg-blue-700 text-white shrink-0" onClick={() => {
+                    const emails = selected.map(s => (s.currentPrimaryEmailAddress || '')).filter(Boolean);
+                    const q = encodeURIComponent(emails.join(','));
+                    window.location.href = `/compose-email?to=${q}`;
+                  }}>
+                    <Mail className="h-3 w-3 mr-1" /> Email
+                  </Button>
+                  <Button size="xs" variant="outline" className="h-7 rounded-full shrink-0" disabled={selected.length < 2} onClick={() => {
+                    if (selected.length < 2) return;
+                    const primary = selected[0];
+                    const duplicates = selected.slice(1).map(s => s.id);
+                    const ok = window.confirm(`Merge ${selected.length} records into ${primary.fullName}? This will archive duplicates.`);
+                    if (!ok) return;
+                    fetch('/api/teachers/merge', {
+                      method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ primaryId: primary.id, duplicateIds: duplicates })
+                    }).then(r=>r.json()).then((js)=>{
+                      alert('Merge complete');
+                      setSelected([] as any);
+                      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+                    }).catch(e=>alert('Merge failed'));
+                  }}>
+                    <GitMerge className="h-3 w-3 mr-1" /> Merge
+                  </Button>
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                  <Button size="sm" className="rounded-full bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
+                    <Plus className="h-4 w-4 mr-1" /> Add Teacher
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <span>Search:</span>
+                <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
+                <span>Showing {showing} of {total}</span>
+                <div className="ml-auto flex items-center gap-2">
+                  <Button size="sm" className="rounded-full bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
+                    <Plus className="h-4 w-4 mr-1" /> Add Teacher
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
           <TeachersGrid 
             teachers={filteredTeachers || []} 
             isLoading={isLoading}
             onFilteredCountChange={(count)=>setGridFilteredCount(count)}
+            onSelectionChanged={(rows)=>setSelected(rows as Teacher[])}
             onAddTeacher={() => setShowAddEducatorModal(true)}
           />
         </div>
