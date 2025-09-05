@@ -10,6 +10,18 @@ async function buildApp(): Promise<express.Express> {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
+  // Ensure our Express routes defined with '/api/...' match even if the
+  // Vercel function strips the '/api' segment before passing to the handler.
+  app.use((req, _res, next) => {
+    try {
+      const url = req.url || '';
+      if (!url.startsWith('/api/')) {
+        req.url = url.startsWith('/') ? `/api${url}` : `/api/${url}`;
+      }
+    } catch {}
+    next();
+  });
+
   await setupAuth(app);
   await registerRoutes(app);
 
