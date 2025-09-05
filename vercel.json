@@ -1,6 +1,7 @@
 {
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "npm run build:vercel",
+  "ignoreCommand": "node vercel-ignore-build-step.js",
   "outputDirectory": "dist/public",
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
