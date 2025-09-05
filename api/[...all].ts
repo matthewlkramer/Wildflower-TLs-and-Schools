@@ -1,10 +1,9 @@
 import express from 'express';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 // Defer loading bundled server code to runtime (CJS bundles)
 
-let appPromise: Promise<express.Express> | null = null;
+let appPromise = null as Promise<express.Express> | null;
 
-async function buildApp(): Promise<express.Express> {
+async function buildApp() {
   const app = express();
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
@@ -84,7 +83,7 @@ async function buildApp(): Promise<express.Express> {
   return app;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   if (!appPromise) appPromise = buildApp();
   const app = await appPromise;
   // @ts-ignore pass through to Express
