@@ -1,8 +1,11 @@
 {
-  "installCommand": "NPM_CONFIG_PRODUCTION=false npm ci",
-  "buildCommand": "npm run build:vercel",
-  "outputDirectory": "public",
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://api-for-wftls.vercel.app/api/$1" }
-  ]
+"installCommand": "npm install",
+"buildCommand": "npm run build",
+"rewrites": [
+{
+"source": "/api/(.*)",
+"has": [{ "type": "host", "value": "wftls.vercel.app" }],
+"destination": "https://api-for-wftls.vercel.app/api/$1"
+}
+]
 }
