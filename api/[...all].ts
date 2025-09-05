@@ -9,6 +9,16 @@ async function buildApp(): Promise<express.Express> {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
+  // Debug: log incoming API requests (can be removed later)
+  app.use((req, _res, next) => {
+    try {
+      if ((req.url || '').startsWith('/api')) {
+        console.log(`[fn] ${req.method} ${req.url}`);
+      }
+    } catch {}
+    next();
+  });
+
   // Ensure incoming URLs include the '/api' prefix to match Express route definitions.
   app.use((req, _res, next) => {
     try {
