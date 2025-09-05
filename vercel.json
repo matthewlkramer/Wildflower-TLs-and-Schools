@@ -1,10 +1,9 @@
 {
-  "installCommand": "NPM_CONFIG_PRODUCTION=false npm ci",
+  "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "npm run build:vercel",
   "ignoreCommand": "node vercel-ignore-build-step.js",
-  "outputDirectory": "public",
+  "outputDirectory": "dist/public",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

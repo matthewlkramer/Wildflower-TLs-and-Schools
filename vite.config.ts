@@ -27,10 +27,8 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname, "client"),
   build: {
-    // On Vercel, emit to repo-root /public so Output Directory can be "public"
-    outDir: process.env.VERCEL === '1'
-      ? path.resolve(import.meta.dirname, "public")
-      : path.resolve(import.meta.dirname, "dist/public"),
+    // Always emit to dist/public; Vercel Output Directory configured to dist/public
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
   },
   server: {

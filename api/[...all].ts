@@ -30,10 +30,42 @@ async function buildApp(): Promise<express.Express> {
     next();
   });
 
-  const { setupAuth } = await import('./_server/auth.cjs');
-  const { registerRoutes } = await import('./_server/routes.cjs');
+  // CommonJS interop: import default and/or named
+  const authMod = await import('./_server/auth.cjs');
+  const routesMod = await import('./_server/routes.cjs');
+  const setupAuth = (authMod as any).setupAuth || (authMod as any).default?.setupAuth;
+  const registerRoutes = (routesMod as any).registerRoutes || (routesMod as any).default?.registerRoutes;
+  if (typeof setupAuth !== 'function' || typeof registerRoutes !== 'function') {
+    console.error('Failed to load server bundles: setupAuth/registerRoutes not found');
+    throw new Error('Server bundles missing exports');
+  }
   await setupAuth(app as any);
   await registerRoutes(app as any);
+
+  // DEBUG: list registered routes to verify mounting works in serverless
+  app.get('/api/_debug/routes', (_req, res) => {
+    try {
+      const routes: any[] = [];
+      // @ts-ignore accessing private router stack
+      const stack = (app as any)._router?.stack || [];
+      for (const layer of stack) {
+        if (layer.route && layer.route.path) {
+          const methods = Object.keys(layer.route.methods || {}).filter(Boolean);
+          routes.push({ path: layer.route.path, methods });
+        } else if (layer.name === 'router' && layer.handle?.stack) {
+          for (const lr of layer.handle.stack) {
+            if (lr.route?.path) {
+              const methods = Object.keys(lr.route.methods || {}).filter(Boolean);
+              routes.push({ path: lr.route.path, methods });
+            }
+          }
+        }
+      }
+      res.json({ ok: true, count: routes.length, routes });
+    } catch (e: any) {
+      res.status(500).json({ ok: false, error: String(e?.message || e) });
+    }
+  });
 
   return app;
 }
