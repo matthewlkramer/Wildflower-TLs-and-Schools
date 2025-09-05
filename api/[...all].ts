@@ -30,8 +30,15 @@ async function buildApp(): Promise<express.Express> {
     next();
   });
 
-  const { setupAuth } = await import('./_server/auth.cjs');
-  const { registerRoutes } = await import('./_server/routes.cjs');
+  // CommonJS interop: import default and/or named
+  const authMod = await import('./_server/auth.cjs');
+  const routesMod = await import('./_server/routes.cjs');
+  const setupAuth = (authMod as any).setupAuth || (authMod as any).default?.setupAuth;
+  const registerRoutes = (routesMod as any).registerRoutes || (routesMod as any).default?.registerRoutes;
+  if (typeof setupAuth !== 'function' || typeof registerRoutes !== 'function') {
+    console.error('Failed to load server bundles: setupAuth/registerRoutes not found');
+    throw new Error('Server bundles missing exports');
+  }
   await setupAuth(app as any);
   await registerRoutes(app as any);
 
