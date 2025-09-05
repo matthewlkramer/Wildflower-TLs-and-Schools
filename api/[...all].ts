@@ -42,6 +42,31 @@ async function buildApp(): Promise<express.Express> {
   await setupAuth(app as any);
   await registerRoutes(app as any);
 
+  // DEBUG: list registered routes to verify mounting works in serverless
+  app.get('/api/_debug/routes', (_req, res) => {
+    try {
+      const routes: any[] = [];
+      // @ts-ignore accessing private router stack
+      const stack = (app as any)._router?.stack || [];
+      for (const layer of stack) {
+        if (layer.route && layer.route.path) {
+          const methods = Object.keys(layer.route.methods || {}).filter(Boolean);
+          routes.push({ path: layer.route.path, methods });
+        } else if (layer.name === 'router' && layer.handle?.stack) {
+          for (const lr of layer.handle.stack) {
+            if (lr.route?.path) {
+              const methods = Object.keys(lr.route.methods || {}).filter(Boolean);
+              routes.push({ path: lr.route.path, methods });
+            }
+          }
+        }
+      }
+      res.json({ ok: true, count: routes.length, routes });
+    } catch (e: any) {
+      res.status(500).json({ ok: false, error: String(e?.message || e) });
+    }
+  });
+
   return app;
 }
 
