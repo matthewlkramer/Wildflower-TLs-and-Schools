@@ -1,7 +1,7 @@
 import express from 'express';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { registerRoutes } from '../server/routes';
-import { setupAuth } from '../server/auth';
+import { registerRoutes } from './_server/routes.js';
+import { setupAuth } from './_server/auth.js';
 
 let appPromise: Promise<express.Express> | null = null;
 
@@ -23,4 +23,3 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // @ts-ignore - express types are compatible
   return app(req, res);
 }
-
