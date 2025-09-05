@@ -1124,7 +1124,13 @@ export type InsertTeacher = InsertEducator;
 export type TeacherSchoolAssociation = EducatorSchoolAssociation;
 export type InsertTeacherSchoolAssociation = InsertEducatorSchoolAssociation;
 export type ActionStep = CharterActionStep;
-export type Tax990 = Charter990;
+export interface Tax990 {
+  id: string;
+  schoolId: string;
+  year?: string;
+  attachment?: string;
+  attachmentUrl?: string;
+}
 
 // Legacy schemas for backward compatibility
 export const insertTeacherSchema = educatorSchema;

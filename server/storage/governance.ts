@@ -9,6 +9,7 @@ export function transformGovernanceDocument(record: any): GovernanceDocument {
   return {
     id: record.id,
     schoolId: Array.isArray(f[GDF.School]) ? String((f[GDF.School] as any[])[0] || '') : String(f[GDF.School] || ''),
+    charterId: String(f[GDF.charter_id] || ''),
     docType: String(f[GDF.Document_type] || ''),
     doc: String(att?.filename || ''),
     docUrl: String(att?.url || link || ''),

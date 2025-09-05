@@ -2372,8 +2372,9 @@ export class SimpleAirtableStorage implements IStorage {
       id: `cert_${Date.now()}`,
       educatorId: certification.educatorId,
       certificationLevel: certification.certificationLevel,
-      expirationDate: certification.expirationDate,
-      notes: certification.notes,
+      certificationStatus: certification.certificationStatus,
+      certifier: certification.certifier,
+      yearReceived: certification.yearReceived,
       created: new Date().toISOString(),
       lastModified: new Date().toISOString(),
     };
@@ -2427,15 +2428,21 @@ export class SimpleAirtableStorage implements IStorage {
         if (eventId) {
           try {
             const ev = await eventsTable.find(eventId);
-            eventName = ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId;
-            eventDate = ev.fields[EVF.Date] || undefined;
+            eventName = String(ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId);
+            {
+              const raw = ev.fields[EVF.Date];
+              eventDate = raw !== undefined && raw !== null ? String(raw) : undefined;
+            }
           } catch (e) {
             try {
               const fallback = await eventsTable.select({ filterByFormula: `RECORD_ID() = "${eventId}"` }).firstPage();
               const ev = fallback?.[0];
               if (ev) {
-                eventName = ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId;
-                eventDate = ev.fields[EVF.Date] || undefined;
+                eventName = String(ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId);
+                {
+                  const raw = ev.fields[EVF.Date];
+                  eventDate = raw !== undefined && raw !== null ? String(raw) : undefined;
+                }
               } else {
                 eventName = eventId;
               }
@@ -2467,8 +2474,11 @@ export class SimpleAirtableStorage implements IStorage {
       if (eventId) {
         try {
           const ev = await eventsTable.find(eventId);
-          eventName = ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId;
-          eventDate = ev.fields[EVF.Date] || undefined;
+          eventName = String(ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId);
+          {
+            const raw = ev.fields[EVF.Date];
+            eventDate = raw !== undefined && raw !== null ? String(raw) : undefined;
+          }
         } catch (e) {
           try {
             const fallback = await eventsTable.select({ filterByFormula: `RECORD_ID() = "${eventId}"` }).firstPage();
@@ -2515,8 +2525,11 @@ export class SimpleAirtableStorage implements IStorage {
               const fallback = await eventsTable.select({ filterByFormula: `RECORD_ID() = "${eventId}"` }).firstPage();
               const ev = fallback?.[0];
               if (ev) {
-                eventName = ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId;
-                eventDate = ev.fields[EVF.Date] || undefined;
+                eventName = String(ev.fields[EVF.Event_Name] || ev.fields['Name'] || eventId);
+                {
+                  const raw = ev.fields[EVF.Date];
+                  eventDate = raw !== undefined && raw !== null ? String(raw) : undefined;
+                }
               } else {
                 eventName = eventId;
               }
@@ -2555,7 +2568,6 @@ export class SimpleAirtableStorage implements IStorage {
     return {
       ...existing,
       ...attendance,
-      lastModified: new Date().toISOString(),
     };
   }
 
