@@ -1,7 +1,6 @@
 {
 "installCommand": "NPM_CONFIG_PRODUCTION=false npm ci",
-"buildCommand": "npm run build
-",
+"buildCommand": "npm run build",
 "outputDirectory": "public",
 "rewrites": [
 { "source": "/api/(.)", "destination": "/api/$1" },
