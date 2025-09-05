@@ -222,7 +222,7 @@ export function AssociationGrid({ mode, rows, loading, editable = false, onOpen,
           const row = p.data!;
           const rowIsEditing = isEditingRow(row.id);
           return (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               {onOpen && (
                 <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-blue-50" title="Open" onClick={() => onOpen(row)}>
                   <ExternalLink className="h-3 w-3 text-blue-600" />

@@ -72,7 +72,7 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     if (!emailAddress) return null;
 
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="sm"

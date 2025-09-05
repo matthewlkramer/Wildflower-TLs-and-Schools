@@ -106,7 +106,7 @@ const ActionsCellRenderer = ({ data: school }: { data: School }) => {
   };
 
   return (
-    <div className="flex space-x-1">
+    <div className="flex items-center space-x-2">
       <Link href={`/school/${school.id}`}>
         <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
           <ExternalLink className="h-3 w-3" />
