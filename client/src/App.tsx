@@ -145,8 +145,7 @@ function AppContent() {
     (async () => {
       if (!isAuthenticated) return;
       try {
-        // Ensure server session cookie exists before prefetching
-        await fetch('/api/auth/me', { credentials: 'include' });
+        // In serverless mode we rely on Authorization header injection; no server session required.
       } catch {}
       const keys = [
         ['/api/teachers'],

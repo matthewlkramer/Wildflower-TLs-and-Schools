@@ -64,6 +64,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return origFetch(input, init);
     };
     async function syncServerSessionFromSupabase() {
+      // In serverless mode we skip server-session bridging and use Authorization headers on /api/*.
+      if (import.meta.env.VITE_ENABLE_SERVER_SESSION !== 'true') return;
       try {
         const { data: sessionData } = await supabase.auth.getSession();
         const access = sessionData.session?.access_token;
@@ -106,19 +108,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const ok = await enforceDomain();
         if (ok) {
           setUser({ id: session.user.id, email: session.user.email || '', name: session.user.user_metadata?.name });
-          try {
-            await fetch('/api/auth/supabase-session', {
-              method: 'POST',
-              headers: { Authorization: `Bearer ${session.access_token}` },
-              credentials: 'include',
-            });
-          } catch {}
+          if (import.meta.env.VITE_ENABLE_SERVER_SESSION === 'true') {
+            try {
+              await fetch('/api/auth/supabase-session', {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${session.access_token}` },
+                credentials: 'include',
+              });
+            } catch {}
+          }
         } else {
           setUser(null);
         }
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
-        try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch {}
+        if (import.meta.env.VITE_ENABLE_SERVER_SESSION === 'true') {
+          try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch {}
+        }
       }
     });
     return () => { mounted = false; sub.subscription.unsubscribe(); };
