@@ -1,7 +1,7 @@
 import express from 'express';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { registerRoutes } from './_server/routes.js';
-import { setupAuth } from './_server/auth.js';
+import { registerRoutes } from '../_server/routes.js';
+import { setupAuth } from '../_server/auth.js';
 
 let appPromise: Promise<express.Express> | null = null;
 
