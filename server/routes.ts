@@ -45,13 +45,13 @@ const insertTemplateFieldSchema = createInsertSchema(templateFields);
 const insertGeneratedDocumentSchema = createInsertSchema(generatedDocuments);
 import { z } from "zod";
 
-// Initialize Stripe
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+// Initialize Stripe lazily; if not configured, loan ACH endpoints will be disabled
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2023-10-16",
+  });
 }
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
-});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Require authentication for all /api routes except /api/auth/*
@@ -1774,6 +1774,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
   app.post("/api/loans/:id/ach-setup", async (req, res) => {
+    if (!stripe) {
+      return res.status(501).json({ message: "ACH setup is not configured on this deployment" });
+    }
     try {
       const loanId = parseInt(req.params.id);
       const { paymentMethodId, accountHolderName } = req.body;
