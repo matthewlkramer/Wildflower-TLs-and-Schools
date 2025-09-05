@@ -1,8 +1,8 @@
 import express from 'express';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-// Import directly from the server source so Vercel bundles it
-import { registerRoutes } from '../server/routes';
-import { setupAuth } from '../server/auth';
+// Use pre-bundled server modules to avoid per-function dependency installs
+import { registerRoutes } from './_server/routes.js';
+import { setupAuth } from './_server/auth.js';
 
 export const config = { runtime: 'nodejs' };
 
@@ -13,8 +13,8 @@ async function buildApp(): Promise<express.Express> {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
-  await setupAuth(app);
-  await registerRoutes(app);
+  await setupAuth(app as unknown as any);
+  await registerRoutes(app as unknown as any);
 
   return app;
 }
@@ -24,5 +24,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const app = await appPromise;
   // Delegate to Express app which serves /api/* routes
   // @ts-ignore - express types are compatible
-  return app(req, res);
+  return (app as unknown as any)(req, res);
 }
