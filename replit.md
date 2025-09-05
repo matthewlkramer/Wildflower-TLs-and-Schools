@@ -44,7 +44,38 @@ Client requests made via TanStack Query are handled by Express routes with valid
 
 ### Deployment Strategy
 - **Development**: Node.js with tsx for server, Vite for client with proxy to backend.
-- **Production**: Client static assets built by Vite, server bundled by esbuild. Single Node.js process serves both API and static files.
+- **Production (Node host)**: Client static assets built by Vite, server bundled by esbuild. Single Node.js process serves both API and static files.
+- **Production (Vercel)**: Client built to `dist/public` and served as static. API runs as a Vercel Function at `/api/*` via `api/index.ts` (Express embedded).
+
+## Vercel Deployment (Static Client + Serverless API)
+
+- Build command: `npm run build:vercel` (skips bundling the Node server)
+- Output directory: `dist/public`
+
+### Environment Variables on Vercel
+
+- Client (used at build/runtime in the browser):
+  - `VITE_SUPABASE_URL`
+  - `VITE_SUPABASE_ANON_KEY`
+
+- Serverless API (set in Vercel env; used by `/api/*`):
+  - `SUPABASE_URL`
+  - `SUPABASE_SERVICE_ROLE_KEY` (or `SERVICE_ROLE_KEY`)
+  - `GOOGLE_CLIENT_ID`
+  - `GOOGLE_CLIENT_SECRET`
+  - `STRIPE_SECRET_KEY` (required by server init)
+  - Airtable credentials used by `server/simple-storage.ts`
+  - `NODE_ENV=production`
+
+### Auth Redirects
+- Supabase → Authentication → URL Configuration
+  - Site URL: `https://<your-vercel-domain>`
+  - Additional Redirect URLs: include `/reset`, `/google-sync`, and localhost equivalents.
+- Google OAuth client: add JS origin `https://<your-vercel-domain>`; keep redirect `https://<PROJECT>.supabase.co/auth/v1/callback`.
+
+### Notes
+- The client automatically attaches the Supabase JWT to `/api/*` requests, enabling stateless auth in serverless.
+- If grids show “No rows”, check Vercel Function logs and verify server envs are present (notably `STRIPE_SECRET_KEY`).
 
 ### Architecture Standards
 - **Schema-First Development**: Prioritizing alignment between TypeScript interfaces, Zod schemas, and Airtable field mappings.

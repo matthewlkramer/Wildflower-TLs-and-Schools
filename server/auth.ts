@@ -173,11 +173,33 @@ export async function setupAuth(app: Express) {
     }
   });
 
-  // Current user
-  app.get('/api/auth/me', (req: Request, res: Response) => {
-    const user = (req.session as any).user as SessionUser | undefined;
-    if (!user) return res.status(401).json({ message: 'Unauthorized' });
-    res.json(user);
+  // Current user; fall back to Supabase JWT if no session exists (serverless-friendly)
+  app.get('/api/auth/me', async (req: Request, res: Response) => {
+    const existing = (req.session as any).user as SessionUser | undefined;
+    if (existing) return res.json(existing);
+    try {
+      const auth = (req.headers['authorization'] || '').toString();
+      const match = auth.match(/^Bearer\s+(.+)$/i);
+      if (!match) return res.status(401).json({ message: 'Unauthorized' });
+      const jwt = match[1];
+      const SUPABASE_URL = process.env.SUPABASE_URL;
+      const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY;
+      if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+        return res.status(500).json({ message: 'Server auth not configured' });
+      }
+      const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+      const { data, error } = await supabase.auth.getUser(jwt);
+      if (error || !data?.user) return res.status(401).json({ message: 'Unauthorized' });
+      const email = data.user.email || '';
+      const name = (data.user.user_metadata as any)?.name || '';
+      const sub = data.user.id;
+      const allowedDomain = (process.env.ALLOWED_GOOGLE_DOMAIN || 'wildflowerschools.org').toLowerCase();
+      const emailDomain = email.split('@')[1]?.toLowerCase();
+      if (!email || emailDomain !== allowedDomain) return res.status(403).json({ message: 'Forbidden' });
+      return res.json({ id: sub, email, name, role: 'user' });
+    } catch {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
   });
 
   // Logout
