@@ -16,7 +16,7 @@ export function useCachedEducators() {
   const queryClient = useQueryClient();
   
   const query = useQuery({
-    queryKey: ["/api/teachers"],
+    queryKey: ["/api/educators"],
     select: (data: any) => {
       const arr = Array.isArray(data) ? data : [];
       return arr.filter((e: any) => !e?.archived);
@@ -32,7 +32,7 @@ export function useCachedEducators() {
   // Prefetch educator details when hovering over a row
   const prefetchEducator = useCallback((educatorId: string) => {
     queryClient.prefetchQuery({
-      queryKey: [`/api/teachers/${educatorId}`],
+      queryKey: [`/api/educators/${educatorId}`],
       staleTime: 5 * 60 * 1000,
     });
   }, [queryClient]);

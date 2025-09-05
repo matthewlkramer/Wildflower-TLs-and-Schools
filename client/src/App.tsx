@@ -148,7 +148,7 @@ function AppContent() {
         // In serverless mode we rely on Authorization header injection; no server session required.
       } catch {}
       const keys = [
-        ['/api/teachers'],
+        ['/api/educators'],
         ['/api/schools'],
         ['/api/charters'],
       ] as const;

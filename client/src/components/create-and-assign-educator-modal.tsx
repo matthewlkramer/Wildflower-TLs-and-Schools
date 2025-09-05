@@ -43,7 +43,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
 
   // Fetch educators for duplicate checking
   const { data: educators = [] } = useQuery<Teacher[]>({
-    queryKey: ["/api/teachers"],
+    queryKey: ["/api/educators"],
   });
 
   const form = useForm({
@@ -133,7 +133,6 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
     onSuccess: () => {
       // Invalidate all possible query key formats
       queryClient.invalidateQueries({ queryKey: ["/api/educators"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/teachers"] }); // Legacy compatibility
       queryClient.invalidateQueries({ queryKey: [`/api/school-associations/${schoolId}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/school-associations", schoolId] });
       

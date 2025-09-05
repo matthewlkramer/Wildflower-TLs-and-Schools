@@ -32,7 +32,7 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
   const [selectedEducator, setSelectedEducator] = useState<Educator | null>(null);
 
   const { data: educators = [] } = useQuery<Educator[]>({
-    queryKey: ["/api/teachers"], // Using legacy endpoint for compatibility
+    queryKey: ["/api/educators"],
     enabled: open,
   });
 

@@ -116,10 +116,10 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest('PUT', `/api/teachers/${id}`, { archived: true }),
+    mutationFn: (id: string) => apiRequest('PUT', `/api/educators/${id}`, { archived: true }),
     onMutate: async (id: string) => {
       // Optimistically remove from cache
-      const key = ['/api/teachers'];
+      const key = ['/api/educators'];
       await queryClient.cancelQueries({ queryKey: key });
       const previous = queryClient.getQueryData<Educator[]>(key);
       if (previous) {
@@ -130,7 +130,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
     onError: (_err, _id, context) => {
       // Roll back cache
       if (context?.previous) {
-        queryClient.setQueryData(['/api/teachers'], context.previous);
+        queryClient.setQueryData(['/api/educators'], context.previous);
       }
       toast({
         title: "Error",
@@ -139,14 +139,14 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/educators'] });
       toast({
         title: "Educator deleted",
         description: "The educator has been successfully deleted.",
       });
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/educators'] });
     }
   });
 
