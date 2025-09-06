@@ -54,9 +54,17 @@ if (process.env.STRIPE_SECRET_KEY) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Require authentication for all /api routes except /api/auth/*
+  // Require authentication for all /api routes except explicit public/debug endpoints
   app.use("/api", (req: Request, res: Response, next: NextFunction) => {
-    if (req.path.startsWith("/auth")) return next();
+    const p = req.path || "";
+    if (
+      p.startsWith("/auth") ||
+      p.startsWith("/_probe") ||
+      p.startsWith("/_routes-public") ||
+      p.startsWith("/_debug/")
+    ) {
+      return next();
+    }
     return requireAuth(req, res, next);
   });
   // Educator routes (primary)
