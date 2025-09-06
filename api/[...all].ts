@@ -13,6 +13,31 @@ async function buildApp() {
     res.status(200).json({ ok: true, from: 'catch-all', note: 'probe before bundle load' });
   });
 
+  // Public route: list mounted routes without requiring auth. Useful to verify
+  // that the bundled server has registered its endpoints in production.
+  app.get('/api/_routes-public', (_req, res) => {
+    try {
+      const routes: any[] = [];
+      const stack = (app as any)._router?.stack || [];
+      for (const layer of stack) {
+        if (layer.route && layer.route.path) {
+          const methods = Object.keys(layer.route.methods || {}).filter(Boolean);
+          routes.push({ path: layer.route.path, methods });
+        } else if (layer.name === 'router' && layer.handle?.stack) {
+          for (const lr of layer.handle.stack) {
+            if (lr.route?.path) {
+              const methods = Object.keys(lr.route.methods || {}).filter(Boolean);
+              routes.push({ path: lr.route.path, methods });
+            }
+          }
+        }
+      }
+      res.json({ ok: true, count: routes.length, routes });
+    } catch (e: any) {
+      res.status(500).json({ ok: false, error: String(e?.message || e) });
+    }
+  });
+
   // Public debug route that bypasses auth middleware in server/routes.ts
   // Using "/api/auth/*" prefix skips requireAuth there.
   app.get('/api/auth/_routes', (_req, res) => {
