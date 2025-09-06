@@ -32,9 +32,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data } = await supabase.auth.getUser();
       const email = data.user?.email || '';
       if (!email) return false;
-      if (!email.endsWith('@wildflowerschools.org')) {
-        await supabase.auth.signOut();
-        setUser(null);
+      // Optional domain enforcement: only enforce if VITE_AUTH_DOMAIN is set
+      const allowed = (import.meta as any).env?.VITE_AUTH_DOMAIN as string | undefined;
+      if (!allowed) return true;
+      const allowedDomain = allowed.trim().toLowerCase();
+      const ok = email.toLowerCase().endsWith(`@${allowedDomain}`);
+      if (!ok) {
+        // Do not force sign-out here to avoid auth loops; just deny
         return false;
       }
       return true;
