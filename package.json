@@ -18,8 +18,7 @@
     "supabase:link": "npx supabase link",
     "supabase:db:push": "npx supabase db push",
     "supabase:functions:deploy": "npx supabase functions deploy gmail-sync gcal-sync daily-cron run-sync",
-    "sync:email-filter": "tsx scripts/sync-email-filter-to-supabase.ts"
-  ,
+    "sync:email-filter": "tsx scripts/sync-email-filter-to-supabase.ts",
     "schema:validate": "tsx scripts/validate-schema-alignment.ts"
   },
   "dependencies": {
@@ -89,6 +88,7 @@
     "openid-client": "^6.6.2",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
+    "pnpm": "^10.15.1",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -108,7 +108,6 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
-    "@vercel/node": "^3.0.0",
     "@replit/vite-plugin-cartographer": "^0.2.7",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@tailwindcss/typography": "^0.5.15",
@@ -122,6 +121,7 @@
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
     "@types/ws": "^8.5.13",
+    "@vercel/node": "^3.0.0",
     "@vitejs/plugin-react": "^4.3.2",
     "autoprefixer": "^10.4.20",
     "cross-env": "^10.0.0",
