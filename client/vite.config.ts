@@ -33,8 +33,8 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname),
   build: {
-    // Always emit to dist/public; Vercel/Render static output can point here
-    outDir: path.resolve(import.meta.dirname, "..", "dist/public"),
+    // Emit inside client/ so Vercel (Root=client) can find it as "dist"
+    outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
   },
   server: {
