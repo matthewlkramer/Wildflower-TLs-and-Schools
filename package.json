@@ -21,7 +21,9 @@
     "supabase:db:push": "npx supabase db push",
     "supabase:functions:deploy": "npx supabase functions deploy gmail-sync gcal-sync daily-cron run-sync",
     "sync:email-filter": "tsx scripts/sync-email-filter-to-supabase.ts",
-    "schema:validate": "tsx scripts/validate-schema-alignment.ts"
+    "schema:validate": "tsx scripts/validate-schema-alignment.ts",
+    "lock:refresh": "pnpm install --lockfile-only",
+    "lock:check": "pnpm install --frozen-lockfile"
   },
   "dependencies": {
     "@googlemaps/react-wrapper": "^1.2.0",
@@ -138,5 +140,3 @@
     "node": "20.x"
   }
 }
-    "lock:refresh": "pnpm install --lockfile-only",
-    "lock:check": "pnpm install --frozen-lockfile",
