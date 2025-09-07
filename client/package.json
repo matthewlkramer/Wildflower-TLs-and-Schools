@@ -54,6 +54,7 @@
     "tailwindcss-animate": "^1.0.7",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^11.13.1",
+    "class-variance-authority": "^0.7.1",
     "react-hook-form": "^7.55.0",
     "react-day-picker": "^8.10.1",
     "recharts": "^2.15.2",

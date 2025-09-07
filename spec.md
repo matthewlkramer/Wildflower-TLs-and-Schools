@@ -79,8 +79,8 @@ Primary navigation tabs surface the main modules:
 - “Add New” opens a creation form or modal for a new teacher.
 - Actions for each row are open detail page for that record, edit record inline, mark inactive, create note, create task, log interaction, delete record (which should mark the record as archived)
 - Clicking a row opens the detail page.
-- Default columns should be Name, current role/school (which should be populated for any educator that is currently active at a school whether that school is open or not, and should say the name of the school, the educator's role(s), and the stage_status of the school), email address, whether they are montessori certified, 
-- Kanban field is _________
+- Default columns should be Name, current role/school (which should be populated for any educator that is currently active at a school whether that school is open or not, and should say the name of the school, the educator's role(s), and the stage_status of the school), whether they are montessori certified, their race/ethnicity, the discovery status, and their individual type
+- Kanban field is "Kanban"
 
 #### Detail Page
 - Shows core fields (name, contact info, status)
@@ -96,8 +96,8 @@ Primary navigation tabs surface the main modules:
 - "Add New" opens a creation form or modal for a new school
 - Actions for each row are open detail page for that record, edit record inline, mark inactive, create note, create task, log interaction, delete record (mark archived)
 - Clicking a row opens the detail page
-- Default columns include school name, current TLs, city/state, school stage_status, .
-- Kanban field is stage_status
+- Default columns include school name, school stage_status, current TLs, membership_status, ages_served, governance model .
+- Kanban field is Stage_Status
 
 #### Detail Page
 - Displays school information including multiple versions of logo, 
@@ -113,8 +113,8 @@ Primary navigation tabs surface the main modules:
 - Add New opens a creation form or modal for a new charter
 - Actions for each row are open detail page for that record, edit record inline, mark inactive, create note, create task, log interaction, delete record (mark archived)
 - Clicking a row opens the detail page
-- Default columns TBD
-- Kanban field TBD
+- Default columns are short name, full name, initial target community, projected open, initial target ages, status
+- Kanban field status
 
 #### Detail Page
 - Shows charter information

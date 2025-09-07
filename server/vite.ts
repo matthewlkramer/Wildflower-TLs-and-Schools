@@ -1,13 +1,13 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
-import { createServer as createViteServer, createLogger } from "vite";
+// Avoid importing Vite at module top so prod doesn't require it
 import { type Server } from "http";
 // Use the client's Vite config during development
-import viteConfig from "../client/vite.config";
+// Lazily import client Vite config only in development
 import { nanoid } from "nanoid";
 
-const viteLogger = createLogger();
+let viteLogger: any = null;
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -21,6 +21,9 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  const { createServer: createViteServer, createLogger } = await import("vite");
+  const viteConfig = (await import("../client/vite.config"))?.default as any;
+  viteLogger = createLogger();
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
