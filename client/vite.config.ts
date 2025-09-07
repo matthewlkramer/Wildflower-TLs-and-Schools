@@ -23,8 +23,9 @@ export default defineConfig({
       // Put the more specific alias first so it wins over "@shared"
       { find: "@shared/loan-schema", replacement: path.resolve(import.meta.dirname, "src", "shims", "loan-schema.ts") },
       { find: "@shared/loan-schema.ts", replacement: path.resolve(import.meta.dirname, "src", "shims", "loan-schema.ts") },
-      // Also replace direct relative import inside shared/schema.ts
-      { find: path.resolve(import.meta.dirname, "..", "shared", "loan-schema.ts"), replacement: path.resolve(import.meta.dirname, "src", "shims", "loan-schema-runtime.ts") },
+      // Also replace the direct relative import inside shared/schema.ts
+      // Catch absolute ids with or without .ts (Vercel/Posix)
+      { find: /\/shared\/loan-schema(\.ts)?$/, replacement: path.resolve(import.meta.dirname, "src", "shims", "loan-schema-runtime.ts") },
       { find: "@", replacement: path.resolve(import.meta.dirname, "src") },
       { find: "@shared", replacement: path.resolve(import.meta.dirname, "..", "shared") },
       { find: "@assets", replacement: path.resolve(import.meta.dirname, "..", "attached_assets") },
