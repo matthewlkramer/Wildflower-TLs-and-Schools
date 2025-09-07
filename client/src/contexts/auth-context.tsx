@@ -64,9 +64,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (token) {
             const headers = new Headers(init?.headers || {});
             if (!headers.has('Authorization')) headers.set('Authorization', `Bearer ${token}`);
-            return origFetch(target, { ...init, headers });
+            return origFetch(target, { ...init, headers, credentials: 'omit' });
           }
-          return origFetch(target, init);
+          return origFetch(target, { ...init, credentials: 'omit' });
         }
       } catch {}
       return origFetch(input, init);

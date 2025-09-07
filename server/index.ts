@@ -18,9 +18,23 @@ function log(message: string, source = "express") {
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-// CORS for separate client host (e.g., Vercel)
-const corsOrigins = process.env.CORS_ORIGIN?.split(',').map(s => s.trim()).filter(Boolean) || ['*'];
-app.use(cors({ origin: corsOrigins as any, credentials: false, allowedHeaders: ['Authorization','Content-Type'] }));
+// CORS for separate client host (e.g., Vercel). Must not be '*' when credentials are used.
+const corsOrigins = (process.env.CORS_ORIGIN || '').split(',').map(s => s.trim()).filter(Boolean);
+const corsOptions: cors.CorsOptions = {
+  origin: corsOrigins.length 
+    ? (origin, callback) => {
+        // Allow no-origin (curl/health checks) and listed origins
+        if (!origin) return callback(null, true);
+        if (corsOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error('Not allowed by CORS'));
+      }
+    : false,
+  credentials: true,
+  allowedHeaders: ['Authorization','Content-Type','X-Requested-With'],
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS']
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use((req, res, next) => {
   const start = Date.now();
