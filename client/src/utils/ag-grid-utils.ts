@@ -13,7 +13,9 @@ export const defaultGridOptions: GridOptions = {
   
   // Selection
   rowSelection: { mode: 'multiRow' },
-  suppressRowClickSelection: true,
+  rowSelection: {
+    enableClickSelection: false,
+  } as any,
   
   // Headers
   headerHeight: 45,

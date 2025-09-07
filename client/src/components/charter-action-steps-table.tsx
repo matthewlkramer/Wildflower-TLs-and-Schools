@@ -177,7 +177,7 @@ export function CharterActionStepsTable({ charterId }: CharterActionStepsTablePr
           rowData={sortedActionSteps}
           columnDefs={columnDefs}
           animateRows={true}
-          suppressRowClickSelection={true}
+          rowSelection={{ enableClickSelection: false } as any}
           domLayout="normal"
           headerHeight={40}
           rowHeight={35}

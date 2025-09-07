@@ -1,0 +1,46 @@
+{
+  "name": "client",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build:vercel": "vite build",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "wouter": "^3.3.5",
+    "@tanstack/react-query": "^5.60.5",
+    "@supabase/supabase-js": "^2.45.4",
+    "ag-grid-community": "^34.1.2",
+    "ag-grid-react": "^34.1.2",
+    "ag-grid-enterprise": "^34.1.2",
+    "date-fns": "^3.6.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.453.0",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss-animate": "^1.0.7",
+    "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^11.13.1",
+    "react-hook-form": "^7.55.0",
+    "react-day-picker": "^8.10.1",
+    "recharts": "^2.15.2",
+    "react-icons": "^5.4.0",
+    "input-otp": "^1.4.2",
+    "vaul": "^1.1.2",
+    "cmdk": "^1.1.1",
+    "zod": "^3.24.2",
+    "zod-validation-error": "^3.4.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.19",
+    "@vitejs/plugin-react": "^4.3.2",
+    "typescript": "5.6.3",
+    "tailwindcss": "^3.4.17",
+    "postcss": "^8.4.47",
+    "autoprefixer": "^10.4.20"
+  }
+}
+

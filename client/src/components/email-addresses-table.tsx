@@ -180,7 +180,7 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
           rowData={emailAddresses}
           columnDefs={columnDefs}
           animateRows={true}
-          suppressRowClickSelection={true}
+          rowSelection={{ enableClickSelection: false } as any}
           domLayout="autoHeight"
           headerHeight={40}
           rowHeight={30}

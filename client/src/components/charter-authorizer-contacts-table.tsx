@@ -134,7 +134,7 @@ export function CharterAuthorizerContactsTable({ charterId }: CharterAuthorizerC
         rowData={contacts}
         columnDefs={columnDefs}
         animateRows={true}
-        suppressRowClickSelection={true}
+        rowSelection={{ enableClickSelection: false } as any}
         domLayout="normal"
         headerHeight={40}
         rowHeight={30}

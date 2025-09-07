@@ -72,7 +72,7 @@ export function EducatorNotesTable({ educatorId }: EducatorNotesTableProps) {
           rowData={notes}
           columnDefs={columnDefs}
           animateRows={true}
-          suppressRowClickSelection={true}
+          rowSelection={{ enableClickSelection: false } as any}
           domLayout="autoHeight"
           headerHeight={40}
           rowHeight={40}

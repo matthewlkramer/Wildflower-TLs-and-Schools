@@ -72,7 +72,7 @@ export function GridTableCard<T = any>({
           rowData={data}
           columnDefs={columns}
           animateRows
-          suppressRowClickSelection
+          rowSelection={{ enableClickSelection: false } as any}
           domLayout="autoHeight"
           headerHeight={40}
           rowHeight={30}
@@ -84,4 +84,3 @@ export function GridTableCard<T = any>({
     </TableCard>
   );
 }
-

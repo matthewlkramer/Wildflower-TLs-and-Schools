@@ -128,7 +128,7 @@ export function Charter990sTable({ charterId }: Charter990sTableProps) {
         rowData={sorted990s}
         columnDefs={columnDefs}
         animateRows={true}
-        suppressRowClickSelection={true}
+        rowSelection={{ enableClickSelection: false } as any}
         domLayout="normal"
         headerHeight={40}
         rowHeight={30}

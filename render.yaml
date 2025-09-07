@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: wildflower-server
+    env: node
+    rootDir: server
+    plan: standard
+    buildCommand: pnpm install --frozen-lockfile && pnpm run build
+    startCommand: pnpm run start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Add your required server env vars here or in Render dashboard
+      # - key: SUPABASE_URL
+      #   sync: false
+      # - key: SUPABASE_SERVICE_ROLE_KEY
+      #   sync: false
+

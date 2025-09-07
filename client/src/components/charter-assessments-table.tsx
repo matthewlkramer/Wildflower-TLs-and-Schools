@@ -102,7 +102,7 @@ export function CharterAssessmentsTable({ charterId }: CharterAssessmentsTablePr
         rowData={assessments}
         columnDefs={columnDefs}
         animateRows={true}
-        suppressRowClickSelection={true}
+        rowSelection={{ enableClickSelection: false } as any}
         domLayout="normal"
         headerHeight={40}
         rowHeight={30}

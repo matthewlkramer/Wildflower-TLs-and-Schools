@@ -293,7 +293,7 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
           rowData={rows}
           columnDefs={columnDefs}
           animateRows={true}
-          suppressRowClickSelection={true}
+          rowSelection={{ enableClickSelection: false } as any}
           domLayout="autoHeight"
           headerHeight={40}
           rowHeight={30}
