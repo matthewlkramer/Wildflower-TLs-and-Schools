@@ -214,6 +214,7 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
       minWidth: 300,
       valueGetter: ({ data }: { data: Educator }) => {
         if (!data) return '';
+        return data.currentRoleSchool || '';
         if (data.currentRoleSchool) return data.currentRoleSchool;
         const roles = data.currentRole;
         let roleText = Array.isArray(roles) ? roles.join(', ') : (roles || '');
@@ -227,7 +228,7 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
         return [roleText, schoolText, statusText].filter(Boolean).join(' ');
       },
       cellRenderer: ({ data }: { data: Educator }) => {
-        if (!data) return '';
+        return data?.currentRoleSchool || '';
 
         // Get current role(s) - join with commas if multiple
         const roles = data.currentRole;

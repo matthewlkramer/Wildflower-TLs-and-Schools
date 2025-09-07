@@ -138,3 +138,5 @@
     "node": "20.x"
   }
 }
+    "lock:refresh": "pnpm install --lockfile-only",
+    "lock:check": "pnpm install --frozen-lockfile",

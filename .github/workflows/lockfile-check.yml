@@ -1,0 +1,25 @@
+name: Lockfile Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  verify-lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Enable corepack
+        run: corepack enable
+      - name: Use pnpm
+        run: corepack prepare pnpm@10.14.0 --activate
+      - name: Check lockfile matches package.json
+        run: pnpm install --frozen-lockfile

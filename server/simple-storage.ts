@@ -2099,8 +2099,8 @@ export class SimpleAirtableStorage implements IStorage {
   // Email address operations
   async getEmailAddresses(): Promise<EmailAddress[]> {
     try {
-      const records = await base('Email Addresses').select().all();
-      return records.map(record => this.transformEmailAddressRecord(record));
+      const records = await selectAll('Email Addresses');
+      return records.map(r => this.transformEmailAddressRecord(r));
     } catch (error) {
       console.warn('Warning: Unable to fetch Email Addresses table - table may not exist or may require permissions');
       return [];
@@ -2109,7 +2109,7 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getEmailAddress(id: string): Promise<EmailAddress | undefined> {
     try {
-      const record = await base('Email Addresses').find(id);
+      const record = await findById('Email Addresses', id);
       return this.transformEmailAddressRecord(record);
     } catch (error) {
       console.warn(`Warning: Unable to fetch email address ${id}:`, error);
@@ -2119,11 +2119,8 @@ export class SimpleAirtableStorage implements IStorage {
 
   async getEmailAddressesByEducatorId(educatorId: string): Promise<EmailAddress[]> {
     try {
-      const records = await base('Email Addresses').select({
-        filterByFormula: `{${EAF.educator_id}} = '${educatorId}'`
-      }).all();
-      
-      return records.map(record => this.transformEmailAddressRecord(record));
+      const records = await selectByFormula('Email Addresses', `{${EAF.educator_id}} = '${educatorId}'`);
+      return records.map(r => this.transformEmailAddressRecord(r));
     } catch (error) {
       console.warn(`Warning: Unable to fetch email addresses for educator ${educatorId}:`, error);
       return [];
@@ -2131,16 +2128,14 @@ export class SimpleAirtableStorage implements IStorage {
   }
 
   async createEmailAddress(emailAddress: InsertEmailAddress): Promise<EmailAddress> {
-    const recs = await base('Email Addresses').create([{
-      fields: {
-        [EAF.educator_id]: emailAddress.educatorId,
-        [EAF.Email_Address]: emailAddress.email,
-        [EAF.Email_Type]: emailAddress.type || 'Personal',
-        [EAF.Current_Primary_Email]: emailAddress.isPrimary || false,
-        [EAF.Active_]: true,
-      }
-    }]);
-    return this.transformEmailAddressRecord(recs[0]);
+    const rec = await createRecord('Email Addresses', {
+      [EAF.educator_id]: emailAddress.educatorId,
+      [EAF.Email_Address]: emailAddress.email,
+      [EAF.Email_Type]: emailAddress.type || 'Personal',
+      [EAF.Current_Primary_Email]: emailAddress.isPrimary || false,
+      [EAF.Active_]: true,
+    });
+    return this.transformEmailAddressRecord(rec);
   }
 
   async updateEmailAddress(id: string, emailAddress: Partial<InsertEmailAddress>): Promise<EmailAddress | undefined> {
@@ -2150,12 +2145,12 @@ export class SimpleAirtableStorage implements IStorage {
     if (emailAddress.type !== undefined) fields[EAF.Email_Type] = emailAddress.type;
     if (emailAddress.isPrimary !== undefined) fields[EAF.Current_Primary_Email] = emailAddress.isPrimary;
     if (emailAddress.isActive !== undefined) fields[EAF.Active_] = emailAddress.isActive;
-    const record = await base('Email Addresses').update(id, fields);
+    const record = await updateRecord('Email Addresses', id, fields);
     return this.transformEmailAddressRecord(record);
   }
 
   async deleteEmailAddress(id: string): Promise<boolean> {
-    await base('Email Addresses').destroy(id);
+    await deleteRecord('Email Addresses', id);
     return true;
   }
 
@@ -2290,8 +2285,7 @@ export class SimpleAirtableStorage implements IStorage {
       initialOutreacher: fields[SJF.Initial_Outreacher] || undefined,
       personResponsibleForFollowUp: fields[SJF.Person_responsible_for_follow_up] || undefined,
       sourceForNonTLs: fields[SJF.Source_for_non_TLs] || undefined,
-      dateSubmitted: fields[SJF.Entry_Date] || undefined,
-      certProcessingStatus: fields[SJF.Status_of_Processing_Montessori_Certs] || undefined,
+      // duplicates removed; values already set above
       responseData: fields[SJF.Message] || fields["Response Data"] || undefined,
       notes: fields["Notes"] || fields["notes"] || undefined,
       created: fields[SJF.Entry_Date] || fields["Created time"] || new Date().toISOString(),
