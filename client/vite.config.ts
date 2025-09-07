@@ -22,6 +22,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
       "@shared": path.resolve(import.meta.dirname, "..", "shared"),
+      "@shared/loan-schema": path.resolve(import.meta.dirname, "src", "shims", "loan-schema.ts"),
       "@assets": path.resolve(import.meta.dirname, "..", "attached_assets"),
       // Ensure dependencies imported from files outside client root (e.g., shared/) resolve
       "zod": path.resolve(import.meta.dirname, "node_modules", "zod"),
