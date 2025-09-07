@@ -12,9 +12,11 @@ export const defaultGridOptions: GridOptions = {
   suppressRowHoverHighlight: false,
   
   // Selection
-  rowSelection: { mode: 'multiRow' },
   rowSelection: {
-    enableClickSelection: false,
+    mode: 'multiRow',
+    // disable selecting rows by clicking anywhere; rely on checkbox/explicit UI
+    // For AG Grid v34, click selection control lives under rowSelection options
+    ...( { enableClickSelection: false } as any ),
   } as any,
   
   // Headers
