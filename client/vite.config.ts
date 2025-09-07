@@ -19,18 +19,19 @@ export default defineConfig({
       : []),
   ],
   resolve: {
-    alias: {
-      "@": path.resolve(import.meta.dirname, "src"),
-      "@shared": path.resolve(import.meta.dirname, "..", "shared"),
-      "@shared/loan-schema": path.resolve(import.meta.dirname, "src", "shims", "loan-schema.ts"),
-      "@assets": path.resolve(import.meta.dirname, "..", "attached_assets"),
+    alias: [
+      // Put the more specific alias first so it wins over "@shared"
+      { find: "@shared/loan-schema", replacement: path.resolve(import.meta.dirname, "src", "shims", "loan-schema.ts") },
+      { find: "@", replacement: path.resolve(import.meta.dirname, "src") },
+      { find: "@shared", replacement: path.resolve(import.meta.dirname, "..", "shared") },
+      { find: "@assets", replacement: path.resolve(import.meta.dirname, "..", "attached_assets") },
       // Ensure dependencies imported from files outside client root (e.g., shared/) resolve
-      "zod": path.resolve(import.meta.dirname, "node_modules", "zod"),
+      { find: "zod", replacement: path.resolve(import.meta.dirname, "node_modules", "zod") },
       // Stub server-only libs referenced from shared/* so client build doesn't fail
-      "drizzle-orm/pg-core": path.resolve(import.meta.dirname, "src", "shims", "drizzle-pg-core.ts"),
-      "drizzle-orm": path.resolve(import.meta.dirname, "src", "shims", "drizzle-orm.ts"),
-      "drizzle-zod": path.resolve(import.meta.dirname, "src", "shims", "drizzle-zod.ts"),
-    },
+      { find: "drizzle-orm/pg-core", replacement: path.resolve(import.meta.dirname, "src", "shims", "drizzle-pg-core.ts") },
+      { find: "drizzle-orm", replacement: path.resolve(import.meta.dirname, "src", "shims", "drizzle-orm.ts") },
+      { find: "drizzle-zod", replacement: path.resolve(import.meta.dirname, "src", "shims", "drizzle-zod.ts") },
+    ],
   },
   root: path.resolve(import.meta.dirname),
   build: {
