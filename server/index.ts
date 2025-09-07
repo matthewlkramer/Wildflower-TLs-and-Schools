@@ -67,6 +67,8 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Lightweight health endpoint
+  app.get('/api/_probe', (_req, res) => res.status(200).json({ ok: true }));
   await setupAuth(app);
   const server = await registerRoutes(app);
 
