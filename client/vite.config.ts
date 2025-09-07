@@ -25,6 +25,10 @@ export default defineConfig({
       "@assets": path.resolve(import.meta.dirname, "..", "attached_assets"),
       // Ensure dependencies imported from files outside client root (e.g., shared/) resolve
       "zod": path.resolve(import.meta.dirname, "node_modules", "zod"),
+      // Stub server-only libs referenced from shared/* so client build doesn't fail
+      "drizzle-orm/pg-core": path.resolve(import.meta.dirname, "src", "shims", "drizzle-pg-core.ts"),
+      "drizzle-orm": path.resolve(import.meta.dirname, "src", "shims", "drizzle-orm.ts"),
+      "drizzle-zod": path.resolve(import.meta.dirname, "src", "shims", "drizzle-zod.ts"),
     },
   },
   root: path.resolve(import.meta.dirname),
