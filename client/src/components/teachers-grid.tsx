@@ -198,11 +198,6 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
       filter: 'agTextColumnFilter',
       filterParams: { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 200,
-      comparator: (a: string, b: string) => {
-        const an = (a || '').trim();
-        const bn = (b || '').trim();
-        return an.localeCompare(bn, undefined, { sensitivity: 'base' });
-      },
       cellRenderer: ({ data: teacher }: { data: Educator }) => (
         <Link href={`/teacher/${teacher.id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
           {teacher.fullName}
@@ -219,6 +214,7 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
       minWidth: 300,
       valueGetter: ({ data }: { data: Educator }) => {
         if (!data) return '';
+        if (data.currentRoleSchool) return data.currentRoleSchool;
         const roles = data.currentRole;
         let roleText = Array.isArray(roles) ? roles.join(', ') : (roles || '');
         roleText = roleText.replace(/\bEmerging Teacher Leader\b/g, 'ETL');

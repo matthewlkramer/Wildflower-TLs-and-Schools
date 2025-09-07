@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import cors from 'cors';
+import compression from 'compression';
 import { registerRoutes } from "./routes";
 import { setupAuth } from "./auth";
 import { storage } from "./simple-storage";
@@ -16,6 +17,8 @@ function log(message: string, source = "express") {
 }
 
 const app = express();
+// Enable gzip/deflate compression for faster list payloads
+app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // CORS for separate client host (e.g., Vercel). Must not be '*' when credentials are used.

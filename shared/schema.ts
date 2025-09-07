@@ -137,6 +137,8 @@ export interface Educator {
   secondaryPhone?: string;
   homeAddress?: string;
   currentPrimaryEmailAddress?: string;
+  // Precomputed display text from Airtable for Teachers grid
+  currentRoleSchool?: string;
 
   // Demographics
   pronouns?: string;
@@ -642,6 +644,7 @@ export const educatorSchema = z.object({
   genderOther: z.string().optional(),
   raceEthnicity: z.array(z.string()).optional(),
   raceEthnicityOther: z.string().optional(),
+  currentRoleSchool: z.string().optional(),
   primaryLanguage: z.array(z.string()).optional(),
   otherLanguages: z.array(z.string()).optional(),
   educationalAttainment: z.string().optional(),

@@ -747,6 +747,7 @@ export const EDUCATORS_FIELDS = {
   First_contact___initial_interests: "First contact - initial interests",
   Target_state: "Target state",
   Target___international: "Target - international",
+  Current_Role_School_for_UI: "Current Role School for UI",
   Tags: "Tags",
   Exclude_from_email_logging: "Exclude from email logging",
   Board_Service: "Board Service",

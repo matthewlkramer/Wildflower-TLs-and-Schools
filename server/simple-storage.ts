@@ -329,6 +329,7 @@ export class SimpleAirtableStorage implements IStorage {
       primaryPhone: fields[EF.Primary_phone] || undefined,
       secondaryPhone: fields[EF.Secondary_phone] || undefined,
       currentPrimaryEmailAddress: fields[EF.Current_Primary_Email_Address] || undefined,  
+      currentRoleSchool: fields[EF.Current_Role_School_for_UI] || undefined,
       homeAddress: fields[EF.Home_Address] || undefined,
       pronouns: fields[EF.Pronouns] || undefined,
       pronounsOther: fields[EF.Pronouns___Other] || undefined,
