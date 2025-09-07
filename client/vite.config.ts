@@ -22,6 +22,7 @@ export default defineConfig({
     alias: [
       // Put the more specific alias first so it wins over "@shared"
       { find: "@shared/loan-schema", replacement: path.resolve(import.meta.dirname, "src", "shims", "loan-schema.ts") },
+      { find: "@shared/loan-schema.ts", replacement: path.resolve(import.meta.dirname, "src", "shims", "loan-schema.ts") },
       { find: "@", replacement: path.resolve(import.meta.dirname, "src") },
       { find: "@shared", replacement: path.resolve(import.meta.dirname, "..", "shared") },
       { find: "@assets", replacement: path.resolve(import.meta.dirname, "..", "attached_assets") },
