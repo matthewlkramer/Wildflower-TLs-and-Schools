@@ -52,17 +52,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Inject Authorization bearer for all /api/* requests using current Supabase session
     // This makes API calls work with serverless functions (no server session persistence).
     const origFetch = window.fetch.bind(window);
+    const apiBase = (import.meta as any).env?.VITE_API_BASE || '';
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       try {
         const url = typeof input === 'string' ? input : (input as URL).toString();
-        if (url.startsWith('/api')) {
+        const isApi = url.startsWith('/api') || (apiBase && url.startsWith(apiBase + '/api'));
+        if (isApi) {
+          const target = (apiBase && url.startsWith('/api')) ? (apiBase + url) : url;
           const { data: sessionData } = await supabase.auth.getSession();
           const token = sessionData.session?.access_token;
           if (token) {
             const headers = new Headers(init?.headers || {});
             if (!headers.has('Authorization')) headers.set('Authorization', `Bearer ${token}`);
-            return origFetch(input, { ...init, headers });
+            return origFetch(target, { ...init, headers });
           }
+          return origFetch(target, init);
         }
       } catch {}
       return origFetch(input, init);
