@@ -1,7 +1,5 @@
 import { z } from "zod";
-import { createInsertSchema } from "drizzle-zod";
-import { pgTable, serial, text, integer, decimal, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+// Note: Server-only Drizzle imports removed to keep client bundle lean
 
 // Airtable-based schema for Wildflower Schools
 // Charter interface for Charters table
