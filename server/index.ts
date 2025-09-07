@@ -1,13 +1,26 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
+import cors from 'cors';
 import { registerRoutes } from "./routes";
 import { setupAuth } from "./auth";
 import { storage } from "./simple-storage";
-import { setupVite, serveStatic, log } from "./vite";
+
+function log(message: string, source = "express") {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+// CORS for separate client host (e.g., Vercel)
+const corsOrigins = process.env.CORS_ORIGIN?.split(',').map(s => s.trim()).filter(Boolean) || ['*'];
+app.use(cors({ origin: corsOrigins as any, credentials: false, allowedHeaders: ['Authorization','Content-Type'] }));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -55,14 +68,21 @@ app.use((req, res, next) => {
   // Do not force a server-side auth redirect on '/'.
 
   if (app.get("env") === "development") {
+    // Dynamically import Vite middleware only in development to avoid prod dependency
+    const { setupVite } = await import("./vite");
     await setupVite(app, server);
-  } else {
-    serveStatic(app);
+  } else if (process.env.SERVE_CLIENT === 'true') {
+    try {
+      const { serveStatic } = await import("./vite");
+      serveStatic(app);
+    } catch (e) {
+      log('static client serving disabled or not available', 'express');
+    }
   }
 
   // Prefer PORT/HOST from environment, fallback to 5000/localhost
   let port = Number(process.env.PORT) || 5000;
-  const host = process.env.HOST || "localhost";
+  const host = process.env.HOST || "0.0.0.0";
 
   // Warm core datasets into in-memory cache for first-user snappiness
   (async () => {
