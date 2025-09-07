@@ -92,7 +92,7 @@ app.use((req, res, next) => {
     await setupVite(app, server);
   } else if (process.env.SERVE_CLIENT === 'true') {
     try {
-      const { serveStatic } = await import("./vite");
+      const { serveStatic } = await import("./static");
       serveStatic(app);
     } catch (e) {
       log('static client serving disabled or not available', 'express');
