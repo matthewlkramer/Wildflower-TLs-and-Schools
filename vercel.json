@@ -1,7 +1,6 @@
 {
-  "installCommand": "corepack enable && corepack prepare pnpm@10.14.0 --activate && pnpm -C client install --no-frozen-lockfile",
-  "buildCommand": "pnpm -C client run build",
-  "ignoreCommand": "node vercel-ignore-build-step.js",
+  "installCommand": "corepack enable && corepack prepare pnpm@10.14.0 --activate && pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm run build",
   "outputDirectory": "dist/public",
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
