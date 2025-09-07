@@ -206,6 +206,74 @@ export async function setupAuth(app: Express) {
     }
   });
 
+  // Alias auth endpoints under /api/_auth/* to avoid any platform-specific routing
+  // quirks with /api/auth/* paths in serverless environments.
+  app.get('/api/_auth/me', async (req: Request, res: Response) => {
+    const existing = (req.session as any).user as SessionUser | undefined;
+    if (existing) return res.json(existing);
+    try {
+      const auth = (req.headers['authorization'] || '').toString();
+      const match = auth.match(/^Bearer\s+(.+)$/i);
+      if (!match) return res.status(401).json({ message: 'Unauthorized' });
+      const jwt = match[1];
+      const SUPABASE_URL = process.env.SUPABASE_URL;
+      const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY;
+      if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+        return res.status(500).json({ message: 'Server auth not configured' });
+      }
+      const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+      const { data, error } = await supabase.auth.getUser(jwt);
+      if (error || !data?.user) return res.status(401).json({ message: 'Unauthorized' });
+      const email = data.user.email || '';
+      const name = (data.user.user_metadata as any)?.name || '';
+      const sub = data.user.id;
+      const allowedDomain = (process.env.ALLOWED_GOOGLE_DOMAIN || 'wildflowerschools.org').toLowerCase();
+      const emailDomain = email.split('@')[1]?.toLowerCase();
+      if (!email || emailDomain !== allowedDomain) return res.status(403).json({ message: 'Forbidden' });
+      return res.json({ id: sub, email, name, role: 'user' });
+    } catch {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+  });
+
+  app.post('/api/_auth/supabase-session', async (req: Request, res: Response) => {
+    const auth = (req.headers['authorization'] || '').toString();
+    const match = auth.match(/^Bearer\s+(.+)$/i);
+    if (!match) return res.status(401).json({ message: 'Unauthorized' });
+    const jwt = match[1];
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY;
+    if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+      return res.status(500).json({ message: 'Server auth not configured' });
+    }
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+    const { data, error } = await supabase.auth.getUser(jwt);
+    if (error || !data?.user) return res.status(401).json({ message: 'Unauthorized' });
+    const email = data.user.email || '';
+    const name = (data.user.user_metadata as any)?.name || '';
+    const sub = data.user.id;
+    const allowedDomain = (process.env.ALLOWED_GOOGLE_DOMAIN || 'wildflowerschools.org').toLowerCase();
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+    if (!email || emailDomain !== allowedDomain) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    try { (req.session as any).user = { id: sub, email, name, role: 'user' } as SessionUser; } catch {}
+    return res.status(200).json({ ok: true });
+  });
+
+  app.post('/api/_auth/logout', (req: Request, res: Response) => {
+    try {
+      if ((req.session as any)?.destroy) {
+        req.session.destroy(() => {
+          try { res.clearCookie('connect.sid'); } catch {}
+          res.status(200).json({ ok: true });
+        });
+        return;
+      }
+    } catch {}
+    res.status(200).json({ ok: true });
+  });
+
   // Logout
   app.post('/api/auth/logout', (req: Request, res: Response) => {
     try {

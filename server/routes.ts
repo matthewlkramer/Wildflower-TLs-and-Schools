@@ -59,6 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const p = req.path || "";
     if (
       p.startsWith("/auth") ||
+      p.startsWith("/_auth") ||
       p.startsWith("/_probe") ||
       p.startsWith("/_routes-public") ||
       p.startsWith("/_debug/")
