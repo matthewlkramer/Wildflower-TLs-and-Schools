@@ -47,7 +47,7 @@ Primary navigation tabs surface the main modules:
 3. Charters
 4. Settings
 5. Extension: we may also want to create a full application for the team that issues and manages loans to schools to support their work
-
+ 
 ### Header Requirements
 
 - Persistent across pages.
