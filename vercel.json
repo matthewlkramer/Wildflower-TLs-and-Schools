@@ -1,6 +1,7 @@
 {
   "installCommand": "corepack enable && corepack prepare pnpm@10.14.0 --activate && pnpm install --no-frozen-lockfile",
-  "buildCommand": "cd client && pnpm build",
+  "installCommand": "corepack enable && corepack prepare pnpm@10.14.0 --activate && pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm --filter client... build",
   "outputDirectory": "client/dist",
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
