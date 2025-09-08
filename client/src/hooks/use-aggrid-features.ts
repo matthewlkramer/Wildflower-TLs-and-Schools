@@ -25,7 +25,8 @@ export function useAgGridFeatures() {
     return () => { active = false; };
   }, [entReady]);
 
-  const filterForText = entReady ? 'agSetColumnFilter' : 'agTextColumnFilter';
+  // Legacy helper kept for compatibility; prefer explicit filters per use-case.
+  const filterForText = entReady ? 'agMultiColumnFilter' : 'agTextColumnFilter';
 
   return { entReady, filterForText } as const;
 }

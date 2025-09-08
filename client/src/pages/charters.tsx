@@ -19,20 +19,26 @@ import { useUserFilter } from "@/contexts/user-filter-context";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
 import { useGridHeight } from "@/components/shared/use-grid-height";
 import { KanbanBoard } from "@/components/shared/KanbanBoard";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { useQuery as useRQ } from "@tanstack/react-query";
+import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, CHARTERS_KANBAN_ORDER, CHARTERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Charters() {
   const gridHeight = useGridHeight();
-  const { searchTerm } = useSearch();
+  const { searchTerm, setSearchTerm } = useSearch();
   const { showOnlyMyRecords, currentUser } = useUserFilter();
   const { setPageTitle } = usePageTitle();
   const [, setLocation] = useLocation();
   const [viewMode, setViewMode] = useState<"table" | "kanban" | "split">("table");
   const [selected, setSelected] = useState<Charter[]>([] as any);
+  const [kFilters, setKFilters] = useState({ state: "All", year: "All", ages: "All" });
 
   useEffect(() => {
     setPageTitle("Charters");
@@ -83,6 +89,7 @@ export default function Charters() {
   try { console.log('[Charters] debug:', searchDebug); } catch {}
 
   const selectedId = (selected as any)?.[0]?.id as string | undefined;
+  const selectedIds = new Set((selected as any[]).map(s => s.id));
   const { data: selectedDetail } = useRQ<Charter>({
     queryKey: ["/api/charters", selectedId],
     enabled: viewMode === "split" && !!selectedId,
@@ -123,6 +130,20 @@ export default function Charters() {
   });
 
   const columnDefs: ColDef<Charter>[] = [
+    {
+      headerName: "Actions",
+      field: "actions",
+      width: 90,
+      filter: false,
+      sortable: false,
+      suppressMenu: true as any,
+      menuTabs: [] as any,
+      cellRenderer: (p:any) => (
+        <div>
+          <button onClick={()=> setLocation(`/charter/${p?.data?.id}`)} className="text-xs px-2 py-1 border hover:bg-slate-50">Open</button>
+        </div>
+      )
+    },
     {
       headerName: "Short Name",
       field: "shortName",
@@ -219,13 +240,21 @@ export default function Charters() {
     <main className="px-4 sm:px-6 lg:px-8 py-8">
       <div className="w-full bg-white rounded-lg border border-slate-200">
         <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3">
-          <span>Search:</span>
-          <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
-          <span>Showing {filteredCharters?.length ?? 0} of {charters?.length ?? 0}</span>
+          <div className="relative mr-2">
+            <Input
+              type="text"
+              placeholder="Search charters..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-8 pl-8 w-48 sm:w-64"
+            />
+            <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
+          </div>
+          <span className="hidden sm:inline">Showing {filteredCharters?.length ?? 0} of {charters?.length ?? 0}</span>
           <div className="ml-auto flex items-center gap-2">
-            <div className="hidden sm:flex items-center bg-slate-100 rounded-full p-0.5">
+            <div className="hidden sm:flex items-center bg-slate-100 p-0.5">
               {(["table","kanban","split"] as const).map(v => (
-                <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 rounded-full ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
+                <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
               ))}
             </div>
             <Button size="xs" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => { try { console.log('Create Charter - to be implemented'); } catch {} }}>
@@ -253,22 +282,82 @@ export default function Charters() {
           </div>
         )}
         {viewMode === "kanban" && (
-          <div className="p-3">
+          <div className="p-3 space-y-3">
+            <div className="flex flex-wrap gap-2 items-center">
+              <Select value={kFilters.state} onValueChange={(v)=>setKFilters(s=>({ ...s, state: v }))}>
+                <SelectTrigger className="h-8 w-[180px]"><SelectValue placeholder="State" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">State: All</SelectItem>
+                  {Array.from(new Set((filteredCharters||[]).map((c:any)=>c.state).filter(Boolean))).map((v:any)=>(
+                    <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={kFilters.year} onValueChange={(v)=>setKFilters(s=>({ ...s, year: v }))}>
+                <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Projected Open" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">Projected Open: All</SelectItem>
+                  {Array.from(new Set((filteredCharters||[]).map((c:any)=>c.projectedOpen).filter(Boolean))).map((v:any)=>(
+                    <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={kFilters.ages} onValueChange={(v)=>setKFilters(s=>({ ...s, ages: v }))}>
+                <SelectTrigger className="h-8 w-[220px]"><SelectValue placeholder="Initial Target Ages" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">Initial Ages: All</SelectItem>
+                  {Array.from(new Set((filteredCharters||[]).flatMap((c:any)=>Array.isArray(c.initialTargetAges)?c.initialTargetAges: (c.initialTargetAges?[c.initialTargetAges]:[])))).filter(Boolean).map((v:any)=>(
+                    <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <KanbanBoard
-              items={filteredCharters || []}
+              items={(filteredCharters || []).filter((c:any)=>{
+                if (kFilters.state!=='All' && c.state!==kFilters.state) return false;
+                if (kFilters.year!=='All' && c.projectedOpen!==kFilters.year) return false;
+                if (kFilters.ages!=='All'){
+                  const ages = Array.isArray(c.initialTargetAges)?c.initialTargetAges:[c.initialTargetAges].filter(Boolean);
+                  if (!ages.includes(kFilters.ages)) return false;
+                }
+                return true;
+              })}
               columns={(() => {
                 const keys = new Set<string>();
-                (filteredCharters||[]).forEach((c:any) => keys.add((c.status && String(c.status)) || '__UNSPECIFIED__'));
-                const arr = Array.from(keys);
-                return arr.map(k => ({ key: k, label: k === '__UNSPECIFIED__' ? 'Unspecified' : k }));
+                (filteredCharters||[]).forEach((c:any) => keys.add((c.status && String(c.status)) || KANBAN_UNSPECIFIED_KEY));
+                return buildKanbanColumns(CHARTERS_KANBAN_ORDER, Array.from(keys));
               })()}
-              groupBy={(c:any) => (c.status && String(c.status)) || '__UNSPECIFIED__'}
+              groupBy={(c:any) => (c.status && String(c.status)) || KANBAN_UNSPECIFIED_KEY}
               getId={(c:any) => c.id}
+              initialCollapsedKeys={labelsToKeys(CHARTERS_KANBAN_COLLAPSED)}
+              selectedIds={selectedIds}
+              onToggleItem={(id, checked) => {
+                const map = new Map((filteredCharters||[]).map((c:any)=>[c.id,c]));
+                const item = map.get(id);
+                if (!item) return;
+                setSelected(prev => {
+                  const exists = (prev as any[]).some(p => p.id === id);
+                  if (checked && !exists) return ([...prev, item] as any);
+                  if (!checked && exists) return ((prev as any[]).filter(p => p.id !== id) as any);
+                  return prev;
+                });
+              }}
+              onToggleColumn={(key, checked) => {
+                const itemsInCol = (filteredCharters||[]).filter((c:any) => ((c.status && String(c.status)) || KANBAN_UNSPECIFIED_KEY) === key);
+                setSelected(prev => {
+                  const prevMap = new Map((prev as any[]).map(p=>[p.id,p]));
+                  if (checked) {
+                    itemsInCol.forEach((it:any)=>{ if (!prevMap.has(it.id)) prevMap.set(it.id, it); });
+                  } else {
+                    itemsInCol.forEach((it:any)=>{ if (prevMap.has(it.id)) prevMap.delete(it.id); });
+                  }
+                  return Array.from(prevMap.values()) as any;
+                });
+              }}
               renderCard={(c:any) => (
                 <div>
-                  <div className="font-medium text-sm">{c.shortName || c.fullName}</div>
-                  <div className="text-xs text-slate-600">{c.city ? c.city : ''}</div>
-                  <div className="mt-2 text-xs"><a className="text-blue-600 hover:underline" href={`/charter/${c.id}`}>Open</a></div>
+                  <div className="font-medium text-sm"><Link className="text-blue-600 hover:underline" href={`/charter/${c.id}`}>{c.shortName || c.fullName}</Link></div>
+                  <div className="text-xs text-slate-600">{Array.isArray(c.initialTargetAges)? c.initialTargetAges.join(', '): (c.initialTargetAges||'')}</div>
                 </div>
               )}
               onItemMove={({ id, to }) => moveMutation.mutate({ id, to })}
@@ -279,16 +368,25 @@ export default function Charters() {
           <div className="h-[70vh]">
             <ResizablePanelGroup direction="horizontal">
               <ResizablePanel defaultSize={60} minSize={35}>
-                <div style={{ height: gridHeight, width: "100%" }}>
+                <div className="ag-theme-material h-full">
                   <AgGridReact
-                    { ...DEFAULT_GRID_PROPS }
-                    rowData={filteredCharters}
-                    columnDefs={columnDefs}
-                    domLayout="normal"
-                    headerHeight={40}
-                    onSelectionChanged={(ev: any) => setSelected(ev.api.getSelectedRows() as any)}
-                    context={{ componentName: 'charters-grid' }}
-                    defaultColDef={DEFAULT_COL_DEF}
+                    rowData={filteredCharters || []}
+                    columnDefs={[{
+                      headerName: 'Charter',
+                      valueGetter: (p:any) => p?.data?.shortName || p?.data?.fullName,
+                      filter: 'agTextColumnFilter',
+                      sortable: true,
+                      flex: 1,
+                      minWidth: 140,
+                      cellRenderer: (p:any) => (
+                        <a href={`/charter/${p?.data?.id}`} className="text-blue-600 hover:underline">{p.value}</a>
+                      ),
+                    }]}
+                    defaultColDef={DEFAULT_COL_DEF as any}
+                    {...{ rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any }}
+                    sideBar={false as any}
+                    enableAdvancedFilter={true as any}
+                    onSelectionChanged={(e:any)=> setSelected(e.api.getSelectedRows() as any)}
                   />
                 </div>
               </ResizablePanel>

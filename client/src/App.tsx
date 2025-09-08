@@ -74,10 +74,13 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/teachers" component={Teachers} />
+      <Route path="/teacher" component={Teachers} />
       <Route path="/teacher/:id" component={TeacherDetail} />
       <Route path="/schools" component={Schools} />
+      <Route path="/school" component={Schools} />
       <Route path="/school/:id" component={SchoolDetail} />
       <Route path="/charters" component={Charters} />
+      <Route path="/charter" component={Charters} />
       <Route path="/charter/:id" component={CharterDetail} />
       <Route path="/loans" component={LoansPage} />
       <Route path="/loans/:id" component={LoanDetail} />
@@ -164,13 +167,7 @@ function AppContent() {
       <PageTitleContext.Provider value={{ pageTitle, setPageTitle }}>
           <div className="min-h-screen bg-slate-50">
             {isAuthenticated && location !== '/login' && !location.startsWith('/reset') && (
-              <Header 
-                searchTerm={searchTerm} 
-                onSearchChange={(value) => {
-                  setSearchTerm(value);
-                  try { console.log('[App] onSearchChange ->', value); } catch {}
-                }}
-              />
+              <Header />
             )}
             <Router />
             {isAuthenticated && import.meta.env.VITE_TOUR_ENABLED === 'true' && <TourLauncher />}

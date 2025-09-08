@@ -2,7 +2,7 @@ import { useMemo, useCallback, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef, GridReadyEvent, GridApi, themeMaterial } from "ag-grid-community";
 import { Link } from "wouter";
-import { ExternalLink, Trash2 } from "lucide-react";
+import { ExternalLink, Trash2, MoreVertical, FilePlus2, ClipboardList, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type School } from "@shared/schema";
@@ -16,6 +16,7 @@ import { SCHOOLS_OPTIONS_AGES_SERVED as AGES_SERVED_OPTIONS, SCHOOLS_OPTIONS_GOV
 import { useToast } from "@/hooks/use-toast";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import { useGridHeight } from "@/components/shared/use-grid-height";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface SchoolsGridProps {
   schools: School[];
@@ -93,34 +94,48 @@ const CurrentTLsCellRenderer = (params: any) => {
 };
 
 const ActionsCellRenderer = ({ data: school }: { data: School }) => {
-  const handleDelete = async () => {
-    const ok = window.confirm(`Are you sure you want to delete ${school.shortName || school.name}?`);
-    if (!ok) return;
+  const open = () => { try { window.location.href = `/school/${school.id}`; } catch {} };
+  const editName = async () => {
+    const current = school.shortName || school.name || '';
+    const next = window.prompt('Edit school name', current);
+    if (next == null || next === current) return;
     try {
-      await apiRequest('PUT', `/api/schools/${school.id}`, { archived: true });
+      await apiRequest('PUT', `/api/schools/${school.id}`, { name: next });
       queryClient.invalidateQueries({ queryKey: ['/api/schools'] });
-    } catch (e) {
-      console.error('Failed to delete school', e);
-      alert('Failed to delete school. Please try again.');
-    }
+    } catch (e) { alert('Failed to update'); }
+  };
+  const markInactive = async () => {
+    if (!confirm('Mark school inactive (archive)?')) return;
+    try { await apiRequest('PUT', `/api/schools/${school.id}`, { archived: true }); queryClient.invalidateQueries({ queryKey: ['/api/schools'] }); } catch (e) { alert('Failed to archive'); }
+  };
+  const createNote = async () => {
+    const notes = window.prompt('New note for this school:');
+    if (!notes) return;
+    try {
+      await apiRequest('POST', `/api/school-notes`, { schoolId: school.id, notes });
+      alert('Note created');
+    } catch (e) { alert('Failed to create note'); }
+  };
+  const createTask = async () => {
+    const item = window.prompt('Task description:');
+    if (!item) return;
+    const dueDate = window.prompt('Due date (YYYY-MM-DD), optional:') || undefined;
+    try { await apiRequest('POST', `/api/action-steps`, { schoolId: school.id, item, dueDate }); alert('Task created'); } catch (e) { alert('Failed to create task'); }
   };
 
   return (
-    <div className="flex items-center space-x-2">
-      <Link href={`/school/${school.id}`}>
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-          <ExternalLink className="h-3 w-3" />
-        </Button>
-      </Link>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
-        onClick={handleDelete}
-      >
-        <Trash2 className="h-3 w-3" />
-      </Button>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><MoreVertical className="h-3 w-3" /></Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={open}><ExternalLink className="h-3 w-3 mr-1" /> Open</DropdownMenuItem>
+        <DropdownMenuItem onClick={editName}><Pencil className="h-3 w-3 mr-1" /> Edit name</DropdownMenuItem>
+        <DropdownMenuItem onClick={createNote}><FilePlus2 className="h-3 w-3 mr-1" /> Create note</DropdownMenuItem>
+        <DropdownMenuItem onClick={createTask}><ClipboardList className="h-3 w-3 mr-1" /> Create task</DropdownMenuItem>
+        <DropdownMenuItem onClick={markInactive}><Trash2 className="h-3 w-3 mr-1" /> Mark inactive</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
@@ -150,7 +165,7 @@ export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange,
       width: 140,
       cellRenderer: StatusBadgeCellRenderer,
       // Prefer Enterprise Set Filter with ordered values; otherwise fall back to text filter
-      filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
+      filter: entReady ? 'agMultiColumnFilter' : 'agTextColumnFilter',
       filterParams: entReady 
         ? ({ values: STAGE_STATUS_ORDER } as any)
         : ({ textFormatter: (v: any) => String(v ?? '').trim().toLowerCase(), defaultOption: 'contains' } as any),
@@ -165,7 +180,7 @@ export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange,
       headerName: "Membership Status",
       width: 160,
       cellRenderer: MembershipStatusCellRenderer,
-      filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
+      filter: entReady ? 'agMultiColumnFilter' : 'agTextColumnFilter',
       filterParams: entReady 
         ? ({ values: MEMBERSHIP_STATUS_ORDER } as any)
         : undefined,
@@ -230,6 +245,8 @@ export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange,
       cellRenderer: ActionsCellRenderer,
       sortable: false,
       filter: false,
+      suppressMenu: true as any,
+      menuTabs: [] as any,
       resizable: false,
     },
   ];

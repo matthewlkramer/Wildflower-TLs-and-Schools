@@ -12,8 +12,12 @@ import { KanbanBoard } from "@/components/shared/KanbanBoard";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { SummaryTab as SchoolSummary } from "@/components/school/tabs/SummaryTab";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, SCHOOLS_KANBAN_ORDER, SCHOOLS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
 import AddSchoolModal from "@/components/add-school-modal";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import { Plus, Pencil, Mail, GitMerge } from "lucide-react";
 import { type School } from "@shared/schema";
 import { useSearch } from "@/contexts/search-context";
@@ -23,7 +27,7 @@ import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
 
 export default function Schools() {
-  const { searchTerm } = useSearch();
+  const { searchTerm, setSearchTerm } = useSearch();
   const { showOnlyMyRecords, currentUser } = useUserFilter();
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
   const [selected, setSelected] = useState<School[]>([] as any);
@@ -64,6 +68,7 @@ export default function Schools() {
   try { console.log('[Schools] debug:', searchDebug); } catch {}
 
   const selectedId = (selected as any)?.[0]?.id as string | undefined;
+  const selectedIds = new Set((selected as any[]).map(s => s.id));
   const { data: selectedDetail } = useQuery<School>({
     queryKey: ["/api/schools", selectedId],
     enabled: viewMode === "split" && !!selectedId,
@@ -111,29 +116,39 @@ export default function Schools() {
         <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3">
           {selected.length > 0 ? (
             <>
-              <span>Selected {selected.length} of {totalAfterSearch}</span>
-              <div className="flex flex-wrap items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-1.5 py-1 sm:flex-nowrap">
-                <Button size="xs" variant="outline" className="h-7 rounded-full shrink-0" onClick={() => {
+              <div className="relative mr-2">
+                <Input
+                  type="text"
+                  placeholder="Search schools..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="h-8 pl-8 w-48 sm:w-64"
+                />
+                <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
+              </div>
+              <span className="hidden sm:inline">Selected {selected.length} of {totalAfterSearch}</span>
+              <div className="flex flex-wrap items-center gap-3 bg-slate-50 border border-slate-200 px-3 py-2">
+                <Button size="sm" variant="outline" className="shrink-0 whitespace-nowrap px-3" onClick={() => {
                   if (selected.length === 1) window.location.href = `/school/${(selected as any)[0].id}`; else alert('Bulk editing not implemented yet.');
                 }}>
-                  <Pencil className="h-3 w-3 mr-1" /> Edit
+                  <Pencil className="h-4 w-4 mr-1" /> Edit
                 </Button>
-                <Button size="xs" className="h-7 rounded-full bg-wildflower-blue hover:bg-blue-700 text-white shrink-0" onClick={() => {
+                <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white shrink-0 whitespace-nowrap px-3" onClick={() => {
                   alert('Emailing schools is not yet implemented (no clear recipient field).');
                 }}>
-                  <Mail className="h-3 w-3 mr-1" /> Email
+                  <Mail className="h-4 w-4 mr-1" /> Email
                 </Button>
-                <Button size="xs" variant="outline" className="h-7 rounded-full shrink-0" disabled={selected.length < 2} onClick={() => alert('Merge wizard not implemented yet. Proposed: choose primary school, merge fields/relations, archive others.')}>
-                  <GitMerge className="h-3 w-3 mr-1" /> Merge
+                <Button size="sm" variant="outline" className="shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => alert('Merge wizard not implemented yet. Proposed: choose primary school, merge fields/relations, archive others.')}>
+                  <GitMerge className="h-4 w-4 mr-1" /> Merge
                 </Button>
               </div>
               <div className="ml-auto flex items-center gap-2">
-                <div className="hidden sm:flex items-center bg-slate-100 rounded-full p-0.5">
+                <div className="hidden sm:flex items-center bg-slate-100 p-0.5">
                   {(["table","kanban","split"] as const).map(v => (
-                    <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 rounded-full ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
+                    <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
                   ))}
                 </div>
-                <Button size="sm" className="rounded-full bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
+                <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1" /> Add School
                 </Button>
                 <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/schools'] })}>
@@ -141,18 +156,26 @@ export default function Schools() {
                 </Button>
               </div>
             </>
-          ) : (
+            ) : (
             <>
-              <span>Search:</span>
-              <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
-              <span>Showing {gridFilteredCount ?? totalAfterSearch} of {totalAfterSearch}</span>
+              <div className="relative mr-2">
+                <Input
+                  type="text"
+                  placeholder="Search schools..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="h-8 pl-8 w-48 sm:w-64"
+                />
+                <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
+              </div>
+              <span className="hidden sm:inline">Showing {gridFilteredCount ?? totalAfterSearch} of {totalAfterSearch}</span>
               <div className="ml-auto flex items-center gap-2">
-                <div className="hidden sm:flex items-center bg-slate-100 rounded-full p-0.5">
+                <div className="hidden sm:flex items-center bg-slate-100 p-0.5">
                   {(["table","kanban","split"] as const).map(v => (
-                    <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 rounded-full ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
+                    <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
                   ))}
                 </div>
-                <Button size="sm" className="rounded-full bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
+                <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1" /> Add School
                 </Button>
                 <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/schools'] })}>
@@ -171,23 +194,92 @@ export default function Schools() {
           />
         )}
         {viewMode === "kanban" && (
-          <div className="p-3">
+          <div className="p-3 space-y-3">
+            <div className="flex flex-wrap gap-2 items-center">
+              <Select value={kFilters.stage} onValueChange={(v)=>setKFilters(s=>({ ...s, stage: v }))}>
+                <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Stage/Status" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">Stage/Status: All</SelectItem>
+                  {Array.from(new Set((filteredSchools||[]).map((s:any)=>s.stageStatus || s.status).filter(Boolean))).map((v:any)=>(
+                    <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={kFilters.membership} onValueChange={(v)=>setKFilters(s=>({ ...s, membership: v }))}>
+                <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Membership" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">Membership: All</SelectItem>
+                  {Array.from(new Set((filteredSchools||[]).map((s:any)=>s.membershipStatus).filter(Boolean))).map((v:any)=>(
+                    <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={kFilters.ages} onValueChange={(v)=>setKFilters(s=>({ ...s, ages: v }))}>
+                <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Ages Served" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">Ages Served: All</SelectItem>
+                  {Array.from(new Set((filteredSchools||[]).flatMap((s:any)=>Array.isArray(s.agesServed)?s.agesServed: (s.agesServed?[s.agesServed]:[])))).filter(Boolean).map((v:any)=>(
+                    <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={kFilters.governance} onValueChange={(v)=>setKFilters(s=>({ ...s, governance: v }))}>
+                <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Governance" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">Governance: All</SelectItem>
+                  {Array.from(new Set((filteredSchools||[]).map((s:any)=>s.governanceModel).filter(Boolean))).map((v:any)=>(
+                    <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <KanbanBoard
-              items={filteredSchools || []}
+              items={(filteredSchools || []).filter((s:any)=>{
+                if (kFilters.stage!=='All' && (s.stageStatus || s.status)!==kFilters.stage) return false;
+                if (kFilters.membership!=='All' && s.membershipStatus!==kFilters.membership) return false;
+                if (kFilters.ages!=='All'){
+                  const ages = Array.isArray(s.agesServed)?s.agesServed:[s.agesServed].filter(Boolean);
+                  if (!ages.includes(kFilters.ages)) return false;
+                }
+                if (kFilters.governance!=='All' && s.governanceModel!==kFilters.governance) return false;
+                return true;
+              })}
               columns={(() => {
                 const keys = new Set<string>();
-                (filteredSchools||[]).forEach((s:any) => keys.add((s.stageStatus && String(s.stageStatus)) || '__UNSPECIFIED__'));
-                const arr = Array.from(keys);
-                return arr.map(k => ({ key: k, label: k === '__UNSPECIFIED__' ? 'Unspecified' : k }));
+                (filteredSchools||[]).forEach((s:any) => keys.add((s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY));
+                return buildKanbanColumns(SCHOOLS_KANBAN_ORDER, Array.from(keys));
               })()}
-              groupBy={(s:any) => (s.stageStatus && String(s.stageStatus)) || '__UNSPECIFIED__'}
+              groupBy={(s:any) => (s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY}
               getId={(s:any) => s.id}
+              initialCollapsedKeys={labelsToKeys(SCHOOLS_KANBAN_COLLAPSED)}
+              selectedIds={selectedIds}
+              onToggleItem={(id, checked) => {
+                const map = new Map((filteredSchools||[]).map((s:any)=>[s.id,s]));
+                const item = map.get(id);
+                if (!item) return;
+                setSelected(prev => {
+                  const exists = (prev as any[]).some(p => p.id === id);
+                  if (checked && !exists) return ([...prev, item] as any);
+                  if (!checked && exists) return ((prev as any[]).filter(p => p.id !== id) as any);
+                  return prev;
+                });
+              }}
+              onToggleColumn={(key, checked) => {
+                const itemsInCol = (filteredSchools||[]).filter((s:any) => ((s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY) === key);
+                setSelected(prev => {
+                  const prevMap = new Map((prev as any[]).map(p=>[p.id,p]));
+                  if (checked) {
+                    itemsInCol.forEach((it:any)=>{ if (!prevMap.has(it.id)) prevMap.set(it.id, it); });
+                  } else {
+                    itemsInCol.forEach((it:any)=>{ if (prevMap.has(it.id)) prevMap.delete(it.id); });
+                  }
+                  return Array.from(prevMap.values()) as any;
+                });
+              }}
               renderCard={(s:any) => (
                 <div>
-                  <div className="font-medium text-sm">{s.name || s.shortName}</div>
-                  <div className="text-xs text-slate-600">{[s.city,s.state].filter(Boolean).join(', ')}</div>
-                  <div className="text-xs text-slate-500">{Array.isArray(s.currentGuides)? s.currentGuides.join(', '): s.currentGuides}</div>
-                  <div className="mt-2 text-xs"><a className="text-blue-600 hover:underline" href={`/school/${s.id}`}>Open</a></div>
+                  <div className="font-medium text-sm"><Link className="text-blue-600 hover:underline" href={`/school/${s.id}`}>{s.name || s.shortName}</Link></div>
+                  <div className="text-xs text-slate-600">{Array.isArray(s.currentTLs)? s.currentTLs.join(', '): (s.currentTLs||'')}</div>
                 </div>
               )}
               onItemMove={({ id, to }) => moveMutation.mutate({ id, to })}
@@ -198,12 +290,27 @@ export default function Schools() {
           <div className="h-[70vh]">
             <ResizablePanelGroup direction="horizontal">
               <ResizablePanel defaultSize={60} minSize={35}>
-                <SchoolsGrid 
-                  schools={filteredSchools || []} 
-                  isLoading={isLoading}
-                  onFilteredCountChange={setGridFilteredCount}
-                  onSelectionChanged={(rows:any)=>setSelected(rows)}
-                />
+                <div className="ag-theme-material h-full">
+                  <AgGridReact
+                    rowData={filteredSchools || []}
+                    columnDefs={[{
+                      headerName: 'School',
+                      valueGetter: (p:any) => p?.data?.shortName || p?.data?.name,
+                      filter: 'agTextColumnFilter',
+                      sortable: true,
+                      flex: 1,
+                      minWidth: 140,
+                      cellRenderer: (p:any) => (
+                        <a href={`/school/${p?.data?.id}`} className="text-blue-600 hover:underline">{p.value}</a>
+                      ),
+                    }]}
+                    defaultColDef={DEFAULT_COL_DEF as any}
+                    {...{ rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any }}
+                    sideBar={false as any}
+                    enableAdvancedFilter={true as any}
+                    onSelectionChanged={(e:any)=> setSelected(e.api.getSelectedRows() as any)}
+                  />
+                </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={40} minSize={25}>

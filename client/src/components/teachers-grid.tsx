@@ -150,24 +150,40 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
     }
   });
 
+  const onOpen = () => { try { window.location.href = `/teacher/${teacher.id}`; } catch {} };
+  const onEditName = async () => {
+    const current = teacher.fullName || '';
+    const next = window.prompt('Edit name', current);
+    if (next == null || next === current) return;
+    try {
+      await apiRequest('PUT', `/api/educators/${teacher.id}`, { fullName: next });
+      queryClient.invalidateQueries({ queryKey: ['/api/educators'] });
+      toast({ title: 'Saved', description: 'Educator updated' });
+    } catch (e) {
+      toast({ title: 'Error', description: 'Failed to update', variant: 'destructive' });
+    }
+  };
+  const onArchive = () => setShowDeleteModal(true);
+  const onCreateNote = () => { try { window.location.href = `/teacher/${teacher.id}`; } catch {} };
+  const onCreateTask = () => { try { window.location.href = `/teacher/${teacher.id}`; } catch {} };
+  const onLogInteraction = () => { try { window.location.href = `/teacher/${teacher.id}`; } catch {} };
+
   return (
     <>
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" asChild>
-          <Link href={`/teacher/${teacher.id}`}>
-            <ExternalLink className="h-3 w-3" />
-          </Link>
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
-          onClick={() => setShowDeleteModal(true)}
-        >
-          <Trash2 className="h-3 w-3" />
-        </Button>
-      </div>
-      
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><MoreVertical className="h-3 w-3" /></Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={onOpen}><ExternalLink className="h-3 w-3 mr-1" /> Open</DropdownMenuItem>
+          <DropdownMenuItem onClick={onEditName}><Pencil className="h-3 w-3 mr-1" /> Edit name</DropdownMenuItem>
+          <DropdownMenuItem onClick={onCreateNote}><FilePlus2 className="h-3 w-3 mr-1" /> Create note</DropdownMenuItem>
+          <DropdownMenuItem onClick={onCreateTask}><ClipboardList className="h-3 w-3 mr-1" /> Create task</DropdownMenuItem>
+          <DropdownMenuItem onClick={onLogInteraction}><MessageSquareText className="h-3 w-3 mr-1" /> Log interaction</DropdownMenuItem>
+          <DropdownMenuItem onClick={onArchive}><Trash2 className="h-3 w-3 mr-1" /> Mark inactive</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <DeleteConfirmationModal
         open={showDeleteModal}
         onOpenChange={setShowDeleteModal}
@@ -268,7 +284,7 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
     {
       headerName: "Montessori Certified",
       field: "montessoriCertified",
-      filter: entReady ? 'agSetColumnFilter' : filterForText,
+      filter: entReady ? 'agMultiColumnFilter' : filterForText,
       filterParams: entReady ? ({ values: ['Yes', 'No', null] } as any) : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 160,
       valueGetter: ({ data }: { data: Educator }) => (
@@ -281,7 +297,7 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
     {
       headerName: "Race/Ethnicity",
       field: "raceEthnicity",
-      filter: entReady ? 'agSetColumnFilter' : filterForText,
+      filter: entReady ? 'agMultiColumnFilter' : filterForText,
       filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 140,
       valueGetter: ({ data }: { data: Educator }) => (Array.isArray(data?.raceEthnicity) ? data.raceEthnicity.join(', ') : (data?.raceEthnicity || '')),
@@ -292,7 +308,7 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
     {
       headerName: "Discovery Status",
       field: "discoveryStatus",
-      filter: entReady ? 'agSetColumnFilter' : filterForText,
+      filter: entReady ? 'agMultiColumnFilter' : filterForText,
       filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 140,
       cellRenderer: ({ data }: { data: Educator }) => (
@@ -302,7 +318,7 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
     {
       headerName: "Type",
       field: "individualType",
-      filter: entReady ? 'agSetColumnFilter' : filterForText,
+      filter: entReady ? 'agMultiColumnFilter' : filterForText,
       filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 120,
       valueGetter: ({ data }: { data: Educator }) => data?.individualType || '',
@@ -316,6 +332,8 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
       cellRenderer: ActionRenderer,
       sortable: false,
       filter: false,
+      suppressMenu: true as any,
+      menuTabs: [] as any,
       width: 100,
       pinned: 'right'
     }

@@ -1,32 +1,18 @@
 import { Link, useLocation } from "wouter";
-import { Plus, User, Search, ChevronDown } from "lucide-react";
+import { User, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useEffect, useRef, useState } from "react";
-import AddEducatorModal from "./add-teacher-modal";
-import AddSchoolModal from "./add-school-modal";
+import { useState } from "react";
 import { WildflowerLogo } from "./wildflower-logo";
 import { useUserFilter } from "@/contexts/user-filter-context";
 import { logger } from "@/lib/logger";
 import { useAuth } from "@/contexts/auth-context";
 
-interface HeaderProps {
-  searchTerm?: string;
-  onSearchChange?: (value: string) => void;
-  searchPlaceholder?: string;
-  showFilters?: boolean;
-  onToggleFilters?: () => void;
-}
-
-export default function Header({ searchTerm = "", onSearchChange, searchPlaceholder, showFilters = false, onToggleFilters }: HeaderProps) {
+export default function Header() {
   const [location] = useLocation();
-  const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
-  const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const { showOnlyMyRecords, setShowOnlyMyRecords } = useUserFilter();
-  const inputRef = useRef<HTMLInputElement | null>(null);
   const { isAuthenticated, user, loginWithGoogle, logout } = useAuth();
   
 
@@ -38,66 +24,7 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
   const isChartersActive = location === "/charters" || location.startsWith("/charter/");
   const isLoansActive = location === "/loans" || location.startsWith("/loan/");
 
-  // Header Add menu is fixed and not context-dependent
-
-  const getSearchPlaceholder = () => {
-    if (searchPlaceholder) return searchPlaceholder;
-    if (isTeachersActive) return "Search teachers...";
-    if (isSchoolsActive) return "Search schools...";
-    if (isChartersActive) return "Search charters...";
-    return "Search...";
-  };
-
-  // Global type-to-search behavior on main list pages
-  useEffect(() => {
-    if (!onSearchChange) return;
-    const isListPage = isTeachersActive || isSchoolsActive || isChartersActive || isLoansActive;
-    if (!isListPage) return;
-
-    const isEditableTarget = (el: EventTarget | null) => {
-      const node = el as HTMLElement | null;
-      if (!node) return false;
-      const tag = node.tagName?.toLowerCase();
-      if (tag === 'input' || tag === 'textarea' || tag === 'select') return true;
-      if ((node as any).isContentEditable) return true;
-      return false;
-    };
-
-    const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey || e.altKey) return;
-      if (isEditableTarget(e.target)) return;
-
-      const key = e.key;
-      const printable = key.length === 1; // letters, numbers, punctuation, including space
-      const special = key === 'Backspace' || key === 'Delete';
-      const clear = key === 'Escape';
-      if (!printable && !special && !clear) return;
-
-      // Focus the header search input
-      try { inputRef.current?.focus(); } catch {}
-
-      if (clear) {
-        e.preventDefault();
-        onSearchChange('');
-        return;
-      }
-
-      if (special) {
-        e.preventDefault();
-        const next = key === 'Backspace' ? (searchTerm || '').slice(0, -1) : '';
-        onSearchChange(next);
-        return;
-      }
-
-      if (printable) {
-        e.preventDefault();
-        onSearchChange((searchTerm || '') + key);
-      }
-    };
-
-    window.addEventListener('keydown', handler, { capture: true });
-    return () => window.removeEventListener('keydown', handler, { capture: true } as any);
-  }, [onSearchChange, isTeachersActive, isSchoolsActive, isChartersActive, isLoansActive, searchTerm]);
+  // Simplified header: navigation, My records toggle, account menu
 
 
 
@@ -152,51 +79,8 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
                 </Link>
               </nav>
               
-              {/* Search and Actions */}
+              {/* Right-side controls */}
               <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
-                {onSearchChange && (
-                  <div className="relative">
-                    <Input
-                      ref={inputRef}
-                      type="text"
-                      placeholder={getSearchPlaceholder()}
-                      value={searchTerm}
-                      onChange={(e) => {
-                        // Log via both logger and console for reliability in dev
-                        logger.log('Header input onChange:', e.target.value);
-                        try { console.log('[Header] onChange', e.target.value); } catch {}
-                        onSearchChange(e.target.value);
-                      }}
-                      className="w-32 sm:w-48 lg:w-64 pl-10"
-                    />
-                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                  </div>
-                )}
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      className="bg-wildflower-blue hover:bg-blue-700 text-white flex-shrink-0"
-                      size="sm"
-                    >
-                      <Plus className="h-4 w-4 sm:mr-2" />
-                      <span className="hidden sm:inline">Add</span>
-                      <ChevronDown className="h-4 w-4 ml-1" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setShowAddEducatorModal(true)}>
-                      Create Teacher
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setShowAddSchoolModal(true)}>
-                      Create School
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => { try { console.log('Create Charter - to be implemented'); } catch {} }}>
-                      Create Charter
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                
                 {/* User Filter Toggle */}
                 <div className="flex items-center space-x-2 flex-shrink-0">
                   <Switch
@@ -238,15 +122,6 @@ export default function Header({ searchTerm = "", onSearchChange, searchPlacehol
           </div>
         </div>
       </header>
-
-      <AddEducatorModal 
-        open={showAddEducatorModal} 
-        onOpenChange={setShowAddEducatorModal}
-      />
-      <AddSchoolModal 
-        open={showAddSchoolModal} 
-        onOpenChange={setShowAddSchoolModal}
-      />
     </>
   );
 }

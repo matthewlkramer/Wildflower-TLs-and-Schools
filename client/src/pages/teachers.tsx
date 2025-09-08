@@ -18,6 +18,7 @@ import { KanbanBoard } from "@/components/shared/KanbanBoard";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { SummaryTab as TeacherSummary } from "@/components/teacher/tabs/SummaryTab";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, TEACHERS_KANBAN_ORDER, TEACHERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
 import { type Teacher } from "@shared/schema";
 import { useSearch } from "@/contexts/search-context";
 import { useCachedEducators } from "@/hooks/use-cached-data";
@@ -27,7 +28,11 @@ import AddEducatorModal from "@/components/add-teacher-modal";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import { Plus, Pencil, Mail, GitMerge } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Teachers() {
   const searchContext = useSearch();
@@ -37,6 +42,7 @@ export default function Teachers() {
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [selected, setSelected] = useState<Teacher[]>([]);
   const [viewMode, setViewMode] = useState<"table" | "kanban" | "split">("table");
+  const [kFilters, setKFilters] = useState({ montessori: "All", race: "All", role: "All", stage: "All", discovery: "All", type: "All" });
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
   const [gridFilteredCount, setGridFilteredCount] = useState<number | null>(null);
@@ -92,6 +98,7 @@ export default function Teachers() {
   
   // Selected teacher detail for split view
   const selectedId = selected?.[0]?.id;
+  const selectedIds = new Set((selected || []).map(s => s.id));
   const { data: selectedDetail } = useQuery<Teacher>({
     queryKey: ["/api/educators", selectedId],
     enabled: viewMode === "split" && !!selectedId,
@@ -138,25 +145,35 @@ export default function Teachers() {
           <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3">
             {selected.length > 0 ? (
               <>
-                <span>Selected {selected.length} of {total}</span>
-                <div className="flex flex-wrap items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-1.5 py-1 sm:flex-nowrap">
-                  <Button size="xs" variant="outline" className="h-7 rounded-full shrink-0" onClick={() => {
+                <div className="relative mr-2">
+                  <Input
+                    type="text"
+                    placeholder="Search teachers..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="h-8 pl-8 w-48 sm:w-64"
+                  />
+                  <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
+                </div>
+                <span className="hidden sm:inline">Selected {selected.length} of {total}</span>
+                <div className="flex flex-wrap items-center gap-3 bg-slate-50 border border-slate-200 px-3 py-2">
+                  <Button size="sm" variant="outline" className="shrink-0 whitespace-nowrap px-3" onClick={() => {
                     if (selected.length === 1) {
                       window.location.href = `/teacher/${selected[0].id}`;
                     } else {
                       alert('Bulk editing is not implemented yet.');
                     }
                   }}>
-                    <Pencil className="h-3 w-3 mr-1" /> Edit
+                    <Pencil className="h-4 w-4 mr-1" /> Edit
                   </Button>
-                  <Button size="xs" className="h-7 rounded-full bg-wildflower-blue hover:bg-blue-700 text-white shrink-0" onClick={() => {
+                  <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white shrink-0 whitespace-nowrap px-3" onClick={() => {
                     const emails = selected.map(s => (s.currentPrimaryEmailAddress || '')).filter(Boolean);
                     const q = encodeURIComponent(emails.join(','));
                     window.location.href = `/compose-email?to=${q}`;
                   }}>
-                    <Mail className="h-3 w-3 mr-1" /> Email
+                    <Mail className="h-4 w-4 mr-1" /> Email
                   </Button>
-                  <Button size="xs" variant="outline" className="h-7 rounded-full shrink-0" disabled={selected.length < 2} onClick={() => {
+                  <Button size="sm" variant="outline" className="shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => {
                     if (selected.length < 2) return;
                     const primary = selected[0];
                     const duplicates = selected.slice(1).map(s => s.id);
@@ -171,32 +188,40 @@ export default function Teachers() {
                       queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
                     }).catch(e=>alert('Merge failed'));
                   }}>
-                    <GitMerge className="h-3 w-3 mr-1" /> Merge
+                    <GitMerge className="h-4 w-4 mr-1" /> Merge
                   </Button>
                 </div>
                 <div className="ml-auto flex items-center gap-2">
-                  <div className="hidden sm:flex items-center bg-slate-100 rounded-full p-0.5">
+                  <div className="hidden sm:flex items-center bg-slate-100 p-0.5">
                     {(["table","kanban","split"] as const).map(v => (
-                      <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 rounded-full ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
+                      <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
                     ))}
                   </div>
-                  <Button size="sm" className="rounded-full bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
+                  <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
                     <Plus className="h-4 w-4 mr-1" /> Add Teacher
                   </Button>
                 </div>
               </>
             ) : (
               <>
-                <span>Search:</span>
-                <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
-                <span>Showing {showing} of {total}</span>
+                <div className="relative mr-2">
+                  <Input
+                    type="text"
+                    placeholder="Search teachers..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="h-8 pl-8 w-48 sm:w-64"
+                  />
+                  <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
+                </div>
+                <span className="hidden sm:inline">Showing {showing} of {total}</span>
                 <div className="ml-auto flex items-center gap-2">
-                  <div className="hidden sm:flex items-center bg-slate-100 rounded-full p-0.5">
+                  <div className="hidden sm:flex items-center bg-slate-100 p-0.5">
                     {(["table","kanban","split"] as const).map(v => (
-                      <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 rounded-full ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
+                      <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
                     ))}
                   </div>
-                  <Button size="sm" className="rounded-full bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
+                  <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
                     <Plus className="h-4 w-4 mr-1" /> Add Teacher
                   </Button>
                 </div>
@@ -213,23 +238,118 @@ export default function Teachers() {
             />
           )}
           {viewMode === "kanban" && (
-            <div className="p-3">
+            <div className="p-3 space-y-3">
+              <div className="flex flex-wrap gap-2 items-center">
+                <Select value={kFilters.montessori} onValueChange={(v)=>setKFilters(s=>({ ...s, montessori: v }))}>
+                  <SelectTrigger className="h-8 w-[160px]"><SelectValue placeholder="Montessori" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">Montessori: All</SelectItem>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={kFilters.race} onValueChange={(v)=>setKFilters(s=>({ ...s, race: v }))}>
+                  <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Race/Ethnicity" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">Race/Ethnicity: All</SelectItem>
+                    {Array.from(new Set((filteredTeachers||[]).flatMap((t:any)=>Array.isArray(t.raceEthnicity)?t.raceEthnicity: (t.raceEthnicity?[t.raceEthnicity]:[])))).filter(Boolean).map((v:any)=>(
+                      <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={kFilters.role} onValueChange={(v)=>setKFilters(s=>({ ...s, role: v }))}>
+                  <SelectTrigger className="h-8 w-[180px]"><SelectValue placeholder="Role" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">Role: All</SelectItem>
+                    {Array.from(new Set((filteredTeachers||[]).flatMap((t:any)=>Array.isArray(t.currentRole)?t.currentRole: (t.currentRole?[t.currentRole]:[])))).filter(Boolean).map((v:any)=>(
+                      <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={kFilters.stage} onValueChange={(v)=>setKFilters(s=>({ ...s, stage: v }))}>
+                  <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Stage/Status" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">Stage/Status: All</SelectItem>
+                    {Array.from(new Set((filteredTeachers||[]).flatMap((t:any)=>Array.isArray(t.activeSchoolStageStatus)?t.activeSchoolStageStatus: (t.activeSchoolStageStatus?[t.activeSchoolStageStatus]:[])))).filter(Boolean).map((v:any)=>(
+                      <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={kFilters.discovery} onValueChange={(v)=>setKFilters(s=>({ ...s, discovery: v }))}>
+                  <SelectTrigger className="h-8 w-[180px]"><SelectValue placeholder="Discovery" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">Discovery: All</SelectItem>
+                    {Array.from(new Set((filteredTeachers||[]).map((t:any)=>t.discoveryStatus).filter(Boolean))).map((v:any)=>(
+                      <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={kFilters.type} onValueChange={(v)=>setKFilters(s=>({ ...s, type: v }))}>
+                  <SelectTrigger className="h-8 w-[180px]"><SelectValue placeholder="Individual Type" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">Type: All</SelectItem>
+                    {Array.from(new Set((filteredTeachers||[]).map((t:any)=>t.individualType).filter(Boolean))).map((v:any)=>(
+                      <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <KanbanBoard
-                items={filteredTeachers || []}
+                items={(filteredTeachers || []).filter((t:any)=>{
+                  const mont = t.montessoriCertified===true?'Yes':(t.montessoriCertified===false?'No':'');
+                  if (kFilters.montessori!=='All' && mont!==kFilters.montessori) return false;
+                  if (kFilters.race!=='All') {
+                    const races = Array.isArray(t.raceEthnicity)?t.raceEthnicity:[t.raceEthnicity].filter(Boolean);
+                    if (!races.includes(kFilters.race)) return false;
+                  }
+                  if (kFilters.role!=='All') {
+                    const roles = Array.isArray(t.currentRole)?t.currentRole:[t.currentRole].filter(Boolean);
+                    if (!roles.includes(kFilters.role)) return false;
+                  }
+                  if (kFilters.stage!=='All') {
+                    const stages = Array.isArray(t.activeSchoolStageStatus)?t.activeSchoolStageStatus:[t.activeSchoolStageStatus].filter(Boolean);
+                    if (!stages.includes(kFilters.stage)) return false;
+                  }
+                  if (kFilters.discovery!=='All' && t.discoveryStatus!==kFilters.discovery) return false;
+                  if (kFilters.type!=='All' && t.individualType!==kFilters.type) return false;
+                  return true;
+                })}
                 columns={(() => {
                   const keys = new Set<string>();
-                  (filteredTeachers||[]).forEach((t:any) => keys.add((t.kanban && String(t.kanban)) || '__UNSPECIFIED__'));
-                  const cols = Array.from(keys);
-                  return cols.map(k => ({ key: k, label: k === '__UNSPECIFIED__' ? 'Unspecified' : k }));
+                  (filteredTeachers||[]).forEach((t:any) => keys.add((t.kanban && String(t.kanban)) || KANBAN_UNSPECIFIED_KEY));
+                  return buildKanbanColumns(TEACHERS_KANBAN_ORDER, Array.from(keys));
                 })()}
-                groupBy={(t:any) => (t.kanban && String(t.kanban)) || '__UNSPECIFIED__'}
+                groupBy={(t:any) => (t.kanban && String(t.kanban)) || KANBAN_UNSPECIFIED_KEY}
                 getId={(t:any) => t.id}
-                renderCard={(t) => (
+                initialCollapsedKeys={labelsToKeys(TEACHERS_KANBAN_COLLAPSED)}
+                selectedIds={selectedIds}
+                onToggleItem={(id, checked) => {
+                  const map = new Map((filteredTeachers||[]).map((t:any)=>[t.id,t]));
+                  const item = map.get(id);
+                  if (!item) return;
+                  setSelected(prev => {
+                    const exists = prev.some(p => p.id === id);
+                    if (checked && !exists) return [...prev, item];
+                    if (!checked && exists) return prev.filter(p => p.id !== id);
+                    return prev;
+                  });
+                }}
+                onToggleColumn={(key, checked) => {
+                  const itemsInCol = (filteredTeachers||[]).filter((t:any) => ((t.kanban && String(t.kanban)) || KANBAN_UNSPECIFIED_KEY) === key);
+                  setSelected(prev => {
+                    const prevMap = new Map(prev.map(p=>[p.id,p]));
+                    if (checked) {
+                      itemsInCol.forEach((it:any)=>{ if (!prevMap.has(it.id)) prevMap.set(it.id, it); });
+                    } else {
+                      itemsInCol.forEach((it:any)=>{ if (prevMap.has(it.id)) prevMap.delete(it.id); });
+                    }
+                    return Array.from(prevMap.values()) as any;
+                  });
+                }}
+                renderCard={(t:any) => (
                   <div>
-                    <div className="font-medium text-sm">{(t as any).fullName || (t as any).firstName + ' ' + (t as any).lastName}</div>
-                    <div className="text-xs text-slate-600">{Array.isArray((t as any).currentRole) ? (t as any).currentRole.join(', ') : (t as any).currentRole}</div>
-                    <div className="text-xs text-slate-500">{Array.isArray((t as any).activeSchool) ? (t as any).activeSchool.join(', ') : (t as any).activeSchool}</div>
-                    <div className="mt-2 text-xs"><a className="text-blue-600 hover:underline" href={`/teacher/${(t as any).id}`}>Open</a></div>
+                    <div className="font-medium text-sm"><Link className="text-blue-600 hover:underline" href={`/teacher/${t.id}`}>{t.fullName || `${t.firstName||''} ${t.lastName||''}`.trim()}</Link></div>
+                    <div className="text-xs text-slate-600">{t.currentRoleSchool || ''}</div>
                   </div>
                 )}
                 onItemMove={({ id, from, to }) => moveMutation.mutate({ id, to })}
@@ -240,13 +360,27 @@ export default function Teachers() {
             <div className="h-[70vh]">
               <ResizablePanelGroup direction="horizontal">
                 <ResizablePanel defaultSize={60} minSize={35}>
-                  <TeachersGrid 
-                    teachers={filteredTeachers || []} 
-                    isLoading={isLoading}
-                    onFilteredCountChange={(count)=>setGridFilteredCount(count)}
-                    onSelectionChanged={(rows)=>setSelected(rows as Teacher[])}
-                    onAddTeacher={() => setShowAddEducatorModal(true)}
-                  />
+                  <div className="ag-theme-material h-full">
+                    <AgGridReact
+                      rowData={filteredTeachers || []}
+                      columnDefs={[{
+                        headerName: 'Name',
+                        valueGetter: (p:any) => p?.data?.fullName || `${p?.data?.firstName || ''} ${p?.data?.lastName || ''}`.trim(),
+                        filter: 'agTextColumnFilter',
+                        sortable: true,
+                        flex: 1,
+                        minWidth: 140,
+                        cellRenderer: (p:any) => (
+                          <a href={`/teacher/${p?.data?.id}`} className="text-blue-600 hover:underline">{p.value}</a>
+                        ),
+                      }]}
+                      defaultColDef={DEFAULT_COL_DEF as any}
+                      {...{ rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any }}
+                      sideBar={false as any}
+                      enableAdvancedFilter={true as any}
+                      onSelectionChanged={(e:any)=> setSelected(e.api.getSelectedRows() as any)}
+                    />
+                  </div>
                 </ResizablePanel>
                 <ResizableHandle withHandle />
                 <ResizablePanel defaultSize={40} minSize={25}>
