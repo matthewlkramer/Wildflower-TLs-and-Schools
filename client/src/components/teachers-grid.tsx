@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import { ColDef, GridReadyEvent, GridApi, themeMaterial } from "ag-grid-community";
 // Modules are registered in initAgGridEnterprise at app startup
 import { Link } from "wouter";
-import { ExternalLink, Trash2, Plus } from "lucide-react";
+import { ExternalLink, Trash2, Plus, MoreVertical, FilePlus2, ClipboardList, MessageSquareText, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type Educator, type School } from "@shared/schema";
@@ -16,6 +16,7 @@ import { useAgGridFeatures } from "@/hooks/use-aggrid-features";
 import { GridBase } from "@/components/shared/GridBase";
 import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
 import { useGridHeight } from "@/components/shared/use-grid-height";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface TeachersGridProps {
   teachers: Educator[];

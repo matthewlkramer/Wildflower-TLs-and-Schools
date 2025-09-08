@@ -25,8 +25,10 @@ export function useAgGridFeatures() {
     return () => { active = false; };
   }, [entReady]);
 
-  // Legacy helper kept for compatibility; prefer explicit filters per use-case.
-  const filterForText = entReady ? 'agMultiColumnFilter' : 'agTextColumnFilter';
+  // Fallback text filter identifier for when enterprise isn't ready.
+  // Keep this as the community text filter so grids don't crash while
+  // enterprise modules are loading.
+  const filterForText = 'agTextColumnFilter';
 
   return { entReady, filterForText } as const;
 }
