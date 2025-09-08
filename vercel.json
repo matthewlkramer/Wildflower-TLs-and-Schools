@@ -1,9 +1,3 @@
 {
-  "installCommand": "corepack enable && corepack prepare pnpm@10.14.0 --activate && pnpm install --no-frozen-lockfile",
-  "installCommand": "corepack enable && corepack prepare pnpm@10.14.0 --activate && pnpm install --no-frozen-lockfile",
-  "buildCommand": "pnpm --filter client... build && node -e \"fs=require('fs');const src='client/dist';if(!fs.existsSync(src)){console.error('Missing',src);process.exit(1)};fs.rmSync('dist',{recursive:true,force:true});fs.mkdirSync('dist',{recursive:true});fs.cpSync(src,'dist',{recursive:true});\"",
-  "outputDirectory": "dist",
-  "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
+  "installCommand": "corepack enable && corepack prepare pnpm@10.14.0 --activate && pnpm install --no-frozen-lockfile"
 }
