@@ -101,7 +101,7 @@ export function KanbanBoard<T>(props: KanbanBoardProps<T>) {
                       aria-label="Select all in column"
                       checked={allSelected}
                       onChange={(e) => onToggleColumn && onToggleColumn(col.key, e.currentTarget.checked)}
-                      className="h-4 w-4"
+                      className="h-3.5 w-3.5 align-middle"
                     />
                   )}
                   <h3 className={`text-sm font-semibold text-slate-700 ${isCollapsed ? "truncate w-[36px]" : ""}`}>{col.label}</h3>
@@ -134,7 +134,7 @@ export function KanbanBoard<T>(props: KanbanBoardProps<T>) {
                           {onToggleItem && (
                             <input
                               type="checkbox"
-                              className="absolute top-1 left-1 h-4 w-4"
+                              className="absolute top-1 left-1 h-3.5 w-3.5 align-middle"
                               checked={!!selectedIds && selectedIds.has(getId(item))}
                               onChange={(e) => onToggleItem(getId(item), e.currentTarget.checked)}
                               onClick={(e) => e.stopPropagation()}

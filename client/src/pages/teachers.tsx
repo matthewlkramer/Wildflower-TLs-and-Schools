@@ -349,7 +349,21 @@ export default function Teachers() {
                 renderCard={(t:any) => (
                   <div>
                     <div className="font-medium text-sm"><Link className="text-blue-600 hover:underline" href={`/teacher/${t.id}`}>{t.fullName || `${t.firstName||''} ${t.lastName||''}`.trim()}</Link></div>
-                    <div className="text-xs text-slate-600">{t.currentRoleSchool || ''}</div>
+                    <div className="text-xs text-slate-600">
+                      <span>{t.currentRoleSchool || t.targetGeoCombined || ''}</span>
+                      {Array.isArray(t.activeSchool) && t.activeSchool.length > 0 && (
+                        <>
+                          <span className="mx-1 text-slate-400">•</span>
+                          {t.activeSchool.map((name:string, i:number) => (
+                            t.activeSchoolIds?.[i] ? (
+                              <Link key={t.activeSchoolIds[i]} href={`/school/${t.activeSchoolIds[i]}`} className="text-blue-600 hover:underline">{name}</Link>
+                            ) : (
+                              <span key={`${name}-${i}`}>{name}</span>
+                            )
+                          )).reduce((prev:any, curr:any, i:number)=> (i? [...prev, <span key={`sep-${i}`}>, </span>, curr] : [curr]), [])}
+                        </>
+                      )}
+                    </div>
                   </div>
                 )}
                 onItemMove={({ id, from, to }) => moveMutation.mutate({ id, to })}

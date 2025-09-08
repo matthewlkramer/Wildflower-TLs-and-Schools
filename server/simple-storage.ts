@@ -350,6 +350,7 @@ export class SimpleAirtableStorage implements IStorage {
 
       currentRole: toStringArray(fields[EF.Current_Role]),
       activeSchool: toStringArray(fields[EF.Currently_Active_School]),
+      activeSchoolIds: toStringArray(fields[EF.Active_School_Record_ID]),
       activeSchoolStageStatus: toStringArray(fields[EF.Stage_Status_for_Active_School]),
       discoveryStatus: fields[EF.Discovery_status] || undefined,
       kanban: fields[EF.Kanban] || undefined,

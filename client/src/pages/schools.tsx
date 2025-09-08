@@ -151,9 +151,6 @@ export default function Schools() {
                 <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1" /> Add School
                 </Button>
-                <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/schools'] })}>
-                  Refresh
-                </Button>
               </div>
             </>
             ) : (
@@ -177,9 +174,6 @@ export default function Schools() {
                 </div>
                 <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1" /> Add School
-                </Button>
-                <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/schools'] })}>
-                  Refresh
                 </Button>
               </div>
             </>

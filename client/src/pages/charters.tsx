@@ -260,9 +260,6 @@ export default function Charters() {
             <Button size="xs" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => { try { console.log('Create Charter - to be implemented'); } catch {} }}>
               Add Charter
             </Button>
-            <Button size="xs" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/charters'] })}>
-              Refresh
-            </Button>
           </div>
         </div>
         {viewMode === "table" && (

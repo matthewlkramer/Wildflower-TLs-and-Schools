@@ -164,6 +164,8 @@ export interface Educator {
   activeSchool?: string[];
   currentRole?: string[];
   activeSchoolStageStatus?: string[];
+  // IDs corresponding to activeSchool names (Airtable Record IDs)
+  activeSchoolIds?: string[];
 
   
   targetCity?: string;
@@ -653,6 +655,7 @@ export const educatorSchema = z.object({
   montessoriLeadGuideTrainings: z.array(z.string()).optional(),
   currentRole: z.array(z.string()).optional(),
   discoveryStatus: z.string().optional(),
+  activeSchoolIds: z.array(z.string()).optional(),
   kanban: z.string().nullable().optional(),
   assignedPartner: z.array(z.string()).optional(),
   assignedPartnerEmail: z.array(z.string()).optional(),

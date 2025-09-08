@@ -236,55 +236,28 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
       filter: 'agTextColumnFilter',
       filterParams: { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 300,
-      valueGetter: ({ data }: { data: Educator }) => {
-        if (!data) return '';
-        return data.currentRoleSchool || '';
-        if (data.currentRoleSchool) return data.currentRoleSchool;
-        const roles = data.currentRole;
-        let roleText = Array.isArray(roles) ? roles.join(', ') : (roles || '');
-        roleText = roleText.replace(/\bEmerging Teacher Leader\b/g, 'ETL');
-        roleText = roleText.replace(/\bTeacher Leader\b/g, 'TL');
-        const schools = data.activeSchool;
-        const schoolArray = Array.isArray(schools) ? schools : (schools ? [schools] : []);
-        const status = data.activeSchoolStageStatus;
-        const statusText = Array.isArray(status) ? status.join(', ') : (status || '');
-        const schoolText = schoolArray.join(', ');
-        return [roleText, schoolText, statusText].filter(Boolean).join(' ');
-      },
+      valueGetter: ({ data }: { data: Educator }) => data?.currentRoleSchool || '',
       cellRenderer: ({ data }: { data: Educator }) => {
-        return data?.currentRoleSchool || '';
-
-        // Get current role(s) - join with commas if multiple
-        const roles = data.currentRole;
-        let roleText = Array.isArray(roles) ? roles.join(', ') : (roles || '');
-        
-        // Replace role abbreviations
-        roleText = roleText.replace(/\bEmerging Teacher Leader\b/g, 'ETL');
-        roleText = roleText.replace(/\bTeacher Leader\b/g, 'TL');
-
-        // Get school data
-        const schools = data.activeSchool;
-        const schoolArray = Array.isArray(schools) ? schools : (schools ? [schools] : []);
-
-        // Get stage/status
-        const status = data.activeSchoolStageStatus;
-        const statusText = Array.isArray(status) ? status.join(', ') : (status || '');
-
+        const roleText = data?.currentRoleSchool || '';
+        const names = Array.isArray(data?.activeSchool) ? data.activeSchool : (data?.activeSchool ? [data.activeSchool] : []);
+        const ids = Array.isArray(data?.activeSchoolIds) ? data.activeSchoolIds : [];
         return (
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-1">
             {roleText && <span>{roleText}</span>}
-            {roleText && schoolArray.length > 0 && <span> at </span>}
-            {schoolArray.length > 0 && (
-              <div className="flex flex-wrap gap-1">
-                {schoolArray.map((school, index) => (
-                  <span key={index}>
-                    <SchoolLink schoolName={school} />
-                    {index < schoolArray.length - 1 && ', '}
-                  </span>
-                ))}
-              </div>
+            {names.length > 0 && (
+              <span className="text-slate-400">•</span>
             )}
-            {statusText && <span> ({statusText})</span>}
+            {names.length > 0 && (
+              <span className="flex flex-wrap gap-1">
+                {names.map((n, i) => (
+                  ids[i] ? (
+                    <Link key={ids[i]} href={`/school/${ids[i]}`} className="text-blue-600 hover:underline">{n}</Link>
+                  ) : (
+                    <span key={`${n}-${i}`}>{n}</span>
+                  )
+                )).reduce((prev, curr, i) => (i ? [...prev, <span key={`sep-${i}`}>, </span>, curr] : [curr]), [] as any)}
+              </span>
+            )}
           </div>
         );
       }
