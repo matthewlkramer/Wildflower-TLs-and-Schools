@@ -157,6 +157,7 @@ export interface Educator {
   montessoriLeadGuideTrainings?: string[];
 
   discoveryStatus?: string;
+  kanban?: string;
   assignedPartner?: string[];
   assignedPartnerEmail?: string[];
   
@@ -652,6 +653,7 @@ export const educatorSchema = z.object({
   montessoriLeadGuideTrainings: z.array(z.string()).optional(),
   currentRole: z.array(z.string()).optional(),
   discoveryStatus: z.string().optional(),
+  kanban: z.string().nullable().optional(),
   assignedPartner: z.array(z.string()).optional(),
   assignedPartnerEmail: z.array(z.string()).optional(),
   householdIncome: z.string().optional(),

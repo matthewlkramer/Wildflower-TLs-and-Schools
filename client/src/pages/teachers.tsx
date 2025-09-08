@@ -14,6 +14,10 @@
  * in-memory after the initial fetch.
  */
 import TeachersGrid from "@/components/teachers-grid";
+import { KanbanBoard } from "@/components/shared/KanbanBoard";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { SummaryTab as TeacherSummary } from "@/components/teacher/tabs/SummaryTab";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { type Teacher } from "@shared/schema";
 import { useSearch } from "@/contexts/search-context";
 import { useCachedEducators } from "@/hooks/use-cached-data";
@@ -32,6 +36,7 @@ export default function Teachers() {
   const { showOnlyMyRecords, currentUser } = useUserFilter();
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [selected, setSelected] = useState<Teacher[]>([]);
+  const [viewMode, setViewMode] = useState<"table" | "kanban" | "split">("table");
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
   const [gridFilteredCount, setGridFilteredCount] = useState<number | null>(null);
@@ -85,6 +90,47 @@ export default function Teachers() {
   logger.log('Teachers - filtered result:', searchDebug);
   try { console.log('[Teachers] debug:', searchDebug); } catch {}
   
+  // Selected teacher detail for split view
+  const selectedId = selected?.[0]?.id;
+  const { data: selectedDetail } = useQuery<Teacher>({
+    queryKey: ["/api/educators", selectedId],
+    enabled: viewMode === "split" && !!selectedId,
+    queryFn: async () => {
+      const r = await fetch(`/api/educators/${selectedId}`, { credentials: "include" });
+      if (!r.ok) throw new Error("Failed to fetch teacher");
+      return r.json();
+    }
+  });
+
+  // Kanban move mutation: update kanban only (no fallback field)
+  const moveMutation = useMutation({
+    mutationFn: async ({ id, to }: { id: string; to: string }) => {
+      const res = await fetch(`/api/educators/${id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kanban: to === '__UNSPECIFIED__' ? null : to }),
+      });
+      if (!res.ok) throw new Error('Failed to update educator');
+      return res.json();
+    },
+    onMutate: async ({ id, to }) => {
+      const key = ['/api/educators'];
+      await queryClient.cancelQueries({ queryKey: key });
+      const prev = queryClient.getQueryData<any[]>(key);
+      if (prev) {
+        queryClient.setQueryData<any[]>(key, prev.map((t) => t.id === id ? { ...t, kanban: to === '__UNSPECIFIED__' ? null : to } : t));
+      }
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) queryClient.setQueryData(['/api/educators'], ctx.prev);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/educators'] });
+    }
+  });
+
   return (
     <>
       <main className="px-4 sm:px-6 lg:px-8 py-8">
@@ -129,6 +175,11 @@ export default function Teachers() {
                   </Button>
                 </div>
                 <div className="ml-auto flex items-center gap-2">
+                  <div className="hidden sm:flex items-center bg-slate-100 rounded-full p-0.5">
+                    {(["table","kanban","split"] as const).map(v => (
+                      <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 rounded-full ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
+                    ))}
+                  </div>
                   <Button size="sm" className="rounded-full bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
                     <Plus className="h-4 w-4 mr-1" /> Add Teacher
                   </Button>
@@ -140,6 +191,11 @@ export default function Teachers() {
                 <code className="px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200">{searchTerm || '-'}</code>
                 <span>Showing {showing} of {total}</span>
                 <div className="ml-auto flex items-center gap-2">
+                  <div className="hidden sm:flex items-center bg-slate-100 rounded-full p-0.5">
+                    {(["table","kanban","split"] as const).map(v => (
+                      <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 rounded-full ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
+                    ))}
+                  </div>
                   <Button size="sm" className="rounded-full bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
                     <Plus className="h-4 w-4 mr-1" /> Add Teacher
                   </Button>
@@ -147,13 +203,66 @@ export default function Teachers() {
               </>
             )}
           </div>
-          <TeachersGrid 
-            teachers={filteredTeachers || []} 
-            isLoading={isLoading}
-            onFilteredCountChange={(count)=>setGridFilteredCount(count)}
-            onSelectionChanged={(rows)=>setSelected(rows as Teacher[])}
-            onAddTeacher={() => setShowAddEducatorModal(true)}
-          />
+          {viewMode === "table" && (
+            <TeachersGrid 
+              teachers={filteredTeachers || []} 
+              isLoading={isLoading}
+              onFilteredCountChange={(count)=>setGridFilteredCount(count)}
+              onSelectionChanged={(rows)=>setSelected(rows as Teacher[])}
+              onAddTeacher={() => setShowAddEducatorModal(true)}
+            />
+          )}
+          {viewMode === "kanban" && (
+            <div className="p-3">
+              <KanbanBoard
+                items={filteredTeachers || []}
+                columns={(() => {
+                  const keys = new Set<string>();
+                  (filteredTeachers||[]).forEach((t:any) => keys.add((t.kanban && String(t.kanban)) || '__UNSPECIFIED__'));
+                  const cols = Array.from(keys);
+                  return cols.map(k => ({ key: k, label: k === '__UNSPECIFIED__' ? 'Unspecified' : k }));
+                })()}
+                groupBy={(t:any) => (t.kanban && String(t.kanban)) || '__UNSPECIFIED__'}
+                getId={(t:any) => t.id}
+                renderCard={(t) => (
+                  <div>
+                    <div className="font-medium text-sm">{(t as any).fullName || (t as any).firstName + ' ' + (t as any).lastName}</div>
+                    <div className="text-xs text-slate-600">{Array.isArray((t as any).currentRole) ? (t as any).currentRole.join(', ') : (t as any).currentRole}</div>
+                    <div className="text-xs text-slate-500">{Array.isArray((t as any).activeSchool) ? (t as any).activeSchool.join(', ') : (t as any).activeSchool}</div>
+                    <div className="mt-2 text-xs"><a className="text-blue-600 hover:underline" href={`/teacher/${(t as any).id}`}>Open</a></div>
+                  </div>
+                )}
+                onItemMove={({ id, from, to }) => moveMutation.mutate({ id, to })}
+              />
+            </div>
+          )}
+          {viewMode === "split" && (
+            <div className="h-[70vh]">
+              <ResizablePanelGroup direction="horizontal">
+                <ResizablePanel defaultSize={60} minSize={35}>
+                  <TeachersGrid 
+                    teachers={filteredTeachers || []} 
+                    isLoading={isLoading}
+                    onFilteredCountChange={(count)=>setGridFilteredCount(count)}
+                    onSelectionChanged={(rows)=>setSelected(rows as Teacher[])}
+                    onAddTeacher={() => setShowAddEducatorModal(true)}
+                  />
+                </ResizablePanel>
+                <ResizableHandle withHandle />
+                <ResizablePanel defaultSize={40} minSize={25}>
+                  <div className="h-full overflow-y-auto p-4">
+                    {!selectedId ? (
+                      <div className="text-sm text-slate-500">Select a row to see details.</div>
+                    ) : selectedDetail ? (
+                      <TeacherSummary teacher={selectedDetail} />
+                    ) : (
+                      <div className="text-sm text-slate-500">Loading…</div>
+                    )}
+                  </div>
+                </ResizablePanel>
+              </ResizablePanelGroup>
+            </div>
+          )}
         </div>
       </main>
       

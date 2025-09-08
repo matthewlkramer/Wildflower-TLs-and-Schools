@@ -17,7 +17,7 @@ export const DEFAULT_GRID_PROPS = {
   domLayout: 'autoHeight' as const,
   enableBrowserTooltips: true,
   getRowId: (params: any) => params?.data?.id ?? params?.data?.ID ?? params?.data?.Id,
-  sideBar: undefined as any,
+  sideBar: true as any,
   rowSelection: {
     mode: 'multiRow',
     checkboxes: true,

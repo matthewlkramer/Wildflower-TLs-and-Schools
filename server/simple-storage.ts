@@ -352,6 +352,7 @@ export class SimpleAirtableStorage implements IStorage {
       activeSchool: toStringArray(fields[EF.Currently_Active_School]),
       activeSchoolStageStatus: toStringArray(fields[EF.Stage_Status_for_Active_School]),
       discoveryStatus: fields[EF.Discovery_status] || undefined,
+      kanban: fields[EF.Kanban] || undefined,
 
       assignedPartner: toStringArray(fields[EF.Assigned_Partner]),
       assignedPartnerEmail: toStringArray(fields[EF.Assigned_Partner_Email]),
@@ -687,6 +688,8 @@ export class SimpleAirtableStorage implements IStorage {
       if (educator.lastName !== undefined) updateFields[EF.Last_Name] = educator.lastName;
       if (educator.fullName !== undefined) updateFields[EF.Full_Name] = educator.fullName;
       if (educator.archived !== undefined) updateFields[EF.Archived] = educator.archived;
+      if (educator.discoveryStatus !== undefined) updateFields[EF.Discovery_status] = educator.discoveryStatus as any;
+      if (educator.kanban !== undefined) updateFields[EF.Kanban] = (educator.kanban === null ? null : educator.kanban) as any;
 
       const record = await base(AT.EDUCATORS).update(id, updateFields);
       return this.transformEducatorRecord(record);

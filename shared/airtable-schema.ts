@@ -676,6 +676,7 @@ export const EDUCATORS_FIELDS = {
   First_Name: "First Name",
   Middle_Name: "Middle Name",
   Last_Name: "Last Name",
+  Kanban: "Kanban",
   Assigned_Partner: "Assigned Partner",
   Discovery_status: "Discovery status",
   Source: "Source",
