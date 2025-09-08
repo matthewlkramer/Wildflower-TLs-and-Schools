@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
 import type { Charter990 } from "@shared/schema";
 import { Edit, ExternalLink, Trash2 } from "lucide-react";
+import { RowActionsSelect } from "@/components/shared/RowActionsSelect";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 
 interface Charter990sTableProps {
   charterId: string;
@@ -41,7 +42,7 @@ export function Charter990sTable({ charterId }: Charter990sTableProps) {
       headerName: "990 Year",
       field: "year",
       width: 120,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const tax990 = params.data;
         const year = params.value || "Unknown Year";
@@ -63,42 +64,24 @@ export function Charter990sTable({ charterId }: Charter990sTableProps) {
       headerName: "Date Entered",
       field: "dateEntered",
       width: 120,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Actions",
       field: "actions",
-      width: 100,
+      width: 120,
       sortable: false,
       filter: false,
       cellRenderer: (params: any) => {
-        const tax990 = params.data;
+        const tax990 = params.data as Charter990;
         return (
-          <div className="flex items-center gap-2">
-            {tax990.docUrl && (
-              <button
-                onClick={() => handleOpen(tax990)}
-                className="text-blue-600 hover:text-blue-800"
-                title="Open 990"
-              >
-                <ExternalLink className="h-4 w-4" />
-              </button>
-            )}
-            <button
-              onClick={() => handleEdit(tax990)}
-              className="text-blue-600 hover:text-blue-800"
-              title="Edit 990"
-            >
-              <Edit className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => handleDelete(tax990)}
-              className="text-red-600 hover:text-red-800"
-              title="Delete 990"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </div>
+          <RowActionsSelect
+            options={[
+              { value: 'open', label: 'Open', run: () => handleOpen(tax990), hidden: !tax990.docUrl },
+              { value: 'edit', label: 'Edit', run: () => handleEdit(tax990) },
+              { value: 'delete', label: 'Delete', run: () => handleDelete(tax990) },
+            ]}
+          />
         );
       },
     },
@@ -123,22 +106,14 @@ export function Charter990sTable({ charterId }: Charter990sTableProps) {
 
   return (
     <div style={{ height: "400px", width: "100%" }}>
-      <AgGridReact
-        theme={themeMaterial}
+      <GridBase
         rowData={sorted990s}
         columnDefs={columnDefs}
-        animateRows={true}
-        rowSelection={{ enableClickSelection: false } as any}
-        domLayout="normal"
-        headerHeight={40}
-        rowHeight={30}
-        context={{
-          componentName: 'charter-990s-table'
-        }}
-        defaultColDef={{
-          sortable: true,
-          resizable: true,
-          filter: true,
+        defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+        gridProps={{
+          rowSelection: { enableClickSelection: false } as any,
+          domLayout: 'normal',
+          context: { componentName: 'charter-990s-table' },
         }}
       />
     </div>

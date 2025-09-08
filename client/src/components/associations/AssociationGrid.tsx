@@ -9,6 +9,7 @@ import { YesNoSelectInline } from "@/components/shared/grid/YesNoSelectInline";
 import { DateInputInline } from "@/components/shared/grid/DateInputInline";
 import { TL_ROLE_OPTIONS } from "@/constants/roles";
 import React from "react";
+import { RowActionsSelect } from "@/components/shared/RowActionsSelect";
 
 export type AssociationRow = {
   id: string;
@@ -217,61 +218,22 @@ export function AssociationGrid({ mode, rows, loading, editable = false, onOpen,
 
     if (onOpen || onEdit || onEndStint || onDelete) {
       base.push({
-        headerName: 'Actions', field: 'actions', width: 180, sortable: false, filter: false, resizable: false,
+        headerName: 'Actions', field: 'actions', width: 140, sortable: false, filter: false, resizable: false,
         cellRenderer: (p: ICellRendererParams<AssociationRow>) => {
           const row = p.data!;
           const rowIsEditing = isEditingRow(row.id);
-          return (
-            <div className="flex items-center gap-2">
-              {onOpen && (
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-blue-50" title="Open" onClick={() => onOpen(row)}>
-                  <ExternalLink className="h-3 w-3 text-blue-600" />
-                </Button>
-              )}
-              {rowIsEditing ? (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 hover:bg-green-50"
-                    title="Save"
-                    onClick={() => saveEdit(row.id)}
-                  >
-                    <Check className="h-3 w-3 text-green-600" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 hover:bg-gray-50"
-                    title="Cancel"
-                    onClick={() => cancelEdit(row.id)}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0 hover:bg-green-50"
-                  title="Edit"
-                  onClick={() => { beginEdit(row); onEdit?.(row); }}
-                >
-                  <Edit3 className="h-3 w-3 text-green-600" />
-                </Button>
-              )}
-              {onEndStint && (
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-yellow-50" title="End stint" onClick={() => onEndStint(row)}>
-                  <UserMinus className="h-3 w-3 text-yellow-600" />
-                </Button>
-              )}
-              {onDelete && (
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-red-50" title="Delete" onClick={() => onDelete(row)}>
-                  <Trash2 className="h-3 w-3 text-red-600" />
-                </Button>
-              )}
-            </div>
-          );
+          const opts = rowIsEditing
+            ? [
+                { value: 'save', label: 'Save', run: () => saveEdit(row.id) },
+                { value: 'cancel', label: 'Cancel', run: () => cancelEdit(row.id) },
+              ]
+            : [
+                { value: 'open', label: 'Open', run: () => onOpen?.(row), hidden: !onOpen },
+                { value: 'edit', label: 'Edit', run: () => { beginEdit(row); onEdit?.(row); }, hidden: !onEdit },
+                { value: 'end', label: 'End stint', run: () => onEndStint?.(row), hidden: !onEndStint },
+                { value: 'delete', label: 'Delete', run: () => onDelete?.(row), hidden: !onDelete },
+              ];
+          return <RowActionsSelect options={opts} /> as any;
         }
       });
     }
@@ -285,8 +247,7 @@ export function AssociationGrid({ mode, rows, loading, editable = false, onOpen,
       columnDefs={columns}
       defaultColDefOverride={DEFAULT_COL_DEF}
       gridProps={{
-        ...DEFAULT_GRID_PROPS,
-        domLayout: 'autoHeight',
+        // DEFAULT_GRID_PROPS already sets domLayout
         loadingOverlayComponentParams: { loadingMessage: 'Loading...' },
         overlayLoadingTemplate: loading ? '<span class="ag-overlay-loading-center">Loading.</span>' : undefined,
       }}

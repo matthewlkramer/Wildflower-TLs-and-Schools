@@ -6,7 +6,7 @@
  * about filtering, and tracks the grid's internal
  * filtered row count via callback.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SchoolsGrid from "@/components/schools-grid";
 import { KanbanBoard } from "@/components/shared/KanbanBoard";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
@@ -17,25 +17,36 @@ import AddSchoolModal from "@/components/add-school-modal";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { Plus, Pencil, Mail, GitMerge } from "lucide-react";
+import { GridBase } from "@/components/shared/GridBase";
+import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
 import { type School } from "@shared/schema";
 import { useSearch } from "@/contexts/search-context";
 import { useCachedSchools } from "@/hooks/use-cached-data";
 import { useUserFilter } from "@/contexts/user-filter-context";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
+import { useGlobalTypeToSearch } from "@/hooks/use-global-type-to-search";
+import { useEducatorLookup } from "@/hooks/use-lookup";
+import { LinkifyEducatorNames } from "@/components/shared/Linkify";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 
 export default function Schools() {
   const { searchTerm, setSearchTerm } = useSearch();
   const { showOnlyMyRecords, currentUser } = useUserFilter();
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
-  const [selected, setSelected] = useState<School[]>([] as any);
+  const [selected, setSelected] = useState<School[]>([]);
   const [viewMode, setViewMode] = useState<"table" | "kanban" | "split">("table");
+  const [kFilters, setKFilters] = useState({ stage: "All", membership: "All", ages: "All", governance: "All" });
+  const searchRef = useRef<HTMLInputElement | null>(null);
 
   const { data: schools, isLoading, prefetchSchool } = useCachedSchools();
+  const { educatorByName } = useEducatorLookup();
 
   // No header AddNew wiring; header shows a fixed Add menu.
+  useGlobalTypeToSearch(searchRef, setSearchTerm);
 
   const filteredSchools = (schools || []).filter((school: School) => {
     const searchTermLower = searchTerm.toLowerCase();
@@ -67,8 +78,8 @@ export default function Schools() {
   logger.log('Schools - filtered result:', searchDebug);
   try { console.log('[Schools] debug:', searchDebug); } catch {}
 
-  const selectedId = (selected as any)?.[0]?.id as string | undefined;
-  const selectedIds = new Set((selected as any[]).map(s => s.id));
+  const selectedId = selected?.[0]?.id;
+  const selectedIds = new Set(selected.map(s => s.id));
   const { data: selectedDetail } = useQuery<School>({
     queryKey: ["/api/schools", selectedId],
     enabled: viewMode === "split" && !!selectedId,
@@ -122,6 +133,7 @@ export default function Schools() {
                   placeholder="Search schools..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  ref={searchRef}
                   className="h-8 pl-8 w-48 sm:w-64"
                 />
                 <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
@@ -161,6 +173,7 @@ export default function Schools() {
                   placeholder="Search schools..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  ref={searchRef}
                   className="h-8 pl-8 w-48 sm:w-64"
                 />
                 <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
@@ -184,7 +197,7 @@ export default function Schools() {
             schools={filteredSchools || []} 
             isLoading={isLoading}
             onFilteredCountChange={setGridFilteredCount}
-            onSelectionChanged={(rows:any)=>setSelected(rows)}
+            onSelectionChanged={(rows: School[]) => setSelected(rows)}
           />
         )}
         {viewMode === "kanban" && (
@@ -194,7 +207,7 @@ export default function Schools() {
                 <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Stage/Status" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">Stage/Status: All</SelectItem>
-                  {Array.from(new Set((filteredSchools||[]).map((s:any)=>s.stageStatus || s.status).filter(Boolean))).map((v:any)=>(
+                  {Array.from(new Set((filteredSchools||[]).map((s)=>s.stageStatus || s.status).filter(Boolean))).map((v)=>(
                     <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
                   ))}
                 </SelectContent>
@@ -203,7 +216,7 @@ export default function Schools() {
                 <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Membership" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">Membership: All</SelectItem>
-                  {Array.from(new Set((filteredSchools||[]).map((s:any)=>s.membershipStatus).filter(Boolean))).map((v:any)=>(
+                  {Array.from(new Set((filteredSchools||[]).map((s)=>s.membershipStatus).filter(Boolean))).map((v)=>(
                     <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
                   ))}
                 </SelectContent>
@@ -212,7 +225,7 @@ export default function Schools() {
                 <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Ages Served" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">Ages Served: All</SelectItem>
-                  {Array.from(new Set((filteredSchools||[]).flatMap((s:any)=>Array.isArray(s.agesServed)?s.agesServed: (s.agesServed?[s.agesServed]:[])))).filter(Boolean).map((v:any)=>(
+                  {Array.from(new Set((filteredSchools||[]).flatMap((s)=>Array.isArray(s.agesServed)?s.agesServed: (s.agesServed?[s.agesServed]:[])))).filter(Boolean).map((v)=>(
                     <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
                   ))}
                 </SelectContent>
@@ -221,14 +234,14 @@ export default function Schools() {
                 <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Governance" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">Governance: All</SelectItem>
-                  {Array.from(new Set((filteredSchools||[]).map((s:any)=>s.governanceModel).filter(Boolean))).map((v:any)=>(
+                  {Array.from(new Set((filteredSchools||[]).map((s)=>s.governanceModel).filter(Boolean))).map((v)=>(
                     <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <KanbanBoard
-              items={(filteredSchools || []).filter((s:any)=>{
+              items={(filteredSchools || []).filter((s)=>{
                 if (kFilters.stage!=='All' && (s.stageStatus || s.status)!==kFilters.stage) return false;
                 if (kFilters.membership!=='All' && s.membershipStatus!==kFilters.membership) return false;
                 if (kFilters.ages!=='All'){
@@ -240,40 +253,42 @@ export default function Schools() {
               })}
               columns={(() => {
                 const keys = new Set<string>();
-                (filteredSchools||[]).forEach((s:any) => keys.add((s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY));
+                (filteredSchools||[]).forEach((s) => keys.add((s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY));
                 return buildKanbanColumns(SCHOOLS_KANBAN_ORDER, Array.from(keys));
               })()}
-              groupBy={(s:any) => (s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY}
-              getId={(s:any) => s.id}
+              groupBy={(s: School) => (s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY}
+              getId={(s: School) => s.id}
               initialCollapsedKeys={labelsToKeys(SCHOOLS_KANBAN_COLLAPSED)}
               selectedIds={selectedIds}
               onToggleItem={(id, checked) => {
-                const map = new Map((filteredSchools||[]).map((s:any)=>[s.id,s]));
+                const map = new Map((filteredSchools||[]).map((s)=>[s.id,s]));
                 const item = map.get(id);
                 if (!item) return;
                 setSelected(prev => {
-                  const exists = (prev as any[]).some(p => p.id === id);
-                  if (checked && !exists) return ([...prev, item] as any);
-                  if (!checked && exists) return ((prev as any[]).filter(p => p.id !== id) as any);
+                  const exists = prev.some(p => p.id === id);
+                  if (checked && !exists) return [...prev, item];
+                  if (!checked && exists) return prev.filter(p => p.id !== id);
                   return prev;
                 });
               }}
               onToggleColumn={(key, checked) => {
-                const itemsInCol = (filteredSchools||[]).filter((s:any) => ((s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY) === key);
+                const itemsInCol = (filteredSchools||[]).filter((s) => ((s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY) === key);
                 setSelected(prev => {
-                  const prevMap = new Map((prev as any[]).map(p=>[p.id,p]));
+                  const prevMap = new Map(prev.map(p=>[p.id,p]));
                   if (checked) {
-                    itemsInCol.forEach((it:any)=>{ if (!prevMap.has(it.id)) prevMap.set(it.id, it); });
+                    itemsInCol.forEach((it)=>{ if (!prevMap.has(it.id)) prevMap.set(it.id, it); });
                   } else {
-                    itemsInCol.forEach((it:any)=>{ if (prevMap.has(it.id)) prevMap.delete(it.id); });
+                    itemsInCol.forEach((it)=>{ if (prevMap.has(it.id)) prevMap.delete(it.id); });
                   }
-                  return Array.from(prevMap.values()) as any;
+                  return Array.from(prevMap.values());
                 });
               }}
-              renderCard={(s:any) => (
+              renderCard={(s: School) => (
                 <div>
                   <div className="font-medium text-sm"><Link className="text-blue-600 hover:underline" href={`/school/${s.id}`}>{s.name || s.shortName}</Link></div>
-                  <div className="text-xs text-slate-600">{Array.isArray(s.currentTLs)? s.currentTLs.join(', '): (s.currentTLs||'')}</div>
+                  <div className="text-xs text-slate-600 flex flex-wrap gap-1">
+                    <LinkifyEducatorNames names={s.currentTLs as any} educatorByName={educatorByName} />
+                  </div>
                 </div>
               )}
               onItemMove={({ id, to }) => moveMutation.mutate({ id, to })}
@@ -285,24 +300,26 @@ export default function Schools() {
             <ResizablePanelGroup direction="horizontal">
               <ResizablePanel defaultSize={60} minSize={35}>
                 <div className="ag-theme-material h-full">
-                  <AgGridReact
+                  <GridBase
                     rowData={filteredSchools || []}
                     columnDefs={[{
                       headerName: 'School',
                       valueGetter: (p:any) => p?.data?.shortName || p?.data?.name,
-                      filter: 'agTextColumnFilter',
+                      ...createTextFilter(),
                       sortable: true,
                       flex: 1,
                       minWidth: 140,
-                      cellRenderer: (p:any) => (
+                      cellRenderer: (p: {data: School; value: string}) => (
                         <a href={`/school/${p?.data?.id}`} className="text-blue-600 hover:underline">{p.value}</a>
                       ),
                     }]}
-                    defaultColDef={DEFAULT_COL_DEF as any}
-                    {...{ rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any }}
-                    sideBar={false as any}
-                    enableAdvancedFilter={true as any}
-                    onSelectionChanged={(e:any)=> setSelected(e.api.getSelectedRows() as any)}
+                    defaultColDefOverride={DEFAULT_COL_DEF}
+                    gridProps={{
+                      rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true },
+                      sideBar: DEFAULT_GRID_PROPS.sideBar,
+                      enableAdvancedFilter: true,
+                      onSelectionChanged: (e: {api: {getSelectedRows: () => School[]}})=> setSelected(e.api.getSelectedRows()),
+                    }}
                   />
                 </div>
               </ResizablePanel>

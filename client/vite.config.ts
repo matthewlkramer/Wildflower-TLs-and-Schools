@@ -42,6 +42,23 @@ export default defineConfig({
     // Emit inside client/ so Vercel (Root=client) can find it as "dist"
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
+    // Increase chunk size warning limit for ag-grid
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        // Manual chunks for better code splitting
+        manualChunks: {
+          // Vendor chunks
+          'react-vendor': ['react', 'react-dom', 'wouter'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-label', '@radix-ui/react-popover', '@radix-ui/react-select', '@radix-ui/react-separator', '@radix-ui/react-switch', '@radix-ui/react-tabs', '@radix-ui/react-toast', '@radix-ui/react-toggle', '@radix-ui/react-tooltip'],
+          'ag-grid': ['ag-grid-community', 'ag-grid-react', 'ag-grid-enterprise'],
+          'utils': ['date-fns', 'clsx', 'tailwind-merge', 'zod'],
+          'query': ['@tanstack/react-query'],
+          'supabase': ['@supabase/supabase-js'],
+          'forms': ['react-hook-form', '@hookform/resolvers']
+        }
+      }
+    }
   },
   server: {
     fs: {

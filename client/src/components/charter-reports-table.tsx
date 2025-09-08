@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
 import type { ReportSubmission } from "@shared/schema";
 import { Edit, Trash2 } from "lucide-react";
 import { getStatusColor } from "@/lib/utils";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 
 interface CharterReportsTableProps {
   charterId: string;
@@ -36,25 +36,25 @@ export function CharterReportsTable({ charterId }: CharterReportsTableProps) {
       headerName: "Report Type",
       field: "reportType",
       width: 200,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Due Date",
       field: "dueDate",
       width: 120,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Submission Date",
       field: "submissionDate",
       width: 140,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Status",
       field: "status",
       width: 120,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const status = params.value;
         if (!status) return <span className="text-slate-500">Not specified</span>;
@@ -107,22 +107,14 @@ export function CharterReportsTable({ charterId }: CharterReportsTableProps) {
 
   return (
     <div style={{ height: "400px", width: "100%" }}>
-      <AgGridReact
-        theme={themeMaterial}
+      <GridBase
         rowData={reports}
         columnDefs={columnDefs}
-        animateRows={true}
-        rowSelection={{ enableClickSelection: false } as any}
-        domLayout="normal"
-        headerHeight={40}
-        rowHeight={30}
-        context={{
-          componentName: 'charter-reports-table'
-        }}
-        defaultColDef={{
-          sortable: true,
-          resizable: true,
-          filter: true,
+        defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+        gridProps={{
+          rowSelection: { enableClickSelection: false } as any,
+          domLayout: 'normal',
+          context: { componentName: 'charter-reports-table' },
         }}
       />
     </div>

@@ -1188,3 +1188,65 @@ export {
 // Backward-compatible aliases
 export type InsertLoanRecord = import("./loan-schema").InsertLoan;
 export type LoanRecord = import("./loan-schema").Loan;
+
+// ============================================================================
+// UNIFIED SCHEMA EXPORTS
+// Re-export types and utilities from the unified schema for new code
+// ============================================================================
+
+// Re-export all utility functions from unified schema
+export {
+  createBaseTransformer,
+  firstId,
+  toNumber,
+  toStringArray,
+  toYesBool,
+  firstAttachment,
+  createdAt,
+  updatedAt,
+  TABLE_TYPE_MAPPING,
+  // Field mappings for transformers
+  SCHOOLS_FIELDS,
+  EDUCATORS_FIELDS,
+  LOCATIONS_FIELDS,
+  EDUCATORS_X_SCHOOLS_FIELDS,
+  GOVERNANCE_DOCS_FIELDS,
+  _990S_FIELDS,
+  SCHOOL_NOTES_FIELDS,
+  ACTION_STEPS_FIELDS,
+} from "./unified-schema";
+
+// Re-export base interfaces from unified schema
+export type {
+  BaseRecord,
+  SearchableRecord,
+  LocationBased,
+  AirtableAttachment,
+  AirtableUser,
+  AirtableRecord,
+} from "./unified-schema";
+
+// Re-export generated Airtable table types for new code
+export type {
+  School as UnifiedSchool,
+  Educator as UnifiedEducator,
+  Location as UnifiedLocation,
+  EducatorSchoolAssociation as UnifiedEducatorSchoolAssociation,
+  GovernanceDocument as UnifiedGovernanceDocument,
+  Charter990 as UnifiedCharter990,
+  CharterNote as UnifiedCharterNote,
+  Charter as UnifiedCharter,
+  ActionStep as UnifiedActionStep,
+} from "./unified-schema";
+
+// Type aliases for gradual migration - these point to the unified types
+// Use these in new code, old aliases above are kept for backward compatibility
+export type ModernSchool = import("./unified-schema").School;
+export type ModernEducator = import("./unified-schema").Educator;
+export type ModernLocation = import("./unified-schema").Location;
+export type ModernEducatorSchoolAssociation = import("./unified-schema").EducatorSchoolAssociation;
+export type ModernGovernanceDocument = import("./unified-schema").GovernanceDocument;
+export type ModernCharter990 = import("./unified-schema").Charter990;
+export type ModernCharterNote = import("./unified-schema").CharterNote;
+export type ModernCharter = import("./unified-schema").Charter;
+export type ModernActionStep = import("./unified-schema").ActionStep;

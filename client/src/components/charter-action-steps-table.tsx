@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
 import type { CharterActionStep } from "@shared/schema";
 import { Edit, Eye, CheckCircle, RotateCcw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { getStatusColor } from "@/lib/utils";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 
 interface CharterActionStepsTableProps {
   charterId: string;
@@ -61,7 +61,7 @@ export function CharterActionStepsTable({ charterId }: CharterActionStepsTablePr
       headerName: "Description",
       field: "description",
       width: 300,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const description = params.value || "No description";
         const truncated = description.length > 80 ? description.substring(0, 80) + "..." : description;
@@ -76,19 +76,19 @@ export function CharterActionStepsTable({ charterId }: CharterActionStepsTablePr
       headerName: "Assignee",
       field: "assignee",
       width: 120,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Due Date",
       field: "dueDate",
       width: 100,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Status",
       field: "status",
       width: 100,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const status = params.value;
         if (!status) return <span className="text-slate-500">Not specified</span>;
@@ -103,7 +103,7 @@ export function CharterActionStepsTable({ charterId }: CharterActionStepsTablePr
       headerName: "Complete",
       field: "complete",
       width: 90,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const complete = params.value;
         return (
@@ -122,38 +122,29 @@ export function CharterActionStepsTable({ charterId }: CharterActionStepsTablePr
       sortable: false,
       filter: false,
       cellRenderer: (params: any) => {
-        const actionStep = params.data;
+        const actionStep = params.data as CharterActionStep;
         return (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => handleOpen(actionStep)}
-              className="text-blue-600 hover:text-blue-800"
-              title="Open action step"
-            >
-              <Eye className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => handleEdit(actionStep)}
-              className="text-blue-600 hover:text-blue-800"
-              title="Edit action step"
-            >
-              <Edit className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => handleToggleComplete(actionStep)}
-              className="text-green-600 hover:text-green-800"
-              title={actionStep.complete ? "Mark as incomplete" : "Mark as complete"}
-            >
-              {actionStep.complete ? <RotateCcw className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
-            </button>
-            <button
-              onClick={() => handleDelete(actionStep)}
-              className="text-red-600 hover:text-red-800"
-              title="Delete action step"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </div>
+          <select
+            aria-label="Actions"
+            defaultValue=""
+            onChange={(e) => {
+              const v = e.target.value;
+              e.currentTarget.selectedIndex = 0;
+              switch (v) {
+                case 'open': handleOpen(actionStep); break;
+                case 'edit': handleEdit(actionStep); break;
+                case 'toggle': handleToggleComplete(actionStep); break;
+                case 'delete': handleDelete(actionStep); break;
+              }
+            }}
+            className="h-7 text-xs border rounded-md px-1 bg-white"
+          >
+            <option value="" disabled>Actions</option>
+            <option value="open">Open</option>
+            <option value="edit">Edit</option>
+            <option value="toggle">{actionStep.complete ? 'Mark incomplete' : 'Mark complete'}</option>
+            <option value="delete">Delete</option>
+          </select>
         );
       },
     },
@@ -172,22 +163,14 @@ export function CharterActionStepsTable({ charterId }: CharterActionStepsTablePr
   return (
     <>
       <div style={{ height: "400px", width: "100%" }}>
-        <AgGridReact
-          theme={themeMaterial}
+        <GridBase
           rowData={sortedActionSteps}
           columnDefs={columnDefs}
-          animateRows={true}
-          rowSelection={{ enableClickSelection: false } as any}
-          domLayout="normal"
-          headerHeight={40}
-          rowHeight={35}
-          context={{
-            componentName: 'charter-action-steps-table'
-          }}
-          defaultColDef={{
-            sortable: true,
-            resizable: true,
-            filter: true,
+          defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+          gridProps={{
+            rowSelection: { enableClickSelection: false } as any,
+            domLayout: 'normal',
+            context: { componentName: 'charter-action-steps-table' },
           }}
         />
       </div>

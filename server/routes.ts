@@ -1,13 +1,13 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
-import { storage } from "./simple-storage";
+import { storage } from "./generic-storage";
 import { loanStorage } from "./loan-storage";
 import { cache } from "./cache";
 import { logger } from "./logger";
 import { requireAuth } from "./auth";
 import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema, eventAttendanceSchema } from "@shared/schema";
-import { EVENTS_FIELDS as EVF } from "@shared/airtable-schema";
+import { EVENTS_FIELDS as EVF } from "@shared/unified-schema";
 import { createInsertSchema } from "drizzle-zod";
 import { 
   borrowers,
@@ -1242,7 +1242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Return public funding rows linked to this school; include name/id
             try {
               const { base } = await import('./airtable-schema');
-              const { PUBLIC_FUNDING_FIELDS: PFF } = await import('@shared/airtable-schema');
+              const { PUBLIC_FUNDING_FIELDS: PFF } = await import('@shared/unified-schema');
               const records = await base('Public funding').select().all();
               const filtered = records.filter(r => {
                 const schools = r.fields[PFF.Schools] as any;

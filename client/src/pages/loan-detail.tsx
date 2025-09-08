@@ -33,6 +33,8 @@ import {
   BarChart3
 } from "lucide-react";
 import { type Loan, type Borrower } from "@shared/loan-schema";
+import { useSchoolLookup } from "@/hooks/use-lookup";
+import { LinkifySchoolName } from "@/components/shared/Linkify";
 
 interface LoanWithBorrower extends Loan {
   borrower?: Borrower;
@@ -53,6 +55,7 @@ export default function LoanDetail() {
       setPageTitle(`Loan ${loan.loanNumber || loan.id || 'Details'}`);
     }
   }, [loan, setPageTitle]);
+  const { schoolByName } = useSchoolLookup();
 
   const formatCurrency = (amount: number | string) => {
     const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
@@ -372,7 +375,7 @@ export default function LoanDetail() {
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">School Name</p>
-                      <p className="font-semibold text-lg">{loan.borrower.name}</p>
+                      <LinkifySchoolName name={loan.borrower.name} schoolByName={schoolByName} />
                     </div>
                     
                     {loan.borrower.businessAddress && (
@@ -659,3 +662,5 @@ export default function LoanDetail() {
     </div>
   );
 }
+
+//

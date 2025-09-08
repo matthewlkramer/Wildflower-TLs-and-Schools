@@ -4,7 +4,7 @@ import cors from 'cors';
 import compression from 'compression';
 import { registerRoutes } from "./routes";
 import { setupAuth } from "./auth";
-import { storage } from "./simple-storage";
+import { storage } from "./generic-storage";
 
 function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {

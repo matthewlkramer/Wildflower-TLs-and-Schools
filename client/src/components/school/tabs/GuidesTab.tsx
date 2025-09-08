@@ -27,6 +27,7 @@ import { apiRequest } from '@/lib/queryClient';
 export function GuidesTab({ schoolId }: { schoolId: string }) {
   type GuideRow = {
     id: string;
+    guideId?: string;
     guideShortName?: string;
     type?: string;
     startDate?: string;
@@ -54,6 +55,7 @@ export function GuidesTab({ schoolId }: { schoolId: string }) {
 
   const rows: GuideRow[] = (assignments || []).map((g) => ({
     id: g.id,
+    guideId: g.guideId,
     guideShortName: (g as any).guideShortName || g.guideId,
     type: (g as any).type || '',
     startDate: g.startDate || '',
@@ -71,7 +73,16 @@ export function GuidesTab({ schoolId }: { schoolId: string }) {
   const [viewRow, setViewRow] = React.useState<GuideAssignment | null>(null);
 
   const columnDefs: ColDef<GuideRow>[] = [
-    { headerName: 'Guide', field: 'guideShortName', flex: 2, filter: 'agTextColumnFilter' },
+    { headerName: 'Guide', field: 'guideShortName', flex: 2, filter: 'agTextColumnFilter',
+      cellRenderer: (p: ICellRendererParams<GuideRow>) => {
+        const row = p.data as GuideRow;
+        const name = row.guideShortName || '-';
+        if (row.guideId) {
+          return <a href={`/teacher/${row.guideId}`} className="text-blue-600 hover:underline">{name}</a> as any;
+        }
+        return <span>{name}</span> as any;
+      }
+    },
     { headerName: 'Type', field: 'type', width: 160, filter: 'agTextColumnFilter' },
     { headerName: 'Start Date', field: 'startDate', width: 140, filter: 'agDateColumnFilter',
       cellRenderer: (p: ICellRendererParams<GuideRow>) => {
@@ -98,36 +109,72 @@ export function GuidesTab({ schoolId }: { schoolId: string }) {
         return <Badge className={d.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>{d.isActive ? 'Active' : 'Inactive'}</Badge>;
       }
     },
-    { headerName: 'Actions', field: 'id', width: 200, sortable: false, filter: false,
+    { headerName: 'Actions', field: 'id', width: 160, sortable: false, filter: false,
       cellRenderer: (p: ICellRendererParams<GuideRow>) => {
         const row = p.data as GuideRow;
         const isEditing = editingRowId === row.id;
         return (
-          <div className="flex gap-1">
-            <Button size="sm" variant="outline" className="h-7 w-7 p-0" title="View" onClick={() => { const full = (assignments || []).find(a => a.id === row.id) || null; setViewRow(full); }}>
-              <Eye className="h-3.5 w-3.5" />
-            </Button>
-            {!isEditing ? (
-              <Button size="sm" variant="outline" className="h-7 w-7 p-0" title="Edit" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDrafts(prev => ({ ...prev, [row.id]: { ...row } })); setEditingRowId(row.id); }}>
-                <Edit className="h-3.5 w-3.5" />
-              </Button>
-            ) : (
-              <>
-                <Button size="sm" variant="outline" className="h-7 w-7 p-0 text-green-700" title="Save" onClick={(e) => { e.preventDefault(); e.stopPropagation(); const d = drafts[row.id]; if (d) { updateAssignment.mutate({ id: row.id, data: { type: d.type, startDate: d.startDate || '', endDate: d.endDate || '', isActive: !!d.isActive } }); setEditingRowId(null); setDrafts(prev => { const cp={...prev}; delete cp[row.id]; return cp; }); } }}>
-                  <Check className="h-3.5 w-3.5" />
-                </Button>
-                <Button size="sm" variant="outline" className="h-7 w-7 p-0" title="Cancel" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingRowId(null); setDrafts(prev => { const cp={...prev}; delete cp[row.id]; return cp; }); }}>
-                  <X className="h-3.5 w-3.5" />
-                </Button>
-              </>
-            )}
-            <Button size="sm" variant="outline" className="h-7 w-7 p-0" title="End stint" onClick={() => { const today = new Date().toISOString().slice(0,10); updateAssignment.mutate({ id: row.id, data: { endDate: today, isActive: false } }); }}>
-              <UserMinus className="h-3.5 w-3.5" />
-            </Button>
-            <Button size="sm" variant="outline" className="h-7 w-7 p-0 text-red-600 hover:text-red-700" title="Delete" onClick={() => { setPendingDeleteId(row.id); setConfirmOpen(true); }}>
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+          <RowActionsSelect
+            options={
+              isEditing
+                ? [
+                    {
+                      value: 'save',
+                      label: 'Save',
+                      run: () => {
+                        const d = drafts[row.id];
+                        if (d) {
+                          updateAssignment.mutate({ id: row.id, data: { type: d.type, startDate: d.startDate || '', endDate: d.endDate || '', isActive: !!d.isActive } });
+                        }
+                        setEditingRowId(null);
+                        setDrafts((prev) => { const cp = { ...prev } as any; delete (cp as any)[row.id]; return cp; });
+                      },
+                    },
+                    {
+                      value: 'cancel',
+                      label: 'Cancel',
+                      run: () => {
+                        setEditingRowId(null);
+                        setDrafts((prev) => { const cp = { ...prev } as any; delete (cp as any)[row.id]; return cp; });
+                      },
+                    },
+                  ]
+                : [
+                    {
+                      value: 'view',
+                      label: 'View',
+                      run: () => {
+                        const full = (assignments || []).find((a) => a.id === row.id) || null;
+                        setViewRow(full);
+                      },
+                    },
+                    {
+                      value: 'edit',
+                      label: 'Edit',
+                      run: () => {
+                        setDrafts((prev) => ({ ...prev, [row.id]: { ...row } }));
+                        setEditingRowId(row.id);
+                      },
+                    },
+                    {
+                      value: 'end',
+                      label: 'End stint',
+                      run: () => {
+                        const today = new Date().toISOString().slice(0, 10);
+                        updateAssignment.mutate({ id: row.id, data: { endDate: today, isActive: false } });
+                      },
+                    },
+                    {
+                      value: 'delete',
+                      label: 'Delete',
+                      run: () => {
+                        setPendingDeleteId(row.id);
+                        setConfirmOpen(true);
+                      },
+                    },
+                  ]
+            }
+          />
         );
       }
     },
@@ -145,7 +192,6 @@ export function GuidesTab({ schoolId }: { schoolId: string }) {
           columnDefs={columnDefs}
           defaultColDefOverride={{ sortable: true, filter: true, resizable: true }}
           gridProps={{
-            domLayout: 'autoHeight',
             singleClickEdit: false,
             stopEditingWhenCellsLoseFocus: false,
             getRowHeight: () => (DEFAULT_GRID_PROPS.rowHeight as number),

@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
 import type { School } from "@shared/schema";
 import { useLocation } from "wouter";
 import { getStatusColor } from "@/lib/utils";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 
 interface CharterSchoolsTableProps {
   charterId: string;
@@ -30,7 +30,7 @@ export function CharterSchoolsTable({ charterId }: CharterSchoolsTableProps) {
       headerName: "School Name",
       field: "name",
       width: 200,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const school = params.data;
         return (
@@ -47,7 +47,7 @@ export function CharterSchoolsTable({ charterId }: CharterSchoolsTableProps) {
       headerName: "Status",
       field: "status",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const status = params.value;
         if (!status) return <span className="text-slate-500">Not specified</span>;
@@ -62,7 +62,7 @@ export function CharterSchoolsTable({ charterId }: CharterSchoolsTableProps) {
       headerName: "SSJ Stage",
       field: "ssjStage",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const stage = params.value;
         if (!stage) return <span className="text-slate-500">Not specified</span>;
@@ -77,7 +77,7 @@ export function CharterSchoolsTable({ charterId }: CharterSchoolsTableProps) {
       headerName: "Community",
       field: "community",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Current Guide(s)",
@@ -99,22 +99,14 @@ export function CharterSchoolsTable({ charterId }: CharterSchoolsTableProps) {
 
   return (
     <div style={{ height: "400px", width: "100%" }}>
-      <AgGridReact
-        theme={themeMaterial}
+      <GridBase
         rowData={schools}
         columnDefs={columnDefs}
-        animateRows={true}
-        rowSelection={{ enableClickSelection: false } as any}
-        domLayout="normal"
-        headerHeight={40}
-        rowHeight={30}
-        context={{
-          componentName: 'charter-schools-table'
-        }}
-        defaultColDef={{
-          sortable: true,
-          resizable: true,
-          filter: true,
+        defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+        gridProps={{
+          rowSelection: { enableClickSelection: false } as any,
+          domLayout: 'normal',
+          context: { componentName: 'charter-schools-table' },
         }}
       />
     </div>

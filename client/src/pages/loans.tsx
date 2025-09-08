@@ -45,8 +45,10 @@ import {
 } from "@shared/loan-schema";
 import QuarterlyReportsTracker from "@/components/QuarterlyReportsTracker";
 import PromissoryNoteManager from "@/components/PromissoryNoteManager";
-import { AgGridReact } from "ag-grid-react";
-import { ColDef, themeMaterial, AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import { ColDef, AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
+import { useEducatorLookup } from "@/hooks/use-lookup";
+import { LinkifyEducatorNames } from "@/components/shared/Linkify";
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -77,6 +79,7 @@ export default function LoansPage() {
   const [showApplicationDialog, setShowApplicationDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { educatorByName } = useEducatorLookup();
 
   // Form for loan application
   const form = useForm<z.infer<typeof loanApplicationSchema>>({
@@ -702,22 +705,15 @@ export default function LoansPage() {
               ) : (
                 <div className="h-96">
                   <div style={{ height: "100%", width: "100%" }}>
-                    <AgGridReact
-                      theme={themeMaterial}
+                    <GridBase
                       rowData={loans}
-                      columnDefs={loansColumnDefs}
-                      domLayout="normal"
-                      animateRows={true}
-                      suppressRowClickSelection={true}
-                      headerHeight={40}
-                      rowHeight={35}
-                      context={{
-                        componentName: 'loans-table'
-                      }}
-                      defaultColDef={{
-                        sortable: true,
-                        resizable: true,
-                        filter: true,
+                      columnDefs={loansColumnDefs as any}
+                      defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+                      gridProps={{
+                        domLayout: 'normal',
+                        animateRows: true,
+                        suppressRowClickSelection: true,
+                        context: { componentName: 'loans-table' },
                       }}
                     />
                   </div>
@@ -806,7 +802,7 @@ export default function LoansPage() {
                           {schoolData?.currentTls && (
                             <div>
                               <span className="text-muted-foreground">Current TLs: </span>
-                              <span className="font-medium">{schoolData.currentTls}</span>
+                              <LinkifyEducatorNames names={schoolData.currentTls as any} educatorByName={educatorByName} />
                             </div>
                           )}
                           
@@ -841,8 +837,8 @@ export default function LoansPage() {
                             </div>
                           )}
                         </div>
-                      </CardContent>
-                    </Card>
+          </CardContent>
+        </Card>
                   );
                 })}
               </div>
@@ -920,3 +916,5 @@ export default function LoansPage() {
     </div>
   );
 }
+
+//

@@ -1,7 +1,7 @@
 // Utility functions for the Wildflower application
 
 import { STATUS_COLORS } from './constants';
-import { SCHOOLS_OPTIONS_SCHOOL_STATUS as SCHOOL_STATUSES } from './airtable-schema';
+import { SCHOOLS_OPTIONS_SCHOOL_STATUS as SCHOOL_STATUSES } from './unified-schema';
 
 /**
  * Get the appropriate color class for a status badge

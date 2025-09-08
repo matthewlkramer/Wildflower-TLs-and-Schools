@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 import type { EventAttendance } from "@shared/schema";
 import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -116,13 +116,13 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
       headerName: "Name",
       field: "eventName",
       flex: 3,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Date",
       field: "eventDate",
       flex: 2,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Attended",
@@ -288,22 +288,14 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
         </Button>
       </div>
       <div style={{ height: "400px", width: "100%" }}>
-        <AgGridReact
-          theme={themeMaterial}
+        <GridBase
           rowData={rows}
           columnDefs={columnDefs}
-          animateRows={true}
-          rowSelection={{ enableClickSelection: false } as any}
-          domLayout="autoHeight"
-          headerHeight={40}
-          rowHeight={30}
-          context={{
-            componentName: 'event-attendance-table'
-          }}
-          defaultColDef={{
-            sortable: true,
-            resizable: true,
-            filter: true,
+          defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+          gridProps={{
+            rowSelection: { enableClickSelection: false } as any,
+            domLayout: 'autoHeight',
+            context: { componentName: 'event-attendance-table' },
           }}
         />
       </div>

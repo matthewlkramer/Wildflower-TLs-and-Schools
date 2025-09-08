@@ -1,10 +1,10 @@
 import { useMemo, useCallback, useState } from "react";
-import { AgGridReact } from "ag-grid-react";
-import { ColDef, GridReadyEvent, GridApi, themeMaterial } from "ag-grid-community";
+import { ColDef, GridReadyEvent, GridApi, ICellRendererParams, ValueGetterParams } from "ag-grid-community";
 import { Link } from "wouter";
 import { ExternalLink, Trash2, MoreVertical, FilePlus2, ClipboardList, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadgeCellRenderer, MultiValueCellRenderer } from "@/components/shared/grid-renderers";
 import { type School } from "@shared/schema";
 import { getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -12,11 +12,18 @@ import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid
 import { GridBase } from "@/components/shared/GridBase";
 import { useAgGridFeatures } from "@/hooks/use-aggrid-features";
 import { STAGE_STATUS_ORDER, STAGE_STATUS_DEFAULT, MEMBERSHIP_STATUS_ORDER } from "@/constants/filters";
-import { SCHOOLS_OPTIONS_AGES_SERVED as AGES_SERVED_OPTIONS, SCHOOLS_OPTIONS_GOVERNANCE_MODEL as GOVERNANCE_MODEL_OPTIONS } from "@/constants/airtable-schema";
+import { SCHOOLS_OPTIONS_AGES_SERVED as AGES_SERVED_OPTIONS, SCHOOLS_OPTIONS_GOVERNANCE_MODEL as GOVERNANCE_MODEL_OPTIONS } from "@shared/unified-schema";
 import { useToast } from "@/hooks/use-toast";
+import { EditNameModal } from "@/components/edit-name-modal";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import { useGridHeight } from "@/components/shared/use-grid-height";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useEducatorLookup } from "@/hooks/use-lookup";
+import { LinkifyEducatorNames } from "@/components/shared/Linkify";
+
+interface SchoolCellRendererParams extends ICellRendererParams {
+  data: School;
+}
 
 interface SchoolsGridProps {
   schools: School[];
@@ -26,7 +33,7 @@ interface SchoolsGridProps {
 }
 
 // Custom cell renderers
-const SchoolNameCellRenderer = (params: any) => {
+const SchoolNameCellRenderer = (params: SchoolCellRendererParams) => {
   const school = params.data;
   return (
     <Link href={`/school/${school.id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
@@ -35,20 +42,9 @@ const SchoolNameCellRenderer = (params: any) => {
   );
 };
 
-const StatusBadgeCellRenderer = (params: any) => {
-  const value = params.value;
-  if (!value) return <span></span>;
-  
-  return (
-    <div className="flex items-center h-full">
-      <Badge className={getStatusColor(value)}>
-        {value}
-      </Badge>
-    </div>
-  );
-};
+// Using StatusBadgeCellRenderer from shared grid-renderers
 
-const MembershipStatusCellRenderer = (params: any) => {
+const MembershipStatusCellRenderer = (params: SchoolCellRendererParams) => {
   const value = params.value;
   if (!value) return <span></span>;
   
@@ -61,48 +57,24 @@ const MembershipStatusCellRenderer = (params: any) => {
   );
 };
 
-const MultiValueCellRenderer = (params: any) => {
-  const values = params.value;
-  if (!values || !Array.isArray(values) || values.length === 0) {
-    return <span></span>;
-  }
-  
-  return (
-    <div className="flex flex-wrap gap-1 items-center h-full">
-      {values.map((value: string, index: number) => (
-        <Badge key={index} variant="outline" className="text-xs">
-          {value}
-        </Badge>
-      ))}
-    </div>
-  );
-};
+// Using MultiValueCellRenderer from shared grid-renderers
 
-const CurrentTLsCellRenderer = (params: any) => {
-  const school = params.data;
-  const currentTLs = school.currentTLs;
-  
-  if (currentTLs && Array.isArray(currentTLs) && currentTLs.length > 0) {
-    return <span>{currentTLs.join(', ')}</span>;
-  }
-  
-  if (currentTLs && typeof currentTLs === 'string') {
-    return <span>{currentTLs}</span>;
-  }
-  
-  return <span className="text-slate-400">-</span>;
+const CurrentTLsCellRenderer = (params: SchoolCellRendererParams & { educatorByName: Map<string,string> }) => {
+  const currentTLs = params?.data?.currentTLs;
+  const names = Array.isArray(currentTLs) ? currentTLs : (currentTLs ? [String(currentTLs)] : []);
+  return <LinkifyEducatorNames names={names} educatorByName={params.educatorByName} /> as any;
 };
 
 const ActionsCellRenderer = ({ data: school }: { data: School }) => {
+  const { toast } = useToast();
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  
   const open = () => { try { window.location.href = `/school/${school.id}`; } catch {} };
-  const editName = async () => {
-    const current = school.shortName || school.name || '';
-    const next = window.prompt('Edit school name', current);
-    if (next == null || next === current) return;
-    try {
-      await apiRequest('PUT', `/api/schools/${school.id}`, { name: next });
-      queryClient.invalidateQueries({ queryKey: ['/api/schools'] });
-    } catch (e) { alert('Failed to update'); }
+  
+  const handleEditSave = async (newName: string) => {
+    await apiRequest('PUT', `/api/schools/${school.id}`, { name: newName });
+    queryClient.invalidateQueries({ queryKey: ['/api/schools'] });
+    toast({ title: "School name updated", description: `Name changed to "${newName}"` });
   };
   const markInactive = async () => {
     if (!confirm('Mark school inactive (archive)?')) return;
@@ -123,24 +95,36 @@ const ActionsCellRenderer = ({ data: school }: { data: School }) => {
     try { await apiRequest('POST', `/api/action-steps`, { schoolId: school.id, item, dueDate }); alert('Task created'); } catch (e) { alert('Failed to create task'); }
   };
 
+  const sendEmail = () => {
+    const to = (school as School & {email?: string; primaryContactEmail?: string}).email || (school as School & {email?: string; primaryContactEmail?: string}).primaryContactEmail || '';
+    const q = to ? `?to=${encodeURIComponent(to)}` : '';
+    try { window.location.href = `/compose-email${q}`; } catch {}
+  };
+
   return (
-    <div className="flex items-center gap-1">
-      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Open" onClick={open}>
-        <ExternalLink className="h-3 w-3" />
-      </Button>
-      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Edit" onClick={editName}>
-        <Pencil className="h-3 w-3" />
-      </Button>
-      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Add note" onClick={createNote}>
-        <FilePlus2 className="h-3 w-3" />
-      </Button>
-      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Add task" onClick={createTask}>
-        <ClipboardList className="h-3 w-3" />
-      </Button>
-      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-600 hover:text-red-700" title="Archive" onClick={markInactive}>
-        <Trash2 className="h-3 w-3" />
-      </Button>
-    </div>
+    <>
+    <select
+      aria-label="Actions"
+      defaultValue=""
+      onChange={(e)=>{ const v=e.target.value; e.currentTarget.selectedIndex=0; switch(v){ case 'open': open(); break; case 'edit': setEditModalOpen(true); break; case 'note': createNote(); break; case 'task': createTask(); break; case 'email': sendEmail(); break; case 'archive': markInactive(); break; }}}
+      className="h-7 text-xs border rounded-md px-1 bg-white"
+    >
+      <option value="" disabled>Actions</option>
+      <option value="open">Open</option>
+      <option value="edit">Edit</option>
+      <option value="note">Add note</option>
+      <option value="task">Add task</option>
+      <option value="email">Send email</option>
+      <option value="archive">Archive</option>
+    </select>
+      <EditNameModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        currentName={school.shortName || school.name || ''}
+        entityType="school"
+        onSave={handleEditSave}
+      />
+    </>
   );
 };
 
@@ -148,6 +132,7 @@ export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange,
   const { toast } = useToast();
   const gridHeight = useGridHeight();
   const { entReady, filterForText } = useAgGridFeatures();
+  const { educatorByName } = useEducatorLookup();
   
   const columnDefs: ColDef[] = [
     {
@@ -156,7 +141,7 @@ export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange,
       width: 200,
       cellRenderer: SchoolNameCellRenderer,
       ...createTextFilter(),
-      valueGetter: (params) => params.data.shortName || params.data.name,
+      valueGetter: (params: ValueGetterParams<School>) => params.data?.shortName || params.data?.name,
       comparator: (valueA: string, valueB: string) => {
         const a = (valueA || '').toLowerCase();
         const b = (valueB || '').toLowerCase();
@@ -199,7 +184,7 @@ export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange,
       field: "currentTLs",
       headerName: "Current TLs",
       width: 120,
-      cellRenderer: CurrentTLsCellRenderer,
+      cellRenderer: (p: any) => CurrentTLsCellRenderer({ ...(p || {}), educatorByName }),
       sortable: false,
       filter: false,
       valueFormatter: (params) => {
@@ -294,7 +279,6 @@ export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange,
         defaultColDefOverride={defaultColDef}
         style={{ height: '100%' }}
         gridProps={{
-          ...DEFAULT_GRID_PROPS,
           getRowId: (p:any)=>p?.data?.id,
           onGridReady: (params: GridReadyEvent) => {
             params.api.sizeColumnsToFit();

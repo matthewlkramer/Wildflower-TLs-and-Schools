@@ -1,9 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { TableCard } from "@/components/shared/TableCard";
-import { AgGridReact } from "ag-grid-react";
-import type { AgGridReactProps } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
 import React from "react";
 
 type QueryKey = ReadonlyArray<string | number>;
@@ -17,7 +15,7 @@ interface GridTableCardProps<T> {
   fetcher?: () => Promise<T[]>;
   columns: ColDef<T>[];
   emptyText?: string;
-  gridProps?: Partial<AgGridReactProps<T>>;
+  gridProps?: Record<string, any>;
 }
 
 export function GridTableCard<T = any>({
@@ -67,18 +65,16 @@ export function GridTableCard<T = any>({
   return (
     <TableCard title={title} description={description} actionsRight={actionsRight}>
       <div style={{ width: "100%" }}>
-        <AgGridReact<T>
-          theme={themeMaterial}
+        <GridBase
           rowData={data}
-          columnDefs={columns}
-          animateRows
-          rowSelection={{ enableClickSelection: false } as any}
-          domLayout="autoHeight"
-          headerHeight={40}
-          rowHeight={30}
-          context={{ refresh: () => refetch() }}
-          defaultColDef={{ sortable: true, resizable: true, filter: true }}
-          {...(gridProps as any)}
+          columnDefs={columns as any}
+          defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+          gridProps={{
+            rowSelection: { enableClickSelection: false } as any,
+            domLayout: 'autoHeight',
+            context: { refresh: () => refetch() },
+            ...(gridProps || {}),
+          }}
         />
       </div>
     </TableCard>

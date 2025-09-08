@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
 import type { EducatorSchoolAssociation } from "@shared/schema";
 import { Edit, Trash2, UserMinus } from "lucide-react";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 import { useLocation } from "wouter";
 
 interface CharterEducatorAssociationsTableProps {
@@ -42,7 +42,7 @@ export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorA
       headerName: "Educator",
       field: "educatorName",
       width: 180,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const association = params.data;
         return (
@@ -59,7 +59,7 @@ export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorA
       headerName: "School",
       field: "schoolName",
       width: 180,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const association = params.data;
         return (
@@ -76,19 +76,19 @@ export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorA
       headerName: "Role",
       field: "role",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Start Date",
       field: "startDate",
       width: 120,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "End Date",
       field: "endDate",
       width: 120,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Active",
@@ -155,22 +155,14 @@ export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorA
 
   return (
     <div style={{ height: "400px", width: "100%" }}>
-      <AgGridReact
-        theme={themeMaterial}
+      <GridBase
         rowData={associations}
         columnDefs={columnDefs}
-        animateRows={true}
-        rowSelection={{ enableClickSelection: false } as any}
-        domLayout="normal"
-        headerHeight={40}
-        rowHeight={30}
-        context={{
-          componentName: 'charter-educator-associations-table'
-        }}
-        defaultColDef={{
-          sortable: true,
-          resizable: true,
-          filter: true,
+        defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+        gridProps={{
+          rowSelection: { enableClickSelection: false } as any,
+          domLayout: 'normal',
+          context: { componentName: 'charter-educator-associations-table' },
         }}
       />
     </div>

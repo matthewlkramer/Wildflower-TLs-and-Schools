@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Edit, X, Check, Trash2, Plus } from 'lucide-react';
 import DeleteConfirmationModal from '@/components/delete-confirmation-modal';
+import { createTextFilter } from '@/utils/ag-grid-utils';
 
 export function NotesTab({ schoolId, onSelectNote }: { schoolId: string; onSelectNote: (note: SchoolNote) => void }) {
   const qc = useQueryClient();
@@ -71,7 +72,7 @@ export function NotesTab({ schoolId, onSelectNote }: { schoolId: string; onSelec
         return d.dateCreated || '-';
       }
     },
-    { headerName: 'Created By', field: 'createdBy', width: 180, filter: 'agTextColumnFilter',
+    { headerName: 'Created By', field: 'createdBy', width: 180, ...createTextFilter(),
       cellRenderer: (p: ICellRendererParams<Row>) => {
         const row = p.data as Row; const d = getDraft(row);
         if (editingRowId === row.id) {
@@ -80,7 +81,7 @@ export function NotesTab({ schoolId, onSelectNote }: { schoolId: string; onSelec
         return d.createdBy || '-';
       }
     },
-    { headerName: 'Note', field: 'content', flex: 2, filter: 'agTextColumnFilter',
+    { headerName: 'Note', field: 'content', flex: 2, ...createTextFilter(),
       cellRenderer: (p: ICellRendererParams<Row>) => {
         const row = p.data as Row; const d = getDraft(row);
         if (editingRowId === row.id) {
@@ -142,8 +143,6 @@ export function NotesTab({ schoolId, onSelectNote }: { schoolId: string; onSelec
           columnDefs={cols}
           defaultColDefOverride={{ sortable: true, filter: true, resizable: true }}
           gridProps={{
-            ...DEFAULT_GRID_PROPS,
-            domLayout: 'autoHeight',
             overlayLoadingTemplate: isLoading ? '<span class="ag-overlay-loading-center">Loading.</span>' : undefined,
           }}
         />

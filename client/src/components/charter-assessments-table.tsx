@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
 import type { AssessmentData } from "@shared/schema";
 import { Edit, Trash2 } from "lucide-react";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 
 interface CharterAssessmentsTableProps {
   charterId: string;
@@ -35,25 +35,25 @@ export function CharterAssessmentsTable({ charterId }: CharterAssessmentsTablePr
       headerName: "Assessment Type",
       field: "assessmentType",
       width: 200,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Test Date",
       field: "testDate",
       width: 120,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Grade",
       field: "grade",
       width: 100,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Results",
       field: "results",
       width: 200,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Actions",
@@ -97,22 +97,14 @@ export function CharterAssessmentsTable({ charterId }: CharterAssessmentsTablePr
 
   return (
     <div style={{ height: "400px", width: "100%" }}>
-      <AgGridReact
-        theme={themeMaterial}
+      <GridBase
         rowData={assessments}
         columnDefs={columnDefs}
-        animateRows={true}
-        rowSelection={{ enableClickSelection: false } as any}
-        domLayout="normal"
-        headerHeight={40}
-        rowHeight={30}
-        context={{
-          componentName: 'charter-assessments-table'
-        }}
-        defaultColDef={{
-          sortable: true,
-          resizable: true,
-          filter: true,
+        defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+        gridProps={{
+          rowSelection: { enableClickSelection: false } as any,
+          domLayout: 'normal',
+          context: { componentName: 'charter-assessments-table' },
         }}
       />
     </div>

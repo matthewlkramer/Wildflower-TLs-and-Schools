@@ -22,6 +22,7 @@ import { DateInputInline } from '@/components/shared/grid/DateInputInline';
 import DeleteConfirmationModal from '@/components/delete-confirmation-modal';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { createTextFilter } from '@/utils/ag-grid-utils';
 
 export function LocationsTab({ schoolId }: { schoolId: string }) {
   type LocRow = {
@@ -73,7 +74,7 @@ export function LocationsTab({ schoolId }: { schoolId: string }) {
   const [viewRow, setViewRow] = React.useState<Location | null>(null);
 
   const columnDefs: ColDef<LocRow>[] = [
-    { headerName: 'Address', field: 'address', flex: 2, filter: 'agTextColumnFilter',
+    { headerName: 'Address', field: 'address', flex: 2, ...createTextFilter(),
       cellRenderer: (p: ICellRendererParams<LocRow>) => {
         const row = p.data as LocRow; const d = getDraft(row);
         if (editingRowId === row.id) {
@@ -173,7 +174,6 @@ export function LocationsTab({ schoolId }: { schoolId: string }) {
           columnDefs={columnDefs}
           defaultColDefOverride={{ sortable: true, filter: true, resizable: true }}
           gridProps={{
-            domLayout: 'autoHeight',
             singleClickEdit: false,
             stopEditingWhenCellsLoseFocus: false,
             getRowHeight: (p: any) => (editingRowId && p.data && p.data.id === editingRowId ? 80 : (DEFAULT_GRID_PROPS.rowHeight as number)),

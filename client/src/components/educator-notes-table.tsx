@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 import type { EducatorNote } from "@shared/schema";
 
 interface EducatorNotesTableProps {
@@ -25,20 +25,20 @@ export function EducatorNotesTable({ educatorId }: EducatorNotesTableProps) {
       headerName: "Date Created",
       field: "dateCreated",
       flex: 1,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       sort: "desc",
     },
     {
       headerName: "Created By",
       field: "createdBy",
       flex: 1,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Notes",
       field: "notes",
       flex: 3,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       wrapText: true,
       autoHeight: true,
     },
@@ -67,22 +67,14 @@ export function EducatorNotesTable({ educatorId }: EducatorNotesTableProps) {
   return (
     <div className="bg-white rounded-lg border border-slate-200">
       <div style={{ height: "400px", width: "100%" }}>
-        <AgGridReact
-          theme={themeMaterial}
+        <GridBase
           rowData={notes}
           columnDefs={columnDefs}
-          animateRows={true}
-          rowSelection={{ enableClickSelection: false } as any}
-          domLayout="autoHeight"
-          headerHeight={40}
-          rowHeight={40}
-          context={{
-            componentName: 'educator-notes-table'
-          }}
-          defaultColDef={{
-            sortable: true,
-            resizable: true,
-            filter: true,
+          defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+          gridProps={{
+            rowSelection: { enableClickSelection: false } as any,
+            domLayout: 'autoHeight',
+            context: { componentName: 'educator-notes-table' },
           }}
         />
       </div>

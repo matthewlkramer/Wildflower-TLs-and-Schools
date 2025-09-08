@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
 import type { CharterAuthorizerContact } from "@shared/schema";
 import { Edit, Trash2, Mail, Phone } from "lucide-react";
+import { RowActionsSelect } from "@/components/shared/RowActionsSelect";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 
 interface CharterAuthorizerContactsTableProps {
   charterId: string;
@@ -35,25 +36,25 @@ export function CharterAuthorizerContactsTable({ charterId }: CharterAuthorizerC
       headerName: "Name",
       field: "name",
       width: 180,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Organization",
       field: "organization",
       width: 200,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Role",
       field: "role",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Email",
       field: "email",
       width: 200,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const email = params.value;
         if (!email) return <span className="text-slate-500">Not provided</span>;
@@ -90,28 +91,18 @@ export function CharterAuthorizerContactsTable({ charterId }: CharterAuthorizerC
     {
       headerName: "Actions",
       field: "actions",
-      width: 100,
+      width: 120,
       sortable: false,
       filter: false,
       cellRenderer: (params: any) => {
-        const contact = params.data;
+        const contact = params.data as CharterAuthorizerContact;
         return (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => handleEdit(contact)}
-              className="text-blue-600 hover:text-blue-800"
-              title="Edit contact"
-            >
-              <Edit className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => handleDelete(contact)}
-              className="text-red-600 hover:text-red-800"
-              title="Delete contact"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </div>
+          <RowActionsSelect
+            options={[
+              { value: 'edit', label: 'Edit', run: () => handleEdit(contact) },
+              { value: 'delete', label: 'Delete', run: () => handleDelete(contact) },
+            ]}
+          />
         );
       },
     },
@@ -129,22 +120,14 @@ export function CharterAuthorizerContactsTable({ charterId }: CharterAuthorizerC
 
   return (
     <div style={{ height: "400px", width: "100%" }}>
-      <AgGridReact
-        theme={themeMaterial}
+      <GridBase
         rowData={contacts}
         columnDefs={columnDefs}
-        animateRows={true}
-        rowSelection={{ enableClickSelection: false } as any}
-        domLayout="normal"
-        headerHeight={40}
-        rowHeight={30}
-        context={{
-          componentName: 'charter-authorizer-contacts-table'
-        }}
-        defaultColDef={{
-          sortable: true,
-          resizable: true,
-          filter: true,
+        defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+        gridProps={{
+          rowSelection: { enableClickSelection: false } as any,
+          domLayout: 'normal',
+          context: { componentName: 'charter-authorizer-contacts-table' },
         }}
       />
     </div>

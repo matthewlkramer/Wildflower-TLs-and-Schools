@@ -1,3 +1,25 @@
-// Minimal runtime stub for client build. Not used by the app in browser.
-export const relations = (..._args: any[]) => ({}) as any;
-
+// Stub for server-only drizzle-orm imports
+export const createId = () => "stub-id";
+export const relations = () => {};
+export const sql = () => {};
+export const placeholder = () => {};
+export const and = () => {};
+export const or = () => {};
+export const eq = () => {};
+export const ne = () => {};
+export const gt = () => {};
+export const gte = () => {};
+export const lt = () => {};
+export const lte = () => {};
+export const isNull = () => {};
+export const isNotNull = () => {};
+export const like = () => {};
+export const ilike = () => {};
+export const inArray = () => {};
+export const notInArray = () => {};
+export const exists = () => {};
+export const notExists = () => {};
+export const between = () => {};
+export const notBetween = () => {};
+export const asc = () => {};
+export const desc = () => {};

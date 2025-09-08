@@ -4,16 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { type School } from "@shared/schema";
+import { type School, type Educator } from "@shared/schema";
 import { getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
-import { useEducatorLookup } from "@/hooks/use-lookup";
-import { LinkifyEducatorNames } from "@/components/shared/Linkify";
-import { RowActionsSelect } from "@/components/shared/RowActionsSelect";
 
 interface SchoolsTableProps {
   schools: School[];
@@ -23,7 +20,6 @@ interface SchoolsTableProps {
 export default function SchoolsTable({ schools, isLoading }: SchoolsTableProps) {
   const [deleteSchoolId, setDeleteSchoolId] = useState<string | null>(null);
   const { toast } = useToast();
-  const { educatorByName } = useEducatorLookup();
 
   const deleteSchoolMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -108,7 +104,23 @@ export default function SchoolsTable({ schools, isLoading }: SchoolsTableProps) 
                 {/* Current TLs (Teacher Leaders) */}
                 <TableCell>
                   <div className="text-sm text-slate-900 flex flex-wrap gap-1">
-                    <LinkifyEducatorNames names={school.currentTLs as any} educatorByName={educatorByName} />
+                    {Array.isArray(school.currentTLs) && school.currentTLs.length > 0 ? (
+                      school.currentTLs.map((n, i) => {
+                        const id = educatorByName.get(String(n || '').toLowerCase());
+                        return (
+                          <span key={`${n}-${i}`} className="inline-flex items-center">
+                            {i > 0 && <span className="mx-0.5">,</span>}
+                            {id ? (
+                              <Link href={`/teacher/${id}`} className="text-blue-600 hover:underline">{n}</Link>
+                            ) : (
+                              <span>{n}</span>
+                            )}
+                          </span>
+                        );
+                      })
+                    ) : (
+                      <span className="text-slate-500">-</span>
+                    )}
                   </div>
                 </TableCell>
                 
@@ -143,16 +155,29 @@ export default function SchoolsTable({ schools, isLoading }: SchoolsTableProps) 
                 
                 {/* Actions */}
                 <TableCell>
-                  <RowActionsSelect
-                    size="sm"
-                    options={[
-                      { value: 'open', label: 'Open', run: () => { try { window.location.href = `/school/${school.id}`; } catch {} } },
-                      { value: 'delete', label: 'Delete', run: () => setDeleteSchoolId(school.id) },
-                    ]}
-                  />
+                  <select
+                    aria-label="Actions"
+                    defaultValue=""
+                    onChange={(e) => {
+                      const v = e.target.value; e.currentTarget.selectedIndex = 0;
+                      if (v === 'open') { window.location.href = `/school/${school.id}`; }
+                      if (v === 'delete') { setDeleteSchoolId(school.id); }
+                    }}
+                    className="h-8 text-xs border rounded-md px-1 bg-white"
+                  >
+                    <option value="" disabled>Actions</option>
+                    <option value="open">Open</option>
+                    <option value="delete">Delete</option>
+                  </select>
                 </TableCell>
               </TableRow>
             ))}
+  const { data: educators = [] } = useQuery<Educator[]>({ queryKey: ['/api/educators'] });
+  const educatorByName = new Map((educators || []).map(e => [
+    (e.fullName || `${e.firstName || ''} ${e.lastName || ''}`.trim()).toLowerCase(),
+    e.id,
+  ]));
+
           </TableBody>
         </Table>
       </div>

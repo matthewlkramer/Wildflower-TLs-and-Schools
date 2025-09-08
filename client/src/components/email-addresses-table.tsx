@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 import type { EmailAddress } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Edit3, Trash2, UserCheck, UserX } from "lucide-react";
@@ -120,26 +120,26 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
       headerName: "Email",
       field: "email",
       flex: 2,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Type",
       field: "type",
       flex: 1,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Primary",
       field: "isPrimary",
       flex: 1,
       cellRenderer: (params: any) => params.value ? "Yes" : "No",
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Status",
       field: "status",
       flex: 1,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Actions",
@@ -175,22 +175,14 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
   return (
     <div className="bg-white rounded-lg border border-slate-200">
       <div style={{ height: "300px", width: "100%" }}>
-        <AgGridReact
-          theme={themeMaterial}
+        <GridBase
           rowData={emailAddresses}
           columnDefs={columnDefs}
-          animateRows={true}
-          rowSelection={{ enableClickSelection: false } as any}
-          domLayout="autoHeight"
-          headerHeight={40}
-          rowHeight={30}
-          context={{
-            componentName: 'email-addresses-table'
-          }}
-          defaultColDef={{
-            sortable: true,
-            resizable: true,
-            filter: true,
+          defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+          gridProps={{
+            rowSelection: { enableClickSelection: false } as any,
+            domLayout: 'autoHeight',
+            context: { componentName: 'email-addresses-table' },
           }}
         />
       </div>

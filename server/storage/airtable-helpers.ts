@@ -1,4 +1,4 @@
-import { base } from '../airtable-schema';
+import { base } from '../airtable-base';
 
 export type Fields = Record<string, any>;
 

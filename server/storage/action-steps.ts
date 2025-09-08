@@ -1,12 +1,11 @@
-import { ACTION_STEPS_FIELDS as ASF } from "@shared/airtable-schema";
+import { ACTION_STEPS_FIELDS as ASF } from "@shared/unified-schema";
 import type { ActionStep } from "@shared/schema";
-import { createdAt, updatedAt } from "./util";
+import { createBaseTransformer } from "@shared/unified-schema";
 
 export function transformActionStepRecord(record: any): ActionStep {
   const f = record.fields;
   const status = String(f[ASF.Status] || '');
-  return {
-    id: record.id,
+  return createBaseTransformer(record, {
     charterId: String(f[ASF.charter_id] || ''),
     description: String(f[ASF.Item] || ''),
     assignee: String(f[ASF.Assignee_Short_Name] || ''),
@@ -14,8 +13,6 @@ export function transformActionStepRecord(record: any): ActionStep {
     completedDate: String(f[ASF.Completed_date] || ''),
     status,
     complete: status.toLowerCase() === 'complete' || status.toLowerCase() === 'completed' || status.toLowerCase() === 'done',
-    created: createdAt(f),
-    lastModified: updatedAt(f),
-  };
+  });
 }
 

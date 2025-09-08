@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 import type { MontessoriCertification } from "@shared/schema";
 
 interface MontessoriCertificationsTableProps {
@@ -39,21 +39,21 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
       headerName: "Year Certified",
       field: "yearReceived",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       valueFormatter: (p) => String(p.value || ''),
     },
     {
       headerName: "Level",
       field: "certificationLevel",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       valueFormatter: (p) => String(p.value || ''),
     },
     {
       headerName: "Abbreviation",
       field: "certifier",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       valueFormatter: (p) => String(p.value || ''),
     },
     {
@@ -123,22 +123,14 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
   return (
     <div className="bg-white rounded-lg border border-slate-200">
       <div style={{ height: "400px", width: "100%" }}>
-        <AgGridReact
-          theme={themeMaterial}
+        <GridBase
           rowData={certifications}
           columnDefs={columnDefs}
-          animateRows={true}
-          rowSelection={{ enableClickSelection: false } as any}
-          domLayout="autoHeight"
-          headerHeight={40}
-          rowHeight={30}
-          context={{
-            componentName: 'montessori-certifications-table'
-          }}
-          defaultColDef={{
-            sortable: true,
-            resizable: true,
-            filter: true,
+          defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+          gridProps={{
+            rowSelection: { enableClickSelection: false } as any,
+            domLayout: 'autoHeight',
+            context: { componentName: 'montessori-certifications-table' },
           }}
         />
       </div>

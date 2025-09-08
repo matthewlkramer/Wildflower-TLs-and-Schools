@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
 import type { CharterGovernanceDocument } from "@shared/schema";
 import { Edit, ExternalLink, Trash2 } from "lucide-react";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 
 interface CharterGovernanceDocumentsTableProps {
   charterId: string;
@@ -41,7 +41,7 @@ export function CharterGovernanceDocumentsTable({ charterId }: CharterGovernance
       headerName: "Document Type",
       field: "docType",
       width: 200,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const document = params.data;
         const docType = params.value || "Document";
@@ -63,7 +63,7 @@ export function CharterGovernanceDocumentsTable({ charterId }: CharterGovernance
       headerName: "Date",
       field: "dateEntered",
       width: 120,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Actions",
@@ -121,22 +121,14 @@ export function CharterGovernanceDocumentsTable({ charterId }: CharterGovernance
 
   return (
     <div style={{ height: "400px", width: "100%" }}>
-      <AgGridReact
-        theme={themeMaterial}
+      <GridBase
         rowData={sortedDocuments}
         columnDefs={columnDefs}
-        animateRows={true}
-        rowSelection={{ enableClickSelection: false } as any}
-        domLayout="normal"
-        headerHeight={40}
-        rowHeight={30}
-        context={{
-          componentName: 'charter-governance-documents-table'
-        }}
-        defaultColDef={{
-          sortable: true,
-          resizable: true,
-          filter: true,
+        defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+        gridProps={{
+          rowSelection: { enableClickSelection: false } as any,
+          domLayout: 'normal',
+          context: { componentName: 'charter-governance-documents-table' },
         }}
       />
     </div>

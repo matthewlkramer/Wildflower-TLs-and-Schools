@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
 import type { CharterNote } from "@shared/schema";
 import { Edit, ExternalLink, Eye, Lock, Unlock, Trash2 } from "lucide-react";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -49,7 +49,7 @@ export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
       headerName: "Headline",
       field: "headline",
       width: 300,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const note = params.data;
         const headline = params.value || "Untitled Note";
@@ -68,19 +68,19 @@ export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
       headerName: "Created By",
       field: "createdBy",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Date Entered",
       field: "dateEntered",
       width: 120,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Private",
       field: "private",
       width: 80,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const isPrivate = params.value;
         return (
@@ -149,22 +149,14 @@ export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
   return (
     <>
       <div style={{ height: "400px", width: "100%" }}>
-        <AgGridReact
-          theme={themeMaterial}
+        <GridBase
           rowData={notes}
           columnDefs={columnDefs}
-          animateRows={true}
-          suppressRowClickSelection={true}
-          domLayout="normal"
-          headerHeight={40}
-          rowHeight={35}
-          context={{
-            componentName: 'charter-notes-table'
-          }}
-          defaultColDef={{
-            sortable: true,
-            resizable: true,
-            filter: true,
+          defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+          gridProps={{
+            suppressRowClickSelection: true,
+            domLayout: 'normal',
+            context: { componentName: 'charter-notes-table' },
           }}
         />
       </div>

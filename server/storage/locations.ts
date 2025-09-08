@@ -1,12 +1,16 @@
-import { LOCATIONS_FIELDS as LF } from "@shared/airtable-schema";
+import { LOCATIONS_FIELDS as LF } from "@shared/unified-schema";
 import type { Location } from "@shared/schema";
-import { firstId, toNumber, toYesBool, createdAt, updatedAt } from "./util";
+import { 
+  createBaseTransformer, 
+  firstId, 
+  toNumber, 
+  toYesBool 
+} from "@shared/unified-schema";
 
 export function transformLocationRecord(record: any): Location {
   const f = record.fields;
   const schoolId = firstId(f[LF.school_id] ?? f[LF.School]);
-  return {
-    id: record.id,
+  return createBaseTransformer(record, {
     schoolId: schoolId || "",
     charterId: firstId(f[LF.charter_id]),
     address: String(f[LF.Address] || ''),
@@ -31,8 +35,6 @@ export function transformLocationRecord(record: any): Location {
     leaseEndDate: String(f[LF.Lease_End_Date] || ''),
     lease: String(f[LF.Lease] || ''),
     timeZone: String(f[LF.Time_Zone] || ''),
-    created: createdAt(f),
-    lastModified: updatedAt(f),
-  };
+  });
 }
 

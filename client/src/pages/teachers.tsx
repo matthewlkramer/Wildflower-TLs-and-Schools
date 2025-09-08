@@ -20,10 +20,9 @@ import { SummaryTab as TeacherSummary } from "@/components/teacher/tabs/SummaryT
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, TEACHERS_KANBAN_ORDER, TEACHERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
 import { type Teacher } from "@shared/schema";
-import { useSearch } from "@/contexts/search-context";
 import { useCachedEducators } from "@/hooks/use-cached-data";
-import { useUserFilter } from "@/contexts/user-filter-context";
-import { useEffect, useState } from "react";
+import { useSearchFilter } from "@/hooks/use-search-filter";
+import { useState } from "react";
 import AddEducatorModal from "@/components/add-teacher-modal";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
@@ -32,69 +31,52 @@ import { Link } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { Plus, Pencil, Mail, GitMerge } from "lucide-react";
+import { GridBase } from "@/components/shared/GridBase";
+import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Teachers() {
-  const searchContext = useSearch();
-  const { searchTerm, setSearchTerm } = searchContext;
-  logger.log('Teachers - useSearch context result:', searchContext);
-  const { showOnlyMyRecords, currentUser } = useUserFilter();
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [selected, setSelected] = useState<Teacher[]>([]);
   const [viewMode, setViewMode] = useState<"table" | "kanban" | "split">("table");
   const [kFilters, setKFilters] = useState({ montessori: "All", race: "All", role: "All", stage: "All", discovery: "All", type: "All" });
 
   const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
-  const [gridFilteredCount, setGridFilteredCount] = useState<number | null>(null);
   
-  // Debug search state
-  logger.log('Teachers render - searchTerm:', `"${searchTerm}"`);;
-  
-  // No header AddNew wiring; header shows a fixed Add menu.
-
-  // Apply text search + user filter
-  const filteredTeachers = (teachers || []).filter((teacher: Teacher) => {
-    if (!teacher) return false;
-    // Text search across common fields (fallback in case AG Grid Quick Filter is unavailable)
-    const term = (searchTerm || "").trim().toLowerCase();
-    if (term) {
-      const haystacks: string[] = [];
-      // Name and types
-      haystacks.push(teacher.fullName || "");
-      haystacks.push(teacher.individualType || "");
-      haystacks.push(teacher.discoveryStatus || "");
-      // Roles with standard abbreviations (match the grid's valueGetter)
+  const {
+    filteredData: filteredTeachers,
+    searchTerm,
+    setSearchTerm,
+    searchInputRef,
+    gridFilteredCount,
+    setGridFilteredCount,
+    searchDebug
+  } = useSearchFilter<Teacher>({
+    data: teachers,
+    searchFields: (teacher) => {
+      const fields: string[] = [];
+      fields.push(teacher.fullName || "");
+      fields.push(teacher.individualType || "");
+      fields.push(teacher.discoveryStatus || "");
       if (Array.isArray(teacher.currentRole)) {
         const roleText = teacher.currentRole.join(", ")
           .replace(/\bEmerging Teacher Leader\b/g, 'ETL')
           .replace(/\bTeacher Leader\b/g, 'TL');
-        haystacks.push(roleText);
+        fields.push(roleText);
       }
-      // Active school names
-      if (Array.isArray(teacher.activeSchool)) haystacks.push(teacher.activeSchool.join(", "));
-      // Stage/Status for active school association
-      if (Array.isArray(teacher.activeSchoolStageStatus)) haystacks.push(teacher.activeSchoolStageStatus.join(", "));
-      // Demographics and assignments
-      if (Array.isArray(teacher.raceEthnicity)) haystacks.push(teacher.raceEthnicity.join(", "));
-      if (Array.isArray(teacher.assignedPartner)) haystacks.push(teacher.assignedPartner.join(", "));
-      if (Array.isArray(teacher.assignedPartnerEmail)) haystacks.push(teacher.assignedPartnerEmail.join(", "));
-      const matchesSearch = haystacks.some(v => (v || "").toLowerCase().includes(term));
-      if (!matchesSearch) return false;
-    }
-    if (showOnlyMyRecords && currentUser) {
-      const isMyRecord = teacher.assignedPartner && teacher.assignedPartner.length > 0 &&
-        teacher.assignedPartner.some(partner => partner && partner.toLowerCase().includes((currentUser || '').toLowerCase()));
-      return isMyRecord;
-    }
-    return true;
+      if (Array.isArray(teacher.activeSchool)) fields.push(teacher.activeSchool.join(", "));
+      if (Array.isArray(teacher.activeSchoolStageStatus)) fields.push(teacher.activeSchoolStageStatus.join(", "));
+      if (Array.isArray(teacher.raceEthnicity)) fields.push(teacher.raceEthnicity.join(", "));
+      if (Array.isArray(teacher.assignedPartner)) fields.push(teacher.assignedPartner.join(", "));
+      if (Array.isArray(teacher.assignedPartnerEmail)) fields.push(teacher.assignedPartnerEmail.join(", "));
+      return fields;
+    },
+    userFilterField: (teacher, currentUser) => {
+      return teacher.assignedPartner && teacher.assignedPartner.length > 0 &&
+        teacher.assignedPartner.some(partner => partner && partner.toLowerCase().includes(currentUser.toLowerCase()));
+    },
+    debugName: "Teachers"
   });
-  
-  // Debug info after filtering (prefer grid-displayed count when available)
-  const showing = gridFilteredCount ?? (filteredTeachers?.length ?? 0);
-  const total = teachers?.length ?? 0;
-  const searchDebug = `Search: "${searchTerm}" | Total: ${total} | Filtered (user-filter/grid): ${showing}`;
-  logger.log('Teachers - filtered result:', searchDebug);
-  try { console.log('[Teachers] debug:', searchDebug); } catch {}
   
   // Selected teacher detail for split view
   const selectedId = selected?.[0]?.id;
@@ -151,6 +133,7 @@ export default function Teachers() {
                     placeholder="Search teachers..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    ref={searchInputRef}
                     className="h-8 pl-8 w-48 sm:w-64"
                   />
                   <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
@@ -210,6 +193,7 @@ export default function Teachers() {
                     placeholder="Search teachers..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    ref={searchInputRef}
                     className="h-8 pl-8 w-48 sm:w-64"
                   />
                   <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
@@ -374,27 +358,29 @@ export default function Teachers() {
             <div className="h-[70vh]">
               <ResizablePanelGroup direction="horizontal">
                 <ResizablePanel defaultSize={60} minSize={35}>
-                  <div className="ag-theme-material h-full">
-                    <AgGridReact
-                      rowData={filteredTeachers || []}
-                      columnDefs={[{
-                        headerName: 'Name',
-                        valueGetter: (p:any) => p?.data?.fullName || `${p?.data?.firstName || ''} ${p?.data?.lastName || ''}`.trim(),
-                        filter: 'agTextColumnFilter',
-                        sortable: true,
-                        flex: 1,
-                        minWidth: 140,
-                        cellRenderer: (p:any) => (
-                          <a href={`/teacher/${p?.data?.id}`} className="text-blue-600 hover:underline">{p.value}</a>
-                        ),
-                      }]}
-                      defaultColDef={DEFAULT_COL_DEF as any}
-                      {...{ rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any }}
-                      sideBar={false as any}
-                      enableAdvancedFilter={true as any}
-                      onSelectionChanged={(e:any)=> setSelected(e.api.getSelectedRows() as any)}
-                    />
-                  </div>
+                <div className="ag-theme-material h-full">
+                  <GridBase
+                    rowData={filteredTeachers || []}
+                    columnDefs={[{
+                      headerName: 'Name',
+                      valueGetter: (p:any) => p?.data?.fullName || `${p?.data?.firstName || ''} ${p?.data?.lastName || ''}`.trim(),
+                      filter: 'agTextColumnFilter',
+                      sortable: true,
+                      flex: 1,
+                      minWidth: 140,
+                      cellRenderer: (p:any) => (
+                        <a href={`/teacher/${p?.data?.id}`} className="text-blue-600 hover:underline">{p.value}</a>
+                      ),
+                    }]}
+                    defaultColDefOverride={DEFAULT_COL_DEF as any}
+                    gridProps={{
+                      rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any,
+                      sideBar: (DEFAULT_GRID_PROPS as any).sideBar,
+                      enableAdvancedFilter: true as any,
+                      onSelectionChanged: (e:any)=> setSelected(e.api.getSelectedRows() as any),
+                    }}
+                  />
+                </div>
                 </ResizablePanel>
                 <ResizableHandle withHandle />
                 <ResizablePanel defaultSize={40} minSize={25}>
@@ -421,3 +407,23 @@ export default function Teachers() {
     </>
   );
 }
+  // Type-to-search: route typing to the page search input
+  useEffect(() => {
+    const isEditable = (el: any) => {
+      if (!el) return false; const t = (el.tagName||'').toLowerCase();
+      return t==='input'||t==='textarea'||t==='select'||!!el.isContentEditable;
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey||e.ctrlKey||e.altKey) return;
+      if (isEditable(document.activeElement)) return;
+      const k=e.key; const printable=k.length===1;
+      if (!(printable||k==='Backspace'||k==='Delete'||k==='Escape')) return;
+      try { searchInputRef.current?.focus(); } catch{}
+      e.preventDefault();
+      if (k==='Escape'){ setSearchTerm(''); return; }
+      if (k==='Backspace'||k==='Delete'){ setSearchTerm((searchTerm||'').slice(0,-1)); return; }
+      if (printable){ setSearchTerm((searchTerm||'')+k); }
+    };
+    window.addEventListener('keydown', onKey, {capture:true});
+    return ()=> window.removeEventListener('keydown', onKey as any, {capture:true} as any);
+  }, [searchTerm, setSearchTerm]);

@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
 import type { CharterRole } from "@shared/schema";
 import { Edit, Trash2 } from "lucide-react";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 
 interface CharterRolesTableProps {
   charterId: string;
@@ -35,19 +35,19 @@ export function CharterRolesTable({ charterId }: CharterRolesTableProps) {
       headerName: "Role",
       field: "role",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Name",
       field: "name",
       width: 180,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Currently Active",
       field: "currentlyActive",
       width: 120,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         const active = params.value;
         return (
@@ -101,22 +101,14 @@ export function CharterRolesTable({ charterId }: CharterRolesTableProps) {
 
   return (
     <div style={{ height: "400px", width: "100%" }}>
-      <AgGridReact
-        theme={themeMaterial}
+      <GridBase
         rowData={roles}
         columnDefs={columnDefs}
-        animateRows={true}
-        rowSelection={{ enableClickSelection: false } as any}
-        domLayout="normal"
-        headerHeight={40}
-        rowHeight={30}
-        context={{
-          componentName: 'charter-roles-table'
-        }}
-        defaultColDef={{
-          sortable: true,
-          resizable: true,
-          filter: true,
+        defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+        gridProps={{
+          rowSelection: { enableClickSelection: false } as any,
+          domLayout: 'normal',
+          context: { componentName: 'charter-roles-table' },
         }}
       />
     </div>

@@ -3,31 +3,34 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useState, createContext, useEffect, useMemo, useContext } from "react";
+import { useState, createContext, useEffect, useMemo, useContext, lazy, Suspense } from "react";
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import { UserFilterProvider } from "@/contexts/user-filter-context";
 import { initAgGridEnterprise } from "@/lib/ag-grid-enterprise";
 
-import Dashboard from "@/pages/dashboard";
-import Teachers from "@/pages/teachers";
-import Schools from "@/pages/schools";
-import Charters from "@/pages/charters";
-import LoansPage from "@/pages/loans";
-import LoanOrigination from "@/pages/loan-origination";
-import LoanDetail from "@/pages/loan-detail";
-import ACHSetup from "@/pages/ach-setup";
-import ACHSetupComplete from "@/pages/ach-setup-complete";
-import TeacherDetail from "@/pages/teacher-detail";
-import SchoolDetail from "@/pages/school-detail";
-import CharterDetail from "@/pages/charter-detail";
-import NotFound from "@/pages/not-found";
-import Settings from "@/pages/settings";
-import GoogleSyncPage from "@/pages/google-sync";
+// Eagerly load auth and common pages
 import LoginPage from "@/pages/login";
 import ResetPasswordPage from "@/pages/reset";
-import ComposeEmailPage from "@/pages/compose-email";
+import NotFound from "@/pages/not-found";
+
+// Lazy load heavy pages to reduce initial bundle size
+const Dashboard = lazy(() => import("@/pages/dashboard"));
+const Teachers = lazy(() => import("@/pages/teachers"));
+const Schools = lazy(() => import("@/pages/schools"));
+const Charters = lazy(() => import("@/pages/charters"));
+const LoansPage = lazy(() => import("@/pages/loans"));
+const LoanOrigination = lazy(() => import("@/pages/loan-origination"));
+const LoanDetail = lazy(() => import("@/pages/loan-detail"));
+const ACHSetup = lazy(() => import("@/pages/ach-setup"));
+const ACHSetupComplete = lazy(() => import("@/pages/ach-setup-complete"));
+const TeacherDetail = lazy(() => import("@/pages/teacher-detail"));
+const SchoolDetail = lazy(() => import("@/pages/school-detail"));
+const CharterDetail = lazy(() => import("@/pages/charter-detail"));
+const Settings = lazy(() => import("@/pages/settings"));
+const GoogleSyncPage = lazy(() => import("@/pages/google-sync"));
+const ComposeEmailPage = lazy(() => import("@/pages/compose-email"));
 
 // Use a shared search context to avoid module duplication issues
 import { SearchContext } from "@/contexts/search-context";
@@ -67,31 +70,42 @@ function Router() {
     return <LoginPage />;
   }
 
+  const LoadingFallback = () => (
+    <div className="min-h-screen flex items-center justify-center text-slate-600">
+      <div className="text-center">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
+        <p className="mt-2">Loading...</p>
+      </div>
+    </div>
+  );
+
   return (
-    <Switch>
-      <Route path="/login" component={LoginPage} />
-      <Route path="/reset" component={ResetPasswordPage} />
-      <Route path="/" component={Dashboard} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/teachers" component={Teachers} />
-      <Route path="/teacher" component={Teachers} />
-      <Route path="/teacher/:id" component={TeacherDetail} />
-      <Route path="/schools" component={Schools} />
-      <Route path="/school" component={Schools} />
-      <Route path="/school/:id" component={SchoolDetail} />
-      <Route path="/charters" component={Charters} />
-      <Route path="/charter" component={Charters} />
-      <Route path="/charter/:id" component={CharterDetail} />
-      <Route path="/loans" component={LoansPage} />
-      <Route path="/loans/:id" component={LoanDetail} />
-      <Route path="/loan-origination" component={LoanOrigination} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/google-sync" component={GoogleSyncPage} />
-      <Route path="/compose-email" component={ComposeEmailPage} />
-      <Route path="/ach-setup/:loanId" component={ACHSetup} />
-      <Route path="/ach-setup-complete" component={ACHSetupComplete} />
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={<LoadingFallback />}>
+      <Switch>
+        <Route path="/login" component={LoginPage} />
+        <Route path="/reset" component={ResetPasswordPage} />
+        <Route path="/" component={Dashboard} />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/teachers" component={Teachers} />
+        <Route path="/teacher" component={Teachers} />
+        <Route path="/teacher/:id" component={TeacherDetail} />
+        <Route path="/schools" component={Schools} />
+        <Route path="/school" component={Schools} />
+        <Route path="/school/:id" component={SchoolDetail} />
+        <Route path="/charters" component={Charters} />
+        <Route path="/charter" component={Charters} />
+        <Route path="/charter/:id" component={CharterDetail} />
+        <Route path="/loans" component={LoansPage} />
+        <Route path="/loans/:id" component={LoanDetail} />
+        <Route path="/loan-origination" component={LoanOrigination} />
+        <Route path="/settings" component={Settings} />
+        <Route path="/google-sync" component={GoogleSyncPage} />
+        <Route path="/compose-email" component={ComposeEmailPage} />
+        <Route path="/ach-setup/:loanId" component={ACHSetup} />
+        <Route path="/ach-setup-complete" component={ACHSetupComplete} />
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 

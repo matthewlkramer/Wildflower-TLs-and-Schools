@@ -3,9 +3,10 @@ import { AgGridReact } from "ag-grid-react";
 import { ColDef, GridReadyEvent, GridApi, themeMaterial } from "ag-grid-community";
 // Modules are registered in initAgGridEnterprise at app startup
 import { Link } from "wouter";
-import { ExternalLink, Trash2, Plus, FilePlus2, ClipboardList, MessageSquareText, Pencil } from "lucide-react";
+import { ExternalLink, Trash2, Plus, FilePlus2, ClipboardList, MessageSquareText, Pencil, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { BadgeRenderer, PillRenderer } from "@/components/shared/grid-renderers";
 import { type Educator, type School } from "@shared/schema";
 import { getStatusColor } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -16,6 +17,7 @@ import { useAgGridFeatures } from "@/hooks/use-aggrid-features";
 import { GridBase } from "@/components/shared/GridBase";
 import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
 import { useGridHeight } from "@/components/shared/use-grid-height";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 // Inline action icons (no dropdown)
 
 interface TeachersGridProps {
@@ -48,68 +50,7 @@ const SchoolLink = ({ schoolName }: { schoolName: string }) => {
   );
 };
 
-// Badge renderer for status fields (Discovery Status, Stage/Status, Montessori Certified)
-const BadgeRenderer = ({ value, field }: { value: string | string[]; field?: string }) => {
-  if (!value) return null;
-  
-  const values = Array.isArray(value) ? value : [value];
-  
-  const getFieldColor = (val: string, fieldName?: string) => {
-    if (fieldName === 'montessoriCertified') {
-      return val?.toLowerCase() === 'yes' 
-        ? 'bg-green-100 text-green-800 border-green-200' 
-        : 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-    
-    if (fieldName === 'discoveryStatus') {
-      const status = val?.toLowerCase();
-      if (status === 'complete') return 'bg-green-100 text-green-800 border-green-200';
-      if (status === 'in process' || status === 'in progress') return 'bg-green-50 text-green-700 border-green-200';
-      if (status === 'paused') return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-    
-    if (fieldName === 'stageStatus') {
-      // Use the updated getStatusColor function for Stage/Status fields
-      return getStatusColor(val);
-    }
-    
-    // Default to existing color logic for other fields
-    return getStatusColor(val);
-  };
-  
-  return (
-    <div className="flex flex-wrap gap-1 items-center h-full">
-      {values.map((val, index) => (
-        <Badge 
-          key={index}
-          variant="outline" 
-          className={`text-xs ${getFieldColor(val, field)}`}
-        >
-          {val}
-        </Badge>
-      ))}
-    </div>
-  );
-};
-
-// Pill renderer for categorical fields (Individual Type, Current Role, Race/Ethnicity)
-const PillRenderer = ({ value }: { value: string | string[] }) => {
-  if (!value) return null;
-  
-  const values = Array.isArray(value) ? value : [value];
-  return (
-    <div className="flex flex-wrap gap-1 items-center h-full">
-      {values.map((val, index) => (
-        <span 
-          key={index}
-          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800"
-        >
-          {val}
-        </span>
-      ))}
-    </div>
-  );
-};
+// Using shared renderers from grid-renderers.tsx
 
 // Action buttons renderer
 const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
@@ -169,28 +110,41 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
   const onCreateTask = () => { try { window.location.href = `/teacher/${teacher.id}`; } catch {} };
   const onLogInteraction = () => { try { window.location.href = `/teacher/${teacher.id}`; } catch {} };
 
+  const onSendEmail = () => {
+    const to = (teacher as any).currentPrimaryEmailAddress || '';
+    const q = to ? `?to=${encodeURIComponent(to)}` : '';
+    try { window.location.href = `/compose-email${q}`; } catch {}
+  };
+
   return (
     <>
-      <div className="flex items-center gap-1">
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Open" onClick={onOpen}>
-          <ExternalLink className="h-3 w-3" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Edit" onClick={onEditName}>
-          <Pencil className="h-3 w-3" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Add note" onClick={onCreateNote}>
-          <FilePlus2 className="h-3 w-3" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Add task" onClick={onCreateTask}>
-          <ClipboardList className="h-3 w-3" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Log interaction" onClick={onLogInteraction}>
-          <MessageSquareText className="h-3 w-3" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-600 hover:text-red-700" title="Archive" onClick={onArchive}>
-          <Trash2 className="h-3 w-3" />
-        </Button>
-      </div>
+      <select
+        aria-label="Actions"
+        defaultValue=""
+        onChange={(e) => {
+          const v = e.target.value;
+          e.currentTarget.selectedIndex = 0;
+          switch (v) {
+            case 'open': onOpen(); break;
+            case 'edit': onEditName(); break;
+            case 'note': onCreateNote(); break;
+            case 'task': onCreateTask(); break;
+            case 'interaction': onLogInteraction(); break;
+            case 'email': onSendEmail(); break;
+            case 'archive': onArchive(); break;
+          }
+        }}
+        className="h-7 text-xs border rounded-md px-1 bg-white"
+      >
+        <option value="" disabled>Actions</option>
+        <option value="open">Open</option>
+        <option value="edit">Edit</option>
+        <option value="note">Add note</option>
+        <option value="task">Add task</option>
+        <option value="interaction">Log interaction</option>
+        <option value="email">Send email</option>
+        <option value="archive">Archive</option>
+      </select>
 
       <DeleteConfirmationModal
         open={showDeleteModal}
@@ -219,8 +173,7 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
     {
       headerName: "Educator Name",
       field: "fullName",
-      filter: 'agTextColumnFilter',
-      filterParams: { defaultOption: 'contains', debounceMs: 150 },
+      ...createTextFilter(),
       minWidth: 200,
       cellRenderer: ({ data: teacher }: { data: Educator }) => (
         <Link href={`/teacher/${teacher.id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
@@ -233,8 +186,7 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
       headerName: "Current role/school",
       field: "currentRoleSchool",
       // Text filter with contains logic similar to Google Sheets
-      filter: 'agTextColumnFilter',
-      filterParams: { defaultOption: 'contains', debounceMs: 150 },
+      ...createTextFilter(),
       minWidth: 300,
       valueGetter: ({ data }: { data: Educator }) => data?.currentRoleSchool || '',
       cellRenderer: ({ data }: { data: Educator }) => {

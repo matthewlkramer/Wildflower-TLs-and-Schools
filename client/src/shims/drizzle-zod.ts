@@ -1,4 +1,3 @@
-// Minimal stubs so client builds don't need drizzle at runtime
-export const createInsertSchema = (..._args: any[]) => ({} as any);
-export const createSelectSchema = (..._args: any[]) => ({} as any);
-
+// Stub for server-only drizzle-zod imports
+export const createSelectSchema = () => ({});
+export const createInsertSchema = () => ({});

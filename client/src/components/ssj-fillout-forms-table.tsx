@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { themeMaterial } from "ag-grid-community";
+import { GridBase } from "@/components/shared/GridBase";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 import type { SSJFilloutForm } from "@shared/schema";
 import { useState } from "react";
 import { ExternalLink } from "lucide-react";
@@ -37,14 +37,14 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
       headerName: "Form Name",
       field: "formName",
       flex: 1,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       valueFormatter: (p) => String(p.value || ''),
     },
     {
       headerName: "Form Type",
       field: "formType",
       flex: 1,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       valueFormatter: (p) => String(p.value || ''),
     },
     {
@@ -66,7 +66,7 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
       headerName: "Status",
       field: "status",
       flex: 1,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       valueFormatter: (p) => String(p.value || ''),
     },
     {
@@ -118,22 +118,14 @@ export function SSJFilloutFormsTable({ educatorId }: SSJFilloutFormsTableProps) 
     <>
       <div className="bg-white rounded-lg border border-slate-200">
         <div style={{ height: "400px", width: "100%" }}>
-          <AgGridReact
-            theme={themeMaterial}
+          <GridBase
             rowData={forms}
             columnDefs={columnDefs}
-            animateRows={true}
-            rowSelection={{ enableClickSelection: false } as any}
-            domLayout="autoHeight"
-            headerHeight={40}
-            rowHeight={30}
-            context={{
-              componentName: 'ssj-fillout-forms-table'
-            }}
-            defaultColDef={{
-              sortable: true,
-              resizable: true,
-              filter: true,
+            defaultColDefOverride={{ sortable: true, resizable: true, filter: true }}
+            gridProps={{
+              rowSelection: { enableClickSelection: false } as any,
+              domLayout: 'autoHeight',
+              context: { componentName: 'ssj-fillout-forms-table' },
             }}
           />
         </div>

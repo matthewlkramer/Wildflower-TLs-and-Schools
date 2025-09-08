@@ -7,12 +7,12 @@
  * Add Charter button in the search row.
  */
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
+import { GridBase } from "@/components/shared/GridBase";
 import type { ColDef } from "ag-grid-community";
 import type { Charter } from "@shared/schema";
 import { useSearch } from "@/contexts/search-context";
 import { usePageTitle } from "@/App";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { getStatusColor } from "@/lib/utils";
 import { useUserFilter } from "@/contexts/user-filter-context";
@@ -27,8 +27,10 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/componen
 import { useQuery as useRQ } from "@tanstack/react-query";
 import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, CHARTERS_KANBAN_ORDER, CHARTERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search } from "lucide-react";
+import { useGlobalTypeToSearch } from "@/hooks/use-global-type-to-search";
+import { createTextFilter } from "@/utils/ag-grid-utils";
 
 export default function Charters() {
   const gridHeight = useGridHeight();
@@ -39,10 +41,13 @@ export default function Charters() {
   const [viewMode, setViewMode] = useState<"table" | "kanban" | "split">("table");
   const [selected, setSelected] = useState<Charter[]>([] as any);
   const [kFilters, setKFilters] = useState({ state: "All", year: "All", ages: "All" });
+  const searchRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setPageTitle("Charters");
   }, [setPageTitle]);
+
+  useGlobalTypeToSearch(searchRef, setSearchTerm);
 
   const { data: charters = [], isLoading } = useQuery<Charter[]>({
     queryKey: ["/api/charters"],
@@ -148,7 +153,7 @@ export default function Charters() {
       headerName: "Short Name",
       field: "shortName",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
       cellRenderer: (params: any) => {
         return (
           <button
@@ -164,19 +169,19 @@ export default function Charters() {
       headerName: "Full Name",
       field: "fullName",
       flex: 1,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Initial Target Community",
       field: "initialTargetCommunity",
       width: 200,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Projected Open",
       field: "projectedOpen",
       width: 150,
-      filter: "agTextColumnFilter",
+      ...createTextFilter(),
     },
     {
       headerName: "Initial Target Ages",
@@ -246,6 +251,7 @@ export default function Charters() {
               placeholder="Search charters..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              ref={searchRef}
               className="h-8 pl-8 w-48 sm:w-64"
             />
             <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
@@ -264,17 +270,15 @@ export default function Charters() {
         </div>
         {viewMode === "table" && (
           <div style={{ height: gridHeight, width: "100%" }}>
-            <AgGridReact
-              { ...DEFAULT_GRID_PROPS }
+            <GridBase
               rowData={filteredCharters}
               columnDefs={columnDefs}
-              domLayout="normal"
-              headerHeight={40}
-              onSelectionChanged={(ev: any) => setSelected(ev.api.getSelectedRows() as any)}
-              context={{
-                componentName: 'charters-grid'
+              defaultColDefOverride={DEFAULT_COL_DEF}
+              gridProps={{
+                domLayout: 'normal',
+                onSelectionChanged: (ev: any) => setSelected(ev.api.getSelectedRows() as any),
+                context: { componentName: 'charters-grid' },
               }}
-              defaultColDef={DEFAULT_COL_DEF}
             />
           </div>
         )}
@@ -366,7 +370,7 @@ export default function Charters() {
             <ResizablePanelGroup direction="horizontal">
               <ResizablePanel defaultSize={60} minSize={35}>
                 <div className="ag-theme-material h-full">
-                  <AgGridReact
+                  <GridBase
                     rowData={filteredCharters || []}
                     columnDefs={[{
                       headerName: 'Charter',
@@ -379,11 +383,13 @@ export default function Charters() {
                         <a href={`/charter/${p?.data?.id}`} className="text-blue-600 hover:underline">{p.value}</a>
                       ),
                     }]}
-                    defaultColDef={DEFAULT_COL_DEF as any}
-                    {...{ rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any }}
-                    sideBar={false as any}
-                    enableAdvancedFilter={true as any}
-                    onSelectionChanged={(e:any)=> setSelected(e.api.getSelectedRows() as any)}
+                    defaultColDefOverride={DEFAULT_COL_DEF as any}
+                    gridProps={{
+                      rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any,
+                      sideBar: (DEFAULT_GRID_PROPS as any).sideBar,
+                      enableAdvancedFilter: true as any,
+                      onSelectionChanged: (e:any)=> setSelected(e.api.getSelectedRows() as any),
+                    }}
                   />
                 </div>
               </ResizablePanel>

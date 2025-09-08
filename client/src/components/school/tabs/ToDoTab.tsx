@@ -4,6 +4,7 @@ import type { ActionStep } from '@shared/schema';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { DEFAULT_GRID_PROPS } from '@/components/shared/ag-grid-defaults';
+import { createTextFilter } from '@/utils/ag-grid-utils';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -47,14 +48,14 @@ export function ToDoTab({ schoolId }: { schoolId: string }) {
   const [createOpen, setCreateOpen] = React.useState(false);
 
   const cols: ColDef<Row>[] = [
-    { headerName: 'Item', field: 'description', flex: 2, filter: 'agTextColumnFilter' },
-    { headerName: 'Assignee', field: 'assignee', width: 160, filter: 'agTextColumnFilter' },
-    { headerName: 'Status', field: 'status', width: 120, filter: 'agTextColumnFilter',
+    { headerName: 'Item', field: 'description', flex: 2, ...createTextFilter() },
+    { headerName: 'Assignee', field: 'assignee', width: 160, ...createTextFilter() },
+    { headerName: 'Status', field: 'status', width: 120, ...createTextFilter(),
       cellRenderer: (p: ICellRendererParams<Row>) => (
         <span className={p.value === 'Complete' ? 'text-green-700' : 'text-slate-700'}>{p.value || '-'}</span>
       )
     },
-    { headerName: 'Due', field: 'dueDate', width: 140, filter: 'agTextColumnFilter' },
+    { headerName: 'Due', field: 'dueDate', width: 140, ...createTextFilter() },
     { headerName: 'Actions', field: 'id', width: 240, sortable: false, filter: false, cellRenderer: (p: ICellRendererParams<Row>) => {
       const r = p.data as Row;
       const toggle = async () => {
@@ -91,8 +92,6 @@ export function ToDoTab({ schoolId }: { schoolId: string }) {
         columnDefs={cols}
         defaultColDefOverride={{ sortable: true, filter: true, resizable: true }}
         gridProps={{
-          ...DEFAULT_GRID_PROPS,
-          domLayout: 'autoHeight',
           overlayLoadingTemplate: isLoading ? '<span class="ag-overlay-loading-center">Loading.</span>' : undefined,
         }}
       />
