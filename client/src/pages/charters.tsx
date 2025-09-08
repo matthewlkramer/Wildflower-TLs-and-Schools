@@ -136,8 +136,8 @@ export default function Charters() {
       width: 90,
       filter: false,
       sortable: false,
-      suppressMenu: true as any,
-      menuTabs: [] as any,
+      suppressHeaderMenuButton: true as any,
+      suppressHeaderContextMenu: true as any,
       cellRenderer: (p:any) => (
         <div>
           <button onClick={()=> setLocation(`/charter/${p?.data?.id}`)} className="text-xs px-2 py-1 border hover:bg-slate-50">Open</button>

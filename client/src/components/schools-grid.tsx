@@ -124,18 +124,23 @@ const ActionsCellRenderer = ({ data: school }: { data: School }) => {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><MoreVertical className="h-3 w-3" /></Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={open}><ExternalLink className="h-3 w-3 mr-1" /> Open</DropdownMenuItem>
-        <DropdownMenuItem onClick={editName}><Pencil className="h-3 w-3 mr-1" /> Edit name</DropdownMenuItem>
-        <DropdownMenuItem onClick={createNote}><FilePlus2 className="h-3 w-3 mr-1" /> Create note</DropdownMenuItem>
-        <DropdownMenuItem onClick={createTask}><ClipboardList className="h-3 w-3 mr-1" /> Create task</DropdownMenuItem>
-        <DropdownMenuItem onClick={markInactive}><Trash2 className="h-3 w-3 mr-1" /> Mark inactive</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex items-center gap-1">
+      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Open" onClick={open}>
+        <ExternalLink className="h-3 w-3" />
+      </Button>
+      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Edit" onClick={editName}>
+        <Pencil className="h-3 w-3" />
+      </Button>
+      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Add note" onClick={createNote}>
+        <FilePlus2 className="h-3 w-3" />
+      </Button>
+      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Add task" onClick={createTask}>
+        <ClipboardList className="h-3 w-3" />
+      </Button>
+      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-600 hover:text-red-700" title="Archive" onClick={markInactive}>
+        <Trash2 className="h-3 w-3" />
+      </Button>
+    </div>
   );
 };
 
@@ -245,8 +250,8 @@ export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange,
       cellRenderer: ActionsCellRenderer,
       sortable: false,
       filter: false,
-      suppressMenu: true as any,
-      menuTabs: [] as any,
+      suppressHeaderMenuButton: true as any,
+      suppressHeaderContextMenu: true as any,
       resizable: false,
     },
   ];

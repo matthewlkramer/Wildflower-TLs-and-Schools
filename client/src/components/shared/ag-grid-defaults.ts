@@ -17,7 +17,14 @@ export const DEFAULT_GRID_PROPS = {
   domLayout: 'autoHeight' as const,
   enableBrowserTooltips: true,
   getRowId: (params: any) => params?.data?.id ?? params?.data?.ID ?? params?.data?.Id,
-  sideBar: true as any,
+  // Start with sideBar available but closed by default
+  sideBar: {
+    hiddenByDefault: true,
+    toolPanels: [
+      { id: 'columns', labelDefault: 'Columns', iconKey: 'columns', toolPanel: 'agColumnsToolPanel' },
+      { id: 'filters', labelDefault: 'Filters', iconKey: 'filter', toolPanel: 'agFiltersToolPanel' },
+    ],
+  } as any,
   rowSelection: {
     mode: 'multiRow',
     checkboxes: true,
