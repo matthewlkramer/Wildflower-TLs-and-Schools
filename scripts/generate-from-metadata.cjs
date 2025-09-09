@@ -745,6 +745,164 @@ export const get${typeName}ById = (id: string) => getById<schema.${typeName}>('$
 `;
   }
 
+  // Create storage object with all methods for backward compatibility
+  storageContent += `
+// Storage object with all methods for backward compatibility
+export const storage = {
+`;
+  
+  for (const [tableName, fields] of tableFields.entries()) {
+    const typeName = getTypeName(tableName);
+    storageContent += `  get${typeName}s,
+  get${typeName}ById,
+  get${typeName}: get${typeName}ById,
+`;
+  }
+  
+  // Add legacy aliases
+  storageContent += `  // Legacy aliases
+  getTeachers: getEducators,
+  getTeacher: getEducatorById,
+  updateTeacher: async (id: string, data: any) => {
+    // TODO: Implement update logic
+    return null;
+  },
+  deleteTeacher: async (id: string) => {
+    // TODO: Implement delete logic  
+    return false;
+  },
+  // Custom methods (implement as needed)
+  getSchoolsByUserId: async (userId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getTlsByUserId: async (userId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getEducatorAssociations: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getSchoolAssociations: async (schoolId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  updateEducator: async (id: string, data: any) => {
+    // TODO: Implement update logic
+    return null;
+  },
+  updateSchool: async (id: string, data: any) => {
+    // TODO: Implement update logic
+    return null;
+  },
+  createEducator: async (data: any) => {
+    // TODO: Implement create logic
+    return null;
+  },
+  createSchool: async (data: any) => {
+    // TODO: Implement create logic
+    return null;
+  },
+  deleteEducator: async (id: string) => {
+    // TODO: Implement delete logic
+    return false;
+  },
+  deleteSchool: async (id: string) => {
+    // TODO: Implement delete logic
+    return false;
+  },
+  createTeacher: async (data: any) => {
+    // TODO: Implement create logic
+    return null;
+  },
+  updateTeacherSchoolAssociation: async (id: string, data: any) => {
+    // TODO: Implement update logic
+    return null;
+  },
+  deleteTeacherSchoolAssociation: async (id: string) => {
+    // TODO: Implement delete logic
+    return false;
+  },
+  createTeacherSchoolAssociation: async (data: any) => {
+    // TODO: Implement create logic
+    return null;
+  },
+  getMontessoriCertificationsByEducatorId: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getEventAttendancesByEducatorId: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getEducatorNotesByEducatorId: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getEmailAddressesByEducatorId: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getSSJFilloutFormsByEducatorId: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getGovernanceDocumentsBySchoolId: async (schoolId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getGuideAssignmentsBySchoolId: async (schoolId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getSchoolNotesBySchoolId: async (schoolId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getLocationsBySchoolId: async (schoolId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getActionStepsByUserId: async (userId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  searchSchools: async (query: string, filters: any) => {
+    // TODO: Implement search logic
+    return [];
+  },
+  getEnrollmentTrends: async () => {
+    // TODO: Implement analytics logic
+    return [];
+  },
+  getSchoolMetrics: async (schoolId: string) => {
+    // TODO: Implement metrics logic
+    return {};
+  },
+  bulkUpdateSchools: async (ids: string[], updates: any) => {
+    // TODO: Implement bulk update logic
+    return [];
+  },
+  bulkImportEducators: async (educators: any[]) => {
+    // TODO: Implement bulk import logic
+    return [];
+  },
+  bulkCreateEducators: async (educators: any[]) => {
+    // TODO: Implement bulk create logic
+    return [];
+  },
+  getNetworkBenchmarks: async () => {
+    // TODO: Implement benchmarks logic
+    return {};
+  },
+  getTableMetadata: async () => {
+    // TODO: Implement metadata logic
+    return {};
+  },
+} as const;
+`;
+
   // Write the storage file
   const storagePath = join(process.cwd(), 'server', 'generic-storage.generated.ts');
   writeFileSync(storagePath, storageContent);

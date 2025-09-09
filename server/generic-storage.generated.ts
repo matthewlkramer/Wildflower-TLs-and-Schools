@@ -1,5 +1,5 @@
 // Generated generic storage with metadata-driven table configuration
-// Generated on 2025-09-09T19:28:50.213Z
+// Generated on 2025-09-09T19:39:35.553Z
 // This file is auto-generated. Do not edit manually.
 
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -1679,3 +1679,291 @@ export const getAgeGrades = () => getAll<schema.AgeGrade>('Ages-Grades');
 export const getAgeGradeById = (id: string) => getById<schema.AgeGrade>('Ages-Grades', id);
 export const getMontessoriCertifiers = () => getAll<schema.MontessoriCertifier>('Montessori Certifiers');
 export const getMontessoriCertifierById = (id: string) => getById<schema.MontessoriCertifier>('Montessori Certifiers', id);
+
+// Storage object with all methods for backward compatibility
+export const storage = {
+  getPartners,
+  getPartnerById,
+  getPartner: getPartnerById,
+  getSSJFilloutForms,
+  getSSJFilloutFormById,
+  getSSJFilloutForm: getSSJFilloutFormById,
+  getMarketingSourceMappings,
+  getMarketingSourceMappingById,
+  getMarketingSourceMapping: getMarketingSourceMappingById,
+  getCharterApplications,
+  getCharterApplicationById,
+  getCharterApplication: getCharterApplicationById,
+  getSchools,
+  getSchoolById,
+  getSchool: getSchoolById,
+  getEducators,
+  getEducatorById,
+  getEducator: getEducatorById,
+  getSSJTypeforms,
+  getSSJTypeformById,
+  getSSJTypeform: getSSJTypeformById,
+  getSchoolNotes,
+  getSchoolNoteById,
+  getSchoolNote: getSchoolNoteById,
+  getMembershipTerminationSteps,
+  getMembershipTerminationStepById,
+  getMembershipTerminationStep: getMembershipTerminationStepById,
+  getLocations,
+  getLocationById,
+  getLocation: getLocationById,
+  getEventAttendances,
+  getEventAttendanceById,
+  getEventAttendance: getEventAttendanceById,
+  getLeadRoutingTemplates,
+  getLeadRoutingTemplateById,
+  getLeadRoutingTemplate: getLeadRoutingTemplateById,
+  getCohorts,
+  getCohortById,
+  getCohort: getCohortById,
+  getEvents,
+  getEventById,
+  getEvent: getEventById,
+  getBoardServices,
+  getBoardServiceById,
+  getBoardService: getBoardServiceById,
+  getSupabase990Schools,
+  getSupabase990SchoolById,
+  getSupabase990School: getSupabase990SchoolById,
+  getCharters,
+  getCharterById,
+  getCharter: getCharterById,
+  getQBOSchoolCodes,
+  getQBOSchoolCodeById,
+  getQBOSchoolCode: getQBOSchoolCodeById,
+  getActionSteps,
+  getActionStepById,
+  getActionStep: getActionStepById,
+  getGuides,
+  getGuideById,
+  getGuide: getGuideById,
+  getCharterRoles,
+  getCharterRoleById,
+  getCharterRole: getCharterRoleById,
+  getMontessoriCerts,
+  getMontessoriCertById,
+  getMontessoriCert: getMontessoriCertById,
+  getGrants,
+  getGrantById,
+  getGrant: getGrantById,
+  getMailingLists,
+  getMailingListById,
+  getMailingList: getMailingListById,
+  getAirtableLoanpaymentss,
+  getAirtableLoanpaymentsById,
+  getAirtableLoanpayments: getAirtableLoanpaymentsById,
+  getAirtableLoanss,
+  getAirtableLoansById,
+  getAirtableLoans: getAirtableLoansById,
+  getEducatorNotes,
+  getEducatorNoteById,
+  getEducatorNote: getEducatorNoteById,
+  getCharterAuthorizerContacts,
+  getCharterAuthorizerContactById,
+  getCharterAuthorizerContact: getCharterAuthorizerContactById,
+  getAssessmentDatas,
+  getAssessmentDataById,
+  getAssessmentData: getAssessmentDataById,
+  getMembershipTerminationStepDates,
+  getMembershipTerminationStepDateById,
+  getMembershipTerminationStepDate: getMembershipTerminationStepDateById,
+  getEducatorSchoolAssociations,
+  getEducatorSchoolAssociationById,
+  getEducatorSchoolAssociation: getEducatorSchoolAssociationById,
+  getNineninetiess,
+  getNineninetiesById,
+  getNinenineties: getNineninetiesById,
+  getGovernanceDocuments,
+  getGovernanceDocumentById,
+  getGovernanceDocument: getGovernanceDocumentById,
+  getGuideAssignments,
+  getGuideAssignmentById,
+  getGuideAssignment: getGuideAssignmentById,
+  getTrainingGrants,
+  getTrainingGrantById,
+  getTrainingGrant: getTrainingGrantById,
+  getReportSubmissions,
+  getReportSubmissionById,
+  getReportSubmission: getReportSubmissionById,
+  getStateAliass,
+  getStateAliasById,
+  getStateAlias: getStateAliasById,
+  getPublicFundings,
+  getPublicFundingById,
+  getPublicFunding: getPublicFundingById,
+  getAnnualEnrollmentDemographics,
+  getAnnualEnrollmentDemographicById,
+  getAnnualEnrollmentDemographic: getAnnualEnrollmentDemographicById,
+  getAssessments,
+  getAssessmentById,
+  getAssessment: getAssessmentById,
+  getEventTypes,
+  getEventTypeById,
+  getEventType: getEventTypeById,
+  getEmailAddresss,
+  getEmailAddressById,
+  getEmailAddress: getEmailAddressById,
+  getMontessoriCertifierOlds,
+  getMontessoriCertifierOldById,
+  getMontessoriCertifierOld: getMontessoriCertifierOldById,
+  getMarketingSourceOptions,
+  getMarketingSourceOptionById,
+  getMarketingSourceOption: getMarketingSourceOptionById,
+  getMontessoriCertLevels,
+  getMontessoriCertLevelById,
+  getMontessoriCertLevel: getMontessoriCertLevelById,
+  getRaceAndEthnicitys,
+  getRaceAndEthnicityById,
+  getRaceAndEthnicity: getRaceAndEthnicityById,
+  getAgeGrades,
+  getAgeGradeById,
+  getAgeGrade: getAgeGradeById,
+  getMontessoriCertifiers,
+  getMontessoriCertifierById,
+  getMontessoriCertifier: getMontessoriCertifierById,
+  // Legacy aliases
+  getTeachers: getEducators,
+  getTeacher: getEducatorById,
+  updateTeacher: async (id: string, data: any) => {
+    // TODO: Implement update logic
+    return null;
+  },
+  deleteTeacher: async (id: string) => {
+    // TODO: Implement delete logic  
+    return false;
+  },
+  // Custom methods (implement as needed)
+  getSchoolsByUserId: async (userId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getTlsByUserId: async (userId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getEducatorAssociations: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getSchoolAssociations: async (schoolId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  updateEducator: async (id: string, data: any) => {
+    // TODO: Implement update logic
+    return null;
+  },
+  updateSchool: async (id: string, data: any) => {
+    // TODO: Implement update logic
+    return null;
+  },
+  createEducator: async (data: any) => {
+    // TODO: Implement create logic
+    return null;
+  },
+  createSchool: async (data: any) => {
+    // TODO: Implement create logic
+    return null;
+  },
+  deleteEducator: async (id: string) => {
+    // TODO: Implement delete logic
+    return false;
+  },
+  deleteSchool: async (id: string) => {
+    // TODO: Implement delete logic
+    return false;
+  },
+  createTeacher: async (data: any) => {
+    // TODO: Implement create logic
+    return null;
+  },
+  updateTeacherSchoolAssociation: async (id: string, data: any) => {
+    // TODO: Implement update logic
+    return null;
+  },
+  deleteTeacherSchoolAssociation: async (id: string) => {
+    // TODO: Implement delete logic
+    return false;
+  },
+  createTeacherSchoolAssociation: async (data: any) => {
+    // TODO: Implement create logic
+    return null;
+  },
+  getMontessoriCertificationsByEducatorId: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getEventAttendancesByEducatorId: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getEducatorNotesByEducatorId: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getEmailAddressesByEducatorId: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getSSJFilloutFormsByEducatorId: async (educatorId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getGovernanceDocumentsBySchoolId: async (schoolId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getGuideAssignmentsBySchoolId: async (schoolId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getSchoolNotesBySchoolId: async (schoolId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getLocationsBySchoolId: async (schoolId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  getActionStepsByUserId: async (userId: string) => {
+    // TODO: Implement filtering logic
+    return [];
+  },
+  searchSchools: async (query: string, filters: any) => {
+    // TODO: Implement search logic
+    return [];
+  },
+  getEnrollmentTrends: async () => {
+    // TODO: Implement analytics logic
+    return [];
+  },
+  getSchoolMetrics: async (schoolId: string) => {
+    // TODO: Implement metrics logic
+    return {};
+  },
+  bulkUpdateSchools: async (ids: string[], updates: any) => {
+    // TODO: Implement bulk update logic
+    return [];
+  },
+  bulkImportEducators: async (educators: any[]) => {
+    // TODO: Implement bulk import logic
+    return [];
+  },
+  bulkCreateEducators: async (educators: any[]) => {
+    // TODO: Implement bulk create logic
+    return [];
+  },
+  getNetworkBenchmarks: async () => {
+    // TODO: Implement benchmarks logic
+    return {};
+  },
+  getTableMetadata: async () => {
+    // TODO: Implement metadata logic
+    return {};
+  },
+} as const;

@@ -36,10 +36,7 @@ import {
   type InsertReportSchedule,
   type InsertQuarterlyReportReminder,
   type ReportSchedule,
-  type QuarterlyReportReminder
-} from "../shared/loan-schema";
-
-import {
+  type QuarterlyReportReminder,
   promissoryNoteTemplates,
   templateFields,
   generatedDocuments,
@@ -49,7 +46,7 @@ import {
   type PromissoryNoteTemplate,
   type TemplateField,
   type GeneratedDocument
-} from "../shared/schema.generated";
+} from "@shared/loan-schema";
 
 // Loan Storage Interface
 export interface ILoanStorage {
