@@ -394,7 +394,7 @@ export function updatedAt(fields: any): string {
   
   for (const [tableName, fields] of tableFields.entries()) {
     for (const field of fields) {
-      if ((field.fieldType === 'singleSelect' || field.fieldType === 'multipleSelect') && field.fieldOptions) {
+      if ((field.fieldType === 'singleSelect' || field.fieldType === 'multipleSelect' || field.fieldType === 'multipleSelects') && field.fieldOptions) {
         const tableKey = tableName.toUpperCase().replace(/\s+/g, '_').replace(/[^A-Z0-9_]/g, '_').replace(/__+/g, '_');
         const fieldKey = field.fieldNameInWFTLS.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
         let constantName = `${tableKey}_OPTIONS_${fieldKey}`;

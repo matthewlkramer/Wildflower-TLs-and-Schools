@@ -22,10 +22,10 @@ import { CharterApplicationsSelector } from "@/components/charter-applications-s
 import { CharterAuthorizerContactsTable } from "@/components/charter-authorizer-contacts-table";
 import { CharterReportsTable } from "@/components/charter-reports-table";
 import { CharterAssessmentsTable } from "@/components/charter-assessments-table";
-import { CharterGovernanceDocumentsTable } from "@/components/charter-governance-documents-table";
-import { Charter990sTable } from "@/components/charter-990s-table";
-import { CharterNotesTable } from "@/components/charter-notes-table";
-import { CharterActionStepsTable } from "@/components/charter-action-steps-table";
+import { GovernanceDocumentsTable } from "@/components/charter-governance-documents-table";
+import { NineninetiessTable } from "@/components/charter-990s-table";
+import { SchoolNotesTable } from "@/components/charter-notes-table";
+import { ActionStepsTable } from "@/components/charter-action-steps-table";
 
 export default function CharterDetail() {
   const { id } = useParams<{ id: string }>();
@@ -210,11 +210,11 @@ export default function CharterDetail() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg border border-slate-200 p-6">
                 <h2 className="text-lg font-semibold text-slate-900 mb-4">Governance Documents</h2>
-                <CharterGovernanceDocumentsTable charterId={id!} />
+                <GovernanceDocumentsTable charterId={id!} />
               </div>
               <div className="bg-white rounded-lg border border-slate-200 p-6">
                 <h2 className="text-lg font-semibold text-slate-900 mb-4">990s</h2>
-                <Charter990sTable charterId={id!} />
+                <NineninetiessTable charterId={id!} />
               </div>
             </div>
           </TabsContent>
@@ -223,11 +223,11 @@ export default function CharterDetail() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg border border-slate-200 p-6">
                 <h2 className="text-lg font-semibold text-slate-900 mb-4">Notes</h2>
-                <CharterNotesTable charterId={id!} />
+                <SchoolNotesTable charterId={id!} />
               </div>
               <div className="bg-white rounded-lg border border-slate-200 p-6">
                 <h2 className="text-lg font-semibold text-slate-900 mb-4">Action Steps</h2>
-                <CharterActionStepsTable charterId={id!} />
+                <ActionStepsTable charterId={id!} />
               </div>
             </div>
           </TabsContent>

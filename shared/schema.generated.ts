@@ -1,5 +1,5 @@
 // Generated schema from Airtable Metadata table
-// Generated on 2025-09-09T20:07:47.218Z
+// Generated on 2025-09-09T21:10:12.647Z
 // This file is auto-generated. Do not edit manually.
 
 import { z } from 'zod';
@@ -1237,9 +1237,60 @@ export const MONTESSORI_CERTIFIERS_FIELDS = {
 } as const;
 
 // Generated Field Options Constants
+export const PARTNERS_COPY_OPTIONS_ROLES = [
+  "Foundation Partner",
+  "Teacher Leader",
+  "Ops Guide",
+  "School Supports Partner",
+  "Finance Administrator",
+  "Regional Entrepreneur",
+  "TL",
+  "Affiliate of Charter Partner",
+] as const;
+
+export const PARTNERS_COPY_OPTIONS_ACTIVESTINT = [
+  "Full time employee",
+  "Part time eligible",
+  "Part time ineligible",
+  "Seasonal or temporary",
+  "Dedicated contractor",
+  "Other contractor",
+  "Sponsored project",
+  "Volunteer",
+  "TL contractor",
+  "Affiliate of Charter Partner",
+] as const;
+
+export const PARTNERS_COPY_OPTIONS_STINTTYPEFROMSTINTS = [
+  "Full time employee",
+  "Part time eligible",
+  "Part time ineligible",
+  "Seasonal or temporary",
+  "Dedicated contractor",
+  "Other contractor",
+  "Sponsored project",
+  "Volunteer",
+  "TL contractor",
+  "Affiliate of Charter Partner",
+] as const;
+
 export const SSJ_FILLOUT_FORMS_OPTIONS_RECEIVECOMMUNICATIONS = [
   "Yes",
   "No",
+] as const;
+
+export const SSJ_FILLOUT_FORMS_OPTIONS_SOCIOECONOMICRACEETHNICITY = [
+  "African-American",
+  "Afro-Caribbean or Black",
+  "American Indian or Alaska Native",
+  "Asian-American",
+  "Hispanic",
+  "Latino",
+  "or Spanish Origin",
+  "Middle Eastern or North African",
+  "Native Hawaiian or Other Pacific Islander",
+  "White",
+  "Other",
 ] as const;
 
 export const SSJ_FILLOUT_FORMS_OPTIONS_STATUSOFPROCESSINGMONTESSORICERTS = [
@@ -1526,6 +1577,17 @@ export const SCHOOLS_OPTIONS_SSJFACILITY = [
   "intending to rent",
 ] as const;
 
+export const SCHOOLS_OPTIONS_AGESSERVED = [
+  "Parent-child",
+  "Infants",
+  "Toddlers",
+  "Primary",
+  "Lower Elementary",
+  "Upper Elementary",
+  "Adolescent / JH",
+  "High School",
+] as const;
+
 export const SCHOOLS_OPTIONS_SSJISTHETEAMONTRACKFORTHEIRENROLLMENTGOALS = [
   "Yes (tuition published",
   "plan enacted",
@@ -1616,6 +1678,19 @@ export const SCHOOLS_OPTIONS_SSJSSJTOOL = [
   "Platform Pilot",
 ] as const;
 
+export const SCHOOLS_OPTIONS_LEFTNETWORKREASON = [
+  "Program absorbed",
+  "Disaffiliated",
+  "Role Alignment",
+  "WF Alignment",
+  "Organizational Sustainability",
+  "Partnership",
+  "No TL Identified",
+  "No Montessori Training",
+  "Personal Reasons",
+  "Facility",
+] as const;
+
 export const SCHOOLS_OPTIONS_SSJREADINESSTOOPENRATING = [
   "High",
   "Low",
@@ -1628,6 +1703,14 @@ export const SCHOOLS_OPTIONS_SSJBOARDDEVELOPMENT = [
   "1-2 mtgs",
   "Board is developed and engaged",
   "3+ mtgs",
+] as const;
+
+export const SCHOOLS_OPTIONS_SCHOOLSCHEDULE = [
+  "Before Care;Morning Care;Afternoon Care;After Care",
+  "Before Care",
+  "Morning Care",
+  "Afternoon Care",
+  "After Care",
 ] as const;
 
 export const SCHOOLS_OPTIONS_DOMAINNAME = [
@@ -1719,6 +1802,31 @@ export const EDUCATORS_OPTIONS_HOUSEHOLDINCOME = [
   "Prefer not to respond",
 ] as const;
 
+export const EDUCATORS_OPTIONS_OTHERLANGUAGES = [
+  "English",
+  "Spanish - EspañolSpanish",
+  "French - Français",
+  "Spanish - Español",
+  "Urdu - اُردُو",
+  "Japanese - 日本語",
+  "Mandarin - 中文",
+  "Arabic - العَرَبِيَّة",
+  "Hindi - हिन्दी",
+  "HungarianHungarian",
+  "Haitian Creole - Kreyol Ayisyen",
+  "Gujarati - ગુજરાતી",
+  "FujianFujian",
+  "Russian - русский язык",
+  "Korean - 한국어",
+  "Cantonese - Gwóngdūng wá",
+  "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ",
+  "OtherHungarian",
+  "Portuguese - Português",
+  "Tami - தமிழ்",
+  "Burmese - မြန်မာစာ",
+  "OtherYoruba",
+] as const;
+
 export const EDUCATORS_OPTIONS_GENDER = [
   "Female",
   "Male",
@@ -1728,6 +1836,31 @@ export const EDUCATORS_OPTIONS_GENDER = [
   "Male/Man",
   "A not-listed or more specific gender identity",
   "Prefer not to respond",
+] as const;
+
+export const EDUCATORS_OPTIONS_MONTESSORILEADGUIDETRAININGS = [
+  "AMI Infants and Toddlers",
+  "AMS (0-3)",
+  "AMI Primary",
+  "AMS Early childhood",
+  "AMI Elementary",
+  "AMS Lower elementary",
+  "AMS Upper elementary",
+  "AMI Adolescent",
+  "AMS Lower secondary",
+  "AMS Upper secondary",
+  "Yes - type TBD",
+] as const;
+
+export const EDUCATORS_OPTIONS_RACEETHNICITY = [
+  "White",
+  "Asian",
+  "Black",
+  "Latino",
+  "Native",
+  "MENA",
+  "Pacific Islander",
+  "Other",
 ] as const;
 
 export const EDUCATORS_OPTIONS_PRONOUNS = [
@@ -1749,6 +1882,31 @@ export const EDUCATORS_OPTIONS_EDUCATIONALATTAINMENT = [
   "Some college",
   "Some graduate school",
   "Did not graduate high school",
+] as const;
+
+export const EDUCATORS_OPTIONS_PRIMARYLANGUAGE = [
+  "English",
+  "French - Français",
+  "Spanish - Español",
+  "Urdu - اُردُو",
+  "Japanese - 日本語",
+  "Mandarin - 中文",
+  "Arabic - العَرَبِيَّة",
+  "Hindi - हिन्दी",
+  "Hungarian - Hungarian",
+  "Haitian Creole - Kreyol Ayisyen",
+  "Gujarati - ગુજરાતી",
+  "Fujian- Fujian",
+  "Russian - русский язык",
+  "Korean - 한국어",
+  "Cantonese - Gwóngdūng wá",
+  "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ",
+  "Other - Hungarian",
+  "Portuguese - Português",
+  "Tami - தமிழ்",
+  "Burmese - မြန်မာစာ",
+  "Other- Yoruba",
+  "A not-listed or more specific language",
 ] as const;
 
 export const EDUCATORS_OPTIONS_DISCOVERYSTATUS = [
@@ -1872,6 +2030,50 @@ export const CHARTERS_OPTIONS_GROUPEXEMPTIONSTATUS = [
 export const ACTION_STEPS_OPTIONS_STATUS = [
   "Incomplete",
   "Complete",
+] as const;
+
+export const GUIDES_OPTIONS_STINTTYPEFROMSTINTS = [
+  "Full time employee",
+  "Part time eligible",
+  "Part time ineligible",
+  "Seasonal or temporary",
+  "Dedicated contractor",
+  "Other contractor",
+  "Sponsored project",
+  "Volunteer",
+  "TL contractor",
+  "Affiliate of Charter Partner",
+] as const;
+
+export const GUIDES_OPTIONS_ROLES = [
+  "Foundation Partner",
+  "Teacher Leader",
+  "Ops Guide",
+  "School Supports Partner",
+  "Finance Administrator",
+  "Regional Entrepreneur",
+  "TL",
+  "Affiliate of Charter Partner",
+] as const;
+
+export const GUIDES_OPTIONS_ACTIVESTINT = [
+  "Full time employee",
+  "Part time eligible",
+  "Part time ineligible",
+  "Seasonal or temporary",
+  "Dedicated contractor",
+  "Other contractor",
+  "Sponsored project",
+  "Volunteer",
+  "TL contractor",
+  "Affiliate of Charter Partner",
+] as const;
+
+export const CHARTER_ROLES_OPTIONS_ROLE = [
+  "Initiator",
+  "Lead admin",
+  "Board chair",
+  "Board member (non-chair)",
 ] as const;
 
 export const MONTESSORI_CERTS_OPTIONS_CERTIFICATIONSTATUS = [
@@ -2008,6 +2210,14 @@ export const EDUCATORS_X_SCHOOLS_OPTIONS_ONTEACHERLEADERGOOGLEGROUP = [
   "Removed",
 ] as const;
 
+export const EDUCATORS_X_SCHOOLS_OPTIONS_ROLES = [
+  "TL",
+  "ETL",
+  "Classroom Staff",
+  "Fellow",
+  "Other",
+] as const;
+
 export const GOVERNANCE_DOCS_OPTIONS_DOCUMENTTYPE = [
   "Articles of Incorporation",
   "Certificate of Incorporation",
@@ -2061,6 +2271,35 @@ export const TRAINING_GRANTS_OPTIONS_TRAININGGRANTSTATUS = [
 export const REPORTS_AND_SUBMISSIONS_OPTIONS_REPORTTYPE = [
   "Performance data",
   "Renewal report",
+] as const;
+
+export const PUBLIC_FUNDING_OPTIONS_RELEVANTLEVELS = [
+  "Parent-child",
+  "Infants",
+  "Toddlers",
+  "Primary",
+  "Lower Elementary",
+  "Upper Elementary",
+  "Adolescent / JH",
+  "High School",
+] as const;
+
+export const ASSESSMENTS_OPTIONS_GRADES = [
+  "PK3",
+  "PK4",
+  "K",
+  "1st",
+  "2nd",
+  "3rd",
+  "4th",
+  "5th",
+  "6th",
+  "7th",
+  "8th",
+  "9th",
+  "10th",
+  "11th",
+  "12th",
 ] as const;
 
 export const EMAIL_ADDRESSES_OPTIONS_EMAILTYPE = [
