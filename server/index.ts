@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import cors from 'cors';
 import compression from 'compression';
-import { registerRoutes } from "./routes";
+import { registerRoutes } from "./routes.generated";
 import { setupAuth } from "./auth";
 import { storage } from "./generic-storage.generated";
 

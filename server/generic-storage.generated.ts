@@ -1,5 +1,5 @@
 // Generated generic storage with metadata-driven table configuration
-// Generated on 2025-09-09T19:05:14.379Z
+// Generated on 2025-09-09T19:28:50.213Z
 // This file is auto-generated. Do not edit manually.
 
 import { drizzle } from 'drizzle-orm/postgres-js';
