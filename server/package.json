@@ -15,7 +15,7 @@
     "dotenv": "^17.2.1",
     "airtable": "^0.12.2",
     "drizzle-orm": "^0.39.1",
-    "@neondatabase/serverless": "^0.10.4",
+    "postgres": "^3.4.4",
     "stripe": "^18.3.0",
     "drizzle-zod": "^0.7.0",
     "zod": "^3.24.2",

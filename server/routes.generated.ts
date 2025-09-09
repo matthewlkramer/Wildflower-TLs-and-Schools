@@ -1,5 +1,5 @@
 // Generated API routes from Airtable Metadata
-// Generated on 2025-09-09T19:39:35.554Z
+// Generated on 2025-09-09T20:07:47.224Z
 // This file is auto-generated. Do not edit manually.
 // Custom business logic is imported from routes-custom.ts
 

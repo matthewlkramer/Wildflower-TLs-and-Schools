@@ -605,6 +605,7 @@ async function generateGenericStorage(tableFields) {
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from '../shared/schema.generated';
+import * as loanSchema from "@shared/loan-schema";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -612,7 +613,7 @@ if (!connectionString) {
 }
 
 const client = postgres(connectionString);
-export const db = drizzle(client, { schema });
+export const db = drizzle(client, { schema: { ...schema, ...loanSchema } });
 
 // Cache configuration
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes

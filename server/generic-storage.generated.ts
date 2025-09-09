@@ -1,10 +1,11 @@
 // Generated generic storage with metadata-driven table configuration
-// Generated on 2025-09-09T19:39:35.553Z
+// Generated on 2025-09-09T20:07:47.222Z
 // This file is auto-generated. Do not edit manually.
 
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from '../shared/schema.generated';
+import * as loanSchema from "@shared/loan-schema";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -12,7 +13,7 @@ if (!connectionString) {
 }
 
 const client = postgres(connectionString);
-export const db = drizzle(client, { schema });
+export const db = drizzle(client, { schema: { ...schema, ...loanSchema } });
 
 // Cache configuration
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
