@@ -80,6 +80,10 @@ export default function Teachers() {
   });
   // Attach global type-to-search to focus and update the page search input
   useGlobalTypeToSearch(searchInputRef as any, setSearchTerm as any);
+
+  // Counts for header display
+  const total = (teachers?.length ?? 0);
+  const showing = (gridFilteredCount ?? (filteredTeachers?.length ?? 0));
   
   // Selected teacher detail for split view
   const selectedId = selected?.[0]?.id;
