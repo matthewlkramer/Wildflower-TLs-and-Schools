@@ -1,13 +1,13 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
-import { storage } from "./generic-storage";
+import { storage } from "./generic-storage.generated";
 import { loanStorage } from "./loan-storage";
 import { cache } from "./cache";
 import { logger } from "./logger";
 import { requireAuth } from "./auth";
-import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema, eventAttendanceSchema } from "@shared/schema";
-import { EVENTS_FIELDS as EVF } from "@shared/schema";
+import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema, eventAttendanceSchema } from "../shared/schema.generated";
+import { EVENTS_FIELDS as EVF } from "../shared/schema.generated";
 import { createInsertSchema } from "drizzle-zod";
 import { 
   borrowers,
@@ -19,7 +19,7 @@ import {
   loanCommitteeReviews,
   capitalSources,
   quarterlyReports
-} from "@shared/schema";
+} from "../shared/schema.generated";
 import {
   reportSchedules,
   quarterlyReportReminders,
@@ -637,7 +637,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/governance-documents", async (req, res) => {
     try {
-      const { governanceDocumentSchema } = await import("@shared/schema");
+const { governanceDocumentSchema } = await import("../shared/schema.generated");
       const validatedData = governanceDocumentSchema.parse(req.body);
       const document = await storage.createGovernanceDocument(validatedData);
       res.status(201).json(document);
@@ -649,7 +649,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/governance-documents/:id", async (req, res) => {
     try {
       const id = req.params.id;
-      const { governanceDocumentSchema } = await import("@shared/schema");
+const { governanceDocumentSchema } = await import("../shared/schema.generated");
       const validatedData = governanceDocumentSchema.partial().parse(req.body);
       const document = await storage.updateGovernanceDocument(id, validatedData);
       if (!document) {
@@ -687,7 +687,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/school-notes", async (req, res) => {
     try {
-      const { schoolNoteSchema } = await import("@shared/schema");
+const { schoolNoteSchema } = await import("../shared/schema.generated");
       const validatedData = schoolNoteSchema.parse(req.body);
       const note = await storage.createSchoolNote(validatedData);
       res.status(201).json(note);
@@ -699,7 +699,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/school-notes/:id", async (req, res) => {
     try {
       const id = req.params.id;
-      const { schoolNoteSchema } = await import("@shared/schema");
+const { schoolNoteSchema } = await import("../shared/schema.generated");
       const validatedData = schoolNoteSchema.partial().parse(req.body);
       const note = await storage.updateSchoolNote(id, validatedData);
       if (!note) {
@@ -759,7 +759,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/grants", async (req, res) => {
     try {
-      const { grantSchema } = await import("@shared/schema");
+const { grantSchema } = await import("../shared/schema.generated");
       const validatedData = grantSchema.parse(req.body);
       const grant = await storage.createGrant(validatedData);
       res.status(201).json(grant);
@@ -771,7 +771,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/grants/:id", async (req, res) => {
     try {
       const id = req.params.id;
-      const { grantSchema } = await import("@shared/schema");
+const { grantSchema } = await import("../shared/schema.generated");
       const validatedData = grantSchema.partial().parse(req.body);
       const grant = await storage.updateGrant(id, validatedData);
       if (!grant) {
@@ -809,7 +809,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/loans", async (req, res) => {
     try {
-      const { loanSchema } = await import("@shared/schema");
+const { loanSchema } = await import("../shared/schema.generated");
       const validatedData = loanSchema.parse(req.body);
       const loan = await storage.createLoan(validatedData);
       res.status(201).json(loan);
@@ -821,7 +821,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/loans/:id", async (req, res) => {
     try {
       const id = req.params.id;
-      const { loanSchema } = await import("@shared/schema");
+const { loanSchema } = await import("../shared/schema.generated");
       const validatedData = loanSchema.partial().parse(req.body);
       const loan = await storage.updateLoan(id, validatedData);
       if (!loan) {
@@ -2422,4 +2422,3 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   return httpServer;
 }
-

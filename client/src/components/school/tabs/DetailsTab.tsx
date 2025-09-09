@@ -1,5 +1,5 @@
 import React from 'react';
-import type { School } from '@shared/schema';
+import type { School } from '@shared/schema.generated';
 import { DetailGrid } from '@/components/shared/DetailGrid';
 import { InfoCard } from '@/components/shared/InfoCard';
 

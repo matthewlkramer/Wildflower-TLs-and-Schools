@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { SchoolNote } from "@shared/schema";
+import type { SchoolNote } from "@shared/schema.generated";
 import { Edit, ExternalLink, Eye, Lock, Unlock, Trash2 } from "lucide-react";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import { useState } from "react";

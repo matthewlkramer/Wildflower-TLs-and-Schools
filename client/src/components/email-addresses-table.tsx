@@ -3,7 +3,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { createTextFilter } from "@/utils/ag-grid-utils";
-import type { EmailAddress } from "@shared/schema";
+import type { EmailAddress } from "@shared/schema.generated";
 import { Button } from "@/components/ui/button";
 import { Edit3, Trash2, UserCheck, UserX } from "lucide-react";
 

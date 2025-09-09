@@ -8,7 +8,7 @@
  */
 import { Badge } from "@/components/ui/badge";
 import { getStatusColor } from "@/lib/utils";
-import type { Teacher } from "@shared/schema";
+import type { Teacher } from "@shared/schema.generated";
 
 export function SummaryTab({ teacher }: { teacher: Teacher }) {
   return (

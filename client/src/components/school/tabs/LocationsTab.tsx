@@ -10,7 +10,7 @@
  * `DEFAULT_GRID_PROPS` to match other grids.
  */
 import React from 'react';
-import type { Location } from '@shared/schema';
+import type { Location } from '@shared/schema.generated';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { Button } from '@/components/ui/button';

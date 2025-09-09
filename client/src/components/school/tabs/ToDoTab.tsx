@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import type { ActionStep } from '@shared/schema';
+import type { ActionStep } from '@shared/schema.generated';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { DEFAULT_GRID_PROPS } from '@/components/shared/ag-grid-defaults';

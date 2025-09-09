@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { EducatorSchoolAssociation } from "@shared/schema";
+import type { EducatorSchoolAssociation } from "@shared/schema.generated";
 import { AssociationGrid, type AssociationRow } from "@/components/associations/AssociationGrid";
 
 interface EducatorSchoolAssociationsTableProps {

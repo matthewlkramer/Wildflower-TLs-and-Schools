@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { createTextFilter } from "@/utils/ag-grid-utils";
-import type { EventAttendance } from "@shared/schema";
+import type { EventAttendance } from "@shared/schema.generated";
 import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { apiRequest, queryClient } from "@/lib/queryClient";

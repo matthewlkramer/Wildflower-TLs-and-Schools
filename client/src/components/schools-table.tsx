@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { type School } from "@shared/schema";
+import { type School } from "@shared/schema.generated";
 import { getStatusColor } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";

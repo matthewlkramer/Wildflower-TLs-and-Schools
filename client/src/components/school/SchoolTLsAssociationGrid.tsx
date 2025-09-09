@@ -1,5 +1,5 @@
 import { AssociationGrid, type AssociationRow } from "@/components/associations/AssociationGrid";
-import type { School, Teacher, TeacherSchoolAssociation } from "@shared/schema";
+import type { School, Teacher, TeacherSchoolAssociation } from "@shared/schema.generated";
 
 type Props = {
   school: School;

@@ -245,6 +245,9 @@ async function generateMetadataDrivenFiles() {
   // Generate generic storage
   await generateGenericStorage(tableFields);
   
+  // Generate routes
+  await generateRoutes(tableFields);
+  
   console.log('✨ Metadata-driven generation complete!');
 }
 
@@ -521,11 +524,9 @@ export function updatedAt(fields: any): string {
   schemaContent += processedTypes.map(type => `  | ${type}`).join('\n');
   schemaContent += ';\n';
 
-  // Add loan schema re-exports for backwards compatibility
-  schemaContent += `\n// Loan-related re-exports for backwards compatibility\nexport type { Loan, LoanPayment } from './loan-schema';\n`;
 
   // Write the schema file
-  const schemaPath = join(OUTPUT_DIR, 'schema.ts');
+  const schemaPath = join(OUTPUT_DIR, 'schema.generated.ts');
   writeFileSync(schemaPath, schemaContent);
   
   console.log(`✅ Schema written to: ${schemaPath}`);
@@ -534,18 +535,67 @@ export function updatedAt(fields: any): string {
   console.log(`   🔍 Generated ${tableFields.size} Zod validation schemas`);
 }
 
+function generateTransformerFields(fields) {
+  return fields.map(field => {
+    const fieldName = field.fieldNameInWFTLS;
+    const originalName = field.originalName;
+    const fieldType = field.fieldType;
+    const zodType = field.zodType;
+    const isRequired = field.isRequired;
+    
+    let transformation = `f['${originalName}']`;
+    
+    // Apply type conversion based on field type and zod type
+    if (zodType === 'number') {
+      transformation = `schema.toNumber(${transformation})`;
+    } else if (zodType === 'boolean') {
+      if (fieldType === 'checkbox') {
+        transformation = `Boolean(${transformation})`;
+      } else {
+        // For fields that should be boolean but come as text
+        transformation = `schema.toYesBool(${transformation})`;
+      }
+    } else if (fieldType === 'multipleRecordLinks' || fieldType === 'singleRecordLink') {
+      if (zodType === 'string') {
+        transformation = `schema.firstId(${transformation})`;
+      } else {
+        transformation = `schema.toStringArray(${transformation})`;
+      }
+    } else if (fieldType === 'multipleAttachments' || fieldType === 'attachment') {
+      if (zodType === 'string') {
+        transformation = `schema.firstAttachment(${transformation})?.url`;
+      } else {
+        transformation = `schema.toStringArray(${transformation}.map(att => att?.url).filter(Boolean))`;
+      }
+    } else if (fieldType === 'multipleSelects' || originalName.includes(',')) {
+      transformation = `schema.toStringArray(${transformation})`;
+    } else {
+      // Default string conversion with fallback
+      const fallback = isRequired ? '""' : 'undefined';
+      transformation = `String(${transformation} || ${fallback})`;
+    }
+    
+    // Handle optional fields
+    if (!isRequired && zodType !== 'string[]') {
+      transformation = `${transformation} || undefined`;
+    }
+    
+    return `        ${fieldName}: ${transformation}`;
+  }).join(',\n');
+}
+
 async function generateGenericStorage(tableFields) {
   console.log('📝 Generating updated generic-storage.ts...');
   
   // Read existing generic-storage.ts to preserve the generic functions
   const { readFileSync } = require('fs');
-  const existingPath = join(process.cwd(), 'server', 'generic-storage.ts');
+  const existingPath = join(process.cwd(), 'server', 'generic-storage.generated.ts');
   
   let existingContent = '';
   try {
     existingContent = readFileSync(existingPath, 'utf8');
   } catch (error) {
-    console.log('   ℹ️  No existing generic-storage.ts found, creating new one');
+    console.log('   ℹ️  No existing generic-storage.generated.ts found, creating new one');
   }
   
   let storageContent = `// Generated generic storage with metadata-driven table configuration
@@ -554,7 +604,7 @@ async function generateGenericStorage(tableFields) {
 
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import * as schema from '../shared/schema';
+import * as schema from '../shared/schema.generated';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -612,12 +662,12 @@ export const TABLE_CONFIG = {
     storageContent += `  '${tableName}': {
     airtableTable: '${tableName}',
     fieldMapping: schema.${constName},
-    transformer: (record: any): schema.${typeName} => schema.createBaseTransformer(record, {
-      ${fields.slice(0, 5).map(field => 
-        `${field.fieldNameInWFTLS}: record.fields?.['${field.originalName}']`
-      ).join(',\n      ')},
-      // Add more field transformations as needed
-    }),
+    transformer: (record: any): schema.${typeName} => {
+      const f = record.fields;
+      return schema.createBaseTransformer(record, {
+${generateTransformerFields(fields)}
+      });
+    },
     cacheEnabled: true,
   },
 `;
@@ -696,12 +746,192 @@ export const get${typeName}ById = (id: string) => getById<schema.${typeName}>('$
   }
 
   // Write the storage file
-  const storagePath = join(process.cwd(), 'server', 'generic-storage-metadata.ts');
+  const storagePath = join(process.cwd(), 'server', 'generic-storage.generated.ts');
   writeFileSync(storagePath, storageContent);
   
   console.log(`✅ Generic storage written to: ${storagePath}`);
   console.log(`   📊 Generated ${tableFields.size} table configurations`);
   console.log(`   🔧 Generated ${tableFields.size * 2} convenience methods`);
+}
+
+async function generateRoutes(tableFields) {
+  console.log('📝 Generating routes.generated.ts...');
+  
+  let routesContent = `// Generated API routes from Airtable Metadata
+// Generated on ${new Date().toISOString()}
+// This file is auto-generated. Do not edit manually.
+
+import type { Express, Request, Response } from "express";
+import * as schema from '../shared/schema.generated';
+import { TABLE_CONFIG } from './generic-storage.generated';
+import { cache } from './cache';
+import { logger } from './logger';
+import { z } from 'zod';
+
+// Generic route generator for CRUD operations
+function generateCRUDRoutes<T>(
+  app: Express,
+  resourceName: string,
+  tableName: string,
+  zodSchema: z.ZodSchema<any>,
+  cacheKeys: string[] = []
+) {
+  const pluralName = resourceName.endsWith('s') ? resourceName : resourceName + 's';
+  const config = TABLE_CONFIG[tableName];
+  
+  if (!config) {
+    throw new Error(\`Table configuration not found for: \${tableName}\`);
+  }
+
+  // GET /api/{resources} - Get all
+  app.get(\`/api/\${pluralName}\`, async (req: Request, res: Response) => {
+    try {
+      // TODO: Implement actual Airtable API call using config
+      const records: T[] = []; // Placeholder
+      res.json(records);
+    } catch (error) {
+      logger.error(\`Failed to fetch \${pluralName}:\`, error);
+      res.status(500).json({ message: \`Failed to fetch \${pluralName}\` });
+    }
+  });
+
+  // GET /api/{resources}/:id - Get by ID
+  app.get(\`/api/\${pluralName}/:id\`, async (req: Request, res: Response) => {
+    try {
+      const id = req.params.id;
+      // TODO: Implement actual Airtable API call using config
+      const record: T | null = null; // Placeholder
+      
+      if (!record) {
+        return res.status(404).json({ message: \`\${resourceName} not found\` });
+      }
+      res.json(record);
+    } catch (error) {
+      logger.error(\`Failed to fetch \${resourceName}:\`, error);
+      res.status(500).json({ message: \`Failed to fetch \${resourceName}\` });
+    }
+  });
+
+  // POST /api/{resources} - Create
+  app.post(\`/api/\${pluralName}\`, async (req: Request, res: Response) => {
+    try {
+      const data = zodSchema.parse(req.body);
+      // TODO: Implement actual Airtable API call using config
+      const record: T = data; // Placeholder
+      
+      // Invalidate relevant caches
+      cache.invalidate(pluralName);
+      cacheKeys.forEach(key => cache.invalidate(key));
+      
+      res.status(201).json(record);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: \`Invalid \${resourceName} data\`, 
+          errors: error.errors 
+        });
+      }
+      logger.error(\`Failed to create \${resourceName}:\`, error);
+      res.status(500).json({ message: \`Failed to create \${resourceName}\` });
+    }
+  });
+
+  // PUT /api/{resources}/:id - Update
+  app.put(\`/api/\${pluralName}/:id\`, async (req: Request, res: Response) => {
+    try {
+      const id = req.params.id;
+      const data = zodSchema.partial().parse(req.body);
+      // TODO: Implement actual Airtable API call using config
+      const record: T | null = null; // Placeholder
+      
+      if (!record) {
+        return res.status(404).json({ message: \`\${resourceName} not found\` });
+      }
+      
+      // Invalidate relevant caches
+      cache.invalidate(pluralName);
+      cacheKeys.forEach(key => cache.invalidate(key));
+      
+      res.json(record);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: \`Invalid \${resourceName} data\`, 
+          errors: error.errors 
+        });
+      }
+      logger.error(\`Failed to update \${resourceName}:\`, error);
+      res.status(500).json({ message: \`Failed to update \${resourceName}\` });
+    }
+  });
+
+  // DELETE /api/{resources}/:id - Delete
+  app.delete(\`/api/\${pluralName}/:id\`, async (req: Request, res: Response) => {
+    try {
+      const id = req.params.id;
+      // TODO: Implement actual Airtable API call using config
+      const success = false; // Placeholder
+      
+      if (!success) {
+        return res.status(404).json({ message: \`\${resourceName} not found\` });
+      }
+      
+      // Invalidate relevant caches
+      cache.invalidate(pluralName);
+      cacheKeys.forEach(key => cache.invalidate(key));
+      
+      res.json({ message: \`\${resourceName} deleted successfully\` });
+    } catch (error) {
+      logger.error(\`Failed to delete \${resourceName}:\`, error);
+      res.status(500).json({ message: \`Failed to delete \${resourceName}\` });
+    }
+  });
+}
+
+export function registerGeneratedRoutes(app: Express): void {
+  console.log('🔧 Registering generated API routes...');
+`;
+
+  // Generate route registrations for each table
+  for (const [tableName, fields] of tableFields.entries()) {
+    const typeName = getTypeName(tableName);
+    let schemaName = tableName.toUpperCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Z0-9_]/g, '_')
+      .replace(/__+/g, '_') + '_SCHEMA';
+    
+    if (/^[0-9]/.test(schemaName)) {
+      schemaName = '_' + schemaName;
+    }
+
+    // Create resource name from table name
+    const resourceName = tableName.toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
+
+    routesContent += `  
+  // Routes for ${tableName}
+  generateCRUDRoutes<schema.${typeName}>(
+    app, 
+    '${resourceName}',
+    '${tableName}',
+    schema.${schemaName}
+  );`;
+  }
+
+  routesContent += `
+  
+  console.log(\`✅ Generated CRUD routes for \${Object.keys(TABLE_CONFIG).length} tables\`);
+}
+`;
+
+  // Write the routes file
+  const routesPath = join(process.cwd(), 'server', 'routes.generated.ts');
+  writeFileSync(routesPath, routesContent);
+  
+  console.log(`✅ Generated routes written to: ${routesPath}`);
+  console.log(`   📊 Generated CRUD routes for ${tableFields.size} tables`);
+  console.log(`   🔧 Each table gets 5 standard routes (GET all, GET by ID, POST, PUT, DELETE)`);
 }
 
 // Run the generator

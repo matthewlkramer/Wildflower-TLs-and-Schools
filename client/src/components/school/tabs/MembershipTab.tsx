@@ -1,5 +1,5 @@
 import React from 'react';
-import type { MembershipFeeByYear, MembershipFeeUpdate } from '@shared/schema';
+import type { MembershipFeeByYear, MembershipFeeUpdate } from '@shared/schema.generated';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useQuery } from '@tanstack/react-query';
 

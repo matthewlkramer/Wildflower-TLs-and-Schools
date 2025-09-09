@@ -9,7 +9,7 @@
  */
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import { InfoCard } from "@/components/shared/InfoCard";
-import type { Teacher } from "@shared/schema";
+import type { Teacher } from "@shared/schema.generated";
 
 export function DemographicsTab({ teacher, onSave }: { teacher: Teacher; onSave?: (vals: any) => void }) {
   const normalizeArray = (v: any): string[] => Array.isArray(v) ? v : (v ? String(v).split(',').map((s: string) => s.trim()).filter(Boolean) : []);

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { createTextFilter } from "@/utils/ag-grid-utils";
-import type { MontessoriCertification } from "@shared/schema";
+import type { MontessoriCertification } from "@shared/schema.generated";
 
 interface MontessoriCertificationsTableProps {
   educatorId: string;

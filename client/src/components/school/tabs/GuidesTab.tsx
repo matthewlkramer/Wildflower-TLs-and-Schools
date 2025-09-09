@@ -12,7 +12,7 @@
  * `gridProps` so a new engineer can recreate the grid exactly.
  */
 import React from 'react';
-import type { GuideAssignment } from '@shared/schema';
+import type { GuideAssignment } from '@shared/schema.generated';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { Button } from '@/components/ui/button';

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { Educator, School } from "@shared/schema";
+import type { Educator, School } from "@shared/schema.generated";
 
 export function useEducatorLookup() {
   const { data: educators = [] } = useQuery<Educator[]>({ queryKey: ["/api/educators"] });

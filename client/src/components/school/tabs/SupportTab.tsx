@@ -1,5 +1,5 @@
 import React from 'react';
-import type { School } from '@shared/schema';
+import type { School } from '@shared/schema.generated';
 import { InfoCard } from '@/components/shared/InfoCard';
 
 export function SupportTab({

@@ -8,7 +8,7 @@
  * was sent. All content is read‑only, organized in three responsive columns so
  * staff can quickly gauge the prospect’s current state.
  */
-import type { SSJFilloutForm, Teacher } from "@shared/schema";
+import type { SSJFilloutForm, Teacher } from "@shared/schema.generated";
 import { useQuery } from "@tanstack/react-query";
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import { InfoCard } from "@/components/shared/InfoCard";

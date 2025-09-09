@@ -16,7 +16,7 @@ import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { InfoCard } from '@/components/shared/InfoCard';
 import { DetailGrid } from '@/components/shared/DetailGrid';
-import type { School } from '@shared/schema';
+import type { School } from '@shared/schema.generated';
 import { GoogleMap } from '@/components/google-map';
 
 export function SummaryTab({ school }: { school: School }) {

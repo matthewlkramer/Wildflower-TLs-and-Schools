@@ -19,7 +19,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/componen
 import { SummaryTab as TeacherSummary } from "@/components/teacher/tabs/SummaryTab";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, TEACHERS_KANBAN_ORDER, TEACHERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
-import { type Teacher } from "@shared/schema";
+import { type Teacher } from "@shared/schema.generated";
 import { useCachedEducators } from "@/hooks/use-cached-data";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { useState } from "react";

@@ -6,7 +6,7 @@
  * viewing form details. Loading state is handled by React Query’s `isLoading`.
  */
 import { useQuery } from "@tanstack/react-query";
-import type { SSJFilloutForm } from "@shared/schema";
+import type { SSJFilloutForm } from "@shared/schema.generated";
 import { useEffect, useMemo, useState } from "react";
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import { InfoCard } from "@/components/shared/InfoCard";

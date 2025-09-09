@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { Grant, Loan } from '@shared/schema';
+import type { Grant, Loan } from '@shared/schema.generated';
 import { TableCard } from '@/components/shared/TableCard';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';

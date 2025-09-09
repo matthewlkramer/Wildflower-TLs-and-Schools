@@ -9,7 +9,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { GridBase } from "@/components/shared/GridBase";
 import type { ColDef } from "ag-grid-community";
-import type { Charter } from "@shared/schema";
+import type { Charter } from "@shared/schema.generated";
 import { useSearch } from "@/contexts/search-context";
 import { usePageTitle } from "@/App";
 import { useEffect, useMemo, useState, useRef } from "react";

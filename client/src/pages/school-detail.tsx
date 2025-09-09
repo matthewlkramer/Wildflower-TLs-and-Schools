@@ -23,7 +23,7 @@ import { ToDoTab } from '@/components/school/tabs/ToDoTab';
 // Membership tab removed per request
 
 import { apiRequest, queryClient } from '@/lib/queryClient';
-import type { School } from '@shared/schema';
+import type { School } from '@shared/schema.generated';
 
 export default function SchoolDetail() {
   const { id } = useParams<{ id: string }>();

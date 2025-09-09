@@ -22,7 +22,7 @@ import { Search } from "lucide-react";
 import { Plus, Pencil, Mail, GitMerge } from "lucide-react";
 import { GridBase } from "@/components/shared/GridBase";
 import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
-import { type School } from "@shared/schema";
+import { type School } from "@shared/schema.generated";
 import { useSearch } from "@/contexts/search-context";
 import { useCachedSchools } from "@/hooks/use-cached-data";
 import { useUserFilter } from "@/contexts/user-filter-context";

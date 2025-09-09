@@ -1,5 +1,5 @@
 import React from 'react';
-import type { School, Teacher, TeacherSchoolAssociation } from '@shared/schema';
+import type { School, Teacher, TeacherSchoolAssociation } from '@shared/schema.generated';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SchoolTLsAssociationGrid } from '@/components/school/SchoolTLsAssociationGrid';
 import DeleteConfirmationModal from '@/components/delete-confirmation-modal';

@@ -5,7 +5,7 @@
  * The tab renders these values in a simple two‑column layout and does not allow
  * editing; it is purely informational for cross‑system audits.
  */
-import type { Teacher } from "@shared/schema";
+import type { Teacher } from "@shared/schema.generated";
 
 export function LinkedTab({ teacher }: { teacher: Teacher }) {
   return (

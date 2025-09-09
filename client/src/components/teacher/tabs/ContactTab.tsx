@@ -9,7 +9,7 @@
  * side by side above the multiline address field.
  */
 import React from 'react';
-import type { Teacher } from "@shared/schema";
+import type { Teacher } from "@shared/schema.generated";
 import { EmailAddressesTable } from "@/components/email-addresses-table";
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import { InfoCard } from "@/components/shared/InfoCard";

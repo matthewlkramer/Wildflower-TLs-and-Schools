@@ -1,5 +1,5 @@
 // Generated schema from Airtable Metadata table
-// Generated on 2025-09-09T17:55:35.627Z
+// Generated on 2025-09-09T18:45:09.710Z
 // This file is auto-generated. Do not edit manually.
 
 import { z } from 'zod';
@@ -979,7 +979,7 @@ export const MAILING_LISTS_FIELDS = {
   googleGroupId: "Google Group ID",
 } as const;
 
-export const LOAN_PAYMENTS_FIELDS = {
+export const AIRTABLE_LOAN_PAYMENTS_FIELDS = {
   amount: "Amount",
   paymentDate: "Payment date",
   school: "School",
@@ -987,7 +987,7 @@ export const LOAN_PAYMENTS_FIELDS = {
   paymentKey: "Payment key",
 } as const;
 
-export const LOANS_FIELDS = {
+export const AIRTABLE_LOANS_FIELDS = {
   schoolId: "school_id",
   loanPaperwork: "Loan paperwork",
   approximateOutstandingAmount: "Approximate Outstanding Amount",
@@ -1960,13 +1960,13 @@ export const MAILING_LISTS_OPTIONS_TYPE = [
   "Google Group",
 ] as const;
 
-export const LOANS_OPTIONS_LOANSTATUS = [
+export const AIRTABLE_LOANS_OPTIONS_LOANSTATUS = [
   "Interest Only Period",
   "Principal Repayment Period",
   "Paid Off",
 ] as const;
 
-export const LOANS_OPTIONS_ISSUEMETHOD = [
+export const AIRTABLE_LOANS_OPTIONS_ISSUEMETHOD = [
   "Sep",
   "TWF",
   "TWF->LF II",
@@ -1974,7 +1974,7 @@ export const LOANS_OPTIONS_ISSUEMETHOD = [
   "Spring Point",
 ] as const;
 
-export const LOANS_OPTIONS_USEOFPROCEEDS = [
+export const AIRTABLE_LOANS_OPTIONS_USEOFPROCEEDS = [
   "Operations",
   "Start-up",
   "Renovations / Construction",
@@ -3023,7 +3023,7 @@ export const MAILING_LISTS_SCHEMA = z.object({
   googleGroupId: z.string().optional(),
 });
 
-export const LOAN_PAYMENTS_SCHEMA = z.object({
+export const AIRTABLE_LOAN_PAYMENTS_SCHEMA = z.object({
   id: z.string(),
   created: z.string(),
   lastModified: z.string(),
@@ -3034,7 +3034,7 @@ export const LOAN_PAYMENTS_SCHEMA = z.object({
   paymentKey: z.any().optional(),
 });
 
-export const LOANS_SCHEMA = z.object({
+export const AIRTABLE_LOANS_SCHEMA = z.object({
   id: z.string(),
   created: z.string(),
   lastModified: z.string(),
@@ -4256,8 +4256,8 @@ export interface MailingList extends BaseRecord {
   googleGroupId?: string;
 }
 
-// Loan payments table
-export interface LoanPayment extends BaseRecord {
+// Airtable Loan payments table
+export interface AirtableLoanpayments extends BaseRecord {
   amount?: number;
   paymentDate?: string;
   school?: string[];
@@ -4265,8 +4265,8 @@ export interface LoanPayment extends BaseRecord {
   paymentKey?: any;
 }
 
-// Loans table
-export interface Loan extends BaseRecord {
+// Airtable Loans table
+export interface AirtableLoans extends BaseRecord {
   schoolId: string;
   loanPaperwork?: string[];
   approximateOutstandingAmount?: number;
@@ -4562,8 +4562,8 @@ export const TABLE_TYPE_MAPPING = {
   "Montessori Certs": "MontessoriCert",
   "Grants": "Grant",
   "Mailing lists": "MailingList",
-  "Loan payments": "LoanPayment",
-  "Loans": "Loan",
+  "Airtable Loan payments": "AirtableLoanpayments",
+  "Airtable Loans": "AirtableLoans",
   "Educator notes": "EducatorNote",
   "Charter authorizers and contacts": "CharterAuthorizerContact",
   "Assessment data": "AssessmentData",
@@ -4614,8 +4614,8 @@ export type AirtableRecord =
   | MontessoriCert
   | Grant
   | MailingList
-  | LoanPayment
-  | Loan
+  | AirtableLoanpayments
+  | AirtableLoans
   | EducatorNote
   | CharterAuthorizerContact
   | AssessmentData
@@ -4638,4 +4638,3 @@ export type AirtableRecord =
   | RaceAndEthnicity
   | AgeGrade
   | MontessoriCertifier;
-

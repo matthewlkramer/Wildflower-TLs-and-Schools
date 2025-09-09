@@ -1,7 +1,7 @@
 // Utility functions for the Wildflower application
 
 import { STATUS_COLORS } from './constants';
-import { SCHOOLS_OPTIONS_SCHOOLSTATUS as SCHOOL_STATUSES } from './schema';
+import { SCHOOLS_OPTIONS_SCHOOLSTATUS as SCHOOL_STATUSES } from './schema.generated';
 
 /**
  * Get the appropriate color class for a status badge
