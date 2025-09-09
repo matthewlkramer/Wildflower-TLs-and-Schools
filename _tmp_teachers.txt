@@ -23,7 +23,6 @@ import { type Teacher } from "@shared/schema.generated";
 import { useCachedEducators } from "@/hooks/use-cached-data";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { useState } from "react";
-import { useGlobalTypeToSearch } from "@/hooks/use-global-type-to-search";
 import AddEducatorModal from "@/components/add-teacher-modal";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
@@ -78,8 +77,6 @@ export default function Teachers() {
     },
     debugName: "Teachers"
   });
-  // Attach global type-to-search to focus and update the page search input
-  useGlobalTypeToSearch(searchInputRef as any, setSearchTerm as any);
   
   // Selected teacher detail for split view
   const selectedId = selected?.[0]?.id;
@@ -410,3 +407,23 @@ export default function Teachers() {
     </>
   );
 }
+  // Type-to-search: route typing to the page search input
+  useEffect(() => {
+    const isEditable = (el: any) => {
+      if (!el) return false; const t = (el.tagName||'').toLowerCase();
+      return t==='input'||t==='textarea'||t==='select'||!!el.isContentEditable;
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey||e.ctrlKey||e.altKey) return;
+      if (isEditable(document.activeElement)) return;
+      const k=e.key; const printable=k.length===1;
+      if (!(printable||k==='Backspace'||k==='Delete'||k==='Escape')) return;
+      try { searchInputRef.current?.focus(); } catch{}
+      e.preventDefault();
+      if (k==='Escape'){ setSearchTerm(''); return; }
+      if (k==='Backspace'||k==='Delete'){ setSearchTerm((searchTerm||'').slice(0,-1)); return; }
+      if (printable){ setSearchTerm((searchTerm||'')+k); }
+    };
+    window.addEventListener('keydown', onKey, {capture:true});
+    return ()=> window.removeEventListener('keydown', onKey as any, {capture:true} as any);
+  }, [searchTerm, setSearchTerm]);
