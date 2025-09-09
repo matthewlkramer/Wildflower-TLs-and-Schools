@@ -28,7 +28,7 @@ import {
   type LoanCommitteeReview,
   type CapitalSource,
   type QuarterlyReport
-} from "../shared/schema.generated";
+} from "@shared/loan-schema";
 
 import {
   reportSchedules,

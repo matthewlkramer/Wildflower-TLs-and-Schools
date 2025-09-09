@@ -9,7 +9,7 @@ import { requireAuth } from "./auth";
 import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema, eventAttendanceSchema } from "../shared/schema.generated";
 import { EVENTS_FIELDS as EVF } from "../shared/schema.generated";
 import { createInsertSchema } from "drizzle-zod";
-import { 
+import {
   borrowers,
   loanApplications,
   loans,
@@ -18,9 +18,7 @@ import {
   loanCovenants,
   loanCommitteeReviews,
   capitalSources,
-  quarterlyReports
-} from "../shared/schema.generated";
-import {
+  quarterlyReports,
   reportSchedules,
   quarterlyReportReminders,
   promissoryNoteTemplates,
