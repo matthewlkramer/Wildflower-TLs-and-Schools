@@ -1,5 +1,5 @@
 // Generated schema from Airtable Metadata table
-// Generated on 2025-09-09T18:45:09.710Z
+// Generated on 2025-09-09T19:05:14.375Z
 // This file is auto-generated. Do not edit manually.
 
 import { z } from 'zod';

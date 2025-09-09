@@ -543,7 +543,7 @@ function generateTransformerFields(fields) {
     const zodType = field.zodType;
     const isRequired = field.isRequired;
     
-    let transformation = `f['${originalName}']`;
+    let transformation = `f["${originalName.replace(/"/g, '\\"')}"]`;
     
     // Apply type conversion based on field type and zod type
     if (zodType === 'number') {
