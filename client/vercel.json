@@ -1,3 +1,0 @@
-"scripts": {
-"diag": "npm config list -l && env|grep -E '^NPM_CONFIG|^NODE_ENV|^CI' || true && ls -la node_modules/.bin || true"
-}
