@@ -1,21 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { CharterNote } from "@shared/schema";
+import type { SchoolNote } from "@shared/schema";
 import { Edit, ExternalLink, Eye, Lock, Unlock, Trash2 } from "lucide-react";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-interface CharterNotesTableProps {
+interface SchoolNotesTableProps {
   charterId: string;
 }
 
-export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
-  const [selectedNote, setSelectedNote] = useState<CharterNote | null>(null);
+export function SchoolNotesTable({ charterId }: SchoolNotesTableProps) {
+  const [selectedNote, setSelectedNote] = useState<SchoolNote | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: notes = [], isLoading } = useQuery<CharterNote[]>({
+  const { data: notes = [], isLoading } = useQuery<SchoolNote[]>({
     queryKey: ["/api/charter-notes/charter", charterId],
     queryFn: async () => {
       const response = await fetch(`/api/charter-notes/charter/${charterId}`, { 
@@ -27,20 +27,20 @@ export function CharterNotesTable({ charterId }: CharterNotesTableProps) {
     enabled: !!charterId,
   });
 
-  const handleOpen = (note: CharterNote) => {
+  const handleOpen = (note: SchoolNote) => {
     setSelectedNote(note);
     setIsModalOpen(true);
   };
 
-  const handleEdit = (note: CharterNote) => {
+  const handleEdit = (note: SchoolNote) => {
     console.log("Edit note:", note);
   };
 
-  const handleTogglePrivate = (note: CharterNote) => {
+  const handleTogglePrivate = (note: SchoolNote) => {
     console.log("Toggle private:", note);
   };
 
-  const handleDelete = (note: CharterNote) => {
+  const handleDelete = (note: SchoolNote) => {
     console.log("Delete note:", note);
   };
 

@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { CharterGovernanceDocument } from "@shared/schema";
+import type { GovernanceDocument } from "@shared/schema";
 import { Edit, ExternalLink, Trash2 } from "lucide-react";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 
-interface CharterGovernanceDocumentsTableProps {
+interface GovernanceDocumentsTableProps {
   charterId: string;
 }
 
-export function CharterGovernanceDocumentsTable({ charterId }: CharterGovernanceDocumentsTableProps) {
-  const { data: documents = [], isLoading } = useQuery<CharterGovernanceDocument[]>({
+export function GovernanceDocumentsTable({ charterId }: GovernanceDocumentsTableProps) {
+  const { data: documents = [], isLoading } = useQuery<GovernanceDocument[]>({
     queryKey: ["/api/charter-governance-documents/charter", charterId],
     queryFn: async () => {
       const response = await fetch(`/api/charter-governance-documents/charter/${charterId}`, { 
@@ -22,17 +22,17 @@ export function CharterGovernanceDocumentsTable({ charterId }: CharterGovernance
     enabled: !!charterId,
   });
 
-  const handleOpen = (document: CharterGovernanceDocument) => {
+  const handleOpen = (document: GovernanceDocument) => {
     if (document.docUrl) {
       window.open(document.docUrl, '_blank');
     }
   };
 
-  const handleEdit = (document: CharterGovernanceDocument) => {
+  const handleEdit = (document: GovernanceDocument) => {
     console.log("Edit document:", document);
   };
 
-  const handleDelete = (document: CharterGovernanceDocument) => {
+  const handleDelete = (document: GovernanceDocument) => {
     console.log("Delete document:", document);
   };
 

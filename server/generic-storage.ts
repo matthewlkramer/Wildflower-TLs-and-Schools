@@ -2,7 +2,7 @@ import { base } from "./airtable-base";
 import { cache } from "./cache";
 import { handleError } from "./error-handler";
 import { AIRTABLE_TABLES as AT } from "@shared/airtable-tables";
-import { TABLE_TYPE_MAPPING, toStringArray, toYesBool } from "@shared/unified-schema";
+import { TABLE_TYPE_MAPPING, toStringArray, toYesBool } from "@shared/schema";
 
 // Import all the transformer functions
 import { transformLocationRecord } from "./storage/locations";
@@ -18,7 +18,7 @@ import {
   GRANTS_FIELDS as GF,
   EVENTS_FIELDS as EVF,
   EVENT_ATTENDANCE_FIELDS as EATF,
-} from "@shared/unified-schema";
+} from "@shared/schema";
 
 // Generic CRUD operations for any Airtable table
 export class GenericStorage {

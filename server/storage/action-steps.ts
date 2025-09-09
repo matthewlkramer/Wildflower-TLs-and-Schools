@@ -1,6 +1,6 @@
-import { ACTION_STEPS_FIELDS as ASF } from "@shared/unified-schema";
+import { ACTION_STEPS_FIELDS as ASF } from "@shared/schema";
 import type { ActionStep } from "@shared/schema";
-import { createBaseTransformer } from "@shared/unified-schema";
+import { createBaseTransformer } from "@shared/schema";
 
 export function transformActionStepRecord(record: any): ActionStep {
   const f = record.fields;

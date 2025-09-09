@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Teacher } from "@shared/schema";
+import type { Educator } from "@shared/schema";
 
 const createAndAssignEducatorSchema = z.object({
   // Educator fields (full name is calculated field, so excluded)
@@ -39,10 +39,10 @@ interface CreateAndAssignEducatorModalProps {
 export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoolId, onSwitchToAssign }: CreateAndAssignEducatorModalProps) {
   const { toast } = useToast();
   const [showDuplicateConfirm, setShowDuplicateConfirm] = useState(false);
-  const [potentialDuplicate, setPotentialDuplicate] = useState<Teacher | null>(null);
+  const [potentialDuplicate, setPotentialDuplicate] = useState<Educator | null>(null);
 
   // Fetch educators for duplicate checking
-  const { data: educators = [] } = useQuery<Teacher[]>({
+  const { data: educators = [] } = useQuery<Educator[]>({
     queryKey: ["/api/educators"],
   });
 

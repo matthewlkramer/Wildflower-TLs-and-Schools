@@ -1,40 +1,40 @@
-import { LOCATIONS_FIELDS as LF } from "@shared/unified-schema";
+import { LOCATIONS_FIELDS as LF } from "@shared/schema";
 import type { Location } from "@shared/schema";
 import { 
   createBaseTransformer, 
   firstId, 
   toNumber, 
   toYesBool 
-} from "@shared/unified-schema";
+} from "@shared/schema";
 
 export function transformLocationRecord(record: any): Location {
   const f = record.fields;
-  const schoolId = firstId(f[LF.school_id] ?? f[LF.School]);
+  const schoolId = firstId(f[LF.schoolId] ?? f[LF.school]);
   return createBaseTransformer(record, {
     schoolId: schoolId || "",
-    charterId: firstId(f[LF.charter_id]),
-    address: String(f[LF.Address] || ''),
-    city: String(f[LF.City] || ''),
-    state: String(f[LF.State] || ''),
-    postalCode: String(f[LF.Postal_code] || ''),
-    country: String(f[LF.Country] || ''),
-    neighborhood: String(f[LF.Neighborhood] || ''),
-    sqFt: toNumber(f[LF.Square_feet]),
-    maxOccupancy: toNumber(f[LF.Max_Students_Licensed_For]),
-    latitude: toNumber(f[LF.Latitude]),
-    longitude: toNumber(f[LF.Longitude]),
-    currentPhysicalAddress: Boolean(f[LF.Current_physical_address_]),
-    currentMailingAddress: Boolean(f[LF.Current_mailing_address_]),
-    locationType: String(f[LF.Location_type] || ''),
-    startDate: String(f[LF.Start_of_time_at_location] || ''),
-    endDate: String(f[LF.End_of_time_at_location] || ''),
-    coLocationType: String(f[LF.Co_Location_Type] || ''),
-    coLocationPartner: String(f[LF.Co_Location_Partner_] || ''),
-    censusTract: String(f[LF.Census_Tract] || ''),
-    qualLICT: toYesBool(f[LF.Qualified_Low_Income_Census_Tract]),
-    leaseEndDate: String(f[LF.Lease_End_Date] || ''),
-    lease: String(f[LF.Lease] || ''),
-    timeZone: String(f[LF.Time_Zone] || ''),
+    charterId: firstId(f[LF.charterId]),
+    address: String(f[LF.address] || ''),
+    city: String(f[LF.city] || ''),
+    state: String(f[LF.state] || ''),
+    postalCode: String(f[LF.postalCode] || ''),
+    country: String(f[LF.country] || ''),
+    neighborhood: String(f[LF.neighborhood] || ''),
+    sqFt: toNumber(f[LF.squareFeet]),
+    maxOccupancy: toNumber(f[LF.maxStudentsLicensedFor]),
+    latitude: toNumber(f[LF.latitude]),
+    longitude: toNumber(f[LF.longitude]),
+    currentPhysicalAddress: Boolean(f[LF.currentPhysicalAddress]),
+    currentMailingAddress: Boolean(f[LF.currentMailingAddress]),
+    locationType: String(f[LF.locationType] || ''),
+    startDate: String(f[LF.startOfTimeAtLocation] || ''),
+    endDate: String(f[LF.endOfTimeAtLocation] || ''),
+    coLocationType: String(f[LF.colocationType] || ''),
+    coLocationPartner: String(f[LF.colocationPartner] || ''),
+    censusTract: String(f[LF.censusTract] || ''),
+    qualLICT: toYesBool(f[LF.qualifiedLowIncomeCensusTract]),
+    leaseEndDate: String(f[LF.leaseEndDate] || ''),
+    lease: String(f[LF.lease] || ''),
+    timeZone: String(f[LF.timeZone] || ''),
   });
 }
 

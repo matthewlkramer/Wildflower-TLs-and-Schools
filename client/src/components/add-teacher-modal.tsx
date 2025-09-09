@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { educatorSchema, type School } from "@shared/schema";
+import { EDUCATORS_SCHEMA, type School } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -24,7 +24,7 @@ export default function AddEducatorModal({ open, onOpenChange }: AddEducatorModa
   });
 
   const form = useForm({
-    resolver: zodResolver(educatorSchema),
+    resolver: zodResolver(EDUCATORS_SCHEMA),
     defaultValues: {
       fullName: "",
       firstName: "",

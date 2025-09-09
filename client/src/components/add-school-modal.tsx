@@ -8,12 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { schoolSchema } from "@shared/schema";
+import { SCHOOLS_SCHEMA } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
-const addSchoolSchema = schoolSchema.pick({
+const addSchoolSchema = SCHOOLS_SCHEMA.pick({
   name: true,
   shortName: true,
   agesServed: true,

@@ -1,4 +1,4 @@
-import { GOVERNANCE_DOCS_FIELDS as GDF, _990S_FIELDS as N9F, SCHOOL_NOTES_FIELDS as SNF } from "@shared/unified-schema";
+import { GOVERNANCE_DOCS_FIELDS as GDF, _990S_FIELDS as N9F, SCHOOL_NOTES_FIELDS as SNF } from "@shared/schema";
 import type { GovernanceDocument, CharterGovernanceDocument, Charter990, CharterNote, Tax990 } from "@shared/schema";
 import { 
   createBaseTransformer, 
@@ -6,7 +6,7 @@ import {
   firstAttachment, 
   createdAt, 
   updatedAt 
-} from "@shared/unified-schema";
+} from "@shared/schema";
 
 export function transformGovernanceDocument(record: any): GovernanceDocument {
   const f = record.fields;

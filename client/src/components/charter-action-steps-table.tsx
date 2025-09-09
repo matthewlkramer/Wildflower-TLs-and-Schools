@@ -1,22 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { CharterActionStep } from "@shared/schema";
+import type { ActionStep } from "@shared/schema";
 import { Edit, Eye, CheckCircle, RotateCcw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { getStatusColor } from "@/lib/utils";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 
-interface CharterActionStepsTableProps {
+interface ActionStepsTableProps {
   charterId: string;
 }
 
-export function CharterActionStepsTable({ charterId }: CharterActionStepsTableProps) {
-  const [selectedActionStep, setSelectedActionStep] = useState<CharterActionStep | null>(null);
+export function ActionStepsTable({ charterId }: ActionStepsTableProps) {
+  const [selectedActionStep, setSelectedActionStep] = useState<ActionStep | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: actionSteps = [], isLoading } = useQuery<CharterActionStep[]>({
+  const { data: actionSteps = [], isLoading } = useQuery<ActionStep[]>({
     queryKey: ["/api/charter-action-steps/charter", charterId],
     queryFn: async () => {
       const response = await fetch(`/api/charter-action-steps/charter/${charterId}`, { 
@@ -39,20 +39,20 @@ export function CharterActionStepsTable({ charterId }: CharterActionStepsTablePr
     return 0;
   });
 
-  const handleOpen = (actionStep: CharterActionStep) => {
+  const handleOpen = (actionStep: ActionStep) => {
     setSelectedActionStep(actionStep);
     setIsModalOpen(true);
   };
 
-  const handleEdit = (actionStep: CharterActionStep) => {
+  const handleEdit = (actionStep: ActionStep) => {
     console.log("Edit action step:", actionStep);
   };
 
-  const handleToggleComplete = (actionStep: CharterActionStep) => {
+  const handleToggleComplete = (actionStep: ActionStep) => {
     console.log("Toggle complete:", actionStep);
   };
 
-  const handleDelete = (actionStep: CharterActionStep) => {
+  const handleDelete = (actionStep: ActionStep) => {
     console.log("Delete action step:", actionStep);
   };
 
@@ -122,7 +122,7 @@ export function CharterActionStepsTable({ charterId }: CharterActionStepsTablePr
       sortable: false,
       filter: false,
       cellRenderer: (params: any) => {
-        const actionStep = params.data as CharterActionStep;
+        const actionStep = params.data as ActionStep;
         return (
           <select
             aria-label="Actions"

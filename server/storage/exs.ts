@@ -1,6 +1,6 @@
-import { EDUCATORS_X_SCHOOLS_FIELDS as EXSF } from "@shared/unified-schema";
+import { EDUCATORS_X_SCHOOLS_FIELDS as EXSF } from "@shared/schema";
 import type { EducatorSchoolAssociation } from "@shared/schema";
-import { createBaseTransformer, firstId } from "@shared/unified-schema";
+import { createBaseTransformer, firstId } from "@shared/schema";
 
 export function transformEXSRecord(
   record: any,

@@ -7,7 +7,7 @@ import { cache } from "./cache";
 import { logger } from "./logger";
 import { requireAuth } from "./auth";
 import { educatorSchema, schoolSchema, educatorSchoolAssociationSchema, locationSchema, guideAssignmentSchema, eventAttendanceSchema } from "@shared/schema";
-import { EVENTS_FIELDS as EVF } from "@shared/unified-schema";
+import { EVENTS_FIELDS as EVF } from "@shared/schema";
 import { createInsertSchema } from "drizzle-zod";
 import { 
   borrowers,
