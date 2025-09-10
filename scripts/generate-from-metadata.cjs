@@ -675,7 +675,7 @@ export async function getAll<T>(tableName: string): Promise<T[]> {
   const cached = getCache(cacheKey);
   if (cached) return cached;
 
-  const config = TABLE_CONFIG[tableName];
+  const config = (TABLE_CONFIG as any)[tableName];
   if (!config) {
     throw new Error(\`Table configuration not found for: \${tableName}\`);
   }
@@ -707,7 +707,7 @@ export async function getById<T>(tableName: string, id: string): Promise<T | nul
   const cached = getCache(cacheKey);
   if (cached) return cached;
 
-  const config = TABLE_CONFIG[tableName];
+  const config = (TABLE_CONFIG as any)[tableName];
   if (!config) {
     throw new Error(\`Table configuration not found for: \${tableName}\`);
   }
@@ -1150,7 +1150,7 @@ function generateCRUDRoutes<T>(
   cacheKeys: string[] = []
 ) {
   const pluralName = resourceName.endsWith('s') ? resourceName : resourceName + 's';
-  const config = TABLE_CONFIG[tableName];
+  const config = (TABLE_CONFIG as any)[tableName];
   
   if (!config) {
     throw new Error(\`Table configuration not found for: \${tableName}\`);
@@ -1213,7 +1213,7 @@ function generateCRUDRoutes<T>(
   app.put(\`/api/\${pluralName}/:id\`, async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
-      const data = zodSchema.partial().parse(req.body);
+      const data = (zodSchema as any).partial().parse(req.body);
       
       // Update record in Airtable
       const airtableRecord = await base(tableName).update(id, data);
@@ -1231,7 +1231,7 @@ function generateCRUDRoutes<T>(
           errors: error.errors 
         });
       }
-      if (error.statusCode === 404) {
+      if ((error as any).statusCode === 404) {
         return res.status(404).json({ message: \`\${resourceName} not found\` });
       }
       logger.error(\`Failed to update \${resourceName}:\`, error);
@@ -1253,7 +1253,7 @@ function generateCRUDRoutes<T>(
       
       res.json({ message: \`\${resourceName} deleted successfully\` });
     } catch (error) {
-      if (error.statusCode === 404) {
+      if ((error as any).statusCode === 404) {
         return res.status(404).json({ message: \`\${resourceName} not found\` });
       }
       logger.error(\`Failed to delete \${resourceName}:\`, error);

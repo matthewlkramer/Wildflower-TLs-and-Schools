@@ -1,5 +1,5 @@
 // Generated generic storage with metadata-driven table configuration
-// Generated on 2025-09-10T00:13:08.161Z
+// Generated on 2025-09-10T00:30:53.820Z
 // This file is auto-generated. Do not edit manually.
 
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -1393,7 +1393,7 @@ export async function getAll<T>(tableName: string): Promise<T[]> {
   const cached = getCache(cacheKey);
   if (cached) return cached;
 
-  const config = TABLE_CONFIG[tableName];
+  const config = (TABLE_CONFIG as any)[tableName];
   if (!config) {
     throw new Error(`Table configuration not found for: ${tableName}`);
   }
@@ -1425,7 +1425,7 @@ export async function getById<T>(tableName: string, id: string): Promise<T | nul
   const cached = getCache(cacheKey);
   if (cached) return cached;
 
-  const config = TABLE_CONFIG[tableName];
+  const config = (TABLE_CONFIG as any)[tableName];
   if (!config) {
     throw new Error(`Table configuration not found for: ${tableName}`);
   }

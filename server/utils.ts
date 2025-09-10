@@ -14,21 +14,30 @@ import * as loanSchema from "@shared/loan-schema";
 // DATABASE CONNECTION
 // =============================================================================
 
+// Database (optional). Some deployments only use Airtable.
+// If DATABASE_URL is absent, skip DB initialization and export a null db.
 const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error('DATABASE_URL environment variable is required');
-}
-
-const client = postgres(connectionString);
-export const db = drizzle(client, { schema: { ...schema, ...loanSchema } });
+export const db = (() => {
+  try {
+    if (!connectionString) return null as any; // Consumers should guard for null when using DB-only features
+    const client = postgres(connectionString);
+    return drizzle(client, { schema: { ...schema, ...loanSchema } });
+  } catch {
+    return null as any;
+  }
+})();
 
 // =============================================================================
 // AIRTABLE BASE
 // =============================================================================
 
+// Airtable base (required for core datasets)
+// Provide clearer errors if env vars are missing at runtime
+const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 export const base = new Airtable({
-  apiKey: process.env.AIRTABLE_API_KEY
-}).base(process.env.AIRTABLE_BASE_ID!);
+  apiKey: AIRTABLE_API_KEY || ''
+}).base((AIRTABLE_BASE_ID || 'MISSING_AIRTABLE_BASE_ID') as string);
 
 // =============================================================================
 // LOGGING

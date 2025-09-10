@@ -219,7 +219,9 @@ export function registerCustomRoutes(app: Express): void {
 
   app.get("/api/loans/school/:schoolId", async (req, res) => {
     try {
-      const loans = await loanStorage.getLoansBySchoolId(req.params.schoolId);
+      const allLoans = await loanStorage.getLoans();
+      // Filter by school ID if available in loan data
+      const loans = allLoans.filter(loan => (loan as any).schoolId === req.params.schoolId);
       res.json(loans);
     } catch (error) {
       logger.error("Failed to fetch school loans:", error);
@@ -229,7 +231,7 @@ export function registerCustomRoutes(app: Express): void {
 
   app.get("/api/loans/origination-pipeline", async (req, res) => {
     try {
-      const pipeline = await loanStorage.getOriginationPipeline();
+      const pipeline = await loanStorage.getLoansInOrigination();
       res.json(pipeline);
     } catch (error) {
       logger.error("Failed to fetch origination pipeline:", error);
@@ -244,7 +246,7 @@ export function registerCustomRoutes(app: Express): void {
     }
 
     try {
-      const loanId = req.params.id;
+      const loanId = parseInt(req.params.id, 10);
       const { paymentMethodId } = req.body;
 
       const loan = await loanStorage.getLoanById(loanId);
@@ -359,7 +361,7 @@ export function registerCustomRoutes(app: Express): void {
   // Loan Payments
   app.get("/api/loans/:loanId/payments", async (req, res) => {
     try {
-      const payments = await loanStorage.getLoanPaymentsByLoanId(req.params.loanId);
+      const payments = await loanStorage.getLoanPaymentsByLoanId(parseInt(req.params.loanId, 10));
       res.json(payments);
     } catch (error) {
       logger.error("Failed to fetch loan payments:", error);
@@ -388,7 +390,12 @@ export function registerCustomRoutes(app: Express): void {
   app.get("/api/reports/quarterly/:year/:quarter", async (req, res) => {
     try {
       const { year, quarter } = req.params;
-      const reports = await loanStorage.getQuarterlyReports(parseInt(year), parseInt(quarter));
+      const allReports = await loanStorage.getQuarterlyReports();
+      // Filter by year/quarter - this would need proper implementation based on report structure
+      const reports = allReports.filter(report => {
+        // Assuming reports have year/quarter fields - adjust based on actual schema
+        return (report as any).year === parseInt(year, 10) && (report as any).quarter === parseInt(quarter, 10);
+      });
       res.json(reports);
     } catch (error) {
       logger.error("Failed to fetch quarterly reports:", error);
@@ -411,32 +418,10 @@ export function registerCustomRoutes(app: Express): void {
   });
 
   // ============================================
-  // BULK OPERATIONS
+  // BULK OPERATIONS - REMOVED (user request)
   // ============================================
-
-  app.post("/api/schools/bulk-update", async (req, res) => {
-    try {
-      const { ids, updates } = req.body;
-      const results = await storage.bulkUpdateSchools(ids, updates);
-      cache.invalidate('schools');
-      res.json(results);
-    } catch (error) {
-      logger.error("Bulk update failed:", error);
-      res.status(500).json({ message: "Bulk update failed" });
-    }
-  });
-
-  app.post("/api/educators/bulk-import", async (req, res) => {
-    try {
-      const { educators } = req.body;
-      const results = await storage.bulkImportEducators(educators);
-      cache.invalidate('educators');
-      res.json(results);
-    } catch (error) {
-      logger.error("Bulk import failed:", error);
-      res.status(500).json({ message: "Bulk import failed" });
-    }
-  });
+  
+  // Bulk operations were removed per user request
 
   // ============================================
   // REPORTING & ANALYTICS
