@@ -600,13 +600,17 @@ import * as schema from '../shared/schema.generated';
 import * as loanSchema from "@shared/loan-schema";
 import { base } from './utils';
 
+// Database (optional). Metadata-driven Airtable reads do not require DB.
 const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error('DATABASE_URL environment variable is required');
-}
-
-const client = postgres(connectionString);
-export const db = drizzle(client, { schema: { ...schema, ...loanSchema } });
+export const db = (() => {
+  try {
+    if (!connectionString) return null as any;
+    const client = postgres(connectionString);
+    return drizzle(client, { schema: { ...schema, ...loanSchema } });
+  } catch {
+    return null as any;
+  }
+})();
 
 // Cache configuration
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -681,15 +685,9 @@ export async function getAll<T>(tableName: string): Promise<T[]> {
   }
 
   try {
-    // Fetch all records from Airtable
+    // Fetch all records from Airtable and transform using native records
     const airtableRecords = await base(config.airtableTable).select().all();
-    const records = airtableRecords.map(record => ({
-      id: record.id,
-      created: record.fields.created || record._rawJson.createdTime,
-      lastModified: record.fields.lastModified || record._rawJson.createdTime,
-      ...record.fields
-    }));
-    const transformed = records.map(config.transformer);
+    const transformed = airtableRecords.map((r: any) => config.transformer(r));
     
     if (config.cacheEnabled) {
       setCache(cacheKey, transformed);
@@ -713,18 +711,10 @@ export async function getById<T>(tableName: string, id: string): Promise<T | nul
   }
 
   try {
-    // Fetch record by ID from Airtable
+    // Fetch record by ID from Airtable and transform using native record
     const airtableRecord = await base(config.airtableTable).find(id);
     if (!airtableRecord) return null;
-    
-    const record = {
-      id: airtableRecord.id,
-      created: airtableRecord.fields.created || airtableRecord._rawJson.createdTime,
-      lastModified: airtableRecord.fields.lastModified || airtableRecord._rawJson.createdTime,
-      ...airtableRecord.fields
-    };
-    
-    const transformed = config.transformer(record);
+    const transformed = config.transformer(airtableRecord);
     
     if (config.cacheEnabled) {
       setCache(cacheKey, transformed);
