@@ -66,7 +66,7 @@ function getZodValidation(zodType, validationType) {
   
   return baseType;
 }
-
+ 
 // Map table names to TypeScript interface names
 function getTypeName(tableName) {
   const mapping = {
@@ -75,16 +75,15 @@ function getTypeName(tableName) {
     'Locations': 'Location',
     'Educators x Schools': 'EducatorSchoolAssociation',
     'Governance docs': 'GovernanceDocument',
-    '990s': 'Charter990',
+    'Nine nineties': 'NineNineties',
     'School notes': 'SchoolNote',
     'Charters': 'Charter',
-    'Loans': 'Loan',
-    'Loan payments': 'LoanPayment',
+    'Airtable Loans': 'AirtableLoan',
+    'Airtable Loan payments': 'AirtableLoanPayment',
     'Events': 'Event',
     'Event attendance': 'EventAttendance',
     'Action steps': 'ActionStep',
     'Grants': 'Grant',
-    'Grants Advice Log': 'GrantAdviceLog',
     'Mailing lists': 'MailingList',
     'Montessori Certs': 'MontessoriCert',
     'SSJ Typeforms: Start a School': 'SSJTypeform',
@@ -92,13 +91,11 @@ function getTypeName(tableName) {
     'Guides': 'Guide',
     'Guides Assignments': 'GuideAssignment',
     'Educator notes': 'EducatorNote',
-    'Training Grants': 'TrainingGrant',
     'Public funding': 'PublicFunding',
     'Event types': 'EventType',
     'QBO School Codes': 'QBOSchoolCode',
     'Montessori Cert Levels': 'MontessoriCertLevel',
     'Montessori Certifiers': 'MontessoriCertifier',
-    'Montessori Certifiers - old list': 'MontessoriCertifierOld',
     'Race and Ethnicity': 'RaceAndEthnicity',
     'Board Service': 'BoardService',
     'Lead Routing and Templates': 'LeadRoutingTemplate',
@@ -368,11 +365,6 @@ export function updatedAt(fields: any): string {
       .replace(/[^A-Z0-9_]/g, '_')
       .replace(/__+/g, '_') + '_FIELDS';
     
-    // Fix names that start with numbers
-    if (/^[0-9]/.test(constName)) {
-      constName = '_' + constName;
-    }
-    
     schemaContent += `\nexport const ${constName} = {\n`;
     
     for (const field of fields) {
@@ -387,22 +379,22 @@ export function updatedAt(fields: any): string {
     schemaContent += `} as const;\n`;
   }
 
-  // Generate field options constants for singleSelect and multipleSelect fields
+  // Generate field options constants for singleSelect and multipleSelects fields
   schemaContent += `\n// Generated Field Options Constants\n`;
   
   const fieldOptionsMap = new Map(); // To track unique options by table and field
   
   for (const [tableName, fields] of tableFields.entries()) {
     for (const field of fields) {
-      if ((field.fieldType === 'singleSelect' || field.fieldType === 'multipleSelect' || field.fieldType === 'multipleSelects') && field.fieldOptions) {
+      if ((field.fieldType === 'singleSelect' || field.fieldType === 'multipleSelects') && field.fieldOptions) {
         const tableKey = tableName.toUpperCase().replace(/\s+/g, '_').replace(/[^A-Z0-9_]/g, '_').replace(/__+/g, '_');
         const fieldKey = field.fieldNameInWFTLS.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
         let constantName = `${tableKey}_OPTIONS_${fieldKey}`;
         
         // Handle names starting with numbers
-        if (/^[0-9]/.test(constantName)) {
-          constantName = '_' + constantName;
-        }
+        //if (/^[0-9]/.test(constantName)) {
+        //  constantName = '_' + constantName;
+        //}
         
         // Parse the options (comma-separated)
         const options = field.fieldOptions.split(',').map(opt => opt.trim()).filter(opt => opt.length > 0);
@@ -606,6 +598,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from '../shared/schema.generated';
 import * as loanSchema from "@shared/loan-schema";
+import { base } from './utils';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -688,8 +681,14 @@ export async function getAll<T>(tableName: string): Promise<T[]> {
   }
 
   try {
-    // Implement Airtable API call here
-    const records = []; // Placeholder - implement actual Airtable API call
+    // Fetch all records from Airtable
+    const airtableRecords = await base(config.airtableTable).select().all();
+    const records = airtableRecords.map(record => ({
+      id: record.id,
+      created: record.fields.created || record._rawJson.createdTime,
+      lastModified: record.fields.lastModified || record._rawJson.createdTime,
+      ...record.fields
+    }));
     const transformed = records.map(config.transformer);
     
     if (config.cacheEnabled) {
@@ -714,9 +713,16 @@ export async function getById<T>(tableName: string, id: string): Promise<T | nul
   }
 
   try {
-    // Implement Airtable API call here
-    const record = null; // Placeholder - implement actual Airtable API call
-    if (!record) return null;
+    // Fetch record by ID from Airtable
+    const airtableRecord = await base(config.airtableTable).find(id);
+    if (!airtableRecord) return null;
+    
+    const record = {
+      id: airtableRecord.id,
+      created: airtableRecord.fields.created || airtableRecord._rawJson.createdTime,
+      lastModified: airtableRecord.fields.lastModified || airtableRecord._rawJson.createdTime,
+      ...airtableRecord.fields
+    };
     
     const transformed = config.transformer(record);
     
@@ -765,141 +771,347 @@ export const storage = {
   getTeachers: getEducators,
   getTeacher: getEducatorById,
   updateTeacher: async (id: string, data: any) => {
-    // TODO: Implement update logic
+    try {
+      const updated = await base('Educators').update(id, data);
+      invalidateCache('Educators');
+      return updated;
+    } catch (error) {
+      console.error(\`Error updating educator \${id}:\`, error);
     return null;
+    }
   },
   deleteTeacher: async (id: string) => {
-    // TODO: Implement delete logic  
+    try {
+      await base('Educators').destroy(id);
+      invalidateCache('Educators');
+      return true;
+    } catch (error) {
+      console.error(\`Error deleting educator \${id}:\`, error);
     return false;
+    }
   },
   // Custom methods (implement as needed)
   getSchoolsByUserId: async (userId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const educators = await getAll<schema.Educator>('Educators');
+      const educator = educators.find(e => e.id === userId);
+      if (!educator) return [];
+      
+      const associations = await getAll<schema.EducatorSchoolAssociation>('Educators x Schools');
+      const educatorAssociations = associations.filter(a => a.educatorId === educator.id);
+      
+      const schools = await getAll<schema.School>('Schools');
+      return schools.filter(s => educatorAssociations.some(a => a.schoolId === s.id));
+    } catch (error) {
+      console.error(\`Error fetching schools for user \${userId}:\`, error);
     return [];
+    }
   },
   getTlsByUserId: async (userId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const educators = await getAll<schema.Educator>('Educators');
+      return educators.filter(e => e.id === userId && e.role === 'TL');
+    } catch (error) {
+      console.error(\`Error fetching TLs for user \${userId}:\`, error);
     return [];
+    }
   },
   getEducatorAssociations: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const associations = await getAll<schema.EducatorSchoolAssociation>('Educators x Schools');
+      return associations.filter(a => a.educatorId === educatorId);
+    } catch (error) {
+      console.error(\`Error fetching associations for educator \${educatorId}:\`, error);
     return [];
+    }
   },
   getSchoolAssociations: async (schoolId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const associations = await getAll<schema.EducatorSchoolAssociation>('Educators x Schools');
+      return associations.filter(a => a.schoolId === schoolId);
+    } catch (error) {
+      console.error(\`Error fetching associations for school \${schoolId}:\`, error);
     return [];
+    }
   },
   updateEducator: async (id: string, data: any) => {
-    // TODO: Implement update logic
+    try {
+      const updated = await base('Educators').update(id, data);
+      invalidateCache('Educators');
+      return TABLE_CONFIG['Educators'].transformer(updated);
+    } catch (error) {
+      console.error(\`Error updating educator \${id}:\`, error);
     return null;
+    }
   },
   updateSchool: async (id: string, data: any) => {
-    // TODO: Implement update logic
+    try {
+      const updated = await base('Schools').update(id, data);
+      invalidateCache('Schools');
+      return TABLE_CONFIG['Schools'].transformer(updated);
+    } catch (error) {
+      console.error(\`Error updating school \${id}:\`, error);
     return null;
+    }
   },
   createEducator: async (data: any) => {
-    // TODO: Implement create logic
+    try {
+      const created = await base('Educators').create(data);
+      invalidateCache('Educators');
+      return TABLE_CONFIG['Educators'].transformer(created);
+    } catch (error) {
+      console.error(\`Error creating educator:\`, error);
     return null;
+    }
   },
   createSchool: async (data: any) => {
-    // TODO: Implement create logic
+    try {
+      const created = await base('Schools').create(data);
+      invalidateCache('Schools');
+      return TABLE_CONFIG['Schools'].transformer(created);
+    } catch (error) {
+      console.error(\`Error creating school:\`, error);
     return null;
+    }
   },
   deleteEducator: async (id: string) => {
-    // TODO: Implement delete logic
+    try {
+      await base('Educators').destroy(id);
+      invalidateCache('Educators');
+      return true;
+    } catch (error) {
+      console.error(\`Error deleting educator \${id}:\`, error);
     return false;
+    }
   },
   deleteSchool: async (id: string) => {
-    // TODO: Implement delete logic
+    try {
+      await base('Schools').destroy(id);
+      invalidateCache('Schools');
+      return true;
+    } catch (error) {
+      console.error(\`Error deleting school \${id}:\`, error);
     return false;
+    }
   },
   createTeacher: async (data: any) => {
-    // TODO: Implement create logic
+    // createTeacher is an alias for createEducator
+    try {
+      const created = await base('Educators').create(data);
+      invalidateCache('Educators');
+      return TABLE_CONFIG['Educators'].transformer(created);
+    } catch (error) {
+      console.error(\`Error creating teacher:\`, error);
     return null;
+    }
   },
   updateTeacherSchoolAssociation: async (id: string, data: any) => {
-    // TODO: Implement update logic
+    try {
+      const updated = await base('Educators x Schools').update(id, data);
+      invalidateCache('Educators x Schools');
+      return TABLE_CONFIG['Educators x Schools'].transformer(updated);
+    } catch (error) {
+      console.error(\`Error updating teacher-school association \${id}:\`, error);
     return null;
+    }
   },
   deleteTeacherSchoolAssociation: async (id: string) => {
-    // TODO: Implement delete logic
+    try {
+      await base('Educators x Schools').destroy(id);
+      invalidateCache('Educators x Schools');
+      return true;
+    } catch (error) {
+      console.error(\`Error deleting teacher-school association \${id}:\`, error);
     return false;
+    }
   },
   createTeacherSchoolAssociation: async (data: any) => {
-    // TODO: Implement create logic
+    try {
+      const created = await base('Educators x Schools').create(data);
+      invalidateCache('Educators x Schools');
+      return TABLE_CONFIG['Educators x Schools'].transformer(created);
+    } catch (error) {
+      console.error(\`Error creating teacher-school association:\`, error);
     return null;
+    }
   },
   getMontessoriCertificationsByEducatorId: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const certs = await getAll<schema.MontessoriCert>('Montessori Certs');
+      return certs.filter(c => c.educatorId === educatorId);
+    } catch (error) {
+      console.error(\`Error fetching Montessori certifications for educator \${educatorId}:\`, error);
     return [];
+    }
   },
   getEventAttendancesByEducatorId: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const attendances = await getAll<schema.EventAttendance>('Event attendance');
+      return attendances.filter(a => a.educatorId === educatorId);
+    } catch (error) {
+      console.error(\`Error fetching event attendances for educator \${educatorId}:\`, error);
     return [];
+    }
   },
   getEducatorNotesByEducatorId: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const notes = await getAll<schema.EducatorNote>('Educator notes');
+      return notes.filter(n => n.educatorId === educatorId);
+    } catch (error) {
+      console.error(\`Error fetching educator notes for educator \${educatorId}:\`, error);
     return [];
+    }
   },
   getEmailAddressesByEducatorId: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const emails = await getAll<schema.EmailAddress>('Email Addresses');
+      return emails.filter(e => e.educatorId === educatorId);
+    } catch (error) {
+      console.error(\`Error fetching email addresses for educator \${educatorId}:\`, error);
     return [];
+    }
   },
   getSSJFilloutFormsByEducatorId: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const forms = await getAll<schema.SSJFilloutForm>('SSJ Fillout Forms');
+      return forms.filter(f => f.educatorId === educatorId);
+    } catch (error) {
+      console.error(\`Error fetching SSJ fillout forms for educator \${educatorId}:\`, error);
     return [];
+    }
   },
   getGovernanceDocumentsBySchoolId: async (schoolId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const docs = await getAll<schema.GovernanceDocument>('Governance docs');
+      return docs.filter(d => d.schoolId === schoolId);
+    } catch (error) {
+      console.error(\`Error fetching governance documents for school \${schoolId}:\`, error);
     return [];
+    }
   },
   getGuideAssignmentsBySchoolId: async (schoolId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const assignments = await getAll<schema.GuideAssignment>('Guides Assignments');
+      return assignments.filter(a => a.schoolId === schoolId);
+    } catch (error) {
+      console.error(\`Error fetching guide assignments for school \${schoolId}:\`, error);
     return [];
+    }
   },
   getSchoolNotesBySchoolId: async (schoolId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const notes = await getAll<schema.SchoolNote>('School notes');
+      return notes.filter(n => n.schoolId === schoolId);
+    } catch (error) {
+      console.error(\`Error fetching school notes for school \${schoolId}:\`, error);
     return [];
+    }
   },
   getLocationsBySchoolId: async (schoolId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const locations = await getAll<schema.Location>('Locations');
+      return locations.filter(l => l.schoolId === schoolId);
+    } catch (error) {
+      console.error(\`Error fetching locations for school \${schoolId}:\`, error);
     return [];
+    }
   },
   getActionStepsByUserId: async (userId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const actionSteps = await getAll<schema.ActionStep>('Action steps');
+      return actionSteps.filter(a => a.userId === userId);
+    } catch (error) {
+      console.error(\`Error fetching action steps for user \${userId}:\`, error);
     return [];
+    }
   },
-  searchSchools: async (query: string, filters: any) => {
-    // TODO: Implement search logic
+  searchSchools: async (query: string, filters: any = {}) => {
+    try {
+      const schools = await getAll<schema.School>('Schools');
+      const lowercaseQuery = query.toLowerCase();
+      
+      let filtered = schools.filter(school => 
+        school.name?.toLowerCase().includes(lowercaseQuery) ||
+        school.city?.toLowerCase().includes(lowercaseQuery) ||
+        school.state?.toLowerCase().includes(lowercaseQuery)
+      );
+      
+      // Apply additional filters if provided
+      if (filters.state) {
+        filtered = filtered.filter(s => s.state === filters.state);
+      }
+      if (filters.status) {
+        filtered = filtered.filter(s => s.status === filters.status);
+      }
+      
+      return filtered;
+    } catch (error) {
+      console.error(\`Error searching schools with query "\${query}":\`, error);
     return [];
+    }
   },
   getEnrollmentTrends: async () => {
-    // TODO: Implement analytics logic
+    try {
+      const enrollment = await getAll<schema.AnnualEnrollmentDemographic>('Annual enrollment and demographics');
+      // Group by year and calculate totals
+      const trends = enrollment.reduce((acc: any, record: any) => {
+        const year = record.year || 'Unknown';
+        if (!acc[year]) acc[year] = { year, totalEnrollment: 0, schoolCount: 0 };
+        acc[year].totalEnrollment += record.totalEnrollment || 0;
+        acc[year].schoolCount++;
+        return acc;
+      }, {});
+      
+      return Object.values(trends);
+    } catch (error) {
+      console.error(\`Error fetching enrollment trends:\`, error);
     return [];
+    }
   },
   getSchoolMetrics: async (schoolId: string) => {
-    // TODO: Implement metrics logic
+    try {
+      const school = await getById<schema.School>('Schools', schoolId);
+      if (!school) return {};
+      
+      const locations = await getAll<schema.Location>('Locations');
+      const schoolLocations = locations.filter(l => l.schoolId === schoolId);
+      
+      const enrollments = await getAll<schema.AnnualEnrollmentDemographic>('Annual enrollment and demographics');
+      const schoolEnrollments = enrollments.filter(e => e.schoolId === schoolId);
+      
+      return {
+        school: school.name,
+        locationCount: schoolLocations.length,
+        enrollmentHistory: schoolEnrollments,
+        currentEnrollment: schoolEnrollments.find(e => e.year === new Date().getFullYear())?.totalEnrollment || 0
+      };
+    } catch (error) {
+      console.error(\`Error fetching school metrics for \${schoolId}:\`, error);
     return {};
-  },
-  bulkUpdateSchools: async (ids: string[], updates: any) => {
-    // TODO: Implement bulk update logic
-    return [];
-  },
-  bulkImportEducators: async (educators: any[]) => {
-    // TODO: Implement bulk import logic
-    return [];
-  },
-  bulkCreateEducators: async (educators: any[]) => {
-    // TODO: Implement bulk create logic
-    return [];
+    }
   },
   getNetworkBenchmarks: async () => {
-    // TODO: Implement benchmarks logic
+    try {
+      const schools = await getAll<schema.School>('Schools');
+      const enrollments = await getAll<schema.AnnualEnrollmentDemographic>('Annual enrollment and demographics');
+      
+      return {
+        totalSchools: schools.length,
+        activeSchools: schools.filter(s => s.status === 'Active').length,
+        averageEnrollment: enrollments.reduce((sum, e) => sum + (e.totalEnrollment || 0), 0) / Math.max(enrollments.length, 1),
+        states: [...new Set(schools.map(s => s.state).filter(Boolean))].length
+      };
+    } catch (error) {
+      console.error(\`Error fetching network benchmarks:\`, error);
     return {};
+    }
   },
   getTableMetadata: async () => {
-    // TODO: Implement metadata logic
-    return {};
+    return {
+      tables: Object.keys(TABLE_CONFIG),
+      generatedAt: new Date().toISOString(),
+      tableCount: Object.keys(TABLE_CONFIG).length
+    };
   },
 } as const;
 `;
@@ -924,10 +1136,8 @@ async function generateRoutes(tableFields) {
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import * as schema from '../shared/schema.generated';
-import { TABLE_CONFIG } from './generic-storage.generated';
-import { cache } from './cache';
-import { logger } from './logger';
-import { requireAuth } from './auth';
+import { TABLE_CONFIG, getAll, getById } from './generic-storage.generated';
+import { cache, logger, requireAuth, base } from './utils';
 import { registerCustomRoutes } from './routes-custom';
 import { z } from 'zod';
 
@@ -949,8 +1159,7 @@ function generateCRUDRoutes<T>(
   // GET /api/{resources} - Get all
   app.get(\`/api/\${pluralName}\`, async (req: Request, res: Response) => {
     try {
-      // TODO: Implement actual Airtable API call using config
-      const records: T[] = []; // Placeholder
+      const records = await getAll<T>(tableName);
       res.json(records);
     } catch (error) {
       logger.error(\`Failed to fetch \${pluralName}:\`, error);
@@ -962,8 +1171,7 @@ function generateCRUDRoutes<T>(
   app.get(\`/api/\${pluralName}/:id\`, async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
-      // TODO: Implement actual Airtable API call using config
-      const record: T | null = null; // Placeholder
+      const record = await getById<T>(tableName, id);
       
       if (!record) {
         return res.status(404).json({ message: \`\${resourceName} not found\` });
@@ -979,8 +1187,10 @@ function generateCRUDRoutes<T>(
   app.post(\`/api/\${pluralName}\`, async (req: Request, res: Response) => {
     try {
       const data = zodSchema.parse(req.body);
-      // TODO: Implement actual Airtable API call using config
-      const record: T = data; // Placeholder
+      
+      // Create record in Airtable
+      const airtableRecord = await base(tableName).create(data);
+      const record = config.transformer(airtableRecord);
       
       // Invalidate relevant caches
       cache.invalidate(pluralName);
@@ -1004,12 +1214,10 @@ function generateCRUDRoutes<T>(
     try {
       const id = req.params.id;
       const data = zodSchema.partial().parse(req.body);
-      // TODO: Implement actual Airtable API call using config
-      const record: T | null = null; // Placeholder
       
-      if (!record) {
-        return res.status(404).json({ message: \`\${resourceName} not found\` });
-      }
+      // Update record in Airtable
+      const airtableRecord = await base(tableName).update(id, data);
+      const record = config.transformer(airtableRecord);
       
       // Invalidate relevant caches
       cache.invalidate(pluralName);
@@ -1023,6 +1231,9 @@ function generateCRUDRoutes<T>(
           errors: error.errors 
         });
       }
+      if (error.statusCode === 404) {
+        return res.status(404).json({ message: \`\${resourceName} not found\` });
+      }
       logger.error(\`Failed to update \${resourceName}:\`, error);
       res.status(500).json({ message: \`Failed to update \${resourceName}\` });
     }
@@ -1032,12 +1243,9 @@ function generateCRUDRoutes<T>(
   app.delete(\`/api/\${pluralName}/:id\`, async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
-      // TODO: Implement actual Airtable API call using config
-      const success = false; // Placeholder
       
-      if (!success) {
-        return res.status(404).json({ message: \`\${resourceName} not found\` });
-      }
+      // Delete record from Airtable
+      await base(tableName).destroy(id);
       
       // Invalidate relevant caches
       cache.invalidate(pluralName);
@@ -1045,6 +1253,9 @@ function generateCRUDRoutes<T>(
       
       res.json({ message: \`\${resourceName} deleted successfully\` });
     } catch (error) {
+      if (error.statusCode === 404) {
+        return res.status(404).json({ message: \`\${resourceName} not found\` });
+      }
       logger.error(\`Failed to delete \${resourceName}:\`, error);
       res.status(500).json({ message: \`Failed to delete \${resourceName}\` });
     }

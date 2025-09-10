@@ -1,5 +1,5 @@
 // Generated schema from Airtable Metadata table
-// Generated on 2025-09-09T21:10:12.647Z
+// Generated on 2025-09-10T00:13:08.158Z
 // This file is auto-generated. Do not edit manually.
 
 import { z } from 'zod';
@@ -95,30 +95,23 @@ export function updatedAt(fields: any): string {
 export const PARTNERS_COPY_FIELDS = {
   roles: "Roles",
   emailTemplates: "Email templates",
-  educatorRecordIds: "Educator Record IDs",
-  grants5: "Grants 5",
   guideAssignments: "Guide assignments",
   shortName: "Short name",
   publicWebsiteActive: "Public website active",
   websiteBio: "Website bio",
-  educatorNotes: "Educator notes",
   startDateFromStints: "Start Date (from Stints)",
   endDateFromStints: "End Date (from Stints)",
   currentlyActive: "Currently active",
   slackHandle: "Slack handle",
-  actionSteps: "Action steps",
   dob: "DOB",
   recordId: "Record ID",
   photo: "Photo",
   activeStint: "Active stint",
-  tls: "TLs",
   phone: "Phone",
   papyrsProfile: "Papyrs profile",
   stintTypeFromStints: "Stint type (from Stints)",
   name: "Name",
   homeAddress: "Home address",
-  schools: "Schools",
-  schoolNotes: "School notes",
   email: "Email",
   guidedSchoolRecordId: "Guided School Record ID",
   ssjProcessDetails: "SSJ Process Details",
@@ -188,7 +181,6 @@ export const SSJ_FILLOUT_FORMS_FIELDS = {
   socioeconomicLgbtqiaIdentifyingFromEmail: "Socio-Economic: LGBTQIA Identifying (from Email)",
   tempMCertCert2: "Temp - M Cert Cert 2",
   communityMemberSelfInfo: "Community Member Self Info",
-  ssjFilloutFormKey: "SSJ FIllout Form key",
   tempMCertYear3: "Temp - M Cert Year 3",
   educators: "Educators",
   linkToStartASchool: "Link to Start a School",
@@ -228,9 +220,7 @@ export const CHARTER_APPLICATIONS_FIELDS = {
   letterOfIntentDeadline: "Letter of Intent deadline",
   nonprofitStatus: "Nonprofit status",
   authorizerDecisionRecd: "Authorizer decision rec'd",
-  targetCommunityFromCharter: "Target community (from Charter)",
   finalBudget: "Final budget",
-  currentTlDiscoveryStatus: "Current TL discovery status",
   likelihoodOfOpeningOnTime: "Likelihood of opening on time",
   authorizerDecision: "Authorizer decision",
   shortName: "Short Name",
@@ -238,19 +228,15 @@ export const CHARTER_APPLICATIONS_FIELDS = {
   fullName: "Full Name",
   charterappid: "charter_app_id",
   milestones: "Milestones",
-  membershipStatusOfSchools: "Membership status of schools",
   grades: "Grades",
-  charterAppKey: "Charter App key",
   letterOfIntentReqd: "Letter of Intent req'd",
   authorizerDecisionExpectedDate: "Authorizer decision expected date",
-  keyDates: "Key dates",
   expectedDecision: "Expected decision",
   opportunitiesAndChallenges: "Opportunities and challenges",
   OfStudents: "# of students",
   appSubmissionDeadline: "App submission deadline",
   likelihoodOfAuthorization: "Likelihood of authorization",
   currentTlsFromSchoolsFromCharter: "Current TLs (from Schools) (from Charter)",
-  landscapeAnalysisFromCharter: "Landscape analysis (from Charter)",
   charterAppProjectMgmtPlanComplete: "Charter app project mgmt plan complete",
   appSubmitted: "App submitted",
   charterDesign: "Charter design",
@@ -271,7 +257,6 @@ export const CHARTER_APPLICATIONS_FIELDS = {
   supportTimeline: "Support timeline",
   status: "Status",
   capacityInterviewTrainingComplete: "Capacity interview training complete",
-  charterlevelMembershipAgreementSigned: "Charter-level membership agreement signed",
   charterAppWalkthrough: "Charter app walkthrough",
   tlMembershipAgreementSigned: "TL membership agreement signed",
   applicationWindow: "Application window",
@@ -287,15 +272,12 @@ export const SCHOOLS_FIELDS = {
   enrollmentAtFullCapacity: "Enrollment at Full Capacity",
   ssjIsTheSchoolPlanningToApplyForInternalWildflowerFunding: "SSJ - Is the school planning to apply for internal Wildflower funding?",
   guideEmail: "Guide email",
-  locationid: "location_id",
   emailDomain: "Email Domain",
   ssjCohortStatus: "SSJ - Cohort Status",
   visioningAlbumComplete: "Visioning album complete",
   transparentClassroom: "Transparent Classroom",
   ssjOriginalProjectedOpenDate: "SSJ - Original Projected Open Date",
-  latinxFromFamilySurvey: "Latinx (from Family Survey)",
   logoUrl: "Logo URL",
-  globalMajority: "global majority",
   ssjGapInFunding: "SSJ - Gap in Funding",
   planningAlbum: "Planning album",
   countOfActiveMailingAddresses: "Count of Active Mailing Addresses",
@@ -307,9 +289,6 @@ export const SCHOOLS_FIELDS = {
   currentPhysicalAddress: "Current Physical Address",
   ssjProjOpenSchoolYearBackup: "SSJ - Proj Open School Year - Backup",
   primaryContactEmail: "Primary Contact Email",
-  locations: "Locations",
-  frl: "FRL",
-  guideassignmentid: "guide_assignment_id",
   opened: "Opened",
   governanceModel: "Governance Model",
   leaseEndDate: "Lease End Date",
@@ -318,37 +297,26 @@ export const SCHOOLS_FIELDS = {
   nondiscriminationPolicyOnApplication: "Nondiscrimination Policy on Application",
   ssjIsTheBudgetAtAStageThatWillAllowTheEtlsToTakeTheirNextSteps: "SSJ - Is the budget at a stage that will allow the ETL(s) to take their next steps?",
   emailAtSchoolFromEducatorsXSchools: "Email at School (from Educators x Schools)",
-  mediumIncome: "Medium Income",
   legalName: "Legal Name",
   agreementVersion: "Agreement Version ",
   familysurveyid: "family_survey_id",
-  isThereA2022990: "Is there a 2022 990?",
-  highIncomeFromFamilySurvey: "High Income (from Family Survey)",
   groupExemptionStatus: "Group exemption status",
   nineNinetiesAttachment: "Nine Nineties attachment",
   membershipAgreementDate: "Membership Agreement date",
-  lowIncome: "Low Income",
   currentTls: "Current TLs",
-  OfFormsSent: "# of forms sent",
   shortName: "Short Name",
   flexibleTuitionModel: "Flexible Tuition Model",
-  grantsWf: "Grants (WF)",
   googleVoice: "Google Voice",
-  grantid: "grant_id",
-  schoolNotes: "School notes",
   signedMembershipAgreement: "Signed Membership Agreement",
   ssjFacility: "SSJ - Facility",
   ssjTargetCity: "SSJ - Target City",
   nondiscriminationPolicyOnWebsite: "Nondiscrimination Policy on Website",
-  nativeAmericanFromFamilySurvey: "Native American (from Family Survey)",
   agesServed: "Ages served",
   ssjIsTheTeamOnTrackForTheirEnrollmentGoals: "SSJ - Is the team on track for their enrollment goals?",
   building4goodFirmAttorney: "Building4Good Firm & Attorney",
   enteredVisioningDate: "Entered Visioning Date",
   primaryContactId: "Primary Contact ID",
-  raceEthnicityFromEducatorViaEducatorsXSchools: "Race & Ethnicity (from Educator) (via Educators x Schools)",
   schoolStatus: "School Status",
-  nineninetyid: "nine_ninety_id",
   leftNetworkDate: "Left Network Date",
   activeGuides: "Active guides",
   tcRecordkeeping: "TC Recordkeeping",
@@ -360,7 +328,6 @@ export const SCHOOLS_FIELDS = {
   billcomAccount: "Bill.com account",
   instagram: "Instagram",
   ein: "EIN",
-  loanFromLoansIssueMethod: "Loan (from Loans - Issue Method)",
   currentPhysicalAddressCity: "Current Physical Address - City",
   bookkeeperAccountant: "Bookkeeper / Accountant",
   ssjLoanApprovedAmt: "SSJ - Loan approved amt",
@@ -373,13 +340,11 @@ export const SCHOOLS_FIELDS = {
   currentMailingAddress: "Current Mailing Address",
   ssjTotalStartupFundingNeeded: "SSJ - Total Startup Funding Needed",
   schoolContactEmails: "School Contact Emails",
-  OfAsianAmericanStudents: "% of Asian American students",
   budgetUtility: "Budget Utility",
   ssjWhatIsTheNextBigDecisionOrActionThisSchoolIsWorkingOn: "SSJ - What is the next big decision or action this school is working on?",
   dateReceivedGroupExemption: "Date received group exemption",
   pod: "Pod",
   legalStructure: "Legal structure",
-  OfAfricanAmericanStudents: "% of African American students",
   archived: "Archived",
   incorporationDate: "Incorporation Date",
   activelongitude: "activeLongitude",
@@ -396,17 +361,10 @@ export const SCHOOLS_FIELDS = {
   primaryContacts: "Primary Contacts",
   countofactiveguides: "CountofActiveGuides",
   schoolPhone: "School Phone",
-  actionstepid: "action_step_id",
   charterShortName: "Charter Short Name",
-  dedupeSchoolWith: "Dedupe school with",
-  educatorsxschoolsid: "educatorsXschools_id",
   guidestarListingRequested: "GuideStar Listing Requested?",
-  whiteFromFamilySurvey: "White (from Family Survey)",
   priorNames: "Prior Names",
-  guideAssignments: "Guide assignments",
-  schoolnoteid: "school_note_id",
   website: "Website",
-  OfStudents: "# of Students",
   schoolSchedule: "School schedule",
   ssjTargetState: "SSJ - Target State",
   domainName: "Domain Name",
@@ -416,11 +374,9 @@ export const SCHOOLS_FIELDS = {
   activelatitude: "activeLatitude",
   googleWorkspaceOrgUnitPath: "Google Workspace Org Unit Path",
   aboutSpanish: "About Spanish",
-  loanid: "loan_id",
   loanReportName: "Loan Report Name",
   currentFyEnd: "Current FY end",
   ssjProjectedOpen: "SSJ - Projected Open",
-  middleEastern: "Middle Eastern",
   businessInsurance: "Business Insurance",
   onNationalWebsite: "On national website",
   qbo: "QBO",
@@ -429,7 +385,6 @@ export const SCHOOLS_FIELDS = {
   admissionsSystem: "Admissions System",
   ssjHasTheEtlIdentifiedAPartner: "SSJ - Has the ETL identified a partner?",
   ssjNameReserved: "SSJ - Name Reserved",
-  pacificIslanderFromFamilySurvey: "Pacific Islander (from Family Survey)",
   countOfActivePhysicalAddresses: "Count of Active Physical Addresses",
   automationNotes: "Automation notes",
   membershipStatus: "Membership Status",
@@ -447,11 +402,7 @@ export const EDUCATORS_FIELDS = {
   assignedPartnerOverrideFromSsjFilloutForms: "Assigned Partner Override (from SSJ Fillout Forms)",
   trainingGrants: "Training Grants",
   startupStageForActiveSchool: "Startup Stage for Active School",
-  primaryContactFor: "Primary contact for",
-  activeHolaspirit: "Active Holaspirit",
   nickname: "Nickname",
-  educatorNotes: "Educator notes",
-  ssjfilloutformid: "ssj_fillout_form_id",
   routedTo: "Routed to",
   gender: "Gender",
   assignedPartner: "Assigned Partner",
@@ -462,17 +413,14 @@ export const EDUCATORS_FIELDS = {
   assignedPartnerEmail: "Assigned Partner Email",
   lastModified: "Last Modified",
   raceEthnicity: "Race & Ethnicity",
-  notesFromEducatorNotes: "Notes (from Educator notes)",
   montessoriCertifications: "Montessori Certifications",
   targetInternational: "Target - international",
   genderOther: "Gender - Other",
   educatorsxschoolsid: "educatorsXschools_id",
   sourceOther: "Source - other",
   certifierFromMontessoriCertifications: "Certifier (from Montessori Certifications)",
-  survey2022WildflowerNetworkSurvey: "survey - 2022 Wildflower Network Survey",
   pronouns: "Pronouns",
   archived: "Archived",
-  educatorsAtSchools: "Educators at Schools",
   currentPrimaryEmailAddress: "Current Primary Email Address",
   emailSentByInitialOutreacher: "Email sent by initial outreacher",
   secondaryPhone: "Secondary phone",
@@ -488,24 +436,20 @@ export const EDUCATORS_FIELDS = {
   certificationLevelsFromMontessoriCertifications: "Certification Levels (from Montessori Certifications)",
   opsGuideRequestPertinentInfo: "Ops Guide Request Pertinent Info",
   activeSchoolAffiliationStatus: "Active School Affiliation Status",
-  montessoricertid: "montessori_cert_id",
   pronounsOther: "Pronouns - Other",
   dedupeWith: "Dedupe with",
   lastName: "Last Name",
-  educatornotesid: "educator_notes_id",
   raceEthnicityOther: "Race & Ethnicity - Other",
   targetState: "Target state",
   created: "Created",
   entryDateFromSsjFilloutForms: "Entry Date (from SSJ Fillout Forms)",
   tcUserId: "TC User ID",
-  emailid: "email_id",
   countOfGetInvolvedForms: "Count of Get Involved Forms",
   contactFormDetailsFromSsjDataOnEducators: "Contact Form Details (from SSJ data on educators)",
   newsletterAndGroupSubscriptions: "Newsletter and Group Subscriptions",
   homeAddress: "Home Address",
   cohorts: "Cohorts",
   source: "Source",
-  countoflinkedschools: "CountofLinkedSchools",
   educationalAttainment: "Educational Attainment",
   messageFromSsjFilloutForms: "Message (from SSJ Fillout Forms)",
   opsGuideAnyFundraisingOpportunities: "Ops Guide Any fundraising opportunities?",
@@ -526,8 +470,6 @@ export const EDUCATORS_FIELDS = {
   schoolStatuses: "School Statuses",
   currentlyActiveAtASchool: "Currently Active at a School?",
   oneOnOneStatus: "One on one status",
-  allSchools: "All Schools",
-  ssjoldstartaschoolid: "ssj_old_start_a_school_id",
   excludeFromEmailLogging: "Exclude from email logging",
   incomeBackground: "Income Background",
 } as const;
@@ -585,7 +527,6 @@ export const SCHOOL_NOTES_FIELDS = {
   partnerShortName: "Partner Short Name",
   headlineNotes: "Headline (Notes)",
   school: "School",
-  schoolNoteKey: "School Note Key",
   charterId: "charter_id",
   partnersCopy: "Partners copy",
   notes: "Notes",
@@ -633,7 +574,6 @@ export const LOCATIONS_FIELDS = {
   lease: "Lease",
   timeZone: "Time Zone",
   endOfTimeAtLocation: "End of time at location",
-  locationKey: "Location Key",
   censusTract: "Census Tract",
   squareFeet: "Square feet",
   neighborhood: "Neighborhood",
@@ -662,84 +602,15 @@ export const LOCATIONS_FIELDS = {
   schoolId: "school_id",
 } as const;
 
-export const EVENT_ATTENDANCE_FIELDS = {
-  ageClassroomsInterestedInOfferingFromEventParticipant: "Age Classrooms Interested in Offering (from Event Participant)",
-  educatorsAtSchoolsFromEventParticipant: "Educators at Schools (from Event Participant)",
-  startedSsjCompletedSsjTypeform: "Started SSJ? (completed SSJ typeform)",
-  currentSchoolFromEventParticipant2: "Current School (from Event Participant) 2",
-  ssjTypeformsStartASchoolFromEventParticipant: "SSJ Typeforms: Start a School (from Event Participant)",
-  network: "Network",
-  registrationDate: "Registration Date",
-  countofloggedplanningsFromEventParticipant: "CountofLoggedPlannings (from Event Participant)",
-  stageChangeFromDiscoveryToVisioningFromEventParticipant: "Stage change from Discovery to Visioning (from Event Participant)",
-  entryDateFromStartASchoolFormFromEducators: "Entry Date (from Start a School form) (from Educators)",
-  registered: "Registered",
-  attended: "Attended",
-  createdFromEventParticipant2: "Created (from Event Participant) 2",
-  currentSchoolFromEventParticipant: "Current School (from Event Participant)",
-  statusFromEventParticipant2: "Status (from Event Participant) 2",
-  tlStoriesRace: "TL Stories Race",
-  montessoriCertifiedFromEventParticipant: "Montessori Certified (from Event Participant)",
-  tlStoriesQ1: "TL Stories Q1",
-  tlStoriesQ2: "TL Stories Q2",
-  sourceFromSsjTypeformsStartASchoolFromEventParticipant: "Source (from SSJ Typeforms: Start a School) (from Event Participant)",
-  eventType: "Event Type",
-  ageClassroomsInterestedInOfferingFromEventParticipant2: "Age Classrooms Interested in Offering (from Event Participant) 2",
-  incomeBackgroundFromEventParticipant: "Income Background (from Event Participant)",
-  phone: "Phone",
-  hubFromEventParticipant2: "Hub (from Event Participant) 2",
-  fullNameFromEventParticipant: "Full Name (from Event Participant)",
-  countofloggeddiscoverFromEventParticipant: "CountofLoggedDiscover (from Event Participant)",
-  educatorId: "educator_id",
-  assignedPartnerFromEventParticipant2: "Assigned Partner (from Event Participant) 2",
-  householdIncomeFromEventParticipant2: "Household Income (from Event Participant) 2",
-  tlStoriesSchoolTarget: "TL Stories School Target",
-  stageChangeFromVisioningToPlanningFromEventParticipant: "Stage change from visioning to planning (from Event Participant)",
-  stageFromEventParticipant: "Stage (from Event Participant)",
-  educatorsAtSchoolsFromEventParticipant2: "Educators at Schools (from Event Participant) 2",
-  educatorRecordCreated: "Educator record created",
-  eventName: "Event Name",
-  timeAtEvent: "Time at event",
-  schoolStatusFromEventParticipant: "School Status (from Event Participant)",
-  eventAttendanceKey: "Event Attendance key",
-  whenDidTheySwitchToVisioning: "When did they switch to visioning",
-  raceEthnicityFromEventParticipant: "Race & Ethnicity (from Event Participant)",
-  hubFromEventParticipant: "Hub (from Event Participant)",
-  eventParticipant: "Event Participant",
-  statusFromEventParticipant: "Status (from Event Participant)",
-  hubNameFromEventParticipant: "Hub Name (from Event Participant)",
-  marketingSource: "Marketing source",
-  householdIncomeFromEventParticipant: "Household Income (from Event Participant)",
-  event: "Event",
-  incomeBackgroundFromEventParticipant2: "Income Background (from Event Participant) 2",
-  assignedPartnerFromEventParticipant: "Assigned Partner (from Event Participant)",
-  montessoriCertificationsFromEventParticipant: "Montessori Certifications (from Event Participant)",
-  createdDate: "Created date",
-  firstVisioningFromEventParticipant: "First visioning (from Event Participant)",
-  raceEthnicityFromEventParticipant2: "Race & Ethnicity (from Event Participant) 2",
-  tlStoriesType: "TL Stories Type",
-  createdFromEventParticipant: "Created (from Event Participant)",
-  countofloggedvisioningFromEventParticipant: "CountofLoggedVisioning (from Event Participant)",
-  schoolStatusFromEventParticipant2: "School Status (from Event Participant) 2",
-  needsSpanishTranslation: "needs spanish translation",
-} as const;
-
 export const LEAD_ROUTING_AND_TEMPLATES_FIELDS = {
   state: "State",
   sendgridTemplateId: "SendGrid Template ID",
   geotype: "Geo-type",
   cc: "cc",
   source: "Source",
+  Type: "Type",
   name: "Name",
   sender: "Sender",
-} as const;
-
-export const COHORTS_FIELDS = {
-  charters: "Charters",
-  cohortName: "Cohort Name",
-  schools: "Schools",
-  startDate: "Start Date",
-  programType: "Program Type",
 } as const;
 
 export const EVENTS_FIELDS = {
@@ -747,7 +618,6 @@ export const EVENTS_FIELDS = {
   eventName: "Event Name",
   type: "Type",
   eventid: "event_id",
-  attendees: "Attendees",
 } as const;
 
 export const BOARD_SERVICE_FIELDS = {
@@ -758,6 +628,8 @@ export const BOARD_SERVICE_FIELDS = {
   communityMemberEmail: "Community Member Email",
   currentlyActive: "Currently Active",
   chair: "Chair",
+  School: "School",
+  Educator: "Educator",
 } as const;
 
 export const SUPABASE_JOIN_990_WITH_SCHOOL_FIELDS = {
@@ -769,7 +641,6 @@ export const SUPABASE_JOIN_990_WITH_SCHOOL_FIELDS = {
 export const CHARTERS_FIELDS = {
   locationIdFromLocations: "Location ID (from Locations)",
   schools: "Schools",
-  charterAssessments: "Charter assessments",
   incorporationDate: "Incorporation Date",
   status: "Status",
   shortName: "Short Name",
@@ -783,22 +654,16 @@ export const CHARTERS_FIELDS = {
   membershipStatusOfSchools: "Membership status of schools",
   nonprofitStatus: "Nonprofit status",
   currentTlsFromSchools: "Current TLs (from Schools)",
-  linkedSchools: "Linked Schools",
-  recordIdFromSchools: "Record ID (from Schools)",
-  locations: "Locations",
   supportTimeline: "Support timeline",
   application: "Application",
   initialTargetAges: "Initial target ages",
   nondiscriminationPolicyOnWebsite: "Nondiscrimination Policy on Website",
-  docIdFromSchoolGovernanceDocuments: "Doc ID (from School governance documents)",
   tlDiscoveryStatus: "TL discovery status",
   currentFyEnd: "Current FY end",
   guidestarListingRequested: "GuideStar Listing Requested?",
-  recidFromCharterApplications: "recID (from Charter applications)",
   dateReceivedGroupExemption: "Date received group exemption",
   nameFromNontlRoles: "Name (from Non-TL roles)",
   authorized: "Authorized",
-  charterKey: "Charter key",
   projectedOpen: "Projected open",
   partnershipWithWfStarted: "Partnership with WF started",
   initialTargetCommunity: "Initial target community",
@@ -806,15 +671,9 @@ export const CHARTERS_FIELDS = {
   website: "Website",
   charterlevelMembershipAgreement: "Charter-level membership agreement",
   recidFromCharterAuthorizersAndContacts: "recId (from Charter authorizers and contacts)",
-  schoolGovernanceDocuments: "School governance documents",
-  annualEnrollmentAndDemographics: "Annual enrollment and demographics",
-  recidFromSchoolReports: "RecID (from School reports)",
-  schoolReports: "School reports",
   groupExemptionStatus: "Group Exemption Status",
-  nineNinetiesId: "Nine nineties Record ID (from Nine nineties)",
   charterId: "charter_id",
   schoolProvidedWith1023RecordkeepingRequirements: "School provided with 1023 recordkeeping requirements",
-  charterassessmentid: "charter_assessment_id",
   fullName: "Full name",
   ein: "EIN",
   roleFromNontlRoles: "Role (from Non-TL roles)",
@@ -847,7 +706,6 @@ export const ACTION_STEPS_FIELDS = {
 
 export const GUIDES_FIELDS = {
   stintTypeFromStints: "Stint type (from Stints)",
-  educatorRecordIds: "Educator Record IDs",
   photo: "Photo",
   name: "Name",
   email: "Email",
@@ -859,15 +717,12 @@ export const GUIDES_FIELDS = {
   slackHandle: "Slack handle",
   roles: "Roles",
   dob: "DOB",
-  copperUserid: "Copper userID",
-  guideAssignments: "Guide assignments",
   homeAddress: "Home address",
   emailOrName: "email or name",
   leadRouting: "Lead Routing",
   shortName: "Short name",
   membershipTerminationStepsAndDates: "Membership termination steps and dates",
   ssjProcessDetails: "SSJ Process Details",
-  guidedSchoolRecordId: "Guided School Record ID",
   startDateFromStints: "Start Date (from Stints)",
   activeStint: "Active stint",
   websiteBio: "Website bio",
@@ -882,16 +737,12 @@ export const CHARTER_ROLES_FIELDS = {
   email: "Email",
   title: "Title",
   charterId: "charter_id",
-  raceEthnicityFromEducatorRecord: "Race & Ethnicity (from Educator record)",
   startDate: "Start date",
   role: "Role",
-  charterRoleKey: "Charter role key",
-  currentPrimaryEmailAddressFromEducatorRecord: "Current Primary Email Address (from Educator record)",
   phone: "Phone",
   endDate: "End date",
   currentlyActive: "Currently active",
   name: "Name",
-  statusFromCharter: "Status (from Charter)",
   educatorRecord: "Educator record",
   charterApplications2: "Charter applications 2",
   charterroleid: "charter_role_id",
@@ -943,7 +794,6 @@ export const GRANTS_FIELDS = {
   daysSinceFullAdviceRequest: "Days since full advice request",
   nonprofitStatus: "Nonprofit status",
   currentTls: "Current TLs",
-  grantKey: "Grant Key",
   einAtTimeOfGrant: "EIN at time of grant",
   countOfActiveMailingAddressesFromSchool: "Count of Active Mailing Addresses (from School)",
   amount: "Amount",
@@ -979,12 +829,60 @@ export const MAILING_LISTS_FIELDS = {
   googleGroupId: "Google Group ID",
 } as const;
 
+export const EVENT_ATTENDANCE_FIELDS = {
+  startedSsjCompletedSsjTypeform: "Started SSJ? (completed SSJ typeform)",
+  ssjTypeformsStartASchoolFromEventParticipant: "SSJ Typeforms: Start a School (from Event Participant)",
+  network: "Network",
+  registrationDate: "Registration Date",
+  countofloggedplanningsFromEventParticipant: "CountofLoggedPlannings (from Event Participant)",
+  stageChangeFromDiscoveryToVisioningFromEventParticipant: "Stage change from Discovery to Visioning (from Event Participant)",
+  entryDateFromStartASchoolFormFromEducators: "Entry Date (from Start a School form) (from Educators)",
+  registered: "Registered",
+  attended: "Attended",
+  createdFromEventParticipant2: "Created (from Event Participant) 2",
+  currentSchoolFromEventParticipant: "Current School (from Event Participant)",
+  tlStoriesRace: "TL Stories Race",
+  montessoriCertifiedFromEventParticipant: "Montessori Certified (from Event Participant)",
+  tlStoriesQ1: "TL Stories Q1",
+  tlStoriesQ2: "TL Stories Q2",
+  sourceFromSsjTypeformsStartASchoolFromEventParticipant: "Source (from SSJ Typeforms: Start a School) (from Event Participant)",
+  eventType: "Event Type",
+  ageClassroomsInterestedInOfferingFromEventParticipant2: "Age Classrooms Interested in Offering (from Event Participant) 2",
+  incomeBackgroundFromEventParticipant: "Income Background (from Event Participant)",
+  phone: "Phone",
+  fullNameFromEventParticipant: "Full Name (from Event Participant)",
+  countofloggeddiscoverFromEventParticipant: "CountofLoggedDiscover (from Event Participant)",
+  educatorId: "educator_id",
+  tlStoriesSchoolTarget: "TL Stories School Target",
+  stageChangeFromVisioningToPlanningFromEventParticipant: "Stage change from visioning to planning (from Event Participant)",
+  stageFromEventParticipant: "Stage (from Event Participant)",
+  educatorRecordCreated: "Educator record created",
+  eventName: "Event Name",
+  timeAtEvent: "Time at event",
+  schoolStatusFromEventParticipant: "School Status (from Event Participant)",
+  whenDidTheySwitchToVisioning: "When did they switch to visioning",
+  raceEthnicityFromEventParticipant: "Race & Ethnicity (from Event Participant)",
+  hubFromEventParticipant: "Hub (from Event Participant)",
+  eventParticipant: "Event Participant",
+  statusFromEventParticipant: "Status (from Event Participant)",
+  marketingSource: "Marketing source",
+  householdIncomeFromEventParticipant: "Household Income (from Event Participant)",
+  event: "Event",
+  assignedPartnerFromEventParticipant: "Assigned Partner (from Event Participant)",
+  montessoriCertificationsFromEventParticipant: "Montessori Certifications (from Event Participant)",
+  createdDate: "Created date",
+  firstVisioningFromEventParticipant: "First visioning (from Event Participant)",
+  tlStoriesType: "TL Stories Type",
+  createdFromEventParticipant: "Created (from Event Participant)",
+  countofloggedvisioningFromEventParticipant: "CountofLoggedVisioning (from Event Participant)",
+  needsSpanishTranslation: "needs spanish translation",
+} as const;
+
 export const AIRTABLE_LOAN_PAYMENTS_FIELDS = {
   amount: "Amount",
   paymentDate: "Payment date",
   school: "School",
   shortName: "Short Name",
-  paymentKey: "Payment key",
 } as const;
 
 export const AIRTABLE_LOANS_FIELDS = {
@@ -995,7 +893,6 @@ export const AIRTABLE_LOANS_FIELDS = {
   loanContactEmail1: "Loan Contact Email 1",
   loanStatus: "Loan Status",
   issueMethod: "Issue Method",
-  loanKey: "Loan Key",
   school: "School",
   interestRate: "Interest Rate",
   contactEmailFromEducatorFromEducatorsXSchoolsFromSchool: "Contact email (from Educator) (from Educators x Schools) (from School)",
@@ -1017,7 +914,6 @@ export const EDUCATOR_NOTES_FIELDS = {
   educatornotesid: "educator_notes_id",
   educatorId: "educator_id",
   date: "Date",
-  educatorNoteKey: "Educator Note Key",
   fullNameFromEducator: "Full Name (from Educator)",
 } as const;
 
@@ -1030,29 +926,6 @@ export const CHARTER_AUTHORIZERS_AND_CONTACTS_FIELDS = {
   contact: "Contact",
   currentlyActive: "Currently active",
   charterId: "charter_id",
-  charterAuthorizerKey: "Charter authorizer key",
-} as const;
-
-export const ASSESSMENT_DATA_FIELDS = {
-  assessmentDataKey: "Assessment Data key",
-  assessment: "Assessment",
-  metOrExceedsFrl: "Met or exceeds - FRL",
-  numberAssessedEll: "Number assessed - ELL",
-  year: "Year",
-  numberAssessedSped: "Number assessed - SPED",
-  school: "School",
-  numberAssessed: "Number assessed",
-  charterId: "charter_id",
-  otherData: "Other data",
-  metOrExceedsBipoc: "Met or exceeds - BIPOC",
-  schoolid: "school_id",
-  numberAssessedBipoc: "Number assessed - BIPOC",
-  metOrExceedsAll: "Met or exceeds - all",
-  assessmentdataid: "assessment_data_id",
-  numberAssessedFrl: "Number assessed - FRL",
-  charter: "Charter",
-  metOrExceedsSped: "Met or exceeds - SPED",
-  metOrExceedsEll: "Met or exceeds - ELL",
 } as const;
 
 export const MEMBERSHIP_TERMINATION_STEPS_AND_DATES_FIELDS = {
@@ -1062,8 +935,98 @@ export const MEMBERSHIP_TERMINATION_STEPS_AND_DATES_FIELDS = {
   responsiblePersonAtWf: "Responsible person at WF",
 } as const;
 
+export const NINE_NINETIES_FIELDS = {
+  supabaseid: "supabase_id",
+  aiDerivedRevenue: "AI Derived Revenue",
+  aiDerivedEoyDate: "AI Derived EOY Date",
+  nineNinetiesReportingYear: "Nine nineties Reporting Year",
+  schoolId: "school_id",
+  charterId: "charter_id",
+  notes: "Notes",
+} as const;
+
+export const GOVERNANCE_DOCS_FIELDS = {
+  documentType: "Document type",
+  govdocid: "govdoc_id",
+  date: "Date",
+  charterId: "charter_id",
+  shortname: "short_name",
+  docNotes: "Doc notes",
+  docLink: "Doc Link",
+  publicationLink: "Publication link",
+  schoolId: "school_id",
+  urlpdfExtensionFormula: "url-->pdf extension formula",
+  school: "School",
+  documentPdf: "Document PDF",
+  created: "Created",
+  charter: "Charter",
+} as const;
+
+export const GUIDES_ASSIGNMENTS_FIELDS = {
+  currentlyActive: "Currently active",
+  guideShortName: "Guide short name",
+  endDate: "End date",
+  schoolShortName: "School Short Name",
+  schoolId: "school_id",
+  startDate: "Start date",
+  type: "Type",
+} as const;
+
+export const COHORTS_FIELDS = {
+  cohortName: "Cohort Name",
+  startDate: "Start Date",
+  programType: "Program Type",
+} as const;
+
+export const SCHOOL_YEAR_FIELDS = {
+  schoolYear: "School year",
+} as const;
+
+export const REPORTS_AND_SUBMISSIONS_FIELDS = {
+  charter: "Charter",
+  reportsid: "reports_id",
+  attachments: "Attachments",
+  schoolYear: "School year",
+  reportType: "Report type",
+  charterId: "charter_id",
+} as const;
+
+export const STATES_ALIASES_FIELDS = {
+  abbreviation: "Abbreviation",
+  state: "State",
+} as const;
+
+export const PUBLIC_FUNDING_FIELDS = {
+  description: "Description",
+  name: "Name",
+  relevantLevels: "Relevant levels",
+} as const;
+
+export const ASSESSMENT_DATA_FIELDS = {
+  assessment: "Assessment",
+  year: "Year",
+  school: "School",
+  numberAssessed: "Number assessed",
+  charterId: "charter_id",
+  schoolid: "school_id",
+  assessmentdataid: "assessment_data_id",
+  charter: "Charter",
+} as const;
+
+export const ANNUAL_ENROLLMENT_AND_DEMOGRAPHICS_FIELDS = {
+  school: "School",
+  numberOfEnrolledStudentsFrl: "Number of enrolled students - FRL",
+  numberOfEnrolledStudentsBipoc: "Number of enrolled students - BIPOC",
+  charter: "Charter",
+  schoolId: "school_id (from School)",
+  numberOfEnrolledStudentsSped: "Number of enrolled students - SPED",
+  numberOfEnrolledStudentsAll: "Number of enrolled students - all",
+  numberOfEnrolledStudentsEll: "Number of enrolled students - ELL",
+  schoolYear: "School Year",
+  annualdataid: "annual_data_id",
+} as const;
+
 export const EDUCATORS_X_SCHOOLS_FIELDS = {
-  edxschoolKey: "edXschool key",
   invitedTo2024Refresher: "Invited to 2024 Refresher",
   whoInitiatedEtlRemoval: "Who initiated E/TL removal?",
   school: "School",
@@ -1094,103 +1057,12 @@ export const EDUCATORS_X_SCHOOLS_FIELDS = {
   endDate: "End Date",
 } as const;
 
-export const NINE_NINETIES_FIELDS = {
-  supabaseid: "supabase_id",
-  aiDerivedRevenue: "AI Derived Revenue",
-  aiDerivedEoyDate: "AI Derived EOY Date",
-  nineNinetiesReportingYear: "Nine nineties Reporting Year",
-  schoolId: "school_id",
-  charterId: "charter_id",
-  notes: "Notes",
-} as const;
-
-export const GOVERNANCE_DOCS_FIELDS = {
-  documentType: "Document type",
-  govdocid: "govdoc_id",
-  date: "Date",
-  docKey: "Doc Key",
-  charterId: "charter_id",
-  shortname: "short_name",
-  docNotes: "Doc notes",
-  docLink: "Doc Link",
-  publicationLink: "Publication link",
-  schoolId: "school_id",
-  urlpdfExtensionFormula: "url-->pdf extension formula",
-  school: "School",
-  documentPdf: "Document PDF",
-  created: "Created",
-  charter: "Charter",
-} as const;
-
-export const GUIDES_ASSIGNMENTS_FIELDS = {
-  currentlyActive: "Currently active",
-  guideShortName: "Guide short name",
-  endDate: "End date",
-  schoolShortName: "School Short Name",
-  schoolId: "school_id",
-  startDate: "Start date",
-  type: "Type",
-} as const;
-
-export const TRAINING_GRANTS_FIELDS = {
-  stageFromEducators: "Stage (from Educators)",
-  trainingStatus: "Training Status",
-  hubNameFromEducators: "Hub Name (from Educators)",
-  trainingGrantAmount: "Training Grant Amount",
-  statusFromEducators: "Status (from Educators)",
-  trainingProgram: "Training Program",
-  cohort: "Cohort",
-  notes: "Notes",
-  applied: "Applied?",
-  trainingGrantStatus: "Training Grant Status",
-} as const;
-
-export const REPORTS_AND_SUBMISSIONS_FIELDS = {
-  charter: "Charter",
-  reportsid: "reports_id",
-  attachments: "Attachments",
-  schoolYear: "School year",
-  reportType: "Report type",
-  charterId: "charter_id",
-} as const;
-
-export const STATES_ALIASES_FIELDS = {
-  abbreviation: "Abbreviation",
-  state: "State",
-} as const;
-
-export const PUBLIC_FUNDING_FIELDS = {
-  description: "Description",
-  schools: "Schools",
-  name: "Name",
-  relevantLevels: "Relevant levels",
-} as const;
-
-export const ANNUAL_ENROLLMENT_AND_DEMOGRAPHICS_FIELDS = {
-  annualDataKey: "Annual data key",
-  school: "School",
-  numberOfEnrolledStudentsFrl: "Number of enrolled students - FRL",
-  numberOfEnrolledStudentsBipoc: "Number of enrolled students - BIPOC",
-  charter: "Charter",
-  schoolId: "school_id (from School)",
-  numberOfEnrolledStudentsSped: "Number of enrolled students - SPED",
-  numberOfEnrolledStudentsAll: "Number of enrolled students - all",
-  numberOfEnrolledStudentsEll: "Number of enrolled students - ELL",
-  schoolYear: "School Year",
-  annualdataid: "annual_data_id",
-} as const;
-
 export const ASSESSMENTS_FIELDS = {
   shortName: "Short Name",
   fullName: "Full Name",
   domain: "Domain",
   annualAssessmentImplementationsBySchool: "Annual Assessment Implementations by School",
   grades: "Grades",
-} as const;
-
-export const EVENT_TYPES_FIELDS = {
-  events: "Events",
-  eventCategory: "Event Category",
 } as const;
 
 export const EMAIL_ADDRESSES_FIELDS = {
@@ -1203,18 +1075,8 @@ export const EMAIL_ADDRESSES_FIELDS = {
   currentPrimaryEmail: "Current Primary Email",
 } as const;
 
-export const MONTESSORI_CERTIFIERS_OLD_LIST_FIELDS = {
-  name: "Name",
-  ssjFilloutFormGetInvolved2: "SSJ Fillout Form: Get Involved 2",
-  ssjFilloutFormGetInvolved: "SSJ Fillout Form: Get Involved",
-  ssjFilloutFormGetInvolved4: "SSJ Fillout Form: Get Involved 4",
-  abbreviation: "Abbreviation",
-  ssjFilloutFormGetInvolved3: "SSJ Fillout Form: Get Involved 3",
-} as const;
-
 export const MARKETING_SOURCE_OPTIONS_FIELDS = {
   marketingSource: "Marketing Source",
-  educators: "Educators",
 } as const;
 
 export const MONTESSORI_CERT_LEVELS_FIELDS = {
@@ -1222,9 +1084,8 @@ export const MONTESSORI_CERT_LEVELS_FIELDS = {
   educators: "Educators",
 } as const;
 
-export const RACE_AND_ETHNICITY_FIELDS = {
-  ssjFilloutFormGetInvolved: "SSJ Fillout Form: Get Involved",
-  name: "Name",
+export const EVENT_TYPES_FIELDS = {
+  eventCategory: "Event Category",
 } as const;
 
 export const AGES_GRADES_FIELDS = {
@@ -1233,6 +1094,10 @@ export const AGES_GRADES_FIELDS = {
 
 export const MONTESSORI_CERTIFIERS_FIELDS = {
   abbreviation: "Abbreviation",
+  name: "Name",
+} as const;
+
+export const RACE_AND_ETHNICITY_FIELDS = {
   name: "Name",
 } as const;
 
@@ -1983,19 +1848,13 @@ export const LOCATIONS_OPTIONS_COLOCATIONTYPE = [
   "Shelter / Transitional Housing",
 ] as const;
 
-export const EVENT_ATTENDANCE_OPTIONS_STARTEDSSJCOMPLETEDSSJTYPEFORM = [
-  "Yes",
-  "No",
-  "N/A",
-] as const;
-
 export const LEAD_ROUTING_AND_TEMPLATES_OPTIONS_GEOTYPE = [
   "States",
 ] as const;
 
-export const COHORTS_OPTIONS_PROGRAMTYPE = [
-  "Blooms",
-  "Charter",
+export const LEAD_ROUTING_AND_TEMPLATES_OPTIONS_TYPE = [
+  "Educator",
+  "Community member",
 ] as const;
 
 export const CHARTERS_OPTIONS_STATUS = [
@@ -2162,6 +2021,12 @@ export const MAILING_LISTS_OPTIONS_TYPE = [
   "Google Group",
 ] as const;
 
+export const EVENT_ATTENDANCE_OPTIONS_STARTEDSSJCOMPLETEDSSJTYPEFORM = [
+  "Yes",
+  "No",
+  "N/A",
+] as const;
+
 export const AIRTABLE_LOANS_OPTIONS_LOANSTATUS = [
   "Interest Only Period",
   "Principal Repayment Period",
@@ -2184,6 +2049,55 @@ export const AIRTABLE_LOANS_OPTIONS_USEOFPROCEEDS = [
   "Expansion",
   "Move",
   "Security deposit",
+] as const;
+
+export const GOVERNANCE_DOCS_OPTIONS_DOCUMENTTYPE = [
+  "Articles of Incorporation",
+  "Certificate of Incorporation",
+  "EIN Letter",
+  "Self management policy",
+  "Nepotism policy",
+  "Conflict of Interest policy",
+  "Bylaws",
+  "Document Retention Policy",
+  "Whistleblower Policy",
+  "Nondiscrimination Policy",
+  "Membership Agreement",
+  "Authorization Letter",
+  "Group Exemption Status Notification to IRS",
+  "Group Exemption Status Notification to School",
+  "Group Exemption Status Withdrawn Notification to IRS",
+  "IRS Determination Letter",
+  "Acknowledgement & Commitment",
+  "IRS Revocation Letter",
+] as const;
+
+export const GUIDES_ASSIGNMENTS_OPTIONS_TYPE = [
+  "Ops Guide",
+  "Equity Coach",
+  "Regional Entrepreneur",
+  "Open Schools Support",
+] as const;
+
+export const COHORTS_OPTIONS_PROGRAMTYPE = [
+  "Blooms",
+  "Charter",
+] as const;
+
+export const REPORTS_AND_SUBMISSIONS_OPTIONS_REPORTTYPE = [
+  "Performance data",
+  "Renewal report",
+] as const;
+
+export const PUBLIC_FUNDING_OPTIONS_RELEVANTLEVELS = [
+  "Parent-child",
+  "Infants",
+  "Toddlers",
+  "Primary",
+  "Lower Elementary",
+  "Upper Elementary",
+  "Adolescent / JH",
+  "High School",
 ] as const;
 
 export const EDUCATORS_X_SCHOOLS_OPTIONS_GSUITEROLES = [
@@ -2216,72 +2130,6 @@ export const EDUCATORS_X_SCHOOLS_OPTIONS_ROLES = [
   "Classroom Staff",
   "Fellow",
   "Other",
-] as const;
-
-export const GOVERNANCE_DOCS_OPTIONS_DOCUMENTTYPE = [
-  "Articles of Incorporation",
-  "Certificate of Incorporation",
-  "EIN Letter",
-  "Self management policy",
-  "Nepotism policy",
-  "Conflict of Interest policy",
-  "Bylaws",
-  "Document Retention Policy",
-  "Whistleblower Policy",
-  "Nondiscrimination Policy",
-  "Membership Agreement",
-  "Authorization Letter",
-  "Group Exemption Status Notification to IRS",
-  "Group Exemption Status Notification to School",
-  "Group Exemption Status Withdrawn Notification to IRS",
-  "IRS Determination Letter",
-  "Acknowledgement & Commitment",
-  "IRS Revocation Letter",
-] as const;
-
-export const GUIDES_ASSIGNMENTS_OPTIONS_TYPE = [
-  "Ops Guide",
-  "Equity Coach",
-  "Regional Entrepreneur",
-  "Open Schools Support",
-] as const;
-
-export const TRAINING_GRANTS_OPTIONS_TRAININGSTATUS = [
-  "Accepted",
-  "In-Progress",
-  "Complete",
-  "Withdrew",
-  "Incomplete application / did not apply",
-] as const;
-
-export const TRAINING_GRANTS_OPTIONS_TRAININGPROGRAM = [
-  "Rising Tide",
-] as const;
-
-export const TRAINING_GRANTS_OPTIONS_COHORT = [
-  "2022 Primary",
-] as const;
-
-export const TRAINING_GRANTS_OPTIONS_TRAININGGRANTSTATUS = [
-  "Planned",
-  "Issued",
-  "Cancelled",
-] as const;
-
-export const REPORTS_AND_SUBMISSIONS_OPTIONS_REPORTTYPE = [
-  "Performance data",
-  "Renewal report",
-] as const;
-
-export const PUBLIC_FUNDING_OPTIONS_RELEVANTLEVELS = [
-  "Parent-child",
-  "Infants",
-  "Toddlers",
-  "Primary",
-  "Lower Elementary",
-  "Upper Elementary",
-  "Adolescent / JH",
-  "High School",
 ] as const;
 
 export const ASSESSMENTS_OPTIONS_GRADES = [
@@ -2317,30 +2165,23 @@ export const PARTNERS_COPY_SCHEMA = z.object({
   lastModified: z.string(),
   roles: z.array(z.string()).optional(),
   emailTemplates: z.string().optional(),
-  educatorRecordIds: z.string().optional(),
-  grants5: z.array(z.string()).optional(),
   guideAssignments: z.string().optional(),
   shortName: z.string().optional(),
   publicWebsiteActive: z.boolean().optional(),
   websiteBio: z.string().optional(),
-  educatorNotes: z.array(z.string()).optional(),
   startDateFromStints: z.string().optional(),
   endDateFromStints: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   currentlyActive: z.string().optional(),
   slackHandle: z.string().optional(),
-  actionSteps: z.array(z.string()).optional(),
   dob: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   recordId: z.any().optional(),
   photo: z.array(z.string()).optional(),
   activeStint: z.array(z.string()).optional(),
-  tls: z.array(z.string()).optional(),
   phone: z.string().regex(/^[\+]?[1-9]?\d{1,14}$/, "Invalid phone number").optional(),
   papyrsProfile: z.string().optional(),
   stintTypeFromStints: z.array(z.string()).optional(),
   name: z.string().optional(),
   homeAddress: z.string().optional(),
-  schools: z.array(z.string()).optional(),
-  schoolNotes: z.array(z.string()).optional(),
   email: z.string().email().optional(),
   guidedSchoolRecordId: z.string().optional(),
   ssjProcessDetails: z.string().optional(),
@@ -2413,7 +2254,6 @@ export const SSJ_FILLOUT_FORMS_SCHEMA = z.object({
   socioeconomicLgbtqiaIdentifyingFromEmail: z.boolean().optional(),
   tempMCertCert2: z.string().optional(),
   communityMemberSelfInfo: z.string().optional(),
-  ssjFilloutFormKey: z.any().optional(),
   tempMCertYear3: z.string().optional(),
   educators: z.array(z.string()).optional(),
   linkToStartASchool: z.array(z.string()).optional(),
@@ -2459,9 +2299,7 @@ export const CHARTER_APPLICATIONS_SCHEMA = z.object({
   letterOfIntentDeadline: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   nonprofitStatus: z.string().optional(),
   authorizerDecisionRecd: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  targetCommunityFromCharter: z.string().optional(),
   finalBudget: z.array(z.string()).optional(),
-  currentTlDiscoveryStatus: z.string().optional(),
   likelihoodOfOpeningOnTime: z.string().optional(),
   authorizerDecision: z.string().optional(),
   shortName: z.string().optional(),
@@ -2469,19 +2307,15 @@ export const CHARTER_APPLICATIONS_SCHEMA = z.object({
   fullName: z.string().optional(),
   charterappid: z.any().optional(),
   milestones: z.any().optional(),
-  membershipStatusOfSchools: z.string().optional(),
   grades: z.any().optional(),
-  charterAppKey: z.any().optional(),
   letterOfIntentReqd: z.string().optional(),
   authorizerDecisionExpectedDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  keyDates: z.any().optional(),
   expectedDecision: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   opportunitiesAndChallenges: z.string().optional(),
   OfStudents: z.number().optional(),
   appSubmissionDeadline: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   likelihoodOfAuthorization: z.string().optional(),
   currentTlsFromSchoolsFromCharter: z.string().optional(),
-  landscapeAnalysisFromCharter: z.string().optional(),
   charterAppProjectMgmtPlanComplete: z.boolean().optional(),
   appSubmitted: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   charterDesign: z.array(z.string()).optional(),
@@ -2502,7 +2336,6 @@ export const CHARTER_APPLICATIONS_SCHEMA = z.object({
   supportTimeline: z.array(z.string()).optional(),
   status: z.string().optional(),
   capacityInterviewTrainingComplete: z.boolean().optional(),
-  charterlevelMembershipAgreementSigned: z.string().optional(),
   charterAppWalkthrough: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   tlMembershipAgreementSigned: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   applicationWindow: z.string().optional(),
@@ -2521,15 +2354,12 @@ export const SCHOOLS_SCHEMA = z.object({
   enrollmentAtFullCapacity: z.number().optional(),
   ssjIsTheSchoolPlanningToApplyForInternalWildflowerFunding: z.string().optional(),
   guideEmail: z.array(z.string()).optional(),
-  locationid: z.string().optional(),
   emailDomain: z.string().optional(),
   ssjCohortStatus: z.string().optional(),
   visioningAlbumComplete: z.boolean().optional(),
   transparentClassroom: z.string().optional(),
   ssjOriginalProjectedOpenDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  latinxFromFamilySurvey: z.string().optional(),
   logoUrl: z.string().url().optional(),
-  globalMajority: z.string().optional(),
   ssjGapInFunding: z.string().optional(),
   planningAlbum: z.array(z.string()).optional(),
   countOfActiveMailingAddresses: z.number().optional(),
@@ -2541,9 +2371,6 @@ export const SCHOOLS_SCHEMA = z.object({
   currentPhysicalAddress: z.string().optional(),
   ssjProjOpenSchoolYearBackup: z.string().optional(),
   primaryContactEmail: z.array(z.string()).optional(),
-  locations: z.array(z.string()).optional(),
-  frl: z.string().optional(),
-  guideassignmentid: z.string().optional(),
   opened: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   governanceModel: z.string().optional(),
   leaseEndDate: z.string().optional(),
@@ -2552,37 +2379,26 @@ export const SCHOOLS_SCHEMA = z.object({
   nondiscriminationPolicyOnApplication: z.boolean().optional(),
   ssjIsTheBudgetAtAStageThatWillAllowTheEtlsToTakeTheirNextSteps: z.string().optional(),
   emailAtSchoolFromEducatorsXSchools: z.array(z.string()).optional(),
-  mediumIncome: z.string().optional(),
   legalName: z.string().optional(),
   agreementVersion: z.string().optional(),
   familysurveyid: z.string().optional(),
-  isThereA2022990: z.number().optional(),
-  highIncomeFromFamilySurvey: z.string().optional(),
   groupExemptionStatus: z.string().optional(),
   nineNinetiesAttachment: z.string().optional(),
   membershipAgreementDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  lowIncome: z.string().optional(),
   currentTls: z.string().optional(),
-  OfFormsSent: z.string().optional(),
   shortName: z.string().optional(),
   flexibleTuitionModel: z.boolean().optional(),
-  grantsWf: z.array(z.string()).optional(),
   googleVoice: z.string().optional(),
-  grantid: z.string().optional(),
-  schoolNotes: z.array(z.string()).optional(),
   signedMembershipAgreement: z.array(z.string()).optional(),
   ssjFacility: z.string().optional(),
   ssjTargetCity: z.string().optional(),
   nondiscriminationPolicyOnWebsite: z.boolean().optional(),
-  nativeAmericanFromFamilySurvey: z.string().optional(),
   agesServed: z.array(z.string()).optional(),
   ssjIsTheTeamOnTrackForTheirEnrollmentGoals: z.string().optional(),
   building4goodFirmAttorney: z.string().optional(),
   enteredVisioningDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   primaryContactId: z.string().optional(),
-  raceEthnicityFromEducatorViaEducatorsXSchools: z.string().optional(),
   schoolStatus: z.string().optional(),
-  nineninetyid: z.string().optional(),
   leftNetworkDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   activeGuides: z.string().optional(),
   tcRecordkeeping: z.string().optional(),
@@ -2592,7 +2408,6 @@ export const SCHOOLS_SCHEMA = z.object({
   billcomAccount: z.string().optional(),
   instagram: z.string().optional(),
   ein: z.string().optional(),
-  loanFromLoansIssueMethod: z.string().optional(),
   currentPhysicalAddressCity: z.string().optional(),
   bookkeeperAccountant: z.string().optional(),
   ssjLoanApprovedAmt: z.string().optional(),
@@ -2605,13 +2420,11 @@ export const SCHOOLS_SCHEMA = z.object({
   currentMailingAddress: z.string().optional(),
   ssjTotalStartupFundingNeeded: z.string().optional(),
   schoolContactEmails: z.array(z.string()).optional(),
-  OfAsianAmericanStudents: z.string().optional(),
   budgetUtility: z.string().optional(),
   ssjWhatIsTheNextBigDecisionOrActionThisSchoolIsWorkingOn: z.string().optional(),
   dateReceivedGroupExemption: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   pod: z.string().optional(),
   legalStructure: z.string().optional(),
-  OfAfricanAmericanStudents: z.string().optional(),
   archived: z.boolean().optional(),
   incorporationDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   activelongitude: z.string().optional(),
@@ -2628,17 +2441,10 @@ export const SCHOOLS_SCHEMA = z.object({
   primaryContacts: z.array(z.string()).optional(),
   countofactiveguides: z.number().optional(),
   schoolPhone: z.string().regex(/^[\+]?[1-9]?\d{1,14}$/, "Invalid phone number").optional(),
-  actionstepid: z.string().optional(),
   charterShortName: z.string().optional(),
-  dedupeSchoolWith: z.string().optional(),
-  educatorsxschoolsid: z.string().optional(),
   guidestarListingRequested: z.boolean().optional(),
-  whiteFromFamilySurvey: z.string().optional(),
   priorNames: z.string().optional(),
-  guideAssignments: z.array(z.string()).optional(),
-  schoolnoteid: z.string().optional(),
   website: z.string().url().optional(),
-  OfStudents: z.string().optional(),
   schoolSchedule: z.array(z.string()).optional(),
   ssjTargetState: z.string().optional(),
   domainName: z.string().optional(),
@@ -2648,11 +2454,9 @@ export const SCHOOLS_SCHEMA = z.object({
   activelatitude: z.string().optional(),
   googleWorkspaceOrgUnitPath: z.string().optional(),
   aboutSpanish: z.string().optional(),
-  loanid: z.string().optional(),
   loanReportName: z.string().optional(),
   currentFyEnd: z.string().optional(),
   ssjProjectedOpen: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  middleEastern: z.string().optional(),
   businessInsurance: z.string().optional(),
   onNationalWebsite: z.string().optional(),
   qbo: z.string().optional(),
@@ -2661,7 +2465,6 @@ export const SCHOOLS_SCHEMA = z.object({
   admissionsSystem: z.string().optional(),
   ssjHasTheEtlIdentifiedAPartner: z.string().optional(),
   ssjNameReserved: z.string().optional(),
-  pacificIslanderFromFamilySurvey: z.string().optional(),
   countOfActivePhysicalAddresses: z.number().optional(),
   automationNotes: z.string().optional(),
   membershipStatus: z.string().optional(),
@@ -2682,11 +2485,7 @@ export const EDUCATORS_SCHEMA = z.object({
   assignedPartnerOverrideFromSsjFilloutForms: z.string().optional(),
   trainingGrants: z.array(z.string()).optional(),
   startupStageForActiveSchool: z.string().optional(),
-  primaryContactFor: z.array(z.string()).optional(),
-  activeHolaspirit: z.boolean().optional(),
   nickname: z.string().optional(),
-  educatorNotes: z.array(z.string()).optional(),
-  ssjfilloutformid: z.string().optional(),
   routedTo: z.string().optional(),
   gender: z.string().optional(),
   assignedPartner: z.array(z.string()).optional(),
@@ -2696,17 +2495,14 @@ export const EDUCATORS_SCHEMA = z.object({
   montessoriLeadGuideTrainings: z.array(z.string()).optional(),
   assignedPartnerEmail: z.string().email().optional(),
   raceEthnicity: z.array(z.string()).optional(),
-  notesFromEducatorNotes: z.string().optional(),
   montessoriCertifications: z.array(z.string()).optional(),
   targetInternational: z.string().optional(),
   genderOther: z.string().optional(),
   educatorsxschoolsid: z.string().optional(),
   sourceOther: z.string().optional(),
   certifierFromMontessoriCertifications: z.string().optional(),
-  survey2022WildflowerNetworkSurvey: z.boolean().optional(),
   pronouns: z.string().optional(),
   archived: z.boolean().optional(),
-  educatorsAtSchools: z.array(z.string()).optional(),
   currentPrimaryEmailAddress: z.string().email().optional(),
   emailSentByInitialOutreacher: z.string().optional(),
   secondaryPhone: z.string().regex(/^[\+]?[1-9]?\d{1,14}$/, "Invalid phone number").optional(),
@@ -2722,23 +2518,19 @@ export const EDUCATORS_SCHEMA = z.object({
   certificationLevelsFromMontessoriCertifications: z.string().optional(),
   opsGuideRequestPertinentInfo: z.string().optional(),
   activeSchoolAffiliationStatus: z.string().optional(),
-  montessoricertid: z.string().optional(),
   pronounsOther: z.string().optional(),
   dedupeWith: z.string().optional(),
   lastName: z.string().optional(),
-  educatornotesid: z.string().optional(),
   raceEthnicityOther: z.string().optional(),
   targetState: z.string().optional(),
   entryDateFromSsjFilloutForms: z.string().optional(),
   tcUserId: z.string().optional(),
-  emailid: z.string().optional(),
   countOfGetInvolvedForms: z.number().optional(),
   contactFormDetailsFromSsjDataOnEducators: z.string().optional(),
   newsletterAndGroupSubscriptions: z.array(z.string()).optional(),
   homeAddress: z.string().optional(),
   cohorts: z.string().optional(),
   source: z.array(z.string()).optional(),
-  countoflinkedschools: z.number().optional(),
   educationalAttainment: z.string().optional(),
   messageFromSsjFilloutForms: z.string().optional(),
   opsGuideAnyFundraisingOpportunities: z.string().optional(),
@@ -2759,8 +2551,6 @@ export const EDUCATORS_SCHEMA = z.object({
   schoolStatuses: z.string().optional(),
   currentlyActiveAtASchool: z.string().optional(),
   oneOnOneStatus: z.string().optional(),
-  allSchools: z.string().optional(),
-  ssjoldstartaschoolid: z.string().optional(),
   excludeFromEmailLogging: z.boolean().optional(),
   incomeBackground: z.string().optional(),
 });
@@ -2824,7 +2614,6 @@ export const SCHOOL_NOTES_SCHEMA = z.object({
   partnerShortName: z.string().optional(),
   headlineNotes: z.string().optional(),
   school: z.array(z.string()).optional(),
-  schoolNoteKey: z.any().optional(),
   charterId: z.string().optional(),
   partnersCopy: z.array(z.string()).optional(),
   notes: z.string().optional(),
@@ -2878,7 +2667,6 @@ export const LOCATIONS_SCHEMA = z.object({
   lease: z.array(z.string()).optional(),
   timeZone: z.string().optional(),
   endOfTimeAtLocation: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  locationKey: z.any().optional(),
   censusTract: z.string().optional(),
   squareFeet: z.number().optional(),
   neighborhood: z.string().optional(),
@@ -2905,71 +2693,6 @@ export const LOCATIONS_SCHEMA = z.object({
   schoolId: z.string(),
 });
 
-export const EVENT_ATTENDANCE_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  ageClassroomsInterestedInOfferingFromEventParticipant: z.string().optional(),
-  educatorsAtSchoolsFromEventParticipant: z.string().optional(),
-  startedSsjCompletedSsjTypeform: z.string().optional(),
-  currentSchoolFromEventParticipant2: z.string().optional(),
-  ssjTypeformsStartASchoolFromEventParticipant: z.string().optional(),
-  network: z.string().optional(),
-  registrationDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  countofloggedplanningsFromEventParticipant: z.string().optional(),
-  stageChangeFromDiscoveryToVisioningFromEventParticipant: z.string().optional(),
-  entryDateFromStartASchoolFormFromEducators: z.string().optional(),
-  registered: z.boolean().optional(),
-  attended: z.boolean().optional(),
-  createdFromEventParticipant2: z.string().optional(),
-  currentSchoolFromEventParticipant: z.string().optional(),
-  statusFromEventParticipant2: z.string().optional(),
-  tlStoriesRace: z.string().optional(),
-  montessoriCertifiedFromEventParticipant: z.string().optional(),
-  tlStoriesQ1: z.string().optional(),
-  tlStoriesQ2: z.string().optional(),
-  sourceFromSsjTypeformsStartASchoolFromEventParticipant: z.string().optional(),
-  eventType: z.string().optional(),
-  ageClassroomsInterestedInOfferingFromEventParticipant2: z.string().optional(),
-  incomeBackgroundFromEventParticipant: z.string().optional(),
-  phone: z.string().regex(/^[\+]?[1-9]?\d{1,14}$/, "Invalid phone number").optional(),
-  hubFromEventParticipant2: z.string().optional(),
-  fullNameFromEventParticipant: z.string().optional(),
-  countofloggeddiscoverFromEventParticipant: z.string().optional(),
-  educatorId: z.string(),
-  assignedPartnerFromEventParticipant2: z.string().optional(),
-  householdIncomeFromEventParticipant2: z.string().optional(),
-  tlStoriesSchoolTarget: z.string().optional(),
-  stageChangeFromVisioningToPlanningFromEventParticipant: z.string().optional(),
-  stageFromEventParticipant: z.string().optional(),
-  educatorsAtSchoolsFromEventParticipant2: z.string().optional(),
-  educatorRecordCreated: z.string().optional(),
-  eventName: z.string().optional(),
-  timeAtEvent: z.number().optional(),
-  schoolStatusFromEventParticipant: z.string().optional(),
-  eventAttendanceKey: z.any().optional(),
-  whenDidTheySwitchToVisioning: z.string().optional(),
-  raceEthnicityFromEventParticipant: z.string().optional(),
-  hubFromEventParticipant: z.string().optional(),
-  eventParticipant: z.array(z.string()).optional(),
-  statusFromEventParticipant: z.string().optional(),
-  hubNameFromEventParticipant: z.string().optional(),
-  marketingSource: z.string().optional(),
-  householdIncomeFromEventParticipant: z.string().optional(),
-  event: z.array(z.string()).optional(),
-  incomeBackgroundFromEventParticipant2: z.string().optional(),
-  assignedPartnerFromEventParticipant: z.string().optional(),
-  montessoriCertificationsFromEventParticipant: z.string().optional(),
-  createdDate: z.string().optional(),
-  firstVisioningFromEventParticipant: z.string().optional(),
-  raceEthnicityFromEventParticipant2: z.string().optional(),
-  tlStoriesType: z.string().optional(),
-  createdFromEventParticipant: z.string().optional(),
-  countofloggedvisioningFromEventParticipant: z.number().optional(),
-  schoolStatusFromEventParticipant2: z.string().optional(),
-  needsSpanishTranslation: z.boolean().optional(),
-});
-
 export const LEAD_ROUTING_AND_TEMPLATES_SCHEMA = z.object({
   id: z.string(),
   created: z.string(),
@@ -2979,19 +2702,9 @@ export const LEAD_ROUTING_AND_TEMPLATES_SCHEMA = z.object({
   geotype: z.string().optional(),
   cc: z.string().optional(),
   source: z.string().optional(),
+  Type: z.string().optional(),
   name: z.string().optional(),
   sender: z.string().email().optional(),
-});
-
-export const COHORTS_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  charters: z.array(z.string()).optional(),
-  cohortName: z.any().optional(),
-  schools: z.array(z.string()).optional(),
-  startDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  programType: z.string().optional(),
 });
 
 export const EVENTS_SCHEMA = z.object({
@@ -3002,7 +2715,6 @@ export const EVENTS_SCHEMA = z.object({
   eventName: z.string().optional(),
   type: z.array(z.string()).optional(),
   eventid: z.any().optional(),
-  attendees: z.array(z.string()).optional(),
 });
 
 export const BOARD_SERVICE_SCHEMA = z.object({
@@ -3016,6 +2728,8 @@ export const BOARD_SERVICE_SCHEMA = z.object({
   communityMemberEmail: z.string().email().optional(),
   currentlyActive: z.boolean().optional(),
   chair: z.boolean().optional(),
+  School: z.string().optional(),
+  Educator: z.string().optional(),
 });
 
 export const SUPABASE_JOIN_990_WITH_SCHOOL_SCHEMA = z.object({
@@ -3032,7 +2746,6 @@ export const CHARTERS_SCHEMA = z.object({
   lastModified: z.string(),
   locationIdFromLocations: z.string().optional(),
   schools: z.array(z.string()).optional(),
-  charterAssessments: z.array(z.string()).optional(),
   incorporationDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   status: z.string().optional(),
   shortName: z.string().optional(),
@@ -3046,22 +2759,16 @@ export const CHARTERS_SCHEMA = z.object({
   membershipStatusOfSchools: z.string().optional(),
   nonprofitStatus: z.string().optional(),
   currentTlsFromSchools: z.string().optional(),
-  linkedSchools: z.string().optional(),
-  recordIdFromSchools: z.string().optional(),
-  locations: z.array(z.string()).optional(),
   supportTimeline: z.string().optional(),
   application: z.array(z.string()).optional(),
   initialTargetAges: z.string().optional(),
   nondiscriminationPolicyOnWebsite: z.boolean().optional(),
-  docIdFromSchoolGovernanceDocuments: z.string().optional(),
   tlDiscoveryStatus: z.string().optional(),
   currentFyEnd: z.string().optional(),
   guidestarListingRequested: z.boolean().optional(),
-  recidFromCharterApplications: z.string().optional(),
   dateReceivedGroupExemption: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   nameFromNontlRoles: z.string().optional(),
   authorized: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  charterKey: z.any().optional(),
   projectedOpen: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   partnershipWithWfStarted: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   initialTargetCommunity: z.string().optional(),
@@ -3069,15 +2776,9 @@ export const CHARTERS_SCHEMA = z.object({
   website: z.string().url().optional(),
   charterlevelMembershipAgreement: z.array(z.string()).optional(),
   recidFromCharterAuthorizersAndContacts: z.string().optional(),
-  schoolGovernanceDocuments: z.array(z.string()).optional(),
-  annualEnrollmentAndDemographics: z.array(z.string()).optional(),
-  recidFromSchoolReports: z.string().optional(),
-  schoolReports: z.array(z.string()).optional(),
   groupExemptionStatus: z.string().optional(),
-  nineNinetiesId: z.string().optional(),
   charterId: z.string().optional(),
   schoolProvidedWith1023RecordkeepingRequirements: z.boolean().optional(),
-  charterassessmentid: z.string().optional(),
   fullName: z.string().optional(),
   ein: z.string().optional(),
   roleFromNontlRoles: z.string().optional(),
@@ -3119,7 +2820,6 @@ export const GUIDES_SCHEMA = z.object({
   created: z.string(),
   lastModified: z.string(),
   stintTypeFromStints: z.array(z.string()).optional(),
-  educatorRecordIds: z.string().optional(),
   photo: z.array(z.string()).optional(),
   name: z.string().optional(),
   email: z.string().email().optional(),
@@ -3131,15 +2831,12 @@ export const GUIDES_SCHEMA = z.object({
   slackHandle: z.string().optional(),
   roles: z.array(z.string()).optional(),
   dob: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  copperUserid: z.string().optional(),
-  guideAssignments: z.array(z.string()).optional(),
   homeAddress: z.string().optional(),
   emailOrName: z.string().optional(),
   leadRouting: z.string().optional(),
   shortName: z.string().optional(),
   membershipTerminationStepsAndDates: z.string().optional(),
   ssjProcessDetails: z.string().optional(),
-  guidedSchoolRecordId: z.string().optional(),
   startDateFromStints: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   activeStint: z.array(z.string()).optional(),
   websiteBio: z.string().optional(),
@@ -3157,16 +2854,12 @@ export const CHARTER_ROLES_SCHEMA = z.object({
   email: z.string().email().optional(),
   title: z.string().optional(),
   charterId: z.string(),
-  raceEthnicityFromEducatorRecord: z.string().optional(),
   startDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   role: z.array(z.string()).optional(),
-  charterRoleKey: z.any().optional(),
-  currentPrimaryEmailAddressFromEducatorRecord: z.string().email().optional(),
   phone: z.string().regex(/^[\+]?[1-9]?\d{1,14}$/, "Invalid phone number").optional(),
   endDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   currentlyActive: z.boolean().optional(),
   name: z.string().optional(),
-  statusFromCharter: z.string().optional(),
   educatorRecord: z.array(z.string()).optional(),
   charterApplications2: z.string().optional(),
   charterroleid: z.any().optional(),
@@ -3223,7 +2916,6 @@ export const GRANTS_SCHEMA = z.object({
   daysSinceFullAdviceRequest: z.any().optional(),
   nonprofitStatus: z.string().optional(),
   currentTls: z.string().optional(),
-  grantKey: z.any().optional(),
   einAtTimeOfGrant: z.string().optional(),
   countOfActiveMailingAddressesFromSchool: z.number().optional(),
   amount: z.number().optional(),
@@ -3262,6 +2954,58 @@ export const MAILING_LISTS_SCHEMA = z.object({
   googleGroupId: z.string().optional(),
 });
 
+export const EVENT_ATTENDANCE_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  startedSsjCompletedSsjTypeform: z.string().optional(),
+  ssjTypeformsStartASchoolFromEventParticipant: z.string().optional(),
+  network: z.string().optional(),
+  registrationDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
+  countofloggedplanningsFromEventParticipant: z.string().optional(),
+  stageChangeFromDiscoveryToVisioningFromEventParticipant: z.string().optional(),
+  entryDateFromStartASchoolFormFromEducators: z.string().optional(),
+  registered: z.boolean().optional(),
+  attended: z.boolean().optional(),
+  createdFromEventParticipant2: z.string().optional(),
+  currentSchoolFromEventParticipant: z.string().optional(),
+  tlStoriesRace: z.string().optional(),
+  montessoriCertifiedFromEventParticipant: z.string().optional(),
+  tlStoriesQ1: z.string().optional(),
+  tlStoriesQ2: z.string().optional(),
+  sourceFromSsjTypeformsStartASchoolFromEventParticipant: z.string().optional(),
+  eventType: z.string().optional(),
+  ageClassroomsInterestedInOfferingFromEventParticipant2: z.string().optional(),
+  incomeBackgroundFromEventParticipant: z.string().optional(),
+  phone: z.string().regex(/^[\+]?[1-9]?\d{1,14}$/, "Invalid phone number").optional(),
+  fullNameFromEventParticipant: z.string().optional(),
+  countofloggeddiscoverFromEventParticipant: z.string().optional(),
+  educatorId: z.string(),
+  tlStoriesSchoolTarget: z.string().optional(),
+  stageChangeFromVisioningToPlanningFromEventParticipant: z.string().optional(),
+  stageFromEventParticipant: z.string().optional(),
+  educatorRecordCreated: z.string().optional(),
+  eventName: z.string().optional(),
+  timeAtEvent: z.number().optional(),
+  schoolStatusFromEventParticipant: z.string().optional(),
+  whenDidTheySwitchToVisioning: z.string().optional(),
+  raceEthnicityFromEventParticipant: z.string().optional(),
+  hubFromEventParticipant: z.string().optional(),
+  eventParticipant: z.array(z.string()).optional(),
+  statusFromEventParticipant: z.string().optional(),
+  marketingSource: z.string().optional(),
+  householdIncomeFromEventParticipant: z.string().optional(),
+  event: z.array(z.string()).optional(),
+  assignedPartnerFromEventParticipant: z.string().optional(),
+  montessoriCertificationsFromEventParticipant: z.string().optional(),
+  createdDate: z.string().optional(),
+  firstVisioningFromEventParticipant: z.string().optional(),
+  tlStoriesType: z.string().optional(),
+  createdFromEventParticipant: z.string().optional(),
+  countofloggedvisioningFromEventParticipant: z.number().optional(),
+  needsSpanishTranslation: z.boolean().optional(),
+});
+
 export const AIRTABLE_LOAN_PAYMENTS_SCHEMA = z.object({
   id: z.string(),
   created: z.string(),
@@ -3270,7 +3014,6 @@ export const AIRTABLE_LOAN_PAYMENTS_SCHEMA = z.object({
   paymentDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
   school: z.array(z.string()).optional(),
   shortName: z.string().optional(),
-  paymentKey: z.any().optional(),
 });
 
 export const AIRTABLE_LOANS_SCHEMA = z.object({
@@ -3284,7 +3027,6 @@ export const AIRTABLE_LOANS_SCHEMA = z.object({
   loanContactEmail1: z.string().email().optional(),
   loanStatus: z.string().optional(),
   issueMethod: z.string().optional(),
-  loanKey: z.any().optional(),
   school: z.array(z.string()).optional(),
   interestRate: z.number().optional(),
   contactEmailFromEducatorFromEducatorsXSchoolsFromSchool: z.array(z.string()).optional(),
@@ -3309,7 +3051,6 @@ export const EDUCATOR_NOTES_SCHEMA = z.object({
   educatornotesid: z.any().optional(),
   educatorId: z.string(),
   date: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  educatorNoteKey: z.any().optional(),
   fullNameFromEducator: z.string().optional(),
 });
 
@@ -3325,32 +3066,6 @@ export const CHARTER_AUTHORIZERS_AND_CONTACTS_SCHEMA = z.object({
   contact: z.string().optional(),
   currentlyActive: z.boolean().optional(),
   charterId: z.string().optional(),
-  charterAuthorizerKey: z.any().optional(),
-});
-
-export const ASSESSMENT_DATA_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  assessmentDataKey: z.any().optional(),
-  assessment: z.array(z.string()).optional(),
-  metOrExceedsFrl: z.number().optional(),
-  numberAssessedEll: z.number().optional(),
-  year: z.array(z.string()).optional(),
-  numberAssessedSped: z.number().optional(),
-  school: z.array(z.string()).optional(),
-  numberAssessed: z.number().optional(),
-  charterId: z.string().optional(),
-  otherData: z.string().optional(),
-  metOrExceedsBipoc: z.number().optional(),
-  schoolid: z.string().optional(),
-  numberAssessedBipoc: z.number().optional(),
-  metOrExceedsAll: z.number().optional(),
-  assessmentdataid: z.any().optional(),
-  numberAssessedFrl: z.number().optional(),
-  charter: z.array(z.string()).optional(),
-  metOrExceedsSped: z.number().optional(),
-  metOrExceedsEll: z.number().optional(),
 });
 
 export const MEMBERSHIP_TERMINATION_STEPS_AND_DATES_SCHEMA = z.object({
@@ -3363,11 +3078,130 @@ export const MEMBERSHIP_TERMINATION_STEPS_AND_DATES_SCHEMA = z.object({
   responsiblePersonAtWf: z.string().email().optional(),
 });
 
+export const NINE_NINETIES_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  supabaseid: z.string().optional(),
+  aiDerivedRevenue: z.number().optional(),
+  aiDerivedEoyDate: z.string().optional(),
+  nineNinetiesReportingYear: z.string().optional(),
+  schoolId: z.string(),
+  charterId: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export const GOVERNANCE_DOCS_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  documentType: z.string().optional(),
+  govdocid: z.any().optional(),
+  date: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
+  charterId: z.string().optional(),
+  shortname: z.string().optional(),
+  docNotes: z.string().optional(),
+  docLink: z.string().optional(),
+  publicationLink: z.string().optional(),
+  schoolId: z.string().optional(),
+  urlpdfExtensionFormula: z.string().url().optional(),
+  school: z.array(z.string()).optional(),
+  documentPdf: z.array(z.string()).optional(),
+  charter: z.array(z.string()).optional(),
+});
+
+export const GUIDES_ASSIGNMENTS_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  currentlyActive: z.boolean().optional(),
+  guideShortName: z.string().optional(),
+  endDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
+  schoolShortName: z.string().optional(),
+  schoolId: z.string(),
+  startDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
+  type: z.string().optional(),
+});
+
+export const COHORTS_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  cohortName: z.any().optional(),
+  startDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
+  programType: z.string().optional(),
+});
+
+export const SCHOOL_YEAR_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  schoolYear: z.string().optional(),
+});
+
+export const REPORTS_AND_SUBMISSIONS_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  charter: z.array(z.string()).optional(),
+  reportsid: z.any().optional(),
+  attachments: z.array(z.string()).optional(),
+  schoolYear: z.array(z.string()).optional(),
+  reportType: z.string().optional(),
+  charterId: z.string().optional(),
+});
+
+export const STATES_ALIASES_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  abbreviation: z.string().optional(),
+  state: z.string().optional(),
+});
+
+export const PUBLIC_FUNDING_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  description: z.string().optional(),
+  name: z.string().optional(),
+  relevantLevels: z.array(z.string()).optional(),
+});
+
+export const ASSESSMENT_DATA_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  assessment: z.array(z.string()).optional(),
+  year: z.array(z.string()).optional(),
+  school: z.array(z.string()).optional(),
+  numberAssessed: z.number().optional(),
+  charterId: z.string().optional(),
+  schoolid: z.string().optional(),
+  assessmentdataid: z.any().optional(),
+  charter: z.array(z.string()).optional(),
+});
+
+export const ANNUAL_ENROLLMENT_AND_DEMOGRAPHICS_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  school: z.array(z.string()).optional(),
+  numberOfEnrolledStudentsFrl: z.number().optional(),
+  numberOfEnrolledStudentsBipoc: z.number().optional(),
+  charter: z.array(z.string()).optional(),
+  schoolId: z.string().optional(),
+  numberOfEnrolledStudentsSped: z.number().optional(),
+  numberOfEnrolledStudentsAll: z.number().optional(),
+  numberOfEnrolledStudentsEll: z.number().optional(),
+  schoolYear: z.array(z.string()).optional(),
+  annualdataid: z.any().optional(),
+});
+
 export const EDUCATORS_X_SCHOOLS_SCHEMA = z.object({
   id: z.string(),
   created: z.string(),
   lastModified: z.string(),
-  edxschoolKey: z.string().optional(),
   invitedTo2024Refresher: z.boolean().optional(),
   whoInitiatedEtlRemoval: z.string().optional(),
   school: z.array(z.string()).optional(),
@@ -3398,115 +3232,6 @@ export const EDUCATORS_X_SCHOOLS_SCHEMA = z.object({
   endDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
 });
 
-export const NINE_NINETIES_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  supabaseid: z.string().optional(),
-  aiDerivedRevenue: z.number().optional(),
-  aiDerivedEoyDate: z.string().optional(),
-  nineNinetiesReportingYear: z.string().optional(),
-  schoolId: z.string(),
-  charterId: z.string().optional(),
-  notes: z.string().optional(),
-});
-
-export const GOVERNANCE_DOCS_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  documentType: z.string().optional(),
-  govdocid: z.any().optional(),
-  date: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  docKey: z.any().optional(),
-  charterId: z.string().optional(),
-  shortname: z.string().optional(),
-  docNotes: z.string().optional(),
-  docLink: z.string().optional(),
-  publicationLink: z.string().optional(),
-  schoolId: z.string().optional(),
-  urlpdfExtensionFormula: z.string().url().optional(),
-  school: z.array(z.string()).optional(),
-  documentPdf: z.array(z.string()).optional(),
-  charter: z.array(z.string()).optional(),
-});
-
-export const GUIDES_ASSIGNMENTS_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  currentlyActive: z.boolean().optional(),
-  guideShortName: z.string().optional(),
-  endDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  schoolShortName: z.string().optional(),
-  schoolId: z.string(),
-  startDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")).optional(),
-  type: z.string().optional(),
-});
-
-export const TRAINING_GRANTS_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  stageFromEducators: z.string().optional(),
-  trainingStatus: z.string().optional(),
-  hubNameFromEducators: z.string().optional(),
-  trainingGrantAmount: z.number().optional(),
-  statusFromEducators: z.string().optional(),
-  trainingProgram: z.string().optional(),
-  cohort: z.string().optional(),
-  notes: z.string().optional(),
-  applied: z.boolean().optional(),
-  trainingGrantStatus: z.string().optional(),
-});
-
-export const REPORTS_AND_SUBMISSIONS_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  charter: z.array(z.string()).optional(),
-  reportsid: z.any().optional(),
-  attachments: z.array(z.string()).optional(),
-  schoolYear: z.array(z.string()).optional(),
-  reportType: z.string().optional(),
-  charterId: z.string().optional(),
-});
-
-export const STATES_ALIASES_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  abbreviation: z.string().optional(),
-  state: z.string().optional(),
-});
-
-export const PUBLIC_FUNDING_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  description: z.string().optional(),
-  schools: z.array(z.string()).optional(),
-  name: z.string().optional(),
-  relevantLevels: z.array(z.string()).optional(),
-});
-
-export const ANNUAL_ENROLLMENT_AND_DEMOGRAPHICS_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  annualDataKey: z.any().optional(),
-  school: z.array(z.string()).optional(),
-  numberOfEnrolledStudentsFrl: z.number().optional(),
-  numberOfEnrolledStudentsBipoc: z.number().optional(),
-  charter: z.array(z.string()).optional(),
-  schoolId: z.string().optional(),
-  numberOfEnrolledStudentsSped: z.number().optional(),
-  numberOfEnrolledStudentsAll: z.number().optional(),
-  numberOfEnrolledStudentsEll: z.number().optional(),
-  schoolYear: z.array(z.string()).optional(),
-  annualdataid: z.any().optional(),
-});
-
 export const ASSESSMENTS_SCHEMA = z.object({
   id: z.string(),
   created: z.string(),
@@ -3516,14 +3241,6 @@ export const ASSESSMENTS_SCHEMA = z.object({
   domain: z.string().optional(),
   annualAssessmentImplementationsBySchool: z.array(z.string()).optional(),
   grades: z.array(z.string()).optional(),
-});
-
-export const EVENT_TYPES_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  events: z.array(z.string()).optional(),
-  eventCategory: z.string().optional(),
 });
 
 export const EMAIL_ADDRESSES_SCHEMA = z.object({
@@ -3539,24 +3256,11 @@ export const EMAIL_ADDRESSES_SCHEMA = z.object({
   currentPrimaryEmail: z.boolean().optional(),
 });
 
-export const MONTESSORI_CERTIFIERS_OLD_LIST_SCHEMA = z.object({
-  id: z.string(),
-  created: z.string(),
-  lastModified: z.string(),
-  name: z.string().optional(),
-  ssjFilloutFormGetInvolved2: z.string().optional(),
-  ssjFilloutFormGetInvolved: z.string().optional(),
-  ssjFilloutFormGetInvolved4: z.string().optional(),
-  abbreviation: z.string().optional(),
-  ssjFilloutFormGetInvolved3: z.string().optional(),
-});
-
 export const MARKETING_SOURCE_OPTIONS_SCHEMA = z.object({
   id: z.string(),
   created: z.string(),
   lastModified: z.string(),
   marketingSource: z.string().optional(),
-  educators: z.array(z.string()).optional(),
 });
 
 export const MONTESSORI_CERT_LEVELS_SCHEMA = z.object({
@@ -3567,12 +3271,11 @@ export const MONTESSORI_CERT_LEVELS_SCHEMA = z.object({
   educators: z.string().optional(),
 });
 
-export const RACE_AND_ETHNICITY_SCHEMA = z.object({
+export const EVENT_TYPES_SCHEMA = z.object({
   id: z.string(),
   created: z.string(),
   lastModified: z.string(),
-  ssjFilloutFormGetInvolved: z.string().optional(),
-  name: z.string().optional(),
+  eventCategory: z.string().optional(),
 });
 
 export const AGES_GRADES_SCHEMA = z.object({
@@ -3590,36 +3293,36 @@ export const MONTESSORI_CERTIFIERS_SCHEMA = z.object({
   name: z.string().optional(),
 });
 
+export const RACE_AND_ETHNICITY_SCHEMA = z.object({
+  id: z.string(),
+  created: z.string(),
+  lastModified: z.string(),
+  name: z.string().optional(),
+});
+
 // Generated Table Interfaces
 
 // Partners copy table
 export interface Partner extends BaseRecord {
   roles?: string[];
   emailTemplates?: string;
-  educatorRecordIds?: string;
-  grants5?: string[];
   guideAssignments?: string;
   shortName?: string;
   publicWebsiteActive?: boolean;
   websiteBio?: string;
-  educatorNotes?: string[];
   startDateFromStints?: string;
   endDateFromStints?: string;
   currentlyActive?: string;
   slackHandle?: string;
-  actionSteps?: string[];
   dob?: string;
   recordId?: any;
   photo?: string[];
   activeStint?: string[];
-  tls?: string[];
   phone?: string;
   papyrsProfile?: string;
   stintTypeFromStints?: string[];
   name?: string;
   homeAddress?: string;
-  schools?: string[];
-  schoolNotes?: string[];
   email?: string;
   guidedSchoolRecordId?: string;
   ssjProcessDetails?: string;
@@ -3690,7 +3393,6 @@ export interface SSJFilloutForm extends BaseRecord {
   socioeconomicLgbtqiaIdentifyingFromEmail?: boolean;
   tempMCertCert2?: string;
   communityMemberSelfInfo?: string;
-  ssjFilloutFormKey?: any;
   tempMCertYear3?: string;
   educators?: string[];
   linkToStartASchool?: string[];
@@ -3732,9 +3434,7 @@ export interface CharterApplication extends BaseRecord {
   letterOfIntentDeadline?: string;
   nonprofitStatus?: string;
   authorizerDecisionRecd?: string;
-  targetCommunityFromCharter?: string;
   finalBudget?: string[];
-  currentTlDiscoveryStatus?: string;
   likelihoodOfOpeningOnTime?: string;
   authorizerDecision?: string;
   shortName?: string;
@@ -3742,19 +3442,15 @@ export interface CharterApplication extends BaseRecord {
   fullName?: string;
   charterappid?: any;
   milestones?: any;
-  membershipStatusOfSchools?: string;
   grades?: any;
-  charterAppKey?: any;
   letterOfIntentReqd?: string;
   authorizerDecisionExpectedDate?: string;
-  keyDates?: any;
   expectedDecision?: string;
   opportunitiesAndChallenges?: string;
   OfStudents?: number;
   appSubmissionDeadline?: string;
   likelihoodOfAuthorization?: string;
   currentTlsFromSchoolsFromCharter?: string;
-  landscapeAnalysisFromCharter?: string;
   charterAppProjectMgmtPlanComplete?: boolean;
   appSubmitted?: string;
   charterDesign?: string[];
@@ -3775,7 +3471,6 @@ export interface CharterApplication extends BaseRecord {
   supportTimeline?: string[];
   status?: string;
   capacityInterviewTrainingComplete?: boolean;
-  charterlevelMembershipAgreementSigned?: string;
   charterAppWalkthrough?: string;
   tlMembershipAgreementSigned?: string;
   applicationWindow?: string;
@@ -3792,15 +3487,12 @@ export interface School extends BaseRecord {
   enrollmentAtFullCapacity?: number;
   ssjIsTheSchoolPlanningToApplyForInternalWildflowerFunding?: string;
   guideEmail?: string[];
-  locationid?: string;
   emailDomain?: string;
   ssjCohortStatus?: string;
   visioningAlbumComplete?: boolean;
   transparentClassroom?: string;
   ssjOriginalProjectedOpenDate?: string;
-  latinxFromFamilySurvey?: string;
   logoUrl?: string;
-  globalMajority?: string;
   ssjGapInFunding?: string;
   planningAlbum?: string[];
   countOfActiveMailingAddresses?: number;
@@ -3812,9 +3504,6 @@ export interface School extends BaseRecord {
   currentPhysicalAddress?: string;
   ssjProjOpenSchoolYearBackup?: string;
   primaryContactEmail?: string[];
-  locations?: string[];
-  frl?: string;
-  guideassignmentid?: string;
   opened?: string;
   governanceModel?: string;
   leaseEndDate?: string;
@@ -3823,37 +3512,26 @@ export interface School extends BaseRecord {
   nondiscriminationPolicyOnApplication?: boolean;
   ssjIsTheBudgetAtAStageThatWillAllowTheEtlsToTakeTheirNextSteps?: string;
   emailAtSchoolFromEducatorsXSchools?: string[];
-  mediumIncome?: string;
   legalName?: string;
   agreementVersion?: string;
   familysurveyid?: string;
-  isThereA2022990?: number;
-  highIncomeFromFamilySurvey?: string;
   groupExemptionStatus?: string;
   nineNinetiesAttachment?: string;
   membershipAgreementDate?: string;
-  lowIncome?: string;
   currentTls?: string;
-  OfFormsSent?: string;
   shortName?: string;
   flexibleTuitionModel?: boolean;
-  grantsWf?: string[];
   googleVoice?: string;
-  grantid?: string;
-  schoolNotes?: string[];
   signedMembershipAgreement?: string[];
   ssjFacility?: string;
   ssjTargetCity?: string;
   nondiscriminationPolicyOnWebsite?: boolean;
-  nativeAmericanFromFamilySurvey?: string;
   agesServed?: string[];
   ssjIsTheTeamOnTrackForTheirEnrollmentGoals?: string;
   building4goodFirmAttorney?: string;
   enteredVisioningDate?: string;
   primaryContactId?: string;
-  raceEthnicityFromEducatorViaEducatorsXSchools?: string;
   schoolStatus?: string;
-  nineninetyid?: string;
   leftNetworkDate?: string;
   activeGuides?: string;
   tcRecordkeeping?: string;
@@ -3863,7 +3541,6 @@ export interface School extends BaseRecord {
   billcomAccount?: string;
   instagram?: string;
   ein?: string;
-  loanFromLoansIssueMethod?: string;
   currentPhysicalAddressCity?: string;
   bookkeeperAccountant?: string;
   ssjLoanApprovedAmt?: string;
@@ -3876,13 +3553,11 @@ export interface School extends BaseRecord {
   currentMailingAddress?: string;
   ssjTotalStartupFundingNeeded?: string;
   schoolContactEmails?: string[];
-  OfAsianAmericanStudents?: string;
   budgetUtility?: string;
   ssjWhatIsTheNextBigDecisionOrActionThisSchoolIsWorkingOn?: string;
   dateReceivedGroupExemption?: string;
   pod?: string;
   legalStructure?: string;
-  OfAfricanAmericanStudents?: string;
   archived?: boolean;
   incorporationDate?: string;
   activelongitude?: string;
@@ -3899,17 +3574,10 @@ export interface School extends BaseRecord {
   primaryContacts?: string[];
   countofactiveguides?: number;
   schoolPhone?: string;
-  actionstepid?: string;
   charterShortName?: string;
-  dedupeSchoolWith?: string;
-  educatorsxschoolsid?: string;
   guidestarListingRequested?: boolean;
-  whiteFromFamilySurvey?: string;
   priorNames?: string;
-  guideAssignments?: string[];
-  schoolnoteid?: string;
   website?: string;
-  OfStudents?: string;
   schoolSchedule?: string[];
   ssjTargetState?: string;
   domainName?: string;
@@ -3919,11 +3587,9 @@ export interface School extends BaseRecord {
   activelatitude?: string;
   googleWorkspaceOrgUnitPath?: string;
   aboutSpanish?: string;
-  loanid?: string;
   loanReportName?: string;
   currentFyEnd?: string;
   ssjProjectedOpen?: string;
-  middleEastern?: string;
   businessInsurance?: string;
   onNationalWebsite?: string;
   qbo?: string;
@@ -3932,7 +3598,6 @@ export interface School extends BaseRecord {
   admissionsSystem?: string;
   ssjHasTheEtlIdentifiedAPartner?: string;
   ssjNameReserved?: string;
-  pacificIslanderFromFamilySurvey?: string;
   countOfActivePhysicalAddresses?: number;
   automationNotes?: string;
   membershipStatus?: string;
@@ -3951,11 +3616,7 @@ export interface Educator extends BaseRecord {
   assignedPartnerOverrideFromSsjFilloutForms?: string;
   trainingGrants?: string[];
   startupStageForActiveSchool?: string;
-  primaryContactFor?: string[];
-  activeHolaspirit?: boolean;
   nickname?: string;
-  educatorNotes?: string[];
-  ssjfilloutformid?: string;
   routedTo?: string;
   gender?: string;
   assignedPartner?: string[];
@@ -3965,17 +3626,14 @@ export interface Educator extends BaseRecord {
   montessoriLeadGuideTrainings?: string[];
   assignedPartnerEmail?: string;
   raceEthnicity?: string[];
-  notesFromEducatorNotes?: string;
   montessoriCertifications?: string[];
   targetInternational?: string;
   genderOther?: string;
   educatorsxschoolsid?: string;
   sourceOther?: string;
   certifierFromMontessoriCertifications?: string;
-  survey2022WildflowerNetworkSurvey?: boolean;
   pronouns?: string;
   archived?: boolean;
-  educatorsAtSchools?: string[];
   currentPrimaryEmailAddress?: string;
   emailSentByInitialOutreacher?: string;
   secondaryPhone?: string;
@@ -3991,23 +3649,19 @@ export interface Educator extends BaseRecord {
   certificationLevelsFromMontessoriCertifications?: string;
   opsGuideRequestPertinentInfo?: string;
   activeSchoolAffiliationStatus?: string;
-  montessoricertid?: string;
   pronounsOther?: string;
   dedupeWith?: string;
   lastName?: string;
-  educatornotesid?: string;
   raceEthnicityOther?: string;
   targetState?: string;
   entryDateFromSsjFilloutForms?: string;
   tcUserId?: string;
-  emailid?: string;
   countOfGetInvolvedForms?: number;
   contactFormDetailsFromSsjDataOnEducators?: string;
   newsletterAndGroupSubscriptions?: string[];
   homeAddress?: string;
   cohorts?: string;
   source?: string[];
-  countoflinkedschools?: number;
   educationalAttainment?: string;
   messageFromSsjFilloutForms?: string;
   opsGuideAnyFundraisingOpportunities?: string;
@@ -4028,8 +3682,6 @@ export interface Educator extends BaseRecord {
   schoolStatuses?: string;
   currentlyActiveAtASchool?: string;
   oneOnOneStatus?: string;
-  allSchools?: string;
-  ssjoldstartaschoolid?: string;
   excludeFromEmailLogging?: boolean;
   incomeBackground?: string;
 }
@@ -4089,7 +3741,6 @@ export interface SchoolNote extends BaseRecord {
   partnerShortName?: string;
   headlineNotes?: string;
   school?: string[];
-  schoolNoteKey?: any;
   charterId?: string;
   partnersCopy?: string[];
   notes?: string;
@@ -4139,7 +3790,6 @@ export interface Location extends BaseRecord {
   lease?: string[];
   timeZone?: string;
   endOfTimeAtLocation?: string;
-  locationKey?: any;
   censusTract?: string;
   squareFeet?: number;
   neighborhood?: string;
@@ -4166,69 +3816,6 @@ export interface Location extends BaseRecord {
   schoolId: string;
 }
 
-// Event attendance table
-export interface EventAttendance extends BaseRecord {
-  ageClassroomsInterestedInOfferingFromEventParticipant?: string;
-  educatorsAtSchoolsFromEventParticipant?: string;
-  startedSsjCompletedSsjTypeform?: string;
-  currentSchoolFromEventParticipant2?: string;
-  ssjTypeformsStartASchoolFromEventParticipant?: string;
-  network?: string;
-  registrationDate?: string;
-  countofloggedplanningsFromEventParticipant?: string;
-  stageChangeFromDiscoveryToVisioningFromEventParticipant?: string;
-  entryDateFromStartASchoolFormFromEducators?: string;
-  registered?: boolean;
-  attended?: boolean;
-  createdFromEventParticipant2?: string;
-  currentSchoolFromEventParticipant?: string;
-  statusFromEventParticipant2?: string;
-  tlStoriesRace?: string;
-  montessoriCertifiedFromEventParticipant?: string;
-  tlStoriesQ1?: string;
-  tlStoriesQ2?: string;
-  sourceFromSsjTypeformsStartASchoolFromEventParticipant?: string;
-  eventType?: string;
-  ageClassroomsInterestedInOfferingFromEventParticipant2?: string;
-  incomeBackgroundFromEventParticipant?: string;
-  phone?: string;
-  hubFromEventParticipant2?: string;
-  fullNameFromEventParticipant?: string;
-  countofloggeddiscoverFromEventParticipant?: string;
-  educatorId: string;
-  assignedPartnerFromEventParticipant2?: string;
-  householdIncomeFromEventParticipant2?: string;
-  tlStoriesSchoolTarget?: string;
-  stageChangeFromVisioningToPlanningFromEventParticipant?: string;
-  stageFromEventParticipant?: string;
-  educatorsAtSchoolsFromEventParticipant2?: string;
-  educatorRecordCreated?: string;
-  eventName?: string;
-  timeAtEvent?: number;
-  schoolStatusFromEventParticipant?: string;
-  eventAttendanceKey?: any;
-  whenDidTheySwitchToVisioning?: string;
-  raceEthnicityFromEventParticipant?: string;
-  hubFromEventParticipant?: string;
-  eventParticipant?: string[];
-  statusFromEventParticipant?: string;
-  hubNameFromEventParticipant?: string;
-  marketingSource?: string;
-  householdIncomeFromEventParticipant?: string;
-  event?: string[];
-  incomeBackgroundFromEventParticipant2?: string;
-  assignedPartnerFromEventParticipant?: string;
-  montessoriCertificationsFromEventParticipant?: string;
-  createdDate?: string;
-  firstVisioningFromEventParticipant?: string;
-  raceEthnicityFromEventParticipant2?: string;
-  tlStoriesType?: string;
-  createdFromEventParticipant?: string;
-  countofloggedvisioningFromEventParticipant?: number;
-  schoolStatusFromEventParticipant2?: string;
-  needsSpanishTranslation?: boolean;
-}
-
 // Lead Routing and Templates table
 export interface LeadRoutingTemplate extends BaseRecord {
   state?: string;
@@ -4236,17 +3823,9 @@ export interface LeadRoutingTemplate extends BaseRecord {
   geotype?: string;
   cc?: string;
   source?: string;
+  Type?: string;
   name?: string;
   sender?: string;
-}
-
-// Cohorts table
-export interface Cohort extends BaseRecord {
-  charters?: string[];
-  cohortName?: any;
-  schools?: string[];
-  startDate?: string;
-  programType?: string;
 }
 
 // Events table
@@ -4255,7 +3834,6 @@ export interface Event extends BaseRecord {
   eventName?: string;
   type?: string[];
   eventid?: any;
-  attendees?: string[];
 }
 
 // Board Service table
@@ -4267,6 +3845,8 @@ export interface BoardService extends BaseRecord {
   communityMemberEmail?: string;
   currentlyActive?: boolean;
   chair?: boolean;
+  School?: string;
+  Educator?: string;
 }
 
 // Supabase join 990 with school table
@@ -4279,7 +3859,6 @@ export interface Supabase990School extends BaseRecord {
 export interface Charter extends BaseRecord {
   locationIdFromLocations?: string;
   schools?: string[];
-  charterAssessments?: string[];
   incorporationDate?: string;
   status?: string;
   shortName?: string;
@@ -4293,22 +3872,16 @@ export interface Charter extends BaseRecord {
   membershipStatusOfSchools?: string;
   nonprofitStatus?: string;
   currentTlsFromSchools?: string;
-  linkedSchools?: string;
-  recordIdFromSchools?: string;
-  locations?: string[];
   supportTimeline?: string;
   application?: string[];
   initialTargetAges?: string;
   nondiscriminationPolicyOnWebsite?: boolean;
-  docIdFromSchoolGovernanceDocuments?: string;
   tlDiscoveryStatus?: string;
   currentFyEnd?: string;
   guidestarListingRequested?: boolean;
-  recidFromCharterApplications?: string;
   dateReceivedGroupExemption?: string;
   nameFromNontlRoles?: string;
   authorized?: string;
-  charterKey?: any;
   projectedOpen?: string;
   partnershipWithWfStarted?: string;
   initialTargetCommunity?: string;
@@ -4316,15 +3889,9 @@ export interface Charter extends BaseRecord {
   website?: string;
   charterlevelMembershipAgreement?: string[];
   recidFromCharterAuthorizersAndContacts?: string;
-  schoolGovernanceDocuments?: string[];
-  annualEnrollmentAndDemographics?: string[];
-  recidFromSchoolReports?: string;
-  schoolReports?: string[];
   groupExemptionStatus?: string;
-  nineNinetiesId?: string;
   charterId?: string;
   schoolProvidedWith1023RecordkeepingRequirements?: boolean;
-  charterassessmentid?: string;
   fullName?: string;
   ein?: string;
   roleFromNontlRoles?: string;
@@ -4360,7 +3927,6 @@ export interface ActionStep extends BaseRecord {
 // Guides table
 export interface Guide extends BaseRecord {
   stintTypeFromStints?: string[];
-  educatorRecordIds?: string;
   photo?: string[];
   name?: string;
   email?: string;
@@ -4372,15 +3938,12 @@ export interface Guide extends BaseRecord {
   slackHandle?: string;
   roles?: string[];
   dob?: string;
-  copperUserid?: string;
-  guideAssignments?: string[];
   homeAddress?: string;
   emailOrName?: string;
   leadRouting?: string;
   shortName?: string;
   membershipTerminationStepsAndDates?: string;
   ssjProcessDetails?: string;
-  guidedSchoolRecordId?: string;
   startDateFromStints?: string;
   activeStint?: string[];
   websiteBio?: string;
@@ -4396,16 +3959,12 @@ export interface CharterRole extends BaseRecord {
   email?: string;
   title?: string;
   charterId: string;
-  raceEthnicityFromEducatorRecord?: string;
   startDate?: string;
   role?: string[];
-  charterRoleKey?: any;
-  currentPrimaryEmailAddressFromEducatorRecord?: string;
   phone?: string;
   endDate?: string;
   currentlyActive?: boolean;
   name?: string;
-  statusFromCharter?: string;
   educatorRecord?: string[];
   charterApplications2?: string;
   charterroleid?: any;
@@ -4458,7 +4017,6 @@ export interface Grant extends BaseRecord {
   daysSinceFullAdviceRequest?: any;
   nonprofitStatus?: string;
   currentTls?: string;
-  grantKey?: any;
   einAtTimeOfGrant?: string;
   countOfActiveMailingAddressesFromSchool?: number;
   amount?: number;
@@ -4495,17 +4053,66 @@ export interface MailingList extends BaseRecord {
   googleGroupId?: string;
 }
 
+// Event attendance table
+export interface EventAttendance extends BaseRecord {
+  startedSsjCompletedSsjTypeform?: string;
+  ssjTypeformsStartASchoolFromEventParticipant?: string;
+  network?: string;
+  registrationDate?: string;
+  countofloggedplanningsFromEventParticipant?: string;
+  stageChangeFromDiscoveryToVisioningFromEventParticipant?: string;
+  entryDateFromStartASchoolFormFromEducators?: string;
+  registered?: boolean;
+  attended?: boolean;
+  createdFromEventParticipant2?: string;
+  currentSchoolFromEventParticipant?: string;
+  tlStoriesRace?: string;
+  montessoriCertifiedFromEventParticipant?: string;
+  tlStoriesQ1?: string;
+  tlStoriesQ2?: string;
+  sourceFromSsjTypeformsStartASchoolFromEventParticipant?: string;
+  eventType?: string;
+  ageClassroomsInterestedInOfferingFromEventParticipant2?: string;
+  incomeBackgroundFromEventParticipant?: string;
+  phone?: string;
+  fullNameFromEventParticipant?: string;
+  countofloggeddiscoverFromEventParticipant?: string;
+  educatorId: string;
+  tlStoriesSchoolTarget?: string;
+  stageChangeFromVisioningToPlanningFromEventParticipant?: string;
+  stageFromEventParticipant?: string;
+  educatorRecordCreated?: string;
+  eventName?: string;
+  timeAtEvent?: number;
+  schoolStatusFromEventParticipant?: string;
+  whenDidTheySwitchToVisioning?: string;
+  raceEthnicityFromEventParticipant?: string;
+  hubFromEventParticipant?: string;
+  eventParticipant?: string[];
+  statusFromEventParticipant?: string;
+  marketingSource?: string;
+  householdIncomeFromEventParticipant?: string;
+  event?: string[];
+  assignedPartnerFromEventParticipant?: string;
+  montessoriCertificationsFromEventParticipant?: string;
+  createdDate?: string;
+  firstVisioningFromEventParticipant?: string;
+  tlStoriesType?: string;
+  createdFromEventParticipant?: string;
+  countofloggedvisioningFromEventParticipant?: number;
+  needsSpanishTranslation?: boolean;
+}
+
 // Airtable Loan payments table
-export interface AirtableLoanpayments extends BaseRecord {
+export interface AirtableLoanPayment extends BaseRecord {
   amount?: number;
   paymentDate?: string;
   school?: string[];
   shortName?: string;
-  paymentKey?: any;
 }
 
 // Airtable Loans table
-export interface AirtableLoans extends BaseRecord {
+export interface AirtableLoan extends BaseRecord {
   schoolId: string;
   loanPaperwork?: string[];
   approximateOutstandingAmount?: number;
@@ -4513,7 +4120,6 @@ export interface AirtableLoans extends BaseRecord {
   loanContactEmail1?: string;
   loanStatus?: string;
   issueMethod?: string;
-  loanKey?: any;
   school?: string[];
   interestRate?: number;
   contactEmailFromEducatorFromEducatorsXSchoolsFromSchool?: string[];
@@ -4536,7 +4142,6 @@ export interface EducatorNote extends BaseRecord {
   educatornotesid?: any;
   educatorId: string;
   date?: string;
-  educatorNoteKey?: any;
   fullNameFromEducator?: string;
 }
 
@@ -4550,30 +4155,6 @@ export interface CharterAuthorizerContact extends BaseRecord {
   contact?: string;
   currentlyActive?: boolean;
   charterId?: string;
-  charterAuthorizerKey?: any;
-}
-
-// Assessment data table
-export interface AssessmentData extends BaseRecord {
-  assessmentDataKey?: any;
-  assessment?: string[];
-  metOrExceedsFrl?: number;
-  numberAssessedEll?: number;
-  year?: string[];
-  numberAssessedSped?: number;
-  school?: string[];
-  numberAssessed?: number;
-  charterId?: string;
-  otherData?: string;
-  metOrExceedsBipoc?: number;
-  schoolid?: string;
-  numberAssessedBipoc?: number;
-  metOrExceedsAll?: number;
-  assessmentdataid?: any;
-  numberAssessedFrl?: number;
-  charter?: string[];
-  metOrExceedsSped?: number;
-  metOrExceedsEll?: number;
 }
 
 // Membership termination steps and dates table
@@ -4584,9 +4165,108 @@ export interface MembershipTerminationStepDate extends BaseRecord {
   responsiblePersonAtWf?: string;
 }
 
+// Nine nineties table
+export interface NineNineties extends BaseRecord {
+  supabaseid?: string;
+  aiDerivedRevenue?: number;
+  aiDerivedEoyDate?: string;
+  nineNinetiesReportingYear?: string;
+  schoolId: string;
+  charterId?: string;
+  notes?: string;
+}
+
+// Governance docs table
+export interface GovernanceDocument extends BaseRecord {
+  documentType?: string;
+  govdocid?: any;
+  date?: string;
+  charterId?: string;
+  shortname?: string;
+  docNotes?: string;
+  docLink?: string;
+  publicationLink?: string;
+  schoolId?: string;
+  urlpdfExtensionFormula?: string;
+  school?: string[];
+  documentPdf?: string[];
+  charter?: string[];
+}
+
+// Guides Assignments table
+export interface GuideAssignment extends BaseRecord {
+  currentlyActive?: boolean;
+  guideShortName?: string;
+  endDate?: string;
+  schoolShortName?: string;
+  schoolId: string;
+  startDate?: string;
+  type?: string;
+}
+
+// Cohorts table
+export interface Cohort extends BaseRecord {
+  cohortName?: any;
+  startDate?: string;
+  programType?: string;
+}
+
+// School year table
+export interface Schoolyear extends BaseRecord {
+  schoolYear?: string;
+}
+
+// Reports and submissions table
+export interface ReportSubmission extends BaseRecord {
+  charter?: string[];
+  reportsid?: any;
+  attachments?: string[];
+  schoolYear?: string[];
+  reportType?: string;
+  charterId?: string;
+}
+
+// States Aliases table
+export interface StateAlias extends BaseRecord {
+  abbreviation?: string;
+  state?: string;
+}
+
+// Public funding table
+export interface PublicFunding extends BaseRecord {
+  description?: string;
+  name?: string;
+  relevantLevels?: string[];
+}
+
+// Assessment data table
+export interface AssessmentData extends BaseRecord {
+  assessment?: string[];
+  year?: string[];
+  school?: string[];
+  numberAssessed?: number;
+  charterId?: string;
+  schoolid?: string;
+  assessmentdataid?: any;
+  charter?: string[];
+}
+
+// Annual enrollment and demographics table
+export interface AnnualEnrollmentDemographic extends BaseRecord {
+  school?: string[];
+  numberOfEnrolledStudentsFrl?: number;
+  numberOfEnrolledStudentsBipoc?: number;
+  charter?: string[];
+  schoolId?: string;
+  numberOfEnrolledStudentsSped?: number;
+  numberOfEnrolledStudentsAll?: number;
+  numberOfEnrolledStudentsEll?: number;
+  schoolYear?: string[];
+  annualdataid?: any;
+}
+
 // Educators x Schools table
 export interface EducatorSchoolAssociation extends BaseRecord {
-  edxschoolKey?: string;
   invitedTo2024Refresher?: boolean;
   whoInitiatedEtlRemoval?: string;
   school?: string[];
@@ -4617,99 +4297,6 @@ export interface EducatorSchoolAssociation extends BaseRecord {
   endDate?: string;
 }
 
-// Nine nineties table
-export interface Ninenineties extends BaseRecord {
-  supabaseid?: string;
-  aiDerivedRevenue?: number;
-  aiDerivedEoyDate?: string;
-  nineNinetiesReportingYear?: string;
-  schoolId: string;
-  charterId?: string;
-  notes?: string;
-}
-
-// Governance docs table
-export interface GovernanceDocument extends BaseRecord {
-  documentType?: string;
-  govdocid?: any;
-  date?: string;
-  docKey?: any;
-  charterId?: string;
-  shortname?: string;
-  docNotes?: string;
-  docLink?: string;
-  publicationLink?: string;
-  schoolId?: string;
-  urlpdfExtensionFormula?: string;
-  school?: string[];
-  documentPdf?: string[];
-  charter?: string[];
-}
-
-// Guides Assignments table
-export interface GuideAssignment extends BaseRecord {
-  currentlyActive?: boolean;
-  guideShortName?: string;
-  endDate?: string;
-  schoolShortName?: string;
-  schoolId: string;
-  startDate?: string;
-  type?: string;
-}
-
-// Training Grants table
-export interface TrainingGrant extends BaseRecord {
-  stageFromEducators?: string;
-  trainingStatus?: string;
-  hubNameFromEducators?: string;
-  trainingGrantAmount?: number;
-  statusFromEducators?: string;
-  trainingProgram?: string;
-  cohort?: string;
-  notes?: string;
-  applied?: boolean;
-  trainingGrantStatus?: string;
-}
-
-// Reports and submissions table
-export interface ReportSubmission extends BaseRecord {
-  charter?: string[];
-  reportsid?: any;
-  attachments?: string[];
-  schoolYear?: string[];
-  reportType?: string;
-  charterId?: string;
-}
-
-// States Aliases table
-export interface StateAlias extends BaseRecord {
-  abbreviation?: string;
-  state?: string;
-}
-
-// Public funding table
-export interface PublicFunding extends BaseRecord {
-  description?: string;
-  schools?: string[];
-  name?: string;
-  relevantLevels?: string[];
-}
-
-// Annual enrollment and demographics table
-export interface AnnualEnrollmentDemographic extends BaseRecord {
-  annualDataKey?: any;
-  school?: string[];
-  numberOfEnrolledStudentsFrl?: number;
-  numberOfEnrolledStudentsBipoc?: number;
-  charter?: string[];
-  schoolId?: string;
-  numberOfEnrolledStudentsSped?: number;
-  numberOfEnrolledStudentsAll?: number;
-  numberOfEnrolledStudentsEll?: number;
-  schoolYear?: string[];
-  annualdataid?: any;
-}
-
 // Assessments table
 export interface Assessment extends BaseRecord {
   shortName?: string;
@@ -4717,12 +4304,6 @@ export interface Assessment extends BaseRecord {
   domain?: string;
   annualAssessmentImplementationsBySchool?: string[];
   grades?: string[];
-}
-
-// Event types table
-export interface EventType extends BaseRecord {
-  events?: string[];
-  eventCategory?: string;
 }
 
 // Email Addresses table
@@ -4736,20 +4317,9 @@ export interface EmailAddress extends BaseRecord {
   currentPrimaryEmail?: boolean;
 }
 
-// Montessori Certifiers - old list table
-export interface MontessoriCertifierOld extends BaseRecord {
-  name?: string;
-  ssjFilloutFormGetInvolved2?: string;
-  ssjFilloutFormGetInvolved?: string;
-  ssjFilloutFormGetInvolved4?: string;
-  abbreviation?: string;
-  ssjFilloutFormGetInvolved3?: string;
-}
-
 // Marketing source options table
 export interface MarketingSourceOption extends BaseRecord {
   marketingSource?: string;
-  educators?: string[];
 }
 
 // Montessori Cert Levels table
@@ -4758,10 +4328,9 @@ export interface MontessoriCertLevel extends BaseRecord {
   educators?: string;
 }
 
-// Race and Ethnicity table
-export interface RaceAndEthnicity extends BaseRecord {
-  ssjFilloutFormGetInvolved?: string;
-  name?: string;
+// Event types table
+export interface EventType extends BaseRecord {
+  eventCategory?: string;
 }
 
 // Ages-Grades table
@@ -4772,6 +4341,11 @@ export interface AgeGrade extends BaseRecord {
 // Montessori Certifiers table
 export interface MontessoriCertifier extends BaseRecord {
   abbreviation?: string;
+  name?: string;
+}
+
+// Race and Ethnicity table
+export interface RaceAndEthnicity extends BaseRecord {
   name?: string;
 }
 
@@ -4787,9 +4361,7 @@ export const TABLE_TYPE_MAPPING = {
   "School notes": "SchoolNote",
   "Membership termination steps": "MembershipTerminationStep",
   "Locations": "Location",
-  "Event attendance": "EventAttendance",
   "Lead Routing and Templates": "LeadRoutingTemplate",
-  "Cohorts": "Cohort",
   "Events": "Event",
   "Board Service": "BoardService",
   "Supabase join 990 with school": "Supabase990School",
@@ -4801,30 +4373,31 @@ export const TABLE_TYPE_MAPPING = {
   "Montessori Certs": "MontessoriCert",
   "Grants": "Grant",
   "Mailing lists": "MailingList",
-  "Airtable Loan payments": "AirtableLoanpayments",
-  "Airtable Loans": "AirtableLoans",
+  "Event attendance": "EventAttendance",
+  "Airtable Loan payments": "AirtableLoanPayment",
+  "Airtable Loans": "AirtableLoan",
   "Educator notes": "EducatorNote",
   "Charter authorizers and contacts": "CharterAuthorizerContact",
-  "Assessment data": "AssessmentData",
   "Membership termination steps and dates": "MembershipTerminationStepDate",
-  "Educators x Schools": "EducatorSchoolAssociation",
-  "Nine nineties": "Ninenineties",
+  "Nine nineties": "NineNineties",
   "Governance docs": "GovernanceDocument",
   "Guides Assignments": "GuideAssignment",
-  "Training Grants": "TrainingGrant",
+  "Cohorts": "Cohort",
+  "School year": "Schoolyear",
   "Reports and submissions": "ReportSubmission",
   "States Aliases": "StateAlias",
   "Public funding": "PublicFunding",
+  "Assessment data": "AssessmentData",
   "Annual enrollment and demographics": "AnnualEnrollmentDemographic",
+  "Educators x Schools": "EducatorSchoolAssociation",
   "Assessments": "Assessment",
-  "Event types": "EventType",
   "Email Addresses": "EmailAddress",
-  "Montessori Certifiers - old list": "MontessoriCertifierOld",
   "Marketing source options": "MarketingSourceOption",
   "Montessori Cert Levels": "MontessoriCertLevel",
-  "Race and Ethnicity": "RaceAndEthnicity",
+  "Event types": "EventType",
   "Ages-Grades": "AgeGrade",
-  "Montessori Certifiers": "MontessoriCertifier"
+  "Montessori Certifiers": "MontessoriCertifier",
+  "Race and Ethnicity": "RaceAndEthnicity"
 } as const;
 
 // All generated table types
@@ -4839,9 +4412,7 @@ export type AirtableRecord =
   | SchoolNote
   | MembershipTerminationStep
   | Location
-  | EventAttendance
   | LeadRoutingTemplate
-  | Cohort
   | Event
   | BoardService
   | Supabase990School
@@ -4853,27 +4424,28 @@ export type AirtableRecord =
   | MontessoriCert
   | Grant
   | MailingList
-  | AirtableLoanpayments
-  | AirtableLoans
+  | EventAttendance
+  | AirtableLoanPayment
+  | AirtableLoan
   | EducatorNote
   | CharterAuthorizerContact
-  | AssessmentData
   | MembershipTerminationStepDate
-  | EducatorSchoolAssociation
-  | Ninenineties
+  | NineNineties
   | GovernanceDocument
   | GuideAssignment
-  | TrainingGrant
+  | Cohort
+  | Schoolyear
   | ReportSubmission
   | StateAlias
   | PublicFunding
+  | AssessmentData
   | AnnualEnrollmentDemographic
+  | EducatorSchoolAssociation
   | Assessment
-  | EventType
   | EmailAddress
-  | MontessoriCertifierOld
   | MarketingSourceOption
   | MontessoriCertLevel
-  | RaceAndEthnicity
+  | EventType
   | AgeGrade
-  | MontessoriCertifier;
+  | MontessoriCertifier
+  | RaceAndEthnicity;

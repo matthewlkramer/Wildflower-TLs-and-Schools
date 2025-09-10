@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { db } from "./utils";
 import { eq, and, gte, lte, isNull, sql } from "drizzle-orm";
 import { 
   borrowers,

@@ -4,8 +4,7 @@
 import type { Express, Request, Response } from "express";
 import { storage } from "./generic-storage.generated";
 import { loanStorage } from "./loan-storage";
-import { cache } from "./cache";
-import { logger } from "./logger";
+import { cache, logger } from "./utils";
 import Stripe from "stripe";
 import { z } from "zod";
 import { createInsertSchema } from "drizzle-zod";

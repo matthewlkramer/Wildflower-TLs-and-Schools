@@ -1,11 +1,12 @@
 // Generated generic storage with metadata-driven table configuration
-// Generated on 2025-09-09T21:10:12.652Z
+// Generated on 2025-09-10T00:13:08.161Z
 // This file is auto-generated. Do not edit manually.
 
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from '../shared/schema.generated';
 import * as loanSchema from "@shared/loan-schema";
+import { base } from './utils';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -54,30 +55,23 @@ export const TABLE_CONFIG = {
       return schema.createBaseTransformer(record, {
         roles: schema.toStringArray(f["Roles"]) || undefined,
         emailTemplates: String(f["Email templates"] || undefined) || undefined,
-        educatorRecordIds: String(f["Educator Record IDs"] || undefined) || undefined,
-        grants5: schema.toStringArray(f["Grants 5"]) || undefined,
         guideAssignments: String(f["Guide assignments"] || undefined) || undefined,
         shortName: String(f["Short name"] || undefined) || undefined,
         publicWebsiteActive: Boolean(f["Public website active"]) || undefined,
         websiteBio: String(f["Website bio"] || undefined) || undefined,
-        educatorNotes: schema.toStringArray(f["Educator notes"]) || undefined,
         startDateFromStints: String(f["Start Date (from Stints)"] || undefined) || undefined,
         endDateFromStints: String(f["End Date (from Stints)"] || undefined) || undefined,
         currentlyActive: String(f["Currently active"] || undefined) || undefined,
         slackHandle: String(f["Slack handle"] || undefined) || undefined,
-        actionSteps: schema.toStringArray(f["Action steps"]) || undefined,
         dob: String(f["DOB"] || undefined) || undefined,
         recordId: String(f["Record ID"] || undefined) || undefined,
         photo: schema.toStringArray(f["Photo"].map(att => att?.url).filter(Boolean)) || undefined,
         activeStint: schema.toStringArray(f["Active stint"]) || undefined,
-        tls: schema.toStringArray(f["TLs"]) || undefined,
         phone: String(f["Phone"] || undefined) || undefined,
         papyrsProfile: String(f["Papyrs profile"] || undefined) || undefined,
         stintTypeFromStints: schema.toStringArray(f["Stint type (from Stints)"]) || undefined,
         name: String(f["Name"] || undefined) || undefined,
         homeAddress: String(f["Home address"] || undefined) || undefined,
-        schools: schema.toStringArray(f["Schools"]) || undefined,
-        schoolNotes: schema.toStringArray(f["School notes"]) || undefined,
         email: String(f["Email"] || undefined) || undefined,
         guidedSchoolRecordId: String(f["Guided School Record ID"] || undefined) || undefined,
         ssjProcessDetails: String(f["SSJ Process Details"] || undefined) || undefined,
@@ -154,7 +148,6 @@ export const TABLE_CONFIG = {
         socioeconomicLgbtqiaIdentifyingFromEmail: schema.toYesBool(f["Socio-Economic: LGBTQIA Identifying (from Email)"]) || undefined,
         tempMCertCert2: String(f["Temp - M Cert Cert 2"] || undefined) || undefined,
         communityMemberSelfInfo: String(f["Community Member Self Info"] || undefined) || undefined,
-        ssjFilloutFormKey: String(f["SSJ FIllout Form key"] || undefined) || undefined,
         tempMCertYear3: String(f["Temp - M Cert Year 3"] || undefined) || undefined,
         educators: schema.toStringArray(f["Educators"]) || undefined,
         linkToStartASchool: schema.toStringArray(f["Link to Start a School"]) || undefined,
@@ -208,9 +201,7 @@ export const TABLE_CONFIG = {
         letterOfIntentDeadline: String(f["Letter of Intent deadline"] || undefined) || undefined,
         nonprofitStatus: String(f["Nonprofit status"] || undefined) || undefined,
         authorizerDecisionRecd: String(f["Authorizer decision rec'd"] || undefined) || undefined,
-        targetCommunityFromCharter: String(f["Target community (from Charter)"] || undefined) || undefined,
         finalBudget: schema.toStringArray(f["Final budget"].map(att => att?.url).filter(Boolean)) || undefined,
-        currentTlDiscoveryStatus: String(f["Current TL discovery status"] || undefined) || undefined,
         likelihoodOfOpeningOnTime: String(f["Likelihood of opening on time"] || undefined) || undefined,
         authorizerDecision: String(f["Authorizer decision"] || undefined) || undefined,
         shortName: String(f["Short Name"] || undefined) || undefined,
@@ -218,19 +209,15 @@ export const TABLE_CONFIG = {
         fullName: String(f["Full Name"] || undefined) || undefined,
         charterappid: String(f["charter_app_id"] || undefined) || undefined,
         milestones: String(f["Milestones"] || undefined) || undefined,
-        membershipStatusOfSchools: String(f["Membership status of schools"] || undefined) || undefined,
         grades: String(f["Grades"] || undefined) || undefined,
-        charterAppKey: String(f["Charter App key"] || undefined) || undefined,
         letterOfIntentReqd: String(f["Letter of Intent req'd"] || undefined) || undefined,
         authorizerDecisionExpectedDate: String(f["Authorizer decision expected date"] || undefined) || undefined,
-        keyDates: String(f["Key dates"] || undefined) || undefined,
         expectedDecision: String(f["Expected decision"] || undefined) || undefined,
         opportunitiesAndChallenges: String(f["Opportunities and challenges"] || undefined) || undefined,
         OfStudents: schema.toNumber(f["# of students"]) || undefined,
         appSubmissionDeadline: String(f["App submission deadline"] || undefined) || undefined,
         likelihoodOfAuthorization: String(f["Likelihood of authorization"] || undefined) || undefined,
         currentTlsFromSchoolsFromCharter: String(f["Current TLs (from Schools) (from Charter)"] || undefined) || undefined,
-        landscapeAnalysisFromCharter: String(f["Landscape analysis (from Charter)"] || undefined) || undefined,
         charterAppProjectMgmtPlanComplete: Boolean(f["Charter app project mgmt plan complete"]) || undefined,
         appSubmitted: String(f["App submitted"] || undefined) || undefined,
         charterDesign: schema.toStringArray(f["Charter design"].map(att => att?.url).filter(Boolean)) || undefined,
@@ -251,7 +238,6 @@ export const TABLE_CONFIG = {
         supportTimeline: schema.toStringArray(f["Support timeline"].map(att => att?.url).filter(Boolean)) || undefined,
         status: String(f["Status"] || undefined) || undefined,
         capacityInterviewTrainingComplete: Boolean(f["Capacity interview training complete"]) || undefined,
-        charterlevelMembershipAgreementSigned: String(f["Charter-level membership agreement signed"] || undefined) || undefined,
         charterAppWalkthrough: String(f["Charter app walkthrough"] || undefined) || undefined,
         tlMembershipAgreementSigned: String(f["TL membership agreement signed"] || undefined) || undefined,
         applicationWindow: String(f["Application window"] || undefined) || undefined,
@@ -274,15 +260,12 @@ export const TABLE_CONFIG = {
         enrollmentAtFullCapacity: schema.toNumber(f["Enrollment at Full Capacity"]) || undefined,
         ssjIsTheSchoolPlanningToApplyForInternalWildflowerFunding: String(f["SSJ - Is the school planning to apply for internal Wildflower funding?"] || undefined) || undefined,
         guideEmail: String(f["Guide email"] || undefined) || undefined,
-        locationid: String(f["location_id"] || undefined) || undefined,
         emailDomain: String(f["Email Domain"] || undefined) || undefined,
         ssjCohortStatus: String(f["SSJ - Cohort Status"] || undefined) || undefined,
         visioningAlbumComplete: Boolean(f["Visioning album complete"]) || undefined,
         transparentClassroom: String(f["Transparent Classroom"] || undefined) || undefined,
         ssjOriginalProjectedOpenDate: String(f["SSJ - Original Projected Open Date"] || undefined) || undefined,
-        latinxFromFamilySurvey: String(f["Latinx (from Family Survey)"] || undefined) || undefined,
         logoUrl: String(f["Logo URL"] || undefined) || undefined,
-        globalMajority: String(f["global majority"] || undefined) || undefined,
         ssjGapInFunding: String(f["SSJ - Gap in Funding"] || undefined) || undefined,
         planningAlbum: schema.toStringArray(f["Planning album"].map(att => att?.url).filter(Boolean)) || undefined,
         countOfActiveMailingAddresses: schema.toNumber(f["Count of Active Mailing Addresses"]) || undefined,
@@ -294,9 +277,6 @@ export const TABLE_CONFIG = {
         currentPhysicalAddress: String(f["Current Physical Address"] || undefined) || undefined,
         ssjProjOpenSchoolYearBackup: String(f["SSJ - Proj Open School Year - Backup"] || undefined) || undefined,
         primaryContactEmail: String(f["Primary Contact Email"] || undefined) || undefined,
-        locations: schema.toStringArray(f["Locations"]) || undefined,
-        frl: String(f["FRL"] || undefined) || undefined,
-        guideassignmentid: String(f["guide_assignment_id"] || undefined) || undefined,
         opened: String(f["Opened"] || undefined) || undefined,
         governanceModel: String(f["Governance Model"] || undefined) || undefined,
         leaseEndDate: String(f["Lease End Date"] || undefined) || undefined,
@@ -305,37 +285,26 @@ export const TABLE_CONFIG = {
         nondiscriminationPolicyOnApplication: Boolean(f["Nondiscrimination Policy on Application"]) || undefined,
         ssjIsTheBudgetAtAStageThatWillAllowTheEtlsToTakeTheirNextSteps: String(f["SSJ - Is the budget at a stage that will allow the ETL(s) to take their next steps?"] || undefined) || undefined,
         emailAtSchoolFromEducatorsXSchools: String(f["Email at School (from Educators x Schools)"] || undefined) || undefined,
-        mediumIncome: String(f["Medium Income"] || undefined) || undefined,
         legalName: String(f["Legal Name"] || undefined) || undefined,
         agreementVersion: String(f["Agreement Version "] || undefined) || undefined,
         familysurveyid: String(f["family_survey_id"] || undefined) || undefined,
-        isThereA2022990: schema.toNumber(f["Is there a 2022 990?"]) || undefined,
-        highIncomeFromFamilySurvey: String(f["High Income (from Family Survey)"] || undefined) || undefined,
         groupExemptionStatus: String(f["Group exemption status"] || undefined) || undefined,
         nineNinetiesAttachment: String(f["Nine Nineties attachment"] || undefined) || undefined,
         membershipAgreementDate: String(f["Membership Agreement date"] || undefined) || undefined,
-        lowIncome: String(f["Low Income"] || undefined) || undefined,
         currentTls: String(f["Current TLs"] || undefined) || undefined,
-        OfFormsSent: String(f["# of forms sent"] || undefined) || undefined,
         shortName: String(f["Short Name"] || undefined) || undefined,
         flexibleTuitionModel: Boolean(f["Flexible Tuition Model"]) || undefined,
-        grantsWf: schema.toStringArray(f["Grants (WF)"]) || undefined,
         googleVoice: String(f["Google Voice"] || undefined) || undefined,
-        grantid: String(f["grant_id"] || undefined) || undefined,
-        schoolNotes: schema.toStringArray(f["School notes"]) || undefined,
         signedMembershipAgreement: schema.toStringArray(f["Signed Membership Agreement"].map(att => att?.url).filter(Boolean)) || undefined,
         ssjFacility: String(f["SSJ - Facility"] || undefined) || undefined,
         ssjTargetCity: String(f["SSJ - Target City"] || undefined) || undefined,
         nondiscriminationPolicyOnWebsite: Boolean(f["Nondiscrimination Policy on Website"]) || undefined,
-        nativeAmericanFromFamilySurvey: String(f["Native American (from Family Survey)"] || undefined) || undefined,
         agesServed: schema.toStringArray(f["Ages served"]) || undefined,
         ssjIsTheTeamOnTrackForTheirEnrollmentGoals: String(f["SSJ - Is the team on track for their enrollment goals?"] || undefined) || undefined,
         building4goodFirmAttorney: String(f["Building4Good Firm & Attorney"] || undefined) || undefined,
         enteredVisioningDate: String(f["Entered Visioning Date"] || undefined) || undefined,
         primaryContactId: String(f["Primary Contact ID"] || undefined) || undefined,
-        raceEthnicityFromEducatorViaEducatorsXSchools: String(f["Race & Ethnicity (from Educator) (via Educators x Schools)"] || undefined) || undefined,
         schoolStatus: String(f["School Status"] || undefined) || undefined,
-        nineninetyid: String(f["nine_ninety_id"] || undefined) || undefined,
         leftNetworkDate: String(f["Left Network Date"] || undefined) || undefined,
         activeGuides: String(f["Active guides"] || undefined) || undefined,
         tcRecordkeeping: String(f["TC Recordkeeping"] || undefined) || undefined,
@@ -347,7 +316,6 @@ export const TABLE_CONFIG = {
         billcomAccount: String(f["Bill.com account"] || undefined) || undefined,
         instagram: String(f["Instagram"] || undefined) || undefined,
         ein: String(f["EIN"] || undefined) || undefined,
-        loanFromLoansIssueMethod: String(f["Loan (from Loans - Issue Method)"] || undefined) || undefined,
         currentPhysicalAddressCity: String(f["Current Physical Address - City"] || undefined) || undefined,
         bookkeeperAccountant: String(f["Bookkeeper / Accountant"] || undefined) || undefined,
         ssjLoanApprovedAmt: String(f["SSJ - Loan approved amt"] || undefined) || undefined,
@@ -360,13 +328,11 @@ export const TABLE_CONFIG = {
         currentMailingAddress: String(f["Current Mailing Address"] || undefined) || undefined,
         ssjTotalStartupFundingNeeded: String(f["SSJ - Total Startup Funding Needed"] || undefined) || undefined,
         schoolContactEmails: String(f["School Contact Emails"] || undefined) || undefined,
-        OfAsianAmericanStudents: String(f["% of Asian American students"] || undefined) || undefined,
         budgetUtility: String(f["Budget Utility"] || undefined) || undefined,
         ssjWhatIsTheNextBigDecisionOrActionThisSchoolIsWorkingOn: String(f["SSJ - What is the next big decision or action this school is working on?"] || undefined) || undefined,
         dateReceivedGroupExemption: String(f["Date received group exemption"] || undefined) || undefined,
         pod: String(f["Pod"] || undefined) || undefined,
         legalStructure: String(f["Legal structure"] || undefined) || undefined,
-        OfAfricanAmericanStudents: String(f["% of African American students"] || undefined) || undefined,
         archived: Boolean(f["Archived"]) || undefined,
         incorporationDate: String(f["Incorporation Date"] || undefined) || undefined,
         activelongitude: String(f["activeLongitude"] || undefined) || undefined,
@@ -383,17 +349,10 @@ export const TABLE_CONFIG = {
         primaryContacts: schema.toStringArray(f["Primary Contacts"]) || undefined,
         countofactiveguides: schema.toNumber(f["CountofActiveGuides"]) || undefined,
         schoolPhone: String(f["School Phone"] || undefined) || undefined,
-        actionstepid: String(f["action_step_id"] || undefined) || undefined,
         charterShortName: String(f["Charter Short Name"] || undefined) || undefined,
-        dedupeSchoolWith: String(f["Dedupe school with"] || undefined) || undefined,
-        educatorsxschoolsid: String(f["educatorsXschools_id"] || undefined) || undefined,
         guidestarListingRequested: Boolean(f["GuideStar Listing Requested?"]) || undefined,
-        whiteFromFamilySurvey: String(f["White (from Family Survey)"] || undefined) || undefined,
         priorNames: String(f["Prior Names"] || undefined) || undefined,
-        guideAssignments: schema.toStringArray(f["Guide assignments"]) || undefined,
-        schoolnoteid: String(f["school_note_id"] || undefined) || undefined,
         website: String(f["Website"] || undefined) || undefined,
-        OfStudents: String(f["# of Students"] || undefined) || undefined,
         schoolSchedule: schema.toStringArray(f["School schedule"]) || undefined,
         ssjTargetState: String(f["SSJ - Target State"] || undefined) || undefined,
         domainName: String(f["Domain Name"] || undefined) || undefined,
@@ -403,11 +362,9 @@ export const TABLE_CONFIG = {
         activelatitude: String(f["activeLatitude"] || undefined) || undefined,
         googleWorkspaceOrgUnitPath: String(f["Google Workspace Org Unit Path"] || undefined) || undefined,
         aboutSpanish: String(f["About Spanish"] || undefined) || undefined,
-        loanid: String(f["loan_id"] || undefined) || undefined,
         loanReportName: String(f["Loan Report Name"] || undefined) || undefined,
         currentFyEnd: String(f["Current FY end"] || undefined) || undefined,
         ssjProjectedOpen: String(f["SSJ - Projected Open"] || undefined) || undefined,
-        middleEastern: String(f["Middle Eastern"] || undefined) || undefined,
         businessInsurance: String(f["Business Insurance"] || undefined) || undefined,
         onNationalWebsite: String(f["On national website"] || undefined) || undefined,
         qbo: String(f["QBO"] || undefined) || undefined,
@@ -416,7 +373,6 @@ export const TABLE_CONFIG = {
         admissionsSystem: String(f["Admissions System"] || undefined) || undefined,
         ssjHasTheEtlIdentifiedAPartner: String(f["SSJ - Has the ETL identified a partner?"] || undefined) || undefined,
         ssjNameReserved: String(f["SSJ - Name Reserved"] || undefined) || undefined,
-        pacificIslanderFromFamilySurvey: String(f["Pacific Islander (from Family Survey)"] || undefined) || undefined,
         countOfActivePhysicalAddresses: schema.toNumber(f["Count of Active Physical Addresses"]) || undefined,
         automationNotes: String(f["Automation notes"] || undefined) || undefined,
         membershipStatus: String(f["Membership Status"] || undefined) || undefined,
@@ -441,11 +397,7 @@ export const TABLE_CONFIG = {
         assignedPartnerOverrideFromSsjFilloutForms: String(f["Assigned Partner Override (from SSJ Fillout Forms)"] || undefined) || undefined,
         trainingGrants: schema.toStringArray(f["Training Grants"]) || undefined,
         startupStageForActiveSchool: String(f["Startup Stage for Active School"] || undefined) || undefined,
-        primaryContactFor: schema.toStringArray(f["Primary contact for"]) || undefined,
-        activeHolaspirit: Boolean(f["Active Holaspirit"]) || undefined,
         nickname: String(f["Nickname"] || undefined) || undefined,
-        educatorNotes: schema.toStringArray(f["Educator notes"]) || undefined,
-        ssjfilloutformid: String(f["ssj_fillout_form_id"] || undefined) || undefined,
         routedTo: String(f["Routed to"] || undefined) || undefined,
         gender: String(f["Gender"] || undefined) || undefined,
         assignedPartner: schema.toStringArray(f["Assigned Partner"]) || undefined,
@@ -456,17 +408,14 @@ export const TABLE_CONFIG = {
         assignedPartnerEmail: String(f["Assigned Partner Email"] || undefined) || undefined,
         lastModified: String(f["Last Modified"] || undefined) || undefined,
         raceEthnicity: schema.toStringArray(f["Race & Ethnicity"]) || undefined,
-        notesFromEducatorNotes: String(f["Notes (from Educator notes)"] || undefined) || undefined,
         montessoriCertifications: schema.toStringArray(f["Montessori Certifications"]) || undefined,
         targetInternational: String(f["Target - international"] || undefined) || undefined,
         genderOther: String(f["Gender - Other"] || undefined) || undefined,
         educatorsxschoolsid: String(f["educatorsXschools_id"] || undefined) || undefined,
         sourceOther: String(f["Source - other"] || undefined) || undefined,
         certifierFromMontessoriCertifications: String(f["Certifier (from Montessori Certifications)"] || undefined) || undefined,
-        survey2022WildflowerNetworkSurvey: Boolean(f["survey - 2022 Wildflower Network Survey"]) || undefined,
         pronouns: String(f["Pronouns"] || undefined) || undefined,
         archived: Boolean(f["Archived"]) || undefined,
-        educatorsAtSchools: schema.toStringArray(f["Educators at Schools"]) || undefined,
         currentPrimaryEmailAddress: String(f["Current Primary Email Address"] || undefined) || undefined,
         emailSentByInitialOutreacher: String(f["Email sent by initial outreacher"] || undefined) || undefined,
         secondaryPhone: String(f["Secondary phone"] || undefined) || undefined,
@@ -482,24 +431,20 @@ export const TABLE_CONFIG = {
         certificationLevelsFromMontessoriCertifications: String(f["Certification Levels (from Montessori Certifications)"] || undefined) || undefined,
         opsGuideRequestPertinentInfo: String(f["Ops Guide Request Pertinent Info"] || undefined) || undefined,
         activeSchoolAffiliationStatus: String(f["Active School Affiliation Status"] || undefined) || undefined,
-        montessoricertid: String(f["montessori_cert_id"] || undefined) || undefined,
         pronounsOther: String(f["Pronouns - Other"] || undefined) || undefined,
         dedupeWith: String(f["Dedupe with"] || undefined) || undefined,
         lastName: String(f["Last Name"] || undefined) || undefined,
-        educatornotesid: String(f["educator_notes_id"] || undefined) || undefined,
         raceEthnicityOther: String(f["Race & Ethnicity - Other"] || undefined) || undefined,
         targetState: String(f["Target state"] || undefined) || undefined,
         created: String(f["Created"] || undefined) || undefined,
         entryDateFromSsjFilloutForms: String(f["Entry Date (from SSJ Fillout Forms)"] || undefined) || undefined,
         tcUserId: String(f["TC User ID"] || undefined) || undefined,
-        emailid: String(f["email_id"] || undefined) || undefined,
         countOfGetInvolvedForms: schema.toNumber(f["Count of Get Involved Forms"]) || undefined,
         contactFormDetailsFromSsjDataOnEducators: String(f["Contact Form Details (from SSJ data on educators)"] || undefined) || undefined,
         newsletterAndGroupSubscriptions: schema.toStringArray(f["Newsletter and Group Subscriptions"]) || undefined,
         homeAddress: String(f["Home Address"] || undefined) || undefined,
         cohorts: String(f["Cohorts"] || undefined) || undefined,
         source: schema.toStringArray(f["Source"]) || undefined,
-        countoflinkedschools: schema.toNumber(f["CountofLinkedSchools"]) || undefined,
         educationalAttainment: String(f["Educational Attainment"] || undefined) || undefined,
         messageFromSsjFilloutForms: String(f["Message (from SSJ Fillout Forms)"] || undefined) || undefined,
         opsGuideAnyFundraisingOpportunities: String(f["Ops Guide Any fundraising opportunities?"] || undefined) || undefined,
@@ -520,8 +465,6 @@ export const TABLE_CONFIG = {
         schoolStatuses: String(f["School Statuses"] || undefined) || undefined,
         currentlyActiveAtASchool: String(f["Currently Active at a School?"] || undefined) || undefined,
         oneOnOneStatus: String(f["One on one status"] || undefined) || undefined,
-        allSchools: String(f["All Schools"] || undefined) || undefined,
-        ssjoldstartaschoolid: String(f["ssj_old_start_a_school_id"] || undefined) || undefined,
         excludeFromEmailLogging: Boolean(f["Exclude from email logging"]) || undefined,
         incomeBackground: String(f["Income Background"] || undefined) || undefined
       });
@@ -593,7 +536,6 @@ export const TABLE_CONFIG = {
         partnerShortName: String(f["Partner Short Name"] || undefined) || undefined,
         headlineNotes: String(f["Headline (Notes)"] || undefined) || undefined,
         school: schema.toStringArray(f["School"]) || undefined,
-        schoolNoteKey: String(f["School Note Key"] || undefined) || undefined,
         charterId: String(f["charter_id"] || undefined) || undefined,
         partnersCopy: schema.toStringArray(f["Partners copy"]) || undefined,
         notes: String(f["Notes"] || undefined) || undefined,
@@ -655,7 +597,6 @@ export const TABLE_CONFIG = {
         lease: schema.toStringArray(f["Lease"].map(att => att?.url).filter(Boolean)) || undefined,
         timeZone: String(f["Time Zone"] || undefined) || undefined,
         endOfTimeAtLocation: String(f["End of time at location"] || undefined) || undefined,
-        locationKey: String(f["Location Key"] || undefined) || undefined,
         censusTract: String(f["Census Tract"] || undefined) || undefined,
         squareFeet: schema.toNumber(f["Square feet"]) || undefined,
         neighborhood: String(f["Neighborhood"] || undefined) || undefined,
@@ -686,75 +627,6 @@ export const TABLE_CONFIG = {
     },
     cacheEnabled: true,
   },
-  'Event attendance': {
-    airtableTable: 'Event attendance',
-    fieldMapping: schema.EVENT_ATTENDANCE_FIELDS,
-    transformer: (record: any): schema.EventAttendance => {
-      const f = record.fields;
-      return schema.createBaseTransformer(record, {
-        ageClassroomsInterestedInOfferingFromEventParticipant: String(f["Age Classrooms Interested in Offering (from Event Participant)"] || undefined) || undefined,
-        educatorsAtSchoolsFromEventParticipant: String(f["Educators at Schools (from Event Participant)"] || undefined) || undefined,
-        startedSsjCompletedSsjTypeform: String(f["Started SSJ? (completed SSJ typeform)"] || undefined) || undefined,
-        currentSchoolFromEventParticipant2: String(f["Current School (from Event Participant) 2"] || undefined) || undefined,
-        ssjTypeformsStartASchoolFromEventParticipant: String(f["SSJ Typeforms: Start a School (from Event Participant)"] || undefined) || undefined,
-        network: String(f["Network"] || undefined) || undefined,
-        registrationDate: String(f["Registration Date"] || undefined) || undefined,
-        countofloggedplanningsFromEventParticipant: String(f["CountofLoggedPlannings (from Event Participant)"] || undefined) || undefined,
-        stageChangeFromDiscoveryToVisioningFromEventParticipant: String(f["Stage change from Discovery to Visioning (from Event Participant)"] || undefined) || undefined,
-        entryDateFromStartASchoolFormFromEducators: String(f["Entry Date (from Start a School form) (from Educators)"] || undefined) || undefined,
-        registered: Boolean(f["Registered"]) || undefined,
-        attended: Boolean(f["Attended"]) || undefined,
-        createdFromEventParticipant2: String(f["Created (from Event Participant) 2"] || undefined) || undefined,
-        currentSchoolFromEventParticipant: String(f["Current School (from Event Participant)"] || undefined) || undefined,
-        statusFromEventParticipant2: String(f["Status (from Event Participant) 2"] || undefined) || undefined,
-        tlStoriesRace: String(f["TL Stories Race"] || undefined) || undefined,
-        montessoriCertifiedFromEventParticipant: String(f["Montessori Certified (from Event Participant)"] || undefined) || undefined,
-        tlStoriesQ1: String(f["TL Stories Q1"] || undefined) || undefined,
-        tlStoriesQ2: String(f["TL Stories Q2"] || undefined) || undefined,
-        sourceFromSsjTypeformsStartASchoolFromEventParticipant: String(f["Source (from SSJ Typeforms: Start a School) (from Event Participant)"] || undefined) || undefined,
-        eventType: String(f["Event Type"] || undefined) || undefined,
-        ageClassroomsInterestedInOfferingFromEventParticipant2: String(f["Age Classrooms Interested in Offering (from Event Participant) 2"] || undefined) || undefined,
-        incomeBackgroundFromEventParticipant: String(f["Income Background (from Event Participant)"] || undefined) || undefined,
-        phone: String(f["Phone"] || undefined) || undefined,
-        hubFromEventParticipant2: String(f["Hub (from Event Participant) 2"] || undefined) || undefined,
-        fullNameFromEventParticipant: String(f["Full Name (from Event Participant)"] || undefined) || undefined,
-        countofloggeddiscoverFromEventParticipant: String(f["CountofLoggedDiscover (from Event Participant)"] || undefined) || undefined,
-        educatorId: String(f["educator_id"] || ""),
-        assignedPartnerFromEventParticipant2: String(f["Assigned Partner (from Event Participant) 2"] || undefined) || undefined,
-        householdIncomeFromEventParticipant2: String(f["Household Income (from Event Participant) 2"] || undefined) || undefined,
-        tlStoriesSchoolTarget: String(f["TL Stories School Target"] || undefined) || undefined,
-        stageChangeFromVisioningToPlanningFromEventParticipant: String(f["Stage change from visioning to planning (from Event Participant)"] || undefined) || undefined,
-        stageFromEventParticipant: String(f["Stage (from Event Participant)"] || undefined) || undefined,
-        educatorsAtSchoolsFromEventParticipant2: String(f["Educators at Schools (from Event Participant) 2"] || undefined) || undefined,
-        educatorRecordCreated: String(f["Educator record created"] || undefined) || undefined,
-        eventName: String(f["Event Name"] || undefined) || undefined,
-        timeAtEvent: schema.toNumber(f["Time at event"]) || undefined,
-        schoolStatusFromEventParticipant: String(f["School Status (from Event Participant)"] || undefined) || undefined,
-        eventAttendanceKey: String(f["Event Attendance key"] || undefined) || undefined,
-        whenDidTheySwitchToVisioning: String(f["When did they switch to visioning"] || undefined) || undefined,
-        raceEthnicityFromEventParticipant: String(f["Race & Ethnicity (from Event Participant)"] || undefined) || undefined,
-        hubFromEventParticipant: String(f["Hub (from Event Participant)"] || undefined) || undefined,
-        eventParticipant: schema.toStringArray(f["Event Participant"]) || undefined,
-        statusFromEventParticipant: String(f["Status (from Event Participant)"] || undefined) || undefined,
-        hubNameFromEventParticipant: String(f["Hub Name (from Event Participant)"] || undefined) || undefined,
-        marketingSource: String(f["Marketing source"] || undefined) || undefined,
-        householdIncomeFromEventParticipant: String(f["Household Income (from Event Participant)"] || undefined) || undefined,
-        event: schema.toStringArray(f["Event"]) || undefined,
-        incomeBackgroundFromEventParticipant2: String(f["Income Background (from Event Participant) 2"] || undefined) || undefined,
-        assignedPartnerFromEventParticipant: String(f["Assigned Partner (from Event Participant)"] || undefined) || undefined,
-        montessoriCertificationsFromEventParticipant: String(f["Montessori Certifications (from Event Participant)"] || undefined) || undefined,
-        createdDate: String(f["Created date"] || undefined) || undefined,
-        firstVisioningFromEventParticipant: String(f["First visioning (from Event Participant)"] || undefined) || undefined,
-        raceEthnicityFromEventParticipant2: String(f["Race & Ethnicity (from Event Participant) 2"] || undefined) || undefined,
-        tlStoriesType: String(f["TL Stories Type"] || undefined) || undefined,
-        createdFromEventParticipant: String(f["Created (from Event Participant)"] || undefined) || undefined,
-        countofloggedvisioningFromEventParticipant: schema.toNumber(f["CountofLoggedVisioning (from Event Participant)"]) || undefined,
-        schoolStatusFromEventParticipant2: String(f["School Status (from Event Participant) 2"] || undefined) || undefined,
-        needsSpanishTranslation: Boolean(f["needs spanish translation"]) || undefined
-      });
-    },
-    cacheEnabled: true,
-  },
   'Lead Routing and Templates': {
     airtableTable: 'Lead Routing and Templates',
     fieldMapping: schema.LEAD_ROUTING_AND_TEMPLATES_FIELDS,
@@ -766,23 +638,9 @@ export const TABLE_CONFIG = {
         geotype: String(f["Geo-type"] || undefined) || undefined,
         cc: String(f["cc"] || undefined) || undefined,
         source: String(f["Source"] || undefined) || undefined,
+        Type: schema.toStringArray(f["Type"]) || undefined,
         name: String(f["Name"] || undefined) || undefined,
         sender: String(f["Sender"] || undefined) || undefined
-      });
-    },
-    cacheEnabled: true,
-  },
-  'Cohorts': {
-    airtableTable: 'Cohorts',
-    fieldMapping: schema.COHORTS_FIELDS,
-    transformer: (record: any): schema.Cohort => {
-      const f = record.fields;
-      return schema.createBaseTransformer(record, {
-        charters: schema.toStringArray(f["Charters"]) || undefined,
-        cohortName: String(f["Cohort Name"] || undefined) || undefined,
-        schools: schema.toStringArray(f["Schools"]) || undefined,
-        startDate: String(f["Start Date"] || undefined) || undefined,
-        programType: String(f["Program Type"] || undefined) || undefined
       });
     },
     cacheEnabled: true,
@@ -796,8 +654,7 @@ export const TABLE_CONFIG = {
         date: String(f["Date"] || undefined) || undefined,
         eventName: String(f["Event Name"] || undefined) || undefined,
         type: schema.toStringArray(f["Type"]) || undefined,
-        eventid: String(f["event_id"] || undefined) || undefined,
-        attendees: schema.toStringArray(f["Attendees"]) || undefined
+        eventid: String(f["event_id"] || undefined) || undefined
       });
     },
     cacheEnabled: true,
@@ -814,7 +671,9 @@ export const TABLE_CONFIG = {
         endDate: String(f["End Date"] || undefined) || undefined,
         communityMemberEmail: String(f["Community Member Email"] || undefined) || undefined,
         currentlyActive: Boolean(f["Currently Active"]) || undefined,
-        chair: Boolean(f["Chair"]) || undefined
+        chair: Boolean(f["Chair"]) || undefined,
+        School: schema.firstId(f["School"]) || undefined,
+        Educator: schema.firstId(f["Educator"]) || undefined
       });
     },
     cacheEnabled: true,
@@ -840,7 +699,6 @@ export const TABLE_CONFIG = {
       return schema.createBaseTransformer(record, {
         locationIdFromLocations: String(f["Location ID (from Locations)"] || undefined) || undefined,
         schools: schema.toStringArray(f["Schools"]) || undefined,
-        charterAssessments: schema.toStringArray(f["Charter assessments"]) || undefined,
         incorporationDate: String(f["Incorporation Date"] || undefined) || undefined,
         status: String(f["Status"] || undefined) || undefined,
         shortName: String(f["Short Name"] || undefined) || undefined,
@@ -854,22 +712,16 @@ export const TABLE_CONFIG = {
         membershipStatusOfSchools: String(f["Membership status of schools"] || undefined) || undefined,
         nonprofitStatus: String(f["Nonprofit status"] || undefined) || undefined,
         currentTlsFromSchools: String(f["Current TLs (from Schools)"] || undefined) || undefined,
-        linkedSchools: String(f["Linked Schools"] || undefined) || undefined,
-        recordIdFromSchools: String(f["Record ID (from Schools)"] || undefined) || undefined,
-        locations: schema.toStringArray(f["Locations"]) || undefined,
         supportTimeline: String(f["Support timeline"] || undefined) || undefined,
         application: schema.toStringArray(f["Application"].map(att => att?.url).filter(Boolean)) || undefined,
         initialTargetAges: String(f["Initial target ages"] || undefined) || undefined,
         nondiscriminationPolicyOnWebsite: Boolean(f["Nondiscrimination Policy on Website"]) || undefined,
-        docIdFromSchoolGovernanceDocuments: String(f["Doc ID (from School governance documents)"] || undefined) || undefined,
         tlDiscoveryStatus: String(f["TL discovery status"] || undefined) || undefined,
         currentFyEnd: String(f["Current FY end"] || undefined) || undefined,
         guidestarListingRequested: Boolean(f["GuideStar Listing Requested?"]) || undefined,
-        recidFromCharterApplications: String(f["recID (from Charter applications)"] || undefined) || undefined,
         dateReceivedGroupExemption: String(f["Date received group exemption"] || undefined) || undefined,
         nameFromNontlRoles: String(f["Name (from Non-TL roles)"] || undefined) || undefined,
         authorized: String(f["Authorized"] || undefined) || undefined,
-        charterKey: String(f["Charter key"] || undefined) || undefined,
         projectedOpen: String(f["Projected open"] || undefined) || undefined,
         partnershipWithWfStarted: String(f["Partnership with WF started"] || undefined) || undefined,
         initialTargetCommunity: String(f["Initial target community"] || undefined) || undefined,
@@ -877,15 +729,9 @@ export const TABLE_CONFIG = {
         website: String(f["Website"] || undefined) || undefined,
         charterlevelMembershipAgreement: schema.toStringArray(f["Charter-level membership agreement"].map(att => att?.url).filter(Boolean)) || undefined,
         recidFromCharterAuthorizersAndContacts: String(f["recId (from Charter authorizers and contacts)"] || undefined) || undefined,
-        schoolGovernanceDocuments: schema.toStringArray(f["School governance documents"]) || undefined,
-        annualEnrollmentAndDemographics: schema.toStringArray(f["Annual enrollment and demographics"]) || undefined,
-        recidFromSchoolReports: String(f["RecID (from School reports)"] || undefined) || undefined,
-        schoolReports: schema.toStringArray(f["School reports"]) || undefined,
         groupExemptionStatus: String(f["Group Exemption Status"] || undefined) || undefined,
-        nineNinetiesId: String(f["Nine nineties Record ID (from Nine nineties)"] || undefined) || undefined,
         charterId: String(f["charter_id"] || undefined) || undefined,
         schoolProvidedWith1023RecordkeepingRequirements: Boolean(f["School provided with 1023 recordkeeping requirements"]) || undefined,
-        charterassessmentid: String(f["charter_assessment_id"] || undefined) || undefined,
         fullName: String(f["Full name"] || undefined) || undefined,
         ein: String(f["EIN"] || undefined) || undefined,
         roleFromNontlRoles: String(f["Role (from Non-TL roles)"] || undefined) || undefined,
@@ -939,7 +785,6 @@ export const TABLE_CONFIG = {
       const f = record.fields;
       return schema.createBaseTransformer(record, {
         stintTypeFromStints: schema.toStringArray(f["Stint type (from Stints)"]) || undefined,
-        educatorRecordIds: String(f["Educator Record IDs"] || undefined) || undefined,
         photo: schema.toStringArray(f["Photo"].map(att => att?.url).filter(Boolean)) || undefined,
         name: String(f["Name"] || undefined) || undefined,
         email: String(f["Email"] || undefined) || undefined,
@@ -951,15 +796,12 @@ export const TABLE_CONFIG = {
         slackHandle: String(f["Slack handle"] || undefined) || undefined,
         roles: schema.toStringArray(f["Roles"]) || undefined,
         dob: String(f["DOB"] || undefined) || undefined,
-        copperUserid: String(f["Copper userID"] || undefined) || undefined,
-        guideAssignments: schema.toStringArray(f["Guide assignments"]) || undefined,
         homeAddress: String(f["Home address"] || undefined) || undefined,
         emailOrName: String(f["email or name"] || undefined) || undefined,
         leadRouting: String(f["Lead Routing"] || undefined) || undefined,
         shortName: String(f["Short name"] || undefined) || undefined,
         membershipTerminationStepsAndDates: String(f["Membership termination steps and dates"] || undefined) || undefined,
         ssjProcessDetails: String(f["SSJ Process Details"] || undefined) || undefined,
-        guidedSchoolRecordId: String(f["Guided School Record ID"] || undefined) || undefined,
         startDateFromStints: String(f["Start Date (from Stints)"] || undefined) || undefined,
         activeStint: schema.toStringArray(f["Active stint"]) || undefined,
         websiteBio: String(f["Website bio"] || undefined) || undefined,
@@ -981,16 +823,12 @@ export const TABLE_CONFIG = {
         email: String(f["Email"] || undefined) || undefined,
         title: String(f["Title"] || undefined) || undefined,
         charterId: String(f["charter_id"] || ""),
-        raceEthnicityFromEducatorRecord: String(f["Race & Ethnicity (from Educator record)"] || undefined) || undefined,
         startDate: String(f["Start date"] || undefined) || undefined,
         role: schema.toStringArray(f["Role"]) || undefined,
-        charterRoleKey: String(f["Charter role key"] || undefined) || undefined,
-        currentPrimaryEmailAddressFromEducatorRecord: String(f["Current Primary Email Address (from Educator record)"] || undefined) || undefined,
         phone: String(f["Phone"] || undefined) || undefined,
         endDate: String(f["End date"] || undefined) || undefined,
         currentlyActive: Boolean(f["Currently active"]) || undefined,
         name: String(f["Name"] || undefined) || undefined,
-        statusFromCharter: String(f["Status (from Charter)"] || undefined) || undefined,
         educatorRecord: schema.toStringArray(f["Educator record"]) || undefined,
         charterApplications2: String(f["Charter applications 2"] || undefined) || undefined,
         charterroleid: String(f["charter_role_id"] || undefined) || undefined,
@@ -1056,7 +894,6 @@ export const TABLE_CONFIG = {
         daysSinceFullAdviceRequest: String(f["Days since full advice request"] || undefined) || undefined,
         nonprofitStatus: String(f["Nonprofit status"] || undefined) || undefined,
         currentTls: String(f["Current TLs"] || undefined) || undefined,
-        grantKey: String(f["Grant Key"] || undefined) || undefined,
         einAtTimeOfGrant: String(f["EIN at time of grant"] || undefined) || undefined,
         countOfActiveMailingAddressesFromSchool: schema.toNumber(f["Count of Active Mailing Addresses (from School)"]) || undefined,
         amount: schema.toNumber(f["Amount"]) || undefined,
@@ -1101,17 +938,72 @@ export const TABLE_CONFIG = {
     },
     cacheEnabled: true,
   },
+  'Event attendance': {
+    airtableTable: 'Event attendance',
+    fieldMapping: schema.EVENT_ATTENDANCE_FIELDS,
+    transformer: (record: any): schema.EventAttendance => {
+      const f = record.fields;
+      return schema.createBaseTransformer(record, {
+        startedSsjCompletedSsjTypeform: String(f["Started SSJ? (completed SSJ typeform)"] || undefined) || undefined,
+        ssjTypeformsStartASchoolFromEventParticipant: String(f["SSJ Typeforms: Start a School (from Event Participant)"] || undefined) || undefined,
+        network: String(f["Network"] || undefined) || undefined,
+        registrationDate: String(f["Registration Date"] || undefined) || undefined,
+        countofloggedplanningsFromEventParticipant: String(f["CountofLoggedPlannings (from Event Participant)"] || undefined) || undefined,
+        stageChangeFromDiscoveryToVisioningFromEventParticipant: String(f["Stage change from Discovery to Visioning (from Event Participant)"] || undefined) || undefined,
+        entryDateFromStartASchoolFormFromEducators: String(f["Entry Date (from Start a School form) (from Educators)"] || undefined) || undefined,
+        registered: Boolean(f["Registered"]) || undefined,
+        attended: Boolean(f["Attended"]) || undefined,
+        createdFromEventParticipant2: String(f["Created (from Event Participant) 2"] || undefined) || undefined,
+        currentSchoolFromEventParticipant: String(f["Current School (from Event Participant)"] || undefined) || undefined,
+        tlStoriesRace: String(f["TL Stories Race"] || undefined) || undefined,
+        montessoriCertifiedFromEventParticipant: String(f["Montessori Certified (from Event Participant)"] || undefined) || undefined,
+        tlStoriesQ1: String(f["TL Stories Q1"] || undefined) || undefined,
+        tlStoriesQ2: String(f["TL Stories Q2"] || undefined) || undefined,
+        sourceFromSsjTypeformsStartASchoolFromEventParticipant: String(f["Source (from SSJ Typeforms: Start a School) (from Event Participant)"] || undefined) || undefined,
+        eventType: String(f["Event Type"] || undefined) || undefined,
+        ageClassroomsInterestedInOfferingFromEventParticipant2: String(f["Age Classrooms Interested in Offering (from Event Participant) 2"] || undefined) || undefined,
+        incomeBackgroundFromEventParticipant: String(f["Income Background (from Event Participant)"] || undefined) || undefined,
+        phone: String(f["Phone"] || undefined) || undefined,
+        fullNameFromEventParticipant: String(f["Full Name (from Event Participant)"] || undefined) || undefined,
+        countofloggeddiscoverFromEventParticipant: String(f["CountofLoggedDiscover (from Event Participant)"] || undefined) || undefined,
+        educatorId: String(f["educator_id"] || ""),
+        tlStoriesSchoolTarget: String(f["TL Stories School Target"] || undefined) || undefined,
+        stageChangeFromVisioningToPlanningFromEventParticipant: String(f["Stage change from visioning to planning (from Event Participant)"] || undefined) || undefined,
+        stageFromEventParticipant: String(f["Stage (from Event Participant)"] || undefined) || undefined,
+        educatorRecordCreated: String(f["Educator record created"] || undefined) || undefined,
+        eventName: String(f["Event Name"] || undefined) || undefined,
+        timeAtEvent: schema.toNumber(f["Time at event"]) || undefined,
+        schoolStatusFromEventParticipant: String(f["School Status (from Event Participant)"] || undefined) || undefined,
+        whenDidTheySwitchToVisioning: String(f["When did they switch to visioning"] || undefined) || undefined,
+        raceEthnicityFromEventParticipant: String(f["Race & Ethnicity (from Event Participant)"] || undefined) || undefined,
+        hubFromEventParticipant: String(f["Hub (from Event Participant)"] || undefined) || undefined,
+        eventParticipant: schema.toStringArray(f["Event Participant"]) || undefined,
+        statusFromEventParticipant: String(f["Status (from Event Participant)"] || undefined) || undefined,
+        marketingSource: String(f["Marketing source"] || undefined) || undefined,
+        householdIncomeFromEventParticipant: String(f["Household Income (from Event Participant)"] || undefined) || undefined,
+        event: schema.toStringArray(f["Event"]) || undefined,
+        assignedPartnerFromEventParticipant: String(f["Assigned Partner (from Event Participant)"] || undefined) || undefined,
+        montessoriCertificationsFromEventParticipant: String(f["Montessori Certifications (from Event Participant)"] || undefined) || undefined,
+        createdDate: String(f["Created date"] || undefined) || undefined,
+        firstVisioningFromEventParticipant: String(f["First visioning (from Event Participant)"] || undefined) || undefined,
+        tlStoriesType: String(f["TL Stories Type"] || undefined) || undefined,
+        createdFromEventParticipant: String(f["Created (from Event Participant)"] || undefined) || undefined,
+        countofloggedvisioningFromEventParticipant: schema.toNumber(f["CountofLoggedVisioning (from Event Participant)"]) || undefined,
+        needsSpanishTranslation: Boolean(f["needs spanish translation"]) || undefined
+      });
+    },
+    cacheEnabled: true,
+  },
   'Airtable Loan payments': {
     airtableTable: 'Airtable Loan payments',
     fieldMapping: schema.AIRTABLE_LOAN_PAYMENTS_FIELDS,
-    transformer: (record: any): schema.AirtableLoanpayments => {
+    transformer: (record: any): schema.AirtableLoanPayment => {
       const f = record.fields;
       return schema.createBaseTransformer(record, {
         amount: schema.toNumber(f["Amount"]) || undefined,
         paymentDate: String(f["Payment date"] || undefined) || undefined,
         school: schema.toStringArray(f["School"]) || undefined,
-        shortName: String(f["Short Name"] || undefined) || undefined,
-        paymentKey: String(f["Payment key"] || undefined) || undefined
+        shortName: String(f["Short Name"] || undefined) || undefined
       });
     },
     cacheEnabled: true,
@@ -1119,7 +1011,7 @@ export const TABLE_CONFIG = {
   'Airtable Loans': {
     airtableTable: 'Airtable Loans',
     fieldMapping: schema.AIRTABLE_LOANS_FIELDS,
-    transformer: (record: any): schema.AirtableLoans => {
+    transformer: (record: any): schema.AirtableLoan => {
       const f = record.fields;
       return schema.createBaseTransformer(record, {
         schoolId: String(f["school_id"] || ""),
@@ -1129,7 +1021,6 @@ export const TABLE_CONFIG = {
         loanContactEmail1: String(f["Loan Contact Email 1"] || undefined) || undefined,
         loanStatus: String(f["Loan Status"] || undefined) || undefined,
         issueMethod: String(f["Issue Method"] || undefined) || undefined,
-        loanKey: String(f["Loan Key"] || undefined) || undefined,
         school: schema.toStringArray(f["School"]) || undefined,
         interestRate: schema.toNumber(f["Interest Rate"]) || undefined,
         contactEmailFromEducatorFromEducatorsXSchoolsFromSchool: String(f["Contact email (from Educator) (from Educators x Schools) (from School)"] || undefined) || undefined,
@@ -1158,7 +1049,6 @@ export const TABLE_CONFIG = {
         educatornotesid: String(f["educator_notes_id"] || undefined) || undefined,
         educatorId: String(f["educator_id"] || ""),
         date: String(f["Date"] || undefined) || undefined,
-        educatorNoteKey: String(f["Educator Note Key"] || undefined) || undefined,
         fullNameFromEducator: String(f["Full Name (from Educator)"] || undefined) || undefined
       });
     },
@@ -1177,37 +1067,7 @@ export const TABLE_CONFIG = {
         email: String(f["Email"] || undefined) || undefined,
         contact: String(f["Contact"] || undefined) || undefined,
         currentlyActive: Boolean(f["Currently active"]) || undefined,
-        charterId: String(f["charter_id"] || undefined) || undefined,
-        charterAuthorizerKey: String(f["Charter authorizer key"] || undefined) || undefined
-      });
-    },
-    cacheEnabled: true,
-  },
-  'Assessment data': {
-    airtableTable: 'Assessment data',
-    fieldMapping: schema.ASSESSMENT_DATA_FIELDS,
-    transformer: (record: any): schema.AssessmentData => {
-      const f = record.fields;
-      return schema.createBaseTransformer(record, {
-        assessmentDataKey: String(f["Assessment Data key"] || undefined) || undefined,
-        assessment: schema.toStringArray(f["Assessment"]) || undefined,
-        metOrExceedsFrl: schema.toNumber(f["Met or exceeds - FRL"]) || undefined,
-        numberAssessedEll: schema.toNumber(f["Number assessed - ELL"]) || undefined,
-        year: schema.toStringArray(f["Year"]) || undefined,
-        numberAssessedSped: schema.toNumber(f["Number assessed - SPED"]) || undefined,
-        school: schema.toStringArray(f["School"]) || undefined,
-        numberAssessed: schema.toNumber(f["Number assessed"]) || undefined,
-        charterId: String(f["charter_id"] || undefined) || undefined,
-        otherData: String(f["Other data"] || undefined) || undefined,
-        metOrExceedsBipoc: schema.toNumber(f["Met or exceeds - BIPOC"]) || undefined,
-        schoolid: String(f["school_id"] || undefined) || undefined,
-        numberAssessedBipoc: schema.toNumber(f["Number assessed - BIPOC"]) || undefined,
-        metOrExceedsAll: schema.toNumber(f["Met or exceeds - all"]) || undefined,
-        assessmentdataid: String(f["assessment_data_id"] || undefined) || undefined,
-        numberAssessedFrl: schema.toNumber(f["Number assessed - FRL"]) || undefined,
-        charter: schema.toStringArray(f["Charter"]) || undefined,
-        metOrExceedsSped: schema.toNumber(f["Met or exceeds - SPED"]) || undefined,
-        metOrExceedsEll: schema.toNumber(f["Met or exceeds - ELL"]) || undefined
+        charterId: String(f["charter_id"] || undefined) || undefined
       });
     },
     cacheEnabled: true,
@@ -1226,49 +1086,10 @@ export const TABLE_CONFIG = {
     },
     cacheEnabled: true,
   },
-  'Educators x Schools': {
-    airtableTable: 'Educators x Schools',
-    fieldMapping: schema.EDUCATORS_X_SCHOOLS_FIELDS,
-    transformer: (record: any): schema.EducatorSchoolAssociation => {
-      const f = record.fields;
-      return schema.createBaseTransformer(record, {
-        edxschoolKey: String(f["edXschool key"] || undefined) || undefined,
-        invitedTo2024Refresher: Boolean(f["Invited to 2024 Refresher"]) || undefined,
-        whoInitiatedEtlRemoval: String(f["Who initiated E/TL removal?"] || undefined) || undefined,
-        school: schema.toStringArray(f["School"]) || undefined,
-        loanFund: Boolean(f["Loan Fund?"]) || undefined,
-        loans: schema.toStringArray(f["Loans"]) || undefined,
-        tlGift2022: Boolean(f["TL Gift 2022"]) || undefined,
-        gsuiteRoles: String(f["GSuite Roles"] || undefined) || undefined,
-        schoolShortName: String(f["School Short Name"] || undefined) || undefined,
-        educator: schema.toStringArray(f["Educator"]) || undefined,
-        onNationalWebsite: String(f["On National Website"] || undefined) || undefined,
-        signedTlAcknowledgementCommitmentToMembership: Boolean(f["Signed TL Acknowledgement & Commitment to Membership"]) || undefined,
-        emailStatus: String(f["Email Status"] || undefined) || undefined,
-        ssjStage: String(f["SSJ Stage"] || undefined) || undefined,
-        educatorId: String(f["educator_id"] || ""),
-        firstNameFromEducator: String(f["First Name (from Educator)"] || undefined) || undefined,
-        charterId: String(f["charter_id"] || undefined) || undefined,
-        educatorFullName: String(f["Educator Full Name"] || undefined) || undefined,
-        startDate: String(f["Start Date"] || undefined) || undefined,
-        educatorsxschoolsid: String(f["educatorsXschools_id"] || undefined) || undefined,
-        onWildflowerDirectory: String(f["On Wildflower Directory"] || undefined) || undefined,
-        onTeacherLeaderGoogleGroup: String(f["On Teacher Leader Google Group"] || undefined) || undefined,
-        montessoriCertifications: String(f["Montessori Certifications"] || undefined) || undefined,
-        emailAtSchool: String(f["Email at School"] || undefined) || undefined,
-        roles: schema.toStringArray(f["Roles"]) || undefined,
-        stagestatus: String(f["Stage_Status"] || undefined) || undefined,
-        schoolStatus: String(f["School Status"] || undefined) || undefined,
-        currentlyActive: Boolean(f["Currently Active"]) || undefined,
-        endDate: String(f["End Date"] || undefined) || undefined
-      });
-    },
-    cacheEnabled: true,
-  },
   'Nine nineties': {
     airtableTable: 'Nine nineties',
     fieldMapping: schema.NINE_NINETIES_FIELDS,
-    transformer: (record: any): schema.Ninenineties => {
+    transformer: (record: any): schema.NineNineties => {
       const f = record.fields;
       return schema.createBaseTransformer(record, {
         supabaseid: String(f["supabase_id"] || undefined) || undefined,
@@ -1291,7 +1112,6 @@ export const TABLE_CONFIG = {
         documentType: String(f["Document type"] || undefined) || undefined,
         govdocid: String(f["govdoc_id"] || undefined) || undefined,
         date: String(f["Date"] || undefined) || undefined,
-        docKey: String(f["Doc Key"] || undefined) || undefined,
         charterId: String(f["charter_id"] || undefined) || undefined,
         shortname: String(f["short_name"] || undefined) || undefined,
         docNotes: String(f["Doc notes"] || undefined) || undefined,
@@ -1324,22 +1144,26 @@ export const TABLE_CONFIG = {
     },
     cacheEnabled: true,
   },
-  'Training Grants': {
-    airtableTable: 'Training Grants',
-    fieldMapping: schema.TRAINING_GRANTS_FIELDS,
-    transformer: (record: any): schema.TrainingGrant => {
+  'Cohorts': {
+    airtableTable: 'Cohorts',
+    fieldMapping: schema.COHORTS_FIELDS,
+    transformer: (record: any): schema.Cohort => {
       const f = record.fields;
       return schema.createBaseTransformer(record, {
-        stageFromEducators: String(f["Stage (from Educators)"] || undefined) || undefined,
-        trainingStatus: String(f["Training Status"] || undefined) || undefined,
-        hubNameFromEducators: String(f["Hub Name (from Educators)"] || undefined) || undefined,
-        trainingGrantAmount: schema.toNumber(f["Training Grant Amount"]) || undefined,
-        statusFromEducators: String(f["Status (from Educators)"] || undefined) || undefined,
-        trainingProgram: String(f["Training Program"] || undefined) || undefined,
-        cohort: String(f["Cohort"] || undefined) || undefined,
-        notes: String(f["Notes"] || undefined) || undefined,
-        applied: Boolean(f["Applied?"]) || undefined,
-        trainingGrantStatus: String(f["Training Grant Status"] || undefined) || undefined
+        cohortName: String(f["Cohort Name"] || undefined) || undefined,
+        startDate: String(f["Start Date"] || undefined) || undefined,
+        programType: String(f["Program Type"] || undefined) || undefined
+      });
+    },
+    cacheEnabled: true,
+  },
+  'School year': {
+    airtableTable: 'School year',
+    fieldMapping: schema.SCHOOL_YEAR_FIELDS,
+    transformer: (record: any): schema.Schoolyear => {
+      const f = record.fields;
+      return schema.createBaseTransformer(record, {
+        schoolYear: String(f["School year"] || undefined) || undefined
       });
     },
     cacheEnabled: true,
@@ -1379,9 +1203,26 @@ export const TABLE_CONFIG = {
       const f = record.fields;
       return schema.createBaseTransformer(record, {
         description: String(f["Description"] || undefined) || undefined,
-        schools: schema.toStringArray(f["Schools"]) || undefined,
         name: String(f["Name"] || undefined) || undefined,
         relevantLevels: schema.toStringArray(f["Relevant levels"]) || undefined
+      });
+    },
+    cacheEnabled: true,
+  },
+  'Assessment data': {
+    airtableTable: 'Assessment data',
+    fieldMapping: schema.ASSESSMENT_DATA_FIELDS,
+    transformer: (record: any): schema.AssessmentData => {
+      const f = record.fields;
+      return schema.createBaseTransformer(record, {
+        assessment: schema.toStringArray(f["Assessment"]) || undefined,
+        year: schema.toStringArray(f["Year"]) || undefined,
+        school: schema.toStringArray(f["School"]) || undefined,
+        numberAssessed: schema.toNumber(f["Number assessed"]) || undefined,
+        charterId: String(f["charter_id"] || undefined) || undefined,
+        schoolid: String(f["school_id"] || undefined) || undefined,
+        assessmentdataid: String(f["assessment_data_id"] || undefined) || undefined,
+        charter: schema.toStringArray(f["Charter"]) || undefined
       });
     },
     cacheEnabled: true,
@@ -1392,7 +1233,6 @@ export const TABLE_CONFIG = {
     transformer: (record: any): schema.AnnualEnrollmentDemographic => {
       const f = record.fields;
       return schema.createBaseTransformer(record, {
-        annualDataKey: String(f["Annual data key"] || undefined) || undefined,
         school: schema.toStringArray(f["School"]) || undefined,
         numberOfEnrolledStudentsFrl: schema.toNumber(f["Number of enrolled students - FRL"]) || undefined,
         numberOfEnrolledStudentsBipoc: schema.toNumber(f["Number of enrolled students - BIPOC"]) || undefined,
@@ -1403,6 +1243,44 @@ export const TABLE_CONFIG = {
         numberOfEnrolledStudentsEll: schema.toNumber(f["Number of enrolled students - ELL"]) || undefined,
         schoolYear: schema.toStringArray(f["School Year"]) || undefined,
         annualdataid: String(f["annual_data_id"] || undefined) || undefined
+      });
+    },
+    cacheEnabled: true,
+  },
+  'Educators x Schools': {
+    airtableTable: 'Educators x Schools',
+    fieldMapping: schema.EDUCATORS_X_SCHOOLS_FIELDS,
+    transformer: (record: any): schema.EducatorSchoolAssociation => {
+      const f = record.fields;
+      return schema.createBaseTransformer(record, {
+        invitedTo2024Refresher: Boolean(f["Invited to 2024 Refresher"]) || undefined,
+        whoInitiatedEtlRemoval: String(f["Who initiated E/TL removal?"] || undefined) || undefined,
+        school: schema.toStringArray(f["School"]) || undefined,
+        loanFund: Boolean(f["Loan Fund?"]) || undefined,
+        loans: schema.toStringArray(f["Loans"]) || undefined,
+        tlGift2022: Boolean(f["TL Gift 2022"]) || undefined,
+        gsuiteRoles: String(f["GSuite Roles"] || undefined) || undefined,
+        schoolShortName: String(f["School Short Name"] || undefined) || undefined,
+        educator: schema.toStringArray(f["Educator"]) || undefined,
+        onNationalWebsite: String(f["On National Website"] || undefined) || undefined,
+        signedTlAcknowledgementCommitmentToMembership: Boolean(f["Signed TL Acknowledgement & Commitment to Membership"]) || undefined,
+        emailStatus: String(f["Email Status"] || undefined) || undefined,
+        ssjStage: String(f["SSJ Stage"] || undefined) || undefined,
+        educatorId: String(f["educator_id"] || ""),
+        firstNameFromEducator: String(f["First Name (from Educator)"] || undefined) || undefined,
+        charterId: String(f["charter_id"] || undefined) || undefined,
+        educatorFullName: String(f["Educator Full Name"] || undefined) || undefined,
+        startDate: String(f["Start Date"] || undefined) || undefined,
+        educatorsxschoolsid: String(f["educatorsXschools_id"] || undefined) || undefined,
+        onWildflowerDirectory: String(f["On Wildflower Directory"] || undefined) || undefined,
+        onTeacherLeaderGoogleGroup: String(f["On Teacher Leader Google Group"] || undefined) || undefined,
+        montessoriCertifications: String(f["Montessori Certifications"] || undefined) || undefined,
+        emailAtSchool: String(f["Email at School"] || undefined) || undefined,
+        roles: schema.toStringArray(f["Roles"]) || undefined,
+        stagestatus: String(f["Stage_Status"] || undefined) || undefined,
+        schoolStatus: String(f["School Status"] || undefined) || undefined,
+        currentlyActive: Boolean(f["Currently Active"]) || undefined,
+        endDate: String(f["End Date"] || undefined) || undefined
       });
     },
     cacheEnabled: true,
@@ -1418,18 +1296,6 @@ export const TABLE_CONFIG = {
         domain: String(f["Domain"] || undefined) || undefined,
         annualAssessmentImplementationsBySchool: schema.toStringArray(f["Annual Assessment Implementations by School"]) || undefined,
         grades: schema.toStringArray(f["Grades"]) || undefined
-      });
-    },
-    cacheEnabled: true,
-  },
-  'Event types': {
-    airtableTable: 'Event types',
-    fieldMapping: schema.EVENT_TYPES_FIELDS,
-    transformer: (record: any): schema.EventType => {
-      const f = record.fields;
-      return schema.createBaseTransformer(record, {
-        events: schema.toStringArray(f["Events"]) || undefined,
-        eventCategory: String(f["Event Category"] || undefined) || undefined
       });
     },
     cacheEnabled: true,
@@ -1451,30 +1317,13 @@ export const TABLE_CONFIG = {
     },
     cacheEnabled: true,
   },
-  'Montessori Certifiers - old list': {
-    airtableTable: 'Montessori Certifiers - old list',
-    fieldMapping: schema.MONTESSORI_CERTIFIERS_OLD_LIST_FIELDS,
-    transformer: (record: any): schema.MontessoriCertifierOld => {
-      const f = record.fields;
-      return schema.createBaseTransformer(record, {
-        name: String(f["Name"] || undefined) || undefined,
-        ssjFilloutFormGetInvolved2: String(f["SSJ Fillout Form: Get Involved 2"] || undefined) || undefined,
-        ssjFilloutFormGetInvolved: String(f["SSJ Fillout Form: Get Involved"] || undefined) || undefined,
-        ssjFilloutFormGetInvolved4: String(f["SSJ Fillout Form: Get Involved 4"] || undefined) || undefined,
-        abbreviation: String(f["Abbreviation"] || undefined) || undefined,
-        ssjFilloutFormGetInvolved3: String(f["SSJ Fillout Form: Get Involved 3"] || undefined) || undefined
-      });
-    },
-    cacheEnabled: true,
-  },
   'Marketing source options': {
     airtableTable: 'Marketing source options',
     fieldMapping: schema.MARKETING_SOURCE_OPTIONS_FIELDS,
     transformer: (record: any): schema.MarketingSourceOption => {
       const f = record.fields;
       return schema.createBaseTransformer(record, {
-        marketingSource: String(f["Marketing Source"] || undefined) || undefined,
-        educators: schema.toStringArray(f["Educators"]) || undefined
+        marketingSource: String(f["Marketing Source"] || undefined) || undefined
       });
     },
     cacheEnabled: true,
@@ -1491,14 +1340,13 @@ export const TABLE_CONFIG = {
     },
     cacheEnabled: true,
   },
-  'Race and Ethnicity': {
-    airtableTable: 'Race and Ethnicity',
-    fieldMapping: schema.RACE_AND_ETHNICITY_FIELDS,
-    transformer: (record: any): schema.RaceAndEthnicity => {
+  'Event types': {
+    airtableTable: 'Event types',
+    fieldMapping: schema.EVENT_TYPES_FIELDS,
+    transformer: (record: any): schema.EventType => {
       const f = record.fields;
       return schema.createBaseTransformer(record, {
-        ssjFilloutFormGetInvolved: String(f["SSJ Fillout Form: Get Involved"] || undefined) || undefined,
-        name: String(f["Name"] || undefined) || undefined
+        eventCategory: String(f["Event Category"] || undefined) || undefined
       });
     },
     cacheEnabled: true,
@@ -1526,6 +1374,17 @@ export const TABLE_CONFIG = {
     },
     cacheEnabled: true,
   },
+  'Race and Ethnicity': {
+    airtableTable: 'Race and Ethnicity',
+    fieldMapping: schema.RACE_AND_ETHNICITY_FIELDS,
+    transformer: (record: any): schema.RaceAndEthnicity => {
+      const f = record.fields;
+      return schema.createBaseTransformer(record, {
+        name: String(f["Name"] || undefined) || undefined
+      });
+    },
+    cacheEnabled: true,
+  },
 } as const;
 
 // Generic CRUD operations
@@ -1540,8 +1399,14 @@ export async function getAll<T>(tableName: string): Promise<T[]> {
   }
 
   try {
-    // Implement Airtable API call here
-    const records = []; // Placeholder - implement actual Airtable API call
+    // Fetch all records from Airtable
+    const airtableRecords = await base(config.airtableTable).select().all();
+    const records = airtableRecords.map(record => ({
+      id: record.id,
+      created: record.fields.created || record._rawJson.createdTime,
+      lastModified: record.fields.lastModified || record._rawJson.createdTime,
+      ...record.fields
+    }));
     const transformed = records.map(config.transformer);
     
     if (config.cacheEnabled) {
@@ -1566,9 +1431,16 @@ export async function getById<T>(tableName: string, id: string): Promise<T | nul
   }
 
   try {
-    // Implement Airtable API call here
-    const record = null; // Placeholder - implement actual Airtable API call
-    if (!record) return null;
+    // Fetch record by ID from Airtable
+    const airtableRecord = await base(config.airtableTable).find(id);
+    if (!airtableRecord) return null;
+    
+    const record = {
+      id: airtableRecord.id,
+      created: airtableRecord.fields.created || airtableRecord._rawJson.createdTime,
+      lastModified: airtableRecord.fields.lastModified || airtableRecord._rawJson.createdTime,
+      ...airtableRecord.fields
+    };
     
     const transformed = config.transformer(record);
     
@@ -1604,12 +1476,8 @@ export const getMembershipTerminationSteps = () => getAll<schema.MembershipTermi
 export const getMembershipTerminationStepById = (id: string) => getById<schema.MembershipTerminationStep>('Membership termination steps', id);
 export const getLocations = () => getAll<schema.Location>('Locations');
 export const getLocationById = (id: string) => getById<schema.Location>('Locations', id);
-export const getEventAttendances = () => getAll<schema.EventAttendance>('Event attendance');
-export const getEventAttendanceById = (id: string) => getById<schema.EventAttendance>('Event attendance', id);
 export const getLeadRoutingTemplates = () => getAll<schema.LeadRoutingTemplate>('Lead Routing and Templates');
 export const getLeadRoutingTemplateById = (id: string) => getById<schema.LeadRoutingTemplate>('Lead Routing and Templates', id);
-export const getCohorts = () => getAll<schema.Cohort>('Cohorts');
-export const getCohortById = (id: string) => getById<schema.Cohort>('Cohorts', id);
 export const getEvents = () => getAll<schema.Event>('Events');
 export const getEventById = (id: string) => getById<schema.Event>('Events', id);
 export const getBoardServices = () => getAll<schema.BoardService>('Board Service');
@@ -1632,54 +1500,56 @@ export const getGrants = () => getAll<schema.Grant>('Grants');
 export const getGrantById = (id: string) => getById<schema.Grant>('Grants', id);
 export const getMailingLists = () => getAll<schema.MailingList>('Mailing lists');
 export const getMailingListById = (id: string) => getById<schema.MailingList>('Mailing lists', id);
-export const getAirtableLoanpaymentss = () => getAll<schema.AirtableLoanpayments>('Airtable Loan payments');
-export const getAirtableLoanpaymentsById = (id: string) => getById<schema.AirtableLoanpayments>('Airtable Loan payments', id);
-export const getAirtableLoanss = () => getAll<schema.AirtableLoans>('Airtable Loans');
-export const getAirtableLoansById = (id: string) => getById<schema.AirtableLoans>('Airtable Loans', id);
+export const getEventAttendances = () => getAll<schema.EventAttendance>('Event attendance');
+export const getEventAttendanceById = (id: string) => getById<schema.EventAttendance>('Event attendance', id);
+export const getAirtableLoanPayments = () => getAll<schema.AirtableLoanPayment>('Airtable Loan payments');
+export const getAirtableLoanPaymentById = (id: string) => getById<schema.AirtableLoanPayment>('Airtable Loan payments', id);
+export const getAirtableLoans = () => getAll<schema.AirtableLoan>('Airtable Loans');
+export const getAirtableLoanById = (id: string) => getById<schema.AirtableLoan>('Airtable Loans', id);
 export const getEducatorNotes = () => getAll<schema.EducatorNote>('Educator notes');
 export const getEducatorNoteById = (id: string) => getById<schema.EducatorNote>('Educator notes', id);
 export const getCharterAuthorizerContacts = () => getAll<schema.CharterAuthorizerContact>('Charter authorizers and contacts');
 export const getCharterAuthorizerContactById = (id: string) => getById<schema.CharterAuthorizerContact>('Charter authorizers and contacts', id);
-export const getAssessmentDatas = () => getAll<schema.AssessmentData>('Assessment data');
-export const getAssessmentDataById = (id: string) => getById<schema.AssessmentData>('Assessment data', id);
 export const getMembershipTerminationStepDates = () => getAll<schema.MembershipTerminationStepDate>('Membership termination steps and dates');
 export const getMembershipTerminationStepDateById = (id: string) => getById<schema.MembershipTerminationStepDate>('Membership termination steps and dates', id);
-export const getEducatorSchoolAssociations = () => getAll<schema.EducatorSchoolAssociation>('Educators x Schools');
-export const getEducatorSchoolAssociationById = (id: string) => getById<schema.EducatorSchoolAssociation>('Educators x Schools', id);
-export const getNineninetiess = () => getAll<schema.Ninenineties>('Nine nineties');
-export const getNineninetiesById = (id: string) => getById<schema.Ninenineties>('Nine nineties', id);
+export const getNineNinetiess = () => getAll<schema.NineNineties>('Nine nineties');
+export const getNineNinetiesById = (id: string) => getById<schema.NineNineties>('Nine nineties', id);
 export const getGovernanceDocuments = () => getAll<schema.GovernanceDocument>('Governance docs');
 export const getGovernanceDocumentById = (id: string) => getById<schema.GovernanceDocument>('Governance docs', id);
 export const getGuideAssignments = () => getAll<schema.GuideAssignment>('Guides Assignments');
 export const getGuideAssignmentById = (id: string) => getById<schema.GuideAssignment>('Guides Assignments', id);
-export const getTrainingGrants = () => getAll<schema.TrainingGrant>('Training Grants');
-export const getTrainingGrantById = (id: string) => getById<schema.TrainingGrant>('Training Grants', id);
+export const getCohorts = () => getAll<schema.Cohort>('Cohorts');
+export const getCohortById = (id: string) => getById<schema.Cohort>('Cohorts', id);
+export const getSchoolyears = () => getAll<schema.Schoolyear>('School year');
+export const getSchoolyearById = (id: string) => getById<schema.Schoolyear>('School year', id);
 export const getReportSubmissions = () => getAll<schema.ReportSubmission>('Reports and submissions');
 export const getReportSubmissionById = (id: string) => getById<schema.ReportSubmission>('Reports and submissions', id);
 export const getStateAliass = () => getAll<schema.StateAlias>('States Aliases');
 export const getStateAliasById = (id: string) => getById<schema.StateAlias>('States Aliases', id);
 export const getPublicFundings = () => getAll<schema.PublicFunding>('Public funding');
 export const getPublicFundingById = (id: string) => getById<schema.PublicFunding>('Public funding', id);
+export const getAssessmentDatas = () => getAll<schema.AssessmentData>('Assessment data');
+export const getAssessmentDataById = (id: string) => getById<schema.AssessmentData>('Assessment data', id);
 export const getAnnualEnrollmentDemographics = () => getAll<schema.AnnualEnrollmentDemographic>('Annual enrollment and demographics');
 export const getAnnualEnrollmentDemographicById = (id: string) => getById<schema.AnnualEnrollmentDemographic>('Annual enrollment and demographics', id);
+export const getEducatorSchoolAssociations = () => getAll<schema.EducatorSchoolAssociation>('Educators x Schools');
+export const getEducatorSchoolAssociationById = (id: string) => getById<schema.EducatorSchoolAssociation>('Educators x Schools', id);
 export const getAssessments = () => getAll<schema.Assessment>('Assessments');
 export const getAssessmentById = (id: string) => getById<schema.Assessment>('Assessments', id);
-export const getEventTypes = () => getAll<schema.EventType>('Event types');
-export const getEventTypeById = (id: string) => getById<schema.EventType>('Event types', id);
 export const getEmailAddresss = () => getAll<schema.EmailAddress>('Email Addresses');
 export const getEmailAddressById = (id: string) => getById<schema.EmailAddress>('Email Addresses', id);
-export const getMontessoriCertifierOlds = () => getAll<schema.MontessoriCertifierOld>('Montessori Certifiers - old list');
-export const getMontessoriCertifierOldById = (id: string) => getById<schema.MontessoriCertifierOld>('Montessori Certifiers - old list', id);
 export const getMarketingSourceOptions = () => getAll<schema.MarketingSourceOption>('Marketing source options');
 export const getMarketingSourceOptionById = (id: string) => getById<schema.MarketingSourceOption>('Marketing source options', id);
 export const getMontessoriCertLevels = () => getAll<schema.MontessoriCertLevel>('Montessori Cert Levels');
 export const getMontessoriCertLevelById = (id: string) => getById<schema.MontessoriCertLevel>('Montessori Cert Levels', id);
-export const getRaceAndEthnicitys = () => getAll<schema.RaceAndEthnicity>('Race and Ethnicity');
-export const getRaceAndEthnicityById = (id: string) => getById<schema.RaceAndEthnicity>('Race and Ethnicity', id);
+export const getEventTypes = () => getAll<schema.EventType>('Event types');
+export const getEventTypeById = (id: string) => getById<schema.EventType>('Event types', id);
 export const getAgeGrades = () => getAll<schema.AgeGrade>('Ages-Grades');
 export const getAgeGradeById = (id: string) => getById<schema.AgeGrade>('Ages-Grades', id);
 export const getMontessoriCertifiers = () => getAll<schema.MontessoriCertifier>('Montessori Certifiers');
 export const getMontessoriCertifierById = (id: string) => getById<schema.MontessoriCertifier>('Montessori Certifiers', id);
+export const getRaceAndEthnicitys = () => getAll<schema.RaceAndEthnicity>('Race and Ethnicity');
+export const getRaceAndEthnicityById = (id: string) => getById<schema.RaceAndEthnicity>('Race and Ethnicity', id);
 
 // Storage object with all methods for backward compatibility
 export const storage = {
@@ -1713,15 +1583,9 @@ export const storage = {
   getLocations,
   getLocationById,
   getLocation: getLocationById,
-  getEventAttendances,
-  getEventAttendanceById,
-  getEventAttendance: getEventAttendanceById,
   getLeadRoutingTemplates,
   getLeadRoutingTemplateById,
   getLeadRoutingTemplate: getLeadRoutingTemplateById,
-  getCohorts,
-  getCohortById,
-  getCohort: getCohortById,
   getEvents,
   getEventById,
   getEvent: getEventById,
@@ -1755,39 +1619,39 @@ export const storage = {
   getMailingLists,
   getMailingListById,
   getMailingList: getMailingListById,
-  getAirtableLoanpaymentss,
-  getAirtableLoanpaymentsById,
-  getAirtableLoanpayments: getAirtableLoanpaymentsById,
-  getAirtableLoanss,
-  getAirtableLoansById,
-  getAirtableLoans: getAirtableLoansById,
+  getEventAttendances,
+  getEventAttendanceById,
+  getEventAttendance: getEventAttendanceById,
+  getAirtableLoanPayments,
+  getAirtableLoanPaymentById,
+  getAirtableLoanPayment: getAirtableLoanPaymentById,
+  getAirtableLoans,
+  getAirtableLoanById,
+  getAirtableLoan: getAirtableLoanById,
   getEducatorNotes,
   getEducatorNoteById,
   getEducatorNote: getEducatorNoteById,
   getCharterAuthorizerContacts,
   getCharterAuthorizerContactById,
   getCharterAuthorizerContact: getCharterAuthorizerContactById,
-  getAssessmentDatas,
-  getAssessmentDataById,
-  getAssessmentData: getAssessmentDataById,
   getMembershipTerminationStepDates,
   getMembershipTerminationStepDateById,
   getMembershipTerminationStepDate: getMembershipTerminationStepDateById,
-  getEducatorSchoolAssociations,
-  getEducatorSchoolAssociationById,
-  getEducatorSchoolAssociation: getEducatorSchoolAssociationById,
-  getNineninetiess,
-  getNineninetiesById,
-  getNinenineties: getNineninetiesById,
+  getNineNinetiess,
+  getNineNinetiesById,
+  getNineNineties: getNineNinetiesById,
   getGovernanceDocuments,
   getGovernanceDocumentById,
   getGovernanceDocument: getGovernanceDocumentById,
   getGuideAssignments,
   getGuideAssignmentById,
   getGuideAssignment: getGuideAssignmentById,
-  getTrainingGrants,
-  getTrainingGrantById,
-  getTrainingGrant: getTrainingGrantById,
+  getCohorts,
+  getCohortById,
+  getCohort: getCohortById,
+  getSchoolyears,
+  getSchoolyearById,
+  getSchoolyear: getSchoolyearById,
   getReportSubmissions,
   getReportSubmissionById,
   getReportSubmission: getReportSubmissionById,
@@ -1797,174 +1661,383 @@ export const storage = {
   getPublicFundings,
   getPublicFundingById,
   getPublicFunding: getPublicFundingById,
+  getAssessmentDatas,
+  getAssessmentDataById,
+  getAssessmentData: getAssessmentDataById,
   getAnnualEnrollmentDemographics,
   getAnnualEnrollmentDemographicById,
   getAnnualEnrollmentDemographic: getAnnualEnrollmentDemographicById,
+  getEducatorSchoolAssociations,
+  getEducatorSchoolAssociationById,
+  getEducatorSchoolAssociation: getEducatorSchoolAssociationById,
   getAssessments,
   getAssessmentById,
   getAssessment: getAssessmentById,
-  getEventTypes,
-  getEventTypeById,
-  getEventType: getEventTypeById,
   getEmailAddresss,
   getEmailAddressById,
   getEmailAddress: getEmailAddressById,
-  getMontessoriCertifierOlds,
-  getMontessoriCertifierOldById,
-  getMontessoriCertifierOld: getMontessoriCertifierOldById,
   getMarketingSourceOptions,
   getMarketingSourceOptionById,
   getMarketingSourceOption: getMarketingSourceOptionById,
   getMontessoriCertLevels,
   getMontessoriCertLevelById,
   getMontessoriCertLevel: getMontessoriCertLevelById,
-  getRaceAndEthnicitys,
-  getRaceAndEthnicityById,
-  getRaceAndEthnicity: getRaceAndEthnicityById,
+  getEventTypes,
+  getEventTypeById,
+  getEventType: getEventTypeById,
   getAgeGrades,
   getAgeGradeById,
   getAgeGrade: getAgeGradeById,
   getMontessoriCertifiers,
   getMontessoriCertifierById,
   getMontessoriCertifier: getMontessoriCertifierById,
+  getRaceAndEthnicitys,
+  getRaceAndEthnicityById,
+  getRaceAndEthnicity: getRaceAndEthnicityById,
   // Legacy aliases
   getTeachers: getEducators,
   getTeacher: getEducatorById,
   updateTeacher: async (id: string, data: any) => {
-    // TODO: Implement update logic
+    try {
+      const updated = await base('Educators').update(id, data);
+      invalidateCache('Educators');
+      return updated;
+    } catch (error) {
+      console.error(`Error updating educator ${id}:`, error);
     return null;
+    }
   },
   deleteTeacher: async (id: string) => {
-    // TODO: Implement delete logic  
+    try {
+      await base('Educators').destroy(id);
+      invalidateCache('Educators');
+      return true;
+    } catch (error) {
+      console.error(`Error deleting educator ${id}:`, error);
     return false;
+    }
   },
   // Custom methods (implement as needed)
   getSchoolsByUserId: async (userId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const educators = await getAll<schema.Educator>('Educators');
+      const educator = educators.find(e => e.id === userId);
+      if (!educator) return [];
+      
+      const associations = await getAll<schema.EducatorSchoolAssociation>('Educators x Schools');
+      const educatorAssociations = associations.filter(a => a.educatorId === educator.id);
+      
+      const schools = await getAll<schema.School>('Schools');
+      return schools.filter(s => educatorAssociations.some(a => a.schoolId === s.id));
+    } catch (error) {
+      console.error(`Error fetching schools for user ${userId}:`, error);
     return [];
+    }
   },
   getTlsByUserId: async (userId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const educators = await getAll<schema.Educator>('Educators');
+      return educators.filter(e => e.id === userId && e.role === 'TL');
+    } catch (error) {
+      console.error(`Error fetching TLs for user ${userId}:`, error);
     return [];
+    }
   },
   getEducatorAssociations: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const associations = await getAll<schema.EducatorSchoolAssociation>('Educators x Schools');
+      return associations.filter(a => a.educatorId === educatorId);
+    } catch (error) {
+      console.error(`Error fetching associations for educator ${educatorId}:`, error);
     return [];
+    }
   },
   getSchoolAssociations: async (schoolId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const associations = await getAll<schema.EducatorSchoolAssociation>('Educators x Schools');
+      return associations.filter(a => a.schoolId === schoolId);
+    } catch (error) {
+      console.error(`Error fetching associations for school ${schoolId}:`, error);
     return [];
+    }
   },
   updateEducator: async (id: string, data: any) => {
-    // TODO: Implement update logic
+    try {
+      const updated = await base('Educators').update(id, data);
+      invalidateCache('Educators');
+      return TABLE_CONFIG['Educators'].transformer(updated);
+    } catch (error) {
+      console.error(`Error updating educator ${id}:`, error);
     return null;
+    }
   },
   updateSchool: async (id: string, data: any) => {
-    // TODO: Implement update logic
+    try {
+      const updated = await base('Schools').update(id, data);
+      invalidateCache('Schools');
+      return TABLE_CONFIG['Schools'].transformer(updated);
+    } catch (error) {
+      console.error(`Error updating school ${id}:`, error);
     return null;
+    }
   },
   createEducator: async (data: any) => {
-    // TODO: Implement create logic
+    try {
+      const created = await base('Educators').create(data);
+      invalidateCache('Educators');
+      return TABLE_CONFIG['Educators'].transformer(created);
+    } catch (error) {
+      console.error(`Error creating educator:`, error);
     return null;
+    }
   },
   createSchool: async (data: any) => {
-    // TODO: Implement create logic
+    try {
+      const created = await base('Schools').create(data);
+      invalidateCache('Schools');
+      return TABLE_CONFIG['Schools'].transformer(created);
+    } catch (error) {
+      console.error(`Error creating school:`, error);
     return null;
+    }
   },
   deleteEducator: async (id: string) => {
-    // TODO: Implement delete logic
+    try {
+      await base('Educators').destroy(id);
+      invalidateCache('Educators');
+      return true;
+    } catch (error) {
+      console.error(`Error deleting educator ${id}:`, error);
     return false;
+    }
   },
   deleteSchool: async (id: string) => {
-    // TODO: Implement delete logic
+    try {
+      await base('Schools').destroy(id);
+      invalidateCache('Schools');
+      return true;
+    } catch (error) {
+      console.error(`Error deleting school ${id}:`, error);
     return false;
+    }
   },
   createTeacher: async (data: any) => {
-    // TODO: Implement create logic
+    // createTeacher is an alias for createEducator
+    try {
+      const created = await base('Educators').create(data);
+      invalidateCache('Educators');
+      return TABLE_CONFIG['Educators'].transformer(created);
+    } catch (error) {
+      console.error(`Error creating teacher:`, error);
     return null;
+    }
   },
   updateTeacherSchoolAssociation: async (id: string, data: any) => {
-    // TODO: Implement update logic
+    try {
+      const updated = await base('Educators x Schools').update(id, data);
+      invalidateCache('Educators x Schools');
+      return TABLE_CONFIG['Educators x Schools'].transformer(updated);
+    } catch (error) {
+      console.error(`Error updating teacher-school association ${id}:`, error);
     return null;
+    }
   },
   deleteTeacherSchoolAssociation: async (id: string) => {
-    // TODO: Implement delete logic
+    try {
+      await base('Educators x Schools').destroy(id);
+      invalidateCache('Educators x Schools');
+      return true;
+    } catch (error) {
+      console.error(`Error deleting teacher-school association ${id}:`, error);
     return false;
+    }
   },
   createTeacherSchoolAssociation: async (data: any) => {
-    // TODO: Implement create logic
+    try {
+      const created = await base('Educators x Schools').create(data);
+      invalidateCache('Educators x Schools');
+      return TABLE_CONFIG['Educators x Schools'].transformer(created);
+    } catch (error) {
+      console.error(`Error creating teacher-school association:`, error);
     return null;
+    }
   },
   getMontessoriCertificationsByEducatorId: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const certs = await getAll<schema.MontessoriCert>('Montessori Certs');
+      return certs.filter(c => c.educatorId === educatorId);
+    } catch (error) {
+      console.error(`Error fetching Montessori certifications for educator ${educatorId}:`, error);
     return [];
+    }
   },
   getEventAttendancesByEducatorId: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const attendances = await getAll<schema.EventAttendance>('Event attendance');
+      return attendances.filter(a => a.educatorId === educatorId);
+    } catch (error) {
+      console.error(`Error fetching event attendances for educator ${educatorId}:`, error);
     return [];
+    }
   },
   getEducatorNotesByEducatorId: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const notes = await getAll<schema.EducatorNote>('Educator notes');
+      return notes.filter(n => n.educatorId === educatorId);
+    } catch (error) {
+      console.error(`Error fetching educator notes for educator ${educatorId}:`, error);
     return [];
+    }
   },
   getEmailAddressesByEducatorId: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const emails = await getAll<schema.EmailAddress>('Email Addresses');
+      return emails.filter(e => e.educatorId === educatorId);
+    } catch (error) {
+      console.error(`Error fetching email addresses for educator ${educatorId}:`, error);
     return [];
+    }
   },
   getSSJFilloutFormsByEducatorId: async (educatorId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const forms = await getAll<schema.SSJFilloutForm>('SSJ Fillout Forms');
+      return forms.filter(f => f.educatorId === educatorId);
+    } catch (error) {
+      console.error(`Error fetching SSJ fillout forms for educator ${educatorId}:`, error);
     return [];
+    }
   },
   getGovernanceDocumentsBySchoolId: async (schoolId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const docs = await getAll<schema.GovernanceDocument>('Governance docs');
+      return docs.filter(d => d.schoolId === schoolId);
+    } catch (error) {
+      console.error(`Error fetching governance documents for school ${schoolId}:`, error);
     return [];
+    }
   },
   getGuideAssignmentsBySchoolId: async (schoolId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const assignments = await getAll<schema.GuideAssignment>('Guides Assignments');
+      return assignments.filter(a => a.schoolId === schoolId);
+    } catch (error) {
+      console.error(`Error fetching guide assignments for school ${schoolId}:`, error);
     return [];
+    }
   },
   getSchoolNotesBySchoolId: async (schoolId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const notes = await getAll<schema.SchoolNote>('School notes');
+      return notes.filter(n => n.schoolId === schoolId);
+    } catch (error) {
+      console.error(`Error fetching school notes for school ${schoolId}:`, error);
     return [];
+    }
   },
   getLocationsBySchoolId: async (schoolId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const locations = await getAll<schema.Location>('Locations');
+      return locations.filter(l => l.schoolId === schoolId);
+    } catch (error) {
+      console.error(`Error fetching locations for school ${schoolId}:`, error);
     return [];
+    }
   },
   getActionStepsByUserId: async (userId: string) => {
-    // TODO: Implement filtering logic
+    try {
+      const actionSteps = await getAll<schema.ActionStep>('Action steps');
+      return actionSteps.filter(a => a.userId === userId);
+    } catch (error) {
+      console.error(`Error fetching action steps for user ${userId}:`, error);
     return [];
+    }
   },
-  searchSchools: async (query: string, filters: any) => {
-    // TODO: Implement search logic
+  searchSchools: async (query: string, filters: any = {}) => {
+    try {
+      const schools = await getAll<schema.School>('Schools');
+      const lowercaseQuery = query.toLowerCase();
+      
+      let filtered = schools.filter(school => 
+        school.name?.toLowerCase().includes(lowercaseQuery) ||
+        school.city?.toLowerCase().includes(lowercaseQuery) ||
+        school.state?.toLowerCase().includes(lowercaseQuery)
+      );
+      
+      // Apply additional filters if provided
+      if (filters.state) {
+        filtered = filtered.filter(s => s.state === filters.state);
+      }
+      if (filters.status) {
+        filtered = filtered.filter(s => s.status === filters.status);
+      }
+      
+      return filtered;
+    } catch (error) {
+      console.error(`Error searching schools with query "${query}":`, error);
     return [];
+    }
   },
   getEnrollmentTrends: async () => {
-    // TODO: Implement analytics logic
+    try {
+      const enrollment = await getAll<schema.AnnualEnrollmentDemographic>('Annual enrollment and demographics');
+      // Group by year and calculate totals
+      const trends = enrollment.reduce((acc: any, record: any) => {
+        const year = record.year || 'Unknown';
+        if (!acc[year]) acc[year] = { year, totalEnrollment: 0, schoolCount: 0 };
+        acc[year].totalEnrollment += record.totalEnrollment || 0;
+        acc[year].schoolCount++;
+        return acc;
+      }, {});
+      
+      return Object.values(trends);
+    } catch (error) {
+      console.error(`Error fetching enrollment trends:`, error);
     return [];
+    }
   },
   getSchoolMetrics: async (schoolId: string) => {
-    // TODO: Implement metrics logic
+    try {
+      const school = await getById<schema.School>('Schools', schoolId);
+      if (!school) return {};
+      
+      const locations = await getAll<schema.Location>('Locations');
+      const schoolLocations = locations.filter(l => l.schoolId === schoolId);
+      
+      const enrollments = await getAll<schema.AnnualEnrollmentDemographic>('Annual enrollment and demographics');
+      const schoolEnrollments = enrollments.filter(e => e.schoolId === schoolId);
+      
+      return {
+        school: school.name,
+        locationCount: schoolLocations.length,
+        enrollmentHistory: schoolEnrollments,
+        currentEnrollment: schoolEnrollments.find(e => e.year === new Date().getFullYear())?.totalEnrollment || 0
+      };
+    } catch (error) {
+      console.error(`Error fetching school metrics for ${schoolId}:`, error);
     return {};
-  },
-  bulkUpdateSchools: async (ids: string[], updates: any) => {
-    // TODO: Implement bulk update logic
-    return [];
-  },
-  bulkImportEducators: async (educators: any[]) => {
-    // TODO: Implement bulk import logic
-    return [];
-  },
-  bulkCreateEducators: async (educators: any[]) => {
-    // TODO: Implement bulk create logic
-    return [];
+    }
   },
   getNetworkBenchmarks: async () => {
-    // TODO: Implement benchmarks logic
+    try {
+      const schools = await getAll<schema.School>('Schools');
+      const enrollments = await getAll<schema.AnnualEnrollmentDemographic>('Annual enrollment and demographics');
+      
+      return {
+        totalSchools: schools.length,
+        activeSchools: schools.filter(s => s.status === 'Active').length,
+        averageEnrollment: enrollments.reduce((sum, e) => sum + (e.totalEnrollment || 0), 0) / Math.max(enrollments.length, 1),
+        states: [...new Set(schools.map(s => s.state).filter(Boolean))].length
+      };
+    } catch (error) {
+      console.error(`Error fetching network benchmarks:`, error);
     return {};
+    }
   },
   getTableMetadata: async () => {
-    // TODO: Implement metadata logic
-    return {};
+    return {
+      tables: Object.keys(TABLE_CONFIG),
+      generatedAt: new Date().toISOString(),
+      tableCount: Object.keys(TABLE_CONFIG).length
+    };
   },
 } as const;

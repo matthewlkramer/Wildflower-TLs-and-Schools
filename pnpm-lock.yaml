@@ -11,6 +11,9 @@ importers:
       airtable-types-gen:
         specifier: ^0.3.1
         version: 0.3.1
+      dotenv:
+        specifier: ^17.2.2
+        version: 17.2.2
     devDependencies:
       '@types/node':
         specifier: 20.16.11
@@ -234,7 +237,7 @@ importers:
         specifier: ^10.0.0
         version: 10.0.0
       esbuild:
-        specifier: ^0.25.0
+        specifier: ^0.25.9
         version: 0.25.9
       tsx:
         specifier: ^4.19.1

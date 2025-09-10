@@ -1,17 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { Ninenineties } from "@shared/schema.generated";
+import type { NineNineties } from "@shared/schema.generated";
 import { Edit, ExternalLink, Trash2 } from "lucide-react";
 import { RowActionsSelect } from "@/components/shared/RowActionsSelect";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 
-interface NineninetiessTableProps {
+interface NineNinetiesTableProps {
   charterId: string;
 }
 
-export function NineninetiessTable({ charterId }: NineninetiessTableProps) {
-  const { data: tax990s = [], isLoading } = useQuery<Ninenineties[]>({
+export function NineNinetiesTable({ charterId }: NineNinetiesTableProps) {
+  const { data: tax990s = [], isLoading } = useQuery<NineNineties[]>({
     queryKey: ["/api/charter-990s/charter", charterId],
     queryFn: async () => {
       const response = await fetch(`/api/charter-990s/charter/${charterId}`, { 
@@ -23,17 +23,17 @@ export function NineninetiessTable({ charterId }: NineninetiessTableProps) {
     enabled: !!charterId,
   });
 
-  const handleOpen = (tax990: Ninenineties) => {
+  const handleOpen = (tax990: NineNineties) => {
     if (tax990.docUrl) {
       window.open(tax990.docUrl, '_blank');
     }
   };
 
-  const handleEdit = (tax990: Ninenineties) => {
+  const handleEdit = (tax990: NineNineties) => {
     console.log("Edit 990:", tax990);
   };
 
-  const handleDelete = (tax990: Ninenineties) => {
+  const handleDelete = (tax990: NineNineties) => {
     console.log("Delete 990:", tax990);
   };
 
@@ -73,7 +73,7 @@ export function NineninetiessTable({ charterId }: NineninetiessTableProps) {
       sortable: false,
       filter: false,
       cellRenderer: (params: any) => {
-        const tax990 = params.data as Ninenineties;
+        const tax990 = params.data as NineNineties;
         return (
           <RowActionsSelect
             options={[

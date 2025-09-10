@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { ZodError } from 'zod';
-import { logger } from './logger';
+import { logger } from './utils';
 
 export class ApiResponse {
   static success<T>(res: Response, data: T, statusCode = 200) {

@@ -23,7 +23,7 @@ import { CharterAuthorizerContactsTable } from "@/components/charter-authorizer-
 import { CharterReportsTable } from "@/components/charter-reports-table";
 import { CharterAssessmentsTable } from "@/components/charter-assessments-table";
 import { GovernanceDocumentsTable } from "@/components/charter-governance-documents-table";
-import { NineninetiessTable } from "@/components/charter-990s-table";
+import { NineNinetiesTable } from "@/components/charter-990s-table";
 import { SchoolNotesTable } from "@/components/charter-notes-table";
 import { ActionStepsTable } from "@/components/charter-action-steps-table";
 
@@ -214,7 +214,7 @@ export default function CharterDetail() {
               </div>
               <div className="bg-white rounded-lg border border-slate-200 p-6">
                 <h2 className="text-lg font-semibold text-slate-900 mb-4">990s</h2>
-                <NineninetiessTable charterId={id!} />
+                <NineNinetiesTable charterId={id!} />
               </div>
             </div>
           </TabsContent>

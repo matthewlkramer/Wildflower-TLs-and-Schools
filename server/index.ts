@@ -3,7 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import cors from 'cors';
 import compression from 'compression';
 import { registerRoutes } from "./routes.generated";
-import { setupAuth } from "./auth";
+import { setupAuth } from "./utils";
 import { storage } from "./generic-storage.generated";
 
 function log(message: string, source = "express") {
@@ -92,7 +92,7 @@ app.use((req, res, next) => {
     await setupVite(app, server);
   } else if (process.env.SERVE_CLIENT === 'true') {
     try {
-      const { serveStatic } = await import("./static");
+      const { serveStatic } = await import("./utils");
       serveStatic(app);
     } catch (e) {
       log('static client serving disabled or not available', 'express');

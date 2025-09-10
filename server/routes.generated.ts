@@ -1,15 +1,13 @@
 // Generated API routes from Airtable Metadata
-// Generated on 2025-09-09T21:10:12.654Z
+// Generated on 2025-09-10T00:13:08.163Z
 // This file is auto-generated. Do not edit manually.
 // Custom business logic is imported from routes-custom.ts
 
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import * as schema from '../shared/schema.generated';
-import { TABLE_CONFIG } from './generic-storage.generated';
-import { cache } from './cache';
-import { logger } from './logger';
-import { requireAuth } from './auth';
+import { TABLE_CONFIG, getAll, getById } from './generic-storage.generated';
+import { cache, logger, requireAuth, base } from './utils';
 import { registerCustomRoutes } from './routes-custom';
 import { z } from 'zod';
 
@@ -31,8 +29,7 @@ function generateCRUDRoutes<T>(
   // GET /api/{resources} - Get all
   app.get(`/api/${pluralName}`, async (req: Request, res: Response) => {
     try {
-      // TODO: Implement actual Airtable API call using config
-      const records: T[] = []; // Placeholder
+      const records = await getAll<T>(tableName);
       res.json(records);
     } catch (error) {
       logger.error(`Failed to fetch ${pluralName}:`, error);
@@ -44,8 +41,7 @@ function generateCRUDRoutes<T>(
   app.get(`/api/${pluralName}/:id`, async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
-      // TODO: Implement actual Airtable API call using config
-      const record: T | null = null; // Placeholder
+      const record = await getById<T>(tableName, id);
       
       if (!record) {
         return res.status(404).json({ message: `${resourceName} not found` });
@@ -61,8 +57,10 @@ function generateCRUDRoutes<T>(
   app.post(`/api/${pluralName}`, async (req: Request, res: Response) => {
     try {
       const data = zodSchema.parse(req.body);
-      // TODO: Implement actual Airtable API call using config
-      const record: T = data; // Placeholder
+      
+      // Create record in Airtable
+      const airtableRecord = await base(tableName).create(data);
+      const record = config.transformer(airtableRecord);
       
       // Invalidate relevant caches
       cache.invalidate(pluralName);
@@ -86,12 +84,10 @@ function generateCRUDRoutes<T>(
     try {
       const id = req.params.id;
       const data = zodSchema.partial().parse(req.body);
-      // TODO: Implement actual Airtable API call using config
-      const record: T | null = null; // Placeholder
       
-      if (!record) {
-        return res.status(404).json({ message: `${resourceName} not found` });
-      }
+      // Update record in Airtable
+      const airtableRecord = await base(tableName).update(id, data);
+      const record = config.transformer(airtableRecord);
       
       // Invalidate relevant caches
       cache.invalidate(pluralName);
@@ -105,6 +101,9 @@ function generateCRUDRoutes<T>(
           errors: error.errors 
         });
       }
+      if (error.statusCode === 404) {
+        return res.status(404).json({ message: `${resourceName} not found` });
+      }
       logger.error(`Failed to update ${resourceName}:`, error);
       res.status(500).json({ message: `Failed to update ${resourceName}` });
     }
@@ -114,12 +113,9 @@ function generateCRUDRoutes<T>(
   app.delete(`/api/${pluralName}/:id`, async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
-      // TODO: Implement actual Airtable API call using config
-      const success = false; // Placeholder
       
-      if (!success) {
-        return res.status(404).json({ message: `${resourceName} not found` });
-      }
+      // Delete record from Airtable
+      await base(tableName).destroy(id);
       
       // Invalidate relevant caches
       cache.invalidate(pluralName);
@@ -127,6 +123,9 @@ function generateCRUDRoutes<T>(
       
       res.json({ message: `${resourceName} deleted successfully` });
     } catch (error) {
+      if (error.statusCode === 404) {
+        return res.status(404).json({ message: `${resourceName} not found` });
+      }
       logger.error(`Failed to delete ${resourceName}:`, error);
       res.status(500).json({ message: `Failed to delete ${resourceName}` });
     }
@@ -207,26 +206,12 @@ function registerGeneratedCRUDRoutes(app: Express): void {
     'Locations',
     schema.LOCATIONS_SCHEMA
   );  
-  // Routes for Event attendance
-  generateCRUDRoutes<schema.EventAttendance>(
-    app, 
-    'event-attendance',
-    'Event attendance',
-    schema.EVENT_ATTENDANCE_SCHEMA
-  );  
   // Routes for Lead Routing and Templates
   generateCRUDRoutes<schema.LeadRoutingTemplate>(
     app, 
     'lead-routing-and-templates',
     'Lead Routing and Templates',
     schema.LEAD_ROUTING_AND_TEMPLATES_SCHEMA
-  );  
-  // Routes for Cohorts
-  generateCRUDRoutes<schema.Cohort>(
-    app, 
-    'cohorts',
-    'Cohorts',
-    schema.COHORTS_SCHEMA
   );  
   // Routes for Events
   generateCRUDRoutes<schema.Event>(
@@ -305,15 +290,22 @@ function registerGeneratedCRUDRoutes(app: Express): void {
     'Mailing lists',
     schema.MAILING_LISTS_SCHEMA
   );  
+  // Routes for Event attendance
+  generateCRUDRoutes<schema.EventAttendance>(
+    app, 
+    'event-attendance',
+    'Event attendance',
+    schema.EVENT_ATTENDANCE_SCHEMA
+  );  
   // Routes for Airtable Loan payments
-  generateCRUDRoutes<schema.AirtableLoanpayments>(
+  generateCRUDRoutes<schema.AirtableLoanPayment>(
     app, 
     'airtable-loan-payments',
     'Airtable Loan payments',
     schema.AIRTABLE_LOAN_PAYMENTS_SCHEMA
   );  
   // Routes for Airtable Loans
-  generateCRUDRoutes<schema.AirtableLoans>(
+  generateCRUDRoutes<schema.AirtableLoan>(
     app, 
     'airtable-loans',
     'Airtable Loans',
@@ -333,13 +325,6 @@ function registerGeneratedCRUDRoutes(app: Express): void {
     'Charter authorizers and contacts',
     schema.CHARTER_AUTHORIZERS_AND_CONTACTS_SCHEMA
   );  
-  // Routes for Assessment data
-  generateCRUDRoutes<schema.AssessmentData>(
-    app, 
-    'assessment-data',
-    'Assessment data',
-    schema.ASSESSMENT_DATA_SCHEMA
-  );  
   // Routes for Membership termination steps and dates
   generateCRUDRoutes<schema.MembershipTerminationStepDate>(
     app, 
@@ -347,15 +332,8 @@ function registerGeneratedCRUDRoutes(app: Express): void {
     'Membership termination steps and dates',
     schema.MEMBERSHIP_TERMINATION_STEPS_AND_DATES_SCHEMA
   );  
-  // Routes for Educators x Schools
-  generateCRUDRoutes<schema.EducatorSchoolAssociation>(
-    app, 
-    'educators-x-schools',
-    'Educators x Schools',
-    schema.EDUCATORS_X_SCHOOLS_SCHEMA
-  );  
   // Routes for Nine nineties
-  generateCRUDRoutes<schema.Ninenineties>(
+  generateCRUDRoutes<schema.NineNineties>(
     app, 
     'nine-nineties',
     'Nine nineties',
@@ -375,12 +353,19 @@ function registerGeneratedCRUDRoutes(app: Express): void {
     'Guides Assignments',
     schema.GUIDES_ASSIGNMENTS_SCHEMA
   );  
-  // Routes for Training Grants
-  generateCRUDRoutes<schema.TrainingGrant>(
+  // Routes for Cohorts
+  generateCRUDRoutes<schema.Cohort>(
     app, 
-    'training-grants',
-    'Training Grants',
-    schema.TRAINING_GRANTS_SCHEMA
+    'cohorts',
+    'Cohorts',
+    schema.COHORTS_SCHEMA
+  );  
+  // Routes for School year
+  generateCRUDRoutes<schema.Schoolyear>(
+    app, 
+    'school-year',
+    'School year',
+    schema.SCHOOL_YEAR_SCHEMA
   );  
   // Routes for Reports and submissions
   generateCRUDRoutes<schema.ReportSubmission>(
@@ -403,12 +388,26 @@ function registerGeneratedCRUDRoutes(app: Express): void {
     'Public funding',
     schema.PUBLIC_FUNDING_SCHEMA
   );  
+  // Routes for Assessment data
+  generateCRUDRoutes<schema.AssessmentData>(
+    app, 
+    'assessment-data',
+    'Assessment data',
+    schema.ASSESSMENT_DATA_SCHEMA
+  );  
   // Routes for Annual enrollment and demographics
   generateCRUDRoutes<schema.AnnualEnrollmentDemographic>(
     app, 
     'annual-enrollment-and-demographics',
     'Annual enrollment and demographics',
     schema.ANNUAL_ENROLLMENT_AND_DEMOGRAPHICS_SCHEMA
+  );  
+  // Routes for Educators x Schools
+  generateCRUDRoutes<schema.EducatorSchoolAssociation>(
+    app, 
+    'educators-x-schools',
+    'Educators x Schools',
+    schema.EDUCATORS_X_SCHOOLS_SCHEMA
   );  
   // Routes for Assessments
   generateCRUDRoutes<schema.Assessment>(
@@ -417,26 +416,12 @@ function registerGeneratedCRUDRoutes(app: Express): void {
     'Assessments',
     schema.ASSESSMENTS_SCHEMA
   );  
-  // Routes for Event types
-  generateCRUDRoutes<schema.EventType>(
-    app, 
-    'event-types',
-    'Event types',
-    schema.EVENT_TYPES_SCHEMA
-  );  
   // Routes for Email Addresses
   generateCRUDRoutes<schema.EmailAddress>(
     app, 
     'email-addresses',
     'Email Addresses',
     schema.EMAIL_ADDRESSES_SCHEMA
-  );  
-  // Routes for Montessori Certifiers - old list
-  generateCRUDRoutes<schema.MontessoriCertifierOld>(
-    app, 
-    'montessori-certifiers---old-list',
-    'Montessori Certifiers - old list',
-    schema.MONTESSORI_CERTIFIERS_OLD_LIST_SCHEMA
   );  
   // Routes for Marketing source options
   generateCRUDRoutes<schema.MarketingSourceOption>(
@@ -452,12 +437,12 @@ function registerGeneratedCRUDRoutes(app: Express): void {
     'Montessori Cert Levels',
     schema.MONTESSORI_CERT_LEVELS_SCHEMA
   );  
-  // Routes for Race and Ethnicity
-  generateCRUDRoutes<schema.RaceAndEthnicity>(
+  // Routes for Event types
+  generateCRUDRoutes<schema.EventType>(
     app, 
-    'race-and-ethnicity',
-    'Race and Ethnicity',
-    schema.RACE_AND_ETHNICITY_SCHEMA
+    'event-types',
+    'Event types',
+    schema.EVENT_TYPES_SCHEMA
   );  
   // Routes for Ages-Grades
   generateCRUDRoutes<schema.AgeGrade>(
@@ -472,6 +457,13 @@ function registerGeneratedCRUDRoutes(app: Express): void {
     'montessori-certifiers',
     'Montessori Certifiers',
     schema.MONTESSORI_CERTIFIERS_SCHEMA
+  );  
+  // Routes for Race and Ethnicity
+  generateCRUDRoutes<schema.RaceAndEthnicity>(
+    app, 
+    'race-and-ethnicity',
+    'Race and Ethnicity',
+    schema.RACE_AND_ETHNICITY_SCHEMA
   );
   
   console.log(`   ✅ Generated CRUD routes for ${Object.keys(TABLE_CONFIG).length} tables`);
