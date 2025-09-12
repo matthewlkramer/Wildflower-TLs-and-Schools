@@ -304,13 +304,13 @@ export default function Schools() {
                   <GridBase
                     rowData={filteredSchools || []}
                     columnDefs={[{
-                      headerName: 'School',
-                      valueGetter: (p:any) => p?.data?.shortName || p?.data?.name,
+                      headerName: 'School Name',
+                      valueGetter: (p:any) => p?.data?.school_name || p?.data?.shortName || p?.data?.name,
                       ...createTextFilter(),
                       sortable: true,
                       flex: 1,
                       minWidth: 140,
-                      cellRenderer: (p: {data: School; value: string}) => (
+                      cellRenderer: (p: {data: any; value: string}) => (
                         <a href={`/school/${p?.data?.id}`} className="text-blue-600 hover:underline">{p.value}</a>
                       ),
                     }]}

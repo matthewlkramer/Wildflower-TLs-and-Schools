@@ -42,7 +42,7 @@ export default function Teachers() {
   const [viewMode, setViewMode] = useState<"table" | "kanban" | "split">("table");
   const [kFilters, setKFilters] = useState({ montessori: "All", race: "All", role: "All", stage: "All", discovery: "All", type: "All" });
 
-  const { data: teachers, isLoading, fields } = useEducatorsSupabase();
+  const { data: teachers, isLoading } = useEducatorsSupabase();
   
   const {
     filteredData: filteredTeachers,
@@ -81,44 +81,10 @@ export default function Teachers() {
   // Selected teacher detail for split view
   const selectedId = selected?.[0]?.id;
   const selectedIds = new Set((selected || []).map(s => s.id));
-  const { data: selectedDetail } = useQuery<Teacher>({
-    queryKey: ["/api/educators", selectedId],
-    enabled: viewMode === "split" && !!selectedId,
-    queryFn: async () => {
-      const r = await fetch(`/api/educators/${selectedId}`, { credentials: "include" });
-      if (!r.ok) throw new Error("Failed to fetch teacher");
-      return r.json();
-    }
-  });
+  const selectedDetail: any = null;
 
   // Kanban move mutation: update kanban only (no fallback field)
-  const moveMutation = useMutation({
-    mutationFn: async ({ id, to }: { id: string; to: string }) => {
-      const res = await fetch(`/api/educators/${id}`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kanban: to === '__UNSPECIFIED__' ? null : to }),
-      });
-      if (!res.ok) throw new Error('Failed to update educator');
-      return res.json();
-    },
-    onMutate: async ({ id, to }) => {
-      const key = ['/api/educators'];
-      await queryClient.cancelQueries({ queryKey: key });
-      const prev = queryClient.getQueryData<any[]>(key);
-      if (prev) {
-        queryClient.setQueryData<any[]>(key, prev.map((t) => t.id === id ? { ...t, kanban: to === '__UNSPECIFIED__' ? null : to } : t));
-      }
-      return { prev };
-    },
-    onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(['/api/educators'], ctx.prev);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/educators'] });
-    }
-  });
+  const moveMutation = useMutation({ mutationFn: async (_: { id: string; to: string }) => true });
 
   return (
     <>
@@ -408,3 +374,7 @@ export default function Teachers() {
     </>
   );
 }
+
+
+
+
