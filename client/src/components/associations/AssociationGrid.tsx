@@ -2,12 +2,9 @@ import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit3, UserMinus, Trash2, Check, X } from "lucide-react";
 import { RoleMultiSelectInline } from "@/components/shared/grid/RoleMultiSelectInline";
 import { YesNoSelectInline } from "@/components/shared/grid/YesNoSelectInline";
 import { DateInputInline } from "@/components/shared/grid/DateInputInline";
-import { TL_ROLE_OPTIONS } from "@/constants/roles";
 import React from "react";
 import { RowActionsSelect } from "@/components/shared/RowActionsSelect";
 
