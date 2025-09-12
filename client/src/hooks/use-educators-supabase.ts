@@ -8,28 +8,37 @@ export function useEducatorsSupabase() {
   const query = useQuery<Educator[]>({
     queryKey: ["supabase/grid_educators"],
     queryFn: async () => {
-      const pageSize = 1000;
-      let offset = 0;
-      let all: any[] = [];
-      // Page through all rows to bypass the 1000-row default limit
-      // Use a deterministic order for stable pagination
-      for (;;) {
-        const { data, error } = await supabase
-          .from("grid_educators")
-          .select("*")
-          .order("id", { ascending: true })
-          .range(offset, offset + pageSize - 1);
-        if (error) throw error;
-        const chunk = data || [];
-        all = all.concat(chunk);
-        if (chunk.length < pageSize) break;
-        offset += pageSize;
+      const fetchAll = async (view: string) => {
+        const pageSize = 1000;
+        let offset = 0;
+        let all: any[] = [];
+        for (;;) {
+          const { data, error } = await supabase
+            .from(view)
+            .select("*")
+            .order("id", { ascending: true })
+            .range(offset, offset + pageSize - 1);
+          if (error) throw error;
+          const chunk = data || [];
+          all = all.concat(chunk);
+          if (chunk.length < pageSize) break;
+          offset += pageSize;
+        }
+        try { if (import.meta.env.DEV) console.log(`[${view}] fetched rows:`, all.length); } catch {}
+        return (all || []) as unknown as Educator[];
+      };
+
+      const candidates = ["grid_educators", "grid_educator"];
+      let lastErr: any;
+      for (const v of candidates) {
+        try {
+          const rows = await fetchAll(v);
+          return rows.filter((e: any) => !e?.archived);
+        } catch (e) {
+          lastErr = e;
+        }
       }
-      // Dev log to verify pagination in browser console
-      try { if (import.meta.env.DEV) console.log('[grid_educators] fetched rows:', all.length); } catch {}
-      const rows = (all || []) as unknown as Educator[];
-      // Server-side view now guarantees one row per id
-      return rows.filter((e: any) => !e?.archived);
+      throw lastErr;
     },
     staleTime: 30 * 60 * 1000,
     gcTime: 2 * 60 * 60 * 1000,
