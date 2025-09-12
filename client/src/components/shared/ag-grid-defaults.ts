@@ -17,9 +17,10 @@ export const DEFAULT_GRID_PROPS = {
   domLayout: 'autoHeight' as const,
   enableBrowserTooltips: true,
   getRowId: (params: any) => params?.data?.id ?? params?.data?.ID ?? params?.data?.Id,
-  // Start with sideBar available but closed by default
+  // SideBar is present but collapsed (shows narrow bar on right)
   sideBar: {
-    hiddenByDefault: false,
+    hiddenByDefault: true,
+    position: 'right',
     toolPanels: [
       { id: 'columns', labelDefault: 'Columns', iconKey: 'columns', toolPanel: 'agColumnsToolPanel' },
       { id: 'filters', labelDefault: 'Filters', iconKey: 'filter', toolPanel: 'agFiltersToolPanel' },

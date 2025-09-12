@@ -29,7 +29,7 @@ import { useChartersSupabase } from "@/hooks/use-charters-supabase";
 import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, CHARTERS_KANBAN_ORDER, CHARTERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search } from "lucide-react";
+import { Search, Pencil, Mail, GitMerge } from "lucide-react";
 import { useGlobalTypeToSearch } from "@/hooks/use-global-type-to-search";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import { ViewModeToggle } from "@/components/shared/ViewModeToggle";
@@ -254,6 +254,22 @@ export default function Charters() {
           </div>
           <span className="hidden sm:inline">Showing {filteredCharters?.length ?? 0} of {charters?.length ?? 0}</span>
           <div className="ml-auto flex items-center gap-2">
+            {/* Always-visible row actions (disabled when no selection) */}
+            <div className="hidden sm:flex items-center gap-2 mr-2">
+              <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length === 0} onClick={() => {
+                if (selected.length === 1) setLocation(`/charter/${selected[0].id}`); else alert('Bulk editing not implemented yet.');
+              }}>
+                <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+              </Button>
+              <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length === 0} onClick={() => {
+                alert('Emailing charters is not yet implemented.');
+              }}>
+                <Mail className="h-3.5 w-3.5 mr-1" /> Email
+              </Button>
+              <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => alert('Merge for charters not implemented yet.')}>
+                <GitMerge className="h-3.5 w-3.5 mr-1" /> Merge
+              </Button>
+            </div>
             <div className="hidden sm:flex items-center"><ViewModeToggle value={viewMode} onChange={setViewMode} /></div>
             <Button size="xs" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => { try { console.log('Create Charter - to be implemented'); } catch {} }}>
               Add Charter

@@ -33,6 +33,7 @@ import { useGlobalTypeToSearch } from "@/hooks/use-global-type-to-search";
 import { useEducatorLookup } from "@/hooks/use-lookup";
 import { LinkifyEducatorNames } from "@/components/shared/Linkify";
 import { createTextFilter } from "@/utils/ag-grid-utils";
+import { ViewModeToggle } from "@/components/shared/ViewModeToggle";
 
 export default function Schools() {
   const { searchTerm, setSearchTerm } = useSearch();
@@ -132,22 +133,25 @@ export default function Schools() {
                 <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
               </div>
               <span className="hidden sm:inline">Selected {selected.length} of {totalAfterSearch}</span>
-              <div className="flex flex-wrap items-center gap-2 rounded-md bg-white border border-slate-200 px-2 py-1.5 shadow-sm">
-                <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" onClick={() => {
-                  if (selected.length === 1) window.location.href = `/school/${(selected as any)[0].id}`; else alert('Bulk editing not implemented yet.');
-                }}>
-                  <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
-                </Button>
-                <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" onClick={() => {
-                  alert('Emailing schools is not yet implemented (no clear recipient field).');
-                }}>
-                  <Mail className="h-3.5 w-3.5 mr-1" /> Email
-                </Button>
-                <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => alert('Merge wizard not implemented yet. Proposed: choose primary school, merge fields/relations, archive others.')}>
-                  <GitMerge className="h-3.5 w-3.5 mr-1" /> Merge
-                </Button>
-              </div>
+              {/* actions moved to right side and always visible */}
               <div className="ml-auto flex items-center gap-2">
+                {/* Always-visible row actions (disabled when no selection) */}
+                 <div className="hidden sm:flex items-center gap-2 mr-2">
+                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length === 0} onClick={() => {
+                    if (selected.length === 1) window.location.href = `/school/${selected[0].id}`; else alert('Bulk editing not implemented yet.');
+                  }}>
+                    <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                  </Button>
+                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length === 0} onClick={() => {
+                    if (selected.length === 0) return;
+                    alert('Emailing schools is not yet implemented (no clear recipient field).');
+                  }}>
+                    <Mail className="h-3.5 w-3.5 mr-1" /> Email
+                  </Button>
+                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => alert('Merge wizard not implemented yet. Proposed: choose primary school, merge fields/relations, archive others.')}>
+                    <GitMerge className="h-3.5 w-3.5 mr-1" /> Merge
+                  </Button>
+                </div>
                 <div className="hidden sm:flex items-center"><ViewModeToggle value={viewMode} onChange={setViewMode} /></div>
                 <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1" /> Add School
@@ -169,6 +173,23 @@ export default function Schools() {
               </div>
               <span className="hidden sm:inline">Showing {gridFilteredCount ?? totalAfterSearch} of {totalAfterSearch}</span>
               <div className="ml-auto flex items-center gap-2">
+                {/* Always-visible row actions (disabled when no selection) */}
+                <div className="hidden sm:flex items-center gap-2 mr-2">
+                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length === 0} onClick={() => {
+                    if (selected.length === 1) window.location.href = `/school/${selected[0].id}`; else alert('Bulk editing not implemented yet.');
+                  }}>
+                    <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                  </Button>
+                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length === 0} onClick={() => {
+                    if (selected.length === 0) return;
+                    alert('Emailing schools is not yet implemented (no clear recipient field).');
+                  }}>
+                    <Mail className="h-3.5 w-3.5 mr-1" /> Email
+                  </Button>
+                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => alert('Merge wizard not implemented yet. Proposed: choose primary school, merge fields/relations, archive others.')}>
+                    <GitMerge className="h-3.5 w-3.5 mr-1" /> Merge
+                  </Button>
+                </div>
                 <div className="hidden sm:flex items-center"><ViewModeToggle value={viewMode} onChange={setViewMode} /></div>
                 <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1" /> Add School

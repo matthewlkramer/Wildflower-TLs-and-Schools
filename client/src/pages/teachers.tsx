@@ -107,42 +107,41 @@ export default function Teachers() {
                   <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
                 </div>
                 <span className="hidden sm:inline">Selected {selected.length} of {total}</span>
-                <div className="flex flex-wrap items-center gap-2 rounded-md bg-white border border-slate-200 px-2 py-1.5 shadow-sm">
-                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" onClick={() => {
-                    if (selected.length === 1) {
-                      window.location.href = `/teacher/${selected[0].id}`;
-                    } else {
-                      alert('Bulk editing is not implemented yet.');
-                    }
-                  }}>
-                    <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
-                  </Button>
-                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" onClick={() => {
-                    const emails = selected.map(s => (s.currentPrimaryEmailAddress || '')).filter(Boolean);
-                    const q = encodeURIComponent(emails.join(','));
-                    window.location.href = `/compose-email?to=${q}`;
-                  }}>
-                    <Mail className="h-3.5 w-3.5 mr-1" /> Email
-                  </Button>
-                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => {
-                    if (selected.length < 2) return;
-                    const primary = selected[0];
-                    const duplicates = selected.slice(1).map(s => s.id);
-                    const ok = window.confirm(`Merge ${selected.length} records into ${primary.fullName}? This will archive duplicates.`);
-                    if (!ok) return;
-                    fetch('/api/teachers/merge', {
-                      method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ primaryId: primary.id, duplicateIds: duplicates })
-                    }).then(r=>r.json()).then((js)=>{
-                      alert('Merge complete');
-                      setSelected([] as any);
-                      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
-                    }).catch(e=>alert('Merge failed'));
-                  }}>
-                    <GitMerge className="h-3.5 w-3.5 mr-1" /> Merge
-                  </Button>
-                </div>
+                {/* actions moved to right side and always visible */}
                 <div className="ml-auto flex items-center gap-2">
+                  {/* Always-visible row actions (disabled when no selection) */}
+                  <div className="hidden sm:flex items-center gap-2 mr-2">
+                    <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length === 0} onClick={() => {
+                      if (selected.length === 1) window.location.href = `/teacher/${selected[0].id}`; else alert('Bulk editing is not implemented yet.');
+                    }}>
+                      <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                    </Button>
+                    <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length === 0} onClick={() => {
+                      const emails = selected.map(s => (s.currentPrimaryEmailAddress || '')).filter(Boolean);
+                      if (!emails.length) return;
+                      const q = encodeURIComponent(emails.join(','));
+                      window.location.href = `/compose-email?to=${q}`;
+                    }}>
+                      <Mail className="h-3.5 w-3.5 mr-1" /> Email
+                    </Button>
+                    <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => {
+                      if (selected.length < 2) return;
+                      const primary = selected[0];
+                      const duplicates = selected.slice(1).map(s => s.id);
+                      const ok = window.confirm(`Merge ${selected.length} records into ${primary.fullName}? This will archive duplicates.`);
+                      if (!ok) return;
+                      fetch('/api/teachers/merge', {
+                        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ primaryId: primary.id, duplicateIds: duplicates })
+                      }).then(r=>r.json()).then((js)=>{
+                        alert('Merge complete');
+                        setSelected([] as any);
+                        queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+                      }).catch(e=>alert('Merge failed'));
+                    }}>
+                      <GitMerge className="h-3.5 w-3.5 mr-1" /> Merge
+                    </Button>
+                  </div>
                   <div className="hidden sm:flex items-center"><ViewModeToggle value={viewMode} onChange={setViewMode} /></div>
                   <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
                     <Plus className="h-4 w-4 mr-1" /> Add Teacher
@@ -164,6 +163,39 @@ export default function Teachers() {
                 </div>
                 <span className="hidden sm:inline">Showing {showing} of {total}</span>
                 <div className="ml-auto flex items-center gap-2">
+                  {/* Always-visible row actions (disabled when no selection) */}
+                  <div className="hidden sm:flex items-center gap-2 mr-2">
+                    <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length === 0} onClick={() => {
+                      if (selected.length === 1) window.location.href = `/teacher/${selected[0].id}`; else alert('Bulk editing is not implemented yet.');
+                    }}>
+                      <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                    </Button>
+                    <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length === 0} onClick={() => {
+                      const emails = selected.map(s => (s.currentPrimaryEmailAddress || '')).filter(Boolean);
+                      if (!emails.length) return;
+                      const q = encodeURIComponent(emails.join(','));
+                      window.location.href = `/compose-email?to=${q}`;
+                    }}>
+                      <Mail className="h-3.5 w-3.5 mr-1" /> Email
+                    </Button>
+                    <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => {
+                      if (selected.length < 2) return;
+                      const primary = selected[0];
+                      const duplicates = selected.slice(1).map(s => s.id);
+                      const ok = window.confirm(`Merge ${selected.length} records into ${primary.fullName}? This will archive duplicates.`);
+                      if (!ok) return;
+                      fetch('/api/teachers/merge', {
+                        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ primaryId: primary.id, duplicateIds: duplicates })
+                      }).then(r=>r.json()).then((js)=>{
+                        alert('Merge complete');
+                        setSelected([] as any);
+                        queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+                      }).catch(e=>alert('Merge failed'));
+                    }}>
+                      <GitMerge className="h-3.5 w-3.5 mr-1" /> Merge
+                    </Button>
+                  </div>
                   <div className="hidden sm:flex items-center"><ViewModeToggle value={viewMode} onChange={setViewMode} /></div>
                   <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
                     <Plus className="h-4 w-4 mr-1" /> Add Teacher
