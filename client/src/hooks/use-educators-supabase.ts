@@ -25,6 +25,8 @@ export function useEducatorsSupabase() {
         if (chunk.length < pageSize) break;
         offset += pageSize;
       }
+      // Dev log to verify pagination in browser console
+      try { if (import.meta.env.DEV) console.log('[grid_educator] fetched rows:', all.length); } catch {}
       const rows = (all || []) as unknown as Educator[];
       // Server-side view now guarantees one row per id
       return rows.filter((e: any) => !e?.archived);

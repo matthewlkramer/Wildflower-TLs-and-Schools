@@ -16,3 +16,11 @@ export const supabase = createClient(url, anon, {
     storageKey: 'wftls-auth',
   },
 });
+
+// Expose for dev console diagnostics
+try {
+  if (import.meta.env.DEV) {
+    // @ts-ignore
+    (window as any).supabase = supabase;
+  }
+} catch {}

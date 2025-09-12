@@ -21,6 +21,7 @@ export function useChartersSupabase() {
         if (chunk.length < pageSize) break;
         offset += pageSize;
       }
+      try { if (import.meta.env.DEV) console.log('[grid_charter] fetched rows:', all.length); } catch {}
       const rows = (all || []) as unknown as Charter[];
       return rows.filter((c: any) => !c?.archived);
     },

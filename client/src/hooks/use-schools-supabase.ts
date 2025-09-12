@@ -21,6 +21,7 @@ export function useSchoolsSupabase() {
         if (chunk.length < pageSize) break;
         offset += pageSize;
       }
+      try { if (import.meta.env.DEV) console.log('[grid_school] fetched rows:', all.length); } catch {}
       const rows = (all || []) as unknown as School[];
       return rows.filter((s: any) => !s?.archived);
     },

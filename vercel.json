@@ -1,11 +1,12 @@
 {
-  "buildCommand": "pnpm -F client build",
+  "version": 2,
+  "framework": "vite",
+  "buildCommand": "pnpm --filter client... build",
   "outputDirectory": "client/dist",
   "rewrites": [
     { "source": "/assets/(.*)", "destination": "/assets/$1" },
     { "source": "/favicon.ico", "destination": "/favicon.ico" },
     { "source": "/robots.txt", "destination": "/robots.txt" },
-    { "source": "/(.*)", "destination": "/" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
-
