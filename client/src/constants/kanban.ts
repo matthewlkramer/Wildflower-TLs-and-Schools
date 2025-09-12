@@ -9,20 +9,20 @@ export const KANBAN_UNSPECIFIED_KEY = "__UNSPECIFIED__";
 
 // Teachers (Educators.Kanban)
 export const TEACHERS_KANBAN_ORDER: string[] = [
-  "No inquiry received",
-  "Inquiry received",
-  "Partner assigned",
-  "Outreach sent",
-  "1:1 scheduled",
-  "1:1 completed",
-  "Discovery in process",
-  "Discovery complete",
-  "Visioning",
-  "Planning",
-  "Startup",
-  "Year 1",
-  "Open",
-  "Paused"
+  'no_inquiry_received',
+  'inquiry_received',
+  'partner_assigned',
+  'outreach_sent',
+  '1:1 scheduled',
+  '1:1 completed',
+  'discovery_in_process',
+  'discovery_complete',
+  'visioning',
+  'planning',
+  'startup',
+  'year 1',
+  'open',
+  'paused',
 ];
 
 // Optionally list labels that should start collapsed (match labels in the order array or live data).

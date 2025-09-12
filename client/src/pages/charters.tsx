@@ -319,7 +319,7 @@ export default function Charters() {
               })}
               columns={(() => {
                 const keys = new Set<string>();
-                (filteredCharters||[]).forEach((c:any) => keys.add((c.status && String(c.status)) || KANBAN_UNSPECIFIED_KEY));
+                (filteredCharters||[]).forEach((c:any) => keys.add(((c.status && String(c.status)) || KANBAN_UNSPECIFIED_KEY)));
                 return buildKanbanColumns(CHARTERS_KANBAN_ORDER, Array.from(keys));
               })()}
               groupBy={(c:any) => (c.status && String(c.status)) || KANBAN_UNSPECIFIED_KEY}

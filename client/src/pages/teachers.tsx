@@ -288,10 +288,10 @@ export default function Teachers() {
               </div>
               <KanbanBoard
                 items={(filteredTeachers || []).filter((t:any)=>{
-                  const mont = t.montessoriCertified===true?'Yes':(t.montessoriCertified===false?'No':'');
+                  const mont = (t.has_montessori_cert ?? t.montessoriCertified) ? 'Yes' : 'No';
                   if (kFilters.montessori!=='All' && mont!==kFilters.montessori) return false;
                   if (kFilters.race!=='All') {
-                    const races = Array.isArray(t.raceEthnicity)?t.raceEthnicity:[t.raceEthnicity].filter(Boolean);
+                    const races = Array.isArray(t.race_ethnicity)?t.race_ethnicity:[t.race_ethnicity ?? t.raceEthnicity].filter(Boolean);
                     if (!races.includes(kFilters.race)) return false;
                   }
                   if (kFilters.role!=='All') {
@@ -302,16 +302,16 @@ export default function Teachers() {
                     const stages = Array.isArray(t.activeSchoolStageStatus)?t.activeSchoolStageStatus:[t.activeSchoolStageStatus].filter(Boolean);
                     if (!stages.includes(kFilters.stage)) return false;
                   }
-                  if (kFilters.discovery!=='All' && t.discoveryStatus!==kFilters.discovery) return false;
-                  if (kFilters.type!=='All' && t.individualType!==kFilters.type) return false;
+                  if (kFilters.discovery!=='All' && (t.discovery_status ?? t.discoveryStatus) !== kFilters.discovery) return false;
+                  if (kFilters.type!=='All' && (t.indiv_type ?? t.individualType) !== kFilters.type) return false;
                   return true;
                 })}
                 columns={(() => {
                   const keys = new Set<string>();
-                  (filteredTeachers||[]).forEach((t:any) => keys.add((t.kanban && String(t.kanban)) || KANBAN_UNSPECIFIED_KEY));
+                  (filteredTeachers||[]).forEach((t:any) => keys.add((t.kanban_group && String(t.kanban_group)) || KANBAN_UNSPECIFIED_KEY));
                   return buildKanbanColumns(TEACHERS_KANBAN_ORDER, Array.from(keys));
                 })()}
-                groupBy={(t:any) => (t.kanban && String(t.kanban)) || KANBAN_UNSPECIFIED_KEY}
+                groupBy={(t:any) => (t.kanban_group && String(t.kanban_group)) || KANBAN_UNSPECIFIED_KEY}
                 getId={(t:any) => t.id}
                 initialCollapsedKeys={labelsToKeys(TEACHERS_KANBAN_COLLAPSED)}
                 selectedIds={selectedIds}

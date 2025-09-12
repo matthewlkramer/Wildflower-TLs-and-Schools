@@ -242,22 +242,22 @@ export default function Schools() {
               </Select>
             </div>
             <KanbanBoard
-              items={(filteredSchools || []).filter((s)=>{
-                if (kFilters.stage!=='All' && (s.stageStatus || s.status)!==kFilters.stage) return false;
-                if (kFilters.membership!=='All' && s.membershipStatus!==kFilters.membership) return false;
+              items={(filteredSchools || []).filter((s:any)=>{
+                if (kFilters.stage!=='All' && ((s.stage_status || s.stageStatus || s.status) !== kFilters.stage)) return false;
+                if (kFilters.membership!=='All' && ((s.membership_status || s.membershipStatus) !== kFilters.membership)) return false;
                 if (kFilters.ages!=='All'){
                   const ages = Array.isArray(s.agesServed)?s.agesServed:[s.agesServed].filter(Boolean);
                   if (!ages.includes(kFilters.ages)) return false;
                 }
-                if (kFilters.governance!=='All' && s.governanceModel!==kFilters.governance) return false;
+                if (kFilters.governance!=='All' && ((s.governance_model || s.governanceModel) !== kFilters.governance)) return false;
                 return true;
               })}
               columns={(() => {
                 const keys = new Set<string>();
-                (filteredSchools||[]).forEach((s) => keys.add((s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY));
+                (filteredSchools||[]).forEach((s:any) => keys.add(((s.stage_status || s.stageStatus) && String(s.stage_status || s.stageStatus)) || KANBAN_UNSPECIFIED_KEY));
                 return buildKanbanColumns(SCHOOLS_KANBAN_ORDER, Array.from(keys));
               })()}
-              groupBy={(s: School) => (s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY}
+              groupBy={(s: any) => ((s.stage_status || s.stageStatus) && String(s.stage_status || s.stageStatus)) || KANBAN_UNSPECIFIED_KEY}
               getId={(s: School) => s.id}
               initialCollapsedKeys={labelsToKeys(SCHOOLS_KANBAN_COLLAPSED)}
               selectedIds={selectedIds}
@@ -273,7 +273,7 @@ export default function Schools() {
                 });
               }}
               onToggleColumn={(key, checked) => {
-                const itemsInCol = (filteredSchools||[]).filter((s) => ((s.stageStatus && String(s.stageStatus)) || KANBAN_UNSPECIFIED_KEY) === key);
+                const itemsInCol = (filteredSchools||[]).filter((s:any) => (((s.stage_status || s.stageStatus) && String(s.stage_status || s.stageStatus)) || KANBAN_UNSPECIFIED_KEY) === key);
                 setSelected(prev => {
                   const prevMap = new Map(prev.map(p=>[p.id,p]));
                   if (checked) {
