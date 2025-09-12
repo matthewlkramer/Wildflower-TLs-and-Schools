@@ -32,6 +32,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search } from "lucide-react";
 import { useGlobalTypeToSearch } from "@/hooks/use-global-type-to-search";
 import { createTextFilter } from "@/utils/ag-grid-utils";
+import { ViewModeToggle } from "@/components/shared/ViewModeToggle";
 
 export default function Charters() {
   const gridHeight = useGridHeight();
@@ -253,11 +254,7 @@ export default function Charters() {
           </div>
           <span className="hidden sm:inline">Showing {filteredCharters?.length ?? 0} of {charters?.length ?? 0}</span>
           <div className="ml-auto flex items-center gap-2">
-            <div className="hidden sm:flex items-center bg-slate-100 p-0.5">
-              {(["table","kanban","split"] as const).map(v => (
-                <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
-              ))}
-            </div>
+            <div className="hidden sm:flex items-center"><ViewModeToggle value={viewMode} onChange={setViewMode} /></div>
             <Button size="xs" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => { try { console.log('Create Charter - to be implemented'); } catch {} }}>
               Add Charter
             </Button>

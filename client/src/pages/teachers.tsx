@@ -36,6 +36,7 @@ import { Plus, Pencil, Mail, GitMerge } from "lucide-react";
 import { GridBase } from "@/components/shared/GridBase";
 import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ViewModeToggle } from "@/components/shared/ViewModeToggle";
 
 export default function Teachers() {
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
@@ -106,24 +107,24 @@ export default function Teachers() {
                   <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
                 </div>
                 <span className="hidden sm:inline">Selected {selected.length} of {total}</span>
-                <div className="flex flex-wrap items-center gap-3 bg-slate-50 border border-slate-200 px-3 py-2">
-                  <Button size="sm" variant="outline" className="shrink-0 whitespace-nowrap px-3" onClick={() => {
+                <div className="flex flex-wrap items-center gap-2 rounded-md bg-white border border-slate-200 px-2 py-1.5 shadow-sm">
+                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" onClick={() => {
                     if (selected.length === 1) {
                       window.location.href = `/teacher/${selected[0].id}`;
                     } else {
                       alert('Bulk editing is not implemented yet.');
                     }
                   }}>
-                    <Pencil className="h-4 w-4 mr-1" /> Edit
+                    <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
                   </Button>
-                  <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white shrink-0 whitespace-nowrap px-3" onClick={() => {
+                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" onClick={() => {
                     const emails = selected.map(s => (s.currentPrimaryEmailAddress || '')).filter(Boolean);
                     const q = encodeURIComponent(emails.join(','));
                     window.location.href = `/compose-email?to=${q}`;
                   }}>
-                    <Mail className="h-4 w-4 mr-1" /> Email
+                    <Mail className="h-3.5 w-3.5 mr-1" /> Email
                   </Button>
-                  <Button size="sm" variant="outline" className="shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => {
+                  <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => {
                     if (selected.length < 2) return;
                     const primary = selected[0];
                     const duplicates = selected.slice(1).map(s => s.id);
@@ -138,15 +139,11 @@ export default function Teachers() {
                       queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
                     }).catch(e=>alert('Merge failed'));
                   }}>
-                    <GitMerge className="h-4 w-4 mr-1" /> Merge
+                    <GitMerge className="h-3.5 w-3.5 mr-1" /> Merge
                   </Button>
                 </div>
                 <div className="ml-auto flex items-center gap-2">
-                  <div className="hidden sm:flex items-center bg-slate-100 p-0.5">
-                    {(["table","kanban","split"] as const).map(v => (
-                      <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
-                    ))}
-                  </div>
+                  <div className="hidden sm:flex items-center"><ViewModeToggle value={viewMode} onChange={setViewMode} /></div>
                   <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
                     <Plus className="h-4 w-4 mr-1" /> Add Teacher
                   </Button>
@@ -167,11 +164,7 @@ export default function Teachers() {
                 </div>
                 <span className="hidden sm:inline">Showing {showing} of {total}</span>
                 <div className="ml-auto flex items-center gap-2">
-                  <div className="hidden sm:flex items-center bg-slate-100 p-0.5">
-                    {(["table","kanban","split"] as const).map(v => (
-                      <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
-                    ))}
-                  </div>
+                  <div className="hidden sm:flex items-center"><ViewModeToggle value={viewMode} onChange={setViewMode} /></div>
                   <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setShowAddEducatorModal(true)}>
                     <Plus className="h-4 w-4 mr-1" /> Add Teacher
                   </Button>

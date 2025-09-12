@@ -132,27 +132,23 @@ export default function Schools() {
                 <Search className="absolute left-2 top-2 h-4 w-4 text-slate-400" />
               </div>
               <span className="hidden sm:inline">Selected {selected.length} of {totalAfterSearch}</span>
-              <div className="flex flex-wrap items-center gap-3 bg-slate-50 border border-slate-200 px-3 py-2">
-                <Button size="sm" variant="outline" className="shrink-0 whitespace-nowrap px-3" onClick={() => {
+              <div className="flex flex-wrap items-center gap-2 rounded-md bg-white border border-slate-200 px-2 py-1.5 shadow-sm">
+                <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" onClick={() => {
                   if (selected.length === 1) window.location.href = `/school/${(selected as any)[0].id}`; else alert('Bulk editing not implemented yet.');
                 }}>
-                  <Pencil className="h-4 w-4 mr-1" /> Edit
+                  <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
                 </Button>
-                <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white shrink-0 whitespace-nowrap px-3" onClick={() => {
+                <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" onClick={() => {
                   alert('Emailing schools is not yet implemented (no clear recipient field).');
                 }}>
-                  <Mail className="h-4 w-4 mr-1" /> Email
+                  <Mail className="h-3.5 w-3.5 mr-1" /> Email
                 </Button>
-                <Button size="sm" variant="outline" className="shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => alert('Merge wizard not implemented yet. Proposed: choose primary school, merge fields/relations, archive others.')}>
-                  <GitMerge className="h-4 w-4 mr-1" /> Merge
+                <Button size="sm" variant="outline" className="h-8 shrink-0 whitespace-nowrap px-3" disabled={selected.length < 2} onClick={() => alert('Merge wizard not implemented yet. Proposed: choose primary school, merge fields/relations, archive others.')}>
+                  <GitMerge className="h-3.5 w-3.5 mr-1" /> Merge
                 </Button>
               </div>
               <div className="ml-auto flex items-center gap-2">
-                <div className="hidden sm:flex items-center bg-slate-100 p-0.5">
-                  {(["table","kanban","split"] as const).map(v => (
-                    <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
-                  ))}
-                </div>
+                <div className="hidden sm:flex items-center"><ViewModeToggle value={viewMode} onChange={setViewMode} /></div>
                 <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1" /> Add School
                 </Button>
@@ -173,11 +169,7 @@ export default function Schools() {
               </div>
               <span className="hidden sm:inline">Showing {gridFilteredCount ?? totalAfterSearch} of {totalAfterSearch}</span>
               <div className="ml-auto flex items-center gap-2">
-                <div className="hidden sm:flex items-center bg-slate-100 p-0.5">
-                  {(["table","kanban","split"] as const).map(v => (
-                    <button key={v} onClick={() => setViewMode(v)} className={`text-xs px-2 py-1 ${viewMode===v?"bg-white border border-slate-300":"text-slate-600"}`}>{v}</button>
-                  ))}
-                </div>
+                <div className="hidden sm:flex items-center"><ViewModeToggle value={viewMode} onChange={setViewMode} /></div>
                 <Button size="sm" className="bg-wildflower-blue hover:bg-blue-700 text-white" onClick={() => setAddSchoolModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1" /> Add School
                 </Button>
