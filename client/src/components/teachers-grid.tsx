@@ -23,6 +23,7 @@ import { createTextFilter } from "@/utils/ag-grid-utils";
 interface TeachersGridProps {
   teachers: Educator[];
   isLoading: boolean;
+  fields?: string[]; // when provided, render dynamic columns for all fields except id
   onFilteredCountChange?: (count: number) => void;
   onAddTeacher?: () => void;
   onSelectionChanged?: (rows: Educator[]) => void;
@@ -169,7 +170,34 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
 
   // Height managed by shared hook
 
-  const columnDefs: ColDef[] = useMemo(() => [
+  const columnDefs: ColDef[] = useMemo(() => {
+    // If fields prop is provided, render dynamic columns for each field except id
+    const pretty = (key: string) => key
+      .replace(/_/g, ' ')
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+      .replace(/^\w/, (c) => c.toUpperCase());
+
+    if (fields && fields.length) {
+      return fields
+        .filter((f) => f !== 'id')
+        .map((f): ColDef => ({
+          headerName: pretty(f),
+          field: f,
+          filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
+          filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
+          sortable: true,
+          flex: 1,
+          minWidth: 120,
+          valueGetter: (p: any) => {
+            const v = p?.data?.[f];
+            if (Array.isArray(v)) return v.join(', ');
+            if (v && typeof v === 'object') return JSON.stringify(v);
+            return v ?? '';
+          },
+        }));
+    }
+
+    return [
     {
       headerName: "Educator Name",
       field: "fullName",
@@ -270,7 +298,8 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
       width: 100,
       pinned: 'right'
     }
-  ], [filterForText]);
+    ];
+  }, [fields, entReady, filterForText]);
 
   const defaultColDef: ColDef = useMemo(() => ({ ...DEFAULT_COL_DEF }), []);
 

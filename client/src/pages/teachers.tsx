@@ -20,7 +20,7 @@ import { SummaryTab as TeacherSummary } from "@/components/teacher/tabs/SummaryT
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, TEACHERS_KANBAN_ORDER, TEACHERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
 import { type Teacher } from "@shared/schema.generated";
-import { useCachedEducators } from "@/hooks/use-cached-data";
+import { useEducatorsSupabase } from "@/hooks/use-educators-supabase";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { useState } from "react";
 import { useGlobalTypeToSearch } from "@/hooks/use-global-type-to-search";
@@ -42,7 +42,7 @@ export default function Teachers() {
   const [viewMode, setViewMode] = useState<"table" | "kanban" | "split">("table");
   const [kFilters, setKFilters] = useState({ montessori: "All", race: "All", role: "All", stage: "All", discovery: "All", type: "All" });
 
-  const { data: teachers, isLoading, prefetchEducator } = useCachedEducators();
+  const { data: teachers, isLoading, fields } = useEducatorsSupabase();
   
   const {
     filteredData: filteredTeachers,
@@ -222,6 +222,7 @@ export default function Teachers() {
           {viewMode === "table" && (
             <TeachersGrid 
               teachers={filteredTeachers || []} 
+              fields={fields}
               isLoading={isLoading}
               onFilteredCountChange={(count)=>setGridFilteredCount(count)}
               onSelectionChanged={(rows)=>setSelected(rows as Teacher[])}

@@ -28,6 +28,7 @@ interface SchoolCellRendererParams extends ICellRendererParams {
 interface SchoolsGridProps {
   schools: School[];
   isLoading: boolean;
+  fields?: string[]; // when provided, render dynamic columns for all fields except id
   onFilteredCountChange?: (count: number) => void;
   onSelectionChanged?: (rows: School[]) => void;
 }
@@ -128,13 +129,39 @@ const ActionsCellRenderer = ({ data: school }: { data: School }) => {
   );
 };
 
-export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange, onSelectionChanged }: SchoolsGridProps) {
+export default function SchoolsGrid({ schools, isLoading, fields, onFilteredCountChange, onSelectionChanged }: SchoolsGridProps) {
   const { toast } = useToast();
   const gridHeight = useGridHeight();
   const { entReady, filterForText } = useAgGridFeatures();
   const { educatorByName } = useEducatorLookup();
   
-  const columnDefs: ColDef[] = [
+  const columnDefs: ColDef[] = useMemo(() => {
+    const pretty = (key: string) => key
+      .replace(/_/g, ' ')
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+      .replace(/^\w/, (c) => c.toUpperCase());
+
+    if (fields && fields.length) {
+      return fields
+        .filter((f) => f !== 'id')
+        .map((f): ColDef => ({
+          headerName: pretty(f),
+          field: f,
+          filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
+          filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
+          sortable: true,
+          flex: 1,
+          minWidth: 120,
+          valueGetter: (p: any) => {
+            const v = p?.data?.[f];
+            if (Array.isArray(v)) return v.join(', ');
+            if (v && typeof v === 'object') return JSON.stringify(v);
+            return v ?? '';
+          },
+        }));
+    }
+
+    return [
     {
       field: "name",
       headerName: "School Name",
@@ -239,7 +266,8 @@ export default function SchoolsGrid({ schools, isLoading, onFilteredCountChange,
       suppressHeaderContextMenu: true as any,
       resizable: false,
     },
-  ];
+    ];
+  }, [fields, entReady]);
 
   const defaultColDef: ColDef = { ...DEFAULT_COL_DEF };
 

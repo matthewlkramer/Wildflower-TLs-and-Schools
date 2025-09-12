@@ -24,7 +24,7 @@ import { GridBase } from "@/components/shared/GridBase";
 import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
 import { type School } from "@shared/schema.generated";
 import { useSearch } from "@/contexts/search-context";
-import { useCachedSchools } from "@/hooks/use-cached-data";
+import { useSchoolsSupabase } from "@/hooks/use-schools-supabase";
 import { useUserFilter } from "@/contexts/user-filter-context";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
@@ -42,7 +42,7 @@ export default function Schools() {
   const [kFilters, setKFilters] = useState({ stage: "All", membership: "All", ages: "All", governance: "All" });
   const searchRef = useRef<HTMLInputElement | null>(null);
 
-  const { data: schools, isLoading, prefetchSchool } = useCachedSchools();
+  const { data: schools, isLoading, fields } = useSchoolsSupabase();
   const { educatorByName } = useEducatorLookup();
 
   // No header AddNew wiring; header shows a fixed Add menu.
@@ -194,7 +194,8 @@ export default function Schools() {
         </div>
         {viewMode === "table" && (
           <SchoolsGrid 
-            schools={filteredSchools || []} 
+            schools={filteredSchools || []}
+            fields={fields}
             isLoading={isLoading}
             onFilteredCountChange={setGridFilteredCount}
             onSelectionChanged={(rows: School[]) => setSelected(rows)}

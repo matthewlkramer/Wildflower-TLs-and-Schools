@@ -1,0 +1,35 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import type { Educator } from "@shared/schema.generated";
+
+// Fetch educators for the main grid from Supabase view `grid_educator`.
+// Assumes the view exposes fields compatible with `Educator` used by the grid.
+export function useEducatorsSupabase() {
+  const query = useQuery<Educator[]>({
+    queryKey: ["supabase/grid_educator"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("grid_educator")
+        .select("*");
+      if (error) throw error;
+      const rows = (data || []) as unknown as Educator[];
+      return rows.filter((e: any) => !e?.archived);
+    },
+    staleTime: 30 * 60 * 1000,
+    gcTime: 2 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    placeholderData: (prev) => prev as any,
+  });
+
+  const fields = Array.isArray(query.data) && query.data.length > 0
+    ? Object.keys(query.data[0] as any)
+    : [];
+
+  return {
+    data: query.data,
+    isLoading: query.isLoading || query.isFetching,
+    error: query.error,
+    fields,
+  };
+}

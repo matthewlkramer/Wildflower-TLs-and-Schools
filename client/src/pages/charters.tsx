@@ -6,7 +6,7 @@
  * "Charters". The header Add menu is fixed; this page also includes a local
  * Add Charter button in the search row.
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { GridBase } from "@/components/shared/GridBase";
 import type { ColDef } from "ag-grid-community";
 import type { Charter } from "@shared/schema.generated";
@@ -25,6 +25,7 @@ import { useGridHeight } from "@/components/shared/use-grid-height";
 import { KanbanBoard } from "@/components/shared/KanbanBoard";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { useQuery as useRQ } from "@tanstack/react-query";
+import { useChartersSupabase } from "@/hooks/use-charters-supabase";
 import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, CHARTERS_KANBAN_ORDER, CHARTERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -49,14 +50,7 @@ export default function Charters() {
 
   useGlobalTypeToSearch(searchRef, setSearchTerm);
 
-  const { data: charters = [], isLoading } = useQuery<Charter[]>({
-    queryKey: ["/api/charters"],
-    queryFn: async () => {
-      const response = await fetch("/api/charters", { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch charters");
-      return response.json();
-    },
-  });
+  const { data: charters = [], isLoading, fields } = useChartersSupabase();
 
   // Filter charters based on search term and user filter
   const filteredCharters = useMemo(() => {
@@ -370,27 +364,51 @@ export default function Charters() {
             <ResizablePanelGroup direction="horizontal">
               <ResizablePanel defaultSize={60} minSize={35}>
                 <div className="ag-theme-material h-full">
-                  <GridBase
-                    rowData={filteredCharters || []}
-                    columnDefs={[{
-                      headerName: 'Charter',
-                      valueGetter: (p:any) => p?.data?.shortName || p?.data?.fullName,
-                      filter: 'agTextColumnFilter',
-                      sortable: true,
-                      flex: 1,
-                      minWidth: 140,
-                      cellRenderer: (p:any) => (
-                        <a href={`/charter/${p?.data?.id}`} className="text-blue-600 hover:underline">{p.value}</a>
-                      ),
-                    }]}
-                    defaultColDefOverride={DEFAULT_COL_DEF as any}
-                    gridProps={{
-                      rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any,
-                      sideBar: (DEFAULT_GRID_PROPS as any).sideBar,
-                      enableAdvancedFilter: true as any,
-                      onSelectionChanged: (e:any)=> setSelected(e.api.getSelectedRows() as any),
-                    }}
-                  />
+                  {(() => {
+                    const pretty = (key: string) => key
+                      .replace(/_/g, ' ')
+                      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+                      .replace(/^\w/, (c) => c.toUpperCase());
+                    const dynamicCols: ColDef[] | null = fields && fields.length ? fields
+                      .filter((f) => f !== 'id')
+                      .map((f): ColDef => ({
+                        headerName: pretty(f),
+                        field: f,
+                        filter: 'agTextColumnFilter',
+                        sortable: true,
+                        flex: 1,
+                        minWidth: 120,
+                        valueGetter: (p: any) => {
+                          const v = p?.data?.[f];
+                          if (Array.isArray(v)) return v.join(', ');
+                          if (v && typeof v === 'object') return JSON.stringify(v);
+                          return v ?? '';
+                        },
+                      })) : null;
+                    return (
+                      <GridBase
+                        rowData={filteredCharters || []}
+                        columnDefs={dynamicCols || [{
+                          headerName: 'Charter',
+                          valueGetter: (p:any) => p?.data?.shortName || p?.data?.fullName,
+                          filter: 'agTextColumnFilter',
+                          sortable: true,
+                          flex: 1,
+                          minWidth: 140,
+                          cellRenderer: (p:any) => (
+                            <a href={`/charter/${p?.data?.id}`} className="text-blue-600 hover:underline">{p.value}</a>
+                          ),
+                        }]}
+                        defaultColDefOverride={DEFAULT_COL_DEF as any}
+                        gridProps={{
+                          rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any,
+                          sideBar: (DEFAULT_GRID_PROPS as any).sideBar,
+                          enableAdvancedFilter: true as any,
+                          onSelectionChanged: (e:any)=> setSelected(e.api.getSelectedRows() as any),
+                        }}
+                      />
+                    );
+                  })()}
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
