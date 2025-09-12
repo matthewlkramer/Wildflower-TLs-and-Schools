@@ -16,8 +16,8 @@
 import TeachersGrid from "@/components/teachers-grid";
 import { KanbanBoard } from "@/components/shared/KanbanBoard";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { SummaryTab as TeacherSummary } from "@/components/teacher/tabs/SummaryTab";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import DetailsPanel from "@/components/DetailsPanel";
+import { useMutation } from "@tanstack/react-query";
 import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, TEACHERS_KANBAN_ORDER, TEACHERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
 import { type Teacher } from "@shared/schema.generated";
 import { useEducatorsSupabase } from "@/hooks/use-educators-supabase";
@@ -27,6 +27,7 @@ import { useGlobalTypeToSearch } from "@/hooks/use-global-type-to-search";
 import AddEducatorModal from "@/components/add-teacher-modal";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
+import { useDetailsTeacher } from "@/hooks/use-details";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Input } from "@/components/ui/input";
@@ -81,7 +82,7 @@ export default function Teachers() {
   // Selected teacher detail for split view
   const selectedId = selected?.[0]?.id;
   const selectedIds = new Set((selected || []).map(s => s.id));
-  const selectedDetail: any = null;
+  const { data: selectedDetail } = useDetailsTeacher(selectedId);
 
   // Kanban move mutation: update kanban only (no fallback field)
   const moveMutation = useMutation({ mutationFn: async (_: { id: string; to: string }) => true });
@@ -90,7 +91,7 @@ export default function Teachers() {
     <>
       <main className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-sm border border-slate-200">
-          <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3">
+          <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3 flex-wrap">
             {selected.length > 0 ? (
               <>
                 <div className="relative mr-2">
@@ -354,7 +355,7 @@ export default function Teachers() {
                     {!selectedId ? (
                       <div className="text-sm text-slate-500">Select a row to see details.</div>
                     ) : selectedDetail ? (
-                      <TeacherSummary teacher={selectedDetail} />
+                      <DetailsPanel data={selectedDetail as any} />
                     ) : (
                       <div className="text-sm text-slate-500">Loading…</div>
                     )}

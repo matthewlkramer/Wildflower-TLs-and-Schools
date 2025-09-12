@@ -10,8 +10,8 @@ import { useState, useEffect, useRef } from "react";
 import SchoolsGrid from "@/components/schools-grid";
 import { KanbanBoard } from "@/components/shared/KanbanBoard";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { SummaryTab as SchoolSummary } from "@/components/school/tabs/SummaryTab";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import DetailsPanel from "@/components/DetailsPanel";
+import { useMutation } from "@tanstack/react-query";
 import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, SCHOOLS_KANBAN_ORDER, SCHOOLS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
 import AddSchoolModal from "@/components/add-school-modal";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ import { useSchoolsSupabase } from "@/hooks/use-schools-supabase";
 import { useUserFilter } from "@/contexts/user-filter-context";
 import { logger } from "@/lib/logger";
 import { queryClient } from "@/lib/queryClient";
+import { useDetailsSchool } from "@/hooks/use-details";
 import { useGlobalTypeToSearch } from "@/hooks/use-global-type-to-search";
 import { useEducatorLookup } from "@/hooks/use-lookup";
 import { LinkifyEducatorNames } from "@/components/shared/Linkify";
@@ -80,15 +81,7 @@ export default function Schools() {
 
   const selectedId = selected?.[0]?.id;
   const selectedIds = new Set(selected.map(s => s.id));
-  const { data: selectedDetail } = useQuery<School>({
-    queryKey: ["/api/schools", selectedId],
-    enabled: viewMode === "split" && !!selectedId,
-    queryFn: async () => {
-      const r = await fetch(`/api/schools/${selectedId}`, { credentials: "include" });
-      if (!r.ok) throw new Error("Failed to fetch school");
-      return r.json();
-    }
-  });
+  const { data: selectedDetail } = useDetailsSchool(selectedId);
 
   // Kanban move mutation: update stageStatus only (no field fallback)
   const moveMutation = useMutation({
@@ -124,7 +117,7 @@ export default function Schools() {
 
 
       <div className="bg-white rounded-lg shadow-sm border border-slate-200">
-        <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3">
+          <div className="px-4 py-2 text-xs text-slate-500 border-b border-slate-100 flex items-center gap-3 flex-wrap">
           {selected.length > 0 ? (
             <>
               <div className="relative mr-2">
@@ -330,7 +323,7 @@ export default function Schools() {
                   {!selectedId ? (
                     <div className="text-sm text-slate-500">Select a row to see details.</div>
                   ) : selectedDetail ? (
-                    <SchoolSummary school={selectedDetail} />
+                    <DetailsPanel data={selectedDetail as any} />
                   ) : (
                     <div className="text-sm text-slate-500">Loading…</div>
                   )}

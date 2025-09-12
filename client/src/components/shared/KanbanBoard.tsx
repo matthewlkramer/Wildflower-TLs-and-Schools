@@ -93,8 +93,8 @@ export function KanbanBoard<T>(props: KanbanBoardProps<T>) {
               onDrop={(e) => onDrop(e, col.key)}
               title={isCollapsed ? `${col.label} (${sorted.length})` : undefined}
             >
-              <div className="px-2 py-2 border-b border-slate-200 flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="px-2 py-2 border-b border-slate-200 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
                   {!isCollapsed && (
                     <input
                       type="checkbox"
@@ -104,7 +104,7 @@ export function KanbanBoard<T>(props: KanbanBoardProps<T>) {
                       className="h-3.5 w-3.5 align-middle"
                     />
                   )}
-                  <h3 className={`text-sm font-semibold text-slate-700 ${isCollapsed ? "truncate w-[36px]" : ""}`}>{col.label}</h3>
+                  <h3 className={`text-sm font-semibold text-slate-700 ${isCollapsed ? "truncate w-[36px]" : "truncate"}`}>{col.label}</h3>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="text-xs text-slate-500 tabular-nums">{sorted.length}</span>
