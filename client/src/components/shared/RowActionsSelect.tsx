@@ -23,7 +23,7 @@ export function RowActionsSelect({
 }) {
   const cls =
     size === 'sm'
-      ? 'h-7 text-xs border rounded-md px-1 bg-white'
+      ? 'h-6 text-xs border rounded-md px-1 bg-white'
       : 'h-8 text-sm border rounded-md px-2 bg-white';
   return (
     <select
@@ -51,5 +51,4 @@ export function RowActionsSelect({
   );
 }
 
-export const selectSmClass = 'h-7 text-xs border rounded-md px-1 bg-white';
-
+export const selectSmClass = 'h-6 text-xs border rounded-md px-1 bg-white';

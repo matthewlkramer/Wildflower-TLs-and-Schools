@@ -108,7 +108,7 @@ const ActionsCellRenderer = ({ data: school }: { data: School }) => {
       aria-label="Actions"
       defaultValue=""
       onChange={(e)=>{ const v=e.target.value; e.currentTarget.selectedIndex=0; switch(v){ case 'open': open(); break; case 'edit': setEditModalOpen(true); break; case 'note': createNote(); break; case 'task': createTask(); break; case 'email': sendEmail(); break; case 'archive': markInactive(); break; }}}
-      className="h-7 text-xs border rounded-md px-1 bg-white"
+      className="h-6 text-xs border rounded-md px-1 bg-white"
     >
       <option value="" disabled>Actions</option>
       <option value="open">Open</option>
@@ -234,14 +234,16 @@ export default function SchoolsGrid({ schools, isLoading, fields, onFilteredCoun
 
     {
       field: "actions",
-      headerName: "Actions",
-      width: 100,
+      headerName: "",
+      width: 140,
+      minWidth: 130,
       cellRenderer: ActionsCellRenderer,
       sortable: false,
       filter: false,
       suppressHeaderMenuButton: true as any,
       suppressHeaderContextMenu: true as any,
       resizable: false,
+      cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' } as any,
     },
     ];
   }, [entReady]);

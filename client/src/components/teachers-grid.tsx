@@ -97,7 +97,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
   };
 
   return (
-    <>
+    <div className="flex items-center justify-center w-full">
       <select
         aria-label="Actions"
         defaultValue=""
@@ -114,7 +114,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
             case 'archive': onArchive(); break;
           }
         }}
-        className="h-7 text-xs border rounded-md px-1 bg-white"
+        className="h-6 text-xs border rounded-md px-2 bg-white"
       >
         <option value="" disabled>Actions</option>
         <option value="open">Open</option>
@@ -137,7 +137,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
         description={`Are you sure you want to delete ${teacher.fullName}? This action cannot be undone.`}
         isLoading={deleteMutation.isPending}
       />
-    </>
+    </div>
   );
 };
 
@@ -242,17 +242,22 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
       )
     },
     {
-      headerName: "Actions",
+      headerName: "",
       field: "actions",
       cellRenderer: ActionRenderer,
+      headerClass: 'ag-right-aligned-header',
+      headerNameTooltip: undefined as any,
+      suppressHeaderTextSelection: true as any,
       sortable: false,
       filter: false,
       suppressHeaderMenuButton: true as any,
       suppressHeaderContextMenu: true as any,
-      width: 100,
+      width: 160,
+      minWidth: 140,
+      cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' } as any,
       pinned: 'right'
     }
-    ];
+  ];
   }, [entReady, filterForText]);
 
   const defaultColDef: ColDef = useMemo(() => ({ ...DEFAULT_COL_DEF }), []);
@@ -261,6 +266,7 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
     setGridApi(params.api);
     // Auto-size columns to fit content
     params.api.sizeColumnsToFit();
+    try { (params.api as any).openToolPanel?.('filters'); } catch {}
   }, []);
   // Enterprise readiness handled by useAgGridFeatures
 

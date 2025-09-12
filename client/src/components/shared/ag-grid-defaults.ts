@@ -19,7 +19,7 @@ export const DEFAULT_GRID_PROPS = {
   getRowId: (params: any) => params?.data?.id ?? params?.data?.ID ?? params?.data?.Id,
   // Start with sideBar available but closed by default
   sideBar: {
-    hiddenByDefault: true,
+    hiddenByDefault: false,
     toolPanels: [
       { id: 'columns', labelDefault: 'Columns', iconKey: 'columns', toolPanel: 'agColumnsToolPanel' },
       { id: 'filters', labelDefault: 'Filters', iconKey: 'filter', toolPanel: 'agFiltersToolPanel' },

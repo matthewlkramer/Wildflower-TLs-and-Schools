@@ -344,6 +344,7 @@ export default function Teachers() {
                       rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any,
                       sideBar: (DEFAULT_GRID_PROPS as any).sideBar,
                       enableAdvancedFilter: true as any,
+                      onGridReady: (p:any) => { try { p.api.openToolPanel('filters'); } catch {} },
                       onSelectionChanged: (e:any)=> setSelected(e.api.getSelectedRows() as any),
                     }}
                   />

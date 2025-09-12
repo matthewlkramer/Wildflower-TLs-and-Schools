@@ -218,7 +218,10 @@ export function AssociationGrid({ mode, rows, loading, editable = false, onOpen,
 
     if (onOpen || onEdit || onEndStint || onDelete) {
       base.push({
-        headerName: 'Actions', field: 'actions', width: 140, sortable: false, filter: false, resizable: false,
+        headerName: '', field: 'actions', width: 160, minWidth: 140, sortable: false, filter: false, resizable: false,
+        cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' } as any,
+        suppressHeaderMenuButton: true as any,
+        suppressHeaderContextMenu: true as any,
         cellRenderer: (p: ICellRendererParams<AssociationRow>) => {
           const row = p.data!;
           const rowIsEditing = isEditingRow(row.id);

@@ -118,15 +118,16 @@ export const commonColumnDefs = {
     className?: string;
     condition?: (params: any) => boolean;
   }>): ColDef => ({
-    headerName: 'Actions',
+    headerName: '',
     field: 'actions',
     sortable: false,
     filter: false,
     resizable: false,
-    minWidth: 150,
+    minWidth: 140,
+    width: 160,
     cellRenderer: (params: any) => {
       const container = document.createElement('div');
-      container.className = 'flex gap-2';
+      container.className = 'flex gap-2 items-center justify-center w-full';
       
       actions.forEach(action => {
         if (action.condition && !action.condition(params)) {
@@ -135,7 +136,7 @@ export const commonColumnDefs = {
         
         const button = document.createElement('button');
         button.textContent = action.label;
-        button.className = action.className || 'text-blue-600 hover:underline text-sm';
+        button.className = action.className || 'h-6 text-xs px-2 border rounded-md bg-white hover:bg-slate-50';
         button.onclick = (e) => {
           e.stopPropagation();
           action.onClick(params);
