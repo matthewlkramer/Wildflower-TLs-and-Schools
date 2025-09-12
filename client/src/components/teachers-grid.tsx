@@ -10,7 +10,8 @@ import { BadgeRenderer, PillRenderer } from "@/components/shared/grid-renderers"
 import { type Educator, type School } from "@shared/schema.generated";
 import { getStatusColor } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
+import { updateEducator } from "@/integrations/supabase/wftls";
 import { useToast } from "@/hooks/use-toast";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
 import { useAgGridFeatures } from "@/hooks/use-aggrid-features";
@@ -38,10 +39,10 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest('PUT', `/api/educators/${id}`, { archived: true }),
+    mutationFn: (id: string) => updateEducator(id, { archived: true }),
     onMutate: async (id: string) => {
       // Optimistically remove from cache
-      const key = ['/api/educators'];
+      const key = ['supabase/grid_educators'];
       await queryClient.cancelQueries({ queryKey: key });
       const previous = queryClient.getQueryData<Educator[]>(key);
       if (previous) {
@@ -52,7 +53,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
     onError: (_err, _id, context) => {
       // Roll back cache
       if (context?.previous) {
-        queryClient.setQueryData(['/api/educators'], context.previous);
+        queryClient.setQueryData(['supabase/grid_educators'], context.previous);
       }
       toast({
         title: "Error",
@@ -61,14 +62,14 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/educators'] });
+      queryClient.invalidateQueries({ queryKey: ['supabase/grid_educators'] });
       toast({
         title: "Educator deleted",
         description: "The educator has been successfully deleted.",
       });
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/educators'] });
+      queryClient.invalidateQueries({ queryKey: ['supabase/grid_educators'] });
     }
   });
 
@@ -78,8 +79,8 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
     const next = window.prompt('Edit name', current);
     if (next == null || next === current) return;
     try {
-      await apiRequest('PUT', `/api/educators/${teacher.id}`, { fullName: next });
-      queryClient.invalidateQueries({ queryKey: ['/api/educators'] });
+      await updateEducator(teacher.id, { fullName: next });
+      queryClient.invalidateQueries({ queryKey: ['supabase/grid_educators'] });
       toast({ title: 'Saved', description: 'Educator updated' });
     } catch (e) {
       toast({ title: 'Error', description: 'Failed to update', variant: 'destructive' });

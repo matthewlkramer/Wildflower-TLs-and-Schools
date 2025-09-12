@@ -3,16 +3,25 @@ import { supabase } from "@/integrations/supabase/client";
 
 export function useDetailsTeacher(id?: string) {
   return useQuery<{ [k: string]: any }>({
-    queryKey: ["supabase/details_teachers", id],
+    queryKey: ["supabase/details_educators", id],
     enabled: !!id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("details_teachers")
+      // Primary: details_educators
+      let { data, error } = await supabase
+        .from("details_educators")
         .select("*")
         .eq("id", id!)
         .single();
-      if (error) throw error;
-      return data as any;
+      if (!error && data) return data as any;
+
+      // Fallback: minimal row from grid_educators
+      const grid = await supabase
+        .from("grid_educators")
+        .select("*")
+        .eq("id", id!)
+        .single();
+      if (grid.error) throw grid.error;
+      return grid.data as any;
     },
   });
 }

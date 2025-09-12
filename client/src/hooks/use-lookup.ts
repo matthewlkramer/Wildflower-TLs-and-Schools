@@ -4,14 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 
 export function useEducatorLookup() {
   const { data: educators = [] } = useQuery<any[]>({
-    queryKey: ["supabase/grid_educator/lookup"],
+    queryKey: ["supabase/grid_educators/lookup"],
     queryFn: async () => {
       const pageSize = 1000;
       let offset = 0;
       let all: any[] = [];
       for (;;) {
         const { data, error } = await supabase
-          .from("grid_educator")
+          .from("grid_educators")
           .select("id, full_name")
           .order("id", { ascending: true })
           .range(offset, offset + pageSize - 1);

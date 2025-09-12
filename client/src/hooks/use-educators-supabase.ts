@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Educator } from "@shared/schema.generated";
 
-// Fetch educators for the main grid from Supabase view `grid_educator`.
+// Fetch educators for the main grid from Supabase view `grid_educators`.
 // Assumes the view exposes fields compatible with `Educator` used by the grid.
 export function useEducatorsSupabase() {
   const query = useQuery<Educator[]>({
-    queryKey: ["supabase/grid_educator"],
+    queryKey: ["supabase/grid_educators"],
     queryFn: async () => {
       const pageSize = 1000;
       let offset = 0;
@@ -15,7 +15,7 @@ export function useEducatorsSupabase() {
       // Use a deterministic order for stable pagination
       for (;;) {
         const { data, error } = await supabase
-          .from("grid_educator")
+          .from("grid_educators")
           .select("*")
           .order("id", { ascending: true })
           .range(offset, offset + pageSize - 1);
@@ -26,7 +26,7 @@ export function useEducatorsSupabase() {
         offset += pageSize;
       }
       // Dev log to verify pagination in browser console
-      try { if (import.meta.env.DEV) console.log('[grid_educator] fetched rows:', all.length); } catch {}
+      try { if (import.meta.env.DEV) console.log('[grid_educators] fetched rows:', all.length); } catch {}
       const rows = (all || []) as unknown as Educator[];
       // Server-side view now guarantees one row per id
       return rows.filter((e: any) => !e?.archived);

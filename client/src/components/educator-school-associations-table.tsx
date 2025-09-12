@@ -9,11 +9,11 @@ interface EducatorSchoolAssociationsTableProps {
 
 export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAssociationsTableProps) {
   const { data: associations = [], isLoading } = useQuery<any[]>({
-    queryKey: ["supabase/detail_associations", { educatorId }],
+    queryKey: ["supabase/details_associations", { educatorId }],
     enabled: !!educatorId,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('detail_associations')
+        .from('details_associations')
         .select('*')
         .eq('people_id', educatorId);
       if (error) throw error;

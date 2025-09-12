@@ -13,11 +13,11 @@ import { useEducatorsSupabase } from '@/hooks/use-educators-supabase';
 
 export function TLsTab({ school, schoolId }: { school: School; schoolId: string }) {
   const { data: associations = [], isLoading: associationsLoading, refetch } = useQuery<any[]>({
-    queryKey: ["supabase/detail_associations", { schoolId }],
+    queryKey: ["supabase/details_associations", { schoolId }],
     enabled: !!schoolId,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('detail_associations')
+        .from('details_associations')
         .select('*')
         .eq('school_id', schoolId);
       if (error) throw error;

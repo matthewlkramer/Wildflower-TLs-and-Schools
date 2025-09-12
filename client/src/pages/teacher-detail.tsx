@@ -18,7 +18,7 @@ import { type Teacher, type SSJFilloutForm } from "@shared/schema.generated";
 import { InfoCard } from "@/components/shared/InfoCard";
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import { TableCard } from "@/components/shared/TableCard";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 import type { EmailAddress } from "@shared/schema.generated";
 import { GridTableCard } from "@/components/shared/GridTableCard";
 import type { ColDef } from "ag-grid-community";
@@ -35,6 +35,7 @@ import { LinkedTab } from "@/components/teacher/tabs/LinkedTab";
 import { DemographicsTab } from "@/components/teacher/tabs/DemographicsTab";
 import { ContactTab } from "@/components/teacher/tabs/ContactTab";
 import { CultivationTab } from "@/components/teacher/tabs/CultivationTab";
+import { updateEducator } from "@/integrations/supabase/wftls";
 
 
 export default function TeacherDetail() {
@@ -46,12 +47,10 @@ export default function TeacherDetail() {
 
   // Mutation to update educator details
   const updateTeacherDetailsMutation = useMutation({
-    mutationFn: async (data: any) => {
-      return await apiRequest("PUT", `/api/educators/${id}`, data);
-    },
+    mutationFn: async (data: any) => updateEducator(id!, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/educators"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/educators", id] });
+      queryClient.invalidateQueries({ queryKey: ["supabase/grid_educators"] });
+      queryClient.invalidateQueries({ queryKey: ["supabase/details_educators", id] });
       toast({ title: "Success", description: "Educator details updated" });
     },
     onError: () => {

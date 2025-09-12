@@ -5,6 +5,7 @@ import { supabase } from "./client";
 // If your project uses different names, adjust here.
 const SCHOOLS_TABLE = "schools";
 const CHARTERS_TABLE = "charters";
+const EDUCATORS_TABLE = "educators";
 
 export async function createSchool(payload: Record<string, any>) {
   const { data, error } = await supabase
@@ -50,3 +51,13 @@ export async function updateCharter(id: string, patch: Record<string, any>) {
   return data;
 }
 
+export async function updateEducator(id: string, patch: Record<string, any>) {
+  const { data, error } = await supabase
+    .from(EDUCATORS_TABLE)
+    .update(patch)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
