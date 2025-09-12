@@ -282,6 +282,10 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
         columnDefs={columnDefs}
         defaultColDefOverride={defaultColDef}
         style={{ height: '100%' }}
+        gridProps={{
+          sideBar: (DEFAULT_GRID_PROPS as any).sideBar,
+          enableAdvancedFilter: true as any,
+        }}
       >
         <div className="relative h-full w-full">
           <AgGridReact

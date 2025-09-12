@@ -7,8 +7,8 @@
  * educator fields, invalidating React Query caches after save.
  */
 import { useParams } from "wouter";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useCachedEducators } from "@/hooks/use-cached-data";
+import { useMutation } from "@tanstack/react-query";
+import { useDetailsTeacher } from "@/hooks/use-details";
 import { useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -42,20 +42,7 @@ export default function TeacherDetail() {
   const [activeTab, setActiveTab] = useState("summary");
   const { toast } = useToast();
 
-  const { data: cachedList = [], isLoading: listLoading } = useCachedEducators();
-  const cached = (cachedList as any[]).find((e) => e?.id === id) as Teacher | undefined;
-
-  const { data: fetched, isLoading: fetchLoading } = useQuery<Teacher>({
-    queryKey: ["/api/educators", id],
-    enabled: !!id && !cached,
-    queryFn: async () => {
-      const response = await fetch(`/api/educators/${id}`, { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch teacher");
-      return response.json();
-    },
-  });
-  const teacher = cached || fetched;
-  const isLoading = listLoading || (!cached && fetchLoading);
+  const { data: teacher, isLoading } = useDetailsTeacher(id);
 
   // Mutation to update educator details
   const updateTeacherDetailsMutation = useMutation({
@@ -107,7 +94,7 @@ export default function TeacherDetail() {
             <div className="border-b border-slate-200 overflow-x-auto">
               <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-slate-900 px-3 py-3 flex-shrink-0">
-                  {teacher.fullName || teacher.firstName + ' ' + teacher.lastName}
+                  {(teacher as any)?.full_name || (teacher as any)?.fullName || ''}
                 </h1>
               <TabsList className="flex bg-transparent h-auto p-0 w-max">
                 <TabsTrigger value="summary" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-wildflower-blue data-[state=active]:text-wildflower-blue rounded-none py-3 px-3 text-xs whitespace-nowrap flex-shrink-0">
@@ -194,4 +181,3 @@ export default function TeacherDetail() {
     </main>
   );
 }
-

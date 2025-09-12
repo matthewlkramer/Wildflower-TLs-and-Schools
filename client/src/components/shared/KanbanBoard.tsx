@@ -140,7 +140,9 @@ export function KanbanBoard<T>(props: KanbanBoardProps<T>) {
                               onClick={(e) => e.stopPropagation()}
                             />
                           )}
-                          {renderCard(item)}
+                      <div className={onToggleItem ? "pl-6" : ""}>
+                        {renderCard(item)}
+                      </div>
                         </div>
                       ))}
                     </div>

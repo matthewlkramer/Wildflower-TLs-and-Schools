@@ -26,11 +26,10 @@ interface SchoolCellRendererParams extends ICellRendererParams {
 }
 
 interface SchoolsGridProps {
-  schools: School[];
+  schools: any[];
   isLoading: boolean;
-  fields?: string[]; // when provided, render dynamic columns for all fields except id
   onFilteredCountChange?: (count: number) => void;
-  onSelectionChanged?: (rows: School[]) => void;
+  onSelectionChanged?: (rows: any[]) => void;
 }
 
 // Custom cell renderers
@@ -137,31 +136,6 @@ export default function SchoolsGrid({ schools, isLoading, fields, onFilteredCoun
   const { educatorByName } = useEducatorLookup();
   
   const columnDefs: ColDef[] = useMemo(() => {
-    const pretty = (key: string) => key
-      .replace(/_/g, ' ')
-      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-      .replace(/^\w/, (c) => c.toUpperCase());
-
-    if (fields && fields.length) {
-      return fields
-        .filter((f) => f !== 'id')
-        .map((f): ColDef => ({
-          headerName: pretty(f),
-          field: f,
-          filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
-          filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
-          sortable: true,
-          flex: 1,
-          minWidth: 120,
-          valueGetter: (p: any) => {
-            const v = p?.data?.[f];
-            if (Array.isArray(v)) return v.join(', ');
-            if (v && typeof v === 'object') return JSON.stringify(v);
-            return v ?? '';
-          },
-        }));
-    }
-
     return [
     {
       field: "school_name",
@@ -270,7 +244,7 @@ export default function SchoolsGrid({ schools, isLoading, fields, onFilteredCoun
       resizable: false,
     },
     ];
-  }, [fields, entReady]);
+  }, [entReady]);
 
   const defaultColDef: ColDef = { ...DEFAULT_COL_DEF };
 
@@ -311,6 +285,8 @@ export default function SchoolsGrid({ schools, isLoading, fields, onFilteredCoun
         style={{ height: '100%' }}
         gridProps={{
           getRowId: (p:any)=>p?.data?.id,
+          sideBar: (DEFAULT_GRID_PROPS as any).sideBar,
+          enableAdvancedFilter: true as any,
           onGridReady: (params: GridReadyEvent) => {
             params.api.sizeColumnsToFit();
           },

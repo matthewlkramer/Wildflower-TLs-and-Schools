@@ -4,7 +4,7 @@
  */
 import React, { useState } from 'react';
 import { useParams } from 'wouter';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,6 +23,7 @@ import { ToDoTab } from '@/components/school/tabs/ToDoTab';
 // Membership tab removed per request
 
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useDetailsSchool } from '@/hooks/use-details';
 import type { School } from '@shared/schema.generated';
 
 export default function SchoolDetail() {
@@ -30,14 +31,7 @@ export default function SchoolDetail() {
 
   const [activeTab, setActiveTab] = useState('summary');
 
-  const { data: school, isLoading } = useQuery<School>({
-    queryKey: ['/api/schools', id],
-    queryFn: async () => {
-      const res = await fetch(`/api/schools/${id}`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch school');
-      return res.json();
-    },
-  });
+  const { data: school, isLoading } = useDetailsSchool(id);
 
   // Tabs fetch their own datasets (associations, teachers, locations, guides)
 

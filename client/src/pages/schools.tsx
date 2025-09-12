@@ -43,7 +43,7 @@ export default function Schools() {
   const [kFilters, setKFilters] = useState({ stage: "All", membership: "All", ages: "All", governance: "All" });
   const searchRef = useRef<HTMLInputElement | null>(null);
 
-  const { data: schools, isLoading, fields } = useSchoolsSupabase();
+  const { data: schools, isLoading } = useSchoolsSupabase();
   const { educatorByName } = useEducatorLookup();
 
   // No header AddNew wiring; header shows a fixed Add menu.
@@ -188,7 +188,6 @@ export default function Schools() {
         {viewMode === "table" && (
           <SchoolsGrid 
             schools={filteredSchools || []}
-            fields={fields}
             isLoading={isLoading}
             onFilteredCountChange={setGridFilteredCount}
             onSelectionChanged={(rows: School[]) => setSelected(rows)}

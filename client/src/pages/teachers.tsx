@@ -325,12 +325,12 @@ export default function Teachers() {
             <div className="h-[70vh]">
               <ResizablePanelGroup direction="horizontal">
                 <ResizablePanel defaultSize={60} minSize={35}>
-                <div className="ag-theme-material h-full">
-                  <GridBase
-                    rowData={filteredTeachers || []}
-                    columnDefs={[{
+                    <div className="ag-theme-material h-full">
+                      <GridBase
+                        rowData={filteredTeachers || []}
+                        columnDefs={[{
                       headerName: 'Name',
-                      valueGetter: (p:any) => p?.data?.fullName || `${p?.data?.firstName || ''} ${p?.data?.lastName || ''}`.trim(),
+                      valueGetter: (p:any) => p?.data?.full_name || p?.data?.fullName || '',
                       filter: 'agTextColumnFilter',
                       sortable: true,
                       flex: 1,
