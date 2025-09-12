@@ -29,27 +29,7 @@ interface TeachersGridProps {
   onSelectionChanged?: (rows: Educator[]) => void;
 }
 
-// School Link Component that finds school ID by name
-const SchoolLink = ({ schoolName }: { schoolName: string }) => {
-  const { data: schools } = useQuery<School[]>({
-    queryKey: ['/api/schools'],
-  });
-
-  const school = schools?.find(s => s.name === schoolName);
-  
-  if (!school) {
-    return <span>{schoolName}</span>;
-  }
-
-  return (
-    <Link 
-      href={`/school/${school.id}`} 
-      className="text-blue-600 hover:text-blue-800 hover:underline"
-    >
-      {schoolName}
-    </Link>
-  );
-};
+// Note: SchoolLink helper removed to avoid legacy /api fetches
 
 // Using shared renderers from grid-renderers.tsx
 

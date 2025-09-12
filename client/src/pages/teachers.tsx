@@ -52,29 +52,22 @@ export default function Teachers() {
     gridFilteredCount,
     setGridFilteredCount,
     searchDebug
-  } = useSearchFilter<Teacher>({
-    data: teachers,
-    searchFields: (teacher) => {
+  } = useSearchFilter<any>({
+    data: teachers as any,
+    searchFields: (t: any) => {
       const fields: string[] = [];
-      fields.push(teacher.fullName || "");
-      fields.push(teacher.individualType || "");
-      fields.push(teacher.discoveryStatus || "");
-      if (Array.isArray(teacher.currentRole)) {
-        const roleText = teacher.currentRole.join(", ")
-          .replace(/\bEmerging Teacher Leader\b/g, 'ETL')
-          .replace(/\bTeacher Leader\b/g, 'TL');
-        fields.push(roleText);
-      }
-      if (Array.isArray(teacher.activeSchool)) fields.push(teacher.activeSchool.join(", "));
-      if (Array.isArray(teacher.activeSchoolStageStatus)) fields.push(teacher.activeSchoolStageStatus.join(", "));
-      if (Array.isArray(teacher.raceEthnicity)) fields.push(teacher.raceEthnicity.join(", "));
-      if (Array.isArray(teacher.assignedPartner)) fields.push(teacher.assignedPartner.join(", "));
-      if (Array.isArray(teacher.assignedPartnerEmail)) fields.push(teacher.assignedPartnerEmail.join(", "));
+      fields.push(t.full_name || t.fullName || "");
+      fields.push(t.indiv_type || t.individualType || "");
+      fields.push(t.discovery_status || t.discoveryStatus || "");
+      const roleText = t.current_role_at_active_school || t.currentRoleSchool || '';
+      if (roleText) fields.push(roleText.replace(/\bEmerging Teacher Leader\b/g, 'ETL').replace(/\bTeacher Leader\b/g, 'TL'));
+      if (Array.isArray(t.race_ethnicity)) fields.push(t.race_ethnicity.join(", "));
+      if (Array.isArray(t.raceEthnicity)) fields.push(t.raceEthnicity.join(", "));
       return fields;
     },
-    userFilterField: (teacher, currentUser) => {
-      return teacher.assignedPartner && teacher.assignedPartner.length > 0 &&
-        teacher.assignedPartner.some(partner => partner && partner.toLowerCase().includes(currentUser.toLowerCase()));
+    userFilterField: (t: any, currentUser) => {
+      const partners = Array.isArray(t.assignedPartner) ? t.assignedPartner : [];
+      return partners.some((p: string) => p && p.toLowerCase().includes(currentUser.toLowerCase()));
     },
     debugName: "Teachers"
   });
