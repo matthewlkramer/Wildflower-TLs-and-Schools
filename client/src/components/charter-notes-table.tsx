@@ -6,6 +6,7 @@ import { Edit, ExternalLink, Eye, Lock, Unlock, Trash2 } from "lucide-react";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SchoolNotesTableProps {
   charterId: string;
@@ -15,32 +16,34 @@ export function SchoolNotesTable({ charterId }: SchoolNotesTableProps) {
   const [selectedNote, setSelectedNote] = useState<SchoolNote | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: notes = [], isLoading } = useQuery<SchoolNote[]>({
-    queryKey: ["/api/charter-notes/charter", charterId],
-    queryFn: async () => {
-      const response = await fetch(`/api/charter-notes/charter/${charterId}`, { 
-        credentials: "include" 
-      });
-      if (!response.ok) throw new Error("Failed to fetch charter notes");
-      return response.json();
-    },
+  const { data: notes = [], isLoading } = useQuery<any[]>({
+    queryKey: ["supabase/notes/charter", charterId],
     enabled: !!charterId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('charter_id', charterId)
+        .order('date_created', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
   });
 
-  const handleOpen = (note: SchoolNote) => {
+  const handleOpen = (note: any) => {
     setSelectedNote(note);
     setIsModalOpen(true);
   };
 
-  const handleEdit = (note: SchoolNote) => {
+  const handleEdit = (note: any) => {
     console.log("Edit note:", note);
   };
 
-  const handleTogglePrivate = (note: SchoolNote) => {
+  const handleTogglePrivate = (note: any) => {
     console.log("Toggle private:", note);
   };
 
-  const handleDelete = (note: SchoolNote) => {
+  const handleDelete = (note: any) => {
     console.log("Delete note:", note);
   };
 

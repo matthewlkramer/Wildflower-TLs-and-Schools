@@ -9,23 +9,29 @@ import { Input } from '@/components/ui/input';
 import { Edit, X, Check, Trash2, Plus } from 'lucide-react';
 import DeleteConfirmationModal from '@/components/delete-confirmation-modal';
 import { createTextFilter } from '@/utils/ag-grid-utils';
+import { supabase } from '@/integrations/supabase/client';
+import { createNote as createNoteFn, updateNote as updateNoteFn, deleteNote as deleteNoteFn } from '@/integrations/supabase/wftls';
 
 export function NotesTab({ schoolId, onSelectNote }: { schoolId: string; onSelectNote: (note: SchoolNote) => void }) {
   const qc = useQueryClient();
-  const { data: notes = [], isLoading } = useQuery<SchoolNote[]>({
-    queryKey: [`/api/school-notes/school/${schoolId}`],
-    queryFn: async () => {
-      const res = await fetch(`/api/school-notes/school/${schoolId}`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch notes');
-      return res.json();
-    },
+  const { data: notes = [], isLoading } = useQuery<any[]>({
+    queryKey: ["supabase/notes/school", schoolId],
     enabled: !!schoolId,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('school_id', schoolId)
+        .order('date_created', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   type Row = { id: string; dateCreated?: string; createdBy?: string; content?: string };
-  const rows: Row[] = (notes || []).map((n) => ({ id: n.id, dateCreated: n.dateCreated || '', createdBy: n.createdBy || '', content: (n as any).headline || n.notes || '' }));
+  const rows: Row[] = (notes || []).map((n: any) => ({ id: n.id, dateCreated: n.date_created || n.dateCreated || '', createdBy: n.created_by || n.createdBy || '', content: n.headline || n.notes || '' }));
 
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, Row>>({});
@@ -34,30 +40,18 @@ export function NotesTab({ schoolId, onSelectNote }: { schoolId: string; onSelec
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const updateNote = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const res = await fetch(`/api/school-notes/${id}`, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      if (!res.ok) throw new Error('Update failed');
-      return res.json();
-    },
-    onSuccess: () => { setEditingRowId(null); setDrafts({}); qc.invalidateQueries({ queryKey: [`/api/school-notes/school/${schoolId}`] }); },
+    mutationFn: async ({ id, data }: { id: string; data: any }) => updateNoteFn(id, data),
+    onSuccess: () => { setEditingRowId(null); setDrafts({}); qc.invalidateQueries({ queryKey: ["supabase/notes/school", schoolId] }); },
   });
 
   const createNote = useMutation({
-    mutationFn: async (data: any) => {
-      const res = await fetch('/api/school-notes', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ schoolId, ...data }) });
-      if (!res.ok) throw new Error('Create failed');
-      return res.json();
-    },
-    onSuccess: () => { setCreating(false); setDrafts({}); qc.invalidateQueries({ queryKey: [`/api/school-notes/school/${schoolId}`] }); },
+    mutationFn: async (data: any) => createNoteFn({ school_id: schoolId, ...data }),
+    onSuccess: () => { setCreating(false); setDrafts({}); qc.invalidateQueries({ queryKey: ["supabase/notes/school", schoolId] }); },
   });
 
   const deleteNote = useMutation({
-    mutationFn: async (id: string) => {
-      const res = await fetch(`/api/school-notes/${id}`, { method: 'DELETE', credentials: 'include' });
-      if (!res.ok) throw new Error('Delete failed');
-      return true;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/school-notes/school/${schoolId}`] }),
+    mutationFn: async (id: string) => deleteNoteFn(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["supabase/notes/school", schoolId] }),
   });
 
   const getDraft = (r: Row) => drafts[r.id] || r;
@@ -108,7 +102,7 @@ export function NotesTab({ schoolId, onSelectNote }: { schoolId: string; onSelec
               </>
             ) : (
               <>
-                <Button size="sm" variant="outline" className="h-7 px-2 text-green-700" onClick={() => updateNote.mutate({ id: row.id, data: { dateCreated: d.dateCreated, createdBy: d.createdBy, notes: d.content } })}><Check className="h-4 w-4" /></Button>
+                <Button size="sm" variant="outline" className="h-7 px-2 text-green-700" onClick={() => updateNote.mutate({ id: row.id, data: { date_created: d.dateCreated, created_by: d.createdBy, notes: d.content } })}><Check className="h-4 w-4" /></Button>
                 <Button size="sm" variant="outline" className="h-7 px-2" onClick={() => { setEditingRowId(null); setDrafts(prev => { const cp = { ...prev }; delete cp[row.id]; return cp; }); }}><X className="h-4 w-4" /></Button>
               </>
             )}
@@ -129,7 +123,7 @@ export function NotesTab({ schoolId, onSelectNote }: { schoolId: string; onSelec
             </Button>
           ) : (
             <div className="flex gap-2">
-              <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => { const id = editingRowId!; const d = drafts[id]; if (d) createNote.mutate({ dateCreated: d.dateCreated, createdBy: d.createdBy, notes: d.content }); }}>
+              <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => { const id = editingRowId!; const d = drafts[id]; if (d) createNote.mutate({ date_created: d.dateCreated, created_by: d.createdBy, notes: d.content }); }}>
                 <Check className="h-4 w-4 mr-1" /> Save
               </Button>
               <Button size="sm" variant="outline" onClick={() => { setCreating(false); setEditingRowId(null); setDrafts({}); }}>

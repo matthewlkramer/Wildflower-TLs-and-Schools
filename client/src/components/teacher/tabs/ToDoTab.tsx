@@ -4,20 +4,25 @@ import type { ActionStep, Teacher } from '@shared/schema.generated';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef } from 'ag-grid-community';
 import { DEFAULT_GRID_PROPS } from '@/components/shared/ag-grid-defaults';
+import { supabase } from '@/integrations/supabase/client';
 
 export function ToDoTab({ teacher }: { teacher: Teacher }) {
   const userId = (teacher as any)?.tcUserID || (teacher as any)?.assignedPartnerShortName || (teacher as any)?.fullName || teacher.id;
-  const { data: steps = [], isLoading } = useQuery<ActionStep[]>({
-    queryKey: ['/api/action-steps/user', userId],
-    queryFn: async () => {
-      const res = await fetch(`/api/action-steps/user/${encodeURIComponent(String(userId))}`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch user action steps');
-      return res.json();
-    },
+  const { data: steps = [], isLoading } = useQuery<any[]>({
+    queryKey: ['supabase/action_steps/people', userId],
     enabled: !!userId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('action_steps')
+        .select('*')
+        .eq('people_id', userId)
+        .order('due_date', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    },
   });
 
-  const rows = (steps || []).map((s) => ({ id: s.id, description: s.description || '', assignee: s.assignee || '', status: s.status || (s.complete ? 'Complete' : 'Pending'), dueDate: s.dueDate || '' }));
+  const rows = (steps || []).map((s: any) => ({ id: s.id, description: s.item ?? s.description ?? '', assignee: s.assignee ?? '', status: s.status ?? (s.complete ? 'Complete' : 'Pending'), dueDate: s.due_date ?? s.dueDate ?? '' }));
   const cols: ColDef<any>[] = [
     { headerName: 'Item', field: 'description', flex: 2, filter: 'agTextColumnFilter' },
     { headerName: 'Assignee', field: 'assignee', width: 160, filter: 'agTextColumnFilter' },
@@ -40,4 +45,3 @@ export function ToDoTab({ teacher }: { teacher: Teacher }) {
     </div>
   );
 }
-

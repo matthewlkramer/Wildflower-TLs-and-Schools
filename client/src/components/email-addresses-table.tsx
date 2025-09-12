@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
+import { supabase } from "@/integrations/supabase/client";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { createTextFilter } from "@/utils/ag-grid-utils";
@@ -12,19 +13,22 @@ interface EmailAddressesTableProps {
 }
 
 export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
-  const { data: emailAddresses = [], isLoading } = useQuery<EmailAddress[]>({
-    queryKey: ["/api/email-addresses/educator", educatorId],
+  const { data: emailAddresses = [], isLoading } = useQuery<any[]>({
+    queryKey: ["supabase/email_addresses/people", educatorId],
+    enabled: !!educatorId,
     queryFn: async () => {
-      const response = await fetch(`/api/email-addresses/educator/${educatorId}`, { 
-        credentials: "include" 
-      });
-      if (!response.ok) throw new Error("Failed to fetch email addresses");
-      return response.json();
+      const { data, error } = await supabase
+        .from('email_addresses')
+        .select('*')
+        .eq('people_id', educatorId)
+        .order('updated_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
     },
   });
 
   const refresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["/api/email-addresses/educator", educatorId] });
+    queryClient.invalidateQueries({ queryKey: ["supabase/email_addresses/people", educatorId] });
   };
 
   const handleEdit = async (emailAddress: EmailAddress) => {
@@ -32,7 +36,8 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     if (nextEmail === null) return;
     const nextType = window.prompt("Update type", emailAddress.type || "");
     try {
-      await apiRequest("PUT", `/api/email-addresses/${emailAddress.id}`, { email: nextEmail, type: nextType || undefined });
+      const { error } = await supabase.from('email_addresses').update({ email: nextEmail, type: nextType || undefined }).eq('id', emailAddress.id);
+      if (error) throw error;
       refresh();
     } catch (err) {
       console.error("Failed to update email address", err);
@@ -42,7 +47,8 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
   const handleDelete = async (emailAddress: EmailAddress) => {
     if (!window.confirm("Delete this email address?")) return;
     try {
-      await apiRequest("DELETE", `/api/email-addresses/${emailAddress.id}`);
+      const { error } = await supabase.from('email_addresses').delete().eq('id', emailAddress.id);
+      if (error) throw error;
       refresh();
     } catch (err) {
       console.error("Failed to delete email address", err);
@@ -51,7 +57,8 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
 
   const handleInactivate = async (emailAddress: EmailAddress) => {
     try {
-      await apiRequest("POST", `/api/email-addresses/${emailAddress.id}/inactivate`);
+      const { error } = await supabase.from('email_addresses').update({ status: 'inactive' }).eq('id', emailAddress.id);
+      if (error) throw error;
       refresh();
     } catch (err) {
       console.error("Failed to inactivate email address", err);
@@ -60,7 +67,9 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
 
   const handleMakePrimary = async (emailAddress: EmailAddress) => {
     try {
-      await apiRequest("POST", `/api/email-addresses/${emailAddress.id}/make-primary`);
+      // Mark the selected as primary; you may also want to unset others in DB via trigger or additional updates
+      const { error } = await supabase.from('email_addresses').update({ is_primary: true }).eq('id', emailAddress.id);
+      if (error) throw error;
       refresh();
     } catch (err) {
       console.error("Failed to make email primary", err);
@@ -132,6 +141,7 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
       headerName: "Primary",
       field: "isPrimary",
       flex: 1,
+      valueGetter: (p: any) => (p?.data?.is_primary ?? p?.data?.isPrimary) ? true : false,
       cellRenderer: (params: any) => params.value ? "Yes" : "No",
       ...createTextFilter(),
     },

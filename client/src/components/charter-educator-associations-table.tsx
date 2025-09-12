@@ -5,6 +5,7 @@ import type { EducatorSchoolAssociation } from "@shared/schema.generated";
 import { Edit, Trash2, UserMinus } from "lucide-react";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import { useLocation } from "wouter";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CharterEducatorAssociationsTableProps {
   charterId: string;
@@ -13,16 +14,27 @@ interface CharterEducatorAssociationsTableProps {
 export function CharterEducatorAssociationsTable({ charterId }: CharterEducatorAssociationsTableProps) {
   const [, setLocation] = useLocation();
 
-  const { data: associations = [], isLoading } = useQuery<EducatorSchoolAssociation[]>({
-    queryKey: ["/api/educator-school-associations/charter", charterId],
-    queryFn: async () => {
-      const response = await fetch(`/api/educator-school-associations/charter/${charterId}`, { 
-        credentials: "include" 
-      });
-      if (!response.ok) throw new Error("Failed to fetch charter educator associations");
-      return response.json();
-    },
+  const { data: associations = [], isLoading } = useQuery<any[]>({
+    queryKey: ["supabase/details_associations/charter", charterId],
     enabled: !!charterId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('details_associations')
+        .select('*')
+        .eq('charter_id', charterId);
+      if (error) throw error;
+      return (data || []).map((a: any) => ({
+        id: a.id,
+        educatorId: a.people_id || a.educatorId,
+        educatorName: a.people_full_name || a.educatorFullName,
+        schoolId: a.school_id || a.schoolId,
+        schoolName: a.school_short_name || a.schoolShortName,
+        role: Array.isArray(a.role) ? a.role.join(', ') : (a.role || ''),
+        startDate: a.start_date || a.startDate || null,
+        endDate: a.end_date || a.endDate || null,
+        active: !!(a.is_active ?? a.isActive),
+      }));
+    },
   });
 
   const handleEdit = (association: EducatorSchoolAssociation) => {

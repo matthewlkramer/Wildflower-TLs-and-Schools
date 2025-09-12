@@ -21,7 +21,7 @@ import { YesNoSelectInline } from '@/components/shared/grid/YesNoSelectInline';
 import { DateInputInline } from '@/components/shared/grid/DateInputInline';
 import DeleteConfirmationModal from '@/components/delete-confirmation-modal';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { supabase } from '@/integrations/supabase/client';
 import { createTextFilter } from '@/utils/ag-grid-utils';
 
 export function LocationsTab({ schoolId }: { schoolId: string }) {
@@ -33,35 +33,56 @@ export function LocationsTab({ schoolId }: { schoolId: string }) {
     startDate?: string;
     endDate?: string;
   };
-  const { data: locations = [], refetch } = useQuery<Location[]>({
-    queryKey: [`/api/locations/school/${schoolId}`],
-    queryFn: async () => {
-      const res = await fetch(`/api/locations/school/${schoolId}`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch locations');
-      return res.json();
-    },
+  const { data: locations = [], refetch } = useQuery<any[]>({
+    queryKey: ["supabase/locations/school", schoolId],
     enabled: !!schoolId,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('locations')
+        .select('*')
+        .eq('school_id', schoolId)
+        .order('start_date', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   const updateLocation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => apiRequest('PUT', `/api/locations/${id}`, data),
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const { error } = await supabase
+        .from('locations')
+        .update({
+          address: data.address,
+          current_physical_address: data.currentPhysicalAddress,
+          current_mailing_address: data.currentMailingAddress,
+          start_date: data.startDate,
+          end_date: data.endDate,
+        })
+        .eq('id', id);
+      if (error) throw error;
+      return true;
+    },
     onSuccess: () => refetch(),
   });
 
   const deleteLocation = useMutation({
-    mutationFn: async (id: string) => apiRequest('DELETE', `/api/locations/${id}`),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('locations').delete().eq('id', id);
+      if (error) throw error;
+      return true;
+    },
     onSuccess: () => refetch(),
   });
 
-  const rows: LocRow[] = (locations || []).map((l) => ({
+  const rows: LocRow[] = (locations || []).map((l: any) => ({
     id: l.id,
     address: l.address || '',
-    currentPhysicalAddress: !!l.currentPhysicalAddress,
-    currentMailingAddress: !!l.currentMailingAddress,
-    startDate: l.startDate || '',
-    endDate: l.endDate || '',
+    currentPhysicalAddress: !!(l.current_physical_address ?? l.currentPhysicalAddress),
+    currentMailingAddress: !!(l.current_mailing_address ?? l.currentMailingAddress),
+    startDate: l.start_date ?? l.startDate ?? '',
+    endDate: l.end_date ?? l.endDate ?? '',
   }));
 
   const [editingRowId, setEditingRowId] = React.useState<string | null>(null);
@@ -214,7 +235,19 @@ function CreateLocationModal({ open, onOpenChange, schoolId, onCreated }: { open
   const [currentPhysical, setCurrentPhysical] = React.useState(false);
   const [currentMailing, setCurrentMailing] = React.useState(false);
   const createLoc = useMutation({
-    mutationFn: async () => apiRequest('POST', '/api/locations', { schoolId, address, startDate, currentPhysicalAddress: currentPhysical, currentMailingAddress: currentMailing }),
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('locations')
+        .insert({
+          school_id: schoolId,
+          address,
+          start_date: startDate,
+          current_physical_address: currentPhysical,
+          current_mailing_address: currentMailing,
+        });
+      if (error) throw error;
+      return true;
+    },
     onSuccess: () => { onOpenChange(false); onCreated(); }
   });
   return (
@@ -261,4 +294,3 @@ function ViewLocationModal({ open, onOpenChange, location }: { open: boolean; on
     </div>
   );
 }
-

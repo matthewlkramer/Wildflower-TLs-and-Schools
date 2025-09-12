@@ -8,18 +8,23 @@ import { createTextFilter } from '@/utils/ag-grid-utils';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client';
 
 export function ToDoTab({ schoolId }: { schoolId: string }) {
-  const { data: steps = [], isLoading } = useQuery<ActionStep[]>({
-    queryKey: [`/api/action-steps/school/${schoolId}`],
-    queryFn: async () => {
-      const res = await fetch(`/api/action-steps/school/${schoolId}`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch action steps');
-      return res.json();
-    },
+  const { data: steps = [], isLoading } = useQuery<any[]>({
+    queryKey: ["supabase/action_steps/school", schoolId],
     enabled: !!schoolId,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('action_steps')
+        .select('*')
+        .eq('school_id', schoolId)
+        .order('due_date', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   type Row = {
@@ -34,13 +39,13 @@ export function ToDoTab({ schoolId }: { schoolId: string }) {
   const rows: Row[] = (steps || [])
     .slice()
     .sort((a, b) => (a.complete === b.complete ? 0 : a.complete ? 1 : -1))
-    .map((s) => ({
+    .map((s: any) => ({
       id: s.id,
-      description: s.description || '-',
-      assignee: s.assignee || '-',
-      status: s.status || (s.complete ? 'Complete' : 'Pending'),
+      description: s.item ?? s.description ?? '-',
+      assignee: s.assignee ?? '-',
+      status: s.status ?? (s.complete ? 'Complete' : 'Pending'),
       complete: !!s.complete,
-      dueDate: s.dueDate || '',
+      dueDate: s.due_date ?? s.dueDate ?? '',
     }));
 
   const [viewRow, setViewRow] = React.useState<Row | null>(null);
@@ -60,13 +65,13 @@ export function ToDoTab({ schoolId }: { schoolId: string }) {
       const r = p.data as Row;
       const toggle = async () => {
         const next = (r.status === 'Complete') ? 'Pending' : 'Complete';
-        await fetch(`/api/action-steps/${r.id}`, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: next }) });
+        await supabase.from('action_steps').update({ status: next }).eq('id', r.id);
         p.api?.refreshInfiniteCache?.();
         p.api?.redrawRows?.();
       };
       const del = async () => {
         if (!confirm('Delete this action step?')) return;
-        await fetch(`/api/action-steps/${r.id}`, { method: 'DELETE', credentials: 'include' });
+        await supabase.from('action_steps').delete().eq('id', r.id);
         p.api?.refreshInfiniteCache?.();
         p.api?.redrawRows?.();
       };
@@ -125,7 +130,7 @@ function CreateActionStepModal({ schoolId, onClose }: { schoolId: string; onClos
   const [dueDate, setDueDate] = React.useState('');
   const [status, setStatus] = React.useState('Pending');
   const save = async () => {
-    await fetch('/api/action-steps', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ schoolId, item, assignee, dueDate, status }) });
+    await supabase.from('action_steps').insert({ school_id: schoolId, item, assignee, due_date: dueDate, status });
     onClose();
   };
   return (
@@ -153,7 +158,7 @@ function EditActionStepModal({ row, onClose }: { row: any; onClose: ()=>void }) 
   const [dueDate, setDueDate] = React.useState(row.dueDate || '');
   const [status, setStatus] = React.useState(row.status || '');
   const save = async () => {
-    await fetch(`/api/action-steps/${row.id}`, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item, assignee, dueDate, status }) });
+    await supabase.from('action_steps').update({ item, assignee, due_date: dueDate, status }).eq('id', row.id);
     onClose();
   };
   return (

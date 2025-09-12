@@ -12,10 +12,11 @@ import type { SSJFilloutForm, Teacher } from "@shared/schema.generated";
 import { useQuery } from "@tanstack/react-query";
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import { InfoCard } from "@/components/shared/InfoCard";
+import { supabase } from "@/integrations/supabase/client";
 
-function mostRecentFilloutDate(ssjForms: SSJFilloutForm[]) {
+function mostRecentFilloutDate(ssjForms: any[]) {
   const dates = (ssjForms || [])
-    .map((f) => f.dateSubmitted)
+    .map((f) => (f.dateSubmitted ?? f.entry_date ?? f.entryDate))
     .filter(Boolean)
     .map((d) => new Date(d as string))
     .filter((d) => !isNaN(d.getTime()));
@@ -26,14 +27,18 @@ function mostRecentFilloutDate(ssjForms: SSJFilloutForm[]) {
 
 export function CultivationTab({ teacher, onSave }: { teacher: Teacher; onSave?: (vals: any)=>void }) {
   const educatorId = teacher.id;
-  const { data: ssjForms = [] } = useQuery<SSJFilloutForm[]>({
-    queryKey: ["/api/ssj-fillout-forms/educator", educatorId],
-    queryFn: async () => {
-      const response = await fetch(`/api/ssj-fillout-forms/educator/${educatorId}`, { credentials: 'include' });
-      if (!response.ok) throw new Error('Failed to fetch SSJ fillout forms');
-      return response.json();
-    },
+  const { data: ssjForms = [] } = useQuery<any[]>({
+    queryKey: ["supabase/ssj_fillout_forms/educator", educatorId],
     enabled: !!educatorId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ssj_fillout_forms')
+        .select('id, entry_date')
+        .eq('people_id', educatorId)
+        .order('entry_date', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
   });
   return (
     <DetailGrid>
@@ -83,4 +88,3 @@ export function CultivationTab({ teacher, onSave }: { teacher: Teacher; onSave?:
     </DetailGrid>
   );
 }
-

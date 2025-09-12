@@ -27,19 +27,13 @@ import { NineNinetiesTable } from "@/components/charter-990s-table";
 import { SchoolNotesTable } from "@/components/charter-notes-table";
 import { ActionStepsTable } from "@/components/charter-action-steps-table";
 
+import { useDetailsCharter } from "@/hooks/use-details";
+
 export default function CharterDetail() {
   const { id } = useParams<{ id: string }>();
   const { setPageTitle } = usePageTitle();
 
-  const { data: charter, isLoading } = useQuery<Charter>({
-    queryKey: ["/api/charters", id],
-    queryFn: async () => {
-      const response = await fetch(`/api/charters/${id}`, { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch charter");
-      return response.json();
-    },
-    enabled: !!id,
-  });
+  const { data: charter, isLoading } = useDetailsCharter(id);
 
   useEffect(() => {
     if (charter) {

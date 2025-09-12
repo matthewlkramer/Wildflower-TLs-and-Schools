@@ -7,6 +7,7 @@ import { X, Edit, Trash2 } from 'lucide-react';
 import { TableCard } from '@/components/shared/TableCard';
 import type { GovernanceDocument, Tax990 } from '@shared/schema.generated';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 function GovernanceDocumentRow({
   document,
@@ -144,12 +145,17 @@ function Tax990Row({
 export function GovernanceTab({ schoolId }: { schoolId: string }) {
   const qc = useQueryClient();
   // Documents
-  const { data: governanceDocuments, isLoading: documentsLoading } = useQuery<GovernanceDocument[]>({
-    queryKey: [`/api/governance-documents/school/${schoolId}`],
-    queryFn: async ({ queryKey }) => {
-      const res = await fetch(queryKey[0] as string, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch governance documents');
-      return res.json();
+  const { data: governanceDocuments, isLoading: documentsLoading } = useQuery<any[]>({
+    queryKey: ["supabase/governance_docs/school", schoolId],
+    enabled: !!schoolId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('governance_docs')
+        .select('*')
+        .eq('school_id', schoolId)
+        .order('date_entered', { ascending: false });
+      if (error) throw error;
+      return data || [];
     },
   });
   const [isCreatingDocument, setIsCreatingDocument] = useState(false);
@@ -157,42 +163,46 @@ export function GovernanceTab({ schoolId }: { schoolId: string }) {
   const [newDocument, setNewDocument] = useState<any>({ docType: '', dateEntered: '' });
   const createDoc = useMutation({
     mutationFn: async () => {
-      const res = await fetch('/api/governance-documents', {
-        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ schoolId, ...newDocument }),
-      });
-      if (!res.ok) throw new Error('Create failed');
-      return res.json();
+      const { error } = await supabase
+        .from('governance_docs')
+        .insert({ school_id: schoolId, doc_type: newDocument.docType, date_entered: newDocument.dateEntered });
+      if (error) throw error;
+      return true;
     },
-    onSuccess: () => { setIsCreatingDocument(false); setNewDocument({ docType: '', dateEntered: '' }); qc.invalidateQueries({ queryKey: [`/api/governance-documents/school/${schoolId}`] }); },
+    onSuccess: () => { setIsCreatingDocument(false); setNewDocument({ docType: '', dateEntered: '' }); qc.invalidateQueries({ queryKey: ["supabase/governance_docs/school", schoolId] }); },
   });
   const updateDoc = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
-      const res = await fetch(`/api/governance-documents/${id}`, {
-        method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error('Update failed');
-      return res.json();
+      const { error } = await supabase
+        .from('governance_docs')
+        .update({ doc_type: data.docType, date_entered: data.dateEntered })
+        .eq('id', id);
+      if (error) throw error;
+      return true;
     },
-    onSuccess: () => { setEditingDocumentId(null); qc.invalidateQueries({ queryKey: [`/api/governance-documents/school/${schoolId}`] }); },
+    onSuccess: () => { setEditingDocumentId(null); qc.invalidateQueries({ queryKey: ["supabase/governance_docs/school", schoolId] }); },
   });
   const deleteDoc = useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/governance-documents/${id}`, { method: 'DELETE', credentials: 'include' });
-      if (!res.ok) throw new Error('Delete failed');
+      const { error } = await supabase.from('governance_docs').delete().eq('id', id);
+      if (error) throw error;
       return true;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/governance-documents/school/${schoolId}`] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["supabase/governance_docs/school", schoolId] }),
   });
 
   // 990s
-  const { data: tax990s, isLoading: tax990sLoading } = useQuery<Tax990[]>({
-    queryKey: [`/api/tax-990s/school/${schoolId}`],
-    queryFn: async ({ queryKey }) => {
-      const res = await fetch(queryKey[0] as string, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch 990s');
-      return res.json();
+  const { data: tax990s, isLoading: tax990sLoading } = useQuery<any[]>({
+    queryKey: ["supabase/nine_nineties/school", schoolId],
+    enabled: !!schoolId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('nine_nineties')
+        .select('*')
+        .eq('school_id', schoolId)
+        .order('year', { ascending: false });
+      if (error) throw error;
+      return data || [];
     },
   });
   const [isCreating990, setIsCreating990] = useState(false);
@@ -200,27 +210,32 @@ export function GovernanceTab({ schoolId }: { schoolId: string }) {
   const [new990, setNew990] = useState<any>({ year: '' });
   const create990 = useMutation({
     mutationFn: async () => {
-      const res = await fetch('/api/tax-990s', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ schoolId, ...new990 }) });
-      if (!res.ok) throw new Error('Create failed');
-      return res.json();
+      const { error } = await supabase
+        .from('nine_nineties')
+        .insert({ school_id: schoolId, year: new990.year });
+      if (error) throw error;
+      return true;
     },
-    onSuccess: () => { setIsCreating990(false); setNew990({ year: '' }); qc.invalidateQueries({ queryKey: [`/api/tax-990s/school/${schoolId}`] }); },
+    onSuccess: () => { setIsCreating990(false); setNew990({ year: '' }); qc.invalidateQueries({ queryKey: ["supabase/nine_nineties/school", schoolId] }); },
   });
   const update990 = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
-      const res = await fetch(`/api/tax-990s/${id}`, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      if (!res.ok) throw new Error('Update failed');
-      return res.json();
+      const { error } = await supabase
+        .from('nine_nineties')
+        .update({ year: data.year })
+        .eq('id', id);
+      if (error) throw error;
+      return true;
     },
-    onSuccess: () => { setEditingTax990Id(null); qc.invalidateQueries({ queryKey: [`/api/tax-990s/school/${schoolId}`] }); },
+    onSuccess: () => { setEditingTax990Id(null); qc.invalidateQueries({ queryKey: ["supabase/nine_nineties/school", schoolId] }); },
   });
   const delete990 = useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/tax-990s/${id}`, { method: 'DELETE', credentials: 'include' });
-      if (!res.ok) throw new Error('Delete failed');
+      const { error } = await supabase.from('nine_nineties').delete().eq('id', id);
+      if (error) throw error;
       return true;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/tax-990s/school/${schoolId}`] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["supabase/nine_nineties/school", schoolId] }),
   });
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

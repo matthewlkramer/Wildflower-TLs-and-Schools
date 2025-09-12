@@ -42,7 +42,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
     mutationFn: (id: string) => updateEducator(id, { archived: true }),
     onMutate: async (id: string) => {
       // Optimistically remove from cache
-      const key = ['supabase/grid_educators'];
+      const key = ['supabase/grid_educator'];
       await queryClient.cancelQueries({ queryKey: key });
       const previous = queryClient.getQueryData<Educator[]>(key);
       if (previous) {
@@ -53,7 +53,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
     onError: (_err, _id, context) => {
       // Roll back cache
       if (context?.previous) {
-        queryClient.setQueryData(['supabase/grid_educators'], context.previous);
+        queryClient.setQueryData(['supabase/grid_educator'], context.previous);
       }
       toast({
         title: "Error",
@@ -62,14 +62,14 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['supabase/grid_educators'] });
+      queryClient.invalidateQueries({ queryKey: ['supabase/grid_educator'] });
       toast({
         title: "Educator deleted",
         description: "The educator has been successfully deleted.",
       });
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['supabase/grid_educators'] });
+      queryClient.invalidateQueries({ queryKey: ['supabase/grid_educator'] });
     }
   });
 
@@ -80,7 +80,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
     if (next == null || next === current) return;
     try {
       await updateEducator(teacher.id, { fullName: next });
-      queryClient.invalidateQueries({ queryKey: ['supabase/grid_educators'] });
+      queryClient.invalidateQueries({ queryKey: ['supabase/grid_educator'] });
       toast({ title: 'Saved', description: 'Educator updated' });
     } catch (e) {
       toast({ title: 'Error', description: 'Failed to update', variant: 'destructive' });

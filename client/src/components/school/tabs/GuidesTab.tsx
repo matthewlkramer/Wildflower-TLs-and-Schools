@@ -22,7 +22,7 @@ import { DateInputInline } from '@/components/shared/grid/DateInputInline';
 import { Badge } from '@/components/ui/badge';
 import DeleteConfirmationModal from '@/components/delete-confirmation-modal';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { supabase } from '@/integrations/supabase/client';
 
 export function GuidesTab({ schoolId }: { schoolId: string }) {
   type GuideRow = {
@@ -35,32 +35,52 @@ export function GuidesTab({ schoolId }: { schoolId: string }) {
     isActive?: boolean;
   };
 
-  const { data: assignments = [] } = useQuery<GuideAssignment[]>({
-    queryKey: [`/api/guide-assignments/school/${schoolId}`],
-    queryFn: async () => {
-      const res = await fetch(`/api/guide-assignments/school/${schoolId}`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch guide assignments');
-      return res.json();
-    },
+  const { data: assignments = [] } = useQuery<any[]>({
+    queryKey: ["supabase/guide_assignments/school", schoolId],
     enabled: !!schoolId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('guide_assignments')
+        .select('*')
+        .eq('school_id', schoolId)
+        .order('start_date', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   const updateAssignment = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => apiRequest('PUT', `/api/guide-assignments/${id}`, data),
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const { error } = await supabase
+        .from('guide_assignments')
+        .update({
+          type: data.type,
+          start_date: data.startDate,
+          end_date: data.endDate,
+          is_active: data.isActive,
+        })
+        .eq('id', id);
+      if (error) throw error;
+      return true;
+    },
   });
 
   const deleteAssignment = useMutation({
-    mutationFn: async (id: string) => apiRequest('DELETE', `/api/guide-assignments/${id}`),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('guide_assignments').delete().eq('id', id);
+      if (error) throw error;
+      return true;
+    },
   });
 
-  const rows: GuideRow[] = (assignments || []).map((g) => ({
+  const rows: GuideRow[] = (assignments || []).map((g: any) => ({
     id: g.id,
-    guideId: g.guideId,
-    guideShortName: (g as any).guideShortName || g.guideId,
-    type: (g as any).type || '',
-    startDate: g.startDate || '',
-    endDate: g.endDate || '',
-    isActive: !!g.isActive,
+    guideId: g.guide_id ?? g.guideId,
+    guideShortName: g.guide_short_name ?? g.guideShortName ?? g.guide_id,
+    type: g.type || '',
+    startDate: g.start_date ?? g.startDate ?? '',
+    endDate: g.end_date ?? g.endDate ?? '',
+    isActive: !!(g.is_active ?? g.isActive),
   }));
 
   const [editingRowId, setEditingRowId] = React.useState<string | null>(null);
@@ -225,7 +245,13 @@ function CreateGuideAssignmentModal({ open, onOpenChange, schoolId, onCreated }:
   const [type, setType] = React.useState('');
   const [startDate, setStartDate] = React.useState('');
   const create = useMutation({
-    mutationFn: async () => apiRequest('POST', '/api/guide-assignments', { schoolId, guideId, guideShortName, type, startDate, isActive: true }),
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('guide_assignments')
+        .insert({ school_id: schoolId, guide_id: guideId, guide_short_name: guideShortName, type, start_date: startDate, is_active: true });
+      if (error) throw error;
+      return true;
+    },
     onSuccess: () => { onOpenChange(false); onCreated(); }
   });
   return (
@@ -274,4 +300,3 @@ function ViewGuideAssignmentModal({ open, onOpenChange, assignment }: { open: bo
     </div>
   );
 }
-

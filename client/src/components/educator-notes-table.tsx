@@ -3,24 +3,35 @@ import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import type { EducatorNote } from "@shared/schema.generated";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EducatorNotesTableProps {
   educatorId: string;
 }
 
 export function EducatorNotesTable({ educatorId }: EducatorNotesTableProps) {
-  const { data: notes = [], isLoading } = useQuery<EducatorNote[]>({
-    queryKey: ["/api/educator-notes/educator", educatorId],
+  const { data: notes = [], isLoading } = useQuery<any[]>({
+    queryKey: ["supabase/notes/people", educatorId],
+    enabled: !!educatorId,
     queryFn: async () => {
-      const response = await fetch(`/api/educator-notes/educator/${educatorId}`, { 
-        credentials: "include" 
-      });
-      if (!response.ok) throw new Error("Failed to fetch educator notes");
-      return response.json();
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('people_id', educatorId)
+        .order('date_created', { ascending: false });
+      if (error) throw error;
+      const rows = data || [];
+      // Normalize keys for display
+      return rows.map((r: any) => ({
+        id: r.id,
+        notes: r.notes ?? r.note ?? '',
+        dateCreated: r.date_created ?? r.date ?? r.created_at ?? '',
+        createdBy: r.created_by ?? r.createdBy ?? '',
+      }));
     },
   });
 
-  const columnDefs: ColDef<EducatorNote>[] = [
+  const columnDefs: ColDef<any>[] = [
     {
       headerName: "Date Created",
       field: "dateCreated",

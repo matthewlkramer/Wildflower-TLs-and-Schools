@@ -11,16 +11,43 @@ import { useEffect, useMemo, useState } from "react";
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import { InfoCard } from "@/components/shared/InfoCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
 
 export function OnlineFormsTab({ educatorId }: { educatorId: string }) {
-  const { data: forms = [], isLoading } = useQuery<SSJFilloutForm[]>({
-    queryKey: ["/api/ssj-fillout-forms/educator", educatorId],
+  const { data: forms = [], isLoading } = useQuery<any[]>({
+    queryKey: ["supabase/ssj_fillout_forms/educator", educatorId],
+    enabled: !!educatorId,
     queryFn: async () => {
-      const response = await fetch(`/api/ssj-fillout-forms/educator/${educatorId}`, {
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Failed to fetch SSJ fillout forms");
-      return response.json();
+      const { data, error } = await supabase
+        .from('ssj_fillout_forms')
+        .select('*')
+        .eq('people_id', educatorId)
+        .order('entry_date', { ascending: false });
+      if (error) throw error;
+      // normalize keys expected by renderer (camelCase)
+      return (data || []).map((r: any) => ({
+        id: r.id,
+        formVersion: r.form_version ?? r.formVersion,
+        dateSubmitted: r.entry_date ?? r.date_submitted ?? r.dateSubmitted,
+        contactTypeStandardized: r.contact_type_standardized ?? r.contactTypeStandardized,
+        firstName: r.first_name ?? r.firstName,
+        lastName: r.last_name ?? r.lastName,
+        email: r.email,
+        city: r.city,
+        cityStandardized: r.city_standardized ?? r.cityStandardized,
+        state: r.state,
+        stateStandardized: r.state_standardized ?? r.stateStandardized,
+        country: r.country,
+        targetGeo: r.target_geo ?? r.targetGeo,
+        raceEthnicity: r.socioeconomic_race_ethnicity ?? r.race_ethnicity ?? r.raceEthnicity,
+        raceEthnicityOther: r.socioeconomic_race_ethnicity_other ?? r.raceEthnicityOther,
+        lgbtqia: r.socioeconomic_lgbtqia_identifying ?? r.lgbtqia,
+        pronouns: r.socioeconomic_pronouns ?? r.pronouns,
+        pronounsOther: r.socioeconomic_pronouns_other ?? r.pronounsOther,
+        gender: r.socioeconomic_gender ?? r.gender,
+        genderStandardized: r.gender_standardized ?? r.genderStandardized,
+        // add any other fields as needed
+      }));
     },
   });
 

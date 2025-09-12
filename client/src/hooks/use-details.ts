@@ -14,15 +14,8 @@ export function useDetailsTeacher(id?: string) {
         .single();
       if (!error && data) return data as any;
 
-      // Fallback: minimal row from grid_educators, then grid_educator
-      let grid = await supabase
-        .from("grid_educators")
-        .select("*")
-        .eq("id", id!)
-        .single();
-      if (!grid.error && grid.data) return grid.data as any;
-
-      grid = await supabase
+      // Fallback: minimal row from grid_educator
+      const grid = await supabase
         .from("grid_educator")
         .select("*")
         .eq("id", id!)

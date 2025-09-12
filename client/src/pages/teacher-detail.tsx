@@ -49,7 +49,7 @@ export default function TeacherDetail() {
   const updateTeacherDetailsMutation = useMutation({
     mutationFn: async (data: any) => updateEducator(id!, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["supabase/grid_educators"] });
+      queryClient.invalidateQueries({ queryKey: ["supabase/grid_educator"] });
       queryClient.invalidateQueries({ queryKey: ["supabase/details_educators", id] });
       toast({ title: "Success", description: "Educator details updated" });
     },

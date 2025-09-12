@@ -5,22 +5,25 @@ import type { NineNineties } from "@shared/schema.generated";
 import { Edit, ExternalLink, Trash2 } from "lucide-react";
 import { RowActionsSelect } from "@/components/shared/RowActionsSelect";
 import { createTextFilter } from "@/utils/ag-grid-utils";
+import { supabase } from "@/integrations/supabase/client";
 
 interface NineNinetiesTableProps {
   charterId: string;
 }
 
 export function NineNinetiesTable({ charterId }: NineNinetiesTableProps) {
-  const { data: tax990s = [], isLoading } = useQuery<NineNineties[]>({
-    queryKey: ["/api/charter-990s/charter", charterId],
-    queryFn: async () => {
-      const response = await fetch(`/api/charter-990s/charter/${charterId}`, { 
-        credentials: "include" 
-      });
-      if (!response.ok) throw new Error("Failed to fetch charter 990s");
-      return response.json();
-    },
+  const { data: tax990s = [], isLoading } = useQuery<any[]>({
+    queryKey: ["supabase/nine_nineties/charter", charterId],
     enabled: !!charterId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('nine_nineties')
+        .select('*')
+        .eq('charter_id', charterId)
+        .order('year', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   const handleOpen = (tax990: NineNineties) => {
