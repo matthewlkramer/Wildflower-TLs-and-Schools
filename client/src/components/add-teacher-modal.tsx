@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { EDUCATORS_SCHEMA, type School } from "@shared/schema.generated";
+import { EDUCATORS_SCHEMA } from "@shared/schema.generated";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,9 +19,7 @@ interface AddEducatorModalProps {
 export default function AddEducatorModal({ open, onOpenChange }: AddEducatorModalProps) {
   const { toast } = useToast();
 
-  const { data: schools } = useQuery<School[]>({
-    queryKey: ["/api/schools"],
-  });
+  // No prefetches here; avoid legacy /api calls on mount
 
   const form = useForm({
     resolver: zodResolver(EDUCATORS_SCHEMA),

@@ -157,21 +157,7 @@ function AppContent() {
     try { console.log('[App] location:', location); } catch {}
   }, [location]);
 
-  // Prefetch core datasets via Express only when explicitly enabled
-  useEffect(() => {
-    (async () => {
-      if (!isAuthenticated) return;
-      if (import.meta.env.VITE_USE_EXPRESS !== 'true') return;
-      const keys = [
-        ['/api/educators'],
-        ['/api/schools'],
-        ['/api/charters'],
-      ] as const;
-      keys.forEach(([k]) => {
-        queryClient.prefetchQuery({ queryKey: [k] });
-      });
-    })();
-  }, [isAuthenticated]);
+  // Legacy Express prefetch removed (Supabase-only client)
 
 
   return (
