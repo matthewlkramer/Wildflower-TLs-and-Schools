@@ -8,5 +8,11 @@ if (!url || !anon) {
   console.warn('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY');
 }
 
-export const supabase = createClient(url, anon);
-
+export const supabase = createClient(url, anon, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storageKey: 'wftls-auth',
+  },
+});

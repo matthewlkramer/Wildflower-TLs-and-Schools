@@ -6,11 +6,22 @@ export function useSchoolsSupabase() {
   const query = useQuery<School[]>({
     queryKey: ["supabase/grid_school"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("grid_school")
-        .select("*");
-      if (error) throw error;
-      const rows = (data || []) as unknown as School[];
+      const pageSize = 1000;
+      let offset = 0;
+      let all: any[] = [];
+      for (;;) {
+        const { data, error } = await supabase
+          .from("grid_school")
+          .select("*")
+          .order("id", { ascending: true })
+          .range(offset, offset + pageSize - 1);
+        if (error) throw error;
+        const chunk = data || [];
+        all = all.concat(chunk);
+        if (chunk.length < pageSize) break;
+        offset += pageSize;
+      }
+      const rows = (all || []) as unknown as School[];
       return rows.filter((s: any) => !s?.archived);
     },
     staleTime: 30 * 60 * 1000,
@@ -31,4 +42,3 @@ export function useSchoolsSupabase() {
     fields,
   };
 }
-

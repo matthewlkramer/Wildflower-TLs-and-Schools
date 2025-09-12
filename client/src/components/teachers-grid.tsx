@@ -339,22 +339,26 @@ export default function TeachersGrid({ teachers, isLoading, fields, onFilteredCo
             defaultColDef={{ ...DEFAULT_COL_DEF, ...(defaultColDef || {}) }}
             onFirstDataRendered={(ev: any) => {
               try {
-                const model: any = {};
-                model.currentRoleSchool = { filterType: 'text', type: 'notContains', filter: 'Paused' };
-                if (entReady) {
-                  const all = Array.from(new Set((teachers || []).map(t => t?.discoveryStatus).filter(Boolean)));
-                  model.discoveryStatus = { filterType: 'set', values: all.filter(v => String(v) !== 'Paused') };
-                } else {
-                  model.discoveryStatus = { filterType: 'text', type: 'notEqual', filter: 'Paused' };
+                // Only apply curated column filter presets when not using dynamic fields
+                const usingDynamic = Array.isArray((ev?.columnApi as any)?.getAllGridColumns?.()) && (fields && fields.length);
+                if (!usingDynamic) {
+                  const model: any = {};
+                  model.currentRoleSchool = { filterType: 'text', type: 'notContains', filter: 'Paused' };
+                  if (entReady) {
+                    const all = Array.from(new Set((teachers || []).map(t => t?.discoveryStatus).filter(Boolean)));
+                    model.discoveryStatus = { filterType: 'set', values: all.filter(v => String(v) !== 'Paused') };
+                  } else {
+                    model.discoveryStatus = { filterType: 'text', type: 'notEqual', filter: 'Paused' };
+                  }
+                  if (entReady) {
+                    const allTypes = Array.from(new Set((teachers || []).map(t => t?.individualType).filter(Boolean)));
+                    model.individualType = { filterType: 'set', values: allTypes.filter(v => String(v) !== 'Community Member') };
+                  } else {
+                    model.individualType = { filterType: 'text', type: 'notEqual', filter: 'Community Member' };
+                  }
+                  ev.api.setFilterModel(model);
+                  ev.api.onFilterChanged();
                 }
-                if (entReady) {
-                  const allTypes = Array.from(new Set((teachers || []).map(t => t?.individualType).filter(Boolean)));
-                  model.individualType = { filterType: 'set', values: allTypes.filter(v => String(v) !== 'Community Member') };
-                } else {
-                  model.individualType = { filterType: 'text', type: 'notEqual', filter: 'Community Member' };
-                }
-                ev.api.setFilterModel(model);
-                ev.api.onFilterChanged();
                 const count = ev.api.getDisplayedRowCount();
                 onFilteredCountChange?.(count);
               } catch {}
