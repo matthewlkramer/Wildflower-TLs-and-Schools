@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { StatusBadgeCellRenderer, MultiValueCellRenderer } from "@/components/shared/grid-renderers";
 import { type School } from "@shared/schema.generated";
 import { getStatusColor } from "@/lib/utils";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
+import { updateSchool } from "@/integrations/supabase/wftls";
 import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
 import { GridBase } from "@/components/shared/GridBase";
 import { useAgGridFeatures } from "@/hooks/use-aggrid-features";
@@ -73,13 +74,13 @@ const ActionsCellRenderer = ({ data: school }: { data: School }) => {
   const open = () => { try { window.location.href = `/school/${school.id}`; } catch {} };
   
   const handleEditSave = async (newName: string) => {
-    await apiRequest('PUT', `/api/schools/${school.id}`, { name: newName });
-    queryClient.invalidateQueries({ queryKey: ['/api/schools'] });
+    await updateSchool(school.id, { name: newName });
+    queryClient.invalidateQueries({ queryKey: ['supabase/grid_school'] });
     toast({ title: "School name updated", description: `Name changed to "${newName}"` });
   };
   const markInactive = async () => {
     if (!confirm('Mark school inactive (archive)?')) return;
-    try { await apiRequest('PUT', `/api/schools/${school.id}`, { archived: true }); queryClient.invalidateQueries({ queryKey: ['/api/schools'] }); } catch (e) { alert('Failed to archive'); }
+    try { await updateSchool(school.id, { archived: true }); queryClient.invalidateQueries({ queryKey: ['supabase/grid_school'] }); } catch (e) { alert('Failed to archive'); }
   };
   const createNote = async () => {
     const notes = window.prompt('New note for this school:');

@@ -33,3 +33,18 @@ export function useDetailsSchool(id?: string) {
   });
 }
 
+export function useDetailsCharter(id?: string) {
+  return useQuery<{ [k: string]: any }>({
+    queryKey: ["supabase/details_charters", id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("details_charters")
+        .select("*")
+        .eq("id", id!)
+        .single();
+      if (error) throw error;
+      return data as any;
+    },
+  });
+}

@@ -1,32 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
 import type { EducatorSchoolAssociation } from "@shared/schema.generated";
 import { AssociationGrid, type AssociationRow } from "@/components/associations/AssociationGrid";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EducatorSchoolAssociationsTableProps {
   educatorId: string;
 }
 
 export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAssociationsTableProps) {
-  const { data: associations = [], isLoading } = useQuery<EducatorSchoolAssociation[]>({
-    queryKey: ["/api/educator-school-associations/educator", educatorId],
+  const { data: associations = [], isLoading } = useQuery<any[]>({
+    queryKey: ["supabase/detail_associations", { educatorId }],
+    enabled: !!educatorId,
     queryFn: async () => {
-      const response = await fetch(`/api/educator-school-associations/educator/${educatorId}`, {
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Failed to fetch educator school associations");
-      return response.json();
+      const { data, error } = await supabase
+        .from('detail_associations')
+        .select('*')
+        .eq('people_id', educatorId);
+      if (error) throw error;
+      return data || [];
     },
   });
 
-  const rows: AssociationRow[] = (associations || []).map((a) => ({
+  const rows: AssociationRow[] = (associations || []).map((a: any) => ({
     id: a.id,
-    schoolId: a.schoolId,
-    schoolShortName: (a as any).schoolShortName,
-    roles: a.role as any,
-    startDate: a.startDate || null,
-    endDate: a.endDate || null,
-    isActive: !!a.isActive,
-    stageStatus: (a as any).stageStatus || null,
+    schoolId: a.school_id || a.schoolId,
+    schoolShortName: a.school_short_name || a.schoolShortName,
+    roles: (a.role || a.roles || a.role_at_school) as any,
+    startDate: a.start_date || a.startDate || null,
+    endDate: a.end_date || a.endDate || null,
+    isActive: !!(a.is_active ?? a.isActive),
+    stageStatus: a.stage_status || a.stageStatus || null,
   }));
 
   if (isLoading) {
@@ -55,6 +58,7 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
           startDate: patch.startDate ?? current.startDate,
           endDate: patch.endDate ?? current.endDate,
         };
+        // Note: Updates remain on server endpoint until Supabase write path is defined
         fetch(`/api/teacher-school-associations/${rowId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },

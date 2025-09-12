@@ -8,21 +8,26 @@ import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
 import CreateAndAssignEducatorModal from '@/components/create-and-assign-educator-modal';
 import AssignEducatorModal from '@/components/assign-educator-modal';
+import { supabase } from '@/integrations/supabase/client';
+import { useEducatorsSupabase } from '@/hooks/use-educators-supabase';
 
 export function TLsTab({ school, schoolId }: { school: School; schoolId: string }) {
-  const { data: associations = [], isLoading: associationsLoading, refetch } = useQuery<TeacherSchoolAssociation[]>({
-    queryKey: [`/api/school-associations/${schoolId}`],
-    queryFn: async () => {
-      const res = await fetch(`/api/school-associations/${schoolId}`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch associations');
-      return res.json();
-    },
+  const { data: associations = [], isLoading: associationsLoading, refetch } = useQuery<any[]>({
+    queryKey: ["supabase/detail_associations", { schoolId }],
     enabled: !!schoolId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('detail_associations')
+        .select('*')
+        .eq('school_id', schoolId);
+      if (error) throw error;
+      return data || [];
+    },
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
 
-  const { data: teachers = [] } = useQuery<Teacher[]>({ queryKey: ['/api/teachers'] });
+  const { data: teachers = [] } = useEducatorsSupabase();
 
   const updateAssociation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => apiRequest('PUT', `/api/teacher-school-associations/${id}`, data),
@@ -63,7 +68,14 @@ export function TLsTab({ school, schoolId }: { school: School; schoolId: string 
         <div className="border rounded-lg p-3">
           <SchoolTLsAssociationGrid
             school={school}
-            associations={associations}
+            associations={(associations as any[]).map((a:any) => ({
+              id: a.id,
+              educatorId: a.people_id || a.educator_id || a.person_id || a.teacher_id,
+              role: a.role || a.roles || a.role_at_school,
+              startDate: a.start_date || a.startDate || null,
+              endDate: a.end_date || a.endDate || null,
+              isActive: a.is_active ?? a.isActive ?? null,
+            })) as unknown as TeacherSchoolAssociation[]}
             teachers={teachers || []}
             onUpdateAssociation={(id, data) => updateAssociation.mutate({ id, data })}
             onEndStint={(id) => updateAssociation.mutate({ id, data: { endDate: new Date().toISOString().slice(0, 10) } })}

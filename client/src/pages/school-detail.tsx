@@ -22,9 +22,10 @@ import { LinkedTab } from '@/components/school/tabs/LinkedTab';
 import { ToDoTab } from '@/components/school/tabs/ToDoTab';
 // Membership tab removed per request
 
-import { apiRequest, queryClient } from '@/lib/queryClient';
+import { queryClient } from '@/lib/queryClient';
 import { useDetailsSchool } from '@/hooks/use-details';
 import type { School } from '@shared/schema.generated';
+import { updateSchool } from '@/integrations/supabase/wftls';
 
 export default function SchoolDetail() {
   const { id } = useParams<{ id: string }>();
@@ -36,8 +37,11 @@ export default function SchoolDetail() {
   // Tabs fetch their own datasets (associations, teachers, locations, guides)
 
   const updateSchoolDetailsMutation = useMutation({
-    mutationFn: async (data: any) => apiRequest('PUT', `/api/schools/${id}`, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['/api/schools', id] }),
+    mutationFn: async (data: any) => updateSchool(id!, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["supabase/details_schools", id] });
+      queryClient.invalidateQueries({ queryKey: ["supabase/grid_school"] });
+    },
   });
 
   if (isLoading || !school) {

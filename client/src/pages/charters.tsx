@@ -26,6 +26,8 @@ import { KanbanBoard } from "@/components/shared/KanbanBoard";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { useQuery as useRQ } from "@tanstack/react-query";
 import { useChartersSupabase } from "@/hooks/use-charters-supabase";
+import { useDetailsCharter } from "@/hooks/use-details";
+import { updateCharter } from "@/integrations/supabase/wftls";
 import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, CHARTERS_KANBAN_ORDER, CHARTERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -90,30 +92,14 @@ export default function Charters() {
 
   const selectedId = (selected as any)?.[0]?.id as string | undefined;
   const selectedIds = new Set((selected as any[]).map(s => s.id));
-  const { data: selectedDetail } = useRQ<Charter>({
-    queryKey: ["/api/charters", selectedId],
-    enabled: viewMode === "split" && !!selectedId,
-    queryFn: async () => {
-      const r = await fetch(`/api/charters/${selectedId}`, { credentials: "include" });
-      if (!r.ok) throw new Error("Failed to fetch charter");
-      return r.json();
-    }
-  });
+  // Split-view detail: use Supabase details view when in split mode and a row is selected
+  const { data: selectedDetail } = useDetailsCharter(selectedId && viewMode === "split" ? selectedId : undefined);
 
   // Kanban move mutation: update status only (no field fallback)
   const moveMutation = useMutation({
-    mutationFn: async ({ id, to }: { id: string; to: string }) => {
-      const res = await fetch(`/api/charters/${id}`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: to === '__UNSPECIFIED__' ? null : to }),
-      });
-      if (!res.ok) throw new Error('Failed to update charter');
-      return res.json();
-    },
+    mutationFn: async ({ id, to }: { id: string; to: string }) => updateCharter(id, { status: to === '__UNSPECIFIED__' ? null : to }),
     onMutate: async ({ id, to }) => {
-      const key = ['/api/charters'];
+      const key = ['supabase/grid_charter'];
       await queryClient.cancelQueries({ queryKey: key });
       const prev = queryClient.getQueryData<any[]>(key);
       if (prev) {
@@ -122,10 +108,10 @@ export default function Charters() {
       return { prev };
     },
     onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(['/api/charters'], ctx.prev);
+      if (ctx?.prev) queryClient.setQueryData(['supabase/grid_charter'], ctx.prev);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/charters'] });
+      queryClient.invalidateQueries({ queryKey: ['supabase/grid_charter'] });
     }
   });
 

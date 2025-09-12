@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { SCHOOLS_SCHEMA } from "@shared/schema.generated";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import { createSchool } from "@/integrations/supabase/wftls";
 
 const addSchoolSchema = SCHOOLS_SCHEMA.pick({
   name: true,
@@ -51,36 +52,20 @@ export default function AddSchoolModal({ open, onOpenChange }: AddSchoolModalPro
   });
 
   const createSchoolMutation = useMutation({
-    mutationFn: async (data: any) => {
-      return await apiRequest("POST", "/api/schools", data);
-    },
+    mutationFn: async (data: any) => createSchool(data),
     onSuccess: async () => {
-      // Clear server-side cache first
-      try {
-        await fetch('/api/cache/clear', { method: 'POST' });
-      } catch (e) {
-        console.log('Cache clear failed:', e);
-      }
-      
-      // Force immediate cache refresh on frontend
-      queryClient.invalidateQueries({ queryKey: ["/api/schools"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/schools"] });
-      
-      toast({
-        title: "Success",
-        description: "School created successfully",
-      });
+      // Invalidate Supabase-backed queries for schools
+      queryClient.invalidateQueries({ queryKey: ["supabase/grid_school"] });
+      queryClient.invalidateQueries({ queryKey: ["supabase/details_schools"] });
+      await queryClient.refetchQueries({ queryKey: ["supabase/grid_school"] });
+      toast({ title: "Success", description: "School created successfully" });
       form.reset();
       onOpenChange(false);
     },
     onError: (error: any) => {
       console.error("School creation error:", error);
       const errorMessage = error?.message || error?.response?.data?.message || "Failed to create school";
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: errorMessage, variant: "destructive" });
     },
   });
 

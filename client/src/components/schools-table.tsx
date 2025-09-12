@@ -8,7 +8,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { type School } from "@shared/schema.generated";
 import { getStatusColor } from "@/lib/utils";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
+import { deleteSchool } from "@/integrations/supabase/wftls";
 import { useToast } from "@/hooks/use-toast";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
 import { useEducatorLookup } from "@/hooks/use-lookup";
@@ -27,10 +28,10 @@ export default function SchoolsTable({ schools, isLoading }: SchoolsTableProps) 
 
   const deleteSchoolMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest("DELETE", `/api/schools/${id}`);
+      return await deleteSchool(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/schools"] });
+      queryClient.invalidateQueries({ queryKey: ["supabase/grid_school"] });
       toast({
         title: "Success",
         description: "School deleted successfully",
