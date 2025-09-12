@@ -3,6 +3,7 @@ import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import type { MontessoriCertification } from "@shared/schema.generated";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MontessoriCertificationsTableProps {
   educatorId: string;
@@ -23,14 +24,17 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
     // TODO: Implement delete functionality
     console.log("Deleting certification:", certification);
   };
-  const { data: certifications = [], isLoading } = useQuery<MontessoriCertification[]>({
-    queryKey: ["/api/montessori-certifications/educator", educatorId],
+  const { data: certifications = [], isLoading } = useQuery<any[]>({
+    queryKey: ["supabase/montessori_certifications/people", educatorId],
+    enabled: !!educatorId,
     queryFn: async () => {
-      const response = await fetch(`/api/montessori-certifications/educator/${educatorId}`, { 
-        credentials: "include" 
-      });
-      if (!response.ok) throw new Error("Failed to fetch Montessori certifications");
-      return response.json();
+      const { data, error } = await supabase
+        .from('montessori_certifications')
+        .select('*')
+        .eq('people_id', educatorId)
+        .order('year_received', { ascending: false });
+      if (error) throw error;
+      return data || [];
     },
   });
 
@@ -40,6 +44,7 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
       field: "yearReceived",
       width: 150,
       ...createTextFilter(),
+      valueGetter: (p:any) => p?.data?.yearReceived ?? p?.data?.year_received ?? '',
       valueFormatter: (p) => String(p.value || ''),
     },
     {
@@ -47,6 +52,7 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
       field: "certificationLevel",
       width: 150,
       ...createTextFilter(),
+      valueGetter: (p:any) => p?.data?.certificationLevel ?? p?.data?.certification_level ?? '',
       valueFormatter: (p) => String(p.value || ''),
     },
     {
@@ -54,6 +60,7 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
       field: "certifier",
       width: 150,
       ...createTextFilter(),
+      valueGetter: (p:any) => p?.data?.certifier ?? p?.data?.certifier_abbreviation ?? p?.data?.certifier_name ?? '',
       valueFormatter: (p) => String(p.value || ''),
     },
     {

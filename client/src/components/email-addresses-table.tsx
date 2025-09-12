@@ -17,12 +17,18 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     queryKey: ["supabase/email_addresses/people", educatorId],
     enabled: !!educatorId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Try to order by common timestamp columns; fall back if missing
+      let q = supabase
         .from('email_addresses')
         .select('*')
-        .eq('people_id', educatorId)
-        .order('updated_at', { ascending: false });
-      if (error) throw error;
+        .eq('people_id', educatorId);
+      let { data, error } = await q.order('updated_at', { ascending: false });
+      if (error) {
+        // Retry by created_at
+        const retry = await q.order('created_at', { ascending: false });
+        if (retry.error) throw retry.error;
+        data = retry.data;
+      }
       return data || [];
     },
   });

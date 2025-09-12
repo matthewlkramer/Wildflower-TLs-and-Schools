@@ -1,29 +1,32 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import type { EventAttendance } from "@shared/schema.generated";
 import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { Eye, Edit3, Check, X, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EventAttendanceTableProps {
   educatorId: string;
 }
 
 export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) {
-  const { data, isLoading } = useQuery<EventAttendance[]>({
-    queryKey: ["/api/event-attendance/educator", educatorId],
+  const { data, isLoading } = useQuery<any[]>({
+    queryKey: ["supabase/event_attendance/people", educatorId],
+    enabled: !!educatorId,
     queryFn: async () => {
-      const response = await fetch(`/api/event-attendance/educator/${educatorId}`, { 
-        credentials: "include" 
-      });
-      if (!response.ok) throw new Error("Failed to fetch event attendance");
-      return response.json();
+      const { data, error } = await supabase
+        .from('event_attendance')
+        .select('*')
+        .eq('people_id', educatorId)
+        .order('event_date', { ascending: false });
+      if (error) throw error;
+      return data || [];
     },
   });
 
@@ -41,7 +44,12 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
 
   const updateAttendance = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<EventAttendance> }) => {
-      await apiRequest('PUT', `/api/event-attendance/${id}`, data);
+      const patch: any = {
+        attended: (data as any).attended,
+        registered: (data as any).registered,
+        registration_date: (data as any).registrationDate,
+      };
+      await supabase.from('event_attendance').update(patch).eq('id', id);
     },
     onSuccess: () => {
       // No invalidation; keep local edits
@@ -50,7 +58,7 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
 
   const deleteAttendance = useMutation({
     mutationFn: async (id: string) => {
-      await apiRequest('DELETE', `/api/event-attendance/${id}`);
+      await supabase.from('event_attendance').delete().eq('id', id);
     },
     onSuccess: (_data, id) => {
       setRows(prev => prev.filter(r => r.id !== id));
@@ -60,16 +68,17 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
   const createAttendance = useMutation({
     mutationFn: async () => {
       if (!selectedEvent) throw new Error('Select an event');
-      const body = {
-        educatorId,
-        eventName: selectedEvent.name,
-        eventDate: selectedEvent.date,
+      const body: any = {
+        people_id: educatorId,
+        event_name: selectedEvent.name,
+        event_date: selectedEvent.date,
         registered: newRegistered,
         attended: newAttended,
-        registrationDate: newRegistrationDate || undefined,
+        registration_date: newRegistrationDate || null,
       };
-      const res = await apiRequest('POST', '/api/event-attendance', body);
-      return res.json();
+      const { data, error } = await supabase.from('event_attendance').insert(body).select('*').single();
+      if (error) throw error;
+      return data as any;
     },
     onSuccess: (created: EventAttendance) => {
       setRows(prev => [created, ...prev]);
@@ -85,19 +94,8 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
   });
 
   // Simple typeahead for events
-  useEffect(() => {
-    const controller = new AbortController();
-    const run = async () => {
-      const q = searchTerm.trim();
-      if (!q) { setEventResults([]); return; }
-      const res = await fetch(`/api/events?search=${encodeURIComponent(q)}`, { credentials: 'include', signal: controller.signal });
-      if (!res.ok) return;
-      const json = await res.json();
-      setEventResults(json);
-    };
-    run().catch(()=>{});
-    return () => controller.abort();
-  }, [searchTerm]);
+  // Typeahead to be wired to a Supabase events catalog if available; currently kept empty to avoid server calls
+  useEffect(() => { setEventResults([]); }, [searchTerm]);
 
   useEffect(() => {
     if (data) setRows(data);

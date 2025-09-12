@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState, createContext, useEffect, useMemo, useContext, lazy, Suspense } from "react";
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
+import { SchoolStatusPromptListener } from "@/components/SchoolStatusPromptListener";
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import { UserFilterProvider } from "@/contexts/user-filter-context";
 import { initAgGridEnterprise } from "@/lib/ag-grid-enterprise";
@@ -167,6 +168,7 @@ function AppContent() {
             {isAuthenticated && location !== '/login' && !location.startsWith('/reset') && (
               <Header />
             )}
+            {isAuthenticated && <SchoolStatusPromptListener />}
             <Router />
             {isAuthenticated && import.meta.env.VITE_TOUR_ENABLED === 'true' && <TourLauncher />}
             <Toaster />

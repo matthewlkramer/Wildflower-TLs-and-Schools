@@ -18,12 +18,22 @@ export function OnlineFormsTab({ educatorId }: { educatorId: string }) {
     queryKey: ["supabase/ssj_fillout_forms/educator", educatorId],
     enabled: !!educatorId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from('ssj_fillout_forms')
         .select('*')
-        .eq('people_id', educatorId)
-        .order('entry_date', { ascending: false });
-      if (error) throw error;
+        .eq('people_id', educatorId);
+      // Try order by entry_date, then date_submitted, then created_at
+      let { data, error } = await q.order('entry_date', { ascending: false });
+      if (error) {
+        const retry1 = await q.order('date_submitted', { ascending: false });
+        if (retry1.error) {
+          const retry2 = await q.order('created_at', { ascending: false });
+          if (retry2.error) throw retry2.error;
+          data = retry2.data;
+        } else {
+          data = retry1.data;
+        }
+      }
       // normalize keys expected by renderer (camelCase)
       return (data || []).map((r: any) => ({
         id: r.id,
