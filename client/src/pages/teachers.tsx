@@ -349,8 +349,8 @@ export default function Teachers() {
           {viewMode === "split" && (
             <div className="h-[70vh]">
               <ResizablePanelGroup direction="horizontal">
-                <ResizablePanel defaultSize={60} minSize={35}>
-                    <div className="ag-theme-material h-full">
+                <ResizablePanel defaultSize={20} minSize={10} maxSize={30}>
+                    <div className="ag-theme-material h-full max-w-[260px] min-w-[180px]">
                       <GridBase
                         rowData={filteredTeachers || []}
                         columnDefs={[{
@@ -369,14 +369,13 @@ export default function Teachers() {
                       rowSelection: { mode: 'multiRow', checkboxes: true, headerCheckbox: true } as any,
                       sideBar: (DEFAULT_GRID_PROPS as any).sideBar,
                       enableAdvancedFilter: true as any,
-                      onGridReady: (p:any) => { try { p.api.openToolPanel('filters'); } catch {} },
                       onSelectionChanged: (e:any)=> setSelected(e.api.getSelectedRows() as any),
                     }}
                   />
                 </div>
                 </ResizablePanel>
                 <ResizableHandle withHandle />
-                <ResizablePanel defaultSize={40} minSize={25}>
+                <ResizablePanel defaultSize={80} minSize={70}>
                   <div className="h-full overflow-y-auto p-4">
                     {!selectedId ? (
                       <div className="text-sm text-slate-500">Select a row to see details.</div>

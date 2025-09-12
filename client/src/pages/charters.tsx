@@ -376,8 +376,8 @@ export default function Charters() {
         {viewMode === "split" && (
           <div className="h-[70vh]">
             <ResizablePanelGroup direction="horizontal">
-              <ResizablePanel defaultSize={60} minSize={35}>
-                <div className="ag-theme-material h-full">
+              <ResizablePanel defaultSize={20} minSize={10} maxSize={30}>
+                <div className="ag-theme-material h-full max-w-[260px] min-w-[180px]">
                   {(() => {
                     const pretty = (key: string) => key
                       .replace(/_/g, ' ')
@@ -426,7 +426,7 @@ export default function Charters() {
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={40} minSize={25}>
+              <ResizablePanel defaultSize={80} minSize={70}>
                 <div className="h-full overflow-y-auto p-4 text-sm">
                   {!selectedId ? (
                     <div className="text-slate-500">Select a row to see details.</div>
