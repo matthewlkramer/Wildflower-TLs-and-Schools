@@ -157,13 +157,11 @@ function AppContent() {
     try { console.log('[App] location:', location); } catch {}
   }, [location]);
 
-  // Prefetch core datasets only when authenticated
+  // Prefetch core datasets via Express only when explicitly enabled
   useEffect(() => {
     (async () => {
       if (!isAuthenticated) return;
-      try {
-        // In serverless mode we rely on Authorization header injection; no server session required.
-      } catch {}
+      if (import.meta.env.VITE_USE_EXPRESS !== 'true') return;
       const keys = [
         ['/api/educators'],
         ['/api/schools'],

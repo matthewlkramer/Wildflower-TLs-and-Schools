@@ -162,7 +162,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
   );
 };
 
-export default function TeachersGrid({ teachers, isLoading, onFilteredCountChange, onAddTeacher, onSelectionChanged }: TeachersGridProps) {
+export default function TeachersGrid({ teachers, isLoading, fields, onFilteredCountChange, onAddTeacher, onSelectionChanged }: TeachersGridProps) {
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const gridHeight = useGridHeight();
   const { entReady, filterForText } = useAgGridFeatures();
@@ -378,3 +378,4 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
     </div>
   );
 }
+
