@@ -162,7 +162,7 @@ const ActionRenderer = ({ data: teacher }: { data: Educator }) => {
   );
 };
 
-export default function TeachersGrid({ teachers, isLoading, fields, onFilteredCountChange, onAddTeacher, onSelectionChanged }: TeachersGridProps) {
+export default function TeachersGrid({ teachers, isLoading, onFilteredCountChange, onAddTeacher, onSelectionChanged }: TeachersGridProps) {
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const gridHeight = useGridHeight();
   const { entReady, filterForText } = useAgGridFeatures();
@@ -199,26 +199,27 @@ export default function TeachersGrid({ teachers, isLoading, fields, onFilteredCo
 
     return [
     {
-      headerName: "Educator Name",
+      headerName: "Full Name",
       field: "fullName",
       ...createTextFilter(),
       minWidth: 200,
-      cellRenderer: ({ data: teacher }: { data: Educator }) => (
-        <Link href={`/teacher/${teacher.id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
-          {teacher.fullName}
+      valueGetter: ({ data }: { data: any }) => data?.full_name ?? data?.fullName ?? '',
+      cellRenderer: ({ data }: { data: any }) => (
+        <Link href={`/teacher/${data.id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+          {data.full_name ?? data.fullName}
         </Link>
       ),
       sort: 'asc',
     },
     {
-      headerName: "Current role/school",
+      headerName: "Role/School",
       field: "currentRoleSchool",
       // Text filter with contains logic similar to Google Sheets
       ...createTextFilter(),
       minWidth: 300,
-      valueGetter: ({ data }: { data: Educator }) => data?.currentRoleSchool || '',
-      cellRenderer: ({ data }: { data: Educator }) => {
-        const roleText = data?.currentRoleSchool || '';
+      valueGetter: ({ data }: { data: any }) => data?.current_role_at_active_school ?? data?.currentRoleSchool ?? '',
+      cellRenderer: ({ data }: { data: any }) => {
+        const roleText = data?.current_role_at_active_school ?? data?.currentRoleSchool ?? '';
         const names = Array.isArray(data?.activeSchool) ? data.activeSchool : (data?.activeSchool ? [data.activeSchool] : []);
         const ids = Array.isArray(data?.activeSchoolIds) ? data.activeSchoolIds : [];
         return (
@@ -243,48 +244,48 @@ export default function TeachersGrid({ teachers, isLoading, fields, onFilteredCo
       }
     },
     {
-      headerName: "Montessori Certified",
+      headerName: "Mont. Cert?",
       field: "montessoriCertified",
       filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
       filterParams: entReady ? ({ values: ['Yes', 'No', null] } as any) : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 160,
-      valueGetter: ({ data }: { data: Educator }) => (
-        data?.montessoriCertified === true ? 'Yes' : (data?.montessoriCertified === false ? 'No' : '')
+      valueGetter: ({ data }: { data: any }) => (
+        (data?.has_montessori_cert ?? data?.montessoriCertified) ? 'Yes' : 'No'
       ),
-      cellRenderer: ({ data }: { data: Educator }) => (
-        <BadgeRenderer value={data?.montessoriCertified === true ? 'Yes' : (data?.montessoriCertified === false ? 'No' : '')} field="montessoriCertified" />
+      cellRenderer: ({ data }: { data: any }) => (
+        <BadgeRenderer value={(data?.has_montessori_cert ?? data?.montessoriCertified) ? 'Yes' : 'No'} field="has_montessori_cert" />
       )
     },
     {
-      headerName: "Race/Ethnicity",
+      headerName: "Race/ethnicity",
       field: "raceEthnicity",
       filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
       filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 140,
-      valueGetter: ({ data }: { data: Educator }) => (Array.isArray(data?.raceEthnicity) ? data.raceEthnicity.join(', ') : (data?.raceEthnicity || '')),
-      cellRenderer: ({ data }: { data: Educator }) => (
-        <PillRenderer value={data.raceEthnicity || []} />
+      valueGetter: ({ data }: { data: any }) => (Array.isArray(data?.race_ethnicity) ? data.race_ethnicity.join(', ') : (data?.race_ethnicity ?? data?.raceEthnicity ?? '')),
+      cellRenderer: ({ data }: { data: any }) => (
+        <PillRenderer value={data.race_ethnicity || data.raceEthnicity || []} />
       )
     },
     {
-      headerName: "Discovery Status",
+      headerName: "Discovery",
       field: "discoveryStatus",
       filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
       filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 140,
-      cellRenderer: ({ data }: { data: Educator }) => (
-        <BadgeRenderer value={data.discoveryStatus || ''} field="discoveryStatus" />
+      cellRenderer: ({ data }: { data: any }) => (
+        <BadgeRenderer value={data.discovery_status ?? data.discoveryStatus ?? ''} field="discovery_status" />
       )
     },
     {
-      headerName: "Type",
+      headerName: "Indiv. Type",
       field: "individualType",
       filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
       filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
       minWidth: 120,
-      valueGetter: ({ data }: { data: Educator }) => data?.individualType || '',
-      cellRenderer: ({ data }: { data: Educator }) => (
-        <PillRenderer value={data.individualType || ''} />
+      valueGetter: ({ data }: { data: any }) => data?.indiv_type ?? data?.individualType ?? '',
+      cellRenderer: ({ data }: { data: any }) => (
+        <PillRenderer value={data.indiv_type ?? data.individualType ?? ''} />
       )
     },
     {
@@ -299,7 +300,7 @@ export default function TeachersGrid({ teachers, isLoading, fields, onFilteredCo
       pinned: 'right'
     }
     ];
-  }, [fields, entReady, filterForText]);
+  }, [entReady, filterForText]);
 
   const defaultColDef: ColDef = useMemo(() => ({ ...DEFAULT_COL_DEF }), []);
 
@@ -339,26 +340,6 @@ export default function TeachersGrid({ teachers, isLoading, fields, onFilteredCo
             defaultColDef={{ ...DEFAULT_COL_DEF, ...(defaultColDef || {}) }}
             onFirstDataRendered={(ev: any) => {
               try {
-                // Only apply curated column filter presets when not using dynamic fields
-                const usingDynamic = Array.isArray((ev?.columnApi as any)?.getAllGridColumns?.()) && (fields && fields.length);
-                if (!usingDynamic) {
-                  const model: any = {};
-                  model.currentRoleSchool = { filterType: 'text', type: 'notContains', filter: 'Paused' };
-                  if (entReady) {
-                    const all = Array.from(new Set((teachers || []).map(t => t?.discoveryStatus).filter(Boolean)));
-                    model.discoveryStatus = { filterType: 'set', values: all.filter(v => String(v) !== 'Paused') };
-                  } else {
-                    model.discoveryStatus = { filterType: 'text', type: 'notEqual', filter: 'Paused' };
-                  }
-                  if (entReady) {
-                    const allTypes = Array.from(new Set((teachers || []).map(t => t?.individualType).filter(Boolean)));
-                    model.individualType = { filterType: 'set', values: allTypes.filter(v => String(v) !== 'Community Member') };
-                  } else {
-                    model.individualType = { filterType: 'text', type: 'notEqual', filter: 'Community Member' };
-                  }
-                  ev.api.setFilterModel(model);
-                  ev.api.onFilterChanged();
-                }
                 const count = ev.api.getDisplayedRowCount();
                 onFilteredCountChange?.(count);
               } catch {}
@@ -382,4 +363,12 @@ export default function TeachersGrid({ teachers, isLoading, fields, onFilteredCo
     </div>
   );
 }
+
+
+
+
+
+
+
+
 

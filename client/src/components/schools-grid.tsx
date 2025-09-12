@@ -36,9 +36,10 @@ interface SchoolsGridProps {
 // Custom cell renderers
 const SchoolNameCellRenderer = (params: SchoolCellRendererParams) => {
   const school = params.data;
+  const label = school.school_name || school.shortName || school.name;
   return (
     <Link href={`/school/${school.id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
-      {school.shortName || school.name}
+      {label}
     </Link>
   );
 };
@@ -163,12 +164,12 @@ export default function SchoolsGrid({ schools, isLoading, fields, onFilteredCoun
 
     return [
     {
-      field: "name",
+      field: "school_name",
       headerName: "School Name",
       width: 200,
       cellRenderer: SchoolNameCellRenderer,
       ...createTextFilter(),
-      valueGetter: (params: ValueGetterParams<School>) => params.data?.shortName || params.data?.name,
+      valueGetter: (params: ValueGetterParams<any>) => params.data?.school_name ?? params.data?.shortName ?? params.data?.name,
       comparator: (valueA: string, valueB: string) => {
         const a = (valueA || '').toLowerCase();
         const b = (valueB || '').toLowerCase();
@@ -177,7 +178,7 @@ export default function SchoolsGrid({ schools, isLoading, fields, onFilteredCoun
       sort: 'asc',
     },
     {
-      field: "stageStatus",
+      field: "stage_status",
       headerName: "Stage/Status",
       width: 140,
       cellRenderer: StatusBadgeCellRenderer,
@@ -193,8 +194,8 @@ export default function SchoolsGrid({ schools, isLoading, fields, onFilteredCoun
       },
     },
     {
-      field: "membershipStatus",
-      headerName: "Membership Status",
+      field: "membership_status",
+      headerName: "Membership",
       width: 160,
       cellRenderer: MembershipStatusCellRenderer,
       filter: entReady ? 'agMultiColumnFilter' : 'agTextColumnFilter',
@@ -208,7 +209,7 @@ export default function SchoolsGrid({ schools, isLoading, fields, onFilteredCoun
       },
     },
     {
-      field: "currentTLs",
+      field: "current_tls",
       headerName: "Current TLs",
       width: 120,
       cellRenderer: (p: any) => CurrentTLsCellRenderer({ ...(p || {}), educatorByName }),
@@ -222,22 +223,24 @@ export default function SchoolsGrid({ schools, isLoading, fields, onFilteredCoun
       },
     },
     {
-      field: "agesServed",
-      headerName: "Ages Served",
-      width: 140,
-      cellRenderer: MultiValueCellRenderer,
+      field: "projected_open",
+      headerName: "Proj. Open",
+      width: 120,
       filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
-      filterParams: entReady ? ({ values: AGES_SERVED_OPTIONS } as any) : { defaultOption: 'contains', debounceMs: 150 },
-      valueFormatter: (params) => {
-        if (Array.isArray(params.value)) {
-          return params.value.join(', ');
-        }
-        return params.value || '';
-      },
+      filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
+      valueGetter: (p: any) => p?.data?.projected_open ?? p?.data?.projectedOpen ?? '',
     },
     {
-      field: "governanceModel",
-      headerName: "Governance Model",
+      field: "all_ages_served",
+      headerName: "Ages",
+      width: 140,
+      filter: entReady ? 'agSetColumnFilter' : 'agTextColumnFilter',
+      filterParams: entReady ? undefined : { defaultOption: 'contains', debounceMs: 150 },
+      valueGetter: (params) => params.data?.all_ages_served ?? (Array.isArray(params.data?.agesServed) ? params.data?.agesServed?.join(', ') : (params.data?.agesServed || '')),
+    },
+    {
+      field: "governance_model",
+      headerName: "Gov. Model",
       width: 160,
       cellRenderer: (params: any) => {
         const value = params.value;
@@ -312,19 +315,6 @@ export default function SchoolsGrid({ schools, isLoading, fields, onFilteredCoun
             params.api.sizeColumnsToFit();
           },
           onFirstDataRendered: (ev: any) => {
-            try {
-              if (entReady) {
-                // Enterprise: preselect allowed set (ordered) including blanks
-                ev.api.setFilterModel({
-                  stageStatus: { filterType: 'set', values: STAGE_STATUS_DEFAULT } as any,
-                } as any);
-              } else {
-                // Community: fall back to text filter excluding Paused
-                ev.api.setFilterModel({
-                  stageStatus: { filterType: 'text', type: 'notEqual', filter: 'Paused' },
-                } as any);
-              }
-            } catch {}
             try {
               const count = ev.api.getDisplayedRowCount();
               onFilteredCountChange?.(count);
