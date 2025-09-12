@@ -19,7 +19,8 @@ export const DEFAULT_GRID_PROPS = {
   getRowId: (params: any) => params?.data?.id ?? params?.data?.ID ?? params?.data?.Id,
   // SideBar is present but collapsed (shows narrow bar on right)
   sideBar: {
-    hiddenByDefault: true,
+    // Show the narrow side bar (collapsed) by default
+    hiddenByDefault: false,
     position: 'right',
     toolPanels: [
       { id: 'columns', labelDefault: 'Columns', iconKey: 'columns', toolPanel: 'agColumnsToolPanel' },
