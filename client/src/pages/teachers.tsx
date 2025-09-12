@@ -285,7 +285,7 @@ export default function Teachers() {
                   });
                 }}
                 onToggleColumn={(key, checked) => {
-                  const itemsInCol = (filteredTeachers||[]).filter((t:any) => ((t.kanban && String(t.kanban)) || KANBAN_UNSPECIFIED_KEY) === key);
+                  const itemsInCol = (filteredTeachers||[]).filter((t:any) => (((t.kanban_group && String(t.kanban_group)) || KANBAN_UNSPECIFIED_KEY) === key));
                   setSelected(prev => {
                     const prevMap = new Map(prev.map(p=>[p.id,p]));
                     if (checked) {
@@ -298,9 +298,9 @@ export default function Teachers() {
                 }}
                 renderCard={(t:any) => (
                   <div>
-                    <div className="font-medium text-sm"><Link className="text-blue-600 hover:underline" href={`/teacher/${t.id}`}>{t.fullName || `${t.firstName||''} ${t.lastName||''}`.trim()}</Link></div>
+                    <div className="font-medium text-sm"><Link className="text-blue-600 hover:underline" href={`/teacher/${t.id}`}>{t.full_name || t.fullName || ''}</Link></div>
                     <div className="text-xs text-slate-600">
-                      <span>{t.currentRoleSchool || t.targetGeoCombined || ''}</span>
+                      <span>{t.current_role_at_active_school || t.currentRoleSchool || ''}</span>
                       {Array.isArray(t.activeSchool) && t.activeSchool.length > 0 && (
                         <>
                           <span className="mx-1 text-slate-400">•</span>

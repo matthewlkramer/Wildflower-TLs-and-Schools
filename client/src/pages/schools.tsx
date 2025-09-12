@@ -284,11 +284,11 @@ export default function Schools() {
                   return Array.from(prevMap.values());
                 });
               }}
-              renderCard={(s: School) => (
+              renderCard={(s: any) => (
                 <div>
-                  <div className="font-medium text-sm"><Link className="text-blue-600 hover:underline" href={`/school/${s.id}`}>{s.name || s.shortName}</Link></div>
+                  <div className="font-medium text-sm"><Link className="text-blue-600 hover:underline" href={`/school/${s.id}`}>{s.school_name || s.shortName || s.name}</Link></div>
                   <div className="text-xs text-slate-600 flex flex-wrap gap-1">
-                    <LinkifyEducatorNames names={s.currentTLs as any} educatorByName={educatorByName} />
+                    <LinkifyEducatorNames names={(s.current_tls as any) ?? (s.currentTLs as any)} educatorByName={educatorByName} />
                   </div>
                 </div>
               )}
