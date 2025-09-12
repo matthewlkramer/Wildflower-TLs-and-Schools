@@ -1,8 +1,8 @@
 {
   "version": 2,
   "framework": "vite",
-  "buildCommand": "pnpm --filter client... build",
-  "outputDirectory": "client/dist",
+  "buildCommand": "pnpm --filter client... build && mkdir -p dist && cp -r client/dist/* dist",
+  "outputDirectory": "dist",
   "rewrites": [
     { "source": "/assets/(.*)", "destination": "/assets/$1" },
     { "source": "/favicon.ico", "destination": "/favicon.ico" },
