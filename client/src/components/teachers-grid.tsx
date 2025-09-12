@@ -247,15 +247,14 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
       cellRenderer: ActionRenderer,
       headerClass: 'ag-right-aligned-header',
       headerNameTooltip: undefined as any,
-      suppressHeaderTextSelection: true as any,
+      // remove deprecated property to avoid AG Grid warnings
       sortable: false,
       filter: false,
       suppressHeaderMenuButton: true as any,
       suppressHeaderContextMenu: true as any,
       width: 160,
       minWidth: 140,
-      cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' } as any,
-      pinned: 'right'
+      cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' } as any
     }
   ];
   }, [entReady, filterForText]);
@@ -266,7 +265,7 @@ export default function TeachersGrid({ teachers, isLoading, onFilteredCountChang
     setGridApi(params.api);
     // Auto-size columns to fit content
     params.api.sizeColumnsToFit();
-    try { (params.api as any).openToolPanel?.('filters'); } catch {}
+    // keep side panel collapsed by default
   }, []);
   // Enterprise readiness handled by useAgGridFeatures
 
