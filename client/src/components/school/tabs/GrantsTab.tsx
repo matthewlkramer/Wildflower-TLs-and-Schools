@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { X, Edit, Trash2, ExternalLink } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 function GrantRow({ grant, isEditing, onEdit, onSave, onCancel, onDelete, onView, isSaving }: {
   grant: Grant;
@@ -95,12 +96,17 @@ function LoanRow({ loan, isEditing, onEdit, onSave, onCancel, onDelete, onView, 
 export function GrantsTab({ schoolId }: { schoolId: string }) {
   const qc = useQueryClient();
   // Grants
-  const { data: grants = [], isLoading: grantsLoading } = useQuery<Grant[]>({
-    queryKey: [`/api/grants/school/${schoolId}`],
-    queryFn: async ({ queryKey }) => {
-      const res = await fetch(queryKey[0] as string, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch grants');
-      return res.json();
+  const { data: grants = [], isLoading: grantsLoading } = useQuery<any[]>({
+    queryKey: ["supabase/grants/school", schoolId],
+    enabled: !!schoolId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('grants')
+        .select('*')
+        .eq('school_id', schoolId)
+        .order('issued_date', { ascending: false });
+      if (error) throw error;
+      return data || [];
     },
   });
   const sortedGrants = (grants || []).slice();
@@ -109,36 +115,46 @@ export function GrantsTab({ schoolId }: { schoolId: string }) {
   const [newGrant, setNewGrant] = useState<any>({ amount: 0, issuedDate: '', issuedBy: '', status: '' });
   const createGrant = useMutation({
     mutationFn: async () => {
-      const res = await fetch('/api/grants', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ schoolId, ...newGrant }) });
-      if (!res.ok) throw new Error('Create failed');
-      return res.json();
+      const { error } = await supabase
+        .from('grants')
+        .insert({ school_id: schoolId, amount: newGrant.amount, issued_date: newGrant.issuedDate, issued_by: newGrant.issuedBy, status: newGrant.status });
+      if (error) throw error;
+      return true;
     },
-    onSuccess: () => { setIsCreatingGrant(false); setNewGrant({ amount: 0, issuedDate: '', issuedBy: '', status: '' }); qc.invalidateQueries({ queryKey: [`/api/grants/school/${schoolId}`] }); },
+    onSuccess: () => { setIsCreatingGrant(false); setNewGrant({ amount: 0, issuedDate: '', issuedBy: '', status: '' }); qc.invalidateQueries({ queryKey: ["supabase/grants/school", schoolId] }); },
   });
   const updateGrant = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
-      const res = await fetch(`/api/grants/${id}`, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      if (!res.ok) throw new Error('Update failed');
-      return res.json();
+      const { error } = await supabase
+        .from('grants')
+        .update({ amount: data.amount, issued_date: data.issuedDate, issued_by: data.issuedBy, status: data.status })
+        .eq('id', id);
+      if (error) throw error;
+      return true;
     },
-    onSuccess: () => { setEditingGrantId(null); qc.invalidateQueries({ queryKey: [`/api/grants/school/${schoolId}`] }); },
+    onSuccess: () => { setEditingGrantId(null); qc.invalidateQueries({ queryKey: ["supabase/grants/school", schoolId] }); },
   });
   const deleteGrant = useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/grants/${id}`, { method: 'DELETE', credentials: 'include' });
-      if (!res.ok) throw new Error('Delete failed');
+      const { error } = await supabase.from('grants').delete().eq('id', id);
+      if (error) throw error;
       return true;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/grants/school/${schoolId}`] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["supabase/grants/school", schoolId] }),
   });
 
   // Loans
-  const { data: loans = [], isLoading: loansLoading } = useQuery<Loan[]>({
-    queryKey: [`/api/loans/school/${schoolId}`],
-    queryFn: async ({ queryKey }) => {
-      const res = await fetch(queryKey[0] as string, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch loans');
-      return res.json();
+  const { data: loans = [], isLoading: loansLoading } = useQuery<any[]>({
+    queryKey: ["supabase/loans/school", schoolId],
+    enabled: !!schoolId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('loans')
+        .select('*')
+        .eq('school_id', schoolId)
+        .order('effective_issue_date', { ascending: false });
+      if (error) throw error;
+      return data || [];
     },
   });
   const [isCreatingLoan, setIsCreatingLoan] = useState(false);
@@ -146,27 +162,32 @@ export function GrantsTab({ schoolId }: { schoolId: string }) {
   const [newLoan, setNewLoan] = useState<any>({ amount: 0, status: '', interestRate: 0 });
   const createLoan = useMutation({
     mutationFn: async () => {
-      const res = await fetch('/api/loans', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ schoolId, ...newLoan }) });
-      if (!res.ok) throw new Error('Create failed');
-      return res.json();
+      const { error } = await supabase
+        .from('loans')
+        .insert({ school_id: schoolId, amount: newLoan.amount, status: newLoan.status, interest_rate: newLoan.interestRate });
+      if (error) throw error;
+      return true;
     },
-    onSuccess: () => { setIsCreatingLoan(false); setNewLoan({ amount: 0, status: '', interestRate: 0 }); qc.invalidateQueries({ queryKey: [`/api/loans/school/${schoolId}`] }); },
+    onSuccess: () => { setIsCreatingLoan(false); setNewLoan({ amount: 0, status: '', interestRate: 0 }); qc.invalidateQueries({ queryKey: ["supabase/loans/school", schoolId] }); },
   });
   const updateLoan = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
-      const res = await fetch(`/api/loans/${id}`, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      if (!res.ok) throw new Error('Update failed');
-      return res.json();
+      const { error } = await supabase
+        .from('loans')
+        .update({ amount: data.amount, status: data.status, interest_rate: data.interestRate })
+        .eq('id', id);
+      if (error) throw error;
+      return true;
     },
-    onSuccess: () => { setEditingLoanId(null); qc.invalidateQueries({ queryKey: [`/api/loans/school/${schoolId}`] }); },
+    onSuccess: () => { setEditingLoanId(null); qc.invalidateQueries({ queryKey: ["supabase/loans/school", schoolId] }); },
   });
   const deleteLoan = useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/loans/${id}`, { method: 'DELETE', credentials: 'include' });
-      if (!res.ok) throw new Error('Delete failed');
+      const { error } = await supabase.from('loans').delete().eq('id', id);
+      if (error) throw error;
       return true;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/loans/school/${schoolId}`] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["supabase/loans/school", schoolId] }),
   });
   const [viewGrant, setViewGrant] = useState<Grant | null>(null);
   const [viewLoan, setViewLoan] = useState<Loan | null>(null);

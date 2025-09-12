@@ -77,14 +77,17 @@ function PublicFundingCard({ schoolId, linkedIds }: { schoolId: string; linkedId
     let cancelled = false;
     const load = async () => {
       try {
-        // Try to fetch by school link first
-        const res = await fetch(`/api/subtable/Public%20funding?school_id=${encodeURIComponent(schoolId)}`, { credentials: 'include' });
-        if (res.ok) {
-          const items = await res.json();
-          const list = Array.isArray(items) ? items.map((r: any) => r?.name || r?.Name || r?.title || '').filter(Boolean) : [];
-          if (!cancelled) setNames(list);
-          return;
-        }
+        // Supabase: public funding by school_id
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data, error } = await supabase
+          .from('public_funding')
+          .select('*')
+          .eq('school_id', schoolId)
+          .order('name', { ascending: true });
+        if (error) throw error;
+        const list = Array.isArray(data) ? data.map((r: any) => r?.name || r?.title || '').filter(Boolean) : [];
+        if (!cancelled) setNames(list);
+        return;
       } catch {}
       // Fallback: just show IDs if we can't resolve
       if (!cancelled) setNames(linkedIds);

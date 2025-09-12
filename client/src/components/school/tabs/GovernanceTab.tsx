@@ -276,7 +276,8 @@ export function GovernanceTab({ schoolId }: { schoolId: string }) {
                   </TableRow>
                 )}
                 {governanceDocuments?.length ? (
-                  governanceDocuments
+                  (governanceDocuments as any[])
+                    .map((d:any)=>({ ...d, docType: d.docType ?? d.doc_type, dateEntered: d.dateEntered ?? d.date_entered, docUrl: d.docUrl ?? d.doc_url }))
                     .sort((a, b) => (a.docType || '').localeCompare(b.docType || ''))
                     .map((document) => (
                       <GovernanceDocumentRow
@@ -327,7 +328,8 @@ export function GovernanceTab({ schoolId }: { schoolId: string }) {
               {tax990sLoading ? (
                 <TableRow className="h-8"><TableCell colSpan={2} className="text-center py-2">Loading 990s...</TableCell></TableRow>
               ) : tax990s?.length ? (
-                tax990s
+                (tax990s as any[])
+                  .map((t:any)=>({ ...t, attachmentUrl: t.attachmentUrl ?? t.attachment_url ?? t.doc_url }))
                   .sort((a, b) => (parseInt(b.year || '0') - parseInt(a.year || '0')))
                   .map((tax990) => (
                     <Tax990Row

@@ -49,7 +49,8 @@ export function NineNinetiesTable({ charterId }: NineNinetiesTableProps) {
       cellRenderer: (params: any) => {
         const tax990 = params.data;
         const year = params.value || "Unknown Year";
-        if (tax990.docUrl) {
+        const docUrl = tax990.docUrl ?? tax990.doc_url ?? tax990.attachment_url;
+        if (docUrl) {
           return (
             <button
               onClick={() => handleOpen(tax990)}
