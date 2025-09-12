@@ -21,12 +21,11 @@ import { createTextFilter } from "@/utils/ag-grid-utils";
 // Inline action icons (no dropdown)
 
 interface TeachersGridProps {
-  teachers: Educator[];
+  teachers: any[];
   isLoading: boolean;
-  fields?: string[]; // when provided, render dynamic columns for all fields except id
   onFilteredCountChange?: (count: number) => void;
   onAddTeacher?: () => void;
-  onSelectionChanged?: (rows: Educator[]) => void;
+  onSelectionChanged?: (rows: any[]) => void;
 }
 
 // Note: SchoolLink helper removed to avoid legacy /api fetches

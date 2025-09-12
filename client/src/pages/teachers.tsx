@@ -181,7 +181,6 @@ export default function Teachers() {
           {viewMode === "table" && (
             <TeachersGrid 
               teachers={filteredTeachers || []} 
-              fields={fields}
               isLoading={isLoading}
               onFilteredCountChange={(count)=>setGridFilteredCount(count)}
               onSelectionChanged={(rows)=>setSelected(rows as Teacher[])}
