@@ -6,7 +6,7 @@ import { GridBase } from "@/components/shared/GridBase";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import type { EmailAddress } from "@shared/schema.generated";
 import { Button } from "@/components/ui/button";
-import { Edit3, Trash2, UserCheck, UserX } from "lucide-react";
+import { Edit3, Trash2, UserCheck } from "lucide-react";
 
 interface EmailAddressesTableProps {
   educatorId: string;
@@ -17,19 +17,20 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     queryKey: ["supabase/email_addresses/people", educatorId],
     enabled: !!educatorId,
     queryFn: async () => {
-      // Try to order by common timestamp columns; fall back if missing
-      let q = supabase
-        .from('email_addresses')
-        .select('*')
-        .eq('people_id', educatorId);
-      let { data, error } = await q.order('updated_at', { ascending: false });
-      if (error) {
-        // Retry by created_at
-        const retry = await q.order('created_at', { ascending: false });
-        if (retry.error) throw retry.error;
-        data = retry.data;
+      // Attempt fresh builders for each ordering to avoid multiple order params
+      const base = () => supabase.from('email_addresses').select('*').eq('people_id', educatorId);
+      try {
+        const { data } = await base().order('updated_at', { ascending: false });
+        return data || [];
+      } catch (e) {
+        try {
+          const { data } = await base().order('created_at', { ascending: false });
+          return data || [];
+        } catch (e2) {
+          const { data } = await base().order('id', { ascending: false });
+          return data || [];
+        }
       }
-      return data || [];
     },
   });
 
@@ -37,12 +38,12 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     queryClient.invalidateQueries({ queryKey: ["supabase/email_addresses/people", educatorId] });
   };
 
-  const handleEdit = async (emailAddress: EmailAddress) => {
-    const nextEmail = window.prompt("Update email", emailAddress.email || "");
+  const handleEdit = async (emailAddress: any) => {
+    const nextEmail = window.prompt("Update email", (emailAddress as any).email_address || "");
     if (nextEmail === null) return;
-    const nextType = window.prompt("Update type", emailAddress.type || "");
+    const nextType = window.prompt("Update type", (emailAddress as any).category || "");
     try {
-      const { error } = await supabase.from('email_addresses').update({ email: nextEmail, type: nextType || undefined }).eq('id', emailAddress.id);
+      const { error } = await supabase.from('email_addresses').update({ email_address: nextEmail, category: nextType || null }).eq('id', emailAddress.id);
       if (error) throw error;
       refresh();
     } catch (err) {
@@ -82,7 +83,7 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     }
   };
 
-  const ActionsCellRenderer = (params: ICellRendererParams<EmailAddress>) => {
+  const ActionsCellRenderer = (params: ICellRendererParams<any>) => {
     const emailAddress = params.data;
     if (!emailAddress) return null;
 
@@ -97,7 +98,7 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
         >
           <Edit3 className="h-3 w-3 text-blue-600" />
         </Button>
-        {!emailAddress.isPrimary && (
+        {!emailAddress["primary"] && (
           <Button
             variant="ghost"
             size="sm"
@@ -108,15 +109,6 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
             <UserCheck className="h-3 w-3 text-green-600" />
           </Button>
         )}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 w-6 p-0 hover:bg-yellow-50"
-          onClick={() => handleInactivate(emailAddress)}
-          title="Inactivate email address"
-        >
-          <UserX className="h-3 w-3 text-yellow-600" />
-        </Button>
         <Button
           variant="ghost"
           size="sm"
@@ -133,28 +125,22 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
   const columnDefs: ColDef<any>[] = [
     {
       headerName: "Email",
-      field: "email",
+      field: "email_address",
       flex: 2,
       ...createTextFilter(),
     },
     {
       headerName: "Type",
-      field: "type",
+      field: "category",
       flex: 1,
       ...createTextFilter(),
     },
     {
       headerName: "Primary",
-      field: "isPrimary",
+      field: "primary",
       flex: 1,
-      valueGetter: (p: any) => (p?.data?.is_primary ?? p?.data?.isPrimary) ? true : false,
+      valueGetter: (p: any) => Boolean(p?.data?.["primary"]),
       cellRenderer: (params: any) => params.value ? "Yes" : "No",
-      ...createTextFilter(),
-    },
-    {
-      headerName: "Status",
-      field: "status",
-      flex: 1,
       ...createTextFilter(),
     },
     {

@@ -20,13 +20,14 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
     queryKey: ["supabase/event_attendance/people", educatorId],
     enabled: !!educatorId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('event_attendance')
-        .select('*')
-        .eq('people_id', educatorId)
-        .order('event_date', { ascending: false });
-      if (error) throw error;
-      return data || [];
+      const base = () => supabase.from('event_attendance').select('*').eq('people_id', educatorId);
+      try {
+        const { data } = await base().order('registration_date', { ascending: false });
+        return data || [];
+      } catch {
+        const { data } = await base();
+        return data || [];
+      }
     },
   });
 
@@ -45,9 +46,8 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
   const updateAttendance = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<EventAttendance> }) => {
       const patch: any = {
-        attended: (data as any).attended,
-        registered: (data as any).registered,
-        registration_date: (data as any).registrationDate,
+        attended_event: (data as any).attended_event,
+        registration_date: (data as any).registration_date,
       };
       await supabase.from('event_attendance').update(patch).eq('id', id);
     },
@@ -70,10 +70,8 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
       if (!selectedEvent) throw new Error('Select an event');
       const body: any = {
         people_id: educatorId,
-        event_name: selectedEvent.name,
-        event_date: selectedEvent.date,
-        registered: newRegistered,
-        attended: newAttended,
+        event_id: selectedEvent.id,
+        attended_event: newAttended,
         registration_date: newRegistrationDate || null,
       };
       const { data, error } = await supabase.from('event_attendance').insert(body).select('*').single();
@@ -101,35 +99,25 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
     if (data) setRows(data);
   }, [data]);
 
-  const onToggle = (id: string, key: keyof Pick<EventAttendance, 'attended' | 'registered'>) => {
-    setRows(prev => prev.map(r => r.id === id ? ({ ...r, [key]: !r[key] }) : r));
+  const onToggle = (id: string) => {
+    setRows(prev => prev.map(r => r.id === id ? ({ ...r, attended_event: !r.attended_event }) : r));
   };
 
   const onChangeDate = (id: string, value: string) => {
-    setRows(prev => prev.map(r => r.id === id ? ({ ...r, registrationDate: value }) : r));
+    setRows(prev => prev.map(r => r.id === id ? ({ ...r, registration_date: value }) : r));
   };
 
   const columnDefs: ColDef<EventAttendance>[] = [
-    {
-      headerName: "Name",
-      field: "eventName",
-      flex: 3,
-      ...createTextFilter(),
-    },
-    {
-      headerName: "Date",
-      field: "eventDate",
-      flex: 2,
-      ...createTextFilter(),
-    },
+    { headerName: "Event ID", field: "event_id", flex: 2, ...createTextFilter() },
+    { headerName: "Registration Date", field: "registration_date", flex: 2, ...createTextFilter() },
     {
       headerName: "Attended",
-      field: "attended",
+      field: "attended_event",
       flex: 1,
       filter: false,
       sortable: false,
       cellRenderer: (params: any) => {
-        const attended = !!params.data?.attended;
+        const attended = !!params.data?.attended_event;
         const isEditing = editingId === params.data?.id;
         return (
           <div className="flex justify-center">
@@ -137,29 +125,7 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
               type="checkbox" 
               checked={attended} 
               readOnly={!isEditing}
-              onChange={() => isEditing && onToggle(params.data.id, 'attended')}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            />
-          </div>
-        );
-      },
-    },
-    {
-      headerName: "Registered",
-      field: "registered",
-      flex: 1,
-      filter: false,
-      sortable: false,
-      cellRenderer: (params: any) => {
-        const registered = !!params.data?.registered;
-        const isEditing = editingId === params.data?.id;
-        return (
-          <div className="flex justify-center">
-            <input
-              type="checkbox"
-              checked={registered}
-              readOnly={!isEditing}
-              onChange={() => isEditing && onToggle(params.data.id, 'registered')}
+              onChange={() => isEditing && onToggle(params.data.id)}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
             />
           </div>
@@ -168,12 +134,12 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
     },
     {
       headerName: "Registration Date",
-      field: "registrationDate",
+      field: "registration_date",
       flex: 2,
       filter: "agTextColumnFilter",
       cellRenderer: (params: any) => {
         const isEditing = editingId === params.data?.id;
-        const value = params.data?.registrationDate || '';
+        const value = params.data?.registration_date || '';
         return isEditing ? (
           <input
             type="date"

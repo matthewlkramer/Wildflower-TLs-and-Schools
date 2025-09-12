@@ -31,22 +31,22 @@ export function CultivationTab({ teacher, onSave }: { teacher: Teacher; onSave?:
     queryKey: ["supabase/ssj_fillout_forms/educator", educatorId],
     enabled: !!educatorId,
     queryFn: async () => {
-      let q = supabase
+      const base = () => supabase
         .from('ssj_fillout_forms')
         .select('id, entry_date, date_submitted, created_at')
         .eq('people_id', educatorId);
-      let { data, error } = await q.order('entry_date', { ascending: false });
-      if (error) {
-        const r1 = await q.order('date_submitted', { ascending: false });
-        if (r1.error) {
-          const r2 = await q.order('created_at', { ascending: false });
-          if (r2.error) throw r2.error;
-          data = r2.data;
-        } else {
-          data = r1.data;
+      try {
+        const { data } = await base().order('entry_date', { ascending: false });
+        return data || [];
+      } catch {
+        try {
+          const { data } = await base().order('date_submitted', { ascending: false });
+          return data || [];
+        } catch {
+          const { data } = await base().order('created_at', { ascending: false });
+          return data || [];
         }
       }
-      return data || [];
     },
   });
   return (

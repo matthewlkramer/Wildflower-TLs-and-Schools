@@ -57,7 +57,7 @@ export function GuidesTab({ schoolId }: { schoolId: string }) {
           type: data.type,
           start_date: data.startDate,
           end_date: data.endDate,
-          is_active: data.isActive,
+          active: data.isActive,
         })
         .eq('id', id);
       if (error) throw error;
@@ -80,7 +80,7 @@ export function GuidesTab({ schoolId }: { schoolId: string }) {
     type: g.type || '',
     startDate: g.start_date ?? g.startDate ?? '',
     endDate: g.end_date ?? g.endDate ?? '',
-    isActive: !!(g.is_active ?? g.isActive),
+    isActive: !!(g.active ?? g.isActive),
   }));
 
   const [editingRowId, setEditingRowId] = React.useState<string | null>(null);
@@ -248,7 +248,7 @@ function CreateGuideAssignmentModal({ open, onOpenChange, schoolId, onCreated }:
     mutationFn: async () => {
       const { error } = await supabase
         .from('guide_assignments')
-        .insert({ school_id: schoolId, guide_id: guideId, guide_short_name: guideShortName, type, start_date: startDate, is_active: true });
+        .insert({ school_id: schoolId, guide_id: guideId, guide_short_name: guideShortName, type, start_date: startDate, active: true });
       if (error) throw error;
       return true;
     },

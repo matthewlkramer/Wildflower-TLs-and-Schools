@@ -54,9 +54,28 @@ function normalizeEducatorRow(row: any) {
   setIfMissing('raceEthnicityOther', 'socioeconomic_race_ethnicity_other');
   setIfMissing('primaryLanguage', 'primary_language');
   setIfMissing('otherLanguages', 'other_languages');
-  setIfMissing('educationalAttainment', 'educational_attainment');
+  setIfMissing('educationalAttainment', 'educ_attainment', 'educational_attainment');
+  // Financial background
+  setIfMissing('householdIncome', 'hh_income');
+  setIfMissing('incomeBackground', 'childhood_income');
   setIfMissing('excludeFromEmailLogging', 'exclude_from_email_logging');
   setIfMissing('inactiveFlag', 'inactive_flag');
+  // Languages (arrays)
+  setIfMissing('primaryLanguage', 'primary_languages', 'primary_language');
+  setIfMissing('otherLanguages', 'other_languages', 'other_language');
+  // Early cultivation fields mapping to UI expectations
+  setIfMissing('firstContactAges', 'first_contact_ages');
+  setIfMissing('firstContactGovernance', 'first_contact_governance_model');
+  setIfMissing('firstContactInterests', 'first_contact_interests');
+  setIfMissing('firstContactNotesOnPreWildflowerEmployment', 'first_contact_notes_on_pre_wf_employment');
+  setIfMissing('firstContactWFSchoolEmploymentStatus', 'first_contact_wf_employment_status');
+  setIfMissing('firstContactRelocate', 'first_contact_willingness_to_relocate');
+  setIfMissing('opsGuideSpecificsChecklist', 'opsguide_checklist');
+  setIfMissing('opsGuideFundraisingOps', 'opsguide_fundraising_opps');
+  setIfMissing('opsGuideMeetingPrefTime', 'opsguide_meeting_prefs');
+  setIfMissing('opsGuideReqPertinentInfo', 'opsguide_request_pertinent_info');
+  setIfMissing('opsGuideSupportTypeNeeded', 'opsguide_support_type_needed');
+  setIfMissing('targetGeo', 'target_geo_combined');
   // Normalize arrays where expected
   const toArray = (v: any) => Array.isArray(v) ? v : (v ? [String(v)] : []);
   if (out.raceEthnicity !== undefined) out.raceEthnicity = toArray(out.raceEthnicity);

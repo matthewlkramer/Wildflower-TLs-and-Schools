@@ -18,24 +18,22 @@ export function OnlineFormsTab({ educatorId }: { educatorId: string }) {
     queryKey: ["supabase/ssj_fillout_forms/educator", educatorId],
     enabled: !!educatorId,
     queryFn: async () => {
-      let q = supabase
-        .from('ssj_fillout_forms')
-        .select('*')
-        .eq('people_id', educatorId);
-      // Try order by entry_date, then date_submitted, then created_at
-      let { data, error } = await q.order('entry_date', { ascending: false });
-      if (error) {
-        const retry1 = await q.order('date_submitted', { ascending: false });
-        if (retry1.error) {
-          const retry2 = await q.order('created_at', { ascending: false });
-          if (retry2.error) throw retry2.error;
-          data = retry2.data;
-        } else {
-          data = retry1.data;
+      const base = () => supabase.from('ssj_fillout_forms').select('*').eq('people_id', educatorId);
+      let data: any[] | null = null;
+      try {
+        const r = await base().order('entry_date', { ascending: false });
+        data = r.data as any[];
+      } catch {
+        try {
+          const r1 = await base().order('date_submitted', { ascending: false });
+          data = r1.data as any[];
+        } catch {
+          const r2 = await base().order('created_at', { ascending: false });
+          data = r2.data as any[];
         }
       }
       // normalize keys expected by renderer (camelCase)
-      return (data || []).map((r: any) => ({
+      return ((data || []) as any[]).map((r: any) => ({
         id: r.id,
         formVersion: r.form_version ?? r.formVersion,
         dateSubmitted: r.entry_date ?? r.date_submitted ?? r.dateSubmitted,

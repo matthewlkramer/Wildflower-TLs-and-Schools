@@ -7,6 +7,7 @@ import { useState, createContext, useEffect, useMemo, useContext, lazy, Suspense
 import Header from "@/components/header";
 import { TourLauncher } from "@/components/interactive-tour";
 import { SchoolStatusPromptListener } from "@/components/SchoolStatusPromptListener";
+import { LocationPromptListener } from "@/components/LocationPromptListener";
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import { UserFilterProvider } from "@/contexts/user-filter-context";
 import { initAgGridEnterprise } from "@/lib/ag-grid-enterprise";
@@ -169,6 +170,7 @@ function AppContent() {
               <Header />
             )}
             {isAuthenticated && <SchoolStatusPromptListener />}
+            {isAuthenticated && <LocationPromptListener />}
             <Router />
             {isAuthenticated && import.meta.env.VITE_TOUR_ENABLED === 'true' && <TourLauncher />}
             <Toaster />

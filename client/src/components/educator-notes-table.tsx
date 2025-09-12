@@ -14,13 +14,20 @@ export function EducatorNotesTable({ educatorId }: EducatorNotesTableProps) {
     queryKey: ["supabase/notes/people", educatorId],
     enabled: !!educatorId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('notes')
-        .select('*')
-        .eq('people_id', educatorId)
-        .order('date_created', { ascending: false });
-      if (error) throw error;
-      const rows = data || [];
+      const base = () => supabase.from('notes').select('*').eq('people_id', educatorId);
+      let rows: any[] = [];
+      try {
+        const { data } = await base().order('date_created', { ascending: false });
+        rows = data || [];
+      } catch {
+        try {
+          const { data } = await base().order('date', { ascending: false });
+          rows = data || [];
+        } catch {
+          const { data } = await base().order('created_at', { ascending: false });
+          rows = data || [];
+        }
+      }
       // Normalize keys for display
       return rows.map((r: any) => ({
         id: r.id,

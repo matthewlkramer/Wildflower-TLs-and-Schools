@@ -153,29 +153,29 @@ export function GovernanceTab({ schoolId }: { schoolId: string }) {
         .from('governance_docs')
         .select('*')
         .eq('school_id', schoolId)
-        .order('date_entered', { ascending: false });
+        .order('doc_type', { ascending: true });
       if (error) throw error;
       return data || [];
     },
   });
   const [isCreatingDocument, setIsCreatingDocument] = useState(false);
   const [editingDocumentId, setEditingDocumentId] = useState<string | null>(null);
-  const [newDocument, setNewDocument] = useState<any>({ docType: '', dateEntered: '' });
+  const [newDocument, setNewDocument] = useState<any>({ docType: '', pdf: '' });
   const createDoc = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
         .from('governance_docs')
-        .insert({ school_id: schoolId, doc_type: newDocument.docType, date_entered: newDocument.dateEntered });
+        .insert({ school_id: schoolId, doc_type: newDocument.docType, pdf: newDocument.pdf || null });
       if (error) throw error;
       return true;
     },
-    onSuccess: () => { setIsCreatingDocument(false); setNewDocument({ docType: '', dateEntered: '' }); qc.invalidateQueries({ queryKey: ["supabase/governance_docs/school", schoolId] }); },
+    onSuccess: () => { setIsCreatingDocument(false); setNewDocument({ docType: '', pdf: '' }); qc.invalidateQueries({ queryKey: ["supabase/governance_docs/school", schoolId] }); },
   });
   const updateDoc = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
       const { error } = await supabase
         .from('governance_docs')
-        .update({ doc_type: data.docType, date_entered: data.dateEntered })
+        .update({ doc_type: data.docType, pdf: data.pdf ?? null })
         .eq('id', id);
       if (error) throw error;
       return true;
@@ -263,7 +263,7 @@ export function GovernanceTab({ schoolId }: { schoolId: string }) {
                       <Input value={newDocument?.docType || ''} onChange={(e) => setNewDocument({ ...newDocument, docType: e.target.value })} placeholder="Document Type" className="h-7 text-sm" />
                     </TableCell>
                     <TableCell className="py-1">
-                      <Input type="date" value={newDocument?.dateEntered || ''} onChange={(e) => setNewDocument({ ...newDocument, dateEntered: e.target.value })} className="h-7 text-sm" />
+                      <Input value={newDocument?.pdf || ''} onChange={(e) => setNewDocument({ ...newDocument, pdf: e.target.value })} placeholder="PDF URL" className="h-7 text-sm" />
                     </TableCell>
                     <TableCell className="py-1">
                       <div className="flex gap-1">
@@ -277,7 +277,7 @@ export function GovernanceTab({ schoolId }: { schoolId: string }) {
                 )}
                 {governanceDocuments?.length ? (
                   (governanceDocuments as any[])
-                    .map((d:any)=>({ ...d, docType: d.docType ?? d.doc_type, dateEntered: d.dateEntered ?? d.date_entered, docUrl: d.docUrl ?? d.doc_url }))
+                    .map((d:any)=>({ ...d, docType: d.doc_type ?? d.docType, docUrl: d.pdf ?? d.doc_url ?? d.docUrl }))
                     .sort((a, b) => (a.docType || '').localeCompare(b.docType || ''))
                     .map((document) => (
                       <GovernanceDocumentRow
@@ -303,7 +303,7 @@ export function GovernanceTab({ schoolId }: { schoolId: string }) {
       </div>
 
       <div className="space-y-4">
-        <TableCard title="990s" actionsRight={<Button size="sm" onClick={() => setIsCreating990(true)}>Add 990</Button>}>
+      <TableCard title="990s" actionsRight={<Button size="sm" onClick={() => setIsCreating990(true)}>Add 990</Button>}>
           <Table>
             <TableHeader>
               <TableRow className="h-8">
