@@ -61,19 +61,19 @@ export default function Dashboard() {
 
   // Fetch user's action steps
   const { data: actionSteps = [], isLoading: actionStepsLoading } = useQuery<ActionStep[]>({
-    queryKey: ['/api/action-steps/user', selectedUser],
+  //  queryKey: ['/api/action-steps/user', selectedUser],
     enabled: !!selectedUser,
   });
 
   // Fetch user's schools
   const { data: schools = [], isLoading: schoolsLoading } = useQuery<School[]>({
-    queryKey: ['/api/schools/user', selectedUser],
+  //  queryKey: ['/api/schools/user', selectedUser],
     enabled: !!selectedUser,
   });
 
   // Fetch user's TLs/ETLs
   const { data: tls = [], isLoading: tlsLoading } = useQuery<Educator[]>({
-    queryKey: ['/api/tls/user', selectedUser],
+  //  queryKey: ['/api/tls/user', selectedUser],
     enabled: !!selectedUser,
   });
 

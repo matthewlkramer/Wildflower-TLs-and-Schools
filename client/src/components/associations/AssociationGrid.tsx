@@ -151,9 +151,7 @@ export function AssociationGrid({ mode, rows, loading, editable = false, onOpen,
             <YesNoSelectInline value={val} onChange={(next) => setDraft((prev) => ({ ...prev, [row.id]: { ...(prev[row.id] || {}), isActive: next } }))} />
           );
         } },
-        { headerName: 'Stage/Status', field: 'stageStatus', flex: 1, cellRenderer: (p) => (
-          <Badge variant="secondary">{p.value || '-'}</Badge>
-        )},
+        // Removed duplicate Stage/Status column to avoid repetition
       );
     } else {
       base.push(

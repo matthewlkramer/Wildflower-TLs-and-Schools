@@ -39,8 +39,7 @@ export function LocationPromptListener() {
         let q = supabase
           .from('location_prompts')
           .select('*')
-          .eq('status', 'pending')
-          .order('created_at', { ascending: true });
+          .eq('status', 'pending');
         if ('schoolId' in scope) q = q.eq('school_id', (scope as any).schoolId);
         if ('charterId' in scope) q = q.eq('charter_id', (scope as any).charterId);
         const { data, error } = await q;
@@ -124,4 +123,3 @@ export function LocationPromptListener() {
     </Dialog>
   );
 }
-

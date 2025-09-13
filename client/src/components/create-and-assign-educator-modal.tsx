@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Educator } from "@shared/schema.generated";
+import { useEducatorsSupabase } from "@/hooks/use-educators-supabase";
 
 const createAndAssignEducatorSchema = z.object({
   // Educator fields (full name is calculated field, so excluded)
@@ -42,9 +43,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
   const [potentialDuplicate, setPotentialDuplicate] = useState<Educator | null>(null);
 
   // Fetch educators for duplicate checking
-  const { data: educators = [] } = useQuery<Educator[]>({
-    queryKey: ["/api/educators"],
-  });
+  const { data: educators = [] } = useEducatorsSupabase();
 
   const form = useForm({
     resolver: zodResolver(createAndAssignEducatorSchema),
