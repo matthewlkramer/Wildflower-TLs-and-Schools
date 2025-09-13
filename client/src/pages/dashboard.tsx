@@ -56,29 +56,27 @@ export default function Dashboard() {
   const { selectedUser } = useUserFilter();
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
-  
-  // No header AddNew wiring; header shows a fixed Add menu.
 
   // Fetch user's action steps
-  const { data: actionSteps = [], isLoading: actionStepsLoading } = useQuery<ActionStep[]>({
+//  const { data: actionSteps = [], isLoading: actionStepsLoading } = useQuery<ActionStep[]>({
   //  queryKey: ['/api/action-steps/user', selectedUser],
-    enabled: !!selectedUser,
-  });
+//    enabled: !!selectedUser,
+//  });
 
   // Fetch user's schools
-  const { data: schools = [], isLoading: schoolsLoading } = useQuery<School[]>({
+//  const { data: schools = [], isLoading: schoolsLoading } = useQuery<School[]>({
   //  queryKey: ['/api/schools/user', selectedUser],
-    enabled: !!selectedUser,
-  });
+//    enabled: !!selectedUser,
+//  });
 
   // Fetch user's TLs/ETLs
-  const { data: tls = [], isLoading: tlsLoading } = useQuery<Educator[]>({
+//  const { data: tls = [], isLoading: tlsLoading } = useQuery<Educator[]>({
   //  queryKey: ['/api/tls/user', selectedUser],
-    enabled: !!selectedUser,
-  });
+//    enabled: !!selectedUser,
+//  });
 
   // Filter incomplete action steps and sort by priority (overdue first, then by due date)
-  const incompleteTasks = actionSteps
+/*  const incompleteTasks = actionSteps
     .filter(step => step.status !== "Complete")
     .sort((a, b) => {
       // Overdue tasks first
@@ -100,7 +98,7 @@ export default function Dashboard() {
       return 0;
     })
     .slice(0, 5); // Show top 5 tasks
-
+*/
   return (
     <>
       <div className="container mx-auto px-4 py-6">
