@@ -185,6 +185,7 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
             rowSelection: { enableClickSelection: false } as any,
             domLayout: 'autoHeight',
             context: { componentName: 'email-addresses-table' },
+            sideBar: false,
           }}
         />
       </div>

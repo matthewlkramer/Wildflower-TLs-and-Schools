@@ -93,6 +93,7 @@ export function EducatorNotesTable({ educatorId }: EducatorNotesTableProps) {
             rowSelection: { enableClickSelection: false } as any,
             domLayout: 'autoHeight',
             context: { componentName: 'educator-notes-table' },
+            sideBar: false,
           }}
         />
       </div>

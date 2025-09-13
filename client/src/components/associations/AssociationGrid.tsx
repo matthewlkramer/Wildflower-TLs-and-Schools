@@ -95,12 +95,16 @@ export function AssociationGrid({ mode, rows, loading, editable = false, onOpen,
           headerName: 'School', field: 'schoolShortName', flex: 2,
           cellRenderer: (p: ICellRendererParams<AssociationRow>) => {
             const row = p.data!;
-            if (!row.schoolId || !row.schoolShortName) return '-';
+            const label = row.schoolShortName || '-';
+            if (!row.schoolId) return label as any;
             return (
-              <button className="text-blue-600 hover:underline" onClick={() => onOpen?.(row)}>{row.schoolShortName}</button>
+              <button className="text-blue-600 hover:underline" onClick={() => onOpen?.(row)}>{label}</button>
             );
           }
         },
+        { headerName: 'Stage/Status', field: 'stageStatus', width: 160, cellRenderer: (p) => (
+          <Badge variant="secondary">{p.value || '-'}</Badge>
+        )},
         { headerName: 'Roles', field: 'roles', flex: 2, valueFormatter: (p) => {
           const v = (p as any).value;
           const arr = Array.isArray(v) ? v : (v ? String(v).split(',').map((s: string) => s.trim()).filter(Boolean) : []);
@@ -250,6 +254,7 @@ export function AssociationGrid({ mode, rows, loading, editable = false, onOpen,
         // DEFAULT_GRID_PROPS already sets domLayout
         loadingOverlayComponentParams: { loadingMessage: 'Loading...' },
         overlayLoadingTemplate: loading ? '<span class="ag-overlay-loading-center">Loading.</span>' : undefined,
+        sideBar: false,
       }}
     />
   );

@@ -9,8 +9,32 @@
 import { Badge } from "@/components/ui/badge";
 import { getStatusColor } from "@/lib/utils";
 import type { Teacher } from "@shared/schema.generated";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export function SummaryTab({ teacher }: { teacher: Teacher }) {
+  const educatorId = (teacher as any)?.id;
+  const { data: activeAssoc } = useQuery<any | null>({
+    queryKey: ["supabase/details_associations/active/byEducator", educatorId],
+    enabled: !!educatorId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('details_associations')
+        .select('*')
+        .eq('people_id', educatorId)
+        .eq('currently_active', true)
+        .order('start_date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) return null;
+      return data as any;
+    }
+  });
+  const currentRole = (Array.isArray(activeAssoc?.role) ? activeAssoc?.role.join(', ') : (activeAssoc?.role || '')) || (Array.isArray((teacher as any)?.currentRole) ? (teacher as any)?.currentRole.join(', ') : ((teacher as any)?.currentRole || ''));
+  const currentSchool = activeAssoc?.school_name || (Array.isArray((teacher as any)?.activeSchool) ? (teacher as any)?.activeSchool.join(', ') : ((teacher as any)?.activeSchool || ''));
+  const stageStatus = activeAssoc?.stage_status || (Array.isArray((teacher as any)?.activeSchoolStageStatus) ? (teacher as any)?.activeSchoolStageStatus.join(', ') : ((teacher as any)?.activeSchoolStageStatus || ''));
+  const montessoriCertified = (teacher as any)?.montessoriCertified ?? (teacher as any)?.has_montessori_cert ?? false;
+  const currentlyActiveAtSchool = (teacher as any)?.currentlyActiveAtSchool ?? (teacher as any)?.currently_active_at_school ?? !!activeAssoc;
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -18,26 +42,25 @@ export function SummaryTab({ teacher }: { teacher: Teacher }) {
           <h4 className="font-medium text-slate-900 mb-2">Basic Info</h4>
           <div className="space-y-1 text-sm">
             <p><span className="text-slate-600">Name:</span> {teacher.fullName}</p>
-            <p><span className="text-slate-600">Current Role:</span> {teacher.currentRole ? (Array.isArray(teacher.currentRole) ? teacher.currentRole.join(', ') : (teacher.currentRole as any)) : '-'}</p>
+            <p><span className="text-slate-600">Current Role:</span> {currentRole || '-'}</p>
             <div><span className="text-slate-600">Discovery Status:</span> <Badge className={getStatusColor(teacher.discoveryStatus || '')}>{teacher.discoveryStatus || '-'}</Badge></div>
           </div>
         </div>
         <div className="bg-slate-50 rounded-lg p-4">
           <h4 className="font-medium text-slate-900 mb-2">Education & Certs</h4>
           <div className="space-y-1 text-sm">
-            <div><span className="text-slate-600">Montessori Certified:</span> <Badge className={teacher.montessoriCertified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>{teacher.montessoriCertified ? 'Yes' : 'No'}</Badge></div>
+            <div><span className="text-slate-600">Montessori Certified:</span> <Badge className={montessoriCertified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>{montessoriCertified ? 'Yes' : 'No'}</Badge></div>
           </div>
         </div>
         <div className="bg-slate-50 rounded-lg p-4">
           <h4 className="font-medium text-slate-900 mb-2">School Connection</h4>
           <div className="space-y-1 text-sm">
-            <p><span className="text-slate-600">Currently Active:</span> {(teacher as any).currentlyActiveAtSchool ? 'Yes' : 'No'}</p>
-            <p><span className="text-slate-600">Current School:</span> {teacher.activeSchool ? (Array.isArray(teacher.activeSchool) ? teacher.activeSchool.join(', ') : (teacher.activeSchool as any)) : '-'}</p>
-            <div><span className="text-slate-600">Stage/Status:</span> <Badge className={getStatusColor(teacher.activeSchoolStageStatus ? (Array.isArray(teacher.activeSchoolStageStatus) ? teacher.activeSchoolStageStatus[0] : (teacher.activeSchoolStageStatus as any)) : '')}>{teacher.activeSchoolStageStatus ? (Array.isArray(teacher.activeSchoolStageStatus) ? teacher.activeSchoolStageStatus.join(', ') : (teacher.activeSchoolStageStatus as any)) : '-'}</Badge></div>
+            <p><span className="text-slate-600">Currently Active:</span> {currentlyActiveAtSchool ? 'Yes' : 'No'}</p>
+            <p><span className="text-slate-600">Current School:</span> {currentSchool || '-'}</p>
+            <div><span className="text-slate-600">Stage/Status:</span> <Badge className={getStatusColor(stageStatus || '')}>{stageStatus || '-'}</Badge></div>
           </div>
         </div>
       </div>
     </div>
   );
 }
-

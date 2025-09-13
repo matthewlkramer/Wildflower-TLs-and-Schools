@@ -25,14 +25,14 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
     console.log("Deleting certification:", certification);
   };
   const { data: certifications = [], isLoading } = useQuery<any[]>({
-    queryKey: ["supabase/montessori_certifications/people", educatorId],
+    queryKey: ["supabase/montessori_certs/people", educatorId],
     enabled: !!educatorId,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('montessori_certifications')
+        .from('montessori_certs')
         .select('*')
-        .eq('people_id', educatorId)
-        .order('year_received', { ascending: false });
+        .eq('person_id', educatorId)
+        .order('created_date', { ascending: false });
       if (error) throw error;
       return data || [];
     },
@@ -40,27 +40,27 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
 
   const columnDefs: ColDef<any>[] = [
     {
-      headerName: "Year Certified",
-      field: "yearReceived",
+      headerName: "Year",
+      field: "year",
       width: 150,
       ...createTextFilter(),
-      valueGetter: (p:any) => p?.data?.yearReceived ?? p?.data?.year_received ?? '',
+      valueGetter: (p:any) => p?.data?.year ?? '',
       valueFormatter: (p) => String(p.value || ''),
     },
     {
       headerName: "Level",
-      field: "certificationLevel",
+      field: "cert_level",
       width: 150,
       ...createTextFilter(),
-      valueGetter: (p:any) => p?.data?.certificationLevel ?? p?.data?.certification_level ?? '',
+      valueGetter: (p:any) => p?.data?.cert_level ?? '',
       valueFormatter: (p) => String(p.value || ''),
     },
     {
-      headerName: "Abbreviation",
-      field: "certifier",
+      headerName: "Training Center",
+      field: "training_center",
       width: 150,
       ...createTextFilter(),
-      valueGetter: (p:any) => p?.data?.certifier ?? p?.data?.certifier_abbreviation ?? p?.data?.certifier_name ?? '',
+      valueGetter: (p:any) => p?.data?.training_center ?? '',
       valueFormatter: (p) => String(p.value || ''),
     },
     {
@@ -138,6 +138,7 @@ export function MontessoriCertificationsTable({ educatorId }: MontessoriCertific
             rowSelection: { enableClickSelection: false } as any,
             domLayout: 'autoHeight',
             context: { componentName: 'montessori-certifications-table' },
+            sideBar: false,
           }}
         />
       </div>

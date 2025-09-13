@@ -24,11 +24,11 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
   const rows: AssociationRow[] = (associations || []).map((a: any) => ({
     id: a.id,
     schoolId: a.school_id || a.schoolId,
-    schoolShortName: a.school_short_name || a.schoolShortName,
+    schoolShortName: a.school_short_name || a.school_name || a.schoolShortName,
     roles: (a.role || a.roles || a.role_at_school) as any,
     startDate: a.start_date || a.startDate || null,
     endDate: a.end_date || a.endDate || null,
-    isActive: !!(a.is_active ?? a.isActive),
+    isActive: !!(a.currently_active ?? a.isActive),
     stageStatus: a.stage_status || a.stageStatus || null,
   }));
 

@@ -260,6 +260,7 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
             rowSelection: { enableClickSelection: false } as any,
             domLayout: 'autoHeight',
             context: { componentName: 'event-attendance-table' },
+            sideBar: false,
           }}
         />
       </div>
