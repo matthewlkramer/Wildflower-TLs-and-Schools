@@ -18,13 +18,13 @@ export function SchoolTLsAssociationGrid({ school, associations, teachers, onUpd
     return {
       id: a.id,
       educatorId: a.educatorId,
-      educatorName: t?.fullName || ((t?.firstName && t?.lastName) ? `${t.firstName} ${t.lastName}` : (a as any).educatorName || a.educatorId),
+      educatorName: (t as any)?.full_name || ((t as any)?.fullName) || (((t as any)?.first_name && (t as any)?.last_name) ? `${(t as any).first_name} ${(t as any).last_name}` : (a as any).educatorName || a.educatorId),
       roles,
       startDate: a.startDate || null,
       endDate: a.endDate || null,
       isActive: !!a.isActive,
-      emailAtSchool: (a as any)?.emailAtSchool || null,
-      phone: t?.primaryPhone || null,
+      emailAtSchool: (a as any)?.emailAtSchool || (a as any)?.role_specific_email || null,
+      phone: (t as any)?.primary_phone || (t as any)?.primaryPhone || null,
     };
   });
 

@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { type Educator } from "@shared/schema.generated";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
+import { useEducatorsSupabase } from "@/hooks/use-educators-supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 
@@ -31,10 +33,7 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
   const { toast } = useToast();
   const [selectedEducator, setSelectedEducator] = useState<Educator | null>(null);
 
-  const { data: educators = [] } = useQuery<Educator[]>({
-    queryKey: ["/api/educators"],
-    enabled: open,
-  });
+  const { data: educators = [] } = useEducatorsSupabase();
 
   const form = useForm({
     resolver: zodResolver(assignEducatorSchema),
@@ -58,25 +57,21 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
 
   const assignEducatorMutation = useMutation({
     mutationFn: async (data: z.infer<typeof assignEducatorSchema>) => {
-      return await apiRequest("POST", "/api/teacher-school-associations", {
-        educatorId: data.educatorId,
-        schoolId: schoolId,
+      const payload: any = {
+        people_id: data.educatorId,
+        school_id: schoolId,
         role: data.role || [],
-        startDate: data.startDate || "",
-        emailAtSchool: data.emailAtSchool || "",
-        isActive: true,
-      });
+        start_date: data.startDate || null,
+        role_specific_email: data.emailAtSchool || null,
+        currently_active: true,
+      };
+      const { error } = await supabase.from('people_roles_associations').insert(payload);
+      if (error) throw error;
+      return true;
     },
     onSuccess: () => {
-      // Invalidate both query key formats and force refetch
-      queryClient.invalidateQueries({ queryKey: [`/api/school-associations/${schoolId}`] });
-      queryClient.invalidateQueries({ queryKey: ["/api/school-associations", schoolId] });
-      queryClient.refetchQueries({ queryKey: [`/api/school-associations/${schoolId}`] });
-      
-      // Additional safety - refetch after a short delay
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: [`/api/school-associations/${schoolId}`] });
-      }, 500);
+      // Invalidate Supabase-driven associations list
+      queryClient.invalidateQueries({ queryKey: ["supabase/details_associations", { schoolId }] });
       
       toast({
         title: "Success",
@@ -144,12 +139,12 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
                           {educators.map((educator) => (
                             <SelectItem key={educator.id} value={educator.id}>
                               <div className="flex flex-col">
-                                <span className="font-medium">
-                                  {educator.fullName || `${educator.firstName} ${educator.lastName}`}
-                                </span>
-                                {educator.currentPrimaryEmailAddress && (
-                                  <span className="text-sm text-gray-500">{educator.currentPrimaryEmailAddress}</span>
-                                )}
+                          <span className="font-medium">
+                            {(educator as any).full_name || educator.fullName || `${(educator as any).first_name ?? educator.firstName ?? ''} ${(educator as any).last_name ?? educator.lastName ?? ''}`}
+                          </span>
+                          {(educator as any).current_primary_email_address && (
+                            <span className="text-sm text-gray-500">{(educator as any).current_primary_email_address}</span>
+                          )}
                               </div>
                             </SelectItem>
                           ))}
@@ -157,8 +152,8 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
                       </Select>
                       {selectedEducator && (
                         <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                          <strong>Selected:</strong> {selectedEducator.fullName || `${selectedEducator.firstName} ${selectedEducator.lastName}`}
-                          {selectedEducator.currentPrimaryEmailAddress && <span className="ml-2">({selectedEducator.currentPrimaryEmailAddress})</span>}
+                          <strong>Selected:</strong> {(selectedEducator as any).full_name || selectedEducator.fullName || `${(selectedEducator as any).first_name ?? selectedEducator.firstName ?? ''} ${(selectedEducator as any).last_name ?? selectedEducator.lastName ?? ''}`}
+                          {(selectedEducator as any).current_primary_email_address && <span className="ml-2">({(selectedEducator as any).current_primary_email_address})</span>}
                         </div>
                       )}
                     </div>

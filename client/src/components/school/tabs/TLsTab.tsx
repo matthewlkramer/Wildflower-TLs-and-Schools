@@ -30,12 +30,27 @@ export function TLsTab({ school, schoolId }: { school: School; schoolId: string 
   const { data: teachers = [] } = useEducatorsSupabase();
 
   const updateAssociation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => apiRequest('PUT', `/api/teacher-school-associations/${id}`, data),
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const patch: any = {
+        role: data.role,
+        start_date: data.startDate,
+        end_date: data.endDate,
+        currently_active: data.isActive,
+        role_specific_email: data.emailAtSchool,
+      };
+      const { error } = await supabase.from('people_roles_associations').update(patch).eq('id', id);
+      if (error) throw error;
+      return true;
+    },
     onSuccess: () => refetch(),
   });
 
   const deleteAssociation = useMutation({
-    mutationFn: async (id: string) => apiRequest('DELETE', `/api/teacher-school-associations/${id}`),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('people_roles_associations').delete().eq('id', id);
+      if (error) throw error;
+      return true;
+    },
     onSuccess: () => refetch(),
   });
 
@@ -74,7 +89,8 @@ export function TLsTab({ school, schoolId }: { school: School; schoolId: string 
               role: a.role || a.roles || a.role_at_school,
               startDate: a.start_date || a.startDate || null,
               endDate: a.end_date || a.endDate || null,
-              isActive: a.is_active ?? a.isActive ?? null,
+              isActive: (a.currently_active ?? a.isActive) ?? null,
+              emailAtSchool: a.role_specific_email || null,
             })) as unknown as TeacherSchoolAssociation[]}
             teachers={teachers || []}
             onUpdateAssociation={(id, data) => updateAssociation.mutate({ id, data })}
