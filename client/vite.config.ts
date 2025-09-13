@@ -7,16 +7,7 @@ export default defineConfig({
   envDir: path.resolve(import.meta.dirname),
   plugins: [
     react(),
-    ...(process.env.REPL_ID !== undefined
-      ? [
-          await import("@replit/vite-plugin-runtime-error-modal").then((m) =>
-            m.default(),
-          ),
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer(),
-          ),
-        ]
-      : []),
+    // Replit plugins will be added when available
   ],
   resolve: {
     alias: [
@@ -61,6 +52,8 @@ export default defineConfig({
     }
   },
   server: {
+    host: "0.0.0.0",
+    port: 5000,
     fs: {
       strict: true,
       deny: ["**/.*"],
