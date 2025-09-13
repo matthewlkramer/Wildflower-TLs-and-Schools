@@ -1,3 +1,6 @@
+// Deprecated: prefer specific hooks
+// - Grid: useGridEducators/useGridTeachers, useGridSchools, useGridCharters
+// - Details: useDetailEducators, useDetailSchools, useDetailCharters
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { set } from "date-fns";
@@ -89,4 +92,3 @@ function normalize(entity: Entity, row: any) {
   setIfMissing('status', 'status');
   return out;
 }
-

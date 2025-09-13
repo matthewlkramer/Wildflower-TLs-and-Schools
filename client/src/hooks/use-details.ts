@@ -240,3 +240,16 @@ export function useDetailsCharter(id?: string) {
     },
   });
 }
+
+// Aliases requested for clearer naming
+export function useDetailEducators(id?: string) {
+  return useDetailsTeacher(id);
+}
+
+export function useDetailSchools(id?: string) {
+  return useDetailsSchool(id);
+}
+
+export function useDetailCharters(id?: string) {
+  return useDetailsCharter(id);
+}

@@ -45,3 +45,13 @@ export function useEducatorsSupabase() {
     fields,
   };
 }
+
+// Aliases for clearer usage in grid views.
+export function useGridEducators() {
+  return useEducatorsSupabase();
+}
+
+// Teachers and educators are the same dataset in this app.
+export function useGridTeachers() {
+  return useEducatorsSupabase();
+}

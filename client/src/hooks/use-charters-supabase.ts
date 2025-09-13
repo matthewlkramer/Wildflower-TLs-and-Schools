@@ -43,3 +43,8 @@ export function useChartersSupabase() {
     fields,
   };
 }
+
+// Alias for grid usage naming consistency
+export function useGridCharters() {
+  return useChartersSupabase();
+}
