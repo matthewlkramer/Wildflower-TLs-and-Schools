@@ -1,12 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-// Temporary - will use generated types later
-interface Database {
-  public: {
-    Tables: Record<string, any>;
-    Views: Record<string, any>;
-    Functions: Record<string, any>;
-  };
-}
+import type { Database } from '../../../../shared/database.types';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string;
 const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string;

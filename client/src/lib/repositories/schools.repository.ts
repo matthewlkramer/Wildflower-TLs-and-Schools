@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { UIGridSchool, UIDetailsSchool, SchoolInsert, SchoolUpdate } from '@/lib/zod';
 import { createQueryKeys, createBaseMutations } from './base.repository';
 
 // Query keys for schools

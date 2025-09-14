@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { UIGridEducator, UIDetailsEducator, EducatorInsert, EducatorUpdate } from '@/lib/zod';
 import { createQueryKeys } from './base.repository';
 
 // Query keys for educators
