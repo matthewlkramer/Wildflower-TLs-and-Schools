@@ -1,0 +1,147 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE gsync.email_filter_addresses (
+  email text NOT NULL,
+  last_synced_at timestamp with time zone DEFAULT now(),
+  educator_id text,
+  CONSTRAINT email_filter_addresses_pkey PRIMARY KEY (email)
+);
+CREATE TABLE gsync.g_email_attachments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  gmail_message_id text NOT NULL,
+  attachment_id text NOT NULL,
+  filename text,
+  mime_type text,
+  size_bytes integer,
+  content_base64 text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  storage_path text,
+  CONSTRAINT g_email_attachments_pkey PRIMARY KEY (id)
+);
+CREATE TABLE gsync.g_email_backfill_queue (
+  user_id uuid NOT NULL,
+  gmail_message_id text NOT NULL,
+  enqueued_at timestamp with time zone NOT NULL DEFAULT now(),
+  status text DEFAULT 'queued'::text CHECK (status = ANY (ARRAY['queued'::text, 'done'::text, 'error'::text])),
+  attempts integer NOT NULL DEFAULT 0,
+  last_attempt_at timestamp with time zone,
+  error_message text,
+  CONSTRAINT g_email_backfill_queue_pkey PRIMARY KEY (user_id, gmail_message_id)
+);
+CREATE TABLE gsync.g_email_sync_progress (
+  user_id uuid NOT NULL,
+  year integer NOT NULL,
+  week integer NOT NULL,
+  sync_status text DEFAULT 'not_started'::text CHECK (sync_status = ANY (ARRAY['not_started'::text, 'running'::text, 'paused'::text, 'completed'::text, 'partial'::text, 'error'::text])),
+  error_message text,
+  total_messages integer,
+  processed_messages integer,
+  started_at timestamp with time zone,
+  completed_at timestamp with time zone,
+  updated_at timestamp with time zone DEFAULT now(),
+  current_run_id text,
+  CONSTRAINT g_email_sync_progress_pkey PRIMARY KEY (user_id, year, week)
+);
+CREATE TABLE gsync.g_emails (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  gmail_message_id text NOT NULL UNIQUE,
+  thread_id text,
+  from_email text,
+  to_emails ARRAY,
+  cc_emails ARRAY,
+  bcc_emails ARRAY,
+  subject text,
+  body_text text,
+  body_html text,
+  sent_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  matched_emails ARRAY,
+  matched_educator_ids ARRAY,
+  CONSTRAINT g_emails_pkey PRIMARY KEY (id)
+);
+CREATE TABLE gsync.g_event_attachments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  google_calendar_id text NOT NULL,
+  google_event_id text NOT NULL,
+  title text,
+  mime_type text,
+  file_url text,
+  file_id text,
+  icon_link text,
+  identity_key text DEFAULT COALESCE(file_id, file_url),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  storage_path text,
+  CONSTRAINT g_event_attachments_pkey PRIMARY KEY (id)
+);
+CREATE TABLE gsync.g_event_sync_progress (
+  user_id uuid NOT NULL,
+  calendar_id text NOT NULL,
+  year integer NOT NULL,
+  month integer NOT NULL,
+  sync_status text DEFAULT 'not_started'::text CHECK (sync_status = ANY (ARRAY['not_started'::text, 'running'::text, 'paused'::text, 'completed'::text, 'partial'::text, 'error'::text])),
+  error_message text,
+  total_events integer,
+  processed_events integer,
+  last_sync_token text,
+  started_at timestamp with time zone,
+  completed_at timestamp with time zone,
+  updated_at timestamp with time zone DEFAULT now(),
+  current_run_id text,
+  CONSTRAINT g_event_sync_progress_pkey PRIMARY KEY (user_id, calendar_id, year, month)
+);
+CREATE TABLE gsync.g_events (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  google_calendar_id text NOT NULL,
+  google_event_id text NOT NULL,
+  summary text,
+  description text,
+  start_time timestamp with time zone,
+  end_time timestamp with time zone,
+  organizer_email text,
+  location text,
+  status text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  matched_emails ARRAY,
+  matched_educator_ids ARRAY,
+  attendees ARRAY,
+  CONSTRAINT g_events_pkey PRIMARY KEY (id)
+);
+CREATE TABLE gsync.google_auth_tokens (
+  user_id uuid NOT NULL,
+  access_token text NOT NULL,
+  refresh_token text NOT NULL,
+  expires_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT google_auth_tokens_pkey PRIMARY KEY (user_id)
+);
+CREATE TABLE gsync.google_sync_messages (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  run_id text,
+  sync_type text NOT NULL CHECK (sync_type = ANY (ARRAY['gmail'::text, 'calendar'::text])),
+  level text DEFAULT 'info'::text,
+  message text NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT google_sync_messages_pkey PRIMARY KEY (id)
+);
+CREATE TABLE gsync.google_sync_settings (
+  user_id uuid NOT NULL,
+  sync_start_date timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT google_sync_settings_pkey PRIMARY KEY (user_id)
+);
+CREATE TABLE gsync.sync_catchup_requests (
+  user_id uuid NOT NULL,
+  status text NOT NULL DEFAULT 'queued'::text CHECK (status = ANY (ARRAY['queued'::text, 'processing'::text, 'done'::text, 'error'::text])),
+  requested_at timestamp with time zone NOT NULL DEFAULT now(),
+  processed_at timestamp with time zone,
+  last_error text,
+  CONSTRAINT sync_catchup_requests_pkey PRIMARY KEY (user_id)
+);
