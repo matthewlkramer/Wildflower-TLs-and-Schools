@@ -1,6 +1,6 @@
 /**
- * School "Linked" tab - Using elegant repository architecture
- * Uses new repository pattern with optimized UI views for data access
+ * School "Linked" tab - Elegant architecture version
+ * Uses new repository pattern with optimized data access
  */
 import React from 'react';
 import { schoolsRepository } from '@/lib/repositories';
@@ -10,7 +10,7 @@ import { createTextFilter } from '@/utils/ag-grid-utils';
 import { ExternalLink, Mail, Calendar } from 'lucide-react';
 
 export function LinkedTab({ schoolId }: { schoolId?: string }) {
-  // Use elegant repository pattern for optimized data access
+  // Use elegant repository pattern for data access
   const { data: emails = [], isLoading: emailsLoading } = schoolsRepository.useEmails(schoolId || '');
   const { data: events = [], isLoading: eventsLoading } = schoolsRepository.useEvents(schoolId || '');
 
