@@ -1074,193 +1074,307 @@ export interface Database {
       }
     }
     Views: {
-      ui_grid_schools: {
+      grid_school: {
         Row: {
           id: string
-          name: string | null
-          shortName: string | null
-          status: string | null
-          governanceModel: string | null
-          agesServed: string[] | null
-          membershipStatus: string | null
-          projectedOpen: string | null
-          about: string | null
-          phone: string | null
-          email: string | null
-          website: string | null
+          school_name: string | null
+          stage_status: string | null
+          membership_status: string | null
+          projected_open: string | null
+          all_ages_served: string | null
+          governance_model: string | null
+          current_tls: string | null
         }
         Relationships: []
       }
-      ui_details_school: {
+      details_schools: {
         Row: {
           id: string
-          name: string | null
-          longName: string | null
-          shortName: string | null
+          long_name: string | null
+          short_name: string | null
           status: string | null
-          governanceModel: string | null
-          agesServed: string[] | null
-          membershipStatus: string | null
-          projectedOpen: string | null
-          about: string | null
-          aboutSpanish: string | null
-          phone: string | null
-          email: string | null
+          governance_model: string | null
+          prior_names: string | null
+          narrative: string | null
+          institutional_partner: string | null
+          ages_served: string[] | null
+          logo: string | null
+          logo_url: string | null
+          school_calendar: string | null
+          school_sched: string[] | null
+          planning_album: string | null
+          school_email: string | null
+          email_domain: string | null
+          school_phone: string | null
+          facebook: string | null
+          instagram: string | null
           website: string | null
-          physicalAddress: string | null
-          mailingAddress: string | null
-          logoUrl: string | null
-          heroImageUrl: string | null
-          institutionalPartner: string | null
-          nonprofitStatus: string | null
-          ein: string | null
-          legalName: string | null
-          legalStructure: string | null
-          incorporationDate: string | null
-          currentFyEnd: string | null
-          openDate: string | null
-          numberOfClassrooms: number | null
-          enrollmentAtFullCapacity: string | null
-          schoolCalendar: string | null
-          schoolSched: string[] | null
-          programFocus: string | null
-          flexibleTuitionModel: string | null
+          number_of_classrooms: number | null
           pod: string | null
-          riskFactors: string | null
+          enrollment_at_full_capacity: string | null
+          flexible_tuition_model: string | null
+          ein: string | null
+          legal_name: string | null
+          about: string | null
+          about_spanish: string | null
+          risk_factors: string | null
           watchlist: string | null
-          planningAlbum: string | null
-          archived: boolean | null
-          created_at: string
-          updated_at: string
+          program_focus: string | null
+          loan_report_name: string | null
+          current_fy_end: string | null
+          incorporation_date: string | null
+          guidestar_listing_requested: string | null
+          nondiscrimination_policy_on_application: string | null
+          nondiscrimination_policy_on_website: string | null
+          qbo_school_codes: string | null
+          membership_termination_steps: string | null
+          legal_structure: string | null
+          open_date: string | null
+          charter_id: string | null
+          public_funding: string[] | null
+          founding_tls: string[] | null
+          on_national_website: string | null
+          domain_name: string | null
+          nonprofit_status: string | null
+          google_voice: string | null
+          website_tool: string | null
+          budget_utility: string | null
+          transparent_classroom: string | null
+          admissions_system: string | null
+          tc_admissions: string | null
+          tc_recordkeeping: string | null
+          gusto: string | null
+          qbo: string | null
+          business_insurance: string | null
+          bill_account: string | null
+          google_workspace_org_unit_path: string | null
+          budget_link: string | null
+          bookkeeper_or_accountant: string | null
+          membership_status: string | null
+          projected_open: string | null
+          physical_address: string | null
+          physical_lat: number | null
+          physical_long: number | null
+          mailing_address: string | null
+          current_cohort: string | null
+          current_guide_name: string | null
+          total_grants_issued: number | null
+          total_loans_issued: number | null
         }
         Relationships: []
       }
-      ui_grid_educators: {
+      grid_educator: {
         Row: {
           id: string
-          fullName: string | null
-          firstName: string | null
-          lastName: string | null
-          primaryEmail: string | null
-          primaryPhone: string | null
-          discoveryStatus: string | null
-          hasMontessoriCert: boolean | null
-          raceEthnicityDisplay: string | null
-          kanbanGroup: string | null
-          kanbanOrder: number | null
-          inactiveFlag: boolean | null
+          full_name: string | null
+          current_role_at_active_school: string | null
+          current_role: string | null
+          active_school: string | null
+          has_montessori_cert: boolean | null
+          race_ethnicity_display: string | null
+          discovery_status: string | null
+          indiv_type: string | null
+          kanban_group: string | null
+          kanban_order: number | null
         }
         Relationships: []
       }
-      ui_details_educator: {
+      details_educators: {
         Row: {
           id: string
-          fullName: string | null
-          firstName: string | null
-          lastName: string | null
-          middleName: string | null
+          full_name: string | null
+          first_name: string | null
           nickname: string | null
-          primaryEmail: string | null
-          nonWildflowerEmail: string | null
-          primaryPhone: string | null
-          primaryPhoneOtherInfo: string | null
-          secondaryPhone: string | null
-          secondaryPhoneOtherInfo: string | null
-          homeAddress: string | null
-          discoveryStatus: string | null
-          hasMontessoriCert: boolean | null
-          raceEthnicity: string[] | null
-          raceEthnicityDisplay: string | null
-          raceEthnicityOther: string | null
-          primaryLanguages: string[] | null
-          otherLanguages: string[] | null
-          educationalAttainment: string | null
-          householdIncome: string | null
-          incomeBackground: string | null
+          middle_name: string | null
+          last_name: string | null
+          primary_phone: string | null
+          primary_phone_other_info: string | null
+          secondary_phone: string | null
+          secondary_phone_other_info: string | null
+          home_address: string | null
+          educ_attainment: string | null
+          primary_languages: string[] | null
+          other_languages: string[] | null
+          race_ethnicity_display: string | null
+          race_ethnicity_other: string | null
           gender: string | null
-          genderOther: string | null
+          gender_other: string | null
+          hh_income: string | null
+          childhood_income: string | null
           lgbtqia: boolean | null
           pronouns: string | null
-          pronounsOther: string | null
-          kanbanGroup: string | null
-          kanbanOrder: number | null
-          inactiveFlag: boolean | null
-          indivType: string | null
-          excludeFromEmailLogging: boolean | null
-          targetGeo: string | null
-          tags: string | null
-          created_at: string
-          updated_at: string
+          pronouns_other: string | null
+          indiv_type: string | null
+          exclude_from_email_logging: boolean | null
+          discovery_status: string | null
+          assigned_partner: string | null
+          educator_notes_1: string | null
+          first_contact_ages: string | null
+          first_contact_governance_model: string | null
+          first_contact_interests: string | null
+          first_contact_notes_on_pre_wf_employment: string | null
+          first_contact_wf_employment_status: string | null
+          first_contact_willingness_to_relocate: string | null
+          first_contact_form_notes: string | null
+          target_geo_combined: string | null
+          self_reflection_doc: string | null
+          opsguide_checklist: string | null
+          opsguide_fundraising_opps: string | null
+          opsguide_meeting_prefs: string | null
+          opsguide_request_pertinent_info: string | null
+          opsguide_support_type_needed: string | null
+          sendgrid_template_selected: string | null
+          sendgrid_send_date: string | null
+          routed_to: string | null
+          assigned_partner_override: string | null
+          person_responsible_for_follow_up: string | null
+          one_on_one_scheduling_status: string | null
+          personal_email_sent: boolean | null
+          personal_email_sent_date: string | null
+          current_role_at_active_school: string | null
+          current_role: string | null
+          active_school: string | null
+          has_montessori_cert: boolean | null
+          kanban_group: string | null
+          kanban_order: number | null
+          mont_cert_summary: string | null
+          primary_email: string | null
+          most_recent_fillout_form_date: string | null
+          most_recent_event_name: string | null
+          most_recent_event_date: string | null
+          most_recent_note: string | null
+          most_recent_note_date: string | null
+          most_recent_note_from: string | null
         }
         Relationships: []
       }
-      ui_school_emails: {
+      details_associations: {
         Row: {
+          role_specific_email: string | null
+          loan_fund: boolean | null
+          email_status: string | null
+          who_initiated_tl_removal: string | null
+          gsuite_roles: string | null
+          currently_active: boolean | null
+          school_id: string | null
+          people_id: string | null
           id: string
-          gmail_message_id: string
-          thread_id: string | null
-          from_email: string | null
-          to_emails: string[] | null
-          cc_emails: string[] | null
-          subject: string | null
-          body_text: string | null
-          sent_at: string | null
-          created_at: string
-          matched_emails: string[] | null
-          matched_educator_ids: string[] | null
+          created_date: string | null
+          start_date: string | null
+          end_date: string | null
+          role: string | null
+          charter_id: string | null
+          authorizer_id: string | null
+          full_name: string | null
+          has_montessori_cert: boolean | null
+          race_ethnicity_display: string | null
+          school_name: string | null
+          stage_status: string | null
+          membership_status: string | null
+          projected_open: string | null
+          all_ages_served: string | null
+          governance_model: string | null
         }
         Relationships: []
       }
-      ui_school_events: {
+      details_charters: {
         Row: {
           id: string
-          google_event_id: string
-          summary: string | null
-          description: string | null
-          start_time: string | null
-          end_time: string | null
-          organizer_email: string | null
-          location: string | null
+          short_name: string | null
+          full_name: string | null
+          initial_target_geo: string | null
+          landscape_analysis: string | null
+          application: string | null
+          non_tl_roles: string | null
           status: string | null
-          created_at: string
-          matched_emails: string[] | null
-          matched_educator_ids: string[] | null
-          attendees: string[] | null
+          ein: string | null
+          incorp_date: string | null
+          current_fy_end: string | null
+          non_discrimination_policy_on_website: boolean | null
+          school_provided_1023: boolean | null
+          guidestar_listing_requested: boolean | null
+          partnership_with_wf: string | null
+          first_site_opened_date: string | null
+          website: string | null
+          nonprofit_status: boolean | null
+          initial_target_planes: string[] | null
+          target_open: string | null
+          support_timeline: string | null
+          app_window: string | null
+          key_dates: string | null
+          milestones: string | null
+          authorizor: string | null
+          num_students: number | null
+          beg_age: string | null
+          end_age: string | null
+          loi_required: boolean | null
+          loi_deadline: string | null
+          loi_submitted: boolean | null
+          loi: string | null
+          odds_authorization: string | null
+          odds_on_time_open: string | null
+          charter_app_roles_set: boolean | null
+          charter_app_pm_plan_complete: boolean | null
+          logic_model_complete: boolean | null
+          comm_engagement_underway: boolean | null
+          app_nonprofit_status: string | null
+          app_deadline: string | null
+          app_submitted: boolean | null
+          joint_kickoff_meeting_date: string | null
+          internal_support_meeting_date: string | null
+          app_walkthrough_date: string | null
+          capacity_intv_training_complete: boolean | null
+          capacity_intv_proj_date: string | null
+          capacity_intv_completed_date: string | null
+          auth_decision: string | null
+          design_advice_session_complete: boolean | null
+          board_membership_signed_date: string | null
+          design_album: string | null
+          budget_exercises: string | null
+          budget_final: string | null
+          most_recent_app: boolean | null
+          app_status: string | null
+          team: string | null
+          opps_challenges: string | null
+          decision_expected_date: string | null
+          authorizer_name: string | null
+          active: boolean | null
+          action_date: string | null
+          action: string | null
+          currently_authorized: boolean | null
+          proj_open_date: string | null
+          membership_status: string | null
+          group_exemption_status: string | null
+          total_grants_issued: number | null
+          total_loans_issued: number | null
+          current_cohort: string | null
+          physical_address: string | null
+          physical_lat: number | null
+          physical_long: number | null
+          mailing_address: string | null
+          mailing_lat: number | null
+          mailing_long: number | null
         }
         Relationships: []
       }
-      ui_educator_emails: {
+      grid_charter: {
         Row: {
           id: string
-          gmail_message_id: string
-          thread_id: string | null
-          from_email: string | null
-          to_emails: string[] | null
-          cc_emails: string[] | null
-          subject: string | null
-          body_text: string | null
-          sent_at: string | null
-          created_at: string
-          matched_emails: string[] | null
-          matched_educator_ids: string[] | null
-        }
-        Relationships: []
-      }
-      ui_educator_events: {
-        Row: {
-          id: string
-          google_event_id: string
-          summary: string | null
-          description: string | null
-          start_time: string | null
-          end_time: string | null
-          organizer_email: string | null
-          location: string | null
+          charter_name: string | null
           status: string | null
-          created_at: string
-          matched_emails: string[] | null
-          matched_educator_ids: string[] | null
-          attendees: string[] | null
+          non_tl_roles: string | null
+          initial_target_geo: string | null
+          initial_target_planes: string[] | null
+          proj_open: string | null
+        }
+        Relationships: []
+      }
+      primary_emails: {
+        Row: {
+          people_id: string
+          email_address: string
+          category: string | null
+          primary: boolean | null
         }
         Relationships: []
       }
