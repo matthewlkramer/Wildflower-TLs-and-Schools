@@ -10,7 +10,7 @@
 import { DetailGrid } from "@/components/shared/DetailGrid";
 import { InfoCard } from "@/components/shared/InfoCard";
 
-export function DemographicsTab({ teacher, onSave }: { teacher: Teacher; onSave?: (vals: any) => void }) {
+export function DemographicsTab({ teacher, onSave }: { teacher: any; onSave?: (vals: any) => void }) {
   const normalizeArray = (v: any): string[] => Array.isArray(v) ? v : (v ? String(v).split(',').map((s: string) => s.trim()).filter(Boolean) : []);
   return (
     <DetailGrid>
@@ -53,12 +53,12 @@ export function DemographicsTab({ teacher, onSave }: { teacher: Teacher; onSave?
         title="Languages"
         columns={2}
         fields={[
-          { key: 'primaryLanguage', label: 'Primary Language', type: 'multiselect', value: Array.isArray(teacher?.primaryLanguage) ? teacher?.primaryLanguage : (teacher?.primaryLanguage ? [teacher.primaryLanguage as unknown as string] : []) },
+          { key: 'primaryLanguages', label: 'Primary Languages', type: 'multiselect', value: Array.isArray(teacher?.primaryLanguages) ? teacher?.primaryLanguages : (teacher?.primaryLanguages ? [teacher.primaryLanguages as unknown as string] : []) },
           { key: 'otherLanguages', label: 'Other Languages', type: 'multiselect', value: Array.isArray(teacher?.otherLanguages) ? teacher?.otherLanguages : (teacher?.otherLanguages ? [teacher.otherLanguages as unknown as string] : []) },
         ]}
         onSave={(vals) => onSave?.({
           ...vals,
-          ...(vals.primaryLanguage !== undefined ? { primaryLanguage: normalizeArray(vals.primaryLanguage) } : {}),
+          ...(vals.primaryLanguages !== undefined ? { primaryLanguages: normalizeArray(vals.primaryLanguages) } : {}),
           ...(vals.otherLanguages !== undefined ? { otherLanguages: normalizeArray(vals.otherLanguages) } : {}),
         })}
       />

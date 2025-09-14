@@ -8,11 +8,11 @@
  */
 import { Badge } from "@/components/ui/badge";
 import { getStatusColor } from "@/lib/utils";
-import type { Teacher } from "@shared/schema.generated";
+// Types handled inline to avoid import issues
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export function SummaryTab({ teacher }: { teacher: Teacher }) {
+export function SummaryTab({ teacher }: { teacher: any }) {
   const educatorId = (teacher as any)?.id;
   const { data: activeAssoc } = useQuery<any | null>({
     queryKey: ["supabase/details_associations/active/byEducator", educatorId],

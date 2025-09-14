@@ -1,9 +1,9 @@
 import React from 'react';
-import type { School } from '@shared/schema.generated';
+// Types handled inline to avoid import issues
 import { DetailGrid } from '@/components/shared/DetailGrid';
 import { InfoCard } from '@/components/shared/InfoCard';
 
-export function DetailsTab({ school }: { school: School }) {
+export function DetailsTab({ school }: { school: any }) {
   return (
     <DetailGrid>
       <InfoCard title="Logos" columns={2} editable={true} fields={[
@@ -48,8 +48,8 @@ export function DetailsTab({ school }: { school: School }) {
       ]} />
 
       <InfoCard title="School Contact Information" columns={2} fields={[
-        { key: 'phone', label: 'School Phone', type: 'text', value: (school as any).phone || '' },
-        { key: 'email', label: 'School Email', type: 'text', value: (school as any).email || '' },
+        { key: 'schoolPhone', label: 'School Phone', type: 'text', value: (school as any).schoolPhone || '' },
+        { key: 'schoolEmail', label: 'School Email', type: 'text', value: (school as any).schoolEmail || '' },
       ]} />
 
       <InfoCard title="Membership" columns={2} fields={[

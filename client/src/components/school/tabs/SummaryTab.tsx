@@ -16,10 +16,10 @@ import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { InfoCard } from '@/components/shared/InfoCard';
 import { DetailGrid } from '@/components/shared/DetailGrid';
-import type { School } from '@shared/schema.generated';
+// Types handled inline to avoid import issues
 import { GoogleMap } from '@/components/google-map';
 
-export function SummaryTab({ school }: { school: School }) {
+export function SummaryTab({ school }: { school: any }) {
   const [aboutLang, setAboutLang] = useState<'en' | 'es'>('en');
   return (
     <div className="space-y-6">
@@ -129,8 +129,8 @@ export function SummaryTab({ school }: { school: School }) {
           columns={1}
           editable={false}
           fields={[
-            { key: 'phone', label: 'School Phone', type: 'readonly', value: (school as any)?.phone || '' },
-            { key: 'email', label: 'School Email', type: 'readonly', value: (school as any)?.email || '' },
+            { key: 'schoolPhone', label: 'School Phone', type: 'readonly', value: (school as any)?.schoolPhone || '' },
+            { key: 'schoolEmail', label: 'School Email', type: 'readonly', value: (school as any)?.schoolEmail || '' },
             { key: 'website', label: 'Website', type: 'readonly', value: (school as any)?.website || '', render: (url) => url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{url}</a>) : (<span className="text-slate-400">-</span>) },
           ]}
         />

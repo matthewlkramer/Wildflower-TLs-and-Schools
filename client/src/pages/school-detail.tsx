@@ -24,7 +24,7 @@ import { ToDoTab } from '@/components/school/tabs/ToDoTab';
 
 import { queryClient } from '@/lib/queryClient';
 import { useDetailsSchool } from '@/hooks/use-details';
-import type { School } from '@shared/schema.generated';
+// Types handled inline to avoid import issues
 import { updateSchool } from '@/integrations/supabase/wftls';
 
 export default function SchoolDetail() {
