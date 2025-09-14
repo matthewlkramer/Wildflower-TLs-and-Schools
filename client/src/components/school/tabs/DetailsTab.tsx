@@ -3,7 +3,8 @@ import React from 'react';
 import { DetailGrid } from '@/components/shared/DetailGrid';
 import { InfoCard } from '@/components/shared/InfoCard';
 
-export function DetailsTab({ school }: { school: any }) {
+export function DetailsTab({ school, onSave }: { school: any; onSave?: (vals: any) => void }) {
+  const normalizeArray = (v: any): string[] => Array.isArray(v) ? v : (v ? String(v).split(',').map((s: string) => s.trim()).filter(Boolean) : []);
   return (
     <DetailGrid>
       <InfoCard title="Logos" columns={2} editable={true} fields={[
@@ -15,28 +16,34 @@ export function DetailsTab({ school }: { school: any }) {
       ]} />
       <InfoCard title="Name" columns={2} fields={[
         { key: 'name', label: 'School Name', type: 'text', value: school.name },
-        { key: 'shortName', label: 'Short Name', type: 'text', value: (school as any).shortName || '' },
-        { key: 'priorNames', label: 'Prior Names', type: 'text', value: (school as any).priorNames || '' },
+        { key: 'shortName', label: 'Short Name', type: 'text', value: school.shortName || '' },
+        { key: 'priorNames', label: 'Prior Names', type: 'text', value: school.priorNames || '' },
       ]} />
 
       <InfoCard title="Program Details" columns={2} fields={[
-        { key: 'governanceModel', label: 'Governance', type: 'text', value: (school as any).governanceModel || '' },
-        { key: 'agesServed', label: 'Ages Served', type: 'text', value: Array.isArray((school as any).agesServed) ? (school as any).agesServed.join(', ') : ((school as any).agesServed || '') },
-        { key: 'programFocus', label: 'Program Focus', type: 'text', value: Array.isArray((school as any).programFocus) ? (school as any).programFocus.join(', ') : ((school as any).programFocus || '') },
-        { key: 'numberOfClassrooms', label: 'Number of Classrooms', type: 'text', value: (school as any).numberOfClassrooms ?? '' },
-        { key: 'enrollmentCap', label: 'Enrollment Capacity', type: 'text', value: (school as any).enrollmentCap ?? '' },
+        { key: 'governanceModel', label: 'Governance', type: 'text', value: school.governanceModel || '' },
+        { key: 'agesServed', label: 'Ages Served', type: 'multiselect', value: Array.isArray(school.agesServed) ? school.agesServed : (school.agesServed ? [school.agesServed as unknown as string] : []) },
+        { key: 'programFocus', label: 'Program Focus', type: 'multiselect', value: Array.isArray(school.programFocus) ? school.programFocus : (school.programFocus ? [school.programFocus as unknown as string] : []) },
+        { key: 'numberOfClassrooms', label: 'Number of Classrooms', type: 'text', value: school.numberOfClassrooms ?? '' },
+        { key: 'enrollmentCap', label: 'Enrollment Capacity', type: 'text', value: school.enrollmentCap ?? '' },
         { key: 'schoolCalendar', label: 'School Calendar', type: 'text', value: (school as any).schoolCalendar ?? '' },
         { key: 'schoolSchedule', label: 'School Schedule', type: 'text', value: (school as any).schoolSchedule ?? '' },
-      ]} />
+      ]}
+      onSave={(vals) => onSave?.({
+        ...vals,
+        ...(vals.agesServed !== undefined ? { agesServed: normalizeArray(vals.agesServed) } : {}),
+        ...(vals.programFocus !== undefined ? { programFocus: normalizeArray(vals.programFocus) } : {}),
+      })}
+      />
 
-      <PublicFundingCard schoolId={school.id} linkedIds={Array.isArray((school as any).publicFundingSources) ? (school as any).publicFundingSources : []} />
+      <PublicFundingCard schoolId={school.id} linkedIds={Array.isArray(school.publicFundingSources) ? school.publicFundingSources : []} />
 
       <InfoCard title="Legal Entity Structure" columns={2} fields={[
-        { key: 'legalStructure', label: 'Legal Structure', type: 'text', value: (school as any).legalStructure || '' },
-        { key: 'legalName', label: 'Legal Name', type: 'text', value: (school as any).legalName || '' },
-        { key: 'EIN', label: 'EIN', type: 'text', value: (school as any).EIN || '' },
+        { key: 'legalStructure', label: 'Legal Structure', type: 'text', value: school.legalStructure || '' },
+        { key: 'legalName', label: 'Legal Name', type: 'text', value: school.legalName || '' },
+        { key: 'ein', label: 'EIN', type: 'text', value: (school as any).ein || '' },
         { key: 'incorporationDate', label: 'Incorporation Date', type: 'text', value: (school as any).incorporationDate || '' },
-        { key: 'currentFYEnd', label: 'Current FY End', type: 'text', value: (school as any).currentFYEnd || '' },
+        { key: 'currentFyEnd', label: 'Current FY End', type: 'text', value: (school as any).currentFyEnd || '' },
         { key: 'institutionalPartner', label: 'Institutional Partner', type: 'text', value: (school as any).institutionalPartner || '' },
       ]} />
 
@@ -53,7 +60,7 @@ export function DetailsTab({ school }: { school: any }) {
       ]} />
 
       <InfoCard title="Membership" columns={2} fields={[
-        { key: 'membershipStatus', label: 'Membership Status', type: 'text', value: (school as any).membershipStatus || '' },
+        { key: 'membershipStatus', label: 'Membership Status', type: 'text', value: school.membershipStatus || '' },
         { key: 'membershipAgreementDate', label: 'Agreement Date', type: 'date', value: (school as any).membershipAgreementDate || '' },
         { key: 'agreementVersion', label: 'Agreement Version', type: 'text', value: (school as any).agreementVersion || '' },
         { key: 'signedMembershipAgreement', label: 'Signed Membership Agreement', type: 'text', value: (school as any).signedMembershipAgreement || '' },
@@ -63,7 +70,7 @@ export function DetailsTab({ school }: { school: any }) {
       ]} />
 
       <InfoCard title="Online Presence" columns={1} editable={true} fields={[
-        { key: 'website', label: 'Website', type: 'text', value: (school as any).website || '', render: (url: string) => url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{url}</a>) : (<span className="text-slate-400">-</span>) },
+        { key: 'website', label: 'Website', type: 'text', value: school.website || '', render: (url: string) => url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{url}</a>) : (<span className="text-slate-400">-</span>) },
         { key: 'instagram', label: 'Instagram', type: 'text', value: (school as any).instagram || '', render: (url: string) => url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{url}</a>) : (<span className="text-slate-400">-</span>) },
         { key: 'facebook', label: 'Facebook', type: 'text', value: (school as any).facebook || '', render: (url: string) => url ? (<a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{url}</a>) : (<span className="text-slate-400">-</span>) },
       ]} />

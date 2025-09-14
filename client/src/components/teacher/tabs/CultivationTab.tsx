@@ -26,6 +26,7 @@ function mostRecentFilloutDate(ssjForms: any[]) {
 }
 
 export function CultivationTab({ teacher, onSave }: { teacher: any; onSave?: (vals: any)=>void }) {
+  const normalizeArray = (v: any): string[] => Array.isArray(v) ? v : (v ? String(v).split(',').map((s: string) => s.trim()).filter(Boolean) : []);
   const educatorId = teacher.id;
   const { data: ssjForms = [] } = useQuery<any[]>({
     queryKey: ["supabase/ssj_fillout_forms/educator", educatorId],
@@ -56,14 +57,14 @@ export function CultivationTab({ teacher, onSave }: { teacher: any; onSave?: (va
         description={`Most recent fillout: ${mostRecentFilloutDate(ssjForms) || '-'}`}
         columns={2}
         fields={[
-          { key: 'sendGridTemplateSelected', label: 'SendGrid Template Selected', type: 'text', value: (teacher as any)?.sendGridTemplateSelected || (teacher as any)?.sendgridTemplateSelected || '' },
-          { key: 'sendGridSendDate', label: 'SendGrid Send Date', type: 'date', value: (teacher as any)?.sendGridSendDate || '' },
-          { key: 'routedTo', label: 'Routed To', type: 'text', value: (teacher as any)?.routedTo || '' },
-          { key: 'assignedPartnerOverride', label: 'Assigned Partner Override', type: 'text', value: (teacher as any)?.assignedPartnerOverride || '' },
-          { key: 'personResponsibleForFollowUp', label: 'Person Responsible for Follow Up', type: 'text', value: (teacher as any)?.personResponsibleForFollowUp || '' },
-          { key: 'oneOnOneSchedulingStatus', label: 'One-on-One Scheduling Status', type: 'text', value: (teacher as any)?.oneOnOneSchedulingStatus || '' },
-          { key: 'personalEmailSent', label: 'Personal Email Sent', type: 'toggle', value: !!(teacher as any)?.personalEmailSent },
-          { key: 'personalEmailSentDate', label: 'Personal Email Sent Date', type: 'date', value: (teacher as any)?.personalEmailSentDate || '' },
+          { key: 'sendGridTemplateSelected', label: 'SendGrid Template Selected', type: 'text', value: teacher?.sendGridTemplateSelected || teacher?.sendgridTemplateSelected || '' },
+          { key: 'sendGridSendDate', label: 'SendGrid Send Date', type: 'date', value: teacher?.sendGridSendDate || '' },
+          { key: 'routedTo', label: 'Routed To', type: 'text', value: teacher?.routedTo || '' },
+          { key: 'assignedPartnerOverride', label: 'Assigned Partner Override', type: 'text', value: teacher?.assignedPartnerOverride || '' },
+          { key: 'personResponsibleForFollowUp', label: 'Person Responsible for Follow Up', type: 'text', value: teacher?.personResponsibleForFollowUp || '' },
+          { key: 'oneOnOneSchedulingStatus', label: 'One-on-One Scheduling Status', type: 'text', value: teacher?.oneOnOneSchedulingStatus || '' },
+          { key: 'personalEmailSent', label: 'Personal Email Sent', type: 'toggle', value: !!teacher?.personalEmailSent },
+          { key: 'personalEmailSentDate', label: 'Personal Email Sent Date', type: 'date', value: teacher?.personalEmailSentDate || '' },
         ]}
         onSave={onSave}
       />
@@ -72,27 +73,36 @@ export function CultivationTab({ teacher, onSave }: { teacher: any; onSave?: (va
         title="First Contact Interests"
         columns={2}
         fields={[
-          { key: 'firstContactNotesOnPreWildflowerEmployment', label: 'Notes on Pre-Wildflower Employment', type: 'textarea', value: (teacher as any)?.firstContactNotesOnPreWildflowerEmployment || '' },
-          { key: 'firstContactWFSchoolEmploymentStatus', label: 'WF School Employment Status', type: 'text', value: (teacher as any)?.firstContactWFSchoolEmploymentStatus || '' },
-          { key: 'firstContactRelocate', label: 'Willingness to Relocate', type: 'text', value: (teacher as any)?.firstContactRelocate || '' },
-          { key: 'firstContactGovernance', label: 'Interest in Governance Model', type: 'multiselect', value: Array.isArray((teacher as any)?.firstContactGovernance) ? (teacher as any).firstContactGovernance : ((teacher as any)?.firstContactGovernance ? String((teacher as any).firstContactGovernance).split(',').map((s:string)=>s.trim()) : []) },
-          { key: 'firstContactAges', label: 'Ages of Interest', type: 'multiselect', value: Array.isArray((teacher as any)?.firstContactAges) ? (teacher as any).firstContactAges : ((teacher as any)?.firstContactAges ? String((teacher as any).firstContactAges).split(',').map((s:string)=>s.trim()) : []) },
-          { key: 'firstContactInterests', label: 'Interests', type: 'textarea', value: (teacher as any)?.firstContactInterests || '' },
+          { key: 'firstContactNotesOnPreWildflowerEmployment', label: 'Notes on Pre-Wildflower Employment', type: 'textarea', value: teacher?.firstContactNotesOnPreWildflowerEmployment || '' },
+          { key: 'firstContactWfSchoolEmploymentStatus', label: 'WF School Employment Status', type: 'text', value: teacher?.firstContactWfSchoolEmploymentStatus || '' },
+          { key: 'firstContactRelocate', label: 'Willingness to Relocate', type: 'text', value: teacher?.firstContactRelocate || '' },
+          { key: 'firstContactGovernance', label: 'Interest in Governance Model', type: 'multiselect', value: Array.isArray(teacher?.firstContactGovernance) ? teacher.firstContactGovernance : (teacher?.firstContactGovernance ? String(teacher.firstContactGovernance).split(',').map((s:string)=>s.trim()) : []) },
+          { key: 'firstContactAges', label: 'Ages of Interest', type: 'multiselect', value: Array.isArray(teacher?.firstContactAges) ? teacher.firstContactAges : (teacher?.firstContactAges ? String(teacher.firstContactAges).split(',').map((s:string)=>s.trim()) : []) },
+          { key: 'firstContactInterests', label: 'Interests', type: 'textarea', value: teacher?.firstContactInterests || '' },
         ]}
-        onSave={onSave}
+        onSave={(vals) => onSave?.({
+          ...vals,
+          ...(vals.firstContactGovernance !== undefined ? { firstContactGovernance: normalizeArray(vals.firstContactGovernance) } : {}),
+          ...(vals.firstContactAges !== undefined ? { firstContactAges: normalizeArray(vals.firstContactAges) } : {}),
+        })}
       />
 
       <InfoCard
         title="Ops Guide"
         columns={2}
         fields={[
-          { key: 'opsGuideMeetingPrefTime', label: 'Meeting Preference Time', type: 'text', value: (teacher as any)?.opsGuideMeetingPrefTime || '' },
-          { key: 'opsGuideSpecificsChecklist', label: 'Specifics Checklist', type: 'multiselect', value: Array.isArray((teacher as any)?.opsGuideSpecificsChecklist) ? (teacher as any).opsGuideSpecificsChecklist : ((teacher as any)?.opsGuideSpecificsChecklist ? String((teacher as any).opsGuideSpecificsChecklist).split(',').map((s:string)=>s.trim()) : []) },
-          { key: 'opsGuideReqPertinentInfo', label: 'Request Pertinent Info', type: 'multiselect', value: Array.isArray((teacher as any)?.opsGuideReqPertinentInfo) ? (teacher as any).opsGuideReqPertinentInfo : ((teacher as any)?.opsGuideReqPertinentInfo ? String((teacher as any).opsGuideReqPertinentInfo).split(',').map((s:string)=>s.trim()) : []) },
-          { key: 'opsGuideSupportTypeNeeded', label: 'Support Type Needed', type: 'multiselect', value: Array.isArray((teacher as any)?.opsGuideSupportTypeNeeded) ? (teacher as any).opsGuideSupportTypeNeeded : ((teacher as any)?.opsGuideSupportTypeNeeded ? String((teacher as any).opsGuideSupportTypeNeeded).split(',').map((s:string)=>s.trim()) : []) },
-          { key: 'opsGuideFundraisingOps', label: 'Fundraising Opportunities', type: 'text', value: (teacher as any)?.opsGuideFundraisingOps || (teacher as any)?.opsGuideFundrasingOps || '' },
+          { key: 'opsGuideMeetingPrefTime', label: 'Meeting Preference Time', type: 'text', value: teacher?.opsGuideMeetingPrefTime || '' },
+          { key: 'opsGuideSpecificsChecklist', label: 'Specifics Checklist', type: 'multiselect', value: Array.isArray(teacher?.opsGuideSpecificsChecklist) ? teacher.opsGuideSpecificsChecklist : (teacher?.opsGuideSpecificsChecklist ? String(teacher.opsGuideSpecificsChecklist).split(',').map((s:string)=>s.trim()) : []) },
+          { key: 'opsGuideReqPertinentInfo', label: 'Request Pertinent Info', type: 'multiselect', value: Array.isArray(teacher?.opsGuideReqPertinentInfo) ? teacher.opsGuideReqPertinentInfo : (teacher?.opsGuideReqPertinentInfo ? String(teacher.opsGuideReqPertinentInfo).split(',').map((s:string)=>s.trim()) : []) },
+          { key: 'opsGuideSupportTypeNeeded', label: 'Support Type Needed', type: 'multiselect', value: Array.isArray(teacher?.opsGuideSupportTypeNeeded) ? teacher.opsGuideSupportTypeNeeded : (teacher?.opsGuideSupportTypeNeeded ? String(teacher.opsGuideSupportTypeNeeded).split(',').map((s:string)=>s.trim()) : []) },
+          { key: 'opsGuideFundraisingOps', label: 'Fundraising Opportunities', type: 'text', value: teacher?.opsGuideFundraisingOps || teacher?.opsGuideFundrasingOps || '' },
         ]}
-        onSave={onSave}
+        onSave={(vals) => onSave?.({
+          ...vals,
+          ...(vals.opsGuideSpecificsChecklist !== undefined ? { opsGuideSpecificsChecklist: normalizeArray(vals.opsGuideSpecificsChecklist) } : {}),
+          ...(vals.opsGuideReqPertinentInfo !== undefined ? { opsGuideReqPertinentInfo: normalizeArray(vals.opsGuideReqPertinentInfo) } : {}),
+          ...(vals.opsGuideSupportTypeNeeded !== undefined ? { opsGuideSupportTypeNeeded: normalizeArray(vals.opsGuideSupportTypeNeeded) } : {}),
+        })}
       />
     </DetailGrid>
   );

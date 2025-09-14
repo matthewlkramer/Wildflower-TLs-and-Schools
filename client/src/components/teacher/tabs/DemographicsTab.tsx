@@ -18,11 +18,11 @@ export function DemographicsTab({ teacher, onSave }: { teacher: any; onSave?: (v
         title="Gender"
         columns={2}
         fields={[
-          { key: 'gender', label: 'Gender', type: 'text', value: (teacher as any)?.gender ?? '' },
-          { key: 'genderOther', label: 'Gender (Other)', type: 'text', value: (teacher as any)?.genderOther ?? '' },
+          { key: 'gender', label: 'Gender', type: 'text', value: teacher?.gender ?? '' },
+          { key: 'genderOther', label: 'Gender (Other)', type: 'text', value: teacher?.genderOther ?? '' },
           { key: 'pronouns', label: 'Pronouns', type: 'text', value: teacher?.pronouns ?? '' },
           { key: 'pronounsOther', label: 'Pronouns (Other)', type: 'text', value: teacher?.pronounsOther ?? '' },
-          { key: 'lgbtqia', label: 'LGBTQIA+', type: 'toggle', value: !!(teacher as any)?.lgbtqia },
+          { key: 'lgbtqia', label: 'LGBTQIA+', type: 'toggle', value: !!teacher?.lgbtqia },
         ]}
         onSave={(vals) => onSave?.(vals)}
       />
@@ -76,10 +76,10 @@ export function DemographicsTab({ teacher, onSave }: { teacher: any; onSave?: (v
         title="Misc."
         columns={2}
         fields={[
-          { key: 'excludeFromEmailLogging', label: 'Exclude From Email Logging', type: 'toggle', value: !!(teacher as any)?.excludeFromEmailLogging },
-          { key: 'pronunciation', label: 'Pronunciation', type: 'text', value: (teacher as any)?.pronunciation ?? '' },
-          { key: 'selfReflection', label: 'Self Reflection', type: 'textarea', value: (teacher as any)?.selfReflection ?? '' },
-          { key: 'inactiveFlag', label: 'Inactive', type: 'toggle', value: !!(teacher as any)?.inactiveFlag },
+          { key: 'excludeFromEmailLogging', label: 'Exclude From Email Logging', type: 'toggle', value: !!teacher?.excludeFromEmailLogging },
+          { key: 'pronunciation', label: 'Pronunciation', type: 'text', value: teacher?.pronunciation ?? '' },
+          { key: 'selfReflection', label: 'Self Reflection', type: 'textarea', value: teacher?.selfReflection ?? '' },
+          { key: 'inactiveFlag', label: 'Inactive', type: 'toggle', value: !!teacher?.inactiveFlag },
         ]}
         onSave={(vals) => onSave?.(vals)}
       />

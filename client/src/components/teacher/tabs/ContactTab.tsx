@@ -23,8 +23,8 @@ export function ContactTab({ teacher, onSave }: { teacher: any; onSave?: (vals: 
           title="Phone"
           columns={2}
           fields={[
-            { key: 'primaryPhone', label: 'Primary Phone', type: 'text', value: (teacher as any)?.primaryPhone ?? '' },
-            { key: 'secondaryPhone', label: 'Secondary Phone', type: 'text', value: (teacher as any)?.secondaryPhone ?? '' },
+            { key: 'primaryPhone', label: 'Primary Phone', type: 'text', value: teacher?.primaryPhone ?? '' },
+            { key: 'secondaryPhone', label: 'Secondary Phone', type: 'text', value: teacher?.secondaryPhone ?? '' },
           ]}
           onSave={(vals)=>onSave?.(vals)}
         />
@@ -32,7 +32,7 @@ export function ContactTab({ teacher, onSave }: { teacher: any; onSave?: (vals: 
           title="Address"
           columns={1}
           fields={[
-            { key: 'homeAddress', label: 'Home Address', type: 'textarea', value: (teacher as any)?.homeAddress ?? '' },
+            { key: 'homeAddress', label: 'Home Address', type: 'textarea', value: teacher?.homeAddress ?? '' },
           ]}
           onSave={(vals)=>onSave?.(vals)}
         />

@@ -15,11 +15,11 @@ export function SupportTab({
         title="High Priority"
         columns={2}
         fields={[
-          { key: 'status', label: 'Status', type: 'text', value: (school as any)?.status ?? '' },
+          { key: 'status', label: 'Status', type: 'text', value: school?.status ?? '' },
           { key: 'ssjStage', label: 'SSJ Stage', type: 'text', value: (school as any)?.ssjStage ?? '' },
           { key: 'ssjProjectedOpen', label: 'Projected Open Date', type: 'date', value: (school as any)?.ssjProjectedOpen ?? '' },
           { key: 'ssjReadinessRating', label: 'Readiness Rating', type: 'text', value: (school as any)?.ssjReadinessRating ?? '' },
-          { key: 'inactiveFlag', label: 'Inactive', type: 'toggle', value: !!(school as any)?.inactiveFlag },
+          { key: 'inactiveFlag', label: 'Inactive', type: 'toggle', value: !!school?.inactiveFlag },
         ]}
         onSave={onSave}
       />
