@@ -5,7 +5,7 @@ import { ExternalLink, Trash2, MoreVertical, FilePlus2, ClipboardList, Pencil } 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadgeCellRenderer, MultiValueCellRenderer } from "@/components/shared/grid-renderers";
-import { type School } from "@shared/schema.generated";
+import { type School } from "@/types/schema.generated";
 import { getStatusColor } from "@/lib/utils";
 import { queryClient } from "@/lib/queryClient";
 import { updateSchool } from "@/integrations/supabase/wftls";
@@ -13,7 +13,8 @@ import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid
 import { GridBase } from "@/components/shared/GridBase";
 import { useAgGridFeatures } from "@/hooks/use-aggrid-features";
 import { STAGE_STATUS_ORDER, STAGE_STATUS_DEFAULT, MEMBERSHIP_STATUS_ORDER } from "@/constants/filters";
-import { SCHOOLS_OPTIONS_AGESSERVED as AGES_SERVED_OPTIONS, SCHOOLS_OPTIONS_GOVERNANCEMODEL as GOVERNANCE_MODEL_OPTIONS } from "@shared/schema.generated";
+// TODO: Add these options to schema.generated
+// import { SCHOOLS_OPTIONS_AGESSERVED as AGES_SERVED_OPTIONS, SCHOOLS_OPTIONS_GOVERNANCEMODEL as GOVERNANCE_MODEL_OPTIONS } from "@/types/schema.generated";
 import { useToast } from "@/hooks/use-toast";
 import { EditNameModal } from "@/components/edit-name-modal";
 import { createTextFilter } from "@/utils/ag-grid-utils";

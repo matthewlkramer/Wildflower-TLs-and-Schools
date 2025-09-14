@@ -24,8 +24,43 @@ export type AssociationUpdate = Tables['people_roles_associations']['Update'];
 export type Email = Tables['z_g_emails']['Row'];
 export type Event = Tables['z_g_events']['Row'];
 
+export type Charter = Tables['charters']['Row'];
+export type CharterInsert = Tables['charters']['Insert'];
+export type CharterUpdate = Tables['charters']['Update'];
+
+export type Note = Tables['notes']['Row'];
+export type ActionStep = Tables['action_steps']['Row'];
+export type Location = Tables['locations']['Row'];
+export type Grant = Tables['grants']['Row'];
+
 export type GovernanceDoc = Tables['governance_docs']['Row'];
 export type NineNinety = Tables['nine_nineties']['Row'];
+
+// Legacy aliases for compatibility
+export type Teacher = Educator;
+export type EducatorNote = Note;
+export type SchoolNote = Note;
+export type EducatorSchoolAssociation = Association;
+export type TeacherSchoolAssociation = Association;
+
+// Additional missing types from old schema
+export type EventAttendance = any; // TODO: Add proper type
+export type EmailAddress = any; // TODO: Add proper type
+export type ReportSubmission = any; // TODO: Add proper type
+export type GovernanceDocument = any; // TODO: Add proper type
+export type CharterRole = any; // TODO: Add proper type
+export type CharterAuthorizerContact = any; // TODO: Add proper type
+export type AssessmentData = any; // TODO: Add proper type
+export type CharterApplication = any; // TODO: Add proper type
+export type NineNineties = NineNinety;
+export type SSJFilloutForm = any; // TODO: Add proper type
+export type MontessoriCertification = any; // TODO: Add proper type
+
+// Schema constants (TODO: populate with real values)
+export const EDUCATORS_SCHEMA = {};
+export const SCHOOLS_SCHEMA = {};
+export const SCHOOLS_OPTIONS_AGESSERVED = [];
+export const SCHOOLS_OPTIONS_GOVERNANCEMODEL = [];
 
 // UI View types (based on actual views from schema)
 export type GridSchool = Views['grid_school']['Row'];

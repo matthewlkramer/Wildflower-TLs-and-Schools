@@ -42,7 +42,7 @@ import {
   type LoanApplication, 
   type Loan, 
   type LoanPayment
-} from "@shared/loan-schema";
+} from "@/types/loan-schema";
 import QuarterlyReportsTracker from "@/components/QuarterlyReportsTracker";
 import PromissoryNoteManager from "@/components/PromissoryNoteManager";
 import { ColDef, AllCommunityModule, ModuleRegistry } from "ag-grid-community";

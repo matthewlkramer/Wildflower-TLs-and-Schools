@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { SchoolNote } from '@shared/schema.generated';
+import type { SchoolNote } from '@/types/schema.generated';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';

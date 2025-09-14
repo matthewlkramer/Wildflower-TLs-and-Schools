@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { EducatorSchoolAssociation } from "@shared/schema.generated";
+import type { EducatorSchoolAssociation } from "@/types/schema.generated";
 import { Edit, Trash2, UserMinus } from "lucide-react";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import { useLocation } from "wouter";

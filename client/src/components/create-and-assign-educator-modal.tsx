@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Educator } from "@shared/schema.generated";
+import type { Educator } from "@/types/schema.generated";
 import { useEducatorsSupabase } from "@/hooks/use-educators-supabase";
 
 const createAndAssignEducatorSchema = z.object({

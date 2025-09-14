@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { ActionStep } from "@shared/schema.generated";
+import type { ActionStep } from "@/types/schema.generated";
 import { Edit, Eye, CheckCircle, RotateCcw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";

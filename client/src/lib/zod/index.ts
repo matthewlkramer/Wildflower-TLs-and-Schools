@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Database } from '../../../../shared/database.types';
+import type { Database } from '@/types/database.types';
 
 // Complete Zod schemas based on database schema
 export const schoolInsertSchema = z.object({

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { Educator } from "@shared/schema.generated";
+import type { Educator } from "@/types/schema.generated";
 
 // Fetch educators for the main grid from Supabase view `grid_educator`.
 // Assumes the view exposes fields compatible with `Educator` used by the grid.

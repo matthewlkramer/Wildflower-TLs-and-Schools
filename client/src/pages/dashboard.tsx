@@ -14,7 +14,7 @@ import { CheckSquare, Building2, Users, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 import { format, parseISO, isToday, isTomorrow, isPast, differenceInDays } from "date-fns";
 import { useUserFilter } from "@/contexts/user-filter-context";
-import { type ActionStep, type School, type Educator } from "@shared/schema.generated";
+import { type ActionStep, type School, type Educator } from "@/types/schema.generated";
 import { useEffect, useState } from "react";
 import AddEducatorModal from "@/components/add-teacher-modal";
 import AddSchoolModal from "@/components/add-school-modal";

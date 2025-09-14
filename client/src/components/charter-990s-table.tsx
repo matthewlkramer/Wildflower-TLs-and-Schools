@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { NineNineties } from "@shared/schema.generated";
+import type { NineNineties } from "@/types/schema.generated";
 import { Edit, ExternalLink, Trash2 } from "lucide-react";
 import { RowActionsSelect } from "@/components/shared/RowActionsSelect";
 import { createTextFilter } from "@/utils/ag-grid-utils";

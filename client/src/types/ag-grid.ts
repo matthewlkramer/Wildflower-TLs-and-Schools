@@ -1,5 +1,5 @@
 import type { ICellRendererParams, IFilterParams, ValueGetterParams, ValueFormatterParams } from "ag-grid-community";
-import type { School, Educator } from "@shared/schema.generated";
+import type { School, Educator } from "@/types/schema.generated";
 
 export interface SchoolCellRendererParams extends ICellRendererParams {
   data: School;

@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { X, Edit, Trash2 } from 'lucide-react';
 import { TableCard } from '@/components/shared/TableCard';
-import type { GovernanceDocument, Tax990 } from '@shared/schema.generated';
+import type { GovernanceDocument, Tax990 } from '@/types/schema.generated';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { EducatorSchoolAssociation } from "@shared/schema.generated";
+import type { EducatorSchoolAssociation } from "@/types/schema.generated";
 import { AssociationGrid, type AssociationRow } from "@/components/associations/AssociationGrid";
 import { supabase } from "@/integrations/supabase/client";
 

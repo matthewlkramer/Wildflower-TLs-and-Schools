@@ -19,7 +19,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/componen
 import DetailsPanel from "@/components/DetailsPanel";
 import { useMutation } from "@tanstack/react-query";
 import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, TEACHERS_KANBAN_ORDER, TEACHERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
-import { type Teacher } from "@shared/schema.generated";
+import { type Teacher } from "@/types/schema.generated";
 import { useEducatorsSupabase } from "@/hooks/use-educators-supabase";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { useState } from "react";

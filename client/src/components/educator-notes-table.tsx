@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { createTextFilter } from "@/utils/ag-grid-utils";
-import type { EducatorNote } from "@shared/schema.generated";
+import type { EducatorNote } from "@/types/schema.generated";
 import { supabase } from "@/integrations/supabase/client";
 
 interface EducatorNotesTableProps {

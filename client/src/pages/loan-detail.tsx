@@ -32,7 +32,7 @@ import {
   Target,
   BarChart3
 } from "lucide-react";
-import { type Loan, type Borrower } from "@shared/loan-schema";
+import { type Loan, type Borrower } from "@/types/loan-schema";
 import { useSchoolLookup } from "@/hooks/use-lookup";
 import { LinkifySchoolName } from "@/components/shared/Linkify";
 

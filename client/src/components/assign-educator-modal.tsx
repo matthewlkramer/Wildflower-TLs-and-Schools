@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { type Educator } from "@shared/schema.generated";
+import { type Educator } from "@/types/schema.generated";
 import { queryClient } from "@/lib/queryClient";
 import { useEducatorsSupabase } from "@/hooks/use-educators-supabase";
 import { supabase } from "@/integrations/supabase/client";

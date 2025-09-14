@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { CharterRole } from "@shared/schema.generated";
+import type { CharterRole } from "@/types/schema.generated";
 import { Edit, Trash2 } from "lucide-react";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 
