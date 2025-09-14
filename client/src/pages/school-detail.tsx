@@ -118,7 +118,7 @@ export default function SchoolDetail() {
               </TabsContent>
 
               <TabsContent value="linked" className="mt-0">
-                <LinkedTab />
+                <LinkedTab schoolId={id || ''} />
               </TabsContent>
 
 
