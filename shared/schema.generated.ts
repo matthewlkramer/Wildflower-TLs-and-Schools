@@ -17,9 +17,9 @@ export type Educator = Tables['people']['Row'];
 export type EducatorInsert = Tables['people']['Insert'];
 export type EducatorUpdate = Tables['people']['Update'];
 
-export type Association = Tables['details_associations']['Row'];
-export type AssociationInsert = Tables['details_associations']['Insert'];
-export type AssociationUpdate = Tables['details_associations']['Update'];
+export type Association = Tables['people_roles_associations']['Row'];
+export type AssociationInsert = Tables['people_roles_associations']['Insert'];
+export type AssociationUpdate = Tables['people_roles_associations']['Update'];
 
 export type Email = Tables['z_g_emails']['Row'];
 export type Event = Tables['z_g_events']['Row'];
@@ -41,90 +41,175 @@ export type UIEducatorEvent = Views['ui_educator_events']['Row'];
 export type UpdateSchoolFieldArgs = Functions['update_school_field']['Args'];
 export type UpdateEducatorFieldArgs = Functions['update_educator_field']['Args'];
 
-// Field mappings for camelCase conversion
+// Field mappings for camelCase conversion (based on actual schema)
 export const SCHOOL_FIELD_MAP = {
   // Database field -> UI field
+  long_name: 'longName',
   short_name: 'shortName',
   governance_model: 'governanceModel',
   ages_served: 'agesServed',
-  membership_status: 'membershipStatus',
-  projected_open: 'projectedOpen',
-  physical_address: 'physicalAddress',
-  mailing_address: 'mailingAddress',
-  created_at: 'createdAt',
-  updated_at: 'updatedAt',
+  logo_url: 'logoUrl',
+  school_email: 'schoolEmail',
+  email_domain: 'emailDomain',
+  domain_name: 'domainName',
+  school_phone: 'schoolPhone',
+  on_national_website: 'onNationalWebsite',
+  nonprofit_status: 'nonprofitStatus',
+  google_voice: 'googleVoice',
+  website_tool: 'websiteTool',
+  budget_utility: 'budgetUtility',
+  transparent_classroom: 'transparentClassroom',
+  admissions_system: 'admissionsSystem',
+  tc_admissions: 'tcAdmissions',
+  tc_recordkeeping: 'tcRecordkeeping',
+  business_insurance: 'businessInsurance',
+  bill_account: 'billAccount',
+  number_of_classrooms: 'numberOfClassrooms',
+  created_by: 'createdBy',
+  last_modified: 'lastModified',
+  last_modified_by: 'lastModifiedBy',
+  enrollment_at_full_capacity: 'enrollmentAtFullCapacity',
+  google_workspace_org_unit_path: 'googleWorkspaceOrgUnitPath',
+  flexible_tuition_model: 'flexibleTuitionModel',
+  about_spanish: 'aboutSpanish',
+  hero_image_url: 'heroImageUrl',
+  hero_image_2_url: 'heroImage2Url',
+  budget_link: 'budgetLink',
+  bookkeeper_or_accountant: 'bookkeeperOrAccountant',
+  risk_factors: 'riskFactors',
+  program_focus: 'programFocus',
+  loan_report_name: 'loanReportName',
+  current_fy_end: 'currentFyEnd',
+  incorporation_date: 'incorporationDate',
+  guidestar_listing_requested: 'guidestarListingRequested',
+  legal_name: 'legalName',
+  nondiscrimination_policy_on_application: 'nondiscriminationPolicyOnApplication',
+  nondiscrimination_policy_on_website: 'nondiscriminationPolicyOnWebsite',
+  qbo_school_codes: 'qboSchoolCodes',
+  membership_termination_steps: 'membershipTerminationSteps',
+  automation_notes: 'automationNotes',
+  legal_structure: 'legalStructure',
+  open_date: 'openDate',
+  charter_id: 'charterId',
+  school_sched: 'schoolSched',
+  public_funding: 'publicFunding',
+  founding_tls: 'foundingTls',
 } as const;
 
 export const EDUCATOR_FIELD_MAP = {
-  // Database field -> UI field
+  // Database field -> UI field (based on actual schema)
   full_name: 'fullName',
   first_name: 'firstName',
   last_name: 'lastName',
   middle_name: 'middleName',
-  primary_email: 'primaryEmail',
-  non_wildflower_email: 'nonWildflowerEmail',
   primary_phone: 'primaryPhone',
   secondary_phone: 'secondaryPhone',
+  primary_phone_other_info: 'primaryPhoneOtherInfo',
+  secondary_phone_other_info: 'secondaryPhoneOtherInfo',
+  google_groups: 'googleGroups',
   home_address: 'homeAddress',
-  discovery_status: 'discoveryStatus',
-  has_montessori_cert: 'hasMontessoriCert',
-  race_ethnicity: 'raceEthnicity',
-  race_ethnicity_display: 'raceEthnicityDisplay',
-  primary_languages: 'primaryLanguages',
+  source_other: 'sourceOther',
+  tc_userid: 'tcUserid',
+  educ_attainment: 'educAttainment',
   other_languages: 'otherLanguages',
-  kanban_group: 'kanbanGroup',
-  kanban_order: 'kanbanOrder',
-  inactive_flag: 'inactiveFlag',
-  created_at: 'createdAt',
-  updated_at: 'updatedAt',
+  race_ethnicity_other: 'raceEthnicityOther',
+  hh_income: 'hhIncome',
+  childhood_income: 'childhoodIncome',
+  gender_other: 'genderOther',
+  pronouns_other: 'pronounsOther',
+  last_modified: 'lastModified',
+  indiv_type: 'indivType',
+  created_by: 'createdBy',
+  exclude_from_email_logging: 'excludeFromEmailLogging',
+  race_ethnicity: 'raceEthnicity',
+  primary_languages: 'primaryLanguages',
 } as const;
 
 export const ASSOCIATION_FIELD_MAP = {
-  // Database field -> UI field
+  // Database field -> UI field (based on people_roles_associations table)
   people_id: 'peopleId',
   school_id: 'schoolId',
+  charter_id: 'charterId',
+  authorizer_id: 'authorizerId',
+  role_specific_email: 'roleSpecificEmail',
+  loan_fund: 'loanFund',
+  email_status: 'emailStatus',
+  who_initiated_tl_removal: 'whoInitiatedTlRemoval',
+  gsuite_roles: 'gsuiteRoles',
+  currently_active: 'currentlyActive',
+  created_date: 'createdDate',
   start_date: 'startDate',
   end_date: 'endDate',
-  currently_active: 'currentlyActive',
-  created_at: 'createdAt',
-  updated_at: 'updatedAt',
 } as const;
 
 // Helper functions for field conversion
-export function convertSchoolToUI(school: School): UIDetailsSchool {
+export function convertSchoolToUI(school: School): any {
+  // Convert database school row to UI format
+  // Will be properly typed once views schema is available
   return {
     ...school,
+    name: school.long_name || school.short_name,
+    longName: school.long_name,
     shortName: school.short_name,
     governanceModel: school.governance_model,
     agesServed: school.ages_served,
-    membershipStatus: school.membership_status,
-    projectedOpen: school.projected_open,
-    physicalAddress: school.physical_address,
-    mailingAddress: school.mailing_address,
-  } as UIDetailsSchool;
+    logoUrl: school.logo_url,
+    schoolEmail: school.school_email,
+    phone: school.school_phone,
+    email: school.school_email,
+    website: school.website,
+    about: school.about,
+    aboutSpanish: school.about_spanish,
+    projectedOpen: school.open_date,
+    membershipStatus: school.nonprofit_status, // Approximate mapping
+    physicalAddress: null, // Will come from locations table
+    mailingAddress: null, // Will come from locations table
+    archived: false, // Not in current schema
+    created_at: school.created || new Date().toISOString(),
+    updated_at: school.last_modified || new Date().toISOString(),
+  };
 }
 
-export function convertEducatorToUI(educator: Educator): UIDetailsEducator {
+export function convertEducatorToUI(educator: Educator): any {
+  // Convert database people row to UI format
+  // Will be properly typed once views schema is available
   return {
     ...educator,
     fullName: educator.full_name,
     firstName: educator.first_name,
     lastName: educator.last_name,
     middleName: educator.middle_name,
-    primaryEmail: educator.primary_email,
-    nonWildflowerEmail: educator.non_wildflower_email,
+    nickname: educator.nickname,
+    primaryEmail: null, // Not in current people schema - comes from associations
+    nonWildflowerEmail: null, // Not in current people schema
     primaryPhone: educator.primary_phone,
     secondaryPhone: educator.secondary_phone,
     homeAddress: educator.home_address,
-    discoveryStatus: educator.discovery_status,
-    hasMontessoriCert: educator.has_montessori_cert,
+    discoveryStatus: null, // Not in current people schema
+    hasMontessoriCert: null, // Comes from montessori_certs table
     raceEthnicity: educator.race_ethnicity,
-    raceEthnicityDisplay: educator.race_ethnicity_display,
+    raceEthnicityDisplay: null, // Computed field
+    raceEthnicityOther: educator.race_ethnicity_other,
     primaryLanguages: educator.primary_languages,
     otherLanguages: educator.other_languages,
-    kanbanGroup: educator.kanban_group,
-    kanbanOrder: educator.kanban_order,
-  } as UIDetailsEducator;
+    educationalAttainment: educator.educ_attainment,
+    householdIncome: educator.hh_income,
+    incomeBackground: educator.childhood_income,
+    gender: educator.gender,
+    genderOther: educator.gender_other,
+    lgbtqia: educator.lgbtqia,
+    pronouns: educator.pronouns,
+    pronounsOther: educator.pronouns_other,
+    kanbanGroup: null, // Not in current people schema
+    kanbanOrder: null, // Not in current people schema
+    inactiveFlag: null, // Not in current people schema
+    indivType: educator.indiv_type,
+    excludeFromEmailLogging: educator.exclude_from_email_logging,
+    targetGeo: null, // Not in current people schema
+    tags: educator.tags,
+    created_at: educator.created || new Date().toISOString(),
+    updated_at: educator.last_modified || new Date().toISOString(),
+  };
 }
 
 // Constants for select options (can be expanded based on your data)
