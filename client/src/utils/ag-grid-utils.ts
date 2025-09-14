@@ -1,7 +1,7 @@
 // Common AG Grid utilities and configurations
 
 import type { ColDef, GridOptions } from "ag-grid-community";
-import { formatDate, formatPhoneNumber } from "@shared/utils";
+import { formatDate, formatPhoneNumber } from "@/lib/format";
 
 /**
  * Default grid options for all AG Grid tables

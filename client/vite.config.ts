@@ -14,6 +14,8 @@ export default defineConfig({
       // Put the more specific alias first so it wins over "@shared"
       { find: "@shared/loan-schema", replacement: path.resolve(import.meta.dirname, "src", "shims", "loan-schema.ts") },
       { find: "@shared/loan-schema.ts", replacement: path.resolve(import.meta.dirname, "src", "shims", "loan-schema.ts") },
+      // Map legacy shared schema types to client app schema (post-Express/Airtable)
+      { find: "@shared/schema.generated", replacement: path.resolve(import.meta.dirname, "src", "supabase", "app-schema.ts") },
       // Also replace the direct relative import inside shared/schema.ts
       // Catch absolute ids with or without .ts (Vercel/Posix)
       { find: /\/shared\/loan-schema(\.ts)?$/, replacement: path.resolve(import.meta.dirname, "src", "shims", "loan-schema-runtime.ts") },
