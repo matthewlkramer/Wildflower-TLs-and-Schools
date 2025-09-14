@@ -5,6 +5,7 @@ The Wildflower TLs & Schools application is a comprehensive management system fo
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
+Database management: Prefers making database changes via Supabase dashboard rather than using migrations.
 
 # System Architecture
 

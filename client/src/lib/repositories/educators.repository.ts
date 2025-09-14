@@ -61,16 +61,17 @@ export const educatorsRepository = {
     });
   },
 
-  // Get linked emails for educator (using UI view)
+  // Get linked emails for educator
   useEmails: (educatorId: string) => {
     return useQuery({
       queryKey: educatorKeys.linked(educatorId, 'emails'),
       enabled: !!educatorId,
       queryFn: async () => {
         const { data, error } = await supabase
-          .from('ui_educator_emails')
+          .from('z_g_emails')
           .select('*')
           .eq('people_id', educatorId)
+          .order('date', { ascending: false })
           .limit(100);
         if (error) throw error;
         return data || [];
@@ -78,16 +79,17 @@ export const educatorsRepository = {
     });
   },
 
-  // Get linked events for educator (using UI view)
+  // Get linked events for educator
   useEvents: (educatorId: string) => {
     return useQuery({
       queryKey: educatorKeys.linked(educatorId, 'events'),
       enabled: !!educatorId,
       queryFn: async () => {
         const { data, error } = await supabase
-          .from('ui_educator_events')
+          .from('z_g_events')
           .select('*')
           .eq('people_id', educatorId)
+          .order('start_time', { ascending: false })
           .limit(100);
         if (error) throw error;
         return data || [];
@@ -95,17 +97,18 @@ export const educatorsRepository = {
     });
   },
 
-  // Update educator field mutation (using secure RPC)
+  // Update educator field mutation
   useUpdateField: () => {
     const queryClient = useQueryClient();
     
     return useMutation({
       mutationFn: async ({ id, field, value }: { id: string; field: string; value: any }) => {
-        const { data, error } = await supabase.rpc('update_educator_field', {
-          educator_id: id,
-          field_name: field,
-          field_value: value
-        });
+        const { data, error } = await supabase
+          .from('people')
+          .update({ [field]: value })
+          .eq('id', id)
+          .select()
+          .single();
         if (error) throw error;
         return data;
       },
@@ -141,15 +144,17 @@ export const educatorsRepository = {
     });
   },
 
-  // Create educator mutation (using secure RPC)
+  // Create educator mutation
   useCreate: () => {
     const queryClient = useQueryClient();
     
     return useMutation({
       mutationFn: async (data: Record<string, any>) => {
-        const { data: result, error } = await supabase.rpc('create_educator', {
-          educator_data: data
-        });
+        const { data: result, error } = await supabase
+          .from('people')
+          .insert(data)
+          .select()
+          .single();
         if (error) throw error;
         return result;
       },
@@ -159,26 +164,20 @@ export const educatorsRepository = {
     });
   },
 
-  // Update educator mutation (using field updates)
+  // Update educator mutation
   useUpdate: () => {
     const queryClient = useQueryClient();
     
     return useMutation({
       mutationFn: async ({ id, data }: { id: string; data: Record<string, any> }) => {
-        // Use field-level updates for security
-        const promises = Object.entries(data).map(([field, value]) => 
-          supabase.rpc('update_educator_field', {
-            educator_id: id,
-            field_name: field,
-            field_value: value
-          })
-        );
-        
-        const results = await Promise.all(promises);
-        const errors = results.filter(r => r.error);
-        if (errors.length > 0) throw errors[0].error;
-        
-        return results[results.length - 1].data; // Return last result
+        const { data: result, error } = await supabase
+          .from('people')
+          .update(data)
+          .eq('id', id)
+          .select()
+          .single();
+        if (error) throw error;
+        return result;
       },
       onSuccess: (data, variables) => {
         queryClient.setQueryData(educatorKeys.detail(variables.id), data);
