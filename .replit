@@ -16,8 +16,8 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 36975
-externalPort = 3000
+localPort = 38409
+externalPort = 3001
 
 [workflows]
 runButton = "Project"
@@ -35,13 +35,13 @@ args = "Frontend App"
 name = "Frontend App"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd client && npm run dev"
-waitForPort = 5000
-
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd client && npm run dev -- --port 5000 --host 0.0.0.0"
+waitForPort = 5000
 
 [agent]
 integrations = ["javascript_stripe:1.0.0", "javascript_log_in_with_replit:1.0.0", "javascript_database:1.0.0", "javascript_sendgrid:1.0.0", "javascript_supabase:1.0.0"]
