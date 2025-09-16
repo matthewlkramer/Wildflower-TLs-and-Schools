@@ -1,25 +1,10 @@
-/**
- * Full Teachers index. This screen pulls all educator records from Airtable via
- * `useCachedEducators` which wraps a React Query cache. Once loaded, records are
- * filtered entirely on the client: first by the global search term coming from
- * `useSearch`, then optionally by the “My records” toggle from
- * `useUserFilter` which keeps only rows where the current user is listed as an
- * assigned partner. The derived list feeds an `AG Grid` instance rendered by
- * `TeachersGrid`. Rows are prefetched with `prefetchEducator` so that hovering a
- * row loads its detail data in React Query ahead of navigation. The page also
- * includes an inline Add Teacher button and opens the
- * `AddEducatorModal` for inline creation. A small debug header shows the active
- * search term and how many rows remain after filtering so that QA can verify the
- * query logic. No server calls occur for filtering; all transformations happen
- * in-memory after the initial fetch.
- */
+
 import TeachersGrid from "@/components/teachers-grid";
 import { KanbanBoard } from "@/components/shared/KanbanBoard";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import DetailsPanel from "@/components/DetailsPanel";
 import { useMutation } from "@tanstack/react-query";
 import { buildKanbanColumns, KANBAN_UNSPECIFIED_KEY, TEACHERS_KANBAN_ORDER, TEACHERS_KANBAN_COLLAPSED, labelsToKeys } from "@/constants/kanban";
-import { type Teacher } from "@/types/schema.generated";
 import { useEducatorsSupabase } from "@/hooks/use-educators-supabase";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { useState } from "react";
@@ -40,7 +25,7 @@ import { ViewModeToggle } from "@/components/shared/ViewModeToggle";
 
 export default function Teachers() {
   const [showAddEducatorModal, setShowAddEducatorModal] = useState(false);
-  const [selected, setSelected] = useState<Teacher[]>([]);
+  const [selected, setSelected] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<"table" | "kanban" | "split">("table");
   const [kFilters, setKFilters] = useState({ montessori: "All", race: "All", role: "All", stage: "All", discovery: "All", type: "All" });
 
@@ -209,7 +194,7 @@ export default function Teachers() {
               teachers={filteredTeachers || []} 
               isLoading={isLoading}
               onFilteredCountChange={(count)=>setGridFilteredCount(count)}
-              onSelectionChanged={(rows)=>setSelected(rows as Teacher[])}
+              onSelectionChanged={(rows)=>setSelected(rows as Educator[])}
               onAddTeacher={() => setShowAddEducatorModal(true)}
             />
           )}

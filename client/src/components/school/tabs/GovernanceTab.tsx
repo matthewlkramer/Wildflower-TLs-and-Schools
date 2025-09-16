@@ -5,7 +5,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { X, Edit, Trash2 } from 'lucide-react';
 import { TableCard } from '@/components/shared/TableCard';
-import type { GovernanceDocument, Tax990 } from '@/types/schema.generated';
+import type { Database } from '@/types/database.types';
+type GovernanceDocument = Database['public']['Tables']['governance_docs']['Row'];
+type Tax990 = Database['public']['Tables']['nine_nineties']['Row'];
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -27,13 +29,16 @@ function GovernanceDocumentRow({
   isSaving: boolean;
 }) {
   const [editData, setEditData] = useState({
-    docType: document.docType || '',
-    dateEntered: document.dateEntered || '',
+    docType: (document as any).doc_type || (document as any).docType || '',
+    dateEntered: (document as any).date_entered || (document as any).dateEntered || '',
   });
 
   useEffect(() => {
     if (isEditing) {
-      setEditData({ docType: document.docType || '', dateEntered: document.dateEntered || '' });
+      setEditData({
+        docType: (document as any).doc_type || (document as any).docType || '',
+        dateEntered: (document as any).date_entered || (document as any).dateEntered || ''
+      });
     }
   }, [isEditing, document]);
 
@@ -57,15 +62,15 @@ function GovernanceDocumentRow({
   ) : (
     <TableRow className="h-8">
       <TableCell className="py-1">
-        {document.docUrl ? (
-          <a href={document.docUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline cursor-pointer">
-            {document.docType || '-'}
+        {(document as any).pdf ? (
+          <a href={(document as any).pdf} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+            {(document as any).doc_type || (document as any).docType || '-'}
           </a>
         ) : (
-          document.docType || '-'
+          ((document as any).doc_type || (document as any).docType || '-')
         )}
       </TableCell>
-      <TableCell className="py-1">{document.dateEntered || '-'}</TableCell>
+      <TableCell className="py-1">{(document as any).date_entered || (document as any).dateEntered || '-'}</TableCell>
       <TableCell className="py-1">
         <div className="flex gap-1">
           <Button size="sm" variant="outline" onClick={onEdit} className="h-8 w-8 p-0">
@@ -97,10 +102,10 @@ function Tax990Row({
   onDelete: () => void;
   isSaving: boolean;
 }) {
-  const [editData, setEditData] = useState({ year: tax990.year || '' });
+  const [editData, setEditData] = useState({ year: (tax990 as any).form_year || (tax990 as any).year || '' });
 
   useEffect(() => {
-    if (isEditing) setEditData({ year: tax990.year || '' });
+    if (isEditing) setEditData({ year: (tax990 as any).form_year || (tax990 as any).year || '' });
   }, [isEditing, tax990]);
 
   return isEditing ? (
@@ -120,12 +125,12 @@ function Tax990Row({
   ) : (
     <TableRow className="h-8">
       <TableCell className="py-1 text-sm">
-        {tax990.attachmentUrl ? (
-          <a href={tax990.attachmentUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline cursor-pointer">
-            {tax990.year || '-'}
+        {(tax990 as any).pdf ? (
+          <a href={(tax990 as any).pdf} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+            {(tax990 as any).form_year || (tax990 as any).year || '-'}
           </a>
         ) : (
-          tax990.year || '-'
+          ((tax990 as any).form_year || (tax990 as any).year || '-')
         )}
       </TableCell>
       <TableCell className="py-1">

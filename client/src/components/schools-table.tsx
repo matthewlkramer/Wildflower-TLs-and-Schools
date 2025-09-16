@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { type School } from "@/types/schema.generated";
+import { type School } from "@/types/db-options";
 import { getStatusColor } from "@/lib/utils";
 import { queryClient } from "@/lib/queryClient";
 import { deleteSchool } from "@/integrations/supabase/wftls";

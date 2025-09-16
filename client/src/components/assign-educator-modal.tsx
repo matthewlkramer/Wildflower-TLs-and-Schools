@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { type Educator } from "@/types/schema.generated";
+// Using flexible type here since grid view returns snake_case keys
+type EducatorLike = Record<string, any>;
 import { queryClient } from "@/lib/queryClient";
 import { useEducatorsSupabase } from "@/hooks/use-educators-supabase";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,7 +32,7 @@ interface AssignEducatorModalProps {
 
 export default function AssignEducatorModal({ open, onOpenChange, schoolId, preselectedEducatorId }: AssignEducatorModalProps) {
   const { toast } = useToast();
-  const [selectedEducator, setSelectedEducator] = useState<Educator | null>(null);
+  const [selectedEducator, setSelectedEducator] = useState<EducatorLike | null>(null);
 
   const { data: educators = [] } = useEducatorsSupabase();
 
@@ -130,7 +131,7 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
                           <SelectValue placeholder="Search and select an educator">
                             {selectedEducator && (
                               <span className="text-left">
-                                {selectedEducator.fullName || `${selectedEducator.firstName} ${selectedEducator.lastName}`}
+                                {(selectedEducator as any).full_name || `${(selectedEducator as any).first_name ?? ''} ${(selectedEducator as any).last_name ?? ''}`}
                               </span>
                             )}
                           </SelectValue>
@@ -140,7 +141,7 @@ export default function AssignEducatorModal({ open, onOpenChange, schoolId, pres
                             <SelectItem key={educator.id} value={educator.id}>
                               <div className="flex flex-col">
                           <span className="font-medium">
-                            {(educator as any).full_name || educator.fullName || `${(educator as any).first_name ?? educator.firstName ?? ''} ${(educator as any).last_name ?? educator.lastName ?? ''}`}
+                            {(educator as any).full_name || `${(educator as any).first_name ?? ''} ${(educator as any).last_name ?? ''}`}
                           </span>
                           {(educator as any).current_primary_email_address && (
                             <span className="text-sm text-gray-500">{(educator as any).current_primary_email_address}</span>

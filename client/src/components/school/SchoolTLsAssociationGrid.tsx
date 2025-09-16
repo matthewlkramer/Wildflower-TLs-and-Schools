@@ -1,10 +1,10 @@
 import { AssociationGrid, type AssociationRow } from "@/components/associations/AssociationGrid";
-import type { School, Teacher, TeacherSchoolAssociation } from "@/types/schema.generated";
+import type { School, Educator, EducatorSchoolAssociation } from "@/types/ui-schema";
 
 type Props = {
   school: School;
-  associations: TeacherSchoolAssociation[];
-  teachers: Teacher[];
+  associations: EducatorSchoolAssociation[];
+  teachers: Educator[];
   onUpdateAssociation: (associationId: string, data: any) => void;
   onEndStint: (associationId: string) => void;
   onDeleteAssociation: (associationId: string) => void;

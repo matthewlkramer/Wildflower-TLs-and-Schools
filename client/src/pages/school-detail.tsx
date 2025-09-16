@@ -57,7 +57,7 @@ export default function SchoolDetail() {
     <main className="max-w-7xl mx-auto p-4">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">School: {school.name}</CardTitle>
+          <CardTitle className="text-2xl">School: {(school as any).long_name || (school as any).school_name}</CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -90,15 +90,15 @@ export default function SchoolDetail() {
               </TabsContent>
 
               <TabsContent value="guides" className="mt-0">
-                <GuidesTab schoolId={id || ''} />
+              <GuidesTab schoolId={id || ''} />
               </TabsContent>
 
               <TabsContent value="tls" className="mt-0">
-                <TLsTab school={school} schoolId={id || ''} />
+              <TLsTab school={school as any} schoolId={id || ''} />
               </TabsContent>
 
               <TabsContent value="ssj" className="mt-0">
-                <SupportTab school={school} onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)} />
+              <SupportTab school={school as any} onSave={(vals) => updateSchoolDetailsMutation.mutate(vals)} />
               </TabsContent>
 
               <TabsContent value="governance" className="mt-0">
@@ -110,7 +110,7 @@ export default function SchoolDetail() {
               </TabsContent>
 
               <TabsContent value="notes" className="mt-0">
-                <NotesTab schoolId={id || ''} />
+              <NotesTab schoolId={id || ''} onSelectNote={() => {}} />
               </TabsContent>
 
               <TabsContent value="todo" className="mt-0">

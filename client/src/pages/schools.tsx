@@ -22,7 +22,7 @@ import { Search } from "lucide-react";
 import { Plus, Pencil, Mail, GitMerge } from "lucide-react";
 import { GridBase } from "@/components/shared/GridBase";
 import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
-import { type School } from "@/types/schema.generated";
+import { type School } from "@/types/db-options";
 import { useSearch } from "@/contexts/search-context";
 import { useSchoolsSupabase } from "@/hooks/use-schools-supabase";
 import { useUserFilter } from "@/contexts/user-filter-context";
@@ -48,24 +48,26 @@ export default function Schools() {
   const { educatorByName } = useEducatorLookup();
 
   // No header AddNew wiring; header shows a fixed Add menu.
-  useGlobalTypeToSearch(searchRef, setSearchTerm);
+  useGlobalTypeToSearch(searchRef as any, setSearchTerm as any);
 
   const filteredSchools = (schools || []).filter((school: School) => {
     const searchTermLower = searchTerm.toLowerCase();
-    const matchesSearch = (school.name || '').toLowerCase().includes(searchTermLower) ||
-                         (school.shortName || '').toLowerCase().includes(searchTermLower) ||
-                         (school.stageStatus || school.status || '').toLowerCase().includes(searchTermLower) ||
-                         (school.membershipStatus || '').toLowerCase().includes(searchTermLower);
+    const matchesSearch = (
+      ((school as any).school_name || (school as any).long_name || '').toString().toLowerCase().includes(searchTermLower) ||
+      ((school as any).short_name || '').toString().toLowerCase().includes(searchTermLower) ||
+      ((school as any).stage_status || (school as any).status || '').toString().toLowerCase().includes(searchTermLower) ||
+      ((school as any).membership_status || '').toString().toLowerCase().includes(searchTermLower)
+    );
     
     if (!matchesSearch) return false;
     
     // Apply user filter if enabled
     if (showOnlyMyRecords && currentUser) {
       // Check if current user is an active guide or assigned partner
-      const isMyRecord = school.currentGuides?.some(guide => 
-        guide.toLowerCase().includes(currentUser.toLowerCase())
-      ) || school.assignedPartner?.toLowerCase().includes(currentUser.toLowerCase()) ||
-          false;
+      const guides: string[] = ((school as any).current_tls as any) || [];
+      const assigned: string = ((school as any).assigned_partner as any) || '';
+      const isMyRecord = (Array.isArray(guides) && guides.some(g=>String(g).toLowerCase().includes(currentUser.toLowerCase()))) ||
+                         (assigned && String(assigned).toLowerCase().includes(currentUser.toLowerCase())) || false;
       
       return isMyRecord;
     }
@@ -213,7 +215,7 @@ export default function Schools() {
                 <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Stage/Status" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">Stage/Status: All</SelectItem>
-                  {Array.from(new Set((filteredSchools||[]).map((s)=>s.stageStatus || s.status).filter(Boolean))).map((v)=>(
+                  {Array.from(new Set((filteredSchools||[]).map((s:any)=>s.stage_status || s.status).filter(Boolean))).map((v)=>(
                     <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
                   ))}
                 </SelectContent>
@@ -222,7 +224,7 @@ export default function Schools() {
                 <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Membership" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">Membership: All</SelectItem>
-                  {Array.from(new Set((filteredSchools||[]).map((s)=>s.membershipStatus).filter(Boolean))).map((v)=>(
+                  {Array.from(new Set((filteredSchools||[]).map((s:any)=>s.membership_status).filter(Boolean))).map((v)=>(
                     <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
                   ))}
                 </SelectContent>
@@ -231,7 +233,7 @@ export default function Schools() {
                 <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Ages Served" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">Ages Served: All</SelectItem>
-                  {Array.from(new Set((filteredSchools||[]).flatMap((s)=>Array.isArray(s.agesServed)?s.agesServed: (s.agesServed?[s.agesServed]:[])))).filter(Boolean).map((v)=>(
+                  {Array.from(new Set((filteredSchools||[]).flatMap((s:any)=>Array.isArray(s.ages_served)?s.ages_served: (s.ages_served?[s.ages_served]:[])))).filter(Boolean).map((v)=>(
                     <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
                   ))}
                 </SelectContent>
@@ -240,7 +242,7 @@ export default function Schools() {
                 <SelectTrigger className="h-8 w-[200px]"><SelectValue placeholder="Governance" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">Governance: All</SelectItem>
-                  {Array.from(new Set((filteredSchools||[]).map((s)=>s.governanceModel).filter(Boolean))).map((v)=>(
+                  {Array.from(new Set((filteredSchools||[]).map((s:any)=>s.governance_model).filter(Boolean))).map((v)=>(
                     <SelectItem key={v} value={String(v)}>{String(v)}</SelectItem>
                   ))}
                 </SelectContent>
@@ -248,21 +250,21 @@ export default function Schools() {
             </div>
             <KanbanBoard
               items={(filteredSchools || []).filter((s:any)=>{
-                if (kFilters.stage!=='All' && ((s.stage_status || s.stageStatus || s.status) !== kFilters.stage)) return false;
-                if (kFilters.membership!=='All' && ((s.membership_status || s.membershipStatus) !== kFilters.membership)) return false;
+                if (kFilters.stage!=='All' && ((s.stage_status || s.status) !== kFilters.stage)) return false;
+                if (kFilters.membership!=='All' && ((s.membership_status) !== kFilters.membership)) return false;
                 if (kFilters.ages!=='All'){
-                  const ages = Array.isArray(s.agesServed)?s.agesServed:[s.agesServed].filter(Boolean);
+                  const ages = Array.isArray(s.ages_served)?s.ages_served:[s.ages_served].filter(Boolean);
                   if (!ages.includes(kFilters.ages)) return false;
                 }
-                if (kFilters.governance!=='All' && ((s.governance_model || s.governanceModel) !== kFilters.governance)) return false;
+                if (kFilters.governance!=='All' && ((s.governance_model) !== kFilters.governance)) return false;
                 return true;
               })}
               columns={(() => {
                 const keys = new Set<string>();
-                (filteredSchools||[]).forEach((s:any) => keys.add(((s.stage_status || s.stageStatus) && String(s.stage_status || s.stageStatus)) || KANBAN_UNSPECIFIED_KEY));
+                (filteredSchools||[]).forEach((s:any) => keys.add(((s.stage_status) && String(s.stage_status)) || KANBAN_UNSPECIFIED_KEY));
                 return buildKanbanColumns(SCHOOLS_KANBAN_ORDER, Array.from(keys));
               })()}
-              groupBy={(s: any) => ((s.stage_status || s.stageStatus) && String(s.stage_status || s.stageStatus)) || KANBAN_UNSPECIFIED_KEY}
+              groupBy={(s: any) => ((s.stage_status) && String(s.stage_status)) || KANBAN_UNSPECIFIED_KEY}
               getId={(s: School) => s.id}
               initialCollapsedKeys={labelsToKeys(SCHOOLS_KANBAN_COLLAPSED)}
               selectedIds={selectedIds}
@@ -291,7 +293,7 @@ export default function Schools() {
               }}
               renderCard={(s: any) => (
                 <div>
-                  <div className="font-medium text-sm"><Link className="text-blue-600 hover:underline" href={`/school/${s.id}`}>{s.school_name || s.shortName || s.name}</Link></div>
+                  <div className="font-medium text-sm"><Link className="text-blue-600 hover:underline" href={`/school/${s.id}`}>{s.school_name || s.short_name || s.long_name}</Link></div>
                   <div className="text-xs text-slate-600 flex flex-wrap gap-1">
                     <LinkifyEducatorNames names={(s.current_tls as any) ?? (s.currentTLs as any)} educatorByName={educatorByName} />
                   </div>

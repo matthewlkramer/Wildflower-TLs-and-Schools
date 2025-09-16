@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { NineNineties } from "@/types/schema.generated";
+import type { NineNineties } from "@/types/db-options";
 import { Edit, ExternalLink, Trash2 } from "lucide-react";
 import { RowActionsSelect } from "@/components/shared/RowActionsSelect";
 import { createTextFilter } from "@/utils/ag-grid-utils";
@@ -26,10 +26,9 @@ export function NineNinetiesTable({ charterId }: NineNinetiesTableProps) {
     },
   });
 
-  const handleOpen = (tax990: NineNineties) => {
-    if (tax990.docUrl) {
-      window.open(tax990.docUrl, '_blank');
-    }
+  const handleOpen = (tax990: NineNineties | any) => {
+    const url = (tax990 as any).pdf || (tax990 as any).link || (tax990 as any).doc_url || (tax990 as any).attachment_url;
+    if (url) window.open(url, '_blank');
   };
 
   const handleEdit = (tax990: NineNineties) => {
@@ -49,7 +48,7 @@ export function NineNinetiesTable({ charterId }: NineNinetiesTableProps) {
       cellRenderer: (params: any) => {
         const tax990 = params.data;
         const year = params.value || "Unknown Year";
-        const docUrl = tax990.docUrl ?? tax990.doc_url ?? tax990.attachment_url;
+        const docUrl = (tax990 as any).pdf ?? (tax990 as any).link ?? (tax990 as any).doc_url ?? (tax990 as any).attachment_url;
         if (docUrl) {
           return (
             <button
@@ -81,7 +80,7 @@ export function NineNinetiesTable({ charterId }: NineNinetiesTableProps) {
         return (
           <RowActionsSelect
             options={[
-              { value: 'open', label: 'Open', run: () => handleOpen(tax990), hidden: !tax990.docUrl },
+              { value: 'open', label: 'Open', run: () => handleOpen(tax990) },
               { value: 'edit', label: 'Edit', run: () => handleEdit(tax990) },
               { value: 'delete', label: 'Delete', run: () => handleDelete(tax990) },
             ]}

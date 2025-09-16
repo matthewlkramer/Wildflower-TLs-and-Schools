@@ -28,8 +28,7 @@ export default function Settings() {
     (async () => {
       try {
         if (!user?.id) return;
-        const { data } = await supabase
-          .from("google_sync_settings")
+        const { data } = await (supabase.from as any)("google_sync_settings")
           .select("sync_start_date")
           .eq("user_id", user.id)
           .single();
@@ -90,22 +89,20 @@ export default function Settings() {
                     setSavingSync(true);
                     const iso = new Date(syncStart + "T00:00:00Z").toISOString();
                     // Read current start to determine if date moved earlier
-                    const { data: cur } = await supabase
-                      .from("google_sync_settings")
+                    const { data: cur } = await (supabase.from as any)("google_sync_settings")
                       .select("sync_start_date")
                       .eq("user_id", user.id)
                       .single();
                     const prevIso: string | null = cur?.sync_start_date || null;
                     const movedEarlier = !prevIso || new Date(iso) < new Date(prevIso);
-                    const { error } = await supabase
-                      .from("google_sync_settings")
+                    const { error } = await (supabase.from as any)("google_sync_settings")
                       .upsert({ user_id: user.id, sync_start_date: iso });
                     if (error) throw error;
                     toast({ title: "Saved", description: "Sync start date updated" });
                     // If moved earlier, enqueue a server-side catch-up request (processed by nightly cron)
                     if (movedEarlier) {
                       try {
-                        await supabase.from('sync_catchup_requests').upsert({ user_id: user.id, status: 'queued' } as any);
+                        await (supabase.from as any)('sync_catchup_requests').upsert({ user_id: user.id, status: 'queued' } as any);
                         toast({ title: 'Catch-up queued', description: 'Historical ingest will run server-side.' });
                       } catch {}
                     }

@@ -41,9 +41,9 @@ export function SummaryTab({ teacher }: { teacher: any }) {
         <div className="bg-slate-50 rounded-lg p-4">
           <h4 className="font-medium text-slate-900 mb-2">Basic Info</h4>
           <div className="space-y-1 text-sm">
-            <p><span className="text-slate-600">Name:</span> {teacher.fullName}</p>
+            <p><span className="text-slate-600">Name:</span> {(teacher as any).full_name}</p>
             <p><span className="text-slate-600">Current Role:</span> {currentRole || '-'}</p>
-            <div><span className="text-slate-600">Discovery Status:</span> <Badge className={getStatusColor(teacher.discoveryStatus || '')}>{teacher.discoveryStatus || '-'}</Badge></div>
+            <div><span className="text-slate-600">Discovery Status:</span> <Badge className={getStatusColor(((teacher as any).discovery_status || '') as any)}>{(teacher as any).discovery_status || '-'}</Badge></div>
           </div>
         </div>
         <div className="bg-slate-50 rounded-lg p-4">

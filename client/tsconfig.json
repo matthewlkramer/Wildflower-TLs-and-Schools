@@ -1,9 +1,32 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "types": ["node", "vite/client"]
+    "noEmit": true,
+    "module": "ESNext",
+    "strict": true,
+    "noImplicitAny": false,
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "types": ["node", "vite/client"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@shared/*": ["../shared/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
+  ,
+  "files": [],
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/pages/loan-*.tsx",
+    "src/pages/loans.tsx",
+    "src/components/google/GoogleSyncDashboard.tsx"
+  ]
 }
-

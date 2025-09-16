@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { CharterAuthorizerContact } from "@/types/schema.generated";
+import type { CharterAuthorizerContact } from "@/types/db-options";
 import { Edit, Trash2, Mail, Phone } from "lucide-react";
 import { RowActionsSelect } from "@/components/shared/RowActionsSelect";
 import { createTextFilter } from "@/utils/ag-grid-utils";

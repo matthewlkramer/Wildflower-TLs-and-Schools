@@ -1,5 +1,7 @@
 import React from 'react';
-import type { MembershipFeeByYear, MembershipFeeUpdate } from '@/types/schema.generated';
+// API response shapes for membership endpoints
+interface MembershipFeeByYear { id: string; year?: string | null; amount?: number | null }
+interface MembershipFeeUpdate { id: string; updateDate?: string | null; updateType?: string | null; attachment?: string | null }
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useQuery } from '@tanstack/react-query';
 

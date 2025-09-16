@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { School } from "@/types/schema.generated";
+import type { School } from "@/types/db-options";
 import { useLocation } from "wouter";
 import { getStatusColor } from "@/lib/utils";
 import { createTextFilter } from "@/utils/ag-grid-utils";

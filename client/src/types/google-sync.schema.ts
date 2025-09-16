@@ -1,3 +1,4 @@
+// Google Sync (z_*) table schemas and Zod validations
 import { z } from 'zod';
 
 /**
@@ -592,4 +593,3 @@ export const Z_TABLES = {
   z_google_sync_settings: 'z_google_sync_settings',
   z_sync_catchup_requests: 'z_sync_catchup_requests',
 } as const;
-

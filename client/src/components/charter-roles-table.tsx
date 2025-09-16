@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { CharterRole } from "@/types/schema.generated";
+// Use loose typing for now
 import { Edit, Trash2 } from "lucide-react";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 
@@ -10,7 +10,7 @@ interface CharterRolesTableProps {
 }
 
 export function CharterRolesTable({ charterId }: CharterRolesTableProps) {
-  const { data: roles = [], isLoading } = useQuery<CharterRole[]>({
+  const { data: roles = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/charter-roles/charter", charterId],
     queryFn: async () => {
       const response = await fetch(`/api/charter-roles/charter/${charterId}`, { 
@@ -22,11 +22,11 @@ export function CharterRolesTable({ charterId }: CharterRolesTableProps) {
     enabled: !!charterId,
   });
 
-  const handleEdit = (role: CharterRole) => {
+  const handleEdit = (role: any) => {
     console.log("Edit role:", role);
   };
 
-  const handleDelete = (role: CharterRole) => {
+  const handleDelete = (role: any) => {
     console.log("Delete role:", role);
   };
 
@@ -45,11 +45,11 @@ export function CharterRolesTable({ charterId }: CharterRolesTableProps) {
     },
     {
       headerName: "Currently Active",
-      field: "currentlyActive",
+      field: "currently_active",
       width: 120,
       ...createTextFilter(),
       cellRenderer: (params: any) => {
-        const active = params.value;
+        const active = params.value ?? params.data?.currently_active;
         return (
           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
             active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'

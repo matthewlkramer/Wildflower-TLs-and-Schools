@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import type { SchoolNote } from '@/types/schema.generated';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
@@ -12,7 +11,7 @@ import { createTextFilter } from '@/utils/ag-grid-utils';
 import { supabase } from '@/integrations/supabase/client';
 import { createNote as createNoteFn, updateNote as updateNoteFn, deleteNote as deleteNoteFn } from '@/integrations/supabase/wftls';
 
-export function NotesTab({ schoolId, onSelectNote }: { schoolId: string; onSelectNote: (note: SchoolNote) => void }) {
+export function NotesTab({ schoolId, onSelectNote }: { schoolId: string; onSelectNote: (note: any) => void }) {
   const qc = useQueryClient();
   const { data: notes = [], isLoading } = useQuery<any[]>({
     queryKey: ["supabase/notes/school", schoolId],

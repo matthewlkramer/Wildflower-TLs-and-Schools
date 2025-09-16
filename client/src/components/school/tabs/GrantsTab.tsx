@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import type { Grant, Loan } from '@/types/schema.generated';
+import type { Database } from '@/types/database.types';
+type Grant = Database['public']['Tables']['grants']['Row'];
+type Loan = Database['public']['Tables']['loans']['Row'];
 import { TableCard } from '@/components/shared/TableCard';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -19,8 +21,8 @@ function GrantRow({ grant, isEditing, onEdit, onSave, onCancel, onDelete, onView
   onView: () => void;
   isSaving: boolean;
 }) {
-  const [editData, setEditData] = useState({ amount: grant.amount || 0, issuedDate: grant.issuedDate || '', issuedBy: grant.issuedBy || '', status: grant.status || '' });
-  useEffect(() => { if (isEditing) setEditData({ amount: grant.amount || 0, issuedDate: grant.issuedDate || '', issuedBy: grant.issuedBy || '', status: grant.status || '' }); }, [isEditing, grant]);
+  const [editData, setEditData] = useState({ amount: grant.amount || 0, issuedDate: (grant as any).issued_date || '', issuedBy: (grant as any).issued_by || '', status: (grant as any).status || '' });
+  useEffect(() => { if (isEditing) setEditData({ amount: grant.amount || 0, issuedDate: (grant as any).issued_date || '', issuedBy: (grant as any).issued_by || '', status: (grant as any).status || '' }); }, [isEditing, grant]);
   return isEditing ? (
     <TableRow>
       <TableCell><Input type="number" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: parseFloat(e.target.value) || 0 })} className="h-8" /></TableCell>
@@ -37,9 +39,9 @@ function GrantRow({ grant, isEditing, onEdit, onSave, onCancel, onDelete, onView
   ) : (
     <TableRow>
       <TableCell>{grant.amount ? `$${grant.amount.toLocaleString()}` : '-'}</TableCell>
-      <TableCell>{grant.issuedDate || '-'}</TableCell>
-      <TableCell>{grant.issuedBy || '-'}</TableCell>
-      <TableCell>{grant.status || '-'}</TableCell>
+      <TableCell>{(grant as any).issued_date || '-'}</TableCell>
+      <TableCell>{(grant as any).issued_by || '-'}</TableCell>
+      <TableCell>{(grant as any).status || '-'}</TableCell>
       <TableCell>
         <div className="flex gap-1">
           <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700" title="Open" onClick={onView}>
@@ -63,8 +65,8 @@ function LoanRow({ loan, isEditing, onEdit, onSave, onCancel, onDelete, onView, 
   onView: () => void;
   isSaving: boolean;
 }) {
-  const [editData, setEditData] = useState({ amount: loan.amount || 0, status: loan.status || '', interestRate: loan.interestRate || 0 });
-  useEffect(() => { if (isEditing) setEditData({ amount: loan.amount || 0, status: loan.status || '', interestRate: loan.interestRate || 0 }); }, [isEditing, loan]);
+  const [editData, setEditData] = useState({ amount: (loan as any).amount_issued || 0, status: (loan as any).loan_status || '', interestRate: (loan as any).interest_rate || 0 });
+  useEffect(() => { if (isEditing) setEditData({ amount: (loan as any).amount_issued || 0, status: (loan as any).loan_status || '', interestRate: (loan as any).interest_rate || 0 }); }, [isEditing, loan]);
   return isEditing ? (
     <TableRow>
       <TableCell><Input type="number" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: parseFloat(e.target.value) || 0 })} className="h-8" /></TableCell>
@@ -79,9 +81,9 @@ function LoanRow({ loan, isEditing, onEdit, onSave, onCancel, onDelete, onView, 
     </TableRow>
   ) : (
     <TableRow>
-      <TableCell>{loan.amount ? `$${loan.amount.toLocaleString()}` : '-'}</TableCell>
-      <TableCell>{loan.status || '-'}</TableCell>
-      <TableCell>{loan.interestRate ? `${loan.interestRate}%` : '-'}</TableCell>
+      <TableCell>{(loan as any).amount_issued ? `$${(loan as any).amount_issued.toLocaleString()}` : '-'}</TableCell>
+      <TableCell>{(loan as any).loan_status || '-'}</TableCell>
+      <TableCell>{(loan as any).interest_rate ? `${(loan as any).interest_rate}%` : '-'}</TableCell>
       <TableCell>
         <div className="flex gap-1">
           <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700" title="Open" onClick={onView}><ExternalLink className="h-4 w-4" /></Button>

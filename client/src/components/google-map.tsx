@@ -51,7 +51,7 @@ const MapComponent = ({ center, zoom, schoolName, shortName, currentAddress, add
       scaledSize: new window.google.maps.Size(40, 40),
       anchor: new window.google.maps.Point(20, 20),
       origin: new window.google.maps.Point(0, 0),
-    } as google.maps.Icon;
+    } as any;
   }, []);
 
   // Create info window content

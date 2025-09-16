@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Educator } from "@/types/schema.generated";
+import type { Educator } from "@/types/db-options";
 import { useEducatorsSupabase } from "@/hooks/use-educators-supabase";
 
 const createAndAssignEducatorSchema = z.object({
@@ -66,9 +66,9 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
     const normalizedFirst = firstName.toLowerCase().trim();
     const normalizedLast = lastName.toLowerCase().trim();
     
-    const duplicate = educators.find(educator => 
-      educator.firstName?.toLowerCase().trim() === normalizedFirst &&
-      educator.lastName?.toLowerCase().trim() === normalizedLast
+    const duplicate = (educators as any[]).find(educator => 
+      (educator as any).first_name?.toLowerCase().trim() === normalizedFirst &&
+      (educator as any).last_name?.toLowerCase().trim() === normalizedLast
     );
     
     if (duplicate) {
@@ -348,7 +348,7 @@ export default function CreateAndAssignEducatorModal({ open, onOpenChange, schoo
             {potentialDuplicate && (
               <Alert>
                 <AlertDescription>
-                  An educator with the name "{potentialDuplicate.firstName} {potentialDuplicate.lastName}" already exists. 
+                  An educator with the name "{(potentialDuplicate as any).first_name} {(potentialDuplicate as any).last_name}" already exists. 
                   Is this the same person you want to assign to this school?
                 </AlertDescription>
               </Alert>

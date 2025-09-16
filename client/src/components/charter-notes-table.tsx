@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { SchoolNote } from "@/types/schema.generated";
+// Using raw Supabase rows; no explicit type needed here
 import { Edit, ExternalLink, Eye, Lock, Unlock, Trash2 } from "lucide-react";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 import { useState } from "react";
@@ -13,7 +13,7 @@ interface SchoolNotesTableProps {
 }
 
 export function SchoolNotesTable({ charterId }: SchoolNotesTableProps) {
-  const [selectedNote, setSelectedNote] = useState<SchoolNote | null>(null);
+  const [selectedNote, setSelectedNote] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: notes = [], isLoading } = useQuery<any[]>({
@@ -69,13 +69,13 @@ export function SchoolNotesTable({ charterId }: SchoolNotesTableProps) {
     },
     {
       headerName: "Created By",
-      field: "createdBy",
+      field: "created_by",
       width: 150,
       ...createTextFilter(),
     },
     {
       headerName: "Date Entered",
-      field: "dateEntered",
+      field: "date_created",
       width: 120,
       ...createTextFilter(),
     },
@@ -185,11 +185,11 @@ export function SchoolNotesTable({ charterId }: SchoolNotesTableProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-1">Created By</h3>
-                  <p className="text-sm text-slate-900">{selectedNote.createdBy || "Unknown"}</p>
+                  <p className="text-sm text-slate-900">{selectedNote.created_by || "Unknown"}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-1">Date Entered</h3>
-                  <p className="text-sm text-slate-900">{selectedNote.dateEntered || "Unknown"}</p>
+                  <p className="text-sm text-slate-900">{selectedNote.date_created || "Unknown"}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-1">Private</h3>

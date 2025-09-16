@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { EducatorSchoolAssociation } from "@/types/schema.generated";
 import { AssociationGrid, type AssociationRow } from "@/components/associations/AssociationGrid";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -24,7 +23,8 @@ export function EducatorSchoolAssociationsTable({ educatorId }: EducatorSchoolAs
   });
 
   const updateAssociation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+    mutationFn: async (args: any) => {
+      const { id, data } = args as { id: string; data: any };
       const { error } = await supabase
         .from('details_associations')
         .update({

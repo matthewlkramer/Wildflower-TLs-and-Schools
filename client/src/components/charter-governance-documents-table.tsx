@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { GovernanceDocument } from "@/types/schema.generated";
+// Use loose typing; API/DB provide snake_case fields
 import { Edit, ExternalLink, Trash2 } from "lucide-react";
 import { createTextFilter } from "@/utils/ag-grid-utils";
 
@@ -10,7 +10,7 @@ interface GovernanceDocumentsTableProps {
 }
 
 export function GovernanceDocumentsTable({ charterId }: GovernanceDocumentsTableProps) {
-  const { data: documents = [], isLoading } = useQuery<GovernanceDocument[]>({
+  const { data: documents = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/charter-governance-documents/charter", charterId],
     queryFn: async () => {
       const response = await fetch(`/api/charter-governance-documents/charter/${charterId}`, { 
@@ -22,30 +22,30 @@ export function GovernanceDocumentsTable({ charterId }: GovernanceDocumentsTable
     enabled: !!charterId,
   });
 
-  const handleOpen = (document: GovernanceDocument) => {
-    if (document.docUrl) {
-      window.open(document.docUrl, '_blank');
-    }
+  const handleOpen = (document: any) => {
+    const url = document.pdf ?? document.link ?? document.doc_url ?? document.attachment_url;
+    if (url) window.open(url, '_blank');
   };
 
-  const handleEdit = (document: GovernanceDocument) => {
+  const handleEdit = (document: any) => {
     console.log("Edit document:", document);
   };
 
-  const handleDelete = (document: GovernanceDocument) => {
+  const handleDelete = (document: any) => {
     console.log("Delete document:", document);
   };
 
   const columnDefs: ColDef<any>[] = [
     {
       headerName: "Document Type",
-      field: "docType",
+      field: "doc_type",
       width: 200,
       ...createTextFilter(),
       cellRenderer: (params: any) => {
         const document = params.data;
-        const docType = params.value || "Document";
-        if (document.docUrl) {
+        const docType = params.value || document.doc_type || "Document";
+        const hasUrl = !!(document.pdf ?? document.link ?? document.doc_url ?? document.attachment_url);
+        if (hasUrl) {
           return (
             <button
               onClick={() => handleOpen(document)}
@@ -61,7 +61,7 @@ export function GovernanceDocumentsTable({ charterId }: GovernanceDocumentsTable
     },
     {
       headerName: "Date",
-      field: "dateEntered",
+      field: "date_entered",
       width: 120,
       ...createTextFilter(),
     },
@@ -75,7 +75,7 @@ export function GovernanceDocumentsTable({ charterId }: GovernanceDocumentsTable
         const document = params.data;
         return (
           <div className="flex items-center gap-2">
-            {document.docUrl && (
+            {(document.pdf ?? document.link ?? document.doc_url ?? document.attachment_url) && (
               <button
                 onClick={() => handleOpen(document)}
                 className="text-blue-600 hover:text-blue-800"
@@ -106,7 +106,7 @@ export function GovernanceDocumentsTable({ charterId }: GovernanceDocumentsTable
 
   // Sort documents alphabetically by type
   const sortedDocuments = [...documents].sort((a, b) => {
-    return (a.docType || "").localeCompare(b.docType || "");
+    return ((a as any).doc_type || "").localeCompare((b as any).doc_type || "");
   });
 
   if (isLoading) {

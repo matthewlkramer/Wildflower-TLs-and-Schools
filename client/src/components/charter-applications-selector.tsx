@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { CharterApplication } from "@/types/schema.generated";
+import type { CharterApplication } from "@/types/db-options";
 import { getStatusColor } from "@/lib/utils";
 
 interface CharterApplicationsSelectorProps {
@@ -72,21 +72,21 @@ export function CharterApplicationsSelector({ charterId }: CharterApplicationsSe
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium text-slate-900">
-                      {application.applicationName || "Application"}
+                      {(application as any).team || "Application"}
                     </h4>
                     <p className="text-sm text-slate-600">
-                      Target Open: {application.targetOpen || "Not specified"}
+                      Target Open: {(application as any).target_open || "Not specified"}
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    {application.status && (
-                      <Badge className={`${getStatusColor(application.status)} text-xs`}>
-                        {application.status}
+                    {(application as any).app_status && (
+                      <Badge className={`${getStatusColor((application as any).app_status)} text-xs`}>
+                        {(application as any).app_status}
                       </Badge>
                     )}
-                    {application.submissionDate && (
+                    {(application as any).app_deadline && (
                       <span className="text-xs text-slate-500">
-                        Submitted: {application.submissionDate}
+                        Deadline: {(application as any).app_deadline}
                       </span>
                     )}
                   </div>
@@ -106,22 +106,22 @@ export function CharterApplicationsSelector({ charterId }: CharterApplicationsSe
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-1">Application Name</h3>
+                <h3 className="text-sm font-medium text-slate-500 mb-1">Team</h3>
                 <p className="text-sm text-slate-900">
-                  {selectedApplication.applicationName || "Not specified"}
+                  {(selectedApplication as any).team || "Not specified"}
                 </p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-slate-500 mb-1">Target Open Date</h3>
                 <p className="text-sm text-slate-900">
-                  {selectedApplication.targetOpen || "Not specified"}
+                  {(selectedApplication as any).target_open || "Not specified"}
                 </p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-slate-500 mb-1">Status</h3>
-                {selectedApplication.status ? (
-                  <Badge className={`${getStatusColor(selectedApplication.status)} text-xs`}>
-                    {selectedApplication.status}
+                {(selectedApplication as any).app_status ? (
+                  <Badge className={`${getStatusColor((selectedApplication as any).app_status)} text-xs`}>
+                    {(selectedApplication as any).app_status}
                   </Badge>
                 ) : (
                   <p className="text-sm text-slate-900">Not specified</p>
@@ -130,7 +130,7 @@ export function CharterApplicationsSelector({ charterId }: CharterApplicationsSe
               <div>
                 <h3 className="text-sm font-medium text-slate-500 mb-1">Submission Date</h3>
                 <p className="text-sm text-slate-900">
-                  {selectedApplication.submissionDate || "Not specified"}
+                  {(selectedApplication as any).app_deadline || "Not specified"}
                 </p>
               </div>
             </div>

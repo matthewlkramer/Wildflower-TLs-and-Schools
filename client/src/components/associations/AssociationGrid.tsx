@@ -2,6 +2,7 @@ import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { DEFAULT_COL_DEF, DEFAULT_GRID_PROPS } from "@/components/shared/ag-grid-defaults";
 import { Badge } from "@/components/ui/badge";
+import { PARTNER_ROLES as TL_ROLE_OPTIONS } from "@/types/db-options";
 import { RoleMultiSelectInline } from "@/components/shared/grid/RoleMultiSelectInline";
 import { YesNoSelectInline } from "@/components/shared/grid/YesNoSelectInline";
 import { DateInputInline } from "@/components/shared/grid/DateInputInline";
@@ -120,7 +121,7 @@ export function AssociationGrid({ mode, rows, loading, editable = false, onOpen,
           const values = Array.isArray(d.roles) ? (d.roles as string[]) : (Array.isArray(row.roles) ? row.roles : (row.roles ? String(row.roles).split(',').map(s=>s.trim()).filter(Boolean) : []));
           return (
             <RoleMultiSelectInline
-              options={TL_ROLE_OPTIONS}
+              options={[...TL_ROLE_OPTIONS] as string[]}
               value={values}
               onChange={(next) => setDraft((prev) => ({ ...prev, [row.id]: { ...(prev[row.id] || {}), roles: next } }))}
             />
@@ -180,7 +181,7 @@ export function AssociationGrid({ mode, rows, loading, editable = false, onOpen,
           const values = Array.isArray(d.roles) ? (d.roles as string[]) : (Array.isArray(row.roles) ? row.roles : (row.roles ? String(row.roles).split(',').map(s=>s.trim()).filter(Boolean) : []));
           return (
             <RoleMultiSelectInline
-              options={TL_ROLE_OPTIONS}
+              options={[...TL_ROLE_OPTIONS] as string[]}
               value={values}
               onChange={(next) => setDraft((prev) => ({ ...prev, [row.id]: { ...(prev[row.id] || {}), roles: next } }))}
             />
@@ -217,7 +218,7 @@ export function AssociationGrid({ mode, rows, loading, editable = false, onOpen,
 
     if (onOpen || onEdit || onEndStint || onDelete) {
       base.push({
-        headerName: '', field: 'actions', width: 160, minWidth: 140, sortable: false, filter: false, resizable: false,
+        headerName: '', field: undefined as any, width: 160, minWidth: 140, sortable: false, filter: false, resizable: false,
         cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' } as any,
         suppressHeaderMenuButton: true as any,
         suppressHeaderContextMenu: true as any,

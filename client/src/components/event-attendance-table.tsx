@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { createTextFilter } from "@/utils/ag-grid-utils";
-import type { EventAttendance } from "@/types/schema.generated";
+import type { EventAttendance } from "@/types/db-options";
 import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { queryClient } from "@/lib/queryClient";
@@ -154,7 +154,7 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
     },
     {
       headerName: "Actions",
-      field: "actions",
+      field: undefined as any,
       flex: 2,
       sortable: false,
       filter: false,
@@ -185,7 +185,7 @@ export function EventAttendanceTable({ educatorId }: EventAttendanceTableProps) 
                   onClick={async () => {
                     const row = rows.find(r => r.id === params.data.id);
                     if (!row) return;
-                    await updateAttendance.mutateAsync({ id: row.id, data: { attended: row.attended, registered: row.registered, registrationDate: row.registrationDate } });
+                    await updateAttendance.mutateAsync({ id: row.id, data: { attended_event: (row as any).attended_event, registration_date: (row as any).registration_date } as any });
                     setEditingId(null);
                   }}
                 >

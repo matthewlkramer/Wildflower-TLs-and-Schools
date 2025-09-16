@@ -45,26 +45,26 @@ export function SummaryTab({ school }: { school: any }) {
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900">{school.name}</h2>
-                <p className="text-lg text-gray-600 mt-1">{school.shortName}</p>
+                <h2 className="text-2xl font-semibold text-gray-900">{(school as any).long_name || (school as any).school_name}</h2>
+                <p className="text-lg text-gray-600 mt-1">{(school as any).short_name}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wider">Governance</p>
-                <p className="text-sm font-medium text-gray-900 mt-1">{(school as any).governanceModel || 'Not specified'}</p>
+                <p className="text-sm font-medium text-gray-900 mt-1">{(school as any).governance_model || 'Not specified'}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wider">Ages Served</p>
-                <p className="text-sm font-medium text-gray-900 mt-1">{Array.isArray((school as any).agesServed) ? (school as any).agesServed.join(', ') : ((school as any).agesServed || 'Not specified')}</p>
+                <p className="text-sm font-medium text-gray-900 mt-1">{Array.isArray((school as any).ages_served) ? (school as any).ages_served.join(', ') : ((school as any).ages_served || 'Not specified')}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wider">Open Date</p>
-                <p className="text-sm font-medium text-gray-900 mt-1">{(school as any).openDate || 'Not specified'}</p>
+                <p className="text-sm font-medium text-gray-900 mt-1">{(school as any).open_date || 'Not specified'}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wider">Membership</p>
-                <p className="text-sm font-medium text-gray-900 mt-1">{(school as any).membershipStatus || 'Not specified'}</p>
+                <p className="text-sm font-medium text-gray-900 mt-1">{(school as any).membership_status || 'Not specified'}</p>
               </div>
             </div>
             {((school as any).about || (school as any).aboutSpanish) && (

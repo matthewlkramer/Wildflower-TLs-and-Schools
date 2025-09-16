@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
 import { createTextFilter } from "@/utils/ag-grid-utils";
-import type { EmailAddress } from "@/types/schema.generated";
+// Use loose typing
 import { Button } from "@/components/ui/button";
 import { Edit3, Trash2, UserCheck } from "lucide-react";
 
@@ -51,7 +51,7 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     }
   };
 
-  const handleDelete = async (emailAddress: EmailAddress) => {
+  const handleDelete = async (emailAddress: any) => {
     if (!window.confirm("Delete this email address?")) return;
     try {
       const { error } = await supabase.from('email_addresses').delete().eq('id', emailAddress.id);
@@ -62,20 +62,12 @@ export function EmailAddressesTable({ educatorId }: EmailAddressesTableProps) {
     }
   };
 
-  const handleInactivate = async (emailAddress: EmailAddress) => {
-    try {
-      const { error } = await supabase.from('email_addresses').update({ status: 'inactive' }).eq('id', emailAddress.id);
-      if (error) throw error;
-      refresh();
-    } catch (err) {
-      console.error("Failed to inactivate email address", err);
-    }
-  };
+  // Inactivate handler removed (no 'status' column in schema)
 
-  const handleMakePrimary = async (emailAddress: EmailAddress) => {
+  const handleMakePrimary = async (emailAddress: any) => {
     try {
       // Mark the selected as primary; you may also want to unset others in DB via trigger or additional updates
-      const { error } = await supabase.from('email_addresses').update({ is_primary: true }).eq('id', emailAddress.id);
+      const { error } = await supabase.from('email_addresses').update({ primary: true }).eq('id', emailAddress.id);
       if (error) throw error;
       refresh();
     } catch (err) {

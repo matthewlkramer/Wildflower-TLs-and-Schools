@@ -17,35 +17,4 @@ export const promissoryNoteTemplates = {} as any;
 export const templateFields = {} as any;
 export const generatedDocuments = {} as any;
 
-// Type-only exports
-export type {
-  InsertBorrower,
-  Borrower,
-  InsertLoanApplication,
-  LoanApplication,
-  InsertLoan,
-  Loan,
-  InsertLoanPayment,
-  LoanPayment,
-  InsertLoanDocument,
-  LoanDocument,
-  InsertLoanCovenant,
-  LoanCovenant,
-  InsertLoanCommitteeReview,
-  LoanCommitteeReview,
-  InsertCapitalSource,
-  CapitalSource,
-  InsertQuarterlyReport,
-  QuarterlyReport,
-  InsertReportSchedule,
-  ReportSchedule,
-  InsertQuarterlyReportReminder,
-  QuarterlyReportReminder,
-  InsertPromissoryNoteTemplate,
-  PromissoryNoteTemplate,
-  InsertTemplateField,
-  TemplateField,
-  InsertGeneratedDocument,
-  GeneratedDocument,
-} from "../../../shared/loan-schema";
-
+// No type re-exports here to avoid module resolution errors in client build.

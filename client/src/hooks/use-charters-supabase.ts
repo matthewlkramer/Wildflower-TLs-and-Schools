@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { Charter } from "@/types/schema.generated";
+import type { Charter } from "@/types/db-options";
 
 export function useChartersSupabase() {
   const query = useQuery<Charter[]>({

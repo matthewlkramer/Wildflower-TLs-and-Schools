@@ -7,7 +7,7 @@ import { ExternalLink, Trash2, Plus, FilePlus2, ClipboardList, MessageSquareText
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BadgeRenderer, PillRenderer } from "@/components/shared/grid-renderers";
-import { type Educator, type School } from "@/types/schema.generated";
+import { type Educator, type School } from "@/types/db-options";
 import { getStatusColor } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";

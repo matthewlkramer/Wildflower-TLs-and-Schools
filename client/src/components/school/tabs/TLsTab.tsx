@@ -1,5 +1,5 @@
 import React from 'react';
-import type { School, Teacher, TeacherSchoolAssociation } from '@/types/schema.generated';
+import type { School, Educator, EducatorSchoolAssociation } from '@/types/ui-schema';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SchoolTLsAssociationGrid } from '@/components/school/SchoolTLsAssociationGrid';
 import DeleteConfirmationModal from '@/components/delete-confirmation-modal';
@@ -91,7 +91,7 @@ export function TLsTab({ school, schoolId }: { school: School; schoolId: string 
               endDate: a.end_date || a.endDate || null,
               isActive: (a.currently_active ?? a.isActive) ?? null,
               emailAtSchool: a.role_specific_email || null,
-            })) as unknown as TeacherSchoolAssociation[]}
+            })) as unknown as EducatorSchoolAssociation[]}
             teachers={teachers || []}
             onUpdateAssociation={(id, data) => updateAssociation.mutate({ id, data })}
             onEndStint={(id) => updateAssociation.mutate({ id, data: { endDate: new Date().toISOString().slice(0, 10) } })}

@@ -11,7 +11,7 @@
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
-import type { Charter } from "@/types/schema.generated";
+import type { Charter } from "@/types/db-options";
 import { usePageTitle } from "@/App";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getStatusColor } from "@/lib/utils";

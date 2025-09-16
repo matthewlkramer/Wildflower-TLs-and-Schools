@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { GridBase } from "@/components/shared/GridBase";
-import type { ActionStep } from "@/types/schema.generated";
+// Use loose typing; API/DB provide snake_case fields
 import { Edit, Eye, CheckCircle, RotateCcw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -13,10 +13,10 @@ interface ActionStepsTableProps {
 }
 
 export function ActionStepsTable({ charterId }: ActionStepsTableProps) {
-  const [selectedActionStep, setSelectedActionStep] = useState<ActionStep | null>(null);
+  const [selectedActionStep, setSelectedActionStep] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: actionSteps = [], isLoading } = useQuery<ActionStep[]>({
+  const { data: actionSteps = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/charter-action-steps/charter", charterId],
     queryFn: async () => {
       const response = await fetch(`/api/charter-action-steps/charter/${charterId}`, { 
@@ -29,41 +29,41 @@ export function ActionStepsTable({ charterId }: ActionStepsTableProps) {
   });
 
   // Sort action steps: incomplete first, then by due date
-  const sortedActionSteps = [...actionSteps].sort((a, b) => {
-    if (a.complete !== b.complete) {
-      return a.complete ? 1 : -1; // incomplete first
-    }
-    if (a.dueDate && b.dueDate) {
-      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-    }
+  const sortedActionSteps = (actionSteps as any[]).slice().sort((a, b) => {
+    const aComplete = !!(a.complete ?? false);
+    const bComplete = !!(b.complete ?? false);
+    if (aComplete !== bComplete) return aComplete ? 1 : -1;
+    const ad = a.dueDate ?? a.due_date;
+    const bd = b.dueDate ?? b.due_date;
+    if (ad && bd) return new Date(ad).getTime() - new Date(bd).getTime();
     return 0;
   });
 
-  const handleOpen = (actionStep: ActionStep) => {
+  const handleOpen = (actionStep: any) => {
     setSelectedActionStep(actionStep);
     setIsModalOpen(true);
   };
 
-  const handleEdit = (actionStep: ActionStep) => {
+  const handleEdit = (actionStep: any) => {
     console.log("Edit action step:", actionStep);
   };
 
-  const handleToggleComplete = (actionStep: ActionStep) => {
+  const handleToggleComplete = (actionStep: any) => {
     console.log("Toggle complete:", actionStep);
   };
 
-  const handleDelete = (actionStep: ActionStep) => {
+  const handleDelete = (actionStep: any) => {
     console.log("Delete action step:", actionStep);
   };
 
   const columnDefs: ColDef<any>[] = [
     {
       headerName: "Description",
-      field: "description",
+      field: "item",
       width: 300,
       ...createTextFilter(),
       cellRenderer: (params: any) => {
-        const description = params.value || "No description";
+        const description = params.value || params.data?.item || "No description";
         const truncated = description.length > 80 ? description.substring(0, 80) + "..." : description;
         return (
           <div className="truncate" title={description}>
@@ -80,17 +80,19 @@ export function ActionStepsTable({ charterId }: ActionStepsTableProps) {
     },
     {
       headerName: "Due Date",
-      field: "dueDate",
+      field: "due_date",
       width: 100,
       ...createTextFilter(),
+      valueGetter: (p: any) => p.data?.dueDate ?? p.data?.due_date ?? '',
     },
     {
       headerName: "Status",
-      field: "status",
+      field: "item_status",
       width: 100,
       ...createTextFilter(),
+      valueGetter: (p: any) => p.data?.status ?? p.data?.item_status ?? '',
       cellRenderer: (params: any) => {
-        const status = params.value;
+        const status = params.value ?? params.data?.item_status;
         if (!status) return <span className="text-slate-500">Not specified</span>;
         return (
           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
@@ -101,11 +103,12 @@ export function ActionStepsTable({ charterId }: ActionStepsTableProps) {
     },
     {
       headerName: "Complete",
-      field: "complete",
+      field: "item_status",
       width: 90,
       ...createTextFilter(),
+      valueGetter: (p: any) => p.data?.complete ?? (p.data?.item_status === 'Complete'),
       cellRenderer: (params: any) => {
-        const complete = params.value;
+        const complete = (params.value ?? params.data?.item_status) === 'Complete';
         return (
           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
             complete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
@@ -122,7 +125,7 @@ export function ActionStepsTable({ charterId }: ActionStepsTableProps) {
       sortable: false,
       filter: false,
       cellRenderer: (params: any) => {
-        const actionStep = params.data as ActionStep;
+        const actionStep = params.data as any;
         return (
           <select
             aria-label="Actions"
@@ -142,7 +145,7 @@ export function ActionStepsTable({ charterId }: ActionStepsTableProps) {
             <option value="" disabled>Actions</option>
             <option value="open">Open</option>
             <option value="edit">Edit</option>
-            <option value="toggle">{actionStep.complete ? 'Mark incomplete' : 'Mark complete'}</option>
+            <option value="toggle">{((actionStep as any).item_status === 'Complete') ? 'Mark incomplete' : 'Mark complete'}</option>
             <option value="delete">Delete</option>
           </select>
         );
