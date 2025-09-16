@@ -1,18 +1,21 @@
-// Config model: field name, display name, visibility, order, and value type/options.
-export type ColumnVisibility = 'show' | 'hide' | 'suppress';
-export type GridValueKind = 'string' | 'boolean' | 'multi' | 'select' | 'date' | 'number';
-export type CharterColumnConfig = {
-  field: string;
-  headerName: string;
-  visibility: ColumnVisibility;
-  order?: number;
-  valueType?: GridValueKind;
-  selectOptions?: string[]; // for select/multi
-  lookupField?: string;     // table.column for select/multi
-  enumName?: string;        // Postgres enum type name for select
-  sortKey?: boolean; // whether this field should be the default sort key
-  kanbanKey?: boolean; // whether this field should be the kanban grouping key
-};
+import type {
+  ColumnVisibility as ColumnVisibilityBase,
+  GridValueKind as GridValueKindBase,
+  GridColumnConfig,
+  DetailCardBlock,
+  DetailMapBlock,
+  DetailTableBlock,
+  DetailTabSpec as DetailTabConfig,
+} from '../shared/detail-types';
+import { ROW_ACTIONS, TABLE_ACTIONS, TABLE_COLUMNS } from '../shared/detail-presets';
+
+export type ColumnVisibility = ColumnVisibilityBase;
+export type GridValueKind = GridValueKindBase;
+export type CharterColumnConfig = GridColumnConfig;
+export type DetailCardSpec = DetailCardBlock;
+export type DetailTableSpec = DetailTableBlock;
+export type DetailMapSpec = DetailMapBlock;
+export type DetailTabSpec = DetailTabConfig;
 
 export const CHARTER_GRID: CharterColumnConfig[] = [
   { field: 'charter_name', headerName: 'Name', visibility: 'show', order: 1, valueType: 'string', sortKey: true },
@@ -22,41 +25,9 @@ export const CHARTER_GRID: CharterColumnConfig[] = [
   { field: 'initial_target_planes', headerName: 'Target planes', visibility: 'show', order: 5, valueType: 'multi', enumName: 'developmental_planes' },
   { field: 'initial_target_geo', headerName: 'Target geography', visibility: 'show', order: 6, valueType: 'string' },
   { field: 'id', headerName: 'ID', visibility: 'suppress' }
-];
+];    
 
 export const CHARTER_KANBAN_CONSTANTS_TABLE = 'ref_charter_statuses';
-
-// Details section types
-export type DetailCardSpec = {
-  kind: 'card';
-  title: string;
-  fields: string[]; // names from details_educators or editable base relation
-  editable: boolean;
-  editSource?: { schema?: string; table: string; pk?: string; exceptions?: Array<{ field: string; mapsToField?: string; viaLookup?: { schema?: string; table: string; labelColumn: string; keyColumn: string } }> };
-};
-
-export type DetailTableSpec = {
-  kind: 'table';
-  title: string;
-  source: { schema?: string; table: string; fkColumn: string }; // fkColumn referencing school id
-  columns: string[];
-  rowActions?: string[];
-  tableActions?: string[];
-};
-
-export type DetailMapSpec = {
-  kind: 'map';
-  title: string;
-  fields: string[];
-};
-
-export type DetailTabSpec = {
-  id: string;
-  label: string;
-  // Default write target for editable cards on this tab
-  writeTo?: { schema?: string; table: string; pk?: string };
-  blocks: (DetailCardSpec | DetailTableSpec | DetailMapSpec)[];
-};
 
 export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
   {
@@ -64,13 +35,12 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
     label: 'Overview',
     writeTo: { schema: 'public', table: 'charters', pk: 'id' },
     blocks: [
-      { kind: 'map', title: 'Location', fields: ['physical_lat','physical_long','physical_address'] },
       { kind: 'card', title: 'Name(s)', fields: ['short_name', 'full_name'], editable: true },
       { kind: 'card', title: 'Status', fields: ['status','membership_status','currently_authorized','authorizer'], editable: false },
       { kind: 'card', title: 'People', fields: ['non_tl_roles'], editable: true },
       { kind: 'card', title: 'Support', fields: ['current_cohort','support_timeline'], editable: false },
       { kind: 'card', title: 'Grants and Loans', fields: ['total_grants_issued', 'total_loans_issued'], editable: false },
-      { kind: 'card', title: 'Initial Vision', fields: ['initial_target_geo','initial_target_planes','target_open'], editable: true },
+      { kind: 'card', title: 'Initial Vision', fields: ['initial_target_geo','initial_target_planes'], editable: true },
     ],
   },
   {
@@ -81,6 +51,7 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
       { kind: 'card', title: 'Legal entity', fields: ['ein','incorp_date','current_fy_end'], editable: true },
       { kind: 'card', title: 'Nonprofit status', fields: ['nonprofit_status','group_exemption_status'], editable: true },
       { kind: 'table', title: 'Authorizer actions', source: { table: 'charter_authorizer_actions', schema: 'public', fkColumn: 'charter_id' }, columns: ['action','action_date','authorized_after_action'], rowActions: ['modal_view'], tableActions: ['addAction'] },
+      { kind: 'card', title: 'Other', fields: ['non_discrimination_policy_on_website','school_provided_1023','guidestart_listing_requested','partnership_with_wf', 'first_site_opened_date', 'website'], editable: true },
     ],
   },
   {
@@ -88,91 +59,94 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
     label: 'Application Details',
     writeTo: { schema: 'public', table: 'charter_applications', pk: 'id' },
     blocks: [
-      { kind: 'card', title: 'Lexxxxy', fields: ['app_window','key_dates','milestones',], editable: true },
-      { kind: 'card', title: 'Ages', fields: ['beg_age','end_age'], editable: true },
-      { kind: 'card', title: 'LOI', fields: ['loi_required','loi_deadline','loi_submitted','loi'], editable: true },
-      { kind: 'card', title: 'dates', fields: ['app_deadline'], editable: true },
-      { kind: 'card', title: 'Projections', fields: ['odds_authorization','odds_on_time_open','proj_open_date'], editable: true },
-      { kind: 'card', title: 'Docs', fields: ['design_album','application'], editable: true },
-      { kind: 'card', title: 'Budgets', fields: ['num_students','budget_exercises','budget_final'], editable: true },
-      { kind: 'card', title: 'People', fields: ['team','opps_challenges'], editable: true },
-      { kind: 'card', title: 'Dates', fields: ['app_submitted','joint_kickoff_meeting_date','jv_contract_signed_date','decision_expected_date'], editable: true },
-      { kind: 'card', title: 'Capacity Interviews', fields: ['capacity_intv_training_complete','capacity_intv_proj_date','capacity_intv_completed_date'], editable: true },
-      { kind: 'card', title: 'Auth Decision', fields: ['auth_decision'], editable: true },
-    ],
+      { kind: 'card', title: 'Overall', fields: ['app_window','authorizer','decision_expected_date','target_open','auth_decision','proj_open_date'], editable: true },
+      { kind: 'card', title: 'Requirements', fields: ['loi_required'], editable: true },
+      { kind: 'card', title: 'Deadlines', fields: ['loi_deadline', 'loi_submitted','app_deadline','app_submitted'], editable: true },
+      { kind: 'card', title: 'Students/Ages', fields: ['num_students','beg_age','end_age'], editable: true },
+      { kind: 'card', title: 'Docs', fields: ['loi','landscape_analysis','design_album','application'], editable: true },
+      { kind: 'card', title: 'Budgets', fields: ['budget_exercises','budget_final'], editable: true },
+      { kind: 'card', title: 'People', fields: ['team'], editable: true }
+      { kind: 'card', title: 'Checklist', fields: ['charter_app_roles_set','charter_app_pm_plan_complete','logic_model_complete','comm_engagement_underway'], editable: true },
+      { kind: 'card', title: 'Schedule', fields: ['joint_kickoff_meeting_date','internal_support_meeting_date','app_walkthrough_date','capacity_intv_training_date','capacity_intv_proj_complete','capacity_intv_completed_date','design_advice_session_complete','board_membership_signed_date'], editable: true },
+
   },
   {
-    id: 'operations',
-    label: 'Ops + Governance',
-    writeTo: { schema: 'public', table: 'charters', pk: 'id' },
+    id: 'educators',
+    label: 'Educators',
     blocks: [
-      { kind: 'card', title: 'Participation + Partnership with Wildflower', fields: ['partnership_with_wf','first_site_opened_date','non_discrimination_policy_on_website','school_provided_1023','guidestar_listing_requested'], editable: true },
+      { kind: 'table', title: 'Educators', source: { table: 'details_educators', schema: 'public', fkColumn: 'charter_id' }, columns: ['educator_name', 'role_at_school', 'start_date', 'end_date', 'currently_active', 'stage_status'], rowActions: ['inline_edit', 'modal_view', 'end_stint'], tableActions: ['addStint', 'addEducatorAndStint'] },
+    ],
   },
   {
     id: 'schools',
     label: 'Schools',
     blocks: [
-      { kind: 'table', title: '', source: { table: 'details_associations', schema: 'public', fkColumn: 'charter_id' }, columns: ['school_name','role', 'start_date', 'end_date', 'currently_active', 'ages_served','stage_status'], rowActions: ['inline_edit', 'modal_view'], tableActions: ['addSchool','addNewSchool'] },
+      { kind: 'table', title: 'Schools', source: { table: 'details_schools', schema: 'public', fkColumn: 'charter_id' }, columns: ['school_name', 'start_date', 'end_date', 'currently_active', 'stage_status'], rowActions: ['inline_edit', 'modal_view', 'end_stint'], tableActions: ['addStint', 'addEducatorAndStint'] },
     ],
   },
   {
-    id: 'people',
-    label: 'People',
+    id: 'enrollment',
+    label: 'Enrollment',
     blocks: [
-      { kind: 'table', title: '', source: { table: 'details_associations', schema: 'public', fkColumn: 'charter_id' }, columns: ['full_name,'role','start_date','end_date','currently_active','race_ethnicity_display','has_montessori_cert'], rowActions: ['inline_edit'], tableActions: ['addRole','addPersonAndRole'] },
+      { kind: 'table', title: '', source: { table: 'annual_enrollment_and_demographics', schema: 'public', fkColumn: 'charter_id' }, columns: ['school_year','enrolled_students_total','enrolled_frl','enrolled_bipoc','enrolled_ell','enrolled_sped'],rowActions: ['inline_edit'], tableActions: ['addEnrollmentData'] },
     ],
   },
   {
-    id: 'grants_and_loans',
+    id: 'docs',
+    label: 'Documents',
+    blocks: [
+      { kind: 'table', title: 'Governance Docs', source: { table: 'governance_docs', schema: 'public', fkColumn: 'charter_id' }, columns: ['doc_type','pdf'],rowActions: ['archive'], tableActions: ['addGovDoc'] },
+      { kind: 'table', title: '990s', source: { table: 'nine_nineties', schema: 'public', fkColumn: 'charter_id' }, columns: ['form_year','pdf'],rowActions: ['archive'], tableActions: ['addSchoolDoc'] },
+    ],
+  },
+  
+  {
+    id: 'reports_and_results',
+    label: 'Reports and Results',
+    blocks: [
+      { kind: 'table', title: '', source: { table: 'school_reports_and_submissions', schema: 'public', fkColumn: 'charter_id' }, columns: ['school_year','report_type','attachment'],rowActions: ['modal_view'], tableActions: ['addReport'] },
+      { kind: 'table', title: '', source: { table: 'annual_assessment_and_metrics_data', schema: 'public', fkColumn: 'charter_id' }, columns: ['school_year','assessment_or_metric','metric_data'],rowActions: ['modal_view'], tableActions: ['addData'] },
+    ],
+  },
+  
+  {
+    id: 'grant_and_loans',
     label: 'Grants and Loans',
     blocks: [
-      { kind: 'table', title: 'Loans', source: { table: 'loans', schema: 'public', fkColumn: 'charter_id' }, columns: ['issue_date','amount_issued','loan_status'], rowActions: ['modal_view']},
-      { kind: 'table', title: 'Grants', source: { table: 'grants', schema: 'public', fkColumn: 'charter_id' }, columns: ['issue_date','amount','grant_status'], rowActions: ['inline_edit','modal_view','archive'], tableActions: ['addGrant'] },
-
-    ],
-  },
-  {
-    id: 'locations',
-    label: 'Locations',
-    blocks: [
-      { kind: 'table', title: '', source: { table: 'locations', schema: 'public', fkColumn: 'charter_id' }, columns: ['address','start_date','end_date','current_mail_address','current_physical_address','lease_end_date'], rowActions: ['modal_view', 'inline_edit','end_occupancy', 'archive'], tableActions: ['addLocation'] },
+      { kind: 'table', title: 'Grants', source: { table: 'grants', schema: 'public', fkColumn: 'charter_id' }, columns: ['issue_date','grant_status','amount'],rowActions: ['inline_edit', 'modal_view'], tableActions: ['addGrant'] },
+      { kind: 'table', title: 'Loans', source: { table: 'loans', schema: 'public', fkColumn: 'charter_id' }, columns: ['issue_date','amount_issued'],rowActions: ['modal_view']},
     ],
   },
   {
     id: 'guides',
     label: 'Guides',
     blocks: [
-      { kind: 'table', title: 'Guide Assignments', source: { table: 'guide_assignments', schema: 'public', fkColumn: 'charter_id' }, columns: ['email_or_name','type','start_date','end_date','active'], rowActions: ['inline_edit'], tableActions: ['addGuideLink','addNewGuide'] }
-    ],
-  },
-  {
-    id: 'documents',
-    label: 'Documents',
-    blocks: [
-      { kind: 'table', title: 'Documents', source: { table: 'governance_docs', schema: 'public', fkColumn: 'charter_id' }, columns: ['document','uploaded_at','notes'], rowActions: ['inline_edit','modal_view'], tableActions: ['addDocument'] },
-      { kind: 'table', title: '990s', source: { table: 'nine_nineties', schema: 'public', fkColumn: 'charter_id' }, columns: ['form_year','pdf'], rowActions: ['archive'], tableActions: ['addSchoolDoc'] },
-    ],
-  },
-  {
-    id: 'notes',
-    label: 'Notes',
-    blocks: [
-      { kind: 'table', title: 'Notes', source: { table: 'notes', schema: 'public', fkColumn: 'charter_id' }, columns: ['note','created_by','created_date','private'], rowActions: ['inline_edit', 'modal_view', 'markPrivate', 'archive'], tableActions: ['addNote'] },
+      { kind: 'table', title: '', source: { table: 'guide_assignments', schema: 'public', fkColumn: 'charter_id' }, columns: ['email_or_name','type','start_date','end_date', 'active'],rowActions: ['inline_edit'], tableActions: ['addGuideLink','addNewGuide'] },
     ],
   },
   {
     id: 'action_steps',
     label: 'Action Steps',
     blocks: [
-      { kind: 'table', title: 'Action Steps', source: { table: 'action_steps', schema: 'public', fkColumn: 'charter_id' }, columns: ['item','assignee','item_status','assigned_date','due_date','completed_date'], rowActions: ['inline_edit', 'modal_view', 'mark_complete', 'archive'], tableActions: ['addActionStep'] },
+      { kind: 'table', title: 'Action Steps', source: { schema: 'public', table: 'action_steps', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.actionSteps], rowActions: [...ROW_ACTIONS.actionSteps], tableActions: [...TABLE_ACTIONS.actionSteps] },
+    ],
+  },
+  {
+    id: 'notes',
+    label: 'Notes',
+    blocks: [
+      { kind: 'table', title: 'Notes', source: { schema: 'public', table: 'notes', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.notesWithBody], rowActions: [...ROW_ACTIONS.notesSnake], tableActions: [...TABLE_ACTIONS.notes] },
     ],
   },
   {
     id: 'google_sync',
     label: 'Google Sync',
+    writeTo: { schema: 'public', table: 'people', pk: 'id' },
     blocks: [
-      { kind: 'table', title: 'Gmails', source: { table: 'g_emails', schema: 'gsync', fkColumn: 'people_id' }, columns: ['sent_at', 'from', 'to_emails', 'cc_emails', 'subject'], rowActions: ['modalView', 'markPrivate'] },
-      { kind: 'table', title: 'Calendar Events', source: { table: 'g_events', schema: 'gsync', fkColumn: 'people_id' }, columns: ['summary', 'start_date', 'attendees'], rowActions: ['modalView', 'markPrivate'] },
+      { kind: 'card', title: 'Google Sync Settings', fields: ['exclude_from_calendar_logging'], editable: true },
+      { kind: 'table', title: 'Gmails', source: { table: 'g_emails', schema: 'gsync', fkColumn: 'charter_id' }, columns: ['sent_at', 'from', 'to_emails', 'cc_emails', 'subject'], rowActions: ['modalView', 'markPrivate'] },
+      { kind: 'table', title: 'Calendar Events', source: { table: 'g_events', schema: 'gsync', fkColumn: 'charter_id' }, columns: ['summary', 'start_date', 'attendees'], rowActions: ['modalView', 'markPrivate'] },
     ],
   },
 ];
+
