@@ -1,17 +1,12 @@
 // Grid section
-export type ColumnVisibility = 'show' | 'hide' | 'suppress';
-export type GridValueKind = 'string' | 'boolean' | 'multi' | 'select' | 'date' | 'number';
-export type EducatorColumnConfig = {
-  field: string;
-  headerName: string;
-  visibility: ColumnVisibility;
-  order?: number; // ignored for suppress
-  valueType?: GridValueKind;
-  selectOptions?: string[]; // when valueType === 'select/multi'
-  lookupField?: string; // when valueType === 'select/multi' and options are dynamic (schema.table or table.column)
-  enumName?: string; // when valueType === 'select/multi' and using a Postgres enum type
-  sortKey?: boolean; // whether this field should be the default sort key
-};
+import type { ColumnVisibility, GridValueKind, GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailTabSpec as SharedDetailTabSpec } from '../shared/detail-types';
+import { ROW_ACTIONS, TABLE_ACTIONS, TABLE_COLUMNS } from '../shared/detail-presets';
+
+export type { ColumnVisibility, GridValueKind } from '../shared/detail-types';
+export type EducatorColumnConfig = GridColumnConfig;
+export type DetailCardSpec = DetailCardBlock;
+export type DetailTableSpec = DetailTableBlock;
+export type DetailTabSpec = SharedDetailTabSpec;
 
 export const EDUCATOR_GRID: EducatorColumnConfig[] = [
   { field: 'full_name', headerName: 'Name', visibility: 'show', order: 1, valueType: 'string', sortKey: true },
@@ -23,43 +18,10 @@ export const EDUCATOR_GRID: EducatorColumnConfig[] = [
   { field: 'indiv_type', headerName: 'Type', visibility: 'show', order: 8, valueType: 'select', selectOptions: ['Educator', 'Community Member'] },
   { field: 'has_montessori_cert', headerName: 'Montessori Certified', visibility: 'show', order: 7, valueType: 'boolean' },
   { field: 'id', headerName: 'ID', visibility: 'suppress' },
-  { field: 'kanban_group', headerName: 'Kanban Group', visibility: 'suppress' },
+  { field: 'kanban_group', headerName: 'Kanban Group', visibility: 'suppress', kanbanKey: true },
 ];
 
-export const EDUCATOR_KANBAN_GROUPING_FIELD = 'kanban_group';
 export const EDUCATOR_KANBAN_CONSTANTS_TABLE = 'ref_educator_statuses';
-
-// Details section types
-export type DetailCardSpec = {
-  kind: 'card';
-  title: string;
-  fields: string[]; // names from details_educators or editable base relation
-  editable: boolean;
-  editSource?: { schema?: string; table: string; pk?: string }; // where to write if editable
-};
-
-export type DetailTableSpec = {
-  kind: 'table';
-  title: string;
-  source: { schema?: string; table: string; fkColumn: string }; // fkColumn referencing educator id
-  columns: string[];
-  rowActions?: string[];
-  tableActions?: string[];
-};
-
-export type DetailTabSpec = {
-  id: string;
-  label: string;
-  // Default write target for editable cards on this tab
-  writeTo?: { schema?: string; table: string; pk?: string };
-  // Exceptions for specific fields that need transformation/mapping before write
-  writeToExceptions?: Array<{
-    field: string;
-    mapsToField?: string; // if the destination field name differs
-    viaLookup?: { schema?: string; table: string; labelColumn: string; keyColumn: string };
-  }>;
-  blocks: (DetailCardSpec | DetailTableSpec)[];
-};
 
 export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
   {
@@ -91,10 +53,10 @@ export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
       }
     ],
     blocks: [
-      { kind: 'card', title: 'Name', fields: ['first_name', 'nickname', 'middle_name', 'last_name', 'pronunciation'], editable: true, editSource: { table: 'people', schema: 'public', pk: 'id' } },
-      { kind: 'card', title: 'Background', fields: ['race_ethnicity_display', 'race_ethnicity_other', 'educ_attainment', 'hh_income', 'childhood_income', 'indiv_type'], editable: true, editSource: { table: 'people', schema: 'public', pk: 'id' } }, 
-      { kind: 'card', title: 'Gender', fields: ['gender', 'gender_other', 'pronouns', 'pronouns_other', 'lgbtqia'], editable: true, editSource: { table: 'people', schema: 'public', pk: 'id' } },
-      { kind: 'card', title: 'Languages', fields: ['primary_languages', 'other_languages'], editable: true, editSource: { table: 'people', schema: 'public', pk: 'id' } },
+      { kind: 'card', title: 'Name', fields: ['first_name', 'nickname', 'middle_name', 'last_name', 'pronunciation'], editable: true },
+      { kind: 'card', title: 'Background', fields: ['race_ethnicity_display', 'race_ethnicity_other', 'educ_attainment', 'hh_income', 'childhood_income', 'indiv_type'], editable: true}, 
+      { kind: 'card', title: 'Gender', fields: ['gender', 'gender_other', 'pronouns', 'pronouns_other', 'lgbtqia'], editable: true},
+      { kind: 'card', title: 'Languages', fields: ['primary_languages', 'other_languages'], editable: true},
     ],
   },
   {
@@ -103,15 +65,15 @@ export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
     writeTo: { schema: 'public', table: 'people', pk: 'id' },
     blocks: [
       { kind: 'table', title: 'Emails', source: { table: 'email_addresses', schema: 'public', fkColumn: 'people_id' }, columns: ['email_address', 'category', 'is_primary', 'is_valid'], rowActions: ['inline_edit', 'toggle_primary', 'toggle_valid'], tableActions: ['addEmail'] },
-      { kind: 'card', title: 'Phone', fields: ['primary_phone', 'primary_phone_other_info', 'secondary_phone', 'secondary_phone_other_info'], editable: true, editSource: { table: 'people', schema: 'public', pk: 'id' } },
-      { kind: 'card', title: 'Address', fields: ['home_address'], editable: true, editSource: { table: 'people', schema: 'public', pk: 'id' } },
+      { kind: 'card', title: 'Phone', fields: ['primary_phone', 'primary_phone_other_info', 'secondary_phone', 'secondary_phone_other_info'], editable: true},
+      { kind: 'card', title: 'Address', fields: ['home_address'], editable: true},
     ],
   },
   {
     id: 'schools',
     label: 'Schools',
     blocks: [
-      { kind: 'table', title: 'Schools', source: { table: 'details_associations', schema: 'public', fkColumn: 'people_id' }, columns: ['school_name', 'role_at_school', 'start_date', 'end_date', 'currently_active', 'stage_status'], rowActions: ['inline_edit', 'modal_view', 'end_stint'], tableActions: ['addStint', 'addEducatorAndStint'] },
+      { kind: 'table', title: 'Schools', source: { table: 'details_associations', schema: 'public', fkColumn: 'people_id' }, columns: ['school_name', 'role', 'start_date', 'end_date', 'currently_active', 'stage_status'], rowActions: ['inline_edit', 'modal_view', 'end_stint','archive'], tableActions: ['addStint', 'addEducatorAndStint'] },
     ],
   },
   {
@@ -153,14 +115,14 @@ export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
     id: 'action_steps',
     label: 'Action Steps',
     blocks: [
-      { kind: 'table', title: 'Action Steps', source: { table: 'action_steps', schema: 'public', fkColumn: 'people_id' }, columns: ['item', 'assignee', 'item_status', 'assigned_date', 'due_date', 'completed_date'], rowActions: ['inline_edit', 'mark_complete', 'archive'], tableActions: ['addActionStep'] },
+      { kind: 'table', title: 'Action Steps', source: { table: 'action_steps', schema: 'public', fkColumn: 'people_id' }, columns: [...TABLE_COLUMNS.actionSteps], rowActions: [...ROW_ACTIONS.actionSteps], tableActions: [...TABLE_ACTIONS.actionSteps] },
     ],
   },
   {
     id: 'notes',
     label: 'Notes',
     blocks: [
-      { kind: 'table', title: 'Notes', source: { table: 'notes', schema: 'public', fkColumn: 'people_id' }, columns: ['created_date', 'created_by', 'private'], rowActions: ['inline_edit', 'markPrivate', 'archive'], tableActions: ['addNote'] },
+      { kind: 'table', title: 'Notes', source: { table: 'notes', schema: 'public', fkColumn: 'people_id' }, columns: [...TABLE_COLUMNS.notesBasic], rowActions: [...ROW_ACTIONS.notesCamel], tableActions: [...TABLE_ACTIONS.notes] },
     ],
   },
   {
@@ -168,9 +130,16 @@ export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
     label: 'Google Sync',
     writeTo: { schema: 'public', table: 'people', pk: 'id' },
     blocks: [
-      { kind: 'card', title: 'Google Sync Settings', fields: ['exclude_from_calendar_logging'], editable: true, editSource: { table: 'people', schema: 'public', pk: 'id' } },
-      { kind: 'table', title: 'Gmails', source: { table: 'g_emails', schema: 'gsync', fkColumn: 'people_id' }, columns: ['sent_at', 'from', 'to_emails', 'cc_emails', 'subject'], rowActions: ['modalView', 'markPrivate'] },
-      { kind: 'table', title: 'Calendar Events', source: { table: 'g_events', schema: 'gsync', fkColumn: 'people_id' }, columns: ['summary', 'start_date', 'attendees'], rowActions: ['modalView', 'markPrivate'] },
+      { kind: 'card', title: 'Google Sync Settings', fields: ['exclude_from_calendar_logging'], editable: true},
+      { kind: 'table', title: 'Gmails', source: { table: 'g_emails', schema: 'gsync', fkColumn: 'people_id' }, columns: [...TABLE_COLUMNS.gmail], rowActions: [...ROW_ACTIONS.modalViewPrivate] },
+      { kind: 'table', title: 'Calendar Events', source: { table: 'g_events', schema: 'gsync', fkColumn: 'people_id' }, columns: [...TABLE_COLUMNS.calendarEvents], rowActions: [...ROW_ACTIONS.modalViewPrivate] },
     ],
   },
 ];
+
+
+
+
+
+
+

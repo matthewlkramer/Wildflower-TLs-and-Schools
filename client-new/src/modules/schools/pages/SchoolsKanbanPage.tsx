@@ -1,14 +1,13 @@
 import React, { useMemo } from 'react';
 import { useGridSchools } from '../api/queries';
 import KanbanBoard from '@/components/shared/KanbanBoard';
-import { SCHOOL_KANBAN_GROUPING_FIELD, SCHOOL_KANBAN_CONSTANTS_TABLE, SCHOOL_GRID } from '../constants';
+import { SCHOOL_KANBAN_CONSTANTS_TABLE, SCHOOL_GRID } from '../constants';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
 
 export function SchoolsKanbanPage() {
   const { data = [], isLoading } = useGridSchools();
-
-  const groupField = SCHOOL_KANBAN_GROUPING_FIELD;
+  const groupField = SCHOOL_GRID.find((c) => c.kanbanKey)?.field || 'stage_status';
 
   // Load constants table
   const constantsTable = SCHOOL_KANBAN_CONSTANTS_TABLE;
@@ -107,3 +106,6 @@ export function SchoolsKanbanPage() {
     />
   );
 }
+
+
+

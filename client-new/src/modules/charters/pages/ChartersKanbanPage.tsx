@@ -1,14 +1,13 @@
 import React, { useMemo } from 'react';
 import { useGridCharters } from '../api/queries';
 import KanbanBoard from '@/components/shared/KanbanBoard';
-import { CHARTER_KANBAN_GROUPING_FIELD, CHARTER_KANBAN_CONSTANTS_TABLE, CHARTER_GRID } from '../constants';
+import { CHARTER_KANBAN_CONSTANTS_TABLE, CHARTER_GRID } from '../constants';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
 
 export function ChartersKanbanPage() {
   const { data = [], isLoading } = useGridCharters();
-
-  const groupField = CHARTER_KANBAN_GROUPING_FIELD;
+  const groupField = CHARTER_GRID.find((c) => c.kanbanKey)?.field || 'status';
 
   const constantsTable = CHARTER_KANBAN_CONSTANTS_TABLE;
   const { data: constants = [] } = useQuery({
@@ -105,3 +104,6 @@ export function ChartersKanbanPage() {
     />
   );
 }
+
+
+

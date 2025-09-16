@@ -3,12 +3,11 @@ import { useGridEducators } from '../api/queries';
 import KanbanBoard from '@/components/shared/KanbanBoard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { EDUCATOR_KANBAN_GROUPING_FIELD, EDUCATOR_KANBAN_CONSTANTS_TABLE, EDUCATOR_GRID } from '../constants';
+import { EDUCATOR_KANBAN_CONSTANTS_TABLE, EDUCATOR_GRID } from '../constants';
 
 export function EducatorsKanbanPage() {
   const { data = [], isLoading } = useGridEducators();
-
-  const groupField = EDUCATOR_KANBAN_GROUPING_FIELD;
+  const groupField = EDUCATOR_GRID.find((c) => c.kanbanKey)?.field || 'kanban_group';
 
   // Load constants for lane definitions: value (label), order, optional visibility
   const constantsTable = EDUCATOR_KANBAN_CONSTANTS_TABLE;
@@ -111,3 +110,6 @@ export function EducatorsKanbanPage() {
     />
   );
 }
+
+
+

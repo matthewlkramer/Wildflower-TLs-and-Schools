@@ -11,6 +11,7 @@ export type GridColumnConfig = {
   lookupField?: string;
   enumName?: string;
   sortKey?: boolean;
+  kanbanKey?: boolean;
 };
 
 export type LookupException = {
@@ -71,3 +72,5 @@ export type DetailTabSpec = {
   writeToExceptions?: LookupException[];
   blocks: DetailBlock[];
 };
+
+
