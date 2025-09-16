@@ -1,0 +1,6 @@
+/* Minimal base styles; add your system later */
+html, body, #root { height: 100%; margin: 0; }
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; }
+
