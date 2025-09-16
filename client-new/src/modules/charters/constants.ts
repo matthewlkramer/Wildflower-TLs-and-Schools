@@ -55,7 +55,7 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
       { kind: 'card', title: 'Students/Ages', fields: ['num_students','beg_age','end_age'], editable: true },
       { kind: 'card', title: 'Docs', fields: ['loi','landscape_analysis','design_album','application'], editable: true },
       { kind: 'card', title: 'Budgets', fields: ['budget_exercises','budget_final'], editable: true },
-      { kind: 'card', title: 'People', fields: ['team'], editable: true }
+      { kind: 'card', title: 'People', fields: ['team'], editable: true },
       { kind: 'card', title: 'Checklist', fields: ['charter_app_roles_set','charter_app_pm_plan_complete','logic_model_complete','comm_engagement_underway'], editable: true },
       { kind: 'card', title: 'Schedule', fields: ['joint_kickoff_meeting_date','internal_support_meeting_date','app_walkthrough_date','capacity_intv_training_date','capacity_intv_proj_complete','capacity_intv_completed_date','design_advice_session_complete','board_membership_signed_date'], editable: true },
 
