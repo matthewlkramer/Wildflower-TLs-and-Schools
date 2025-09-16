@@ -1,21 +1,11 @@
-import type {
-  ColumnVisibility as ColumnVisibilityBase,
-  GridValueKind as GridValueKindBase,
-  GridColumnConfig,
-  DetailCardBlock,
-  DetailMapBlock,
-  DetailTableBlock,
-  DetailTabSpec as DetailTabConfig,
-} from '../shared/detail-types';
-import { ROW_ACTIONS, TABLE_ACTIONS, TABLE_COLUMNS } from '../shared/detail-presets';
+import type { ColumnVisibility, GridValueKind, GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailMapBlock, DetailTabSpec as SharedDetailTabSpec } from '../shared/detail-types';
 
-export type ColumnVisibility = ColumnVisibilityBase;
-export type GridValueKind = GridValueKindBase;
+export type { ColumnVisibility, GridValueKind } from '../shared/detail-types';
 export type CharterColumnConfig = GridColumnConfig;
 export type DetailCardSpec = DetailCardBlock;
 export type DetailTableSpec = DetailTableBlock;
 export type DetailMapSpec = DetailMapBlock;
-export type DetailTabSpec = DetailTabConfig;
+export type DetailTabSpec = SharedDetailTabSpec;
 
 export const CHARTER_GRID: CharterColumnConfig[] = [
   { field: 'charter_name', headerName: 'Name', visibility: 'show', order: 1, valueType: 'string', sortKey: true },
@@ -149,4 +139,5 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
     ],
   },
 ];
+
 
