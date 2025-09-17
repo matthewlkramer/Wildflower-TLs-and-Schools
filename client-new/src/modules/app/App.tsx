@@ -15,6 +15,7 @@ import { initAgGridEnterprise } from '@/lib/ag-grid';
 import { EducatorsKanbanPage } from '../educators/pages/EducatorsKanbanPage';
 import { SchoolsKanbanPage } from '../schools/pages/SchoolsKanbanPage';
 import { ChartersKanbanPage } from '../charters/pages/ChartersKanbanPage';
+import { SettingsPage } from '../settings/pages/SettingsPage';
 
 export function App() {
   return (
@@ -74,6 +75,12 @@ export function App() {
               <CharterDetailPage params={params} />
             </RequireAuth>
           )}</Route>
+
+          <Route path="/settings">
+            <RequireAuth>
+              <SettingsPage />
+            </RequireAuth>
+          </Route>
 
           <Route>Not found</Route>
         </Switch>
