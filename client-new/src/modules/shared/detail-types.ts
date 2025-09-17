@@ -4,8 +4,7 @@ export type GridValueKind = 'string' | 'boolean' | 'multi' | 'select' | 'date' |
 export type GridColumnConfig = {
   field: string;
   headerName: string;
-  visibility: ColumnVisibility;
-  order?: number;
+  visibility?: ColumnVisibility;
   valueType?: GridValueKind;
   selectOptions?: string[];
   lookupField?: string;
@@ -32,9 +31,49 @@ export type CardEditSource = {
   exceptions?: LookupException[];
 };
 
+export type DetailFieldType = 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'attachment';
+
+export type FieldEditConfig = {
+  schema?: string;
+  table: string;
+  pk?: string;
+  column?: string;
+  enumName?: string;
+  exceptions?: LookupException[];
+};
+
+export type FieldReference = {
+  schema?: string;
+  table: string;
+  valueColumn: string;
+  labelColumn: string;
+};
+
+export type FieldMetadata = {
+  label: string;
+  type?: DetailFieldType;
+  array?: boolean;
+  multiline?: boolean;
+  options?: string[];
+  edit?: FieldEditConfig;
+  reference?: FieldReference;
+};
+
+export type FieldMetadataMap = Record<string, FieldMetadata>;
+
+export type TableColumnMeta = {
+  field: string;
+  label?: string;
+  type?: DetailFieldType;
+  array?: boolean;
+  multiline?: boolean;
+  reference?: FieldReference;
+};
+
 export type DetailCardBlock = {
   kind: 'card';
-  title: string;
+  title?: string;
+  width?: 'half' | 'full';
   fields: string[];
   editable: boolean;
   editSource?: CardEditSource;
@@ -42,20 +81,23 @@ export type DetailCardBlock = {
 
 export type DetailTableBlock = {
   kind: 'table';
-  title: string;
+  title?: string;
+  width?: 'half' | 'full';
   source: {
     schema?: string;
     table: string;
     fkColumn: string;
   };
   columns: string[];
+  columnMeta?: readonly TableColumnMeta[];
   rowActions?: string[];
   tableActions?: string[];
 };
 
 export type DetailMapBlock = {
   kind: 'map';
-  title: string;
+  title?: string;
+  width?: 'half' | 'full';
   fields: string[];
 };
 
@@ -72,5 +114,3 @@ export type DetailTabSpec = {
   writeToExceptions?: LookupException[];
   blocks: DetailBlock[];
 };
-
-

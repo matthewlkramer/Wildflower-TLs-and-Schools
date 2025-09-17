@@ -17,25 +17,22 @@ export function ChartersPage() {
     const keySet = new Set<string>();
     for (const row of sample) Object.keys(row || {}).forEach((k) => keySet.add(k));
 
-    const configPresent: CharterColumnConfig[] = CHARTER_GRID.filter((c) => keySet.has(c.field));
-    const suppressed = new Set(configPresent.filter(c => c.visibility === 'suppress').map(c => c.field));
-
-    const orderedFromConfig = configPresent
-      .filter(c => c.visibility !== 'suppress')
-      .sort((a, b) => (a.order ?? 1e9) - (b.order ?? 1e9));
-
     const defs: ColDef<any>[] = [];
-    for (const c of orderedFromConfig) {
-      const def: ColDef<any> = { field: c.field, headerName: c.headerName };
-      if (c.visibility === 'hide') def.hide = true;
-      switch (c.valueType) {
+
+    for (const config of CHARTER_GRID) {
+      if (!keySet.has(config.field)) continue;
+      if (config.visibility === 'suppress') continue;
+
+      const def: ColDef<any> = { field: config.field, headerName: config.headerName };
+      if (config.visibility === 'hide') def.hide = true;
+
+      switch (config.valueType) {
         case 'select':
           def.filter = 'agSetColumnFilter';
-          if ((c as any).selectOptions && (c as any).selectOptions.length) {
-            def.filterParams = { values: (c as any).selectOptions as any } as any;
-          } else if ((c as any).lookupField) {
-            const src = (c as any).lookupField as string;
-            const [table, column] = src.split('.');
+          if (config.selectOptions && config.selectOptions.length) {
+            def.filterParams = { values: config.selectOptions as any } as any;
+          } else if (config.lookupField) {
+            const [table, column] = config.lookupField.split('.');
             def.filterParams = {
               values: (p: any) => {
                 (supabase as any).from(table).select(column).order(column, { ascending: true }).then(({ data, error }: any) => {
@@ -45,11 +42,10 @@ export function ChartersPage() {
                 });
               }
             } as any;
-          } else if ((c as any).enumName) {
-            const enumType = (c as any).enumName as string;
+          } else if (config.enumName) {
             def.filterParams = {
               values: (p: any) => {
-                (supabase as any).rpc('enum_values', { enum_type: enumType }).then(({ data, error }: any) => {
+                (supabase as any).rpc('enum_values', { enum_type: config.enumName }).then(({ data, error }: any) => {
                   if (error) { p.success([]); return; }
                   const vals = Array.isArray(data) ? data.map((r: any) => r.value ?? r).map(String) : [];
                   p.success(vals);
@@ -81,10 +77,11 @@ export function ChartersPage() {
         default:
           break;
       }
+
       defs.push(def);
     }
-    // Strict: do not append unknown keys
-    const sortCfg = configPresent.find((c: any) => c.sortKey === true);
+
+    const sortCfg = CHARTER_GRID.find((c) => c.sortKey === true);
     if (sortCfg) {
       const col = defs.find((d) => d.field === sortCfg.field);
       if (col) {
@@ -92,15 +89,17 @@ export function ChartersPage() {
         col.sort = 'asc';
       }
     } else {
-      const nameCol = defs.find((d) => d.field === 'full_name' || d.field === 'short_name' || d.field === 'name' || d.field === 'charter_name');
+      const nameCol = defs.find((d) => d.field === 'full_name' || d.field === 'name' || d.field === 'short_name');
       if (nameCol) {
         nameCol.headerName = 'Name';
         nameCol.sortable = true;
         nameCol.sort = 'asc';
       }
     }
+
     return defs;
   }, [data]);
+
 
   if (isLoading) return <div>Loading charters.</div>;
 

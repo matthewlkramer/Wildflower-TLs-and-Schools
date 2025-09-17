@@ -21,7 +21,6 @@ export type Database = {
           charter_id: string | null
           completed_date: string | null
           due_date: string | null
-          entity_id: string | null
           id: string
           item: string | null
           item_status: Database["public"]["Enums"]["action_step_status"] | null
