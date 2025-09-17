@@ -1,0 +1,16 @@
+{
+  "baseId": "appXXXXXXXXXXXXXXXX",
+  "tables": [
+    {
+      "name": "Example Table",
+      "airtableTable": "Teachers",
+      "view": "Grid view",
+      "lastModifiedField": "Last Modified",
+      "supabaseTable": "teachers",
+      "primaryKey": "id",
+      "airtableIdField": "airtable_id",
+      "useAirtableRecordId": true,
+      "fields": ["Name", "Email", "Status", "Last Modified"]
+    }
+  ]
+}
