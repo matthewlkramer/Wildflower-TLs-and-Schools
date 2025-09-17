@@ -10,6 +10,7 @@ export function Header() {
         <Link href="/educators">Educators</Link>
         <Link href="/schools">Schools</Link>
         <Link href="/charters">Charters</Link>
+        <Link href="/settings">Settings</Link>
       </nav>
       <div className="ml-auto text-sm">
         {user ? (
