@@ -1,12 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useGridCharters } from '../api/queries';
 import KanbanBoard from '@/components/shared/KanbanBoard';
 import { CHARTER_KANBAN_CONSTANTS_TABLE, CHARTER_GRID } from '../constants';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
+import { GridPageHeader } from '@/components/shared/GridPageHeader';
+import { useLocation } from 'wouter';
+import type { SavedView } from '@/hooks/useSavedViews';
 
 export function ChartersKanbanPage() {
   const { data = [], isLoading } = useGridCharters();
+  const [, navigate] = useLocation();
+  const [quick, setQuick] = useState('');
   const groupField = CHARTER_GRID.find((c) => c.kanbanKey)?.field || 'status';
 
   const constantsTable = CHARTER_KANBAN_CONSTANTS_TABLE;
@@ -37,11 +42,25 @@ export function ChartersKanbanPage() {
     return s;
   }, [constMap]);
 
-  const filteredItems = useMemo(() => data.filter((r: any) => {
+  // Filter by quick filter text if provided
+  const quickFilteredData = useMemo(() => {
+    if (!quick.trim()) return data;
+    const searchText = quick.toLowerCase();
+    return data.filter((item: any) => {
+      // Search in common text fields for charters
+      const searchableFields = ['charter_name', 'name', 'full_name', 'short_name', 'status', 'city', 'state'];
+      return searchableFields.some(field => {
+        const value = item[field];
+        return value && String(value).toLowerCase().includes(searchText);
+      });
+    });
+  }, [data, quick]);
+
+  const filteredItems = useMemo(() => quickFilteredData.filter((r: any) => {
     const v = r[groupField];
     const key = v == null || v === '' ? '__UNSPECIFIED__' : String(v).trim();
     return !suppressedKeys.has(key);
-  }), [data, groupField, suppressedKeys]);
+  }), [quickFilteredData, groupField, suppressedKeys]);
 
   const groupKeys = useMemo(() => {
     const keys = new Set<string>();
@@ -86,22 +105,55 @@ export function ChartersKanbanPage() {
     return Array.from(set);
   }, [constMap, filteredItems, groupField]);
 
-  
+  const handleViewModeChange = (viewMode: string) => {
+    if (viewMode === 'table') {
+      navigate('/charters');
+    } else if (viewMode === 'split') {
+      navigate('/charters/split');
+    }
+    // kanban view stays on current page
+  };
+
+  const handleApplySavedView = (view: SavedView) => {
+    // Apply quick filter for kanban view
+    setQuick(view.quickFilter);
+  };
+
+  const handleSaveCurrentView = () => {
+    return {
+      filters: {},
+      sortModel: [],
+      columnState: [],
+      quickFilter: quick
+    };
+  };
 
   return (
-    <KanbanBoard<any>
-      items={filteredItems}
-      columns={columns}
-      groupBy={(it) => (it as any)[groupField]}
-      getId={(it) => String((it as any).id)}
-      initialCollapsedKeys={initialCollapsed}
-      renderCard={(c) => (
-        <div>
-          <div style={{ fontWeight: 600, fontSize: 13 }}>{(c as any).charter_name || (c as any).full_name || (c as any).short_name || ''}</div>
-          <div style={{ fontSize: 12, color: '#475569' }}>{(c as any).status || ''}</div>
-        </div>
-      )}
-    />
+    <div>
+      <GridPageHeader 
+        entityType="charter"
+        quickFilter={quick}
+        onQuickFilterChange={setQuick}
+        currentViewMode="kanban"
+        onViewModeChange={handleViewModeChange}
+        onAddNew={() => console.log('Add new charter')}
+        onApplySavedView={handleApplySavedView}
+        onSaveCurrentView={handleSaveCurrentView}
+      />
+      <KanbanBoard<any>
+        items={filteredItems}
+        columns={columns}
+        groupBy={(it) => (it as any)[groupField]}
+        getId={(it) => String((it as any).id)}
+        initialCollapsedKeys={initialCollapsed}
+        renderCard={(c) => (
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 13 }}>{(c as any).charter_name || (c as any).full_name || (c as any).short_name || ''}</div>
+            <div style={{ fontSize: 12, color: '#475569' }}>{(c as any).status || ''}</div>
+          </div>
+        )}
+      />
+    </div>
   );
 }
 

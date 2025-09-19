@@ -1,4 +1,5 @@
 import { ROW_ACTIONS, TABLE_ACTIONS, TABLE_COLUMNS, TABLE_COLUMN_META } from '../shared/detail-presets';
+import { TABLE_PRESETS } from '../shared/table-presets';
 import type { ColumnVisibility, GridValueKind, GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailMapBlock, DetailTabSpec as SharedDetailTabSpec, FieldMetadataMap } from '../shared/detail-types';
 
 export type { ColumnVisibility, GridValueKind } from '../shared/detail-types';
@@ -24,7 +25,6 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
   {
     id: 'overview',
     label: 'Overview',
-    writeTo: { table: 'charters', pk: 'id' },
     blocks: [
       { kind: 'card', title: 'Name(s)', fields: ['short_name', 'full_name'], editable: true },
       { kind: 'card', title: 'Status', fields: ['status','membership_status','currently_authorized','authorizer'], editable: false },
@@ -37,18 +37,16 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
   {
     id: 'details',
     label: 'Details',
-    writeTo: { table: 'charters', pk: 'id' },
     blocks: [
       { kind: 'card', title: 'Legal entity', fields: ['ein','incorp_date','current_fy_end'], editable: true },
       { kind: 'card', title: 'Nonprofit status', fields: ['nonprofit_status','group_exemption_status'], editable: true },
-      { kind: 'table', title: 'Authorizer actions', source: { table: 'charter_authorizer_actions', fkColumn: 'charter_id' }, columns: ['action','action_date','authorized_after_action'], rowActions: ['modal_view'], tableActions: ['addAction'] },
+      { kind: 'table', title: 'Authorizer actions', source: TABLE_PRESETS.charterAuthorizerActions.source, columns: [...TABLE_PRESETS.charterAuthorizerActions.columns], rowActions: [...TABLE_PRESETS.charterAuthorizerActions.rowActions!], tableActions: ['addAction'], tableActionLabels: ['Add Action'] },
       { kind: 'card', title: 'Other', fields: ['non_discrimination_policy_on_website','school_provided_1023','guidestart_listing_requested','partnership_with_wf', 'first_site_opened_date', 'website'], editable: true },
     ],
   },
   {
     id: 'app_details',
-    label: 'Application Details',
-    writeTo: { table: 'charter_applications', pk: 'id' },
+    label: 'App Details',
     blocks: [
       { kind: 'card', title: 'Overall', fields: ['app_window','authorizer','decision_expected_date','target_open','auth_decision','proj_open_date'], editable: true },
       { kind: 'card', title: 'Requirements', fields: ['loi_required'], editable: true },
@@ -65,78 +63,77 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
     id: 'educators',
     label: 'Educators',
     blocks: [
-      { kind: 'table',  source: { table: 'details_educators', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.educatorsOnCharters], columnMeta: TABLE_COLUMN_META.educatorsOnCharters, rowActions: ['inline_edit', 'modal_view', 'end_stint'], tableActions: ['addStint', 'addEducatorAndStint'] },
+      { kind: 'table',  source: TABLE_PRESETS.educatorsOnCharters.source, columns: [...TABLE_PRESETS.educatorsOnCharters.columns], columnMeta: TABLE_PRESETS.educatorsOnCharters.columnMeta, rowActions: [...(TABLE_PRESETS.educatorsOnCharters.rowActions || [])], tableActions: ['addStint', 'addEducatorAndStint'], tableActionLabels: ['Add Stint','Add Educator & Stint'] },
     ],
   },
   {
     id: 'schools',
     label: 'Schools',
     blocks: [
-      { kind: 'table', source: { table: 'details_schools', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.schoolsOnCharters], columnMeta: TABLE_COLUMN_META.schoolsOnCharters, rowActions: ['inline_edit', 'modal_view', 'end_stint'], tableActions: ['addStint', 'addEducatorAndStint'] },
+      { kind: 'table', source: TABLE_PRESETS.schoolsOnCharters.source, columns: [...TABLE_PRESETS.schoolsOnCharters.columns], columnMeta: TABLE_PRESETS.schoolsOnCharters.columnMeta, rowActions: [...(TABLE_PRESETS.schoolsOnCharters.rowActions || [])], tableActions: ['addStint', 'addEducatorAndStint'], tableActionLabels: ['Add Stint','Add Educator & Stint'] },
     ],
   },
   {
     id: 'enrollment',
     label: 'Enrollment',
     blocks: [
-      { kind: 'table', source: { table: 'annual_enrollment_and_demographics', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.enrollment], columnMeta: TABLE_COLUMN_META.enrollment, rowActions: ['inline_edit'], tableActions: ['addEnrollmentData'] },
+      { kind: 'table', source: TABLE_PRESETS.charterEnrollment.source, columns: [...TABLE_PRESETS.charterEnrollment.columns], columnMeta: TABLE_PRESETS.charterEnrollment.columnMeta, rowActions: [...(TABLE_PRESETS.charterEnrollment.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterEnrollment.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterEnrollment.tableActionLabels || [])] },
     ],
   },
   {
     id: 'docs',
-    label: 'Documents',
+    label: 'Docs',
     blocks: [
-      { kind: 'table', title: 'Governance Docs', source: { table: 'governance_docs', fkColumn: 'charter_id' }, columns: ['doc_type','pdf'],rowActions: ['archive'], tableActions: ['addGovDoc'] },
-      { kind: 'table', title: '990s', source: { table: 'nine_nineties', fkColumn: 'charter_id' }, columns: ['form_year','pdf'],rowActions: ['archive'], tableActions: ['addSchoolDoc'] },
+      { kind: 'table', title: 'Governance Docs', source: TABLE_PRESETS.charterGovernanceDocs.source, columns: [...TABLE_PRESETS.charterGovernanceDocs.columns], rowActions: [...(TABLE_PRESETS.charterGovernanceDocs.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterGovernanceDocs.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterGovernanceDocs.tableActionLabels || [])] },
+      { kind: 'table', title: '990s', source: TABLE_PRESETS.charterNineNineties.source, columns: [...TABLE_PRESETS.charterNineNineties.columns], columnMeta: TABLE_PRESETS.charterNineNineties.columnMeta, rowActions: [...(TABLE_PRESETS.charterNineNineties.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterNineNineties.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterNineNineties.tableActionLabels || [])] },
     ],
   },
   
   {
     id: 'reports_and_results',
-    label: 'Reports and Results',
+    label: 'Reports',
     blocks: [
-      { kind: 'table', title: '', source: { table: 'school_reports_and_submissions', fkColumn: 'charter_id' }, columns: ['school_year','report_type','attachment'],rowActions: ['modal_view'], tableActions: ['addReport'] },
-      { kind: 'table', title: '', source: { table: 'annual_assessment_and_metrics_data', fkColumn: 'charter_id' }, columns: ['school_year','assessment_or_metric','metric_data'],rowActions: ['modal_view'], tableActions: ['addData'] },
+      { kind: 'table', title: '', source: TABLE_PRESETS.charterReports.source, columns: [...TABLE_PRESETS.charterReports.columns], rowActions: [...(TABLE_PRESETS.charterReports.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterReports.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterReports.tableActionLabels || [])] },
+      { kind: 'table', title: '', source: TABLE_PRESETS.charterAnnualData.source, columns: [...TABLE_PRESETS.charterAnnualData.columns], rowActions: [...(TABLE_PRESETS.charterAnnualData.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterAnnualData.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterAnnualData.tableActionLabels || [])] },
     ],
   },
   
   {
     id: 'grant_and_loans',
-    label: 'Grants and Loans',
+    label: 'Grants & Loans',
     blocks: [
-      { kind: 'table', title: 'Grants', source: { table: 'grants', fkColumn: 'charter_id' }, columns: ['issue_date','grant_status','amount'],rowActions: ['inline_edit', 'modal_view'], tableActions: ['addGrant'] },
-      { kind: 'table', title: 'Loans', source: { table: 'loans', fkColumn: 'charter_id' }, columns: ['issue_date','amount_issued'],rowActions: ['modal_view']},
+      { kind: 'table', title: 'Grants', source: TABLE_PRESETS.charterGrants.source, columns: [...TABLE_PRESETS.charterGrants.columns], columnMeta: TABLE_PRESETS.charterGrants.columnMeta, rowActions: [...(TABLE_PRESETS.charterGrants.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterGrants.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterGrants.tableActionLabels || [])] },
+      { kind: 'table', title: 'Loans', source: TABLE_PRESETS.charterLoans.source, columns: [...TABLE_PRESETS.charterLoans.columns], rowActions: [...(TABLE_PRESETS.charterLoans.rowActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterLoans.tableActionLabels || [])]},
     ],
   },
   {
     id: 'guides',
     label: 'Guides',
     blocks: [
-      { kind: 'table', source: { table: 'guide_assignments', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.guides], columnMeta: TABLE_COLUMN_META.guides, rowActions: ['inline_edit'], tableActions: ['addGuideLink','addNewGuide'] },
+      { kind: 'table', source: TABLE_PRESETS.charterGuideAssignments.source, columns: [...TABLE_PRESETS.charterGuideAssignments.columns], columnMeta: TABLE_PRESETS.charterGuideAssignments.columnMeta, rowActions: [...(TABLE_PRESETS.charterGuideAssignments.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterGuideAssignments.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterGuideAssignments.tableActionLabels || [])] },
     ],
   },
   {
     id: 'action_steps',
     label: 'Action Steps',
     blocks: [
-      { kind: 'table', source: { table: 'action_steps', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.actionSteps], columnMeta: TABLE_COLUMN_META.actionSteps, rowActions: [...ROW_ACTIONS.actionSteps], tableActions: [...TABLE_ACTIONS.actionSteps] },
+      { kind: 'table', source: { table: 'action_steps', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.actionSteps], columnMeta: TABLE_COLUMN_META.actionSteps, rowActions: [...ROW_ACTIONS.actionSteps], tableActions: [...TABLE_ACTIONS.actionSteps], tableActionLabels: ['Add Action Step'] },
     ],
   },
   {
     id: 'notes',
     label: 'Notes',
     blocks: [
-      { kind: 'table', source: { table: 'notes', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.notes], columnMeta: TABLE_COLUMN_META.notes, rowActions: [...ROW_ACTIONS.notes], tableActions: [...TABLE_ACTIONS.notes] },
+      { kind: 'table', source: { table: 'notes', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.notes], columnMeta: TABLE_COLUMN_META.notes, rowActions: [...ROW_ACTIONS.notes], tableActions: [...TABLE_ACTIONS.notes], tableActionLabels: ['Add Note'] },
     ],
   },
   {
     id: 'google_sync',
-    label: 'Google Sync',
-    writeTo: { table: 'people', pk: 'id' },
+    label: 'gmail/gCal',
     blocks: [
       { kind: 'card', title: 'Google Sync Settings', fields: ['exclude_from_calendar_logging'], editable: true },
-      { kind: 'table', title: 'Gmails', source: { table: 'g_emails', schema: 'gsync', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.gmail], columnMeta: TABLE_COLUMN_META.gmail, rowActions: [...ROW_ACTIONS.modalViewPrivate] },
-      { kind: 'table', title: 'Calendar Events', source: { table: 'g_events', schema: 'gsync', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.calendarEvents], columnMeta: TABLE_COLUMN_META.calendarEvents, rowActions: [...ROW_ACTIONS.modalViewPrivate] },
+      { kind: 'table', title: 'Gmails', source: TABLE_PRESETS.charterGmails.source, columns: [...TABLE_PRESETS.charterGmails.columns], columnMeta: TABLE_PRESETS.charterGmails.columnMeta, rowActions: [...(TABLE_PRESETS.charterGmails.rowActions || [])] },
+      { kind: 'table', title: 'Calendar Events', source: TABLE_PRESETS.charterCalendarEvents.source, columns: [...TABLE_PRESETS.charterCalendarEvents.columns], columnMeta: TABLE_PRESETS.charterCalendarEvents.columnMeta, rowActions: [...(TABLE_PRESETS.charterCalendarEvents.rowActions || [])] },
     ],
   },
 ];
@@ -151,8 +148,8 @@ export const CHARTER_FIELD_METADATA: FieldMetadataMap = {
   'app_window': { label: 'Application Window', type: 'string', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'application': { label: 'Application Document', type: 'attachment', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'auth_decision': { label: 'Authorization Decision', type: 'string', edit: { table: 'charter_applications', pk: 'charter_id' } },
-  'authorizer': { label: 'Authorizer', type: 'string', edit: { table: 'charter_applications', pk: 'charter_id' } },
-  'beg_age': { label: 'Beginning Age', type: 'number', edit: { table: 'charter_applications', pk: 'charter_id' } },
+  'authorizer': { label: 'Authorizer', type: 'string', edit: { table: 'charter_applications', pk: 'charter_id' }, lookup: { table: 'charter_authorizers', valueColumn: 'authorizer_name', labelColumn: 'authorizer_name' } },
+  'beg_age': { label: 'Beginning Age', type: 'enum', edit: { table: 'charter_applications', pk: 'charter_id' , enumName: 'ages-grades' } },
   'board_membership_signed_date': { label: 'Board Membership Signed Date', type: 'date', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'budget_exercises': { label: 'Budget Exercises', type: 'attachment', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'budget_final': { label: 'Final Budget', type: 'attachment', edit: { table: 'charter_applications', pk: 'charter_id' } },
@@ -162,20 +159,20 @@ export const CHARTER_FIELD_METADATA: FieldMetadataMap = {
   'charter_app_pm_plan_complete': { label: 'PM Plan Complete', type: 'boolean', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'charter_app_roles_set': { label: 'Roles Set', type: 'boolean', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'comm_engagement_underway': { label: 'Community Engagement Underway', type: 'boolean', edit: { table: 'charter_applications', pk: 'charter_id' } },
-  'current_fy_end': { label: 'Current Fiscal Year End', type: 'date', edit: { table: 'charters' } },
+  'current_fy_end': { label: 'Current Fiscal Year End', type: 'enum', edit: { table: 'charters' , enumName: 'fiscal_year_end'} },
   'currently_authorized': { label: 'Currently Authorized', type: 'boolean', edit: { table: 'charters' } },
   'decision_expected_date': { label: 'Decision Expected Date', type: 'date', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'design_advice_session_complete': { label: 'Design Advice Session Complete', type: 'boolean', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'design_album': { label: 'Design Album', type: 'attachment', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'ein': { label: 'EIN', type: 'string', edit: { table: 'charters' } },
-  'end_age': { label: 'Ending Age', type: 'number', edit: { table: 'charter_applications', pk: 'charter_id' } },
+  'end_age': { label: 'Ending Age', type: 'enum', edit: { table: 'charter_applications', pk: 'charter_id', enumName: 'ages-grades' } },
   'first_site_opened_date': { label: 'First Site Opened Date', type: 'date', edit: { table: 'charters' } },
   'full_name': { label: 'Full Name', type: 'string', edit: { table: 'charters' } },
-  'group_exemption_status': { label: 'Group Exemption Status', type: 'string', edit: { table: 'charters' } },
+  'group_exemption_status': { label: 'Group Exemption Status', type: 'enum', edit: { table: 'charters' , enumName: 'group_exemption_status'} },
   'guidestart_listing_requested': { label: 'Guidestar Listing Requested', type: 'boolean', edit: { table: 'charters' } },
   'incorp_date': { label: 'Incorporation Date', type: 'date', edit: { table: 'charters' } },
   'initial_target_geo': { label: 'Initial Target Geography', type: 'string', edit: { table: 'charters' } },
-  'initial_target_planes': { label: 'Initial Target Planes', type: 'string', array: true, edit: { table: 'charters' } },
+  'initial_target_planes': { label: 'Initial Target Planes', type: 'enum', array: true, edit: { table: 'charters' , enumName: 'developmental_planes'} },
   'internal_support_meeting_date': { label: 'Internal Support Meeting Date', type: 'date', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'joint_kickoff_meeting_date': { label: 'Joint Kickoff Meeting Date', type: 'date', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'landscape_analysis': { label: 'Landscape Analysis', type: 'attachment', edit: { table: 'charter_applications', pk: 'charter_id' } },
@@ -184,17 +181,17 @@ export const CHARTER_FIELD_METADATA: FieldMetadataMap = {
   'loi_deadline': { label: 'LOI Deadline', type: 'date', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'loi_required': { label: 'LOI Required', type: 'boolean', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'loi_submitted': { label: 'LOI Submitted', type: 'date', edit: { table: 'charter_applications', pk: 'charter_id' } },
-  'membership_status': { label: 'Membership Status', type: 'string', edit: { table: 'charters' } },
+  'membership_status': { label: 'Membership Status', type: 'string', edit: { table: 'charters' }, lookup: { table: 'ref_membership_statuses', valueColumn: 'value', labelColumn: 'value' } },
   'non_discrimination_policy_on_website': { label: 'Non-Discrimination Policy on Website', type: 'boolean', edit: { table: 'charters' } },
   'non_tl_roles': { label: 'Non-TL Roles', type: 'string', multiline: true, edit: { table: 'charters' } },
-  'nonprofit_status': { label: 'Nonprofit Status', type: 'string', edit: { table: 'charters' } },
+  'nonprofit_status': { label: 'Nonprofit Status', type: 'enum', edit: { table: 'charters' , enumName: 'nonprofit_status_rev'} },
   'num_students': { label: 'Projected Students', type: 'number', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'opps_challenges': { label: 'Opportunities & Challenges', type: 'string', multiline: true, edit: { table: 'charter_applications', pk: 'charter_id' } },
   'partnership_with_wf': { label: 'Partnership with WF', type: 'string', edit: { table: 'charters' } },
   'proj_open_date': { label: 'Projected Open Date', type: 'date', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'school_provided_1023': { label: 'School Provided 1023', type: 'boolean', edit: { table: 'charters' } },
   'short_name': { label: 'Short Name', type: 'string', edit: { table: 'charters' } },
-  'status': { label: 'Status', type: 'enum', edit: { table: 'charters' } },
+  'status': { label: 'Status', type: 'enum', edit: { table: 'charters' , enumName: 'charter_status'} },
   'support_timeline': { label: 'Support Timeline', type: 'string', multiline: true, edit: { table: 'charters' } },
   'target_open': { label: 'Target Open Date', type: 'date', edit: { table: 'charter_applications', pk: 'charter_id' } },
   'team': { label: 'Team', type: 'string', multiline: true, edit: { table: 'charter_applications', pk: 'charter_id' } },

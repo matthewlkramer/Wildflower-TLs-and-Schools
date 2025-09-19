@@ -1,5 +1,5 @@
 // AUTO-GENERATED FILE. DO NOT EDIT.
-// Run "pnpm tsx scripts/generate-schema-metadata.ts" to regenerate.
+// Run "pnpm tsx scripts/generate-schema-metadata.ts" from client-new/ to regenerate.
 
 export const schemaMetadata = {
   "public": {
@@ -77,6 +77,24 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "guide_id": {
+          "schema": "public",
+          "table": "action_steps",
+          "column": "guide_id",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "guides",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            }
+          ]
+        },
         "id": {
           "schema": "public",
           "table": "action_steps",
@@ -84,6 +102,16 @@ export const schemaMetadata = {
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "action_steps",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -298,6 +326,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "annual_assessment_and_metrics_data",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "met_plus_bipoc": {
           "schema": "public",
           "table": "annual_assessment_and_metrics_data",
@@ -402,7 +440,7 @@ export const schemaMetadata = {
             {
               "relation": "ref_school_years",
               "referencedColumns": [
-                "school_year"
+                "value"
               ],
               "isOneToOne": false
             }
@@ -504,6 +542,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "annual_enrollment_and_demographics",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "school_id": {
           "schema": "public",
           "table": "annual_enrollment_and_demographics",
@@ -548,7 +596,7 @@ export const schemaMetadata = {
             {
               "relation": "ref_school_years",
               "referencedColumns": [
-                "school_year"
+                "value"
               ],
               "isOneToOne": false
             }
@@ -820,20 +868,20 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
-        "joint_kickoff_meeting_date": {
+        "is_archived": {
           "schema": "public",
           "table": "charter_applications",
-          "column": "joint_kickoff_meeting_date",
-          "baseType": "string",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
           "isNullable": true,
           "enumRef": null,
           "references": []
         },
-        "key_dates": {
+        "joint_kickoff_meeting_date": {
           "schema": "public",
           "table": "charter_applications",
-          "column": "key_dates",
+          "column": "joint_kickoff_meeting_date",
           "baseType": "string",
           "isArray": false,
           "isNullable": true,
@@ -885,16 +933,6 @@ export const schemaMetadata = {
           "table": "charter_applications",
           "column": "loi_submitted",
           "baseType": "boolean",
-          "isArray": false,
-          "isNullable": true,
-          "enumRef": null,
-          "references": []
-        },
-        "milestones": {
-          "schema": "public",
-          "table": "charter_applications",
-          "column": "milestones",
-          "baseType": "string",
           "isArray": false,
           "isNullable": true,
           "enumRef": null,
@@ -1034,23 +1072,15 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
-        "authorizer_id": {
+        "authorizer": {
           "schema": "public",
           "table": "charter_authorization_actions",
-          "column": "authorizer_id",
+          "column": "authorizer",
           "baseType": "string",
           "isArray": false,
           "isNullable": true,
           "enumRef": null,
-          "references": [
-            {
-              "relation": "charter_authorizers",
-              "referencedColumns": [
-                "id"
-              ],
-              "isOneToOne": false
-            }
-          ]
+          "references": []
         },
         "charter_id": {
           "schema": "public",
@@ -1062,16 +1092,6 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
-        "created_at": {
-          "schema": "public",
-          "table": "charter_authorization_actions",
-          "column": "created_at",
-          "baseType": "string",
-          "isArray": false,
-          "isNullable": false,
-          "enumRef": null,
-          "references": []
-        },
         "id": {
           "schema": "public",
           "table": "charter_authorization_actions",
@@ -1079,6 +1099,16 @@ export const schemaMetadata = {
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "charter_authorization_actions",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         }
@@ -1102,7 +1132,7 @@ export const schemaMetadata = {
           "column": "authorizer_name",
           "baseType": "string",
           "isArray": false,
-          "isNullable": true,
+          "isNullable": false,
           "enumRef": null,
           "references": []
         },
@@ -1114,15 +1144,47 @@ export const schemaMetadata = {
           "isArray": false,
           "isNullable": false,
           "enumRef": null,
-          "references": []
+          "references": [
+            {
+              "relation": "charters",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            },
+            {
+              "relation": "details_charters",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            },
+            {
+              "relation": "grid_charter",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            }
+          ]
         },
-        "id": {
+        "is_archived": {
           "schema": "public",
           "table": "charter_authorizers",
-          "column": "id",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "start_of_authorization": {
+          "schema": "public",
+          "table": "charter_authorizers",
+          "column": "start_of_authorization",
           "baseType": "string",
           "isArray": false,
-          "isNullable": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         }
@@ -1190,6 +1252,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "group_exemption_status": {
+          "schema": "public",
+          "table": "charters",
+          "column": "group_exemption_status",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "guidestar_listing_requested": {
           "schema": "public",
           "table": "charters",
@@ -1220,6 +1292,26 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "initial_authorization": {
+          "schema": "public",
+          "table": "charters",
+          "column": "initial_authorization",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "initial_authorizer": {
+          "schema": "public",
+          "table": "charters",
+          "column": "initial_authorizer",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "initial_target_geo": {
           "schema": "public",
           "table": "charters",
@@ -1240,6 +1332,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "charters",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "landscape_analysis": {
           "schema": "public",
           "table": "charters",
@@ -1249,6 +1351,24 @@ export const schemaMetadata = {
           "isNullable": true,
           "enumRef": null,
           "references": []
+        },
+        "membership_status": {
+          "schema": "public",
+          "table": "charters",
+          "column": "membership_status",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "ref_membership_statuses",
+              "referencedColumns": [
+                "value"
+              ],
+              "isOneToOne": false
+            }
+          ]
         },
         "non_discrimination_policy_on_website": {
           "schema": "public",
@@ -1392,6 +1512,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "cohort_participation",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "participation_status": {
           "schema": "public",
           "table": "cohort_participation",
@@ -1441,6 +1571,16 @@ export const schemaMetadata = {
           "table": "cohorts",
           "column": "cohort_type",
           "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "cohorts",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
           "isNullable": true,
           "enumRef": null,
@@ -1500,6 +1640,36 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "email_addresses",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_primary": {
+          "schema": "public",
+          "table": "email_addresses",
+          "column": "is_primary",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_valid": {
+          "schema": "public",
+          "table": "email_addresses",
+          "column": "is_valid",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
         "people_id": {
           "schema": "public",
           "table": "email_addresses",
@@ -1552,16 +1722,6 @@ export const schemaMetadata = {
               "isOneToOne": false
             }
           ]
-        },
-        "primary": {
-          "schema": "public",
-          "table": "email_addresses",
-          "column": "primary",
-          "baseType": "boolean",
-          "isArray": false,
-          "isNullable": true,
-          "enumRef": null,
-          "references": []
         }
       }
     },
@@ -1604,6 +1764,36 @@ export const schemaMetadata = {
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "email_drafts",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "sent": {
+          "schema": "public",
+          "table": "email_drafts",
+          "column": "sent",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "sent_at": {
+          "schema": "public",
+          "table": "email_drafts",
+          "column": "sent_at",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -1671,10 +1861,10 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
-        "event_id": {
+        "event_name": {
           "schema": "public",
           "table": "event_attendance",
-          "column": "event_id",
+          "column": "event_name",
           "baseType": "string",
           "isArray": false,
           "isNullable": true,
@@ -1683,7 +1873,7 @@ export const schemaMetadata = {
             {
               "relation": "event_list",
               "referencedColumns": [
-                "id"
+                "event_name"
               ],
               "isOneToOne": false
             }
@@ -1696,6 +1886,16 @@ export const schemaMetadata = {
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "event_attendance",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -1796,13 +1996,13 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
-        "id": {
+        "is_archived": {
           "schema": "public",
           "table": "event_list",
-          "column": "id",
-          "baseType": "string",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
-          "isNullable": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -1818,7 +2018,7 @@ export const schemaMetadata = {
             {
               "relation": "ref_event_types",
               "referencedColumns": [
-                "event_type"
+                "value"
               ],
               "isOneToOne": false
             }
@@ -1877,6 +2077,16 @@ export const schemaMetadata = {
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "governance_docs",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -2165,6 +2375,16 @@ export const schemaMetadata = {
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "grants",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -2459,6 +2679,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "group_exemption_actions",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "notes": {
           "schema": "public",
           "table": "group_exemption_actions",
@@ -2547,6 +2777,24 @@ export const schemaMetadata = {
             }
           ]
         },
+        "email_or_name": {
+          "schema": "public",
+          "table": "guide_assignments",
+          "column": "email_or_name",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "guides",
+              "referencedColumns": [
+                "email_or_name"
+              ],
+              "isOneToOne": false
+            }
+          ]
+        },
         "end_date": {
           "schema": "public",
           "table": "guide_assignments",
@@ -2582,6 +2830,16 @@ export const schemaMetadata = {
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "guide_assignments",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -2731,6 +2989,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "guides",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "old_id": {
           "schema": "public",
           "table": "guides",
@@ -2829,6 +3097,16 @@ export const schemaMetadata = {
           "column": "indiv_type_array",
           "baseType": "string",
           "isArray": true,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "lead_routing_and_templates",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
           "isNullable": true,
           "enumRef": null,
           "references": []
@@ -2994,6 +3272,16 @@ export const schemaMetadata = {
           "table": "loans",
           "column": "interest_rate",
           "baseType": "number",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "loans",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
           "isNullable": true,
           "enumRef": null,
@@ -3277,6 +3565,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "locations",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "lat": {
           "schema": "public",
           "table": "locations",
@@ -3473,6 +3771,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "mailing_lists",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "name": {
           "schema": "public",
           "table": "mailing_lists",
@@ -3609,6 +3917,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "membership_actions",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "membership_status_after_action": {
           "schema": "public",
           "table": "membership_actions",
@@ -3621,7 +3939,7 @@ export const schemaMetadata = {
             {
               "relation": "ref_membership_statuses",
               "referencedColumns": [
-                "status"
+                "value"
               ],
               "isOneToOne": false
             }
@@ -3740,6 +4058,16 @@ export const schemaMetadata = {
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "montessori_certs",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -3912,6 +4240,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "nine_nineties",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "link": {
           "schema": "public",
           "table": "nine_nineties",
@@ -3978,6 +4316,42 @@ export const schemaMetadata = {
     },
     "notes": {
       "columns": {
+        "action_step_id": {
+          "schema": "public",
+          "table": "notes",
+          "column": "action_step_id",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "action_steps",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            }
+          ]
+        },
+        "charter_application_id": {
+          "schema": "public",
+          "table": "notes",
+          "column": "charter_application_id",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "charter_applications",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            }
+          ]
+        },
         "charter_id": {
           "schema": "public",
           "table": "notes",
@@ -4030,6 +4404,60 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "governance_doc_id": {
+          "schema": "public",
+          "table": "notes",
+          "column": "governance_doc_id",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "governance_docs",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            }
+          ]
+        },
+        "grant_id": {
+          "schema": "public",
+          "table": "notes",
+          "column": "grant_id",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "grants",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            }
+          ]
+        },
+        "guide_id": {
+          "schema": "public",
+          "table": "notes",
+          "column": "guide_id",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "guides",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            }
+          ]
+        },
         "id": {
           "schema": "public",
           "table": "notes",
@@ -4039,6 +4467,80 @@ export const schemaMetadata = {
           "isNullable": false,
           "enumRef": null,
           "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "notes",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_private": {
+          "schema": "public",
+          "table": "notes",
+          "column": "is_private",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "loan_id": {
+          "schema": "public",
+          "table": "notes",
+          "column": "loan_id",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "loans",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            }
+          ]
+        },
+        "montessori_cert_id": {
+          "schema": "public",
+          "table": "notes",
+          "column": "montessori_cert_id",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "montessori_certs",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            }
+          ]
+        },
+        "nine_ninety_id": {
+          "schema": "public",
+          "table": "notes",
+          "column": "nine_ninety_id",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "nine_nineties",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            }
+          ]
         },
         "people_id": {
           "schema": "public",
@@ -4093,16 +4595,6 @@ export const schemaMetadata = {
             }
           ]
         },
-        "private": {
-          "schema": "public",
-          "table": "notes",
-          "column": "private",
-          "baseType": "boolean",
-          "isArray": false,
-          "isNullable": true,
-          "enumRef": null,
-          "references": []
-        },
         "school_id": {
           "schema": "public",
           "table": "notes",
@@ -4128,6 +4620,24 @@ export const schemaMetadata = {
             },
             {
               "relation": "schools",
+              "referencedColumns": [
+                "id"
+              ],
+              "isOneToOne": false
+            }
+          ]
+        },
+        "ssj_fillout_form_id": {
+          "schema": "public",
+          "table": "notes",
+          "column": "ssj_fillout_form_id",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": [
+            {
+              "relation": "ssj_fillout_forms",
               "referencedColumns": [
                 "id"
               ],
@@ -4198,6 +4708,16 @@ export const schemaMetadata = {
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "open_date_revisions",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -4402,6 +4922,16 @@ export const schemaMetadata = {
           "table": "people",
           "column": "indiv_type",
           "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "people",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
           "isNullable": true,
           "enumRef": null,
@@ -4631,16 +5161,6 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
-        "educator_notes_1": {
-          "schema": "public",
-          "table": "people_educator_early_cultivation",
-          "column": "educator_notes_1",
-          "baseType": "string",
-          "isArray": false,
-          "isNullable": true,
-          "enumRef": null,
-          "references": []
-        },
         "first_contact_ages": {
           "schema": "public",
           "table": "people_educator_early_cultivation",
@@ -4706,6 +5226,16 @@ export const schemaMetadata = {
           "table": "people_educator_early_cultivation",
           "column": "first_contact_willingness_to_relocate",
           "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "people_educator_early_cultivation",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
           "isNullable": true,
           "enumRef": null,
@@ -5090,6 +5620,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "people_roles_associations",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "loan_fund": {
           "schema": "public",
           "table": "people_roles_associations",
@@ -5165,7 +5705,7 @@ export const schemaMetadata = {
             {
               "relation": "ref_roles",
               "referencedColumns": [
-                "role_short"
+                "value"
               ],
               "isOneToOne": false
             }
@@ -5272,6 +5812,16 @@ export const schemaMetadata = {
           "table": "people_systems",
           "column": "in_wf_directory",
           "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "people_systems",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
           "isNullable": true,
           "enumRef": null,
@@ -5394,6 +5944,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "ref_boolean",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "spanish": {
           "schema": "public",
           "table": "ref_boolean",
@@ -5438,6 +5998,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "ref_certifications",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "lead_guide_training": {
           "schema": "public",
           "table": "ref_certifications",
@@ -5460,12 +6030,134 @@ export const schemaMetadata = {
         }
       }
     },
+    "ref_charter_authorizer_actions": {
+      "columns": {
+        "action": {
+          "schema": "public",
+          "table": "ref_charter_authorizer_actions",
+          "column": "action",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "ref_charter_authorizer_actions",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        }
+      }
+    },
+    "ref_charter_statuses": {
+      "columns": {
+        "is_archived": {
+          "schema": "public",
+          "table": "ref_charter_statuses",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "label": {
+          "schema": "public",
+          "table": "ref_charter_statuses",
+          "column": "label",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "value": {
+          "schema": "public",
+          "table": "ref_charter_statuses",
+          "column": "value",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": false,
+          "enumRef": null,
+          "references": []
+        }
+      }
+    },
+    "ref_educator_statuses": {
+      "columns": {
+        "is_archived": {
+          "schema": "public",
+          "table": "ref_educator_statuses",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "kanban_visibility": {
+          "schema": "public",
+          "table": "ref_educator_statuses",
+          "column": "kanban_visibility",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "label": {
+          "schema": "public",
+          "table": "ref_educator_statuses",
+          "column": "label",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "order": {
+          "schema": "public",
+          "table": "ref_educator_statuses",
+          "column": "order",
+          "baseType": "number",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "value": {
+          "schema": "public",
+          "table": "ref_educator_statuses",
+          "column": "value",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": false,
+          "enumRef": null,
+          "references": []
+        }
+      }
+    },
     "ref_event_types": {
       "columns": {
-        "event_type": {
+        "is_archived": {
           "schema": "public",
           "table": "ref_event_types",
-          "column": "event_type",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "value": {
+          "schema": "public",
+          "table": "ref_event_types",
+          "column": "value",
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
@@ -5496,6 +6188,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "ref_gender",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "spanish": {
           "schema": "public",
           "table": "ref_gender",
@@ -5515,6 +6217,16 @@ export const schemaMetadata = {
           "table": "ref_membership_agreement_versions",
           "column": "end_date",
           "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "ref_membership_agreement_versions",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
           "isNullable": true,
           "enumRef": null,
@@ -5544,20 +6256,20 @@ export const schemaMetadata = {
     },
     "ref_membership_statuses": {
       "columns": {
-        "created_at": {
+        "is_archived": {
           "schema": "public",
           "table": "ref_membership_statuses",
-          "column": "created_at",
-          "baseType": "string",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
-          "isNullable": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
-        "status": {
+        "value": {
           "schema": "public",
           "table": "ref_membership_statuses",
-          "column": "status",
+          "column": "value",
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
@@ -5598,13 +6310,13 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
-        "plane": {
+        "is_archived": {
           "schema": "public",
           "table": "ref_planes",
-          "column": "plane",
-          "baseType": "string",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
-          "isNullable": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -5615,6 +6327,16 @@ export const schemaMetadata = {
           "baseType": "string",
           "isArray": true,
           "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "value": {
+          "schema": "public",
+          "table": "ref_planes",
+          "column": "value",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": false,
           "enumRef": null,
           "references": []
         }
@@ -5632,13 +6354,13 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
-        "name": {
+        "is_archived": {
           "schema": "public",
           "table": "ref_public_funding_sources",
-          "column": "name",
-          "baseType": "string",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
-          "isNullable": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -5649,6 +6371,16 @@ export const schemaMetadata = {
           "baseType": "string",
           "isArray": true,
           "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "value": {
+          "schema": "public",
+          "table": "ref_public_funding_sources",
+          "column": "value",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": false,
           "enumRef": null,
           "references": []
         }
@@ -5686,6 +6418,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "ref_race_and_ethnicity",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "spanish": {
           "schema": "public",
           "table": "ref_race_and_ethnicity",
@@ -5710,23 +6452,13 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
-        "role_long": {
+        "is_archived": {
           "schema": "public",
           "table": "ref_roles",
-          "column": "role_long",
-          "baseType": "string",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
-          "isNullable": false,
-          "enumRef": null,
-          "references": []
-        },
-        "role_short": {
-          "schema": "public",
-          "table": "ref_roles",
-          "column": "role_short",
-          "baseType": "string",
-          "isArray": false,
-          "isNullable": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -5737,6 +6469,26 @@ export const schemaMetadata = {
           "baseType": "boolean",
           "isArray": false,
           "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "value": {
+          "schema": "public",
+          "table": "ref_roles",
+          "column": "value",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "value_long": {
+          "schema": "public",
+          "table": "ref_roles",
+          "column": "value_long",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": false,
           "enumRef": null,
           "references": []
         }
@@ -5774,13 +6526,13 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
-        "school_year": {
+        "is_archived": {
           "schema": "public",
           "table": "ref_school_years",
-          "column": "school_year",
-          "baseType": "string",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
-          "isNullable": false,
+          "isNullable": true,
           "enumRef": null,
           "references": []
         },
@@ -5798,6 +6550,70 @@ export const schemaMetadata = {
           "schema": "public",
           "table": "ref_school_years",
           "column": "starting_calendar_year",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "value": {
+          "schema": "public",
+          "table": "ref_school_years",
+          "column": "value",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": false,
+          "enumRef": null,
+          "references": []
+        }
+      }
+    },
+    "ref_stage_statuses": {
+      "columns": {
+        "is_archived": {
+          "schema": "public",
+          "table": "ref_stage_statuses",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "kanban_visibility": {
+          "schema": "public",
+          "table": "ref_stage_statuses",
+          "column": "kanban_visibility",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": false,
+          "enumRef": null,
+          "references": []
+        },
+        "label": {
+          "schema": "public",
+          "table": "ref_stage_statuses",
+          "column": "label",
+          "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "order": {
+          "schema": "public",
+          "table": "ref_stage_statuses",
+          "column": "order",
+          "baseType": "number",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "value": {
+          "schema": "public",
+          "table": "ref_stage_statuses",
+          "column": "value",
           "baseType": "string",
           "isArray": false,
           "isNullable": false,
@@ -5860,6 +6676,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "school_reports_and_submissions",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "report_type": {
           "schema": "public",
           "table": "school_reports_and_submissions",
@@ -5882,7 +6708,7 @@ export const schemaMetadata = {
             {
               "relation": "ref_school_years",
               "referencedColumns": [
-                "school_year"
+                "value"
               ],
               "isOneToOne": false
             }
@@ -5927,6 +6753,16 @@ export const schemaMetadata = {
           "table": "school_ssj_data",
           "column": "entered_visioning_date",
           "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "school_ssj_data",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
           "isNullable": true,
           "enumRef": null,
@@ -6610,6 +7446,16 @@ export const schemaMetadata = {
           "enumRef": null,
           "references": []
         },
+        "is_archived": {
+          "schema": "public",
+          "table": "schools",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "last_modified": {
           "schema": "public",
           "table": "schools",
@@ -7004,6 +7850,16 @@ export const schemaMetadata = {
     },
     "sources": {
       "columns": {
+        "is_archived": {
+          "schema": "public",
+          "table": "sources",
+          "column": "is_archived",
+          "baseType": "boolean",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
         "ref_sources": {
           "schema": "public",
           "table": "sources",
@@ -7313,6 +8169,16 @@ export const schemaMetadata = {
           "table": "ssj_fillout_forms",
           "column": "initial_outreacher",
           "baseType": "string",
+          "isArray": false,
+          "isNullable": true,
+          "enumRef": null,
+          "references": []
+        },
+        "is_archived": {
+          "schema": "public",
+          "table": "ssj_fillout_forms",
+          "column": "is_archived",
+          "baseType": "boolean",
           "isArray": false,
           "isNullable": true,
           "enumRef": null,

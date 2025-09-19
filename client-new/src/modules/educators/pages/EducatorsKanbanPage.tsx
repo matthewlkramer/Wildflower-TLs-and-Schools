@@ -1,12 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useGridEducators } from '../api/queries';
 import KanbanBoard from '@/components/shared/KanbanBoard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
 import { EDUCATOR_KANBAN_CONSTANTS_TABLE, EDUCATOR_GRID } from '../constants';
+import { GridPageHeader } from '@/components/shared/GridPageHeader';
+import { useLocation } from 'wouter';
+import type { SavedView } from '@/hooks/useSavedViews';
 
 export function EducatorsKanbanPage() {
   const { data = [], isLoading } = useGridEducators();
+  const [, navigate] = useLocation();
+  const [quick, setQuick] = useState('');
   const groupField = EDUCATOR_GRID.find((c) => c.kanbanKey)?.field || 'kanban_group';
 
   // Load constants for lane definitions: value (label), order, optional visibility
@@ -39,11 +44,25 @@ export function EducatorsKanbanPage() {
     return s;
   }, [constMap]);
 
-  const filteredItems = useMemo(() => data.filter((r: any) => {
+  // Filter by quick filter text if provided
+  const quickFilteredData = useMemo(() => {
+    if (!quick.trim()) return data;
+    const searchText = quick.toLowerCase();
+    return data.filter((item: any) => {
+      // Search in common text fields
+      const searchableFields = ['full_name', 'name', 'current_role', 'current_role_at_active_school', 'email'];
+      return searchableFields.some(field => {
+        const value = item[field];
+        return value && String(value).toLowerCase().includes(searchText);
+      });
+    });
+  }, [data, quick]);
+
+  const filteredItems = useMemo(() => quickFilteredData.filter((r: any) => {
     const v = r[groupField];
     const key = v == null || v === '' ? '__UNSPECIFIED__' : String(v).trim();
     return !suppressedKeys.has(key);
-  }), [data, groupField, suppressedKeys]);
+  }), [quickFilteredData, groupField, suppressedKeys]);
 
   const groupKeys = useMemo(() => {
     const keys = new Set<string>();
@@ -94,20 +113,57 @@ export function EducatorsKanbanPage() {
     return Array.from(set);
   }, [constMap, filteredItems, groupField]);
 
+  const handleViewModeChange = (viewMode: string) => {
+    if (viewMode === 'table') {
+      navigate('/educators');
+    } else if (viewMode === 'split') {
+      navigate('/educators/split');
+    }
+    // kanban view stays on current page
+  };
+
+  const handleApplySavedView = (view: SavedView) => {
+    // Apply quick filter for kanban view
+    setQuick(view.quickFilter);
+    // Note: Other filter settings don't apply to kanban view
+  };
+
+  const handleSaveCurrentView = () => {
+    // For kanban view, we mainly save the quick filter
+    return {
+      filters: {}, // Kanban doesn't use grid filters
+      sortModel: [], // Kanban has its own sorting
+      columnState: [], // Kanban doesn't use columns
+      quickFilter: quick
+    };
+  };
+
   return (
-    <KanbanBoard<any>
-      items={filteredItems}
-      columns={columns}
-      groupBy={(it) => (it as any)[groupField]}
-      getId={(it) => String((it as any).id)}
-      initialCollapsedKeys={initialCollapsed}
-      renderCard={(t) => (
-        <div>
-          <div style={{ fontWeight: 600, fontSize: 13 }}>{(t as any).full_name || (t as any).name || ''}</div>
-          <div style={{ fontSize: 12, color: '#475569' }}>{(t as any).current_role_at_active_school || (t as any).current_role || ''}</div>
-        </div>
-      )}
-    />
+    <div>
+      <GridPageHeader 
+        entityType="educator"
+        quickFilter={quick}
+        onQuickFilterChange={setQuick}
+        currentViewMode="kanban"
+        onViewModeChange={handleViewModeChange}
+        onAddNew={() => console.log('Add new educator')}
+        onApplySavedView={handleApplySavedView}
+        onSaveCurrentView={handleSaveCurrentView}
+      />
+      <KanbanBoard<any>
+        items={filteredItems}
+        columns={columns}
+        groupBy={(it) => (it as any)[groupField]}
+        getId={(it) => String((it as any).id)}
+        initialCollapsedKeys={initialCollapsed}
+        renderCard={(t) => (
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 13 }}>{(t as any).full_name || (t as any).name || ''}</div>
+            <div style={{ fontSize: 12, color: '#475569' }}>{(t as any).current_role_at_active_school || (t as any).current_role || ''}</div>
+          </div>
+        )}
+      />
+    </div>
   );
 }
 

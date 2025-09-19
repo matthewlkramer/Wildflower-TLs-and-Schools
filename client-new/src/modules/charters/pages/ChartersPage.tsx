@@ -1,15 +1,19 @@
 import React, { useMemo, useState } from 'react';
 import { GridBase } from '@/components/shared/GridBase';
+import { createGridActionColumn } from '@/components/shared/GridRowActionsCell';
 import type { ColDef } from 'ag-grid-community';
 import { useGridCharters } from '../api/queries';
 import { useLocation } from 'wouter';
 import { CHARTER_GRID, type CharterColumnConfig } from '../constants';
 import { supabase } from '@/lib/supabase/client';
+import { GridPageHeader } from '@/components/shared/GridPageHeader';
+import type { SavedView } from '@/hooks/useSavedViews';
 
 export function ChartersPage() {
   const { data = [], isLoading } = useGridCharters();
   const [, navigate] = useLocation();
   const [quick, setQuick] = useState('');
+  const [gridApi, setGridApi] = useState<any>(null);
 
   const cols = useMemo<ColDef<any>[]>(() => {
     if (!data || data.length === 0) return [];
@@ -97,24 +101,81 @@ export function ChartersPage() {
       }
     }
 
+    defs.push(createGridActionColumn('charter'));
     return defs;
   }, [data]);
 
 
   if (isLoading) return <div>Loading charters.</div>;
 
+  const handleViewModeChange = (viewMode: string) => {
+    if (viewMode === 'kanban') {
+      navigate('/charters/kanban');
+    } else if (viewMode === 'split') {
+      navigate('/charters/split');
+    }
+    // table view stays on current page
+  };
+
+  const handleAddNew = () => {
+    console.log('Add new charter');
+  };
+
+  const handleApplySavedView = (view: SavedView) => {
+    if (!gridApi) return;
+
+    // Apply quick filter
+    setQuick(view.quickFilter);
+    gridApi.setGridOption('quickFilterText', view.quickFilter);
+
+    // Apply column state (visibility, width, order)
+    gridApi.applyColumnState({
+      state: view.columnState,
+      applyOrder: true
+    });
+
+    // Apply sorting
+    gridApi.setSortModel(view.sortModel);
+
+    // Apply filters
+    Object.keys(view.filters).forEach(colId => {
+      const filterModel = view.filters[colId];
+      gridApi.setFilterModel({
+        [colId]: filterModel
+      });
+    });
+  };
+
+  const handleSaveCurrentView = () => {
+    if (!gridApi) {
+      return {
+        filters: {},
+        sortModel: [],
+        columnState: [],
+        quickFilter: quick
+      };
+    }
+
+    return {
+      filters: gridApi.getFilterModel() || {},
+      sortModel: gridApi.getSortModel() || [],
+      columnState: gridApi.getColumnState() || [],
+      quickFilter: quick
+    };
+  };
+
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-        <h1 style={{ margin: 0 }}>Charters</h1>
-        <input
-          type="text"
-          placeholder="Quick filter..."
-          value={quick}
-          onChange={(e) => setQuick(e.target.value)}
-          style={{ flex: '0 0 260px', padding: '6px 8px' }}
-        />
-      </div>
+      <GridPageHeader 
+        entityType="charter"
+        quickFilter={quick}
+        onQuickFilterChange={setQuick}
+        currentViewMode="table"
+        onViewModeChange={handleViewModeChange}
+        onAddNew={handleAddNew}
+        onApplySavedView={handleApplySavedView}
+        onSaveCurrentView={handleSaveCurrentView}
+      />
       <GridBase
         columnDefs={cols}
         rowData={data as any[]}
@@ -130,10 +191,20 @@ export function ChartersPage() {
             hiddenByDefault: false,
           },
           onGridReady: (params) => {
+            setGridApi(params.api);
             params.api.setSideBarVisible(true);
             params.api.closeToolPanel();
           },
-          onRowClicked: (e) => navigate(`/charters/${e.data.id}`),
+          onRowClicked: (e) => {
+            const eventTarget = e.event instanceof Event ? (e.event.target as HTMLElement | null) : null;
+            if (eventTarget) {
+              if (eventTarget.closest('select.row-action-select')) return;
+              const cellEl = eventTarget.closest('[col-id]');
+              const colId = cellEl instanceof HTMLElement ? cellEl.getAttribute('col-id') : null;
+              if (colId && colId.startsWith('__charter_actions')) return;
+            }
+            navigate(`/charters/${e.data.id}`);
+          },
         }}
       />
     </div>

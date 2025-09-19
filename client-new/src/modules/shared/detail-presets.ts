@@ -1,9 +1,10 @@
 import type { TableColumnMeta } from './detail-types';
 
 export const ROW_ACTIONS = {
-  actionSteps: Object.freeze(['inline_edit', 'modal_view', 'mark_complete', 'archive'] as const),
-  notes: Object.freeze(['inline_edit', 'modal_view', 'markPrivate', 'archive'] as const),
-  modalViewPrivate: Object.freeze(['modalView', 'markPrivate'] as const),
+  // Canonical action ids
+  actionSteps: Object.freeze(['inline_edit', 'view_in_modal', 'toggle_complete', 'archive'] as const),
+  notes: Object.freeze(['inline_edit', 'view_in_modal', 'toggle_private_public', 'archive'] as const),
+  withPrivacy: Object.freeze(['view_in_modal', 'toggle_private_public'] as const),
 } as const;
 
 export const TABLE_ACTIONS = {
@@ -48,7 +49,7 @@ export const TABLE_COLUMN_META: Record<string, readonly TableColumnMeta[]> = {
     { field: 'note', label: 'Note', type: 'string', multiline: true },
     { field: 'created_by', label: 'Created By', type: 'string' }, //single-select - chooses from the guides table
     { field: 'created_date', label: 'Created Date', type: 'date' },
-    { field: 'private', label: 'Private?', type: 'boolean' },
+    { field: 'is_private', label: 'Private?', type: 'boolean' },
   ]),
   gmail: Object.freeze<TableColumnMeta[]>([
     { field: 'sent_at', label: 'Sent At', type: 'date' },
@@ -73,14 +74,14 @@ export const TABLE_COLUMN_META: Record<string, readonly TableColumnMeta[]> = {
     { field: 'role', label: 'Role', type: 'string' }, //multi-select - on ref_roles.value
     { field: 'start_date', label: 'Start Date', type: 'date' },
     { field: 'end_date', label: 'End Date', type: 'date' },
-    { field: 'currently_active', label: 'Active?', type: 'boolean' },
+    { field: 'is_active', label: 'Active?', type: 'boolean' },
   ]),
   schools: Object.freeze<TableColumnMeta[]>([
     { field: 'school_name', label: 'School Name', type: 'string' },
     { field: 'role', label: 'Role', type: 'enum' }, //multi-select - on ref_roles.value
     { field: 'start_date', label: 'Start Date', type: 'date' },
     { field: 'end_date', label: 'End Date', type: 'date' },
-    { field: 'currently_active', label: 'Active?', type: 'boolean' },
+    { field: 'is_active', label: 'Active?', type: 'boolean' },
     { field: 'stage_status', label: 'Stage/Status', type: 'string' },
   ]),
   locations: Object.freeze<TableColumnMeta[]>([
@@ -95,7 +96,7 @@ export const TABLE_COLUMN_META: Record<string, readonly TableColumnMeta[]> = {
     { field: 'type', label: 'Type', type: 'enum' }, //enum 'guide_types'
     { field: 'start_date', label: 'Start Date', type: 'date' },
     { field: 'end_date', label: 'End Date', type: 'date' },
-    { field: 'active', label: 'Active?', type: 'boolean' },
+    { field: 'is_active', label: 'Active?', type: 'boolean' },
   ]),
   grants: Object.freeze<TableColumnMeta[]>([
     { field: 'issue_date', label: 'Issue Date', type: 'date' },

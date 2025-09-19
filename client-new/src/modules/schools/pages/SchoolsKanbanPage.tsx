@@ -1,12 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useGridSchools } from '../api/queries';
 import KanbanBoard from '@/components/shared/KanbanBoard';
 import { SCHOOL_KANBAN_CONSTANTS_TABLE, SCHOOL_GRID } from '../constants';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
+import { GridPageHeader } from '@/components/shared/GridPageHeader';
+import { useLocation } from 'wouter';
+import type { SavedView } from '@/hooks/useSavedViews';
 
 export function SchoolsKanbanPage() {
   const { data = [], isLoading } = useGridSchools();
+  const [, navigate] = useLocation();
+  const [quick, setQuick] = useState('');
   const groupField = SCHOOL_GRID.find((c) => c.kanbanKey)?.field || 'stage_status';
 
   // Load constants table
@@ -39,11 +44,25 @@ export function SchoolsKanbanPage() {
     return s;
   }, [constMap]);
 
-  const filteredItems = useMemo(() => data.filter((r: any) => {
+  // Filter by quick filter text if provided
+  const quickFilteredData = useMemo(() => {
+    if (!quick.trim()) return data;
+    const searchText = quick.toLowerCase();
+    return data.filter((item: any) => {
+      // Search in common text fields for schools
+      const searchableFields = ['school_name', 'name', 'city', 'state', 'address', 'email'];
+      return searchableFields.some(field => {
+        const value = item[field];
+        return value && String(value).toLowerCase().includes(searchText);
+      });
+    });
+  }, [data, quick]);
+
+  const filteredItems = useMemo(() => quickFilteredData.filter((r: any) => {
     const v = r[groupField];
     const key = v == null || v === '' ? '__UNSPECIFIED__' : String(v).trim();
     return !suppressedKeys.has(key);
-  }), [data, groupField, suppressedKeys]);
+  }), [quickFilteredData, groupField, suppressedKeys]);
 
   const groupKeys = useMemo(() => {
     const keys = new Set<string>();
@@ -90,20 +109,55 @@ export function SchoolsKanbanPage() {
 
   
 
+  const handleViewModeChange = (viewMode: string) => {
+    if (viewMode === 'table') {
+      navigate('/schools');
+    } else if (viewMode === 'split') {
+      navigate('/schools/split');
+    }
+    // kanban view stays on current page
+  };
+
+  const handleApplySavedView = (view: SavedView) => {
+    // Apply quick filter for kanban view
+    setQuick(view.quickFilter);
+  };
+
+  const handleSaveCurrentView = () => {
+    return {
+      filters: {},
+      sortModel: [],
+      columnState: [],
+      quickFilter: quick
+    };
+  };
+
   return (
-    <KanbanBoard<any>
-      items={filteredItems}
-      columns={columns}
-      groupBy={(it) => (it as any)[groupField]}
-      getId={(it) => String((it as any).id)}
-      initialCollapsedKeys={initialCollapsed}
-      renderCard={(s) => (
-        <div>
-          <div style={{ fontWeight: 600, fontSize: 13 }}>{(s as any).school_name || (s as any).long_name || (s as any).short_name || ''}</div>
-          <div style={{ fontSize: 12, color: '#475569' }}>{(s as any).stage_status || (s as any).status || ''}</div>
-        </div>
-      )}
-    />
+    <div>
+      <GridPageHeader 
+        entityType="school"
+        quickFilter={quick}
+        onQuickFilterChange={setQuick}
+        currentViewMode="kanban"
+        onViewModeChange={handleViewModeChange}
+        onAddNew={() => console.log('Add new school')}
+        onApplySavedView={handleApplySavedView}
+        onSaveCurrentView={handleSaveCurrentView}
+      />
+      <KanbanBoard<any>
+        items={filteredItems}
+        columns={columns}
+        groupBy={(it) => (it as any)[groupField]}
+        getId={(it) => String((it as any).id)}
+        initialCollapsedKeys={initialCollapsed}
+        renderCard={(s) => (
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 13 }}>{(s as any).school_name || (s as any).long_name || (s as any).short_name || ''}</div>
+            <div style={{ fontSize: 12, color: '#475569' }}>{(s as any).stage_status || (s as any).status || ''}</div>
+          </div>
+        )}
+      />
+    </div>
   );
 }
 

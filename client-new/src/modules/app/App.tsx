@@ -13,8 +13,11 @@ import { SchoolDetailPage } from '../schools/pages/SchoolDetailPage';
 import { CharterDetailPage } from '../charters/pages/CharterDetailPage';
 import { initAgGridEnterprise } from '@/lib/ag-grid';
 import { EducatorsKanbanPage } from '../educators/pages/EducatorsKanbanPage';
+import { EducatorsSplitPage } from '../educators/pages/EducatorsSplitPage';
 import { SchoolsKanbanPage } from '../schools/pages/SchoolsKanbanPage';
+import { SchoolsSplitPage } from '../schools/pages/SchoolsSplitPage';
 import { ChartersKanbanPage } from '../charters/pages/ChartersKanbanPage';
+import { ChartersSplitPage } from '../charters/pages/ChartersSplitPage';
 import { SettingsPage } from '../settings/pages/SettingsPage';
 
 export function App() {
@@ -38,6 +41,11 @@ export function App() {
               <EducatorsKanbanPage />
             </RequireAuth>
           </Route>
+          <Route path="/educators/split">
+            <RequireAuth>
+              <EducatorsSplitPage />
+            </RequireAuth>
+          </Route>
           <Route path="/educators/:id">{(params: any) => (
             <RequireAuth>
               <EducatorDetailPage params={params} />
@@ -54,6 +62,11 @@ export function App() {
               <SchoolsKanbanPage />
             </RequireAuth>
           </Route>
+          <Route path="/schools/split">
+            <RequireAuth>
+              <SchoolsSplitPage />
+            </RequireAuth>
+          </Route>
           <Route path="/schools/:id">{(params: any) => (
             <RequireAuth>
               <SchoolDetailPage params={params} />
@@ -68,6 +81,11 @@ export function App() {
           <Route path="/charters/kanban">
             <RequireAuth>
               <ChartersKanbanPage />
+            </RequireAuth>
+          </Route>
+          <Route path="/charters/split">
+            <RequireAuth>
+              <ChartersSplitPage />
             </RequireAuth>
           </Route>
           <Route path="/charters/:id">{(params: any) => (

@@ -1,15 +1,19 @@
 import React, { useMemo, useState } from 'react';
 import { GridBase } from '@/components/shared/GridBase';
+import { createGridActionColumn } from '@/components/shared/GridRowActionsCell';
 import type { ColDef } from 'ag-grid-community';
 import { useGridSchools } from '../api/queries';
 import { useLocation } from 'wouter';
 import { SCHOOL_GRID, type SchoolColumnConfig } from '../constants';
 import { supabase } from '@/lib/supabase/client';
+import { GridPageHeader } from '@/components/shared/GridPageHeader';
+import type { SavedView } from '@/hooks/useSavedViews';
 
 export function SchoolsPage() {
   const { data = [], isLoading } = useGridSchools();
   const [, navigate] = useLocation();
   const [quick, setQuick] = useState('');
+  const [gridApi, setGridApi] = useState<any>(null);
 
   const cols = useMemo<ColDef<any>[]>(() => {
     if (!data || data.length === 0) return [];
@@ -97,24 +101,81 @@ export function SchoolsPage() {
       }
     }
 
+    defs.push(createGridActionColumn('school'));
     return defs;
   }, [data]);
 
 
   if (isLoading) return <div>Loading schools.</div>;
 
+  const handleViewModeChange = (viewMode: string) => {
+    if (viewMode === 'kanban') {
+      navigate('/schools/kanban');
+    } else if (viewMode === 'split') {
+      navigate('/schools/split');
+    }
+    // table view stays on current page
+  };
+
+  const handleAddNew = () => {
+    console.log('Add new school');
+  };
+
+  const handleApplySavedView = (view: SavedView) => {
+    if (!gridApi) return;
+
+    // Apply quick filter
+    setQuick(view.quickFilter);
+    gridApi.setGridOption('quickFilterText', view.quickFilter);
+
+    // Apply column state (visibility, width, order)
+    gridApi.applyColumnState({
+      state: view.columnState,
+      applyOrder: true
+    });
+
+    // Apply sorting
+    gridApi.setSortModel(view.sortModel);
+
+    // Apply filters
+    Object.keys(view.filters).forEach(colId => {
+      const filterModel = view.filters[colId];
+      gridApi.setFilterModel({
+        [colId]: filterModel
+      });
+    });
+  };
+
+  const handleSaveCurrentView = () => {
+    if (!gridApi) {
+      return {
+        filters: {},
+        sortModel: [],
+        columnState: [],
+        quickFilter: quick
+      };
+    }
+
+    return {
+      filters: gridApi.getFilterModel() || {},
+      sortModel: gridApi.getSortModel() || [],
+      columnState: gridApi.getColumnState() || [],
+      quickFilter: quick
+    };
+  };
+
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-        <h1 style={{ margin: 0 }}>Schools</h1>
-        <input
-          type="text"
-          placeholder="Quick filter..."
-          value={quick}
-          onChange={(e) => setQuick(e.target.value)}
-          style={{ flex: '0 0 260px', padding: '6px 8px' }}
-        />
-      </div>
+      <GridPageHeader 
+        entityType="school"
+        quickFilter={quick}
+        onQuickFilterChange={setQuick}
+        currentViewMode="table"
+        onViewModeChange={handleViewModeChange}
+        onAddNew={handleAddNew}
+        onApplySavedView={handleApplySavedView}
+        onSaveCurrentView={handleSaveCurrentView}
+      />
       <GridBase
         columnDefs={cols}
         rowData={data as any[]}
@@ -130,10 +191,20 @@ export function SchoolsPage() {
             hiddenByDefault: false,
           },
           onGridReady: (params) => {
+            setGridApi(params.api);
             params.api.setSideBarVisible(true);
             params.api.closeToolPanel();
           },
-          onRowClicked: (e) => navigate(`/schools/${e.data.id}`),
+          onRowClicked: (e) => {
+            const eventTarget = e.event instanceof Event ? (e.event.target as HTMLElement | null) : null;
+            if (eventTarget) {
+              if (eventTarget.closest('select.row-action-select')) return;
+              const cellEl = eventTarget.closest('[col-id]');
+              const colId = cellEl instanceof HTMLElement ? cellEl.getAttribute('col-id') : null;
+              if (colId && colId.startsWith('__school_actions')) return;
+            }
+            navigate(`/schools/${e.data.id}`);
+          },
         }}
       />
     </div>

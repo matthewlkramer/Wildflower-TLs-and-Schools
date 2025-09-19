@@ -1,6 +1,7 @@
 // Config model: field name, display name, visibility, order, and value type/options.
 import type { ColumnVisibility, GridValueKind, GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailMapBlock, DetailTabSpec as SharedDetailTabSpec, FieldMetadataMap } from '../shared/detail-types';
 import { ROW_ACTIONS, TABLE_ACTIONS, TABLE_COLUMNS, TABLE_COLUMN_META } from '../shared/detail-presets';
+import { TABLE_PRESETS } from '../shared/table-presets';
 
 export type { ColumnVisibility, GridValueKind } from '../shared/detail-types';
 export type SchoolColumnConfig = GridColumnConfig;
@@ -26,7 +27,6 @@ export const SCHOOL_DETAIL_TABS: DetailTabSpec[] = [
   {
     id: 'overview',
     label: 'Overview',
-    writeTo: { table: 'schools', pk: 'id' },
     blocks: [
       { kind: 'map', title: 'Location', fields: ['physical_lat','physical_long','physical_address'] },
       { kind: 'card', title: 'Name(s)', fields: ['short_name', 'long_name', 'prior_names','founding_tls'], editable: true },
@@ -42,7 +42,6 @@ export const SCHOOL_DETAIL_TABS: DetailTabSpec[] = [
   {
     id: 'details',
     label: 'Details',
-    writeTo: { table: 'schools', pk: 'id' },
     blocks: [
       { kind: 'card', title: 'Legal entity', fields: ['status','legal_structure','ein','incorporation_date','current_fy_end','loan_report_name'], editable: true },
       { kind: 'card', title: 'Nonprofit status', fields: ['nonprofit_status','group_exemption_status'], editable: true },
@@ -54,7 +53,6 @@ export const SCHOOL_DETAIL_TABS: DetailTabSpec[] = [
   {
     id: 'ssj',
     label: 'SSJ',
-    writeTo: { table: 'schools_ssj_data', pk: 'id' },
     blocks: [
       { kind: 'card', title: 'Target location', fields: ['ssj_target_city','ssj_target_state'], editable: true },
       { kind: 'card', title: 'Milestones', fields: ['entered_visioning_date','visioning_album_complete','visioning_album','entered_planning_date','planning_album','entered_startup_date'], editable: true },
@@ -66,8 +64,7 @@ export const SCHOOL_DETAIL_TABS: DetailTabSpec[] = [
   },
   {
     id: 'systems',
-    label: 'Systems & Ops',
-    writeTo: { table: 'schools', pk: 'id' },
+    label: 'Systems',
     blocks: [
       { kind: 'card', title: 'Systems', fields: ['google_workspace_org_unit_path','transparent_classroom','admissions_system'], editable: true },
       { kind: 'card', title: 'Operations', fields: ['gsuite_roles','google_voice','website_tool','tc_recordkeeping','tc_admissions','business_insurance'], editable: true },
@@ -78,26 +75,24 @@ export const SCHOOL_DETAIL_TABS: DetailTabSpec[] = [
   {
     id: 'educators',
     label: 'Educators',
-    writeTo: { table: 'people', pk: 'id' },
     blocks: [
-      { kind: 'table', source: { table: 'educators', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.educators], columnMeta: TABLE_COLUMN_META.educators, rowActions: ['inline_edit', 'view_educators','email','add_note','add_task','end_link','archive'], tableActions: ['addExistingEducatorToSchool','addNewEducatorToSchool'] },
+      { kind: 'table', source: { table: 'educators', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.educators], columnMeta: TABLE_COLUMN_META.educators, rowActions: ['inline_edit', 'view_educators','email','add_note','add_task','end_link','archive'], tableActions: ['addExistingEducatorToSchool','addNewEducatorToSchool'], tableActionLabels: ['Add Existing Educator','Add New Educator'] },
     ],
   },
 
   {
     id: 'enrollment',
-    label: 'Enrollment & Demographics',
-    writeTo: { table: 'annual_enrollment_and_demographics', pk: 'school_id' },
+    label: 'Enrollment',
     blocks: [
-      { kind: 'table', source: { table: 'annual_enrollment_and_demographics', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.enrollment], columnMeta: TABLE_COLUMN_META.enrollment, rowActions: ['inline_edit'], tableActions: ['addRecord'] },
+      { kind: 'table', source: TABLE_PRESETS.schoolEnrollment.source, columns: [...TABLE_PRESETS.schoolEnrollment.columns], columnMeta: TABLE_PRESETS.schoolEnrollment.columnMeta, rowActions: [...(TABLE_PRESETS.schoolEnrollment.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolEnrollment.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolEnrollment.tableActionLabels || [])] },
     ],
   },
   {
     id: 'grants_and_loans',
     label: 'Grants & Loans',
     blocks: [
-      { kind: 'table', width: 'half',title: 'Loans', source: { table: 'loans', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.loans], columnMeta: TABLE_COLUMN_META.loans, rowActions: ['modal_view']},
-      { kind: 'table', width: 'half',title: 'Grants', source: { table: 'grants', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.grants], columnMeta: TABLE_COLUMN_META.grants, rowActions: ['inline_edit','modal_view','archive'], tableActions: ['addGrant'] },
+      { kind: 'table', width: 'half', title: 'Loans', source: TABLE_PRESETS.schoolLoans.source, columns: [...TABLE_PRESETS.schoolLoans.columns], columnMeta: TABLE_PRESETS.schoolLoans.columnMeta, rowActions: [...(TABLE_PRESETS.schoolLoans.rowActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolLoans.tableActionLabels || [])] },
+      { kind: 'table', width: 'half', title: 'Grants', source: TABLE_PRESETS.schoolGrants.source, columns: [...TABLE_PRESETS.schoolGrants.columns], columnMeta: TABLE_PRESETS.schoolGrants.columnMeta, rowActions: [...(TABLE_PRESETS.schoolGrants.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolGrants.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolGrants.tableActionLabels || [])] },
 
     ],
   },
@@ -105,44 +100,44 @@ export const SCHOOL_DETAIL_TABS: DetailTabSpec[] = [
     id: 'locations',
     label: 'Locations',
     blocks: [
-      { kind: 'table', source: { table: 'locations', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.locations], columnMeta: TABLE_COLUMN_META.locations, rowActions: ['modal_view', 'inline_edit','end_occupancy', 'archive'], tableActions: ['addLocation'] },
+      { kind: 'table', source: TABLE_PRESETS.schoolLocations.source, columns: [...TABLE_PRESETS.schoolLocations.columns], columnMeta: TABLE_PRESETS.schoolLocations.columnMeta, rowActions: [...(TABLE_PRESETS.schoolLocations.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolLocations.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolLocations.tableActionLabels || [])] },
     ],
   },
   {
     id: 'guides',
-    label: 'Guide Assignments',
+    label: 'Guides',
     blocks: [
-      { kind: 'table', source: { table: 'guide_assignments', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.guides], columnMeta: TABLE_COLUMN_META.guides, rowActions: ['inline_edit'], tableActions: ['addGuideLink','addNewGuide'] }
+      { kind: 'table', source: TABLE_PRESETS.schoolGuideAssignments.source, columns: [...TABLE_PRESETS.schoolGuideAssignments.columns], columnMeta: TABLE_PRESETS.schoolGuideAssignments.columnMeta, rowActions: [...(TABLE_PRESETS.schoolGuideAssignments.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolGuideAssignments.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolGuideAssignments.tableActionLabels || [])] }
     ],
   },
   {
     id: 'documents',
-    label: 'Documents',
+    label: 'Docs',
     blocks: [
-      { kind: 'table', width: 'half', title: 'Documents', source: { table: 'governance_docs', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.governanceDocs], columnMeta: TABLE_COLUMN_META.governanceDocs, rowActions: ['inline_edit','modal_view'], tableActions: ['addDocument'] },
-      { kind: 'table', width: 'half', title: '990s', source: { table: 'nine_nineties', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.nineNineties], columnMeta: TABLE_COLUMN_META.nineNineties, rowActions: ['archive'], tableActions: ['addSchoolDoc'] },
+      { kind: 'table', width: 'half', title: 'Documents', source: TABLE_PRESETS.schoolGovernanceDocs.source, columns: [...TABLE_PRESETS.schoolGovernanceDocs.columns], columnMeta: TABLE_PRESETS.schoolGovernanceDocs.columnMeta, rowActions: [...(TABLE_PRESETS.schoolGovernanceDocs.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolGovernanceDocs.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolGovernanceDocs.tableActionLabels || [])] },
+      { kind: 'table', width: 'half', title: '990s', source: TABLE_PRESETS.schoolNineNineties.source, columns: [...TABLE_PRESETS.schoolNineNineties.columns], columnMeta: TABLE_PRESETS.schoolNineNineties.columnMeta, rowActions: [...(TABLE_PRESETS.schoolNineNineties.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolNineNineties.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolNineNineties.tableActionLabels || [])] },
     ],
   },
   {
     id: 'action_steps',
     label: 'Action Steps',
     blocks: [
-      { kind: 'table', source: { table: 'action_steps', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.actionSteps], columnMeta: TABLE_COLUMN_META.actionSteps, rowActions: [...ROW_ACTIONS.actionSteps], tableActions: [...TABLE_ACTIONS.actionSteps] },
+      { kind: 'table', source: { table: 'action_steps', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.actionSteps], columnMeta: TABLE_COLUMN_META.actionSteps, rowActions: [...ROW_ACTIONS.actionSteps], tableActions: [...TABLE_ACTIONS.actionSteps], tableActionLabels: ['Add Action Step'] },
     ],
   },
   {
     id: 'notes',
     label: 'Notes',
     blocks: [
-      { kind: 'table', source: { table: 'notes', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.notes], columnMeta: TABLE_COLUMN_META.notes, rowActions: [...ROW_ACTIONS.notes], tableActions: [...TABLE_ACTIONS.notes] },
+      { kind: 'table', source: TABLE_PRESETS.schoolNotes.source, columns: [...TABLE_PRESETS.schoolNotes.columns], columnMeta: TABLE_PRESETS.schoolNotes.columnMeta, rowActions: [...(TABLE_PRESETS.schoolNotes.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolNotes.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolNotes.tableActionLabels || [])] },
     ],
   },
   {
     id: 'google_sync',
-    label: 'Google Sync',
+    label: 'gmail/gCal',
     blocks: [
-      { kind: 'table', width: 'half', title: 'Gmails', source: { table: 'g_emails', schema: 'gsync', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.gmail], columnMeta: TABLE_COLUMN_META.gmail, rowActions: [...ROW_ACTIONS.modalViewPrivate] },
-      { kind: 'table', width: 'half', title: 'Calendar Events', source: { table: 'g_events', schema: 'gsync', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.calendarEvents], columnMeta: TABLE_COLUMN_META.calendarEvents, rowActions: [...ROW_ACTIONS.modalViewPrivate] },
+      { kind: 'table', width: 'half', title: 'Gmails', source: TABLE_PRESETS.schoolGmails.source, columns: [...TABLE_PRESETS.schoolGmails.columns], columnMeta: TABLE_PRESETS.schoolGmails.columnMeta, rowActions: [...(TABLE_PRESETS.schoolGmails.rowActions || [])] },
+      { kind: 'table', width: 'half', title: 'Calendar Events', source: TABLE_PRESETS.schoolCalendarEvents.source, columns: [...TABLE_PRESETS.schoolCalendarEvents.columns], columnMeta: TABLE_PRESETS.schoolCalendarEvents.columnMeta, rowActions: [...(TABLE_PRESETS.schoolCalendarEvents.rowActions || [])] },
     ],
   },
 
@@ -153,12 +148,11 @@ export const SCHOOL_DETAIL_TABS: DetailTabSpec[] = [
 export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {
   'about': { label: 'About', type: 'string', multiline: true, edit: { table: 'schools' } },
   'about_spanish': { label: 'About (Spanish)', type: 'string', multiline: true, edit: { table: 'schools' } },
-  'ages_served': { label: 'Ages Served', type: 'string', array: true, edit: { table: 'schools' } },
-  'board_members': { label: 'Board Members', type: 'string', multiline: true, edit: { table: 'schools' } },
-  'current_cohort': { label: 'Current Cohort', type: 'string', edit: { table: 'schools' } },
-  'current_fy_end': { label: 'Current Fiscal Year End', type: 'date', edit: { table: 'schools' } },
-  'current_guide_name': { label: 'Current Guide Name', type: 'string', edit: { table: 'schools' } },
-  'current_tls': { label: 'Current TLs', type: 'string', edit: { table: 'schools' } },
+  'ages_served': { label: 'Ages Served', type: 'enum', array: true, edit: { table: 'schools' , enumName: 'ages_spans_rev'} },
+  'current_cohort': { label: 'Current Cohort', type: 'string'},
+  'current_fy_end': { label: 'Current Fiscal Year End', type: 'enum', edit: { table: 'schools' , enumName: 'fiscal_year_end'} },
+  'current_guide_name': { label: 'Current Guide Name', type: 'string' },
+  'current_tls': { label: 'Current TLs', type: 'string'},
   'domain_name': { label: 'Domain Name', type: 'string', edit: { table: 'schools' } },
   'ein': { label: 'EIN', type: 'string', edit: { table: 'schools' } },
   'enrollment_at_full_capacity': { label: 'Enrollment at Full Capacity', type: 'number', edit: { table: 'schools' } },
@@ -166,55 +160,52 @@ export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {
   'entered_startup_date': { label: 'Entered Startup Date', type: 'date', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
   'entered_visioning_date': { label: 'Entered Visioning Date', type: 'date', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
   'facebook': { label: 'Facebook', type: 'string', edit: { table: 'schools' } },
-  'founders': { label: 'Founders', type: 'string', multiline: true, edit: { table: 'schools' } },
-  'founding_tls': { label: 'Founding TLs', type: 'string', array: true, reference: { table: 'people', valueColumn: 'id', labelColumn: 'full_name' } },
-  'fundraising_committee': { label: 'Fundraising Committee', type: 'string', multiline: true, edit: { table: 'schools' } },
-  'governance_model': { label: 'Governance Model', type: 'string', edit: { table: 'schools' } },
+  'founding_tls': { label: 'Founding TLs', type: 'string', array: true, edit: { table: 'people'}, lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
+  'governance_model': { label: 'Governance Model', type: 'enum', edit: { table: 'schools' , enumName: 'governance_models'} },
   'incorporation_date': { label: 'Incorporation Date', type: 'date', edit: { table: 'schools' } },
   'instagram': { label: 'Instagram', type: 'string', edit: { table: 'schools' } },
   'institutional_partner': { label: 'Institutional Partner', type: 'string', edit: { table: 'schools' } },
-  'legal_structure': { label: 'Legal Structure', type: 'string', edit: { table: 'schools' } },
+  'legal_structure': { label: 'Legal Structure', type: 'enum', edit: { table: 'schools' ,enumName: 'legal_structure_options'} },
   'loan_report_name': { label: 'Loan Report Name', type: 'string', edit: { table: 'schools' } },  
   'logo': { label: 'Logo', type: 'attachment' },  
   'logo_url': { label: 'Logo URL', type: 'string' },
   'long_name': { label: 'Long Name', type: 'string', edit: { table: 'schools' } },  
   'mailing_address': { label: 'Mailing Address', type: 'string', multiline: true },
-  'membership_status': { label: 'Membership Status', type: 'string', edit: { table: 'schools' } },
-  'nonprofit_status': { label: 'Nonprofit Status', type: 'string', edit: { table: 'schools' } },
+  'membership_status': { label: 'Membership Status', type: 'string', edit: { table: 'schools' } , lookup: { table: 'ref_membership_statuses', valueColumn: 'value', labelColumn: 'value' } },
+  'nonprofit_status': { label: 'Nonprofit Status', type: 'enum', edit: { table: 'schools' ,enumName: 'nonprofit_status_rev'} },
   'number_of_classrooms': { label: 'Number of Classrooms', type: 'number', edit: { table: 'schools' } },
   'open_date': { label: 'Open Date', type: 'date', edit: { table: 'schools' } },
-  'ops_committee': { label: 'Operations Committee', type: 'string', multiline: true, edit: { table: 'schools' } },  
   'physical_address': { label: 'Physical Address', type: 'string', multiline: true },  
   'physical_lat': { label: 'Latitude', type: 'number' },  
   'physical_long': { label: 'Longitude', type: 'number' },
-  'planning_album': { label: 'Planning Album', type: 'string', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
+  'planning_album': { label: 'Planning Album', type: 'attachment', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
   'prior_names': { label: 'Prior Names', type: 'string', edit: { table: 'schools' } },
   'program_focus': { label: 'Program Focus', type: 'string', multiline: true, edit: { table: 'schools' } },
-  'public_funding': { label: 'Public Funding', type: 'string', edit: { table: 'schools' } },
+  'public_funding': { label: 'Public Funding', type: 'string', array: true, edit: { table: 'schools'}, lookup: { table: 'ref_public_funding_sources', valueColumn: 'value', labelColumn: 'value' } },
   'risk_factors': { label: 'Risk Factors', type: 'string', multiline: true, edit: { table: 'schools' } },
   'school_email': { label: 'School Email', type: 'string', edit: { table: 'schools' } },
   'school_name': { label: 'School Name', type: 'string', edit: { table: 'schools' } },
   'school_phone': { label: 'School Phone', type: 'string', edit: { table: 'schools' } },
   'short_name': { label: 'Short Name', type: 'string', edit: { table: 'schools' } },
-  'ssj_amount_raised': { label: 'Amount Raised', type: 'number', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
-  'ssj_board_development': { label: 'Board Development', type: 'string', multiline: true, edit: { table: 'schools_ssj_data', pk: 'school_id' } },
-  'ssj_budget_ready_for_next_steps': { label: 'Budget Ready for Next Steps', type: 'boolean', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
-  'ssj_facility': { label: 'Facility', type: 'string', multiline: true, edit: { table: 'schools_ssj_data', pk: 'school_id' } },
+  'ssj_amount_raised': { label: 'Amount Raised', type: 'string', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
+  'ssj_board_development': { label: 'Board Development', type: 'enum', edit: { table: 'schools_ssj_data', pk: 'school_id',enumName:'ssj_board_dev_status' } },
+  'ssj_budget_ready_for_next_steps': { label: 'Budget Ready for Next Steps', type: 'enum', edit: { table: 'schools_ssj_data', pk: 'school_id', enumName:'ssj_budget_ready_for_next_steps_enum' } },
+  'ssj_facility': { label: 'Facility', type: 'enum', edit: { table: 'schools_ssj_data', pk: 'school_id', enumName: 'ssj_facility_enum' } },
   'ssj_fundraising_narrative': { label: 'Fundraising Narrative', type: 'string', multiline: true, edit: { table: 'schools_ssj_data', pk: 'school_id' } },
-  'ssj_gap_in_funding': { label: 'Gap in Funding', type: 'number', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
-  'ssj_has_partner': { label: 'Has Partner', type: 'boolean', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
+  'ssj_gap_in_funding': { label: 'Gap in Funding', type: 'string', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
+  'ssj_has_partner': { label: 'Has Partner', type: 'enum', edit: { table: 'schools_ssj_data', pk: 'school_id', enumName: 'ssj_has_partner_enum' } },
   'ssj_loan_approved_amt': { label: 'Loan Approved Amount', type: 'number', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
   'ssj_loan_eligibility': { label: 'Loan Eligibility', type: 'string', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
-  'ssj_on_track_for_enrollment': { label: 'On Track for Enrollment', type: 'boolean', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
-  'ssj_ops_guide_support_track': { label: 'Ops Guide Support Track', type: 'string', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
-  'ssj_pathway_to_funding': { label: 'Pathway to Funding', type: 'string', multiline: true, edit: { table: 'schools_ssj_data', pk: 'school_id' } },
-  'ssj_readiness_to_open_rating': { label: 'Readiness to Open Rating', type: 'string', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
-  'ssj_seeking_wf_funding': { label: 'Seeking WF Funding', type: 'boolean', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
+  'ssj_on_track_for_enrollment': { label: 'On Track for Enrollment', type: 'enum', edit: { table: 'schools_ssj_data', pk: 'school_id', enumName: 'ssj_on_track_for_enrollment_enum' } },
+  'ssj_ops_guide_support_track': { label: 'Ops Guide Support Track', type: 'enum', edit: { table: 'schools_ssj_data', pk: 'school_id', enumName: 'ssj_ops_guide_support_track_enum' } },
+  'ssj_pathway_to_funding': { label: 'Pathway to Funding', type: 'enum', multiline: true, edit: { table: 'schools_ssj_data', pk: 'school_id', enumName: 'ssj_pathway_to_funding_enum' } },
+  'ssj_readiness_to_open_rating': { label: 'Readiness to Open Rating', type: 'enum', edit: { table: 'schools_ssj_data', pk: 'school_id' , enumName: 'high_med_low'} },
+  'ssj_seeking_wf_funding': { label: 'Seeking WF Funding', type: 'enum', edit: { table: 'schools_ssj_data', pk: 'school_id', enumName: 'ssj_seeking_wf_funding_enum' } },
   'ssj_target_city': { label: 'SSJ Target City', type: 'string', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
   'ssj_target_state': { label: 'SSJ Target State', type: 'string', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
-  'ssj_total_startup_funding_needed': { label: 'Total Startup Funding Needed', type: 'number', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
+  'ssj_total_startup_funding_needed': { label: 'Total Startup Funding Needed', type: 'string', edit: { table: 'schools_ssj_data', pk: 'school_id' } },
   'stage_status': { label: 'Stage Status', type: 'enum'},
-  'status': { label: 'Status', type: 'string', edit: { table: 'schools' } },  
+  'status': { label: 'Status', type: 'enum', edit: { table: 'schools' , enumName: 'school_statuses'} },  
   'total_grants_issued': { label: 'Total Grants Issued', type: 'number' },  
   'total_loans_issued': { label: 'Total Loans Issued', type: 'number' },
   'visioning_album': { label: 'Visioning Album', type: 'attachment', edit: { table: 'schools_ssj_data', pk: 'school_id' } },

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
 
 export function ResetPage() {
   const [password, setPassword] = useState('');
@@ -39,7 +40,7 @@ export function ResetPage() {
         onChange={(e) => setPassword(e.target.value)}
       />
       {error && <div className="mt-2 text-red-600 text-sm">{error}</div>}
-      <button className="mt-4 px-4 py-2 border rounded" type="submit">Save</button>
+      <Button className="mt-4" type="submit">Save</Button>
     </form>
   );
 }

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
+import { getColumnMetadata } from '../../shared/schema-metadata';
 
 export type WriteTarget = { schema?: string; table: string; pk?: string };
 export type CardEditSource = WriteTarget & { exceptions?: ExceptionMap[] };
@@ -60,8 +61,21 @@ export async function saveCardValues(
 ) {
   const tableRel = writeTo.schema ? `${writeTo.schema}.${writeTo.table}` : writeTo.table;
   const transformed = await applyExceptions(values, exceptions);
+  // Filter out any fields that aren't actual columns on the target table to prevent 400s
+  const filtered: Record<string, any> = {};
+  for (const [k, v] of Object.entries(transformed)) {
+    const cm = getColumnMetadata(writeTo.schema, writeTo.table, k);
+    if (cm) filtered[k] = v;
+  }
   const pk = writeTo.pk || 'id';
-  const match = pk === 'id' ? { id: educatorId } : { [pk]: educatorId } as any;
-  const { error } = await (supabase as any).from(tableRel).update(transformed).match(match);
+  const match = pk === 'id' ? ({ id: educatorId } as any) : ({ [pk]: educatorId } as any);
+  const updateQuery = (supabase as any).from(tableRel).update(filtered).match(match).select();
+  const { data, error } = await updateQuery;
   if (error) throw error;
+  // If no row was updated and this is a child table keyed by a foreign pk, create it via upsert
+  if ((!data || data.length === 0) && pk !== 'id') {
+    const upsertPayload = { ...filtered, [pk]: educatorId } as any;
+    const { error: upsertError } = await (supabase as any).from(tableRel).upsert(upsertPayload, { onConflict: pk }).select();
+    if (upsertError) throw upsertError;
+  }
 }

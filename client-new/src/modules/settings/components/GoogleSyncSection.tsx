@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
 
 const GMAIL_FN = 'gmail-sync';
 const CAL_FN = 'gcal-sync';
