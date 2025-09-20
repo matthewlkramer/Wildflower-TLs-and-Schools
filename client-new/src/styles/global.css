@@ -52,6 +52,19 @@ textarea {
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
+/* Unify native input heights with select triggers */
+input,
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea,
+select,
+.wf-input {
+  height: 32px !important;
+  min-height: 32px !important;
+  line-height: 1.2 !important;
+}
+
 button {
   background: var(--wf-accent);
   border-color: var(--wf-accent);
@@ -65,6 +78,55 @@ button:hover {
   background: var(--wf-accent-dark);
   border-color: var(--wf-accent-dark);
   box-shadow: 0 0 0 2px rgba(15, 138, 141, 0.15);
+}
+
+/* Ensure select triggers and multi-select triggers are white, not teal */
+button[data-radix-select-trigger],
+button.wf-multi-select-trigger {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  padding: 6px 10px;
+  height: 32px !important;
+  min-height: 32px !important;
+  line-height: 1 !important;
+}
+
+button[data-radix-select-trigger]:hover,
+button.wf-multi-select-trigger:hover {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06);
+}
+
+/* Force dropdown panels to be opaque white */
+[data-radix-select-content],
+.wf-multi-select-content {
+  background: #ffffff !important;
+}
+
+/* Compact multi-select option rows */
+.wf-multi-select-content label {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  line-height: 1.1 !important;
+}
+
+/* Force smaller font inside all dropdown menus */
+[data-radix-select-content],
+[data-radix-select-content] * {
+  font-size: 12px !important;
+}
+.wf-multi-select-content,
+.wf-multi-select-content * {
+  font-size: 12px !important;
+}
+
+/* Ensure our unified trigger class is white even if global button wins */
+.wf-control-trigger {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
 }
 
 button:focus,
@@ -102,6 +164,14 @@ main {
   background: var(--wf-surface);
   box-shadow: var(--wf-shadow);
   padding: 8px;
+}
+
+/* Remove the outer gray border around AG Grid */
+.ag-theme-material .ag-root-wrapper,
+.ag-theme-material .ag-root-wrapper-body,
+.ag-theme-material .ag-root {
+  border: none !important;
+  outline: none !important;
 }
 
 /* Remove left border from actions column */
@@ -384,3 +454,17 @@ button:disabled {
   align-items: center !important;
   display: flex !important;
 }
+
+
+
+/* Compact Radix select option rows globally */
+[data-radix-select-content] [role='option']{
+  font-size:12px !important;
+  line-height:1.1 !important;
+  min-height:20px !important;
+  padding-top:2px !important;
+  padding-bottom:2px !important;
+}
+
+.wf-multi-select-content { font-size: 11px !important; }
+.wf-multi-select-content label { padding-top: 1px !important; padding-bottom: 1px !important; line-height: 1 !important; min-height: 16px !important; }

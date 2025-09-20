@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import type { ICellRendererParams } from 'ag-grid-community';
 import { GridBase } from '@/components/shared/GridBase';
 import { createGridActionColumn } from '@/components/shared/GridRowActionsCell';
 import type { ColDef } from 'ag-grid-community';
@@ -22,6 +23,32 @@ export function ChartersPage() {
     for (const row of sample) Object.keys(row || {}).forEach((k) => keySet.add(k));
 
     const defs: ColDef<any>[] = [];
+
+    // Simple badge renderer for arrays (used for initial_target_planes)
+    const BadgesRenderer: React.FC<ICellRendererParams> = (p) => {
+      const arr = Array.isArray(p.value) ? p.value : (p.value != null ? [p.value] : []);
+      if (!arr.length) return <></>;
+      return (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          {arr.map((v: any, idx: number) => (
+            <span
+              key={String(v) + idx}
+              style={{
+                fontSize: 12,
+                background: '#e2e8f0',
+                color: '#0f172a',
+                borderRadius: 999,
+                padding: '2px 8px',
+                lineHeight: 1.2,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {String(v)}
+            </span>
+          ))}
+        </div>
+      );
+    };
 
     for (const config of CHARTER_GRID) {
       if (!keySet.has(config.field)) continue;
@@ -60,7 +87,11 @@ export function ChartersPage() {
           break;
         case 'multi':
           def.filter = 'agTextColumnFilter';
-          def.valueFormatter = (p: any) => Array.isArray(p.value) ? p.value.join(', ') : (p.value ?? '');
+          if (config.field === 'initial_target_planes') {
+            def.cellRenderer = BadgesRenderer as any;
+          } else {
+            def.valueFormatter = (p: any) => Array.isArray(p.value) ? p.value.join(', ') : (p.value ?? '');
+          }
           break;
         case 'boolean':
           def.filter = 'agSetColumnFilter';

@@ -48,7 +48,12 @@ export function mergeTableColumnMeta(options: {
     type: manual?.type,
     array: manual?.array,
     multiline: manual?.multiline,
+    options: manual?.options,
+    enumName: manual?.enumName,
+    lookup: manual?.lookup,
     reference: manual?.reference,
+    edit: manual?.edit,
+    writeTo: manual?.writeTo,
   };
 
   if (columnInfo) {

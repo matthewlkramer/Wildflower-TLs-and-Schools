@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import type { ICellRendererParams } from 'ag-grid-community';
 import { GridBase } from '@/components/shared/GridBase';
 import { createGridActionColumn } from '@/components/shared/GridRowActionsCell';
 import type { ColDef } from 'ag-grid-community';
@@ -14,6 +15,39 @@ export function EducatorsPage() {
   const [, navigate] = useLocation();
   const [quick, setQuick] = useState('');
   const [gridApi, setGridApi] = useState<any>(null);
+  const [lookups, setLookups] = useState<Record<string, Record<string, string>>>({});
+
+  // Preload lookup maps for columns that specify `lookupField` (table.labelColumn).
+  useEffect(() => {
+    let cancelled = false;
+    async function loadLookups() {
+      const entries = EDUCATOR_GRID.filter((c) => Boolean((c as any).lookupField)).map((c) => (c as any).lookupField as string);
+      const distinct = Array.from(new Set(entries));
+      const next: Record<string, Record<string, string>> = { ...lookups };
+      for (const key of distinct) {
+        if (!key || next[key]) continue;
+        const [table, labelColumn] = key.split('.');
+        if (!table || !labelColumn) continue;
+        const sel = `value, ${labelColumn}`;
+        const { data, error } = await (supabase as any).from(table).select(sel).order(labelColumn, { ascending: true });
+        if (!cancelled && !error && Array.isArray(data)) {
+          const map: Record<string, string> = {};
+          for (const row of data) {
+            const v = row?.value;
+            const lbl = row?.[labelColumn];
+            if (v != null) map[String(v)] = String(lbl ?? v);
+          }
+          next[key] = map;
+        }
+      }
+      if (!cancelled) {
+        setLookups(next);
+        if (gridApi) gridApi.refreshCells({ force: true });
+      }
+    }
+    loadLookups();
+    return () => { cancelled = true; };
+  }, [gridApi]);
 
   const cols = useMemo<ColDef<any>[]>(() => {
     if (!data || data.length === 0) return [];
@@ -22,6 +56,33 @@ export function EducatorsPage() {
     for (const row of sample) Object.keys(row || {}).forEach((k) => keySet.add(k));
 
     const defs: ColDef<any>[] = [];
+
+    // Simple badge renderer for arrays (used for race_ethnicity)
+    const BadgesRenderer: React.FC<ICellRendererParams & { map?: Record<string, string> }> = (p) => {
+      const map = (p as any).map as Record<string, string> | undefined;
+      const arr = Array.isArray(p.value) ? p.value : (p.value != null ? [p.value] : []);
+      if (!arr.length) return <></>;
+      return (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          {arr.map((v: any, idx: number) => (
+            <span
+              key={String(v) + idx}
+              style={{
+                fontSize: 12,
+                background: '#e2e8f0',
+                color: '#0f172a',
+                borderRadius: 999,
+                padding: '2px 8px',
+                lineHeight: 1.2,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {(map && map[String(v)]) || String(v)}
+            </span>
+          ))}
+        </div>
+      );
+    };
 
     for (const config of EDUCATOR_GRID) {
       if (!keySet.has(config.field)) continue;
@@ -46,6 +107,15 @@ export function EducatorsPage() {
                 });
               }
             } as any;
+            // Display mapping for select (single) using lookup map if present
+            const key = config.lookupField;
+            def.valueFormatter = (p: any) => {
+              const v = p.value;
+              if (v == null) return '';
+              const map = lookups[key];
+              if (!map) return String(v);
+              return map[String(v)] ?? String(v);
+            };
           } else if (config.enumName) {
             def.filterParams = {
               values: (p: any) => {
@@ -60,7 +130,23 @@ export function EducatorsPage() {
           break;
         case 'multi':
           def.filter = 'agTextColumnFilter';
-          def.valueFormatter = (p: any) => Array.isArray(p.value) ? p.value.join(', ') : (p.value ?? '');
+          if (config.lookupField) {
+            const key = config.lookupField;
+            // Display badges specifically for race_ethnicity; others remain comma-separated
+            if (config.field === 'race_ethnicity') {
+              def.cellRenderer = BadgesRenderer as any;
+              def.cellRendererParams = { map: lookups[key] } as any;
+            } else {
+              def.valueFormatter = (p: any) => {
+                const arr = Array.isArray(p.value) ? p.value : (p.value != null ? [p.value] : []);
+                const map = lookups[key];
+                if (!map) return arr.map((x: any) => String(x)).join(', ');
+                return arr.map((x: any) => map[String(x)] ?? String(x)).join(', ');
+              };
+            }
+          } else {
+            def.valueFormatter = (p: any) => Array.isArray(p.value) ? p.value.join(', ') : (p.value ?? '');
+          }
           break;
         case 'boolean':
           def.filter = 'agSetColumnFilter';

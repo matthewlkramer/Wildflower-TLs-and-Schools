@@ -1,4 +1,4 @@
-import { ROW_ACTIONS, TABLE_ACTIONS, TABLE_COLUMNS, TABLE_COLUMN_META } from '../shared/detail-presets';
+// Legacy bundles removed; presets are self-contained
 import { TABLE_PRESETS } from '../shared/table-presets';
 import type { ColumnVisibility, GridValueKind, GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailMapBlock, DetailTabSpec as SharedDetailTabSpec, FieldMetadataMap } from '../shared/detail-types';
 
@@ -14,7 +14,7 @@ export const CHARTER_GRID: CharterColumnConfig[] = [
   { field: 'status', headerName: 'Status', visibility: 'show', valueType: 'select', enumName: 'charter_status', kanbanKey: true },
   { field: 'proj_open', headerName: 'Projected open', visibility: 'show', valueType: 'date' },
   { field: 'non_tl_roles', headerName: 'Non-TL leadership', visibility: 'show', valueType: 'string' },
-  { field: 'initial_target_planes', headerName: 'Target planes', visibility: 'show', valueType: 'multi', enumName: 'developmental_planes' },
+  { field: 'initial_target_planes', headerName: 'Target planes', visibility: 'show', valueType: 'multi', lookupField: 'ref_planes.label' },
   { field: 'initial_target_geo', headerName: 'Target geography', visibility: 'show', valueType: 'string' },
   { field: 'id', headerName: 'ID', visibility: 'suppress' }
 ];    
@@ -40,7 +40,7 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
     blocks: [
       { kind: 'card', title: 'Legal entity', fields: ['ein','incorp_date','current_fy_end'], editable: true },
       { kind: 'card', title: 'Nonprofit status', fields: ['nonprofit_status','group_exemption_status'], editable: true },
-      { kind: 'table', title: 'Authorizer actions', source: TABLE_PRESETS.charterAuthorizerActions.source, columns: [...TABLE_PRESETS.charterAuthorizerActions.columns], rowActions: [...TABLE_PRESETS.charterAuthorizerActions.rowActions!], tableActions: ['addAction'], tableActionLabels: ['Add Action'] },
+      { kind: 'table', title: 'Authorizer actions', preset: 'charterAuthorizerActions' },
       { kind: 'card', title: 'Other', fields: ['non_discrimination_policy_on_website','school_provided_1023','guidestart_listing_requested','partnership_with_wf', 'first_site_opened_date', 'website'], editable: true },
     ],
   },
@@ -63,29 +63,29 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
     id: 'educators',
     label: 'Educators',
     blocks: [
-      { kind: 'table',  source: TABLE_PRESETS.educatorsOnCharters.source, columns: [...TABLE_PRESETS.educatorsOnCharters.columns], columnMeta: TABLE_PRESETS.educatorsOnCharters.columnMeta, rowActions: [...(TABLE_PRESETS.educatorsOnCharters.rowActions || [])], tableActions: ['addStint', 'addEducatorAndStint'], tableActionLabels: ['Add Stint','Add Educator & Stint'] },
+      { kind: 'table',  preset: 'charterEducators' },
     ],
   },
   {
     id: 'schools',
     label: 'Schools',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.schoolsOnCharters.source, columns: [...TABLE_PRESETS.schoolsOnCharters.columns], columnMeta: TABLE_PRESETS.schoolsOnCharters.columnMeta, rowActions: [...(TABLE_PRESETS.schoolsOnCharters.rowActions || [])], tableActions: ['addStint', 'addEducatorAndStint'], tableActionLabels: ['Add Stint','Add Educator & Stint'] },
+      { kind: 'table', preset: 'charterSchools' },
     ],
   },
   {
     id: 'enrollment',
     label: 'Enrollment',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.charterEnrollment.source, columns: [...TABLE_PRESETS.charterEnrollment.columns], columnMeta: TABLE_PRESETS.charterEnrollment.columnMeta, rowActions: [...(TABLE_PRESETS.charterEnrollment.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterEnrollment.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterEnrollment.tableActionLabels || [])] },
+      { kind: 'table', preset: 'charterEnrollment' },
     ],
   },
   {
     id: 'docs',
     label: 'Docs',
     blocks: [
-      { kind: 'table', title: 'Governance Docs', source: TABLE_PRESETS.charterGovernanceDocs.source, columns: [...TABLE_PRESETS.charterGovernanceDocs.columns], rowActions: [...(TABLE_PRESETS.charterGovernanceDocs.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterGovernanceDocs.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterGovernanceDocs.tableActionLabels || [])] },
-      { kind: 'table', title: '990s', source: TABLE_PRESETS.charterNineNineties.source, columns: [...TABLE_PRESETS.charterNineNineties.columns], columnMeta: TABLE_PRESETS.charterNineNineties.columnMeta, rowActions: [...(TABLE_PRESETS.charterNineNineties.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterNineNineties.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterNineNineties.tableActionLabels || [])] },
+      { kind: 'table', title: 'Governance Docs', preset: 'charterGovernanceDocs' },
+      { kind: 'table', title: '990s', preset: 'charterNineNineties' },
     ],
   },
   
@@ -93,8 +93,8 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
     id: 'reports_and_results',
     label: 'Reports',
     blocks: [
-      { kind: 'table', title: '', source: TABLE_PRESETS.charterReports.source, columns: [...TABLE_PRESETS.charterReports.columns], rowActions: [...(TABLE_PRESETS.charterReports.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterReports.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterReports.tableActionLabels || [])] },
-      { kind: 'table', title: '', source: TABLE_PRESETS.charterAnnualData.source, columns: [...TABLE_PRESETS.charterAnnualData.columns], rowActions: [...(TABLE_PRESETS.charterAnnualData.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterAnnualData.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterAnnualData.tableActionLabels || [])] },
+      { kind: 'table', title: '', preset: 'charterReports' },
+      { kind: 'table', title: '', preset: 'charterAnnualData' },
     ],
   },
   
@@ -102,29 +102,29 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
     id: 'grant_and_loans',
     label: 'Grants & Loans',
     blocks: [
-      { kind: 'table', title: 'Grants', source: TABLE_PRESETS.charterGrants.source, columns: [...TABLE_PRESETS.charterGrants.columns], columnMeta: TABLE_PRESETS.charterGrants.columnMeta, rowActions: [...(TABLE_PRESETS.charterGrants.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterGrants.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterGrants.tableActionLabels || [])] },
-      { kind: 'table', title: 'Loans', source: TABLE_PRESETS.charterLoans.source, columns: [...TABLE_PRESETS.charterLoans.columns], rowActions: [...(TABLE_PRESETS.charterLoans.rowActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterLoans.tableActionLabels || [])]},
+      { kind: 'table', title: 'Grants', preset: 'charterGrants' },
+      { kind: 'table', title: 'Loans', preset: 'charterLoans' },
     ],
   },
   {
     id: 'guides',
     label: 'Guides',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.charterGuideAssignments.source, columns: [...TABLE_PRESETS.charterGuideAssignments.columns], columnMeta: TABLE_PRESETS.charterGuideAssignments.columnMeta, rowActions: [...(TABLE_PRESETS.charterGuideAssignments.rowActions || [])], tableActions: [...(TABLE_PRESETS.charterGuideAssignments.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.charterGuideAssignments.tableActionLabels || [])] },
+      { kind: 'table', preset: 'charterGuideAssignments' },
     ],
   },
   {
     id: 'action_steps',
     label: 'Action Steps',
     blocks: [
-      { kind: 'table', source: { table: 'action_steps', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.actionSteps], columnMeta: TABLE_COLUMN_META.actionSteps, rowActions: [...ROW_ACTIONS.actionSteps], tableActions: [...TABLE_ACTIONS.actionSteps], tableActionLabels: ['Add Action Step'] },
+      { kind: 'table', preset: 'charterActionSteps' },
     ],
   },
   {
     id: 'notes',
     label: 'Notes',
     blocks: [
-      { kind: 'table', source: { table: 'notes', fkColumn: 'charter_id' }, columns: [...TABLE_COLUMNS.notes], columnMeta: TABLE_COLUMN_META.notes, rowActions: [...ROW_ACTIONS.notes], tableActions: [...TABLE_ACTIONS.notes], tableActionLabels: ['Add Note'] },
+      { kind: 'table', preset: 'charterNotes' },
     ],
   },
   {
@@ -132,15 +132,11 @@ export const CHARTER_DETAIL_TABS: DetailTabSpec[] = [
     label: 'gmail/gCal',
     blocks: [
       { kind: 'card', title: 'Google Sync Settings', fields: ['exclude_from_calendar_logging'], editable: true },
-      { kind: 'table', title: 'Gmails', source: TABLE_PRESETS.charterGmails.source, columns: [...TABLE_PRESETS.charterGmails.columns], columnMeta: TABLE_PRESETS.charterGmails.columnMeta, rowActions: [...(TABLE_PRESETS.charterGmails.rowActions || [])] },
-      { kind: 'table', title: 'Calendar Events', source: TABLE_PRESETS.charterCalendarEvents.source, columns: [...TABLE_PRESETS.charterCalendarEvents.columns], columnMeta: TABLE_PRESETS.charterCalendarEvents.columnMeta, rowActions: [...(TABLE_PRESETS.charterCalendarEvents.rowActions || [])] },
+      { kind: 'table', title: 'Gmails', preset: 'charterGmails' },
+      { kind: 'table', title: 'Calendar Events', preset: 'charterCalendarEvents' },
     ],
   },
 ];
-
-
-
-
 
 
 export const CHARTER_FIELD_METADATA: FieldMetadataMap = {
@@ -199,3 +195,4 @@ export const CHARTER_FIELD_METADATA: FieldMetadataMap = {
   'total_loans_issued': { label: 'Total Loans Issued', type: 'number' },
   'website': { label: 'Website', type: 'string', edit: { table: 'charters' } },
 };
+

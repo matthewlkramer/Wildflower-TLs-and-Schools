@@ -18,9 +18,8 @@ export const defaultColDef: ColDef = {
 };
 
 export const baseGridOptions: GridOptions = {
-  theme: 'legacy',
-  rowHeight: 36,
-  headerHeight: 38,
+  rowHeight: 42,
+  headerHeight: 48,
   animateRows: true,
   suppressCellFocus: true,
   rowSelection: { mode: 'singleRow', enableClickSelection: false },

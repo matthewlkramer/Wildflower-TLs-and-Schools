@@ -3,7 +3,6 @@ import { AgGridReact } from 'ag-grid-react';
 import type { ColDef, GridOptions } from 'ag-grid-community';
 import { baseGridOptions } from './ag-grid-defaults';
 
-import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-material.css';
 
 type GridBaseProps<T> = {

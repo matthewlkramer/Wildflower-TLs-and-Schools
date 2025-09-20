@@ -23,7 +23,7 @@ export function Header() {
   return (
     <header className="app-header">
       <div className="app-header__logo">
-        <Link href="/educators" className="app-header__logo-link" aria-label="TLs & Schools">
+        <Link href="/" className="app-header__logo-link" aria-label="TLs & Schools">
           <img className="app-header__logo-image" src={wildflowerLogo} alt="Wildflower" />
           <span className="app-header__brand-text">
             <span className="app-header__brand-name">TLs &amp; Schools</span>

@@ -1,6 +1,6 @@
 // Config model: field name, display name, visibility, order, and value type/options.
 import type { ColumnVisibility, GridValueKind, GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailMapBlock, DetailTabSpec as SharedDetailTabSpec, FieldMetadataMap } from '../shared/detail-types';
-import { ROW_ACTIONS, TABLE_ACTIONS, TABLE_COLUMNS, TABLE_COLUMN_META } from '../shared/detail-presets';
+// Legacy bundles removed; presets are self-contained
 import { TABLE_PRESETS } from '../shared/table-presets';
 
 export type { ColumnVisibility, GridValueKind } from '../shared/detail-types';
@@ -76,7 +76,7 @@ export const SCHOOL_DETAIL_TABS: DetailTabSpec[] = [
     id: 'educators',
     label: 'Educators',
     blocks: [
-      { kind: 'table', source: { table: 'educators', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.educators], columnMeta: TABLE_COLUMN_META.educators, rowActions: ['inline_edit', 'view_educators','email','add_note','add_task','end_link','archive'], tableActions: ['addExistingEducatorToSchool','addNewEducatorToSchool'], tableActionLabels: ['Add Existing Educator','Add New Educator'] },
+      { kind: 'table', readSource: TABLE_PRESETS.schoolEducators.readSource!, columns: TABLE_PRESETS.schoolEducators.columns as any, rowActions: [...(TABLE_PRESETS.schoolEducators.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolEducators.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolEducators.tableActionLabels || [])] },
     ],
   },
 
@@ -84,15 +84,15 @@ export const SCHOOL_DETAIL_TABS: DetailTabSpec[] = [
     id: 'enrollment',
     label: 'Enrollment',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.schoolEnrollment.source, columns: [...TABLE_PRESETS.schoolEnrollment.columns], columnMeta: TABLE_PRESETS.schoolEnrollment.columnMeta, rowActions: [...(TABLE_PRESETS.schoolEnrollment.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolEnrollment.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolEnrollment.tableActionLabels || [])] },
+      { kind: 'table', preset: 'schoolEnrollment' },
     ],
   },
   {
     id: 'grants_and_loans',
     label: 'Grants & Loans',
     blocks: [
-      { kind: 'table', width: 'half', title: 'Loans', source: TABLE_PRESETS.schoolLoans.source, columns: [...TABLE_PRESETS.schoolLoans.columns], columnMeta: TABLE_PRESETS.schoolLoans.columnMeta, rowActions: [...(TABLE_PRESETS.schoolLoans.rowActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolLoans.tableActionLabels || [])] },
-      { kind: 'table', width: 'half', title: 'Grants', source: TABLE_PRESETS.schoolGrants.source, columns: [...TABLE_PRESETS.schoolGrants.columns], columnMeta: TABLE_PRESETS.schoolGrants.columnMeta, rowActions: [...(TABLE_PRESETS.schoolGrants.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolGrants.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolGrants.tableActionLabels || [])] },
+      { kind: 'table', width: 'half', title: 'Loans', preset: 'schoolLoans' },
+      { kind: 'table', width: 'half', title: 'Grants', preset: 'schoolGrants' },
 
     ],
   },
@@ -100,44 +100,44 @@ export const SCHOOL_DETAIL_TABS: DetailTabSpec[] = [
     id: 'locations',
     label: 'Locations',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.schoolLocations.source, columns: [...TABLE_PRESETS.schoolLocations.columns], columnMeta: TABLE_PRESETS.schoolLocations.columnMeta, rowActions: [...(TABLE_PRESETS.schoolLocations.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolLocations.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolLocations.tableActionLabels || [])] },
+      { kind: 'table', preset: 'schoolLocations' },
     ],
   },
   {
     id: 'guides',
     label: 'Guides',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.schoolGuideAssignments.source, columns: [...TABLE_PRESETS.schoolGuideAssignments.columns], columnMeta: TABLE_PRESETS.schoolGuideAssignments.columnMeta, rowActions: [...(TABLE_PRESETS.schoolGuideAssignments.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolGuideAssignments.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolGuideAssignments.tableActionLabels || [])] }
+      { kind: 'table', preset: 'schoolGuideAssignments' }
     ],
   },
   {
     id: 'documents',
     label: 'Docs',
     blocks: [
-      { kind: 'table', width: 'half', title: 'Documents', source: TABLE_PRESETS.schoolGovernanceDocs.source, columns: [...TABLE_PRESETS.schoolGovernanceDocs.columns], columnMeta: TABLE_PRESETS.schoolGovernanceDocs.columnMeta, rowActions: [...(TABLE_PRESETS.schoolGovernanceDocs.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolGovernanceDocs.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolGovernanceDocs.tableActionLabels || [])] },
-      { kind: 'table', width: 'half', title: '990s', source: TABLE_PRESETS.schoolNineNineties.source, columns: [...TABLE_PRESETS.schoolNineNineties.columns], columnMeta: TABLE_PRESETS.schoolNineNineties.columnMeta, rowActions: [...(TABLE_PRESETS.schoolNineNineties.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolNineNineties.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolNineNineties.tableActionLabels || [])] },
+      { kind: 'table', width: 'half', title: 'Documents', preset: 'schoolGovernanceDocs' },
+      { kind: 'table', width: 'half', title: '990s', preset: 'schoolNineNineties' },
     ],
   },
   {
     id: 'action_steps',
     label: 'Action Steps',
     blocks: [
-      { kind: 'table', source: { table: 'action_steps', fkColumn: 'school_id' }, columns: [...TABLE_COLUMNS.actionSteps], columnMeta: TABLE_COLUMN_META.actionSteps, rowActions: [...ROW_ACTIONS.actionSteps], tableActions: [...TABLE_ACTIONS.actionSteps], tableActionLabels: ['Add Action Step'] },
+      { kind: 'table', readSource: TABLE_PRESETS.schoolActionSteps.readSource!, columns: TABLE_PRESETS.schoolActionSteps.columns as any, rowActions: [...(TABLE_PRESETS.schoolActionSteps.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolActionSteps.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolActionSteps.tableActionLabels || [])] },
     ],
   },
   {
     id: 'notes',
     label: 'Notes',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.schoolNotes.source, columns: [...TABLE_PRESETS.schoolNotes.columns], columnMeta: TABLE_PRESETS.schoolNotes.columnMeta, rowActions: [...(TABLE_PRESETS.schoolNotes.rowActions || [])], tableActions: [...(TABLE_PRESETS.schoolNotes.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.schoolNotes.tableActionLabels || [])] },
+      { kind: 'table', preset: 'schoolNotes' },
     ],
   },
   {
     id: 'google_sync',
     label: 'gmail/gCal',
     blocks: [
-      { kind: 'table', width: 'half', title: 'Gmails', source: TABLE_PRESETS.schoolGmails.source, columns: [...TABLE_PRESETS.schoolGmails.columns], columnMeta: TABLE_PRESETS.schoolGmails.columnMeta, rowActions: [...(TABLE_PRESETS.schoolGmails.rowActions || [])] },
-      { kind: 'table', width: 'half', title: 'Calendar Events', source: TABLE_PRESETS.schoolCalendarEvents.source, columns: [...TABLE_PRESETS.schoolCalendarEvents.columns], columnMeta: TABLE_PRESETS.schoolCalendarEvents.columnMeta, rowActions: [...(TABLE_PRESETS.schoolCalendarEvents.rowActions || [])] },
+      { kind: 'table', width: 'half', title: 'Gmails', preset: 'schoolGmails' },
+      { kind: 'table', width: 'half', title: 'Calendar Events', preset: 'schoolCalendarEvents' },
     ],
   },
 

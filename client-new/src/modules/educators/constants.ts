@@ -1,6 +1,6 @@
 // Grid section
 import type { ColumnVisibility, GridValueKind, GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailTabSpec as SharedDetailTabSpec, FieldMetadataMap } from '../shared/detail-types';
-import { ROW_ACTIONS, TABLE_ACTIONS, TABLE_COLUMNS, TABLE_COLUMN_META } from '../shared/detail-presets';
+// Legacy bundles removed; presets are self-contained
 import { TABLE_PRESETS } from '../shared/table-presets';
 
 export type { ColumnVisibility, GridValueKind } from '../shared/detail-types';
@@ -13,9 +13,9 @@ export const EDUCATOR_GRID: EducatorColumnConfig[] = [
   { field: 'full_name', headerName: 'Name', valueType: 'string', sortKey: true },
   { field: 'current_role_at_active_school', headerName: 'Current Role at Active School', valueType: 'string' },
   { field: 'active_school', headerName: 'Active School', visibility: 'hide', valueType: 'string' },
-  { field: 'current_role', headerName: 'Current Role', visibility: 'hide', valueType: 'select', lookupField: 'ref_roles.role_short' },
+  { field: 'current_role', headerName: 'Current Role', visibility: 'hide', valueType: 'select' },
   { field: 'discovery_status', headerName: 'Discovery Status', valueType: 'select', selectOptions: ['In Process', 'Complete'] },
-  { field: 'race_ethnicity', headerName: 'Race/Ethnicity', valueType: 'multi', lookupField: 'ref_race_and_ethnicity.english_short' },
+  { field: 'race_ethnicity', headerName: 'Race/Ethnicity', valueType: 'multi', lookupField: 'ref_race_and_ethnicity.english_label_short' },
   { field: 'has_montessori_cert', headerName: 'Montessori Certified', valueType: 'boolean' },
   { field: 'indiv_type', headerName: 'Type', valueType: 'select', selectOptions: ['Educator', 'Community Member'] },
   { field: 'id', headerName: 'ID', visibility: 'suppress' },
@@ -49,7 +49,7 @@ export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
     id: 'contact_info',
     label: 'Contact Info',
     blocks: [
-      { kind: 'table', title: 'Emails', source: TABLE_PRESETS.educatorEmails.source, columns: [...TABLE_PRESETS.educatorEmails.columns], columnMeta: TABLE_PRESETS.educatorEmails.columnMeta, rowActions: [...(TABLE_PRESETS.educatorEmails.rowActions || [])], tableActions: [...(TABLE_PRESETS.educatorEmails.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.educatorEmails.tableActionLabels || [])] },
+      { kind: 'table', title: 'Emails', preset: 'educatorEmails' },
       { kind: 'card', title: 'Phone', fields: ['primary_phone', 'primary_phone_other_info', 'secondary_phone', 'secondary_phone_other_info'], editable: true},
       { kind: 'card', title: 'Address', fields: ['home_address'], editable: true},
     ],
@@ -58,14 +58,14 @@ export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
     id: 'schools',
     label: 'Schools',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.educatorSchools.source, columns: [...TABLE_PRESETS.educatorSchools.columns], columnMeta: TABLE_PRESETS.educatorSchools.columnMeta, rowActions: [...(TABLE_PRESETS.educatorSchools.rowActions || [])], tableActions: [...(TABLE_PRESETS.educatorSchools.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.educatorSchools.tableActionLabels || [])] },
+      { kind: 'table', preset: 'educatorSchools' },
     ],
   },
   {
     id: 'certifications',
     label: 'Certs',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.educatorMontessoriCerts.source, columns: [...TABLE_PRESETS.educatorMontessoriCerts.columns], columnMeta: TABLE_PRESETS.educatorMontessoriCerts.columnMeta, rowActions: [...(TABLE_PRESETS.educatorMontessoriCerts.rowActions || [])], tableActions: [...(TABLE_PRESETS.educatorMontessoriCerts.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.educatorMontessoriCerts.tableActionLabels || [])] },
+      { kind: 'table', preset: 'educatorMontessoriCerts' },
     ],
   },
   {
@@ -73,7 +73,7 @@ export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
     label: 'Early Cultivation',
     blocks: [
       { kind: 'card', title: 'Progress', fields: ['discovery_status', 'assigned_partner','target_geo_combined', 'self_reflection_doc'], editable: true },
-      { kind: 'card', title: 'First Contact', fields: ['first_contact_ages', 'first_contact_governance_model', 'first_contact_interests', 'first_contact_notes_on_pre_wf_employment', 'first_contact_wf_employment_status', 'first_contact_willingness_to_relocate', 'first_contact_form_notes'], editable: true },
+      { kind: 'card', title: 'First Contact', fields: ['first_contact_ages', 'first_contact_governance_model', 'first_contact_interests', 'first_contact_notes_on_pre_wf_employment', 'first_contact_wf_employment_status', 'first_contact_willingness_to_relocate'], editable: true },
       { kind: 'card', title: 'Ops Guide Prefs', fields: ['opsguide_checklist', 'opsguide_fundraising_opps', 'opsguide_meeting_prefs', 'opsguide_request_pertinent_info', 'opsguide_support_type_needed'], editable: true },
       { kind: 'card', title: 'Follow Up', fields: ['sendgrid_template_selected', 'sendgrid_send_date','person_responsible_for_follow_up', 'one_on_one_scheduling_status', 'personal_email_sent', 'personal_email_sent_date'], editable: true },
     ],
@@ -82,28 +82,28 @@ export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
     id: 'events',
     label: 'Events',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.educatorEvents.source, columns: [...TABLE_PRESETS.educatorEvents.columns], columnMeta: TABLE_PRESETS.educatorEvents.columnMeta, rowActions: [...(TABLE_PRESETS.educatorEvents.rowActions || [])], tableActions: [...(TABLE_PRESETS.educatorEvents.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.educatorEvents.tableActionLabels || [])] },
+      { kind: 'table', preset: 'educatorEvents' },
     ],
   },
   {
     id: 'systems',
     label: 'Systems',
     blocks: [
-      { kind: 'card', fields: [...TABLE_COLUMNS.systems], editable: true },
+      { kind: 'card', fields: ['on_connected','on_slack','in_tl_google_grp','in_wf_directory','who_initiated_tl_removal','on_natl_website','gsuite_roles'], editable: true },
     ],
   },
   {
     id: 'action_steps',
     label: 'Action Steps',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.educatorActionSteps.source, columns: [...TABLE_PRESETS.educatorActionSteps.columns], columnMeta: TABLE_PRESETS.educatorActionSteps.columnMeta, rowActions: [...(TABLE_PRESETS.educatorActionSteps.rowActions || [])], tableActions: [...(TABLE_PRESETS.educatorActionSteps.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.educatorActionSteps.tableActionLabels || [])] },
+      { kind: 'table', preset: 'educatorActionSteps' },
     ],
   },
   {
     id: 'notes',
     label: 'Notes',
     blocks: [
-      { kind: 'table', source: TABLE_PRESETS.educatorNotes.source, columns: [...TABLE_PRESETS.educatorNotes.columns], columnMeta: TABLE_PRESETS.educatorNotes.columnMeta, rowActions: [...(TABLE_PRESETS.educatorNotes.rowActions || [])], tableActions: [...(TABLE_PRESETS.educatorNotes.tableActions || [])], tableActionLabels: [...(TABLE_PRESETS.educatorNotes.tableActionLabels || [])] },
+      { kind: 'table', preset: 'educatorNotes' },
     ],
   },
   {
@@ -111,8 +111,8 @@ export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
     label: 'gmail/gCal',
     blocks: [
       { kind: 'card', title: 'Google Sync Settings', fields: ['exclude_from_calendar_logging'], editable: true},
-      { kind: 'table', title: 'Gmails', source: TABLE_PRESETS.educatorGmails.source, columns: [...TABLE_PRESETS.educatorGmails.columns], columnMeta: TABLE_PRESETS.educatorGmails.columnMeta, rowActions: [...(TABLE_PRESETS.educatorGmails.rowActions || [])] },
-      { kind: 'table', title: 'Calendar Events', source: TABLE_PRESETS.educatorCalendarEvents.source, columns: [...TABLE_PRESETS.educatorCalendarEvents.columns], columnMeta: TABLE_PRESETS.educatorCalendarEvents.columnMeta, rowActions: [...(TABLE_PRESETS.educatorCalendarEvents.rowActions || [])] },
+      { kind: 'table', title: 'Gmails', preset: 'educatorGmails' },
+      { kind: 'table', title: 'Calendar Events', preset: 'educatorCalendarEvents' },
     ],
   },
 ];
@@ -154,7 +154,6 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   'first_contact_notes_on_pre_wf_employment': { label: 'Notes on Pre-WF Employment', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
   'first_contact_wf_employment_status': { label: 'Notes on WF Employment Status at first contact', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
   'first_contact_willingness_to_relocate': { label: 'Initial Willingness to Relocate', type: 'boolean', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'first_contact_form_notes': { label: 'Initial Interest: Form Notes', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
   'target_geo_combined': { label: 'Target Geography', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
   'self_reflection_doc': { label: 'Self Reflection Document', type: 'attachment', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
   'opsguide_checklist': { label: 'Ops Guide - Checklist', type: 'boolean', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },

@@ -1,18 +1,12 @@
 import React from 'react';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { useQueryClient } from '@tanstack/react-query';
+import { Button as MButton, Menu, MenuItem } from '@mui/material';
 
 import { supabase } from '@/lib/supabase/client';
 import type { RowActionId } from '@/modules/shared/detail-types';
 import { useAuth } from '@/modules/auth/auth-context';
-import type { CreateNoteConfig, CreateTaskConfig } from '@/modules/shared/detail-actions-presets';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import type { CreateNoteConfig, CreateTaskConfig } from '@/modules/shared/detail-types';
 
 type GridRowEntity = 'educator' | 'school' | 'charter';
 
@@ -288,6 +282,7 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
     try {
       switch (selected) {
         case 'inline_edit': {
+          // For main grids, inline editing is disabled: open detail with intent
           navigateToDetail(entity, data?.id, { action: 'inline_edit' });
           break;
         }
@@ -337,45 +332,80 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
     }
   };
 
+  // Main grids: always show the Actions menu (no inline edit UI here)
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+  
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <>
-      <Select
-        value={value}
-        onValueChange={handleChange}
-        onOpenChange={(open) => {
-          if (!open) setValue('');
+      <MButton
+        variant="contained"
+        size="small"
+        onClick={handleClick}
+        sx={{
+          height: 24,
+          minHeight: 24,
+          textTransform: 'none',
+          fontSize: 14,
+          fontFamily: 'inherit',
+          fontWeight: 400,
+          borderRadius: '6px',
+          px: 1.5,
+          boxShadow: 'none',
+          backgroundColor: '#0f8a8d',
+          color: '#ffffff',
+          '&:hover': { 
+            backgroundColor: '#0b6e71',
+            boxShadow: 'none'
+          },
+        }}
+        onMouseDown={(event) => event.stopPropagation()}
+        onMouseUp={(event) => event.stopPropagation()}
+      >
+        Actions
+        <span style={{ marginLeft: 8, opacity: 0.9 }}>▾</span>
+      </MButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        elevation={2}
+        MenuListProps={{ dense: true }}
+        PaperProps={{ 
+          sx: { 
+            borderRadius: 1, 
+            mt: 0.5,
+            minWidth: 120
+          } 
         }}
       >
-        <SelectTrigger 
-          className="w-[85px] text-xs border-slate-300 hover:border-slate-400 focus:ring-1 focus:ring-slate-400"
-          style={{ height: '24px', minHeight: '24px', padding: '2px 8px', fontSize: '12px' }}
-          onMouseDown={(event) => event.stopPropagation()}
-          onMouseUp={(event) => event.stopPropagation()}
-          onClick={(event) => event.stopPropagation()}
-        >
-          <SelectValue placeholder="Actions" />
-        </SelectTrigger>
-        <SelectContent 
-          className="bg-white border border-slate-200 shadow-lg z-50"
-          style={{ 
-            backgroundColor: '#ffffff', 
-            border: '1px solid #e2e8f0', 
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', 
-            zIndex: 9999 
-          }}
-        >
-          {actions.map((id) => (
-            <SelectItem 
-              key={id} 
-              value={id} 
-              className="text-xs"
-              style={{ backgroundColor: '#ffffff', color: '#1f2937', fontSize: '11px', padding: '4px 8px' }}
-            >
-              {ACTION_LABELS[id]}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        {actions.map((id) => (
+          <MenuItem 
+            key={id}
+            onClick={() => {
+              handleClose();
+              handleChange(id);
+            }}
+            sx={{ 
+              fontSize: '0.75rem', 
+              py: 0.5, 
+              minHeight: 'auto' 
+            }}
+          >
+            {ACTION_LABELS[id]}
+          </MenuItem>
+        ))}
+      </Menu>
       {modalState ? (
         <CreateActionModal
           label={ACTION_LABELS[modalState.action]}
