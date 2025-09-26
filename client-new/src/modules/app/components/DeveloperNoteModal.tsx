@@ -145,6 +145,27 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
     }
   }
 
+  async function captureDomSnapshot(): Promise<void> {
+    try {
+      setHideWhilePicking(true);
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      // Dynamic import to avoid upfront bundle cost
+      const mod: any = await import('html2canvas');
+      const html2canvas = mod.default || mod;
+      const canvas: HTMLCanvasElement = await html2canvas(document.body, { useCORS: true, logging: false, windowWidth: document.documentElement.scrollWidth, windowHeight: document.documentElement.scrollHeight });
+      const blob: Blob | null = await new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/png'));
+      if (!blob) throw new Error('Snapshot failed');
+      setShotBlob(blob);
+      const url = URL.createObjectURL(blob);
+      setShotPreview(url);
+      setScreenshotUrl('');
+    } catch (e: any) {
+      alert(e?.message || 'Quick snapshot failed');
+    } finally {
+      setHideWhilePicking(false);
+    }
+  }
+
   const reset = () => {
     setNoteTypes([]);
     setComment('');
@@ -246,10 +267,11 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
         {/* Screenshot annotation instead of DOM focus picker */}
         <div style={{ display: 'grid', gap: 4 }}>
           <div style={{ fontSize: 12, color: '#475569' }}>
-            Capture a screenshot (without the modal) and optionally click on the image to mark the problem area. Then press <strong>Save Screenshot</strong> to upload and attach it.
+            Capture a screenshot, then click on the image to mark the problem area. Use <strong>Quick Snapshot</strong> (no prompt) for a DOM render, or <strong>Capture Screen</strong> to choose a tab/window.
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <MButton variant="outlined" size="small" onClick={async () => { await captureScreenshot(); }}>Capture Screenshot</MButton>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <MButton variant="outlined" size="small" onClick={async () => { await captureDomSnapshot(); }}>Quick Snapshot (no prompt)</MButton>
+            <MButton variant="outlined" size="small" onClick={async () => { await captureScreenshot(); }}>Capture Screen</MButton>
             <MButton variant="outlined" size="small" disabled={!shotBlob} onClick={async () => { const link = await uploadAnnotated(); if (!link) return; }}>Save Screenshot</MButton>
             <TextField label="Screenshot URL" size="small" value={screenshotUrl} fullWidth InputProps={{ readOnly: true }} />
           </div>

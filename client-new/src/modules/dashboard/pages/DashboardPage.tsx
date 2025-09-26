@@ -70,6 +70,31 @@ export function DashboardPage() {
     }
   };
 
+  // Inline privacy toggles for dashboard grids
+  const toggleEmailPrivacy = React.useCallback(async (row: AnyRow) => {
+    if (!row || !userId) return;
+    const next = !row.is_private;
+    try {
+      const { error } = await (fromGsync('g_emails') as any)
+        .update({ is_private: next })
+        .eq('user_id', userId)
+        .eq('gmail_message_id', row.id);
+      if (!error) setEmails((prev) => prev.map((r) => (r.id === row.id ? { ...r, is_private: next } : r)));
+    } catch {}
+  }, [userId]);
+
+  const toggleEventPrivacy = React.useCallback(async (row: AnyRow) => {
+    if (!row || !userId) return;
+    const next = !row.is_private;
+    try {
+      const { error } = await (fromGsync('g_events') as any)
+        .update({ is_private: next })
+        .eq('user_id', userId)
+        .eq('google_event_id', row.id);
+      if (!error) setEvents((prev) => prev.map((r) => (r.id === row.id ? { ...r, is_private: next } : r)));
+    } catch {}
+  }, [userId]);
+
   // When an email is opened, fetch attachments and any missing body fields
   useEffect(() => {
     if (!editEmail || !userId) return;
@@ -256,21 +281,45 @@ export function DashboardPage() {
     const cols = buildCols(spec.my_emails.columns);
     return cols.map((c) => {
       if (c.field === 'sent_at') return { ...c, valueFormatter: (p: any) => fmtDate(p.value), width: 100, flex: 0 } as ColDef<any>;
-      if (c.field === 'is_private') return { ...c, width: 72, flex: 0 } as ColDef<any>;
+      if (c.field === 'is_private') {
+        const renderer = (p: any) => {
+          const input = document.createElement('input');
+          input.type = 'checkbox';
+          input.checked = !!p.value;
+          input.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleEmailPrivacy(p.data);
+          });
+          return input;
+        };
+        return { ...c, width: 72, flex: 0, cellRenderer: renderer } as ColDef<any>;
+      }
       if (c.field === 'subject') return { ...c, flex: 2, minWidth: 240 } as ColDef<any>;
       return c;
     });
-  }, [spec]);
+  }, [spec, toggleEmailPrivacy]);
   const eventsCols = useMemo(() => {
     const cols = buildCols(spec.my_meetings.columns);
     return cols.map((c) => {
       if (c.field === 'start_time') return { ...c, valueFormatter: (p: any) => fmtDateWithShortTime(p.value), width: 120, flex: 0 } as ColDef<any>;
       if (c.field === 'end_time') return { ...c, valueFormatter: (p: any) => fmtDate(p.value), width: 100, flex: 0 } as ColDef<any>;
-      if (c.field === 'is_private') return { ...c, width: 72, flex: 0 } as ColDef<any>;
+      if (c.field === 'is_private') {
+        const renderer = (p: any) => {
+          const input = document.createElement('input');
+          input.type = 'checkbox';
+          input.checked = !!p.value;
+          input.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleEventPrivacy(p.data);
+          });
+          return input;
+        };
+        return { ...c, width: 72, flex: 0, cellRenderer: renderer } as ColDef<any>;
+      }
       if (c.field === 'summary') return { ...c, flex: 2, minWidth: 240 } as ColDef<any>;
       return c;
     });
-  }, [spec]);
+  }, [spec, toggleEventPrivacy]);
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 16 }}>
