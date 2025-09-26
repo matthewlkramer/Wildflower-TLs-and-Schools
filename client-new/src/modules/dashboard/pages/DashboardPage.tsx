@@ -140,25 +140,25 @@ export function DashboardPage() {
     if (!editEvent || !userId) return;
     let cancelled = false;
     (async () => {
-      try {
-        const id = String(editEvent.id);
-        let att: any[] = [];
         try {
-          const res = await (fromGsync('g_event_attachments') as any)
-            .select('attachment_id,filename,storage_path')
-            .eq('user_id', userId)
-            .eq('google_event_id', id);
-          att = Array.isArray(res?.data) ? res.data : [];
-        } catch {}
-        if (!Array.isArray(att) || att.length === 0) {
+          const id = String(editEvent.id);
+          let att: any[] = [];
           try {
-            const res2 = await (fromGsync('g_event_attachments') as any)
-              .select('attachment_id,filename,storage_path')
+            const res = await (fromGsync('g_event_attachments') as any)
+              .select('file_id,title,storage_path')
               .eq('user_id', userId)
-              .eq('event_id', id);
-            att = Array.isArray(res2?.data) ? res2.data : [];
+              .eq('google_event_id', id);
+            att = Array.isArray(res?.data) ? res.data : [];
           } catch {}
-        }
+          if (!Array.isArray(att) || att.length === 0) {
+            try {
+              const res2 = await (fromGsync('g_event_attachments') as any)
+                .select('file_id,title,storage_path')
+                .eq('user_id', userId)
+                .eq('google_event_id', id);
+              att = Array.isArray(res2?.data) ? res2.data : [];
+            } catch {}
+          }
         // Create signed URLs for attachments (gcal-attachments bucket)
         try {
           const enriched: any[] = [];
@@ -496,7 +496,7 @@ export function DashboardPage() {
                 <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>Attachments</div>
                 <ul style={{ margin: 0, paddingLeft: 16 }}>
                   {((editEmail as any).attachments as any[]).map((a, idx) => {
-                    const name = String(a.filename || a.storage_path || a.attachment_id || `Attachment ${idx + 1}`);
+                    const name = String(a.title || a.filename || a.storage_path || a.file_id || `Attachment ${idx + 1}`);
                     const href = (a as any).url || '';
                     return (
                       <li key={idx} style={{ fontSize: 12 }}>
