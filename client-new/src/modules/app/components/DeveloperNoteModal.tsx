@@ -153,7 +153,20 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       const mod: any = await import('html2canvas');
       const html2canvas = mod.default || mod;
       // Try with foreignObjectRendering first to avoid CSS parser limitations (e.g., CSS Color 4 functions)
-      const baseOpts = { useCORS: true, logging: false, windowWidth: document.documentElement.scrollWidth, windowHeight: document.documentElement.scrollHeight, backgroundColor: '#ffffff' } as const;
+      const fullW = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, window.innerWidth);
+      const fullH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, window.innerHeight);
+      const baseOpts = {
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        // Ensure we render the full page, not just the viewport
+        windowWidth: fullW,
+        windowHeight: fullH,
+        width: fullW,
+        height: fullH,
+        scrollX: 0,
+        scrollY: 0,
+      } as const;
       let canvas: HTMLCanvasElement;
       try {
         canvas = await html2canvas(document.body, { ...baseOpts, foreignObjectRendering: true });
