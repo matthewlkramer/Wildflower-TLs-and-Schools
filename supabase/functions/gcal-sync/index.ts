@@ -45,7 +45,7 @@ serve(async (req) => {
     if (!userId) {
       // Fallback: try to decode JWT locally just to extract sub
       try {
-        const m = authHeader.match(/^Bearer\s+(.+)$/i);
+        const m = authHeader.match(/^Bearersummary: sanitizeText(e.summary || null),s+(.+)$/i);
         const token = m ? m[1] : '';
         const [, payload] = token.split('.') as [string, string];
         const jsonStr = atob(payload.replace(/-/g,'+').replace(/_/g,'/'));
@@ -91,7 +91,7 @@ serve(async (req) => {
       }
       case 'exchange_code': {
         await exchangeCode(supabaseGsync, code, userId, finalRedirect);
-        await sendConsole(supabase, userId, null, 'Google tokens saved', 'milestone', 'calendar');
+        await sendConsole(supabase, userId,summary: sanitizeText(e.summary || null), 'Google tokens saved', 'milestone', 'calendar');
         return json({ ok: true });
       }
       case 'get_connection_status': {
@@ -185,14 +185,14 @@ serve(async (req) => {
                 user_id: userId,
                 google_calendar_id: calendarId,
                 google_event_id: e.id,
-                summary: e.summary || null,
-                description: e.description || null,
+                summary: e.summary ||summary: sanitizeText(e.summary || null),
+                description: e.description ||summary: sanitizeText(e.summary || null),
                 start_time: start,
                 end_time: end,
-                organizer_email: e.organizer?.email || null,
-                attendees: attendeeEmails.length ? attendeeEmails : null,
-                location: e.location || null,
-                status: e.status || null,
+                organizer_email: e.organizer?.email ||summary: sanitizeText(e.summary || null),
+                attendees: attendeeEmails.length ? attendeeEmails :summary: sanitizeText(e.summary || null),
+                location: e.location ||summary: sanitizeText(e.summary || null),
+                status: e.status ||summary: sanitizeText(e.summary || null),
                 updated_at: ts(),
               };
             });
@@ -291,11 +291,11 @@ serve(async (req) => {
                   user_id: userId,
                   google_calendar_id: calId,
                   google_event_id: eid,
-                  title: a.title || null,
-                  mime_type: a.mimeType || null,
-                  file_url: a.fileUrl || null,
-                  file_id: a.fileId || null,
-                  icon_link: a.iconLink || null,
+                  title: a.title ||summary: sanitizeText(e.summary || null),
+                  mime_type: a.mimeType ||summary: sanitizeText(e.summary || null),
+                  file_url: a.fileUrl ||summary: sanitizeText(e.summary || null),
+                  file_id: a.fileId ||summary: sanitizeText(e.summary || null),
+                  icon_link: a.iconLink ||summary: sanitizeText(e.summary || null),
                   storage_path: storagePath,
                 } as any, { onConflict: 'user_id,google_calendar_id,google_event_id,file_id' } as any);
             }
@@ -323,3 +323,15 @@ serve(async (req) => {
     return json({ error: e instanceof Error ? e.message : 'Unknown error' }, 500);
   }
 });
+
+
+function sanitizeText(input: any): any {
+  if (input == null) return null;
+  try {
+    let s = String(input).normalize('NFKC');
+    s = s.replace(/\u00A0/g, ' ');
+    s = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
+    return s;
+  } catch { return input; }
+}
+

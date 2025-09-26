@@ -265,9 +265,9 @@ serve(async (req) => {
         }
       }
       
-      case 'backfill_bodies_from_view': {
-        try {
-          const accessToken = await getValidAccessTokenOrThrow(supabaseGsync, userId);
+  case 'backfill_bodies_from_view': {
+    try {
+      const accessToken = await getValidAccessTokenOrThrow(supabaseGsync, userId);
           const batch = Number(body?.limit ?? 100);
           const { data: rows, error } = await supabaseGsync
             .from('g_emails_full_bodies_to_download')
@@ -330,13 +330,18 @@ serve(async (req) => {
             while (stack.length) {
               const node = stack.pop(); if (!node) continue; if (node.parts) stack.push(...node.parts);
               const mime = node.mimeType || ''; const data = node.body?.data;
-              if (data) { const decoded = atob(data.replace(/-/g,'+').replace(/_/g,'/')); if (mime.includes('text/plain')) text += decoded; if (mime.includes('text/html')) html += decoded; }
+              if (data) {
+                const bytes = base64urlToBytes(data);
+                const decoded = new TextDecoder('utf-8').decode(bytes);
+                if (mime.includes('text/plain')) text += decoded;
+                if (mime.includes('text/html')) html += decoded;
+              }
               const attachId = node.body?.attachmentId;
               if (attachId || node.filename) {
                 attachments.push({ id: attachId || `${mid}-${attachments.length}`, filename: node.filename, mimeType: mime || undefined, size: node.body?.size });
               }
             }
-            const { error: upErr } = await supabaseSrvGsync.from('g_emails').update({ subject: subject || null, body_text: text || null, body_html: html || null, updated_at: ts() }).eq('user_id', userId).eq('gmail_message_id', mid);
+            const { error: upErr } = await supabaseSrvGsync.from('g_emails').update({ subject: sanitizeText(subject) || null, body_text: sanitizeText(text) || null, body_html: sanitizeText(html) || null, updated_at: ts() }).eq('user_id', userId).eq('gmail_message_id', mid);
             if (upErr) {
               await sendConsole(supabase, userId, null, `Backfill(view): update failed for ${mid}: ${upErr.message}`, 'error', 'gmail');
               continue;
@@ -414,3 +419,30 @@ serve(async (req) => {
     return json({ error: e instanceof Error ? e.message : 'Unknown error' }, 500);
   }
 });
+
+function base64urlToBytes(data: string): Uint8Array {
+  try {
+    let s = data.replace(/-/g, '+').replace(/_/g, '/');
+    const pad = s.length % 4;
+    if (pad) s += '='.repeat(4 - pad);
+    const bin = atob(s);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  } catch {
+    return new Uint8Array();
+  }
+}
+
+function sanitizeText(input: string | null | undefined): string | null {
+  if (input == null) return null;
+  try {
+    let s = input.normalize('NFKC');
+    s = s.replace(/\u00A0/g, ' ');
+    // remove control chars except tab/newline/carriage-return
+    s = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
+    return s;
+  } catch {
+    return input as any;
+  }
+}

@@ -774,7 +774,19 @@ function DetailCard({ block, tab, entityId, details, fieldMeta }: { block: Detai
 
               ) : (
 
-                <div style={{ fontSize: 12 }}>{renderDisplayValue(value, meta, referenceLabels[field], selectOptions)}</div>
+                <div style={{ fontSize: 12 }}>
+                  {field === 'most_recent_note' && typeof value === 'string' && value ? (
+                    details?.most_recent_note_id ? (
+                      <MostRecentNoteLinkById noteId={String(details.most_recent_note_id)} title={String(value)} />
+                    ) : (
+                      <MostRecentNoteLink entityDetails={details} entityId={entityId} title={String(value)} />
+                    )
+                  ) : field === 'most_recent_fillout_form_date' && typeof value === 'string' && value && details?.most_recent_fillout_form_id ? (
+                    <MostRecentFilloutFormLink formId={String(details.most_recent_fillout_form_id)} title={String(value)} />
+                  ) : (
+                    renderDisplayValue(value, meta, referenceLabels[field], selectOptions)
+                  )}
+                </div>
 
               )}
 
@@ -2638,3 +2650,227 @@ function useReferenceLabels(
 
 
 
+
+// Lightweight link + modal to show the most recent note for an entity
+function MostRecentNoteLink({ entityDetails, entityId, title }: { entityDetails: any; entityId: string; title: string }) {
+  const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string>("");
+  const [note, setNote] = React.useState<any>(null);
+
+  const load = async () => {
+    setLoading(true);
+    setError("");
+    setNote(null);
+    try {
+      const fkCandidates = ['people_id', 'school_id', 'charter_id'];
+      // Build OR filter across likely fk columns
+      const ors = fkCandidates.map((k) => `${k}.eq.${entityId}`).join(',');
+      const { data, error } = await (supabase as any)
+        .from('notes')
+        .select('*')
+        .or(ors)
+        .order('created_date', { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      setNote((data && data[0]) || null);
+    } catch (e: any) {
+      setError(e?.message || 'Unable to load note');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => { setOpen(true); void load(); }}
+        style={{
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          margin: 0,
+          fontSize: 12,
+          color: '#0ea5e9',
+          cursor: 'pointer',
+          textDecoration: 'underline',
+        }}
+        title="View full note"
+      >
+        {title}
+      </button>
+
+      {open ? (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}
+          onClick={() => setOpen(false)}
+        >
+          <div
+            style={{ minWidth: 560, maxWidth: '90vw', maxHeight: '90vh', overflow: 'auto', background: '#ffffff', borderRadius: 8, boxShadow: '0 12px 32px rgba(15,23,42,0.2)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #e2e8f0', fontWeight: 600 }}>
+              <span>Most Recent Note</span>
+              <button type="button" onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer' }}>x</button>
+            </div>
+            <div style={{ padding: 16, display: 'grid', gap: 10 }}>
+              {loading ? (
+                <div style={{ fontSize: 12, color: '#64748b' }}>Loading note.</div>
+              ) : error ? (
+                <div style={{ fontSize: 12, color: '#dc2626' }}>{error}</div>
+              ) : note ? (
+                <>
+                  <div style={{ fontWeight: 600, fontSize: 14 }}>
+                    {String((note as any).title ?? (note as any).subject ?? title)}
+                  </div>
+                  <div style={{ whiteSpace: 'pre-wrap', fontSize: 13, color: '#111827' }}>
+                    {String((note as any).full_text ?? (note as any).text ?? '')}
+                  </div>
+                </>
+              ) : (
+                <div style={{ fontSize: 12, color: '#64748b' }}>No note found.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+// Link + modal: load note by id (view-only)
+function MostRecentNoteLinkById({ noteId, title }: { noteId?: string; title: string }) {
+  const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string>("");
+  const [note, setNote] = React.useState<any>(null);
+
+  const load = async () => {
+    if (!noteId) { setError('Note id is missing'); setNote(null); return; }
+    setLoading(true);
+    setError("");
+    setNote(null);
+    try {
+      const { data, error } = await (supabase as any)
+        .from('notes')
+        .select('*')
+        .eq('id', noteId)
+        .maybeSingle();
+      if (error) throw error;
+      setNote(data || null);
+    } catch (e: any) {
+      setError(e?.message || 'Unable to load note');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => { setOpen(true); void load(); }}
+        style={{ background: 'none', border: 'none', padding: 0, margin: 0, fontSize: 12, color: '#0ea5e9', cursor: 'pointer', textDecoration: 'underline' }}
+        title="View full note"
+      >
+        {title}
+      </button>
+      {open ? (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }} onClick={() => setOpen(false)}>
+          <div style={{ minWidth: 560, maxWidth: '90vw', maxHeight: '90vh', overflow: 'auto', background: '#ffffff', borderRadius: 8, boxShadow: '0 12px 32px rgba(15,23,42,0.2)' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #e2e8f0', fontWeight: 600 }}>
+              <span>Most Recent Note</span>
+              <button type="button" onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer' }}>x</button>
+            </div>
+            <div style={{ padding: 16, display: 'grid', gap: 10 }}>
+              {loading ? (
+                <div style={{ fontSize: 12, color: '#64748b' }}>Loading note.</div>
+              ) : error ? (
+                <div style={{ fontSize: 12, color: '#dc2626' }}>{error}</div>
+              ) : note ? (
+                <>
+                  <div style={{ fontWeight: 600, fontSize: 14 }}>{String((note as any).title ?? (note as any).subject ?? title)}</div>
+                  <div style={{ whiteSpace: 'pre-wrap', fontSize: 13, color: '#111827' }}>{String((note as any).full_text ?? (note as any).text ?? '')}</div>
+                </>
+              ) : (
+                <div style={{ fontSize: 12, color: '#64748b' }}>No note found.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+// Link + modal: load fillout form by id (view-only)
+function MostRecentFilloutFormLink({ formId, title }: { formId?: string; title: string }) {
+  const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string>("");
+  const [form, setForm] = React.useState<any>(null);
+
+  const load = async () => {
+    if (!formId) { setError('Form id is missing'); setForm(null); return; }
+    setLoading(true);
+    setError("");
+    setForm(null);
+    try {
+      const { data, error } = await (supabase as any)
+        .from('ssj_fillout_forms')
+        .select('*')
+        .eq('id', formId)
+        .maybeSingle();
+      if (error) throw error;
+      setForm(data || null);
+    } catch (e: any) {
+      setError(e?.message || 'Unable to load form');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => { setOpen(true); void load(); }}
+        style={{ background: 'none', border: 'none', padding: 0, margin: 0, fontSize: 12, color: '#0ea5e9', cursor: 'pointer', textDecoration: 'underline' }}
+        title="View fillout form"
+      >
+        {title}
+      </button>
+      {open ? (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }} onClick={() => setOpen(false)}>
+          <div style={{ minWidth: 560, maxWidth: '90vw', maxHeight: '90vh', overflow: 'auto', background: '#ffffff', borderRadius: 8, boxShadow: '0 12px 32px rgba(15,23,42,0.2)' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #e2e8f0', fontWeight: 600 }}>
+              <span>Most Recent Fillout Form</span>
+              <button type="button" onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer' }}>x</button>
+            </div>
+            <div style={{ padding: 16, display: 'grid', gap: 10 }}>
+              {loading ? (
+                <div style={{ fontSize: 12, color: '#64748b' }}>Loading form.</div>
+              ) : error ? (
+                <div style={{ fontSize: 12, color: '#dc2626' }}>{error}</div>
+              ) : form ? (
+                <div style={{ display: 'grid', gap: 8 }}>
+                  {Object.entries(form as any).map(([k, v]) => (
+                    <div key={k} style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 8, alignItems: 'start' }}>
+                      <div style={{ fontSize: 12, color: '#64748b' }}>{k}</div>
+                      <div style={{ fontSize: 13, color: '#111827', whiteSpace: 'pre-wrap' }}>
+                        {Array.isArray(v) ? v.join(', ') : (typeof v === 'object' && v !== null ? JSON.stringify(v, null, 2) : String(v ?? ''))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ fontSize: 12, color: '#64748b' }}>No form found.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}

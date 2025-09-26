@@ -60,12 +60,26 @@ input,
 input[type="text"],
 input[type="number"],
 input[type="date"],
-textarea,
 select,
 .wf-input {
   height: 32px !important;
   min-height: 32px !important;
   line-height: 1.2 !important;
+}
+
+/* Allow multiline textareas (e.g., MUI TextField multiline) to expand naturally */
+.MuiInputBase-multiline textarea {
+  height: auto !important;
+  min-height: 240px !important;
+  line-height: 1.4 !important;
+}
+
+/* Ensure dialogs have clear spacing between title and content */
+.MuiDialogTitle-root {
+  padding-bottom: 8px !important;
+}
+.MuiDialogContent-root {
+  padding-top: 24px !important;
 }
 
 button {

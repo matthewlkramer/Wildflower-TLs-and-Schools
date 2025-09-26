@@ -213,8 +213,8 @@ serve(async (req) => {
               user_id: userId,
               google_calendar_id: CALENDAR_ID,
               google_event_id: e.id,
-              summary: e.summary || null,
-              description: e.description || null,
+              summary: sanitizeText(e.summary || null),
+              description: sanitizeText(e.description || null),
               start_time: start,
               end_time: end,
               organizer_email: e.organizer?.email || null,
@@ -331,7 +331,7 @@ serve(async (req) => {
               const start = e.start?.dateTime || (e.start?.date ? new Date(e.start.date).toISOString() : null);
               const end = e.end?.dateTime || (e.end?.date ? new Date(e.end.date).toISOString() : null);
               const attendeeEmails = (e.attendees || []).map((a: any) => (a?.email || '').toLowerCase()).filter(Boolean);
-              return { user_id: userId, google_calendar_id: CALENDAR_ID, google_event_id: e.id, summary: e.summary || null, description: e.description || null, start_time: start, end_time: end, organizer_email: e.organizer?.email || null, attendees: attendeeEmails.length ? attendeeEmails : null, location: e.location || null, status: e.status || null, updated_at: ts() };
+              return { user_id: userId, google_calendar_id: CALENDAR_ID, google_event_id: e.id, summary: sanitizeText(e.summary || null), description: sanitizeText(e.description || null), start_time: start, end_time: end, organizer_email: e.organizer?.email || null, attendees: attendeeEmails.length ? attendeeEmails : null, location: e.location || null, status: e.status || null, updated_at: ts() };
             });
             if (rows.length) await supabase.from('gsync.g_events').upsert(rows, { onConflict: 'user_id,google_event_id' } as any);
             processed += rows.length;
@@ -455,3 +455,15 @@ serve(async (req) => {
     return json({ error: e instanceof Error ? e.message : 'Unknown error' }, 500);
   }
 });
+
+
+function sanitizeText(input: any): any {
+  if (input == null) return null;
+  try {
+    let s = String(input).normalize('NFKC');
+    s = s.replace(/\u00A0/g, ' ');
+    s = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
+    return s;
+  } catch { return input; }
+}
+
