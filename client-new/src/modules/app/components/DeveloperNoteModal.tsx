@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button as MButton, TextField, FormControlLabel, Checkbox, MenuItem, FormControl, Select, ListItemText } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button as MButton, TextField, Checkbox, MenuItem, FormControl, Select, ListItemText } from '@mui/material';
 import { supabase } from '@/lib/supabase/client';
 import { getBufferedLogsText } from '@/lib/log-buffer';
 
@@ -12,10 +12,10 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
   const [availableTypes, setAvailableTypes] = React.useState<EnumOption[]>([]);
   const [comment, setComment] = React.useState('');
   const [priority, setPriority] = React.useState<'High' | 'Medium' | 'Low'>('Medium');
-  const [picking, setPicking] = React.useState(false);
-  const [focusSelector, setFocusSelector] = React.useState('');
-  const [focusBox, setFocusBox] = React.useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [screenshotUrl, setScreenshotUrl] = React.useState<string>('');
+  const [shotBlob, setShotBlob] = React.useState<Blob | null>(null);
+  const [shotPreview, setShotPreview] = React.useState<string>('');
+  const [pin, setPin] = React.useState<{ x: number; y: number } | null>(null); // normalized 0..1
   const [saving, setSaving] = React.useState(false);
   const [typesOpen, setTypesOpen] = React.useState(false);
   const [hideWhilePicking, setHideWhilePicking] = React.useState(false);
@@ -41,24 +41,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
     return () => { cancelled = true; };
   }, []);
 
-  React.useEffect(() => {
-    if (!picking) return;
-    const onClick = (e: MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const el = e.target as Element;
-      const sel = cssPath(el);
-      const label = describeElement(el);
-      const rect = (el as HTMLElement).getBoundingClientRect();
-      setFocusSelector(`${label}  (${sel})`);
-      setFocusBox({ x: Math.round(rect.left), y: Math.round(rect.top), width: Math.round(rect.width), height: Math.round(rect.height) });
-      setPicking(false);
-      setHideWhilePicking(false);
-    };
-    document.addEventListener('click', onClick, true);
-    document.body.style.cursor = 'crosshair';
-    return () => { document.removeEventListener('click', onClick, true); document.body.style.cursor = 'auto'; };
-  }, [picking]);
+  // No DOM picking now that we annotate screenshots
 
   async function captureScreenshot(): Promise<string | null> {
     try {
@@ -99,14 +82,12 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       }
       track.stop();
       if (!blob) return null;
-      const { data: { session } } = await supabase.auth.getSession();
-      const uid = session?.user?.id || 'anon';
-      const key = `${uid}/${Date.now()}.png`;
-      try { await supabase.storage.createBucket('developer-notes', { public: false }); } catch {}
-      const { error: upErr } = await supabase.storage.from('developer-notes').upload(key, blob, { upsert: true, contentType: 'image/png' });
-      if (upErr) { alert(`Upload failed: ${upErr.message}`); return null; }
-      const { data: signed } = await supabase.storage.from('developer-notes').createSignedUrl(key, 7 * 24 * 3600);
-      return signed?.signedUrl || null;
+      // Hold the blob for annotation rather than uploading immediately
+      setShotBlob(blob);
+      const url = URL.createObjectURL(blob);
+      setShotPreview(url);
+      setScreenshotUrl('');
+      return url;
     } catch {
       alert('Screenshot capture was cancelled or failed.');
       return null;
@@ -115,13 +96,62 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
     }
   }
 
+  async function uploadAnnotated(): Promise<string | null> {
+    try {
+      if (!shotBlob) return null;
+      // If a pin is set, draw it onto an annotated image first
+      let toUpload: Blob = shotBlob;
+      if (pin) {
+        const img = await blobToImage(shotBlob);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Canvas unavailable');
+        ctx.drawImage(img, 0, 0);
+        // Draw a red pin/circle at normalized coordinates
+        const x = Math.round(pin.x * img.width);
+        const y = Math.round(pin.y * img.height);
+        ctx.fillStyle = 'rgba(220, 38, 38, 0.9)';
+        ctx.strokeStyle = 'rgba(220, 38, 38, 1)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, y, Math.max(6, Math.floor(img.width * 0.006)), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x, y, Math.max(10, Math.floor(img.width * 0.01)), 0, Math.PI * 2);
+        ctx.stroke();
+        toUpload = await new Promise<Blob>((resolve, reject) => {
+          canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/png');
+        });
+      }
+      const { data: { session } } = await supabase.auth.getSession();
+      const uid = session?.user?.id || 'anon';
+      const key = `${uid}/${Date.now()}.png`;
+      // Expect the bucket to exist; client cannot create buckets under RLS
+      const bucket = 'dev-notes-screenshots';
+      const { error: upErr } = await supabase.storage.from(bucket).upload(key, toUpload, { upsert: true, contentType: 'image/png' });
+      if (upErr) {
+        alert(`Upload failed (ensure storage bucket '${bucket}' exists and policy allows uploads): ${upErr.message}`);
+        return null;
+      }
+      const { data: signed } = await supabase.storage.from(bucket).createSignedUrl(key, 7 * 24 * 3600);
+      const link = signed?.signedUrl || null;
+      if (link) setScreenshotUrl(link);
+      return link;
+    } catch (e: any) {
+      alert(e?.message || 'Upload failed');
+      return null;
+    }
+  }
+
   const reset = () => {
     setNoteTypes([]);
     setComment('');
     setPriority('Medium');
-    setPicking(false);
-    setFocusSelector('');
-    setFocusBox(null);
+    setShotBlob(null);
+    setShotPreview('');
+    setPin(null);
     setScreenshotUrl('');
   };
 
@@ -132,13 +162,13 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       // Capture recent client logs for dedicated column
       const logs = getBufferedLogsText(200);
       let link: string | null = screenshotUrl || null;
-      if (!link) link = await captureScreenshot();
+      if (!link && shotBlob) link = await uploadAnnotated();
 
       const payload: any = {
         notes_type: noteTypes,
         comment: finalComment,
         user_priority: priority,
-        focus_area: focusSelector || (focusBox ? JSON.stringify(focusBox) : null),
+        focus_area: null,
         screenshot_link: link || null,
         logs: logs || null,
       };
@@ -213,32 +243,21 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
+        {/* Screenshot annotation instead of DOM focus picker */}
         <div style={{ display: 'grid', gap: 4 }}>
           <div style={{ fontSize: 12, color: '#475569' }}>
-            To set a focus area: first click <strong>Pick Focus Area</strong>, then click the element in the interface to highlight. The modal will temporarily disappear while you pick and reappear after selection.
+            Capture a screenshot (without the modal) and optionally click on the image to mark the problem area. Then press <strong>Save Screenshot</strong> to upload and attach it.
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <MButton
-              variant="outlined"
-              size="small"
-              onClick={() => { setPicking(true); setHideWhilePicking(true); }}
-            >
-              {picking ? 'Click any element…' : 'Pick Focus Area'}
-            </MButton>
-            <TextField label="Focus Area" size="small" value={focusSelector} fullWidth InputProps={{ readOnly: true }} />
-          </div>
-        </div>
-        {focusBox ? (
-          <div style={{ fontSize: 12, color: '#334155' }}>Focus Box: {focusBox.width}×{focusBox.height} at ({focusBox.x},{focusBox.y})</div>
-        ) : null}
-        <div style={{ display: 'grid', gap: 4 }}>
-          <div style={{ fontSize: 12, color: '#475569' }}>
-            To capture a screenshot (without the modal), click <strong>Capture Screenshot</strong> and choose the app tab/screen in the browser prompt. The modal will temporarily disappear during capture and then return.
-          </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <MButton variant="outlined" size="small" onClick={async () => { const url = await captureScreenshot(); if (url) setScreenshotUrl(url || ''); }}>Capture Screenshot</MButton>
+            <MButton variant="outlined" size="small" onClick={async () => { await captureScreenshot(); }}>Capture Screenshot</MButton>
+            <MButton variant="outlined" size="small" disabled={!shotBlob} onClick={async () => { const link = await uploadAnnotated(); if (!link) return; }}>Save Screenshot</MButton>
             <TextField label="Screenshot URL" size="small" value={screenshotUrl} fullWidth InputProps={{ readOnly: true }} />
           </div>
+          {shotPreview ? (
+            <div style={{ border: '1px solid #e2e8f0', borderRadius: 4, overflow: 'hidden', maxHeight: 360 }}>
+              <ScreenshotCanvas imageUrl={shotPreview} pin={pin} onPick={(pt) => setPin(pt)} />
+            </div>
+          ) : null}
         </div>
       </DialogContent>
       <DialogActions>
@@ -288,4 +307,64 @@ function describeElement(el: Element): string {
   } catch {
     return 'element';
   }
+}
+
+function blobToImage(blob: Blob): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
+    img.src = url;
+  });
+}
+
+function ScreenshotCanvas({ imageUrl, pin, onPick }: { imageUrl: string; pin: { x: number; y: number } | null; onPick: (pt: { x: number; y: number }) => void }) {
+  const ref = React.useRef<HTMLCanvasElement | null>(null);
+  const [img, setImg] = React.useState<HTMLImageElement | null>(null);
+  const [size, setSize] = React.useState<{ w: number; h: number }>({ w: 0, h: 0 });
+
+  React.useEffect(() => {
+    const i = new Image();
+    i.onload = () => {
+      setImg(i);
+      const maxW = 800;
+      const scale = i.width > maxW ? maxW / i.width : 1;
+      setSize({ w: Math.round(i.width * scale), h: Math.round(i.height * scale) });
+    };
+    i.src = imageUrl;
+  }, [imageUrl]);
+
+  React.useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas || !img) return;
+    canvas.width = size.w;
+    canvas.height = size.h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, size.w, size.h);
+    ctx.drawImage(img, 0, 0, size.w, size.h);
+    if (pin) {
+      const x = Math.round(pin.x * size.w);
+      const y = Math.round(pin.y * size.h);
+      ctx.fillStyle = 'rgba(220, 38, 38, 0.9)';
+      ctx.strokeStyle = 'rgba(220, 38, 38, 1)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(4, Math.floor(size.w * 0.006)), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(8, Math.floor(size.w * 0.01)), 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }, [img, size, pin]);
+
+  function handleClick(e: React.MouseEvent<HTMLCanvasElement>) {
+    const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    onPick({ x, y });
+  }
+
+  return <canvas ref={ref} width={size.w} height={size.h} style={{ width: size.w, height: size.h, display: 'block', cursor: 'crosshair' }} onClick={handleClick} />;
 }
