@@ -170,6 +170,9 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       outCanvas.height = outH;
       const outCtx = outCanvas.getContext('2d');
       if (!outCtx) throw new Error('Canvas unavailable');
+      // Persist original scroll position on window to restore later
+      (window as unknown as any).__WF_ORIG_SCROLL_X = window.pageXOffset || 0;
+      (window as unknown as any).__WF_ORIG_SCROLL_Y = window.pageYOffset || 0;
 
       const baseOpts = {
         useCORS: true,
@@ -179,15 +182,20 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
         windowHeight: tileH,
         width: fullW,
         height: tileH,
-        scrollX: 0,
       } as const;
 
+      const origX = window.pageXOffset || 0;
+      const origY = window.pageYOffset || 0;
       let y = 0;
       while (y < fullH) {
         const h = Math.min(tileH, fullH - y);
-        // Each tile renders the slice starting at y by offsetting scrollY negatively
-        const optsFO = { ...baseOpts, height: h, windowHeight: h, scrollY: -y, foreignObjectRendering: true } as any;
-        const optsCanvas = { ...baseOpts, height: h, windowHeight: h, scrollY: -y, foreignObjectRendering: false } as any;
+        // Scroll the page to the tile start so html2canvas captures the correct region
+        window.scrollTo(0, y);
+        // Wait a frame so layout/paint catches up
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        const optsFO = { ...baseOpts, height: h, windowHeight: h, foreignObjectRendering: true } as any;
+        const optsCanvas = { ...baseOpts, height: h, windowHeight: h, foreignObjectRendering: false } as any;
         let tile: HTMLCanvasElement | null = null;
         try {
           tile = await html2canvas(document.body, optsFO);
@@ -214,6 +222,13 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
     } catch (e: any) {
       alert(e?.message || 'Quick snapshot failed');
     } finally {
+      // Restore original scroll position
+      try {
+        const w: any = window as any;
+        const ox = w.__WF_ORIG_SCROLL_X as number | undefined;
+        const oy = w.__WF_ORIG_SCROLL_Y as number | undefined;
+        if (typeof ox === 'number' && typeof oy === 'number') window.scrollTo(ox, oy);
+      } catch {}
       setHideWhilePicking(false);
     }
   }
