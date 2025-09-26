@@ -142,10 +142,23 @@ export function DashboardPage() {
     (async () => {
       try {
         const id = String(editEvent.id);
-        let { data: att = [] } = await (fromGsync('g_event_attachments') as any)
-          .select('attachment_id,filename,storage_path')
-          .eq('user_id', userId)
-          .eq('google_event_id', id);
+        let att: any[] = [];
+        try {
+          const res = await (fromGsync('g_event_attachments') as any)
+            .select('attachment_id,filename,storage_path')
+            .eq('user_id', userId)
+            .eq('google_event_id', id);
+          att = Array.isArray(res?.data) ? res.data : [];
+        } catch {}
+        if (!Array.isArray(att) || att.length === 0) {
+          try {
+            const res2 = await (fromGsync('g_event_attachments') as any)
+              .select('attachment_id,filename,storage_path')
+              .eq('user_id', userId)
+              .eq('event_id', id);
+            att = Array.isArray(res2?.data) ? res2.data : [];
+          } catch {}
+        }
         // Create signed URLs for attachments (gcal-attachments bucket)
         try {
           const enriched: any[] = [];
@@ -243,20 +256,18 @@ export function DashboardPage() {
         }
         // My Emails (gsync)
         if (userId) {
-          const { data } = await (fromGsync('g_emails_with_people_ids_mv') as any)
-            .select('id:gmail_message_id,sent_at,subject,body_text,from_email,to_emails,cc_emails,bcc_emails,is_private,user_id,people_id')
+          const { data } = await (fromGsync('g_emails_without_people_ids') as any)
+            .select('id:gmail_message_id,sent_at,subject,body_text,from_email,to_emails,cc_emails,bcc_emails,is_private,user_id')
             .eq('user_id', userId)
-            .not('people_id', 'is', null)
             .order('sent_at', { ascending: false })
             .limit(100);
           if (!cancelled) setEmails(Array.isArray(data) ? data : []);
         }
         // My Meetings (events)
         if (userId) {
-          const { data } = await (fromGsync('g_events_with_people_ids_mv') as any)
-            .select('id:google_event_id,start_time,end_time,location,organizer_email,attendees,summary,description,is_private,user_id,people_id')
+          const { data } = await (fromGsync('g_events_without_people_ids') as any)
+            .select('id:google_event_id,start_time,end_time,location,organizer_email,attendees,summary,description,is_private,user_id')
             .eq('user_id', userId)
-            .not('people_id', 'is', null)
             .order('start_time', { ascending: false })
             .limit(100);
           if (!cancelled) setEvents(Array.isArray(data) ? data : []);

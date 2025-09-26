@@ -202,7 +202,7 @@ serve(async (req) => {
             if (!toInsert.length) return;
             const { error } = await supabaseSrvGsync
               .from('g_emails')
-              .upsert(toInsert as any, { onConflict: 'user_id,gmail_message_id' } as any);
+              .upsert(toInsert as any, { onConflict: 'user_id,gmail_message_id', ignoreDuplicates: true } as any);
             if (error) return json({ ok: false, source: 'upsert', status: 0, error: error.message });
             toInsert.length = 0;
           };
@@ -239,9 +239,6 @@ serve(async (req) => {
                 to_emails: to,
                 cc_emails: cc,
                 bcc_emails: bcc,
-                subject: null,
-                body_text: null,
-                body_html: null,
                 sent_at: sentAt,
                 updated_at: ts(),
               });

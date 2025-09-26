@@ -164,7 +164,7 @@ serve(async (req) => {
             pageToken = listJson.nextPageToken;
             const rows: any[] = [];
             for (const id of ids) {
-            const det = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc&metadataHeaders=Bcc&metadataHeaders=Date`, { headers: { Authorization: `Bearer ${accessToken}` } });
+              const det = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc&metadataHeaders=Bcc&metadataHeaders=Date`, { headers: { Authorization: `Bearer ${accessToken}` } });
               if (!det.ok) continue;
               const msg: any = await det.json();
               const headers = parseHeaders(msg.payload?.headers || []);
@@ -172,11 +172,10 @@ serve(async (req) => {
               const to = splitAddresses(headers['to']);
               const cc = splitAddresses(headers['cc']);
               const bcc = splitAddresses(headers['bcc']);
-              const subject = headers['subject'] || '';
               const sentAt = (headers['date'] ? new Date(headers['date']) : null)?.toISOString() ?? null;
-              rows.push({ user_id: userId, gmail_message_id: msg.id, thread_id: msg.threadId, from_email: from, to_emails: to, cc_emails: cc, bcc_emails: bcc, subject, body_text: null, body_html: null, sent_at: sentAt, updated_at: ts() });
+              rows.push({ user_id: userId, gmail_message_id: msg.id, thread_id: msg.threadId, from_email: from, to_emails: to, cc_emails: cc, bcc_emails: bcc, sent_at: sentAt, updated_at: ts() });
             }
-            if (rows.length) await supabase.from('gsync.g_emails').upsert(rows, { onConflict: 'user_id,gmail_message_id' } as any);
+            if (rows.length) await supabase.from('gsync.g_emails').upsert(rows, { onConflict: 'user_id,gmail_message_id', ignoreDuplicates: true } as any);
             processed += rows.length;
             if (!pageToken || processed >= MAX) break;
             await sleep(120);
@@ -225,7 +224,7 @@ serve(async (req) => {
               updated_at: ts(),
             };
           });
-          if (rows.length) await supabase.from('gsync.g_events').upsert(rows, { onConflict: 'user_id,google_event_id' } as any);
+          if (rows.length) await supabase.from('gsync.g_events').upsert(rows, { onConflict: 'user_id,google_event_id', ignoreDuplicates: true } as any);
           processed += rows.length;
           await sleep(150);
         } while (pageToken);
