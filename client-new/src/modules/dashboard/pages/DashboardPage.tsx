@@ -50,6 +50,26 @@ export function DashboardPage() {
     } catch { return String(s ?? ''); }
   };
 
+  const fmtDateWithShortTime = (s?: string | null) => {
+    if (!s) return '';
+    try {
+      const d = new Date(s);
+      const y = d.getFullYear();
+      const mo = d.getMonth() + 1;
+      const da = d.getDate();
+      let h = d.getHours();
+      const m = d.getMinutes();
+      const pm = h >= 12;
+      h = h % 12;
+      if (h === 0) h = 12;
+      const mm = String(m).padStart(2, '0');
+      const ap = pm ? 'p' : 'a';
+      return `${mo}/${da}/${y} ${h}:${mm}${ap}`;
+    } catch {
+      return fmtDate(s);
+    }
+  };
+
   // When an email is opened, fetch attachments and any missing body fields
   useEffect(() => {
     if (!editEmail || !userId) return;
@@ -238,11 +258,11 @@ export function DashboardPage() {
   }, [spec]);
   const eventsCols = useMemo(() => {
     const cols = buildCols(spec.my_meetings.columns);
-    return cols.map((c) =>
-      (c.field === 'start_time' || c.field === 'end_time')
-        ? { ...c, valueFormatter: (p: any) => fmtDate(p.value) }
-        : c
-    );
+    return cols.map((c) => {
+      if (c.field === 'start_time') return { ...c, valueFormatter: (p: any) => fmtDateWithShortTime(p.value) };
+      if (c.field === 'end_time') return { ...c, valueFormatter: (p: any) => fmtDate(p.value) };
+      return c;
+    });
   }, [spec]);
 
   return (
