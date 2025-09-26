@@ -189,18 +189,23 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       let y = 0;
       while (y < fullH) {
         const h = Math.min(tileH, fullH - y);
-        // Scroll the page to the tile start so html2canvas captures the correct region
-        window.scrollTo(0, y);
-        // Wait a frame so layout/paint catches up
-        // eslint-disable-next-line no-await-in-loop
-        await new Promise((r) => requestAnimationFrame(() => r(null)));
-        const optsFO = { ...baseOpts, height: h, windowHeight: h, foreignObjectRendering: true } as any;
-        const optsCanvas = { ...baseOpts, height: h, windowHeight: h, foreignObjectRendering: false } as any;
+        const onclone = (doc: Document) => {
+          try {
+            const w: any = doc.defaultView as any;
+            if (w && typeof w.scrollTo === 'function') w.scrollTo(0, y);
+            (doc.documentElement as any).scrollTop = y;
+            (doc.body as any).scrollTop = y;
+            // Ensure FO path shifts content for the current tile
+            (doc.body as any).style.transform = `translateY(-${y}px)`;
+          } catch {}
+        };
+        const optsFO = { ...baseOpts, height: h, windowHeight: h, scrollX: 0, scrollY: 0, foreignObjectRendering: true, onclone } as any;
+        const optsCanvas = { ...baseOpts, height: h, windowHeight: h, scrollX: 0, scrollY: 0, foreignObjectRendering: false, onclone } as any;
         let tile: HTMLCanvasElement | null = null;
         try {
-          tile = await html2canvas(document.body, optsFO);
+          tile = await html2canvas(document.documentElement, optsFO);
         } catch {
-          tile = await html2canvas(document.body, optsCanvas);
+          tile = await html2canvas(document.documentElement, optsCanvas);
         }
         if (!tile) break;
         // Draw the tile into the output canvas at scaled position
