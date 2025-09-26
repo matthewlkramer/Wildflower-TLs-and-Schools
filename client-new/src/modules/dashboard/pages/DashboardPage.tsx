@@ -386,9 +386,9 @@ export function DashboardPage() {
 
       {/* Action Step Modal */}
       <Dialog open={!!editStep} onClose={() => setEditStep(null)} maxWidth="md" fullWidth PaperProps={{ sx: { maxWidth: 720 } }}>
-        <DialogTitle sx={{ pb: 1 }}>Edit Action Step</DialogTitle>
+        <DialogTitle sx={{ pb: 1, position: 'relative', zIndex: 1 }}>Edit Action Step</DialogTitle>
         {editStep ? (
-          <DialogContent sx={{ display: 'grid', gap: 2, pt: 6 }}>
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 8, maxHeight: '80vh' }}>
             <TextField
               label="Due Date"
               type="date"
@@ -458,11 +458,11 @@ export function DashboardPage() {
       </Dialog>
 
       {/* Email Modal */}
-      <Dialog open={!!editEmail} onClose={() => setEditEmail(null)} maxWidth="lg" fullWidth PaperProps={{ sx: { maxWidth: 980 } }}>
-        <DialogTitle sx={{ pb: 1 }}>Email</DialogTitle>
+      <Dialog open={!!editEmail} onClose={() => setEditEmail(null)} maxWidth="lg" fullWidth PaperProps={{ sx: { maxWidth: 1100 } }}>
+        <DialogTitle sx={{ pb: 1, position: 'relative', zIndex: 1 }}>Email</DialogTitle>
         {editEmail ? (
-          <DialogContent sx={{ display: 'grid', gap: 2, pt: 6 }}>
-            <TextField label="Sent Date" size="small" value={fmtDate(editEmail.sent_at)} InputProps={{ readOnly: true }} />
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 8, maxHeight: '85vh' }}>
+            <TextField sx={{ mt: 0.5 }} label="Sent Date" size="small" value={fmtDate(editEmail.sent_at)} InputProps={{ readOnly: true }} />
             <TextField label="From" size="small" value={String(editEmail.from_email || '')} InputProps={{ readOnly: true }} />
             <TextField label="To" size="small" value={Array.isArray(editEmail.to_emails) ? editEmail.to_emails.join(', ') : ''} InputProps={{ readOnly: true }} />
             <TextField label="CC" size="small" value={Array.isArray(editEmail.cc_emails) ? editEmail.cc_emails.join(', ') : ''} InputProps={{ readOnly: true }} />
@@ -475,13 +475,14 @@ export function DashboardPage() {
                 value={String(editEmail.body_text || editEmail.body_html || '')}
                 InputProps={{ readOnly: true }}
                 multiline
-                rows={20}
+                rows={24}
                 sx={{
+                  flex: 1,
                   '& .MuiInputBase-inputMultiline': {
                     whiteSpace: 'pre-wrap',
                     lineHeight: 1.4,
                     overflow: 'auto',
-                    maxHeight: 600,
+                    maxHeight: '60vh',
                   },
                 }}
               />
@@ -543,11 +544,11 @@ export function DashboardPage() {
       </Dialog>
 
       {/* Event Modal */}
-      <Dialog open={!!editEvent} onClose={() => setEditEvent(null)} maxWidth="lg" fullWidth PaperProps={{ sx: { maxWidth: 980 } }}>
-        <DialogTitle sx={{ pb: 1 }}>Event</DialogTitle>
+      <Dialog open={!!editEvent} onClose={() => setEditEvent(null)} maxWidth="lg" fullWidth PaperProps={{ sx: { maxWidth: 1100 } }}>
+        <DialogTitle sx={{ pb: 1, position: 'relative', zIndex: 1 }}>Event</DialogTitle>
         {editEvent ? (
-          <DialogContent sx={{ display: 'grid', gap: 2, pt: 6 }}>
-            <TextField label="Start Date" size="small" value={fmtDate(editEvent.start_time)} InputProps={{ readOnly: true }} />
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 8, maxHeight: '85vh' }}>
+            <TextField sx={{ mt: 0.5 }} label="Start Date" size="small" value={fmtDate(editEvent.start_time)} InputProps={{ readOnly: true }} />
             <TextField label="End Date" size="small" value={fmtDate(editEvent.end_time)} InputProps={{ readOnly: true }} />
             <TextField label="Location" size="small" value={String(editEvent.location || '')} InputProps={{ readOnly: true }} />
             <TextField label="Organizer" size="small" value={String(editEvent.organizer_email || '')} InputProps={{ readOnly: true }} />
@@ -560,13 +561,14 @@ export function DashboardPage() {
                 value={String(editEvent.description || '')}
                 InputProps={{ readOnly: true }}
                 multiline
-                rows={16}
+                rows={20}
                 sx={{
+                  flex: 1,
                   '& .MuiInputBase-inputMultiline': {
                     whiteSpace: 'pre-wrap',
                     lineHeight: 1.4,
                     overflow: 'auto',
-                    maxHeight: 600,
+                    maxHeight: '60vh',
                   },
                 }}
               />
