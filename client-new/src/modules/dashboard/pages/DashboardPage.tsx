@@ -388,7 +388,7 @@ export function DashboardPage() {
       <Dialog open={!!editStep} onClose={() => setEditStep(null)} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Action Step</DialogTitle>
         {editStep ? (
-          <DialogContent sx={{ display: 'grid', gap: 2, pt: 2 }}>
+          <DialogContent sx={{ display: 'grid', gap: 2, pt: 4 }}>
             <TextField
               label="Due Date"
               type="date"
@@ -458,10 +458,10 @@ export function DashboardPage() {
       </Dialog>
 
       {/* Email Modal */}
-      <Dialog open={!!editEmail} onClose={() => setEditEmail(null)} maxWidth="sm" fullWidth>
+      <Dialog open={!!editEmail} onClose={() => setEditEmail(null)} maxWidth="md" fullWidth>
         <DialogTitle>Email</DialogTitle>
         {editEmail ? (
-          <DialogContent sx={{ display: 'grid', gap: 2, pt: 2 }}>
+          <DialogContent sx={{ display: 'grid', gap: 2, pt: 4 }}>
             <TextField label="Sent Date" size="small" value={fmtDate(editEmail.sent_at)} InputProps={{ readOnly: true }} />
             <TextField label="From" size="small" value={String(editEmail.from_email || '')} InputProps={{ readOnly: true }} />
             <TextField label="To" size="small" value={Array.isArray(editEmail.to_emails) ? editEmail.to_emails.join(', ') : ''} InputProps={{ readOnly: true }} />
@@ -469,7 +469,15 @@ export function DashboardPage() {
             <TextField label="BCC" size="small" value={Array.isArray(editEmail.bcc_emails) ? editEmail.bcc_emails.join(', ') : ''} InputProps={{ readOnly: true }} />
             <TextField label="Subject" size="small" value={String(editEmail.subject || '')} InputProps={{ readOnly: true }} />
             {editEmail.body_text || editEmail.body_html ? (
-              <TextField label="Body" size="small" value={String(editEmail.body_text || editEmail.body_html || '')} InputProps={{ readOnly: true }} multiline minRows={6} />
+              <TextField
+                label="Body"
+                size="small"
+                value={String(editEmail.body_text || editEmail.body_html || '')}
+                InputProps={{ readOnly: true }}
+                multiline
+                minRows={16}
+                sx={{ '& .MuiInputBase-inputMultiline': { whiteSpace: 'pre-wrap', lineHeight: 1.4 } }}
+              />
             ) : null}
             <FormControlLabel
               control={<Checkbox checked={!!editEmail.is_private} onChange={(e) => setEditEmail({ ...editEmail, is_private: e.target.checked })} />}
@@ -528,10 +536,10 @@ export function DashboardPage() {
       </Dialog>
 
       {/* Event Modal */}
-      <Dialog open={!!editEvent} onClose={() => setEditEvent(null)} maxWidth="sm" fullWidth>
+      <Dialog open={!!editEvent} onClose={() => setEditEvent(null)} maxWidth="md" fullWidth>
         <DialogTitle>Event</DialogTitle>
         {editEvent ? (
-          <DialogContent sx={{ display: 'grid', gap: 2, pt: 2 }}>
+          <DialogContent sx={{ display: 'grid', gap: 2, pt: 4 }}>
             <TextField label="Start Date" size="small" value={fmtDate(editEvent.start_time)} InputProps={{ readOnly: true }} />
             <TextField label="End Date" size="small" value={fmtDate(editEvent.end_time)} InputProps={{ readOnly: true }} />
             <TextField label="Location" size="small" value={String(editEvent.location || '')} InputProps={{ readOnly: true }} />
@@ -539,7 +547,15 @@ export function DashboardPage() {
             <TextField label="Attendees" size="small" value={Array.isArray(editEvent.attendees) ? editEvent.attendees.join(', ') : ''} InputProps={{ readOnly: true }} />
             <TextField label="Summary" size="small" value={String(editEvent.summary || '')} InputProps={{ readOnly: true }} />
             {editEvent.description ? (
-              <TextField label="Description" size="small" value={String(editEvent.description || '')} InputProps={{ readOnly: true }} multiline minRows={6} />
+              <TextField
+                label="Description"
+                size="small"
+                value={String(editEvent.description || '')}
+                InputProps={{ readOnly: true }}
+                multiline
+                minRows={12}
+                sx={{ '& .MuiInputBase-inputMultiline': { whiteSpace: 'pre-wrap', lineHeight: 1.4 } }}
+              />
             ) : null}
             <FormControlLabel
               control={<Checkbox checked={!!editEvent.is_private} onChange={(e) => setEditEvent({ ...editEvent, is_private: e.target.checked })} />}
