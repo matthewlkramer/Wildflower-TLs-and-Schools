@@ -1,8 +1,15 @@
 import React from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '../auth-context';
+import { useLocation } from 'wouter';
 
 export function LoginPage() {
+  const { user } = useAuth();
+  const [, navigate] = useLocation();
+  React.useEffect(() => {
+    if (user) navigate('/dashboard', { replace: true });
+  }, [user, navigate]);
   async function signInGoogle() {
     await supabase.auth.signInWithOAuth({ provider: 'google' });
   }
@@ -16,4 +23,3 @@ export function LoginPage() {
     </div>
   );
 }
-

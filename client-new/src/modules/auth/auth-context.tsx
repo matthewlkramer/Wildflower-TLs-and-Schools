@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { useLocation } from 'wouter';
 
 type AuthContextType = {
   user: { id: string; email: string } | null;
@@ -67,7 +68,12 @@ export function useAuth() {
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
+  const [, navigate] = useLocation();
   if (loading) return <div>Loading...</div>;
-  if (!user) return <div>Not authorized. Please log in at /login.</div>;
+  if (!user) {
+    // Redirect unauthenticated users to /login
+    try { navigate('/login', { replace: true }); } catch {}
+    return null;
+  }
   return <>{children}</>;
 }
