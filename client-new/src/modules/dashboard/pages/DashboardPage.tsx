@@ -232,8 +232,18 @@ export function DashboardPage() {
   const schoolsCols = useMemo(() => buildCols(spec.my_schools.columns), [spec]);
   const chartersCols = useMemo(() => buildCols(spec.my_charters.columns), [spec]);
   const stepsCols = useMemo(() => buildCols(spec.my_action_steps.columns), [spec]);
-  const emailsCols = useMemo(() => buildCols(spec.my_emails.columns), [spec]);
-  const eventsCols = useMemo(() => buildCols(spec.my_meetings.columns), [spec]);
+  const emailsCols = useMemo(() => {
+    const cols = buildCols(spec.my_emails.columns);
+    return cols.map((c) => (c.field === 'sent_at' ? { ...c, valueFormatter: (p: any) => fmtDate(p.value) } : c));
+  }, [spec]);
+  const eventsCols = useMemo(() => {
+    const cols = buildCols(spec.my_meetings.columns);
+    return cols.map((c) =>
+      (c.field === 'start_time' || c.field === 'end_time')
+        ? { ...c, valueFormatter: (p: any) => fmtDate(p.value) }
+        : c
+    );
+  }, [spec]);
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 16 }}>
