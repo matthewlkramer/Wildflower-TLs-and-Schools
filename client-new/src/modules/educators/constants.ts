@@ -1,7 +1,5 @@
 // Grid section
-import type { ColumnVisibility, GridValueKind, GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailTabSpec as SharedDetailTabSpec, FieldMetadataMap } from '../shared/detail-types';
-// Legacy bundles removed; presets are self-contained
-import { TABLE_PRESETS } from '../shared/table-presets';
+import type { GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailTabSpec as SharedDetailTabSpec, FieldMetadataMap } from '../shared/detail-types';
 
 export type { ColumnVisibility, GridValueKind } from '../shared/detail-types';
 export type EducatorColumnConfig = GridColumnConfig;
@@ -11,14 +9,15 @@ export type DetailTabSpec = SharedDetailTabSpec;
 
 export const EDUCATOR_GRID: EducatorColumnConfig[] = [
   { field: 'full_name', headerName: 'Name', valueType: 'string', sortKey: true },
-  { field: 'current_role_at_active_school', headerName: 'Current Role at Active School', valueType: 'string' },
-  { field: 'active_school', headerName: 'Active School', visibility: 'hide', valueType: 'string' },
-  { field: 'current_role', headerName: 'Current Role', visibility: 'hide', valueType: 'select' },
-  { field: 'discovery_status', headerName: 'Discovery Status', valueType: 'select', selectOptions: ['In Process', 'Complete'] },
+  { field: 'current_role_at_active_school', headerName: 'Role at Curr. School', valueType: 'string' },
+  { field: 'active_school', headerName: 'Curr. School', visibility: 'hide', valueType: 'string' },
+  { field: 'current_role', headerName: 'Curr. Role', visibility: 'hide', valueType: 'select' },
+  { field: 'discovery_status', headerName: 'Discovery', valueType: 'select', selectOptions: ['In Process', 'Complete'] },
   { field: 'race_ethnicity', headerName: 'Race/Ethnicity', valueType: 'multi', lookupField: 'ref_race_and_ethnicity.english_label_short' },
-  { field: 'has_montessori_cert', headerName: 'Montessori Certified', valueType: 'boolean' },
+  { field: 'has_montessori_cert', headerName: 'Trained?', valueType: 'boolean' },
   { field: 'indiv_type', headerName: 'Type', valueType: 'select', selectOptions: ['Educator', 'Community Member'] },
   { field: 'id', headerName: 'ID', visibility: 'suppress' },
+  { field: 'active_school_id', headerName: 'Active School ID', visibility: 'suppress', valueType: 'string' },
   { field: 'kanban_group', headerName: 'Kanban Group', visibility: 'suppress', kanbanKey: true },
 ];
 
@@ -37,7 +36,7 @@ export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
   },
   {
     id: 'name_and_background',
-    label: 'Name and Background',
+    label: 'Name/Background',
     blocks: [
       { kind: 'card', title: 'Name', fields: ['first_name', 'nickname', 'middle_name', 'last_name', 'pronunciation'], editable: true },
       { kind: 'card', title: 'Background', fields: ['race_ethnicity', 'race_ethnicity_other', 'educ_attainment', 'hh_income', 'childhood_income', 'indiv_type'], editable: true}, 
@@ -147,7 +146,7 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   'indiv_type': { label: 'Type', type: 'string', edit: { table: 'people' } },
   'exclude_from_email_logging': { label: 'Exclude from Email Logging', type: 'boolean', edit: { table: 'people' } },
   'discovery_status': { label: 'Discovery Status', type: 'enum', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' , enumName: 'discovery_statuses'} },
-  'assigned_partner': { label: 'Assigned Partner', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id'} },
+  'assigned_partner': { label: 'Assigned Partner', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id'}, lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
   'first_contact_ages': { label: 'Initial Interest: Ages', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
   'first_contact_governance_model': { label: 'Initial Interest: Governance Model', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
   'first_contact_interests': { label: 'Initial Interest', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
@@ -166,7 +165,7 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   'routed_to': { label: 'Routed To', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' },lookup: {table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name'} },
   'assigned_partner_override': { label: 'Assigned Partner Override', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id'}, lookup: {table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name'} },
   'person_responsible_for_follow_up': { label: 'Person Responsible for Follow Up', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' ,}, lookup: {table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name'} }, 
-  'one_on_one_scheduling_status': { label: 'One-on-One Scheduling Status', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
+  'one_on_one_scheduling_status': { label: 'One-on-One Scheduling Status', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' }, lookup: { table: 'ref_one_on_one_status', valueColumn: 'value', labelColumn: 'label' } },
   'personal_email_sent': { label: 'Personal Email Sent', type: 'boolean', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
   'personal_email_sent_date': { label: 'Personal Email Sent Date', type: 'date', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },  
   'current_role_at_active_school': { label: 'Current Role at Active School', type: 'string' },  

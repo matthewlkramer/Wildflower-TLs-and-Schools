@@ -15,6 +15,7 @@ export function ChartersPage() {
   const [, navigate] = useLocation();
   const [quick, setQuick] = useState('');
   const [gridApi, setGridApi] = useState<any>(null);
+  const [selectedCount, setSelectedCount] = useState(0);
 
   const cols = useMemo<ColDef<any>[]>(() => {
     if (!data || data.length === 0) return [];
@@ -23,6 +24,8 @@ export function ChartersPage() {
     for (const row of sample) Object.keys(row || {}).forEach((k) => keySet.add(k));
 
     const defs: ColDef<any>[] = [];
+
+    // Automatic selection column is provided by baseGridOptions; no manual checkbox column here
 
     // Simple badge renderer for arrays (used for initial_target_planes)
     const BadgesRenderer: React.FC<ICellRendererParams> = (p) => {
@@ -87,6 +90,11 @@ export function ChartersPage() {
           break;
         case 'multi':
           def.filter = 'agTextColumnFilter';
+          def.filterValueGetter = ((p: any) => {
+            const v = p.value;
+            const arr = Array.isArray(v) ? v : (v != null ? [v] : []);
+            return arr.map((x) => String(x)).join(', ');
+          }) as any;
           if (config.field === 'initial_target_planes') {
             def.cellRenderer = BadgesRenderer as any;
           } else {
@@ -132,6 +140,12 @@ export function ChartersPage() {
       }
     }
 
+    // Remove right divider on the last data column before actions
+    if (defs.length > 0) {
+      const last = defs[defs.length - 1] as any;
+      const prev = (last.headerClass as string) || '';
+      last.headerClass = (prev ? prev + ' ' : '') + 'no-right-border';
+    }
     defs.push(createGridActionColumn('charter'));
     return defs;
   }, [data]);
@@ -201,11 +215,34 @@ export function ChartersPage() {
         entityType="charter"
         quickFilter={quick}
         onQuickFilterChange={setQuick}
+        selectedCount={selectedCount}
         currentViewMode="table"
         onViewModeChange={handleViewModeChange}
         onAddNew={handleAddNew}
         onApplySavedView={handleApplySavedView}
         onSaveCurrentView={handleSaveCurrentView}
+        onOpenColumnsPanel={() => {
+          if (!gridApi) return;
+          const opened = gridApi.getOpenedToolPanel?.();
+          if (opened === 'columns') {
+            gridApi.closeToolPanel();
+            gridApi.setSideBarVisible(false);
+          } else {
+            gridApi.setSideBarVisible(true);
+            gridApi.openToolPanel('columns');
+          }
+        }}
+        onOpenFiltersPanel={() => {
+          if (!gridApi) return;
+          const opened = gridApi.getOpenedToolPanel?.();
+          if (opened === 'filters') {
+            gridApi.closeToolPanel();
+            gridApi.setSideBarVisible(false);
+          } else {
+            gridApi.setSideBarVisible(true);
+            gridApi.openToolPanel('filters');
+          }
+        }}
       />
       <GridBase
         columnDefs={cols}
@@ -219,12 +256,26 @@ export function ChartersPage() {
               { id: 'filters', labelDefault: 'Filters', labelKey: 'filters', iconKey: 'filter', toolPanel: 'agFiltersToolPanel' },
             ],
             position: 'right',
-            hiddenByDefault: false,
+            hiddenByDefault: true,
           },
           onGridReady: (params) => {
             setGridApi(params.api);
-            params.api.setSideBarVisible(true);
+            params.api.setSideBarVisible(false);
             params.api.closeToolPanel();
+            try {
+              const usp = new URLSearchParams(window.location.search);
+              const panel = usp.get('panel');
+              if (panel === 'columns' || panel === 'filters') {
+                params.api.setSideBarVisible(true);
+                params.api.openToolPanel(panel);
+                const url = new URL(window.location.href);
+                url.searchParams.delete('panel');
+                window.history.replaceState({}, '', url.toString());
+              }
+            } catch {}
+          },
+          onSelectionChanged: (e) => {
+            try { setSelectedCount(e.api.getSelectedRows().length); } catch {}
           },
           onRowClicked: (e) => {
             const eventTarget = e.event instanceof Event ? (e.event.target as HTMLElement | null) : null;

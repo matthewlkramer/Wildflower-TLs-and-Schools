@@ -12,6 +12,7 @@ import { EducatorDetailPage } from '../educators/pages/EducatorDetailPage';
 import { SchoolDetailPage } from '../schools/pages/SchoolDetailPage';
 import { CharterDetailPage } from '../charters/pages/CharterDetailPage';
 import { initAgGridEnterprise } from '@/lib/ag-grid';
+import { initLogBuffer } from '@/lib/log-buffer';
 import { EducatorsKanbanPage } from '../educators/pages/EducatorsKanbanPage';
 import { EducatorsSplitPage } from '../educators/pages/EducatorsSplitPage';
 import { SchoolsKanbanPage } from '../schools/pages/SchoolsKanbanPage';
@@ -19,6 +20,8 @@ import { SchoolsSplitPage } from '../schools/pages/SchoolsSplitPage';
 import { ChartersKanbanPage } from '../charters/pages/ChartersKanbanPage';
 import { ChartersSplitPage } from '../charters/pages/ChartersSplitPage';
 import { SettingsPage } from '../settings/pages/SettingsPage';
+import { ComposeEmailPage } from '../email/ComposeEmailPage';
+import { DashboardPage } from '../dashboard/pages/DashboardPage';
 
 export function App() {
   return (
@@ -28,6 +31,11 @@ export function App() {
       <main className="p-4">
         <Switch>
           <Route path="/" component={HomeRedirect} />
+          <Route path="/dashboard">
+            <RequireAuth>
+              <DashboardPage />
+            </RequireAuth>
+          </Route>
           <Route path="/login" component={LoginPage} />
           <Route path="/reset" component={ResetPage} />
 
@@ -100,6 +108,12 @@ export function App() {
             </RequireAuth>
           </Route>
 
+          <Route path="/email/compose">
+            <RequireAuth>
+              <ComposeEmailPage />
+            </RequireAuth>
+          </Route>
+
           <Route>Not found</Route>
         </Switch>
       </main>
@@ -112,6 +126,7 @@ function AgInit() {
   useEffect(() => {
     if (!done) {
       initAgGridEnterprise();
+      try { initLogBuffer(); } catch {}
       setDone(true);
     }
   }, [done]);
@@ -123,7 +138,7 @@ function HomeRedirect() {
   const [, navigate] = useLocation();
   useEffect(() => {
     if (!loading) {
-      navigate(user ? '/educators' : '/login', { replace: true });
+      navigate(user ? '/dashboard' : '/login', { replace: true });
     }
   }, [loading, user, navigate]);
   return null;

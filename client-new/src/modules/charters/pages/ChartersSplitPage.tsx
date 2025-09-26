@@ -241,17 +241,15 @@ export function ChartersSplitPage() {
         </div>
 
         {/* Right side - Detail view */}
-        <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+        <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '8px', padding: 12 }}>
           {selectedCharterId && selectedCharterData ? (
-            <div style={{ transform: 'scale(0.9)', transformOrigin: 'top left', width: '111%', height: '111%' }}>
-              <DetailsRenderer
-                entityId={selectedCharterId}
-                details={selectedCharterData as any}
-                tabs={CHARTER_DETAIL_TABS}
-                fieldMeta={CHARTER_FIELD_METADATA}
-                resolveTitle={(details) => details.charter_name ?? details.full_name ?? details.short_name ?? selectedCharterId}
-              />
-            </div>
+            <DetailsRenderer
+              entityId={selectedCharterId}
+              details={selectedCharterData as any}
+              tabs={CHARTER_DETAIL_TABS}
+              fieldMeta={CHARTER_FIELD_METADATA}
+              resolveTitle={(details) => details.charter_name ?? details.full_name ?? details.short_name ?? selectedCharterId}
+            />
           ) : (
             <div style={{ padding: '20px', color: '#6b7280' }}>
               Select a charter from the list to view details

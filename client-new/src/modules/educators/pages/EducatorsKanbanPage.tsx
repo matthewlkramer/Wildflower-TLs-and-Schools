@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useGridEducators } from '../api/queries';
 import KanbanBoard from '@/components/shared/KanbanBoard';
 import { useQuery } from '@tanstack/react-query';
@@ -13,6 +13,19 @@ export function EducatorsKanbanPage() {
   const [, navigate] = useLocation();
   const [quick, setQuick] = useState('');
   const groupField = EDUCATOR_GRID.find((c) => c.kanbanKey)?.field || 'kanban_group';
+  // Kanban-specific UI state
+  const [showColumns, setShowColumns] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const storageKeyCols = 'kanban-columns-educators';
+  const storageKeyFilters = 'kanban-filters-educators';
+  const [cardFields, setCardFields] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem(storageKeyCols) || '[]'); } catch { return []; }
+  });
+  const [filters, setFilters] = useState<Record<string, string[]>>(() => {
+    try { return JSON.parse(localStorage.getItem(storageKeyFilters) || '{}'); } catch { return {}; }
+  });
+  useEffect(() => { localStorage.setItem(storageKeyCols, JSON.stringify(cardFields)); }, [cardFields]);
+  useEffect(() => { localStorage.setItem(storageKeyFilters, JSON.stringify(filters)); }, [filters]);
 
   // Load constants for lane definitions: value (label), order, optional visibility
   const constantsTable = EDUCATOR_KANBAN_CONSTANTS_TABLE;
@@ -58,11 +71,28 @@ export function EducatorsKanbanPage() {
     });
   }, [data, quick]);
 
-  const filteredItems = useMemo(() => quickFilteredData.filter((r: any) => {
+  // Apply Kanban filters (simple equals/contains across selected fields using unique values present)
+  const filteredByPanel = useMemo(() => {
+    const entries = Object.entries(filters).filter(([, vals]) => Array.isArray(vals) && vals.length > 0);
+    if (entries.length === 0) return quickFilteredData;
+    return quickFilteredData.filter((row: any) => {
+      return entries.every(([field, vals]) => {
+        const v = (row as any)[field];
+        if (v == null) return false;
+        if (Array.isArray(v)) {
+          const set = new Set(vals.map(String));
+          return v.some((x) => set.has(String(x)));
+        }
+        return vals.map(String).includes(String(v));
+      });
+    });
+  }, [quickFilteredData, filters]);
+
+  const filteredItems = useMemo(() => filteredByPanel.filter((r: any) => {
     const v = r[groupField];
     const key = v == null || v === '' ? '__UNSPECIFIED__' : String(v).trim();
     return !suppressedKeys.has(key);
-  }), [quickFilteredData, groupField, suppressedKeys]);
+  }), [filteredByPanel, groupField, suppressedKeys]);
 
   const groupKeys = useMemo(() => {
     const keys = new Set<string>();
@@ -149,6 +179,8 @@ export function EducatorsKanbanPage() {
         onAddNew={() => console.log('Add new educator')}
         onApplySavedView={handleApplySavedView}
         onSaveCurrentView={handleSaveCurrentView}
+        onOpenColumnsPanel={() => setShowColumns(true)}
+        onOpenFiltersPanel={() => setShowFilters(true)}
       />
       <KanbanBoard<any>
         items={filteredItems}
@@ -156,16 +188,121 @@ export function EducatorsKanbanPage() {
         groupBy={(it) => (it as any)[groupField]}
         getId={(it) => String((it as any).id)}
         initialCollapsedKeys={initialCollapsed}
+        onCardClick={(item) => {
+          const id = String((item as any).id);
+          navigate(`/educators/${id}`);
+        }}
         renderCard={(t) => (
           <div>
             <div style={{ fontWeight: 600, fontSize: 13 }}>{(t as any).full_name || (t as any).name || ''}</div>
             <div style={{ fontSize: 12, color: '#475569' }}>{(t as any).current_role_at_active_school || (t as any).current_role || ''}</div>
+            {cardFields.length > 0 && (
+              <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {cardFields.map((f) => (
+                  <div key={f} style={{ fontSize: 11, color: '#334155' }}>
+                    <span style={{ color: '#64748b' }}>{(EDUCATOR_GRID.find((c: any) => c.field === f)?.headerName) || f}: </span>
+                    <span>{renderFieldValue((t as any)[f])}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       />
+
+      {/* Columns modal */}
+      {showColumns && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }} onClick={() => setShowColumns(false)}>
+          <div style={{ background: '#fff', borderRadius: 8, padding: 16, width: 520, maxWidth: '95vw' }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ margin: 0, marginBottom: 12, fontSize: 16 }}>Choose Columns for Cards</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, maxHeight: '50vh', overflow: 'auto' }}>
+              {EDUCATOR_GRID.filter((c: any) => c.visibility !== 'suppress' && c.field !== groupField).map((c: any) => {
+                const checked = cardFields.includes(c.field);
+                return (
+                  <label key={c.field} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+                    <input type="checkbox" checked={checked} onChange={(e) => {
+                      setCardFields((prev) => {
+                        const set = new Set(prev);
+                        if (e.target.checked) set.add(c.field); else set.delete(c.field);
+                        return Array.from(set);
+                      });
+                    }} />
+                    <span>{c.headerName || c.field}</span>
+                  </label>
+                );
+              })}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
+              <button type="button" onClick={() => setShowColumns(false)} style={{ border: '1px solid #cbd5e1', background: 'transparent', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filters modal */}
+      {showFilters && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }} onClick={() => setShowFilters(false)}>
+          <div style={{ background: '#fff', borderRadius: 8, padding: 16, width: 520, maxWidth: '95vw' }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ margin: 0, marginBottom: 12, fontSize: 16 }}>Set Filters</h3>
+            <p style={{ marginTop: 0, marginBottom: 8, color: '#64748b', fontSize: 12 }}>Select values to include for each field.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: '50vh', overflow: 'auto' }}>
+              {EDUCATOR_GRID.filter((c: any) => c.visibility !== 'suppress').map((c: any) => {
+                const uniq = uniqueValues(filteredByPanel, c.field);
+                if (uniq.length === 0) return null;
+                const sel = new Set(filters[c.field] || []);
+                return (
+                  <div key={c.field}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 6 }}>{c.headerName || c.field}</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {uniq.map((val) => (
+                        <label key={String(val)} style={{ border: '1px solid #cbd5e1', borderRadius: 999, padding: '2px 8px', fontSize: 12, cursor: 'pointer' }}>
+                          <input type="checkbox" checked={sel.has(String(val))} onChange={(e) => {
+                            setFilters((prev) => {
+                              const next = { ...prev } as Record<string, string[]>;
+                              const s = new Set(next[c.field] || []);
+                              if (e.target.checked) s.add(String(val)); else s.delete(String(val));
+                              next[c.field] = Array.from(s);
+                              // drop empty arrays to simplify
+                              if (next[c.field].length === 0) delete next[c.field];
+                              return next;
+                            });
+                          }} style={{ marginRight: 6 }} />
+                          {String(val)}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginTop: 12 }}>
+              <button type="button" onClick={() => setFilters({})} style={{ border: '1px solid #cbd5e1', background: 'transparent', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}>Clear All</button>
+              <div>
+                <button type="button" onClick={() => setShowFilters(false)} style={{ border: '1px solid #cbd5e1', background: 'transparent', padding: '6px 10px', borderRadius: 6, cursor: 'pointer', marginRight: 8 }}>Close</button>
+                <button type="button" onClick={() => setShowFilters(false)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 6, cursor: 'pointer' }}>Apply</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
+function uniqueValues(rows: any[], field: string): any[] {
+  const set = new Set<string>();
+  for (const r of rows || []) {
+    const v = r?.[field];
+    if (v == null) continue;
+    if (Array.isArray(v)) { for (const x of v) set.add(String(x)); }
+    else set.add(String(v));
+  }
+  return Array.from(set.values());
+}
 
-
+function renderFieldValue(v: any) {
+  if (v == null) return '';
+  if (Array.isArray(v)) return v.join(', ');
+  if (typeof v === 'boolean') return v ? 'Yes' : 'No';
+  return String(v);
+}

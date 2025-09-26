@@ -13,6 +13,7 @@ interface GridPageHeaderProps {
   entityType: EntityType;
   quickFilter: string;
   onQuickFilterChange: (value: string) => void;
+  selectedCount?: number;
   onAddNew?: () => void;
   currentViewMode?: 'table' | 'kanban' | 'split';
   onViewModeChange?: (viewMode: string) => void;
@@ -23,6 +24,8 @@ interface GridPageHeaderProps {
     columnState: Array<{ colId: string; hide?: boolean; width?: number; pinned?: 'left' | 'right' | null }>;
     quickFilter: string;
   };
+  onOpenColumnsPanel?: () => void;
+  onOpenFiltersPanel?: () => void;
 }
 
 const ENTITY_LABELS: Record<EntityType, string> = {
@@ -41,11 +44,14 @@ export function GridPageHeader({
   entityType, 
   quickFilter, 
   onQuickFilterChange, 
+  selectedCount = 0,
   onAddNew,
   currentViewMode = 'table',
   onViewModeChange,
   onApplySavedView,
-  onSaveCurrentView
+  onSaveCurrentView,
+  onOpenColumnsPanel,
+  onOpenFiltersPanel
 }: GridPageHeaderProps) {
   const [viewMode, setViewMode] = useState(currentViewMode);
 
@@ -89,6 +95,103 @@ export function GridPageHeader({
         style={{ height: 36, minHeight: 36 }}
       />
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <MButton
+          variant="contained"
+          size="small"
+          disabled={selectedCount < 2}
+          onClick={() => window.alert(`Merge selected (${selectedCount}). This functionality is coming later.`)}
+          sx={{
+            height: CONTROL_HEIGHT,
+            minHeight: CONTROL_HEIGHT,
+            textTransform: 'none',
+            fontSize: CONTROL_FONT_SIZE,
+            fontFamily: 'inherit',
+            fontWeight: 500,
+            borderRadius: `${CONTROL_RADIUS}px`,
+            px: 1.5,
+            boxShadow: 'none',
+            backgroundColor: selectedCount < 2 ? '#94a3b8' : '#0f8a8d',
+            color: '#ffffff',
+            '&:hover': { backgroundColor: selectedCount < 2 ? '#94a3b8' : '#0b6e71' },
+          }}
+        >
+          Merge
+        </MButton>
+        <MButton
+          variant="contained"
+          size="small"
+          disabled={selectedCount < 2}
+          onClick={() => window.alert(`Bulk edit selected (${selectedCount}). This functionality is coming later.`)}
+          sx={{
+            height: CONTROL_HEIGHT,
+            minHeight: CONTROL_HEIGHT,
+            textTransform: 'none',
+            fontSize: CONTROL_FONT_SIZE,
+            fontFamily: 'inherit',
+            fontWeight: 500,
+            borderRadius: `${CONTROL_RADIUS}px`,
+            px: 1.5,
+            boxShadow: 'none',
+            backgroundColor: selectedCount < 2 ? '#94a3b8' : '#0f8a8d',
+            color: '#ffffff',
+            '&:hover': { backgroundColor: selectedCount < 2 ? '#94a3b8' : '#0b6e71' },
+          }}
+        >
+          Bulk Edit
+        </MButton>
+        {(onApplySavedView && onSaveCurrentView) && (
+          <SavedViewsManager
+            entityType={entityType}
+            onApplyView={onApplySavedView}
+            onSaveCurrentView={onSaveCurrentView}
+          />
+        )}
+        {onOpenColumnsPanel ? (
+          <MButton
+            variant="contained"
+            size="small"
+            onClick={onOpenColumnsPanel}
+            sx={{
+              height: CONTROL_HEIGHT,
+              minHeight: CONTROL_HEIGHT,
+              textTransform: 'none',
+              fontSize: CONTROL_FONT_SIZE,
+              fontFamily: 'inherit',
+              fontWeight: 500,
+              borderRadius: `${CONTROL_RADIUS}px`,
+              px: 1.5,
+              boxShadow: 'none',
+              backgroundColor: '#0f8a8d',
+              color: '#ffffff',
+              '&:hover': { backgroundColor: '#0b6e71' },
+            }}
+          >
+            Choose Columns
+          </MButton>
+        ) : null}
+        {onOpenFiltersPanel ? (
+          <MButton
+            variant="contained"
+            size="small"
+            onClick={onOpenFiltersPanel}
+            sx={{
+              height: CONTROL_HEIGHT,
+              minHeight: CONTROL_HEIGHT,
+              textTransform: 'none',
+              fontSize: CONTROL_FONT_SIZE,
+              fontFamily: 'inherit',
+              fontWeight: 500,
+              borderRadius: `${CONTROL_RADIUS}px`,
+              px: 1.5,
+              boxShadow: 'none',
+              backgroundColor: '#0f8a8d',
+              color: '#ffffff',
+              '&:hover': { backgroundColor: '#0b6e71' },
+            }}
+          >
+            Set Filters
+          </MButton>
+        ) : null}
         <MButton 
           onClick={handleAddNew}
           variant="contained"
@@ -147,15 +250,6 @@ export function GridPageHeader({
           </Menu>
         </FormControl>
       </div>
-      {(onApplySavedView && onSaveCurrentView) && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-          <SavedViewsManager
-            entityType={entityType}
-            onApplyView={onApplySavedView}
-            onSaveCurrentView={onSaveCurrentView}
-          />
-        </div>
-      )}
     </div>
   );
 }

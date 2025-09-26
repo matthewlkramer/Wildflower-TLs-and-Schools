@@ -241,17 +241,15 @@ export function SchoolsSplitPage() {
         </div>
 
         {/* Right side - Detail view */}
-        <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+        <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '8px', padding: 12 }}>
           {selectedSchoolId && selectedSchoolData ? (
-            <div style={{ transform: 'scale(0.9)', transformOrigin: 'top left', width: '111%', height: '111%' }}>
-              <DetailsRenderer
-                entityId={selectedSchoolId}
-                details={selectedSchoolData as any}
-                tabs={SCHOOL_DETAIL_TABS}
-                fieldMeta={SCHOOL_FIELD_METADATA}
-                resolveTitle={(details) => details.school_name ?? details.name ?? selectedSchoolId}
-              />
-            </div>
+            <DetailsRenderer
+              entityId={selectedSchoolId}
+              details={selectedSchoolData as any}
+              tabs={SCHOOL_DETAIL_TABS}
+              fieldMeta={SCHOOL_FIELD_METADATA}
+              resolveTitle={(details) => details.school_name ?? details.name ?? selectedSchoolId}
+            />
           ) : (
             <div style={{ padding: '20px', color: '#6b7280' }}>
               Select a school from the list to view details

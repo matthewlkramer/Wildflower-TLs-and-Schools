@@ -15,22 +15,25 @@ export function EducatorsPage() {
   const [, navigate] = useLocation();
   const [quick, setQuick] = useState('');
   const [gridApi, setGridApi] = useState<any>(null);
+  const [selectedCount, setSelectedCount] = useState(0);
   const [lookups, setLookups] = useState<Record<string, Record<string, string>>>({});
 
   // Preload lookup maps for columns that specify `lookupField` (table.labelColumn).
+  // Load on mount; refresh cells when lookups change or grid becomes ready.
   useEffect(() => {
     let cancelled = false;
-    async function loadLookups() {
+    (async () => {
       const entries = EDUCATOR_GRID.filter((c) => Boolean((c as any).lookupField)).map((c) => (c as any).lookupField as string);
       const distinct = Array.from(new Set(entries));
-      const next: Record<string, Record<string, string>> = { ...lookups };
+      const next: Record<string, Record<string, string>> = {};
       for (const key of distinct) {
-        if (!key || next[key]) continue;
+        if (!key) continue;
         const [table, labelColumn] = key.split('.');
         if (!table || !labelColumn) continue;
         const sel = `value, ${labelColumn}`;
         const { data, error } = await (supabase as any).from(table).select(sel).order(labelColumn, { ascending: true });
-        if (!cancelled && !error && Array.isArray(data)) {
+        if (cancelled) return;
+        if (!error && Array.isArray(data)) {
           const map: Record<string, string> = {};
           for (const row of data) {
             const v = row?.value;
@@ -40,14 +43,16 @@ export function EducatorsPage() {
           next[key] = map;
         }
       }
-      if (!cancelled) {
-        setLookups(next);
-        if (gridApi) gridApi.refreshCells({ force: true });
-      }
-    }
-    loadLookups();
+      if (!cancelled) setLookups((prev) => ({ ...prev, ...next }));
+    })();
     return () => { cancelled = true; };
-  }, [gridApi]);
+  }, []);
+
+  useEffect(() => {
+    if (gridApi) {
+      try { gridApi.refreshCells({ force: true }); } catch {}
+    }
+  }, [lookups, gridApi]);
 
   const cols = useMemo<ColDef<any>[]>(() => {
     if (!data || data.length === 0) return [];
@@ -56,6 +61,8 @@ export function EducatorsPage() {
     for (const row of sample) Object.keys(row || {}).forEach((k) => keySet.add(k));
 
     const defs: ColDef<any>[] = [];
+
+    // Automatic selection column is provided by baseGridOptions; no manual checkbox column here
 
     // Simple badge renderer for arrays (used for race_ethnicity)
     const BadgesRenderer: React.FC<ICellRendererParams & { map?: Record<string, string> }> = (p) => {
@@ -129,22 +136,40 @@ export function EducatorsPage() {
           }
           break;
         case 'multi':
-          def.filter = 'agTextColumnFilter';
           if (config.lookupField) {
             const key = config.lookupField;
-            // Display badges specifically for race_ethnicity; others remain comma-separated
+            const map = lookups[key] as Record<string, string> | undefined;
+            // Race/Ethnicity: use set filter with canonical options and label mapping
             if (config.field === 'race_ethnicity') {
+              def.filter = 'agSetColumnFilter';
+              const deriveUnique = (): string[] => {
+                const set = new Set<string>();
+                for (const row of data) {
+                  const raw = (row as any)?.[config.field];
+                  if (Array.isArray(raw)) raw.forEach((x: any) => set.add(String(x)));
+                  else if (raw != null) set.add(String(raw));
+                }
+                return Array.from(set.values());
+              };
+              const values = map ? Object.keys(map) : deriveUnique();
+              def.filterParams = {
+                values,
+                valueFormatter: (p: any) => (map && p?.value != null ? (map[String(p.value)] ?? String(p.value)) : String(p?.value ?? '')),
+              } as any;
               def.cellRenderer = BadgesRenderer as any;
-              def.cellRendererParams = { map: lookups[key] } as any;
+              def.cellRendererParams = { map } as any;
             } else {
+              // Other multi with lookup: text filter on labels
+              def.filter = 'agTextColumnFilter';
               def.valueFormatter = (p: any) => {
                 const arr = Array.isArray(p.value) ? p.value : (p.value != null ? [p.value] : []);
-                const map = lookups[key];
                 if (!map) return arr.map((x: any) => String(x)).join(', ');
                 return arr.map((x: any) => map[String(x)] ?? String(x)).join(', ');
               };
             }
           } else {
+            // No lookup: simple text filter over joined array
+            def.filter = 'agTextColumnFilter';
             def.valueFormatter = (p: any) => Array.isArray(p.value) ? p.value.join(', ') : (p.value ?? '');
           }
           break;
@@ -168,6 +193,110 @@ export function EducatorsPage() {
           break;
       }
 
+      // Make school names clickable
+      if (config.field === 'active_school') {
+        def.cellRenderer = (p: any) => {
+          const label = String(p.value ?? '').trim();
+          if (!label) return '';
+          // Separate the school name from any parenthetical status e.g. "School Name (Planning)"
+          const parenIdx = label.indexOf(' (');
+          const schoolName = parenIdx > -1 ? label.slice(0, parenIdx) : label;
+          const trailing = parenIdx > -1 ? label.slice(parenIdx) : '';
+
+          const handleClick = async (e: any) => {
+            e?.stopPropagation?.();
+            // Prefer direct id from row when available
+            let schoolId: string | null = p?.data?.active_school_id ?? null;
+            // Fallback to lookups if id not present
+            if (!schoolId) {
+              try {
+                const ds = await (supabase as any).from('details_schools').select('id,long_name').eq('long_name', schoolName).maybeSingle();
+                if (!ds.error && ds.data?.id) schoolId = String(ds.data.id);
+              } catch {}
+              if (!schoolId) {
+                try {
+                  const tryMatch = async (col: string) => {
+                    const res = await (supabase as any).from('schools').select('id').eq(col, schoolName).maybeSingle();
+                    return !res.error && res.data?.id ? String(res.data.id) : null;
+                  };
+                  schoolId = (await tryMatch('short_name')) || (await tryMatch('long_name')) || (await tryMatch('legal_name'));
+                } catch {}
+              }
+            }
+            if (schoolId) navigate(`/schools/${encodeURIComponent(schoolId)}`);
+          };
+          return (
+            <span>
+              <a href="#" onClick={handleClick} style={{ color: '#0f8a8d', textDecoration: 'underline', cursor: 'pointer' }}>{schoolName}</a>
+              {trailing ? <span>{trailing}</span> : null}
+            </span>
+          );
+        };
+      }
+
+      if (config.field === 'current_role_at_active_school') {
+        def.cellRenderer = (p: any) => {
+          const text = String(p.value ?? '').trim();
+          if (!text) return '';
+          // Heuristic: extract school name after the last ' at '
+          const idx = text.toLowerCase().lastIndexOf(' at ');
+          const role = idx > -1 ? text.slice(0, idx) : text;
+          const schoolLabelRaw = idx > -1 ? text.slice(idx + 4).trim() : '';
+          // Separate the school name from any parenthetical status
+          const parenIdx2 = schoolLabelRaw.indexOf(' (');
+          const schoolLabel = parenIdx2 > -1 ? schoolLabelRaw.slice(0, parenIdx2) : schoolLabelRaw;
+          const trailing2 = parenIdx2 > -1 ? schoolLabelRaw.slice(parenIdx2) : '';
+          const handleClick = async (e: any) => {
+            e?.stopPropagation?.();
+            if (!schoolLabel && !p?.data?.active_school_id) return;
+            let schoolId: string | null = p?.data?.active_school_id ?? null;
+            if (!schoolId && schoolLabel) {
+              try {
+                const ds = await (supabase as any).from('details_schools').select('id,long_name').eq('long_name', schoolLabel).maybeSingle();
+                if (!ds.error && ds.data?.id) schoolId = String(ds.data.id);
+              } catch {}
+              if (!schoolId) {
+                try {
+                  const tryMatch = async (col: string) => {
+                    const res = await (supabase as any).from('schools').select('id').eq(col, schoolLabel).maybeSingle();
+                    return !res.error && res.data?.id ? String(res.data.id) : null;
+                  };
+                  schoolId = (await tryMatch('short_name')) || (await tryMatch('long_name')) || (await tryMatch('legal_name'));
+                } catch {}
+              }
+            }
+            if (schoolId) navigate(`/schools/${encodeURIComponent(schoolId)}`);
+          };
+          return (
+            <span>
+              <span>{role}</span>
+              {schoolLabel ? (
+                <>
+                  <span>{' at '}</span>
+                  <a href="#" onClick={handleClick} style={{ color: '#0f8a8d', textDecoration: 'underline', cursor: 'pointer' }}>{schoolLabel}</a>
+                  {trailing2 ? <span>{trailing2}</span> : null}
+                </>
+              ) : null}
+            </span>
+          );
+        };
+      }
+
+      // Ensure multi-select arrays are searchable via text filter
+      if (config.valueType === 'multi') {
+        if (!def.filter) def.filter = 'agTextColumnFilter';
+        const key = (config as any).lookupField as string | undefined;
+        def.filterValueGetter = ((p: any) => {
+          const v = p.value;
+          const arr: any[] = Array.isArray(v) ? v : (v != null ? [v] : []);
+          if (key && lookups[key]) {
+            const map = lookups[key];
+            return arr.map((x) => map[String(x)] ?? String(x)).join(', ');
+          }
+          return arr.map((x) => String(x)).join(', ');
+        }) as any;
+      }
+
       defs.push(def);
     }
 
@@ -187,6 +316,12 @@ export function EducatorsPage() {
       }
     }
 
+    // Remove right divider on the last data column before actions
+    if (defs.length > 0) {
+      const last = defs[defs.length - 1] as any;
+      const prev = (last.headerClass as string) || '';
+      last.headerClass = (prev ? prev + ' ' : '') + 'no-right-border';
+    }
     defs.push(createGridActionColumn('educator'));
     return defs;
   }, [data]);
@@ -252,11 +387,34 @@ export function EducatorsPage() {
         entityType="educator"
         quickFilter={quick}
         onQuickFilterChange={setQuick}
+        selectedCount={selectedCount}
         currentViewMode="table"
         onViewModeChange={handleViewModeChange}
         onAddNew={() => console.log('Add new educator')}
         onApplySavedView={handleApplySavedView}
         onSaveCurrentView={handleSaveCurrentView}
+        onOpenColumnsPanel={() => {
+          if (!gridApi) return;
+          const opened = gridApi.getOpenedToolPanel?.();
+          if (opened === 'columns') {
+            gridApi.closeToolPanel();
+            gridApi.setSideBarVisible(false);
+          } else {
+            gridApi.setSideBarVisible(true);
+            gridApi.openToolPanel('columns');
+          }
+        }}
+        onOpenFiltersPanel={() => {
+          if (!gridApi) return;
+          const opened = gridApi.getOpenedToolPanel?.();
+          if (opened === 'filters') {
+            gridApi.closeToolPanel();
+            gridApi.setSideBarVisible(false);
+          } else {
+            gridApi.setSideBarVisible(true);
+            gridApi.openToolPanel('filters');
+          }
+        }}
       />
       <GridBase
         columnDefs={cols}
@@ -282,12 +440,28 @@ export function EducatorsPage() {
               },
             ],
             position: 'right',
-            hiddenByDefault: false, // show the slim sidebar with icons
+            hiddenByDefault: true,
           },
           onGridReady: (params) => {
             setGridApi(params.api);
-            params.api.setSideBarVisible(true);
-            params.api.closeToolPanel(); // keep it collapsed by default
+            // Hide the side bar icon rail by default; open via header buttons
+            params.api.setSideBarVisible(false);
+            params.api.closeToolPanel();
+            try {
+              const usp = new URLSearchParams(window.location.search);
+              const panel = usp.get('panel');
+              if (panel === 'columns' || panel === 'filters') {
+                params.api.setSideBarVisible(true);
+                params.api.openToolPanel(panel);
+                // clean query param without reload
+                const url = new URL(window.location.href);
+                url.searchParams.delete('panel');
+                window.history.replaceState({}, '', url.toString());
+              }
+            } catch {}
+          },
+          onSelectionChanged: (e) => {
+            try { setSelectedCount(e.api.getSelectedRows().length); } catch {}
           },
           onRowClicked: (e) => {
             const eventTarget = e.event instanceof Event ? (e.event.target as HTMLElement | null) : null;

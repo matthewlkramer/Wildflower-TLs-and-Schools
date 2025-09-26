@@ -6,10 +6,8 @@ export async function setSyncStatus(
   userId: string,
   patch: { sync_status?: string | null; error_message?: string | null; started_at?: string | null; completed_at?: string | null }
 ) {
-  // Update both gmail+calendar heads if present
-  const now = ts();
-  await supabase.from('g_email_sync_progress').update({ ...patch, updated_at: now }).eq('user_id', userId);
-  await supabase.from('g_event_sync_progress').update({ ...patch, updated_at: now }).eq('user_id', userId);
+  // Progress tables were removed; no-op
+  try { console.log('[progress] setSyncStatus', { userId, patch, at: ts() }); } catch {}
 }
 
 export async function setPeriodStatus(
@@ -19,7 +17,6 @@ export async function setPeriodStatus(
   patch: Record<string, any>,
   onConflict: string,
 ) {
-  const row = { ...keys, ...patch, updated_at: ts() };
-  await supabase.from(table).upsert(row, { onConflict });
+  // Progress tables were removed; no-op
+  try { console.log('[progress] setPeriodStatus', { table, keys, patch, onConflict, at: ts() }); } catch {}
 }
-

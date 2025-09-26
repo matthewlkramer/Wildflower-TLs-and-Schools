@@ -11,6 +11,9 @@ const GMAIL_BATCH = Number(Deno.env.get('DAILY_GMAIL_PAGE_SIZE') || 100);
 const BACKFILL_BATCH = Number(Deno.env.get('DAILY_BACKFILL_BATCH') || 100);
 const CALENDAR_ID = Deno.env.get('DAILY_CALENDAR_ID') || 'primary';
 
+// Gmail search expects YYYY/MM/DD for date boundaries
+const fmtDate = (d: Date) => `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2,'0')}/${String(d.getUTCDate()).padStart(2,'0')}`;
+
 serve(async (req) => {
   if (req.method === 'GET') return json({ ok: true, function: 'daily-cron', now: ts() });
   const cronSecret = Deno.env.get('CRON_SECRET') || '';
@@ -22,26 +25,46 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, serviceRole);
 
     // Process all users that have Google tokens
-    const { data: users } = await supabase.from('google_auth_tokens').select('user_id');
-    // Pull any explicit catch-up requests and prioritize these users with higher caps
-    const { data: queued } = await supabase.from('sync_catchup_requests').select('user_id,status').eq('status','queued');
-    const queuedSet = new Set<string>((queued || []).map((r: any) => r.user_id));
+    const { data: users } = await supabase.from('gsync.google_auth_tokens').select('user_id');
+    // Catch-up queues removed; no prioritization
+    const queuedSet = new Set<string>();
     const now = new Date();
-    const since = new Date(now.getTime() - 24 * 3600 * 1000);
 
     let usersProcessed = 0;
 
     for (const u of (users || [])) {
       const userId = u.user_id as string;
       const runId = crypto.randomUUID();
-      await sendConsole(supabase, userId, runId, `Daily sync starting for last 24h window`, 'info', 'gmail');
+      // Compute window starts per object type based on last successful import minus 24h
+      const getSince = async (objectType: 'email' | 'event') => {
+        try {
+          const { data: hist } = await supabase
+            .from('gsync.google_sync_history')
+            .select('end_of_sync_period, started_at, headers_fetch_successful')
+            .eq('user_id', userId)
+            .eq('object_type', objectType)
+            .eq('headers_fetch_successful', true)
+            .order('id', { ascending: false })
+            .limit(1);
+          const row = Array.isArray(hist) ? hist[0] : null;
+          const endIso = row?.end_of_sync_period as string | null | undefined;
+          const startIso = row?.started_at as string | null | undefined;
+          const base = endIso ? new Date(endIso) : (startIso ? new Date(startIso) : new Date(now.getTime() - 24 * 3600 * 1000));
+          return new Date(base.getTime() - 24 * 3600 * 1000);
+        } catch {
+          return new Date(now.getTime() - 24 * 3600 * 1000);
+        }
+      };
+      const sinceEmail = await getSince('email');
+      const sinceEvent = await getSince('event');
+      await sendConsole(supabase, userId, runId, `Daily sync windows: email from ${fmtDate(sinceEmail)}; event from ${fmtDate(sinceEvent)}`, 'info', 'gmail');
 
       // Acquire token once; refresh helper inside getValidAccessTokenOrThrow ensures validity
       const accessToken = await getValidAccessTokenOrThrow(supabase, userId);
 
       // 1) Gmail: ingest last 24h headers only
       try {
-        const q = `newer_than:1d`;
+        const q = `after:${fmtDate(sinceEmail)}`;
         let pageToken: string | undefined = undefined;
         let stored = 0;
         const extractEmail = (s?: string): string | null => {
@@ -68,7 +91,7 @@ serve(async (req) => {
           pageToken = listJson.nextPageToken;
           const rows: any[] = [];
           for (const id of ids) {
-            const det = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc&metadataHeaders=Bcc&metadataHeaders=Subject&metadataHeaders=Date`, { headers: { Authorization: `Bearer ${accessToken}` } });
+            const det = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc&metadataHeaders=Bcc&metadataHeaders=Date`, { headers: { Authorization: `Bearer ${accessToken}` } });
             if (!det.ok) continue;
             const msg: any = await det.json();
             const headers = parseHeaders(msg.payload?.headers || []);
@@ -76,7 +99,6 @@ serve(async (req) => {
             const to = splitAddresses(headers['to']);
             const cc = splitAddresses(headers['cc']);
             const bcc = splitAddresses(headers['bcc']);
-            const subject = headers['subject'] || '';
             const sentAt = (headers['date'] ? new Date(headers['date']) : null)?.toISOString() ?? null;
             rows.push({
               user_id: userId,
@@ -86,7 +108,7 @@ serve(async (req) => {
               to_emails: to,
               cc_emails: cc,
               bcc_emails: bcc,
-              subject,
+              subject: null,
               body_text: null,
               body_html: null,
               sent_at: sentAt,
@@ -94,12 +116,26 @@ serve(async (req) => {
             });
           }
           if (rows.length) {
-            await supabase.from('g_emails').upsert(rows, { onConflict: 'gmail_message_id' });
+            await supabase.from('gsync.g_emails').upsert(rows, { onConflict: 'user_id,gmail_message_id' } as any);
             stored += rows.length;
           }
           await sleep(150);
         } while (pageToken);
         await sendConsole(supabase, userId, runId, `Daily Gmail: stored ${stored} headers`, 'info', 'gmail');
+        try {
+          await supabase
+            .from('gsync.google_sync_history')
+            .insert({
+              user_id: userId,
+              start_of_sync_period: since.toISOString(),
+              end_of_sync_period: now.toISOString(),
+              object_type: 'email',
+              headers_fetched: stored,
+              headers_fetch_successful: true,
+              initiator: 'system',
+              started_at: ts(),
+            } as any);
+        } catch {}
       } catch (e) {
         await sendConsole(supabase, userId, runId, `Daily Gmail failed: ${e instanceof Error ? e.message : String(e)}`,'error','gmail');
       }
@@ -107,7 +143,7 @@ serve(async (req) => {
       // 1b) Gmail backlog catch-up older than 24h (idempotent upserts)
       try {
         // Determine user start date
-        const { data: settings } = await supabase.from('google_sync_settings').select('sync_start_date').eq('user_id', userId).single();
+        const { data: settings } = await supabase.from('gsync.google_sync_settings').select('sync_start_date').eq('user_id', userId).single();
         const START = settings?.sync_start_date ? new Date(settings.sync_start_date) : null;
         if (START) {
           const olderThanQ = `after:${fmtDate(START)} older_than:1d`;
@@ -128,7 +164,7 @@ serve(async (req) => {
             pageToken = listJson.nextPageToken;
             const rows: any[] = [];
             for (const id of ids) {
-              const det = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc&metadataHeaders=Bcc&metadataHeaders=Subject&metadataHeaders=Date`, { headers: { Authorization: `Bearer ${accessToken}` } });
+            const det = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc&metadataHeaders=Bcc&metadataHeaders=Date`, { headers: { Authorization: `Bearer ${accessToken}` } });
               if (!det.ok) continue;
               const msg: any = await det.json();
               const headers = parseHeaders(msg.payload?.headers || []);
@@ -140,7 +176,7 @@ serve(async (req) => {
               const sentAt = (headers['date'] ? new Date(headers['date']) : null)?.toISOString() ?? null;
               rows.push({ user_id: userId, gmail_message_id: msg.id, thread_id: msg.threadId, from_email: from, to_emails: to, cc_emails: cc, bcc_emails: bcc, subject, body_text: null, body_html: null, sent_at: sentAt, updated_at: ts() });
             }
-            if (rows.length) await supabase.from('g_emails').upsert(rows, { onConflict: 'gmail_message_id' });
+            if (rows.length) await supabase.from('gsync.g_emails').upsert(rows, { onConflict: 'user_id,gmail_message_id' } as any);
             processed += rows.length;
             if (!pageToken || processed >= MAX) break;
             await sleep(120);
@@ -153,7 +189,7 @@ serve(async (req) => {
 
       // 2) Calendar: ingest last 24h events
       try {
-        const timeMin = since.toISOString();
+        const timeMin = sinceEvent.toISOString();
         const timeMax = now.toISOString();
         let pageToken: string | undefined = undefined;
         let processed = 0;
@@ -189,18 +225,87 @@ serve(async (req) => {
               updated_at: ts(),
             };
           });
-          if (rows.length) await supabase.from('g_events').upsert(rows, { onConflict: 'user_id,google_calendar_id,google_event_id' } as any);
+          if (rows.length) await supabase.from('gsync.g_events').upsert(rows, { onConflict: 'user_id,google_event_id' } as any);
           processed += rows.length;
           await sleep(150);
         } while (pageToken);
         await sendConsole(supabase, userId, runId, `Daily Calendar: upserted ~${processed} events`, 'info', 'calendar');
+        try {
+          await supabase
+            .from('gsync.google_sync_history')
+            .insert({
+              user_id: userId,
+              start_of_sync_period: sinceEvent.toISOString(),
+              end_of_sync_period: now.toISOString(),
+              object_type: 'event',
+              headers_fetched: processed,
+              headers_fetch_successful: true,
+              initiator: 'system',
+              started_at: ts(),
+            } as any);
+        } catch {}
       } catch (e) {
         await sendConsole(supabase, userId, runId, `Daily Calendar failed: ${e instanceof Error ? e.message : String(e)}`,'error','calendar');
       }
 
+      // Calendar: refresh matching views and backfill from view (attachments)
+      try {
+        try { await supabase.from('gsync.google_sync_history').insert({ user_id: userId, start_of_sync_period: sinceEvent.toISOString(), end_of_sync_period: now.toISOString(), object_type: 'event', initiator: 'system', started_at: ts() } as any); } catch {}
+        try { await supabase.from('gsync.refresh_calendar_matching_views' as any); } catch {}
+        const CALB = Math.max(1, Math.min(200, Number(Deno.env.get('DAILY_GCAL_BACKFILL') || 50)));
+        const { data: evs } = await supabase
+          .from('gsync.g_events_full_bodies_to_download')
+          .select('user_id, google_event_id, google_calendar_id')
+          .eq('user_id', userId)
+          .limit(CALB);
+        let evUpd = 0;
+        for (const r of (evs || [])) {
+          const eid = (r as any).google_event_id as string;
+          const calId = (r as any).google_calendar_id || CALENDAR_ID;
+          if (!eid) continue;
+          const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events/${encodeURIComponent(eid)}`);
+          const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+          if (!resp.ok) continue;
+          const ev: any = await resp.json();
+          const summary = ev.summary || null;
+          const description = ev.description || null;
+          await supabase.from('gsync.g_events').update({ summary, description, updated_at: ts() }).eq('user_id', userId).eq('google_calendar_id', calId).eq('google_event_id', eid);
+          const atts: any[] = Array.isArray(ev.attachments) ? ev.attachments : [];
+          if (atts.length) { try { await supabase.storage.createBucket('gcal-attachments', { public: false }); } catch {} }
+          for (const a of atts) {
+            const fid = a.fileId as string | undefined;
+            let storagePath: string | null = null;
+            if (fid) {
+              const driveUrl = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fid)}?alt=media`;
+              const dres = await fetch(driveUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
+              if (dres.ok) {
+                const blob = await dres.blob();
+                const safe = (a.title || fid || 'attachment').replace(/[^a-zA-Z0-9._-]+/g, '_');
+                const key = `${userId}/${calId}/${eid}/${fid}-${safe}`;
+                await supabase.storage.from('gcal-attachments').upload(key, blob, { upsert: true, contentType: (a.mimeType || undefined) as any });
+                storagePath = key;
+              }
+            }
+            await supabase.from('gsync.g_event_attachments').upsert({
+              user_id: userId,
+              google_calendar_id: calId,
+              google_event_id: eid,
+              title: a.title || null,
+              mime_type: a.mimeType || null,
+              file_url: a.fileUrl || null,
+              file_id: a.fileId || null,
+              icon_link: a.iconLink || null,
+              storage_path: storagePath,
+            } as any, { onConflict: 'user_id,google_calendar_id,google_event_id,file_id' } as any);
+          }
+          evUpd++;
+        }
+        if (evUpd < CALB) { try { await supabase.from('gsync.refresh_events_with_people_ids' as any); } catch {} }
+      } catch {}
+
       // 2b) Calendar backlog catch-up older than 24h
       try {
-        const { data: settings } = await supabase.from('google_sync_settings').select('sync_start_date').eq('user_id', userId).single();
+        const { data: settings } = await supabase.from('gsync.google_sync_settings').select('sync_start_date').eq('user_id', userId).single();
         const START = settings?.sync_start_date ? new Date(settings.sync_start_date) : null;
         if (START) {
           const timeMin = new Date(Date.UTC(START.getUTCFullYear(), START.getUTCMonth(), START.getUTCDate())).toISOString();
@@ -229,7 +334,7 @@ serve(async (req) => {
               const attendeeEmails = (e.attendees || []).map((a: any) => (a?.email || '').toLowerCase()).filter(Boolean);
               return { user_id: userId, google_calendar_id: CALENDAR_ID, google_event_id: e.id, summary: e.summary || null, description: e.description || null, start_time: start, end_time: end, organizer_email: e.organizer?.email || null, attendees: attendeeEmails.length ? attendeeEmails : null, location: e.location || null, status: e.status || null, updated_at: ts() };
             });
-            if (rows.length) await supabase.from('g_events').upsert(rows, { onConflict: 'user_id,google_calendar_id,google_event_id' } as any);
+            if (rows.length) await supabase.from('gsync.g_events').upsert(rows, { onConflict: 'user_id,google_event_id' } as any);
             processed += rows.length;
             if (!pageToken || processed >= MAX) break;
             await sleep(120);
@@ -256,7 +361,7 @@ serve(async (req) => {
         const token2 = await getValidAccessTokenOrThrow(supabase, userId);
         // Note: select rows missing subject OR body_text
         const { data: rows } = await supabase
-          .from('g_emails')
+          .from('gsync.g_emails')
           .select('gmail_message_id, matched_educator_ids, subject, body_text')
           .eq('user_id', userId)
           .or('subject.is.null,body_text.is.null')
@@ -297,7 +402,7 @@ serve(async (req) => {
             return { text: text || undefined, html: html || undefined, attachments };
           };
           const bodies = extractParts(full.payload);
-          await supabase.from('g_emails').update({ subject: subject || (r as any).subject || null, body_text: bodies.text || null, body_html: bodies.html || null, updated_at: ts() }).eq('user_id', userId).eq('gmail_message_id', mid);
+          await supabase.from('gsync.g_emails').update({ subject: subject || (r as any).subject || null, body_text: bodies.text || null, body_html: bodies.html || null, updated_at: ts() }).eq('user_id', userId).eq('gmail_message_id', mid);
           try { await supabase.storage.createBucket('gmail-attachments', { public: false }); } catch {}
           for (const a of (bodies.attachments || [])) {
             if (!a.id) continue;
@@ -308,7 +413,7 @@ serve(async (req) => {
             const bin = Uint8Array.from(atob(contentBase64), c => c.charCodeAt(0));
             const key = `${userId}/${mid}/${a.id}-${(a.filename || 'attachment').replace(/[^a-zA-Z0-9._-]+/g,'_')}`;
             await supabase.storage.from('gmail-attachments').upload(key, new Blob([bin], { type: a.mimeType || 'application/octet-stream' }), { upsert: true });
-            await supabase.from('g_email_attachments').upsert({
+            await supabase.from('gsync.g_email_attachments').upsert({
               user_id: userId,
               gmail_message_id: mid,
               attachment_id: a.id,
@@ -323,14 +428,25 @@ serve(async (req) => {
           if (done % 10 === 0) await sleep(100);
         }
         await sendConsole(supabase, userId, runId, `Daily Backfill: updated ${done} messages`, 'info', 'gmail');
+        try {
+          await supabase
+            .from('gsync.google_sync_history')
+            .insert({
+              user_id: userId,
+              start_of_sync_period: since.toISOString(),
+              end_of_sync_period: now.toISOString(),
+              object_type: 'email',
+              backfill_downloads: done,
+              backfill_download_successful: true,
+              initiator: 'system',
+              started_at: ts(),
+            } as any);
+        } catch {}
       } catch (e) {
         await sendConsole(supabase, userId, runId, `Daily backfill failed: ${e instanceof Error ? e.message : String(e)}`,'error','gmail');
       }
 
-      // If explicitly queued, mark as done
-      if (queuedSet.has(userId)) {
-        try { await supabase.from('sync_catchup_requests').update({ status: 'done', processed_at: ts(), last_error: null } as any).eq('user_id', userId); } catch {}
-      }
+      // No catch-up queue to update
       usersProcessed++;
       await sleep(100);
     }

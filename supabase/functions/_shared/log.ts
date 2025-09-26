@@ -13,12 +13,10 @@ export async function sendConsole(
   level: 'info' | 'milestone' | 'error' = 'info',
   syncType: 'gmail' | 'calendar' = 'gmail'
 ) {
-  await supabase
-    .from('google_sync_messages')
-    .insert({ user_id: userId, run_id: runId, message, level, sync_type: syncType, created_at: ts() });
+  // Messages table was removed; fall back to console logging only
+  try { console.log(`[${syncType}] ${level}:`, message, { userId, runId, at: ts() }); } catch {}
 }
 
 export function logDebugErr(...args: any[]) {
   try { console.error('[debug-err]', ...args); } catch {}
 }
-

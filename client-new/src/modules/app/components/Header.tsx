@@ -3,6 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { useAuth } from '../../auth/auth-context';
 import wildflowerLogo from '@/assets/wildflower-logo.jpeg';
 import { Button } from '@/components/ui/button';
+import { DeveloperNoteModal } from './DeveloperNoteModal';
 
 type NavItem = {
   label: string;
@@ -11,6 +12,7 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
+  { label: 'Dashboard', href: '/dashboard', match: /^\/(dashboard)?$/ },
   { label: 'Educators', href: '/educators', match: /^\/educators/ },
   { label: 'Schools', href: '/schools', match: /^\/schools/ },
   { label: 'Charters', href: '/charters', match: /^\/charters/ },
@@ -19,6 +21,7 @@ const NAV_ITEMS: NavItem[] = [
 export function Header() {
   const { user, signOut } = useAuth();
   const [location] = useLocation();
+  const [noteOpen, setNoteOpen] = React.useState(false);
 
   return (
     <header className="app-header">
@@ -46,9 +49,21 @@ export function Header() {
         })}
       </nav>
 
-      <div className="app-header__account">
+      <div className="app-header__account" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {user ? (
           <>
+            <button
+              type="button"
+              title="Add Developer Note"
+              aria-label="Add Developer Note"
+              onClick={() => setNoteOpen(true)}
+              style={{
+                border: 'none', background: 'transparent', cursor: 'pointer',
+                color: '#0f172a', padding: 6, borderRadius: 6
+              }}
+            >
+              <DeltaIcon />
+            </button>
             <Link href="/settings" className="app-header__settings" aria-label="Settings">
               <SettingsIcon />
             </Link>
@@ -65,6 +80,8 @@ export function Header() {
           </Link>
         )}
       </div>
+
+      <DeveloperNoteModal open={noteOpen} onClose={() => setNoteOpen(false)} />
     </header>
   );
 }
@@ -90,6 +107,15 @@ function SettingsIcon() {
         stroke="currentColor"
         strokeWidth="1.2"
       />
+    </svg>
+  );
+}
+
+function DeltaIcon() {
+  // Simple triangle/delta icon
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 3l9 18H3L12 3z" />
     </svg>
   );
 }

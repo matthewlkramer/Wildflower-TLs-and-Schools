@@ -5,7 +5,7 @@ export function useGridEducators() {
   return useQuery({
     queryKey: ['view/grid_educator', 'all'],
     queryFn: async () => {
-      const pageSize = 1000;
+      const pageSize = 5000;
       const all: any[] = [];
       let from = 0;
       // Use a stable order to avoid duplicates across pages

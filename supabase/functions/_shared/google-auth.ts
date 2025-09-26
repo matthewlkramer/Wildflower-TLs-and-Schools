@@ -26,20 +26,23 @@ export async function exchangeCode(supabase: SupabaseClient, code: string, userI
   });
 
   const expiresAt = new Date(Date.now() + (token.expires_in ?? 3600) * 1000).toISOString();
-  await supabase.from('google_auth_tokens').upsert({
+  // Caller must pass a schema-bound client: db.schema = 'gsync'
+  const { error } = await supabase.from('google_auth_tokens').upsert({
     user_id: userId,
     access_token: token.access_token,
     refresh_token: token.refresh_token,
     expires_at: expiresAt,
     updated_at: ts(),
   });
+  if (error) throw new Error(`save tokens failed: ${error.message}`);
   return { ok: true };
 }
 
 export async function refreshAccessToken(supabase: SupabaseClient, userId: string) {
   const clientId = Deno.env.get('GOOGLE_CLIENT_ID') ?? '';
   const clientSecret = Deno.env.get('GOOGLE_CLIENT_SECRET') ?? '';
-  const { data } = await supabase.from('google_auth_tokens').select('refresh_token').eq('user_id', userId).single();
+  const { data, error: selErr } = await supabase.from('google_auth_tokens').select('refresh_token').eq('user_id', userId).single();
+  if (selErr) throw new Error(`read refresh token failed: ${selErr.message}`);
   if (!data?.refresh_token) throw new Error('No refresh token');
   const token = await fetchToken({
     client_id: clientId,
@@ -48,13 +51,14 @@ export async function refreshAccessToken(supabase: SupabaseClient, userId: strin
     grant_type: 'refresh_token',
   });
   const expiresAt = new Date(Date.now() + (token.expires_in ?? 3600) * 1000).toISOString();
-  await supabase.from('google_auth_tokens').upsert({
+  const { error: upErr } = await supabase.from('google_auth_tokens').upsert({
     user_id: userId,
     access_token: token.access_token,
     refresh_token: data.refresh_token,
     expires_at: expiresAt,
     updated_at: ts(),
   });
+  if (upErr) throw new Error(`save refreshed token failed: ${upErr.message}`);
   return token.access_token as string;
 }
 
@@ -73,4 +77,3 @@ export async function getValidAccessTokenOrThrow(supabase: SupabaseClient, userI
   if (!tok) throw new Error('No valid access token');
   return tok;
 }
-

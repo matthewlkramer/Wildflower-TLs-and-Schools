@@ -13,12 +13,13 @@ export interface KanbanBoardProps<T> {
   getId: (item: T) => string;
   renderCard: (item: T) => React.ReactNode;
   onItemMove?: (opts: { id: string; from: string; to: string }) => void | Promise<void>;
+  onCardClick?: (item: T) => void;
   emptyText?: string;
   initialCollapsedKeys?: string[];
 }
 
 export function KanbanBoard<T>(props: KanbanBoardProps<T>) {
-  const { items, columns, groupBy, getId, renderCard, onItemMove, emptyText, initialCollapsedKeys } = props;
+  const { items, columns, groupBy, getId, renderCard, onItemMove, onCardClick, emptyText, initialCollapsedKeys } = props;
 
   const groups = useMemo(() => {
     const map = new Map<string, T[]>();
@@ -51,11 +52,13 @@ export function KanbanBoard<T>(props: KanbanBoardProps<T>) {
   };
 
   const dndEnabled = !!onItemMove;
+  const draggingRef = useRef(false);
   const onDragStart = (e: React.DragEvent, item: T, from: string) => {
     if (!dndEnabled) return;
     const id = getId(item);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', JSON.stringify({ id, from }));
+    draggingRef.current = true;
   };
   const onDragOver = (e: React.DragEvent) => { if (dndEnabled) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; } };
   const onDrop = (e: React.DragEvent, to: string) => {
@@ -68,7 +71,11 @@ export function KanbanBoard<T>(props: KanbanBoardProps<T>) {
       if (from === to) return;
       onItemMove && onItemMove({ id, from, to });
     } catch {}
+    finally {
+      draggingRef.current = false;
+    }
   };
+  const onDragEnd = () => { draggingRef.current = false; };
 
   // Basic inline style approximations (no Tailwind here)
   const colStyle = (isCollapsed: boolean): React.CSSProperties => ({
@@ -114,7 +121,16 @@ export function KanbanBoard<T>(props: KanbanBoardProps<T>) {
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {sorted.map((item) => (
-                        <div key={getId(item)} style={{ position: 'relative', background: '#fff', border: '1px solid #e2e8f0', borderRadius: 6, padding: 8, cursor: dndEnabled ? 'grab' : 'default' }} draggable={dndEnabled} onDragStart={(e) => onDragStart(e, item, col.key)}>
+                        <div
+                          key={getId(item)}
+                          style={{ position: 'relative', background: '#fff', border: '1px solid #e2e8f0', borderRadius: 6, padding: 8, cursor: onCardClick ? 'pointer' : (dndEnabled ? 'grab' : 'default') }}
+                          draggable={dndEnabled}
+                          onDragStart={(e) => onDragStart(e, item, col.key)}
+                          onDragEnd={onDragEnd}
+                          onClick={() => { if (!draggingRef.current && onCardClick) onCardClick(item); }}
+                          role={onCardClick ? 'button' as any : undefined}
+                          tabIndex={onCardClick ? 0 : undefined}
+                        >
                           {renderCard(item)}
                         </div>
                       ))}

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase/client';
+import { supabase, fromGsync } from '@/lib/supabase/client';
 import { useAuth } from '../../auth/auth-context';
 import { GoogleSyncSection, type GoogleSyncNotification, type GoogleSyncSummary } from '../components/GoogleSyncSection';
 
@@ -41,8 +41,9 @@ const valueStyle: React.CSSProperties = {
 const buttonStyle: React.CSSProperties = {
   padding: '6px 10px',
   borderRadius: 4,
-  border: '1px solid #cbd5f5',
-  background: '#f8fafc',
+  border: '1px solid #cbd5e1',
+  background: '#ffffff',
+  color: '#0f172a',
   fontSize: 13,
 };
 
@@ -91,7 +92,7 @@ export function SettingsPage() {
     let cancelled = false;
     (async () => {
       try {
-        const { data } = await (supabase.from as any)('google_sync_settings')
+        const { data } = await (fromGsync('google_sync_settings') as any)
           .select('sync_start_date')
           .eq('user_id', user.id)
           .maybeSingle();
@@ -112,23 +113,18 @@ export function SettingsPage() {
     try {
       setSavingSync(true);
       const iso = new Date(`${syncStart}T00:00:00Z`).toISOString();
-      const { data: current } = await (supabase.from as any)('google_sync_settings')
+      const { data: current } = await (fromGsync('google_sync_settings') as any)
         .select('sync_start_date')
         .eq('user_id', user.id)
         .maybeSingle();
       const previousIso: string | null = current?.sync_start_date ?? null;
       const movedEarlier = !previousIso || new Date(iso) < new Date(previousIso);
-      const { error } = await (supabase.from as any)('google_sync_settings')
+      const { error } = await (fromGsync('google_sync_settings') as any)
         .upsert({ user_id: user.id, sync_start_date: iso });
       if (error) throw error;
       showBanner({ type: 'info', text: 'Sync start date saved.' });
       if (movedEarlier) {
-        try {
-          await (supabase.from as any)('sync_catchup_requests').upsert({ user_id: user.id, status: 'queued' });
-          showBanner({ type: 'info', text: 'Catch-up queued. Historical ingest will run automatically.' });
-        } catch (err: any) {
-          showBanner({ type: 'error', text: err?.message || 'Failed to queue catch-up request.' });
-        }
+        showBanner({ type: 'info', text: 'Start date moved earlier. Use Fetch to backfill.' });
       }
     } catch (e: any) {
       showBanner({ type: 'error', text: e?.message || 'Unable to save sync start date.' });
@@ -238,6 +234,7 @@ export function SettingsPage() {
           <GoogleSyncSection
             onNotify={showBanner}
             onSyncSummary={(summary) => setSyncSummary(summary)}
+            syncStartIso={syncStart ? `${syncStart}T00:00:00Z` : undefined}
           />
         </section>
       </div>

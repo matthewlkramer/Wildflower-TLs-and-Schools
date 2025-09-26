@@ -53,6 +53,7 @@ export function mergeTableColumnMeta(options: {
     lookup: manual?.lookup,
     reference: manual?.reference,
     edit: manual?.edit,
+    update: (manual as any)?.update,
     writeTo: manual?.writeTo,
   };
 

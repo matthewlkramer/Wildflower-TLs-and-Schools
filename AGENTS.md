@@ -1,155 +1,147 @@
-# Wildflower TLs & Schools — Agents Guide
+# Wildflower TLs & Schools – Agents Guide
 
-This document orients contributors and automation/AI agents to work safely and effectively in this codebase.
+This document orients contributors and automation/AI agents so they work safely and effectively in the current codebase.
 
 ## Overview
 
-- Stack: React + Vite (client), Express (server), Airtable (primary data), Supabase (Auth + Google sync storage + Edge Functions).
-- Purpose: End-to-end management of teachers/educators, schools, charters, and loans with Airtable as the system of record. Optional per-user Gmail/Calendar sync in Supabase.
+- **Stack**: React 18 + Vite (front-end in client-new/), Supabase (Auth, Google sync data + Edge Functions).
+- **Purpose**: Manage teachers/educators, schools, charter pipelines, and loans via Supabase.
 
 ## Architecture
 
-- `client/`: React app served via Vite in development and built into `dist/public` for production.
-- `server/`: Express server providing REST API for Airtable-backed entities and serving the client app.
-- `shared/`: Type definitions and constants shared across server/client.
-- `supabase/`: CLI config, SQL migrations, and Edge Functions for `gmail-sync` and `gcal-sync`.
-- `google/`: Original Google Sync dashboard source (mirrored under `client/src/components/google`).
-- `scripts/`: Node utility scripts (e.g., seeding email filter addresses into Supabase).
+- client-new/: Primary front-end. Vite app with React Query, AG Grid Enterprise (dynamic registration), shared layout/components, and a growing shared module surface (src/modules/shared).
+  - src/modules/*: Feature modules (educators, schools, charters) hold API hooks, constants, pages, and shared helpers.
+  - src/modules/shared/detail-types.ts: Canonical typings for grid/detail configs.
+  - src/modules/shared/detail-presets.ts: Reusable presets for table actions/columns.
+  - src/modules/shared/details-renderer.tsx: Generic renderer powering module detail views (map blocks now embed Google Maps if coordinates/address are present).
+- client/: Previous SPA (kept for reference / gradual migration).
+- server/: Express API serving Airtable data and legacy UIs.
+- supabase/: CLI config, SQL migrations, and Edge Functions (gmail-sync, gcal-sync).
+- scripts/: Node utilities (e.g., sync-email-filter-to-supabase.ts).
+- google/: Original Google Sync dashboard mirrored from the legacy client (client/).
 
-## Directory Map (selected)
+## Directory Map (selected client-new/ paths)
 
-- `client/src/pages/login.tsx`: Google SSO login page.
-- `client/src/pages/reset.tsx`: Password reset page (Supabase recovery token flow).
-- `client/src/pages/google-sync.tsx`: Renders the Google Sync dashboard (optional module).
-- `client/src/components/google/GoogleSyncDashboard.tsx`: In-app dashboard UI for Gmail/Calendar sync.
-- `client/src/components/header.tsx`: Global header; shows user email and Sign out.
-- `client/src/contexts/auth-context.tsx`: Supabase Auth provider; enforces `@wildflowerschools.org` domain.
-- `server/index.ts`, `server/routes.ts`, `server/vite.ts`: Express setup and API routes.
-- `server/cache.ts`, `server/logger.ts`: Request logging and in-memory caching for snappy reads.
-- `shared/schema.ts`: Types for Airtable entities and legacy mappings.
-- `supabase/migrations/0001_init.sql`: Tables for tokens, progress, logs, emails, and events.
-- `supabase/functions/gmail-sync`, `supabase/functions/gcal-sync`: Edge Functions for OAuth + sync control.
-- `scripts/sync-email-filter-to-supabase.ts`: Populate `email_filter_addresses` from Airtable.
+- src/App.tsx: App shell (initialises AG Grid modules via initAgGridEnterprise).
+- src/modules/educators/*: Educator list/detail/Kanban pages, Supabase queries, helper utilities.
+- src/modules/schools/*: Schools list/detail/Kanban; mirrors educator module patterns.
+- src/modules/charters/*: Charter list/detail/Kanban; tabs described by constants.ts and rendered via the shared renderer.
+- src/modules/shared/detail-presets.ts: Shared row/table action presets & column lists (used by all modules).
+- src/modules/shared/details-renderer.tsx: Generic detail renderer (cards/tables/maps) that consumes each module's DetailTabSpec.
+
+Legacy locations (still referenced by older flows):
+- client/src/...: Old React app + components.
+- server/routes.ts: Airtable-backed REST endpoints.
 
 ## Local Development
 
-- Requirements: Node 18+, pnpm/npm, Supabase CLI (via `npx supabase`).
-- Run dev server: `npm run dev` (Express + Vite middleware).
-- Build: `npm run build` (builds client and bundles server into `dist/`).
-- Server bundle: If you change files in `server/` or `shared/`, run `node api/build-server.mjs` (or `npm run build:vercel`) before committing so `api/_server` stays current.
-- Start prod build: `npm run start`.
+- Requirements: Node 18+, npm, Supabase CLI (
+px supabase).
+- Front-end dev server: cd client-new && npm run dev (Vite + Supabase auth).
+- Typecheck: cd client-new && npm run typecheck (tsc --noEmit).
+- Front-end build: cd client-new && npm run build (outputs to dist/).
+- Legacy server: 
+pm run dev (runs Express + legacy client) – only needed if you still interact with the old client/ UI.
 
-## Environments & Secrets
+> **Note**: Keep client-new’s tsconfig.json in sync with workspace tooling. The root 
+pm run check is no longer wired; run checks inside client-new.
 
-Client (`.env.local`):
-- `VITE_SUPABASE_URL` — Supabase project URL.
-- `VITE_SUPABASE_ANON_KEY` — Supabase anonymous key.
+## Environment & Secrets
 
-Server/scripts (`.env`):
-- Airtable creds already used by the server storage layer.
-- `SUPABASE_URL` — used by scripts.
-- `SUPABASE_SERVICE_ROLE_KEY` — used by scripts (do not expose to client).
+Client (client-new/.env.local):
+- VITE_SUPABASE_URL
+- VITE_SUPABASE_ANON_KEY
+- VITE_AG_GRID_LICENSE_KEY
 
-Supabase Edge Functions (set via CLI secrets):
-- Auto-injected: `SUPABASE_URL`, `SUPABASE_ANON_KEY` (from the project; do not set via CLI).
-- Set via CLI: `SERVICE_ROLE_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`.
+Server / legacy scripts (.env):
+- Airtable API key, base IDs.
+- SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (scripts + functions deployment).
 
-CLI secrets:
-- `npx supabase secrets set SERVICE_ROLE_KEY=... GOOGLE_CLIENT_ID=... GOOGLE_CLIENT_SECRET=... GOOGLE_REDIRECT_URI=...`
-- Note: the CLI rejects names starting with `SUPABASE_`.
+Supabase Edge Functions secrets (via CLI):
+- SERVICE_ROLE_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI (Supabase injects SUPABASE_URL / SUPABASE_ANON_KEY).
 
 ## Authentication
 
-- Supabase Auth with Google SSO; login at `/login`.
-- Domain restriction: only `@wildflowerschools.org` accounts are allowed; others are signed out.
-- Global route guard: unauthenticated users are redirected to `/login` (except `/reset`).
-- Header shows the signed-in email with a dropdown (Settings, Sign out).
-- Password reset flow:
-  - Settings → “Send password reset email” → link opens `/reset`.
-  - `/reset` consumes recovery tokens from the URL hash, lets user set a new password, then redirects to `/login`.
+- Supabase Auth + Google SSO. client-new enforces @wildflowerschools.org via auth context.
+- Unauthenticated users redirected to /login; /reset handles password reset tokens.
+- Ensure front-end requests include Supabase auth headers where required (e.g., invoking Edge Functions).
 
-## Core App (Teachers, Schools, Charters, Loans)
+## Core Modules (client-new)
 
-- Lists:
-  - Teachers/Educators, Schools, Charters pages render ag‑grid tables with sorting and header type‑ahead search.
-  - “My records” toggle (header) scopes data to the current user via `@/contexts/user-filter-context`.
-  - “Add New” triggers creation modals or navigates to create forms depending on section.
-- Detail Views:
-  - Show core fields, related data (e.g., educator↔school associations), and notes.
-  - Edit actions call server `/api/...` endpoints; server invalidates caches; client updates React Query caches.
-- Validation:
-  - Server validates payloads with zod schemas derived from `shared/schema.ts` (and `@shared/loan-schema`).
-- Loans:
-  - Includes applications, payments, documents, covenants, committee reviews, templates, and generated documents (see `server/routes.ts`).
+- **Educators, Schools, Charters**
+  - constants.ts: Declarative grid + detail tab configs. Grids use sortKey to make the column for sorting in table view and kanbanKey to mark the column that powers the Kanban grouping.
+  - pi/queries.ts: Supabase-backed data fetch (paginated helper for large views).
+  - pages/*: React pages; list pages use GridBase; detail pages use the shared renderer.
+  - pages/*KanbanPage.tsx: Generic Kanban board using KanbanBoard + constants-defined grouping.
+  - Shared presets (ROW_ACTIONS, TABLE_ACTIONS, TABLE_COLUMNS) keep action arrays consistent without altering feature content.
+- **Details Renderer**
+  - Cards render inline editing (delegated to module save helpers).
+  - Tables fetch up to 200 rows from Supabase (respecting schema/table validators).
+  - Map blocks embed Google Maps when lat/lng or address fields are present.
 
-## AG Grid 
+## AG Grid
 
-- Initialization: Centralized in `client/src/lib/ag-grid-enterprise.ts:5` via `initAgGridEnterprise()`; called once at app start in `client/src/App.tsx:74`.
-- Community module: Always registers `AllCommunityModule` so community features work everywhere.
-- Enterprise modules: Dynamically imported and registered (Set Filter, SideBar, Columns/Filters tool panels, Menu). No per-grid registration needed.
-- License: Optional. If `VITE_AG_GRID_LICENSE_KEY` is set, it is applied; without it, enterprise modules still register (useful in dev), but AG Grid may show a watermark.
-- Feature flag hook: `client/src/hooks/use-aggrid-features.ts:4` exposes `{ entReady, filterForText }` where `filterForText` resolves to `"agSetColumnFilter"` when enterprise is ready, otherwise `"agTextColumnFilter"`.
-- Grid wrapper: Use `client/src/components/shared/GridBase.tsx:14` and defaults from `client/src/components/shared/ag-grid-defaults.ts:3` and `client/src/components/shared/ag-grid-defaults.ts:11` for consistent config (theme, row heights, selection, etc.).
-- Theme: We use `themeMaterial` from `ag-grid-community` with `ag-theme-material` container class.
-- Typical usage: Set column `filter: filterForText` for text columns; numeric/date columns can still specify explicit filters.
-- Common error 200: “SetFilterModule is not registered” occurs if modules aren’t registered before grid mounts. Our init runs in `AppContent` so don’t re‑register in components; just consume `filterForText` or check `entReady`.
-- Example column: `{ field: 'name', headerName: 'Name', filter: filterForText }` guards enterprise set filter safely.
+- Initialisation: client-new/src/lib/ag-grid-enterprise.ts (called in App.tsx).
+- Use GridBase + g-grid-defaults.ts for consistent theming/behaviour.
+- ilterForText hook toggles enterprise/community filter automatically.
+- When adding filters, prefer using shared presets or type-specific settings (e.g., ilter: filterForText).
 
 ## Google Sync
 
-- Edge Functions: `gmail-sync` and `gcal-sync` in `supabase/functions/`.
-- Storage schema (Supabase):
-  - `google_auth_tokens` — per-user Google OAuth tokens.
-  - `google_sync_messages` — log stream consumed by the dashboard.
-  - `g_email_sync_progress` — Gmail weekly progress per user.
-  - `g_event_sync_progress` — Calendar monthly progress per user/calendar.
-  - `g_emails`, `g_events` — normalized storage for messages/events.
-  - `email_filter_addresses` — list of addresses to match/allowlist (seeded from Airtable).
-- Dashboard: `/google-sync` integrates realtime and polling on the above tables.
-- Current state: “start_sync” endpoints update status and logs (safe placeholders). Extend to full ingestion by calling Google APIs and writing into `g_emails`/`g_events`.
+- Edge Functions manage OAuth & sync state; Supabase tables (g_emails, g_events) surface data to the UI.
+- Front-end modules reuse presets to show Gmail/Calendar tables within detail tabs.
+- When extending: handle Supabase auth tokens, respect xclude_from_calendar_logging, and write activity back to Supabase tables.
 
 ## Data Sources
 
-- Airtable: primary system of record for schools/teachers; accessed via `server/simple-storage.ts` and Airtable schema mappings in `shared/`.
-- Supabase: auxiliary system for Auth + Gmail/Calendar sync data. Keep it isolated from Airtable content.
-
-## Server APIs & Storage
-
-- Endpoints: see `server/routes.ts` (e.g., `/api/educators`, `/api/schools`, `/api/charters`, loan routes, etc.).
-- Storage: `server/simple-storage.ts` maps Airtable records to `shared/schema.ts` types; methods include full CRUD for major entities.
-- Caching: `server/cache.ts` memoizes frequently used datasets; routes invalidate relevant cache keys on mutation.
+- Supabase stores authentication state, Google sync artifacts, authoritative source of data and module-specific denormalised views (details_*, grid_*).
 
 ## Common Tasks
 
-- Link to Supabase project: `npm run supabase:link`
-- Push DB schema: `npm run supabase:db:push`
-- Deploy functions: `npm run supabase:functions:deploy`
-- Seed email filter from Airtable: `npm run sync:email-filter`
+- Typecheck front-end: cd client-new && npm run typecheck.
+- Run front-end tests (if added): npm run test (configure within client-new).
+- Deploy Edge Functions: 
+pm run supabase:functions:deploy (set secrets first).
+- Sync email filters: 
+pm run sync:email-filter (requires .env + Airtable access).
 
-## Conventions
+## Conventions & Guidelines
 
-- Keep changes minimal and focused; avoid unrelated refactors.
-- Prefer SQL migrations in `supabase/migrations/` over ad‑hoc schema changes.
-- Do not hardcode secrets; use `.env`, client `VITE_*` vars, or Supabase CLI secrets.
-- Client-only code must import from `client/src/...` (avoid reaching outside Vite root).
-- Use TypeScript across client/server; align types with `shared/` when applicable.
+- **Module-first structure**: For new feature work, create/extend modules under client-new/src/modules/* rather than scattering components.
+- **Shared presets**: Use detail-presets.ts for repeated action/column arrays; extend it carefully so existing modules retain semantics.
+- **Avoid unwanted refactors**: When modifying constants.ts, preserve existing tab ordering/field groupings unless explicitly asked.
+- **Testing**: Always run pnpm run typecheck when touching TypeScript-heavy modules. Add unit/integration tests under client-new/src as we expand coverage.
+- **Maps**: Map blocks expect [latField, lngField, addressField]. Provide data in Supabase views to enable map previews.
 
 ## Deployment
 
-- Build the app: `npm run build` → server at `dist/index.js`, static assets at `dist/public`.
-- Run Express in production: `npm run start` (ensure `.env` exists on the host).
-- Supabase Functions: deploy with `npx supabase functions deploy gmail-sync gcal-sync` after setting secrets.
+- Front-end build output: client-new/dist/ (serve via Vercel)
+- Edge Functions: 
+px supabase functions deploy gmail-sync gcal-sync.
 
 ## Troubleshooting
 
-- Supabase link error about Postgres version: set the `major_version` in `supabase/config.toml` to match the project and retry `link`/`db push`.
-- CLI skips `SUPABASE_*` secrets: expected; use `SERVICE_ROLE_KEY` and let Supabase inject `SUPABASE_URL/ANON_KEY`.
-- OAuth redirect errors: ensure Google Console has callback `https://<project>.supabase.co/auth/v1/callback` and Supabase Auth “Site URL/Redirects” include your app’s URL.
-- Client 401s to functions: ensure the user is signed in (Supabase JWT) before calling `supabase.functions.invoke`.
+- **Typecheck fails with missing tsconfig**: Run pnpm run typecheck inside client-new (root script is deprecated).
+- **AG Grid “module not registered” errors**: Ensure initAgGridEnterprise runs before grids mount.
+- **Supabase 401**: Confirm auth context has a session; re-login or refresh tokens as needed.
+- **Google map block blank**: Ensure Supabase view exposes numeric lat/lng or a non-empty address.
 
-## Roadmap Hints (for agents)
+## Roadmap Hints
 
-- Implement full Gmail ingestion (list → headers → bodies) into `g_emails`; respect `email_filter_addresses`.
-- Implement Calendar ingestion into `g_events` with monthly progress updates and sync tokens.
-- Extend the dashboard to show per-period progress bars and error drilldowns.
-- Add server-side protection using Supabase JWT verification if exposing custom API endpoints.
+- Expand Supabase functions for full Gmail/Calendar ingestion and error handling.
+- Add module-level tests (React Testing Library + Vitest) once critical flows stabilise.
+- Gradually migrate remaining shared utilities from client/ to client-new or client-new/src/modules/shared.
+## Recent Updates (2025-09)
+
+- Detail pages now read `action`/`section` query params via `useDetailIntent`, which drives default tab selection and can auto-open inline edit or fire a table row action.
+- Main AG Grid list pages share `GridRowActionsCell` for inline edit/view/email/add note/add task/archive shortcuts; archive uses the base tables (`people`, `schools`, `charters`).
+- `details-renderer.tsx` handles forced card edit and initial row actions; check `DetailActionPreset` when adding new tables so dropdowns stay in sync.
+- Global styling lives in `client-new/src/styles/global.css` (subtle blue/gray theme borrowed from the legacy client).
+
+## Outstanding Follow-ups
+
+- Hook `add_note`/`add_task` from the list dropdown directly into the preset modal/create flow instead of just navigating.
+- Migrate remaining charter tables that still rely on `createRowActions(...)` (authorizer actions, governance docs/990s, reports/metrics, grants, loans) to the shared presets so they inherit toggle/archive behaviour.
+- Review Supabase mutation targets for archive toggles on grid_* views before enabling for end users.
+
+

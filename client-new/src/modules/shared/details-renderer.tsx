@@ -31,6 +31,7 @@ import {
 import { mergeTableColumnMeta, mergeFieldMetadata } from './schema-metadata';
 
 import { saveCardValues, type ExceptionMap, type WriteTarget } from '../educators/helpers/write-helpers';
+import { formatCurrencyUSD } from '@/lib/utils';
 import { TABLE_PRESETS } from './table-presets';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -134,25 +135,24 @@ export function DetailsRenderer({ entityId, details, tabs, resolveTitle, default
 
       <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8 }}>{title}</h1>
 
-      {/* OPTION 1: Pill/Button Style - Modern rounded tabs */}
-      { <Box sx={{ marginBottom: 3, padding: '8px', backgroundColor: '#e0f2f1', borderRadius: '12px', display: 'inline-flex' }}>
+      <Box sx={{ marginBottom: 1.5, padding: '4px', backgroundColor: '#e0f2f1', borderRadius: '10px', display: 'inline-flex' }}>
         <Tabs 
           value={active} 
           onChange={(event, newValue) => setActive(newValue)}
           sx={{
-            minHeight: 40,
+            minHeight: 32,
             '& .MuiTabs-indicator': {
               display: 'none',
             },
             '& .MuiTab-root': {
               textTransform: 'none',
               fontWeight: 500,
-              fontSize: '0.875rem',
+              fontSize: '0.8rem',
               color: '#475569',
-              minHeight: 36,
-              borderRadius: '8px',
-              margin: '0 4px',
-              padding: '6px 16px',
+              minHeight: 28,
+              borderRadius: '6px',
+              margin: '0 2px',
+              padding: '4px 10px',
               transition: 'all 0.2s',
               '&.Mui-selected': {
                 color: '#ffffff',
@@ -172,169 +172,7 @@ export function DetailsRenderer({ entityId, details, tabs, resolveTitle, default
             <Tab key={tab.id} label={tab.label} value={tab.id} />
           ))}
         </Tabs>
-      </Box> }
-
-      {/* OPTION 2: Classic Folder Tabs - Traditional file folder appearance */}
-      {/* <Box sx={{ marginBottom: 2 }}>
-        <Tabs 
-          value={active} 
-          onChange={(event, newValue) => setActive(newValue)}
-          sx={{
-            minHeight: 42,
-            '& .MuiTabs-indicator': {
-              display: 'none',
-            },
-            '& .MuiTabs-flexContainer': {
-              borderBottom: '2px solid #d0d5dd',
-            },
-            '& .MuiTab-root': {
-              textTransform: 'none',
-              fontWeight: 500,
-              fontSize: '0.9rem',
-              color: '#64748b',
-              backgroundColor: '#e2e8f0',
-              minHeight: 42,
-              border: '1px solid #d0d5dd',
-              borderBottom: 'none',
-              borderRadius: '8px 8px 0 0',
-              marginRight: '4px',
-              '&.Mui-selected': {
-                color: '#1f2937',
-                fontWeight: 600,
-                backgroundColor: '#ffffff',
-                borderColor: '#d0d5dd',
-                borderBottom: '2px solid #ffffff',
-                marginBottom: '-2px',
-                zIndex: 1,
-              },
-              '&:hover': {
-                backgroundColor: '#f1f5f9',
-              },
-              '&.Mui-selected:hover': {
-                backgroundColor: '#ffffff',
-              },
-            },
-          }}
-        >
-          {safeTabs.map((tab) => (
-            <Tab key={tab.id} label={tab.label} value={tab.id} />
-          ))}
-        </Tabs>
-      </Box> */}
-
-      {/* OPTION 3: Underline Only - Minimal clean style */}
-      {/*<Box sx={{ borderBottom: 2, borderColor: '#e2e8f0', marginBottom: 3 }}>
-        <Tabs 
-          value={active} 
-          onChange={(event, newValue) => setActive(newValue)}
-          sx={{
-            '& .MuiTabs-indicator': {
-              backgroundColor: '#0f8a8d',
-              height: 3,
-              borderRadius: '3px 3px 0 0',
-            },
-            '& .MuiTab-root': {
-              textTransform: 'none',
-              fontWeight: 500,
-              fontSize: '0.9rem',
-              color: '#64748b',
-              minHeight: 44,
-              padding: '12px 20px',
-              '&.Mui-selected': {
-                color: '#0f8a8d',
-                fontWeight: 600,
-              },
-              '&:hover': {
-                color: '#334155',
-                backgroundColor: 'rgba(15, 138, 141, 0.04)',
-              },
-            },
-          }}
-        >
-          {safeTabs.map((tab) => (
-            <Tab key={tab.id} label={tab.label} value={tab.id} />
-          ))}
-        </Tabs>
-      </Box>*/}
-
-      {/* OPTION 4: Segmented Control - iOS style toggle */}
-      {/* <Box sx={{ marginBottom: 3 }}>
-        <Box sx={{ 
-          display: 'inline-flex', 
-          backgroundColor: '#ffffff', 
-          padding: '4px',
-          borderRadius: '10px',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-        }}>
-          <Tabs 
-            value={active} 
-            onChange={(event, newValue) => setActive(newValue)}
-            sx={{
-              minHeight: 36,
-              '& .MuiTabs-indicator': {
-                display: 'none',
-              },
-              '& .MuiTab-root': {
-                textTransform: 'none',
-                fontWeight: 500,
-                fontSize: '0.875rem',
-                color: '#64748b',
-                minHeight: 36,
-                borderRadius: '6px',
-                padding: '6px 20px',
-                margin: '0 2px',
-                transition: 'all 0.2s',
-                '&.Mui-selected': {
-                  color: '#0f8a8d',
-                  backgroundColor: '#f0fafa',
-                  fontWeight: 600,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                },
-                '&:hover': {
-                  backgroundColor: '#f9fafb',
-                },
-                '&.Mui-selected:hover': {
-                  backgroundColor: '#e0f2f1',
-                },
-              },
-            }}
-          >
-            {safeTabs.map((tab) => (
-              <Tab key={tab.id} label={tab.label} value={tab.id} />
-            ))}
-          </Tabs>
-        </Box>
-      </Box>*/ }
-
-      {/* OPTION 5: Card Style - Each tab as a card */}
-      {/* <Box sx={{ display: 'flex', gap: 1, marginBottom: 3, flexWrap: 'wrap' }}>
-        {safeTabs.map((tab) => (
-          <Box
-            key={tab.id}
-            onClick={() => setActive(tab.id)}
-            sx={{
-              padding: '10px 20px',
-              backgroundColor: active === tab.id ? '#ffffff' : '#f8fafc',
-              border: active === tab.id ? '2px solid #0f8a8d' : '2px solid #e2e8f0',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: active === tab.id ? 600 : 500,
-              fontSize: '0.9rem',
-              color: active === tab.id ? '#0f8a8d' : '#64748b',
-              boxShadow: active === tab.id ? '0 2px 8px rgba(15,138,141,0.15)' : 'none',
-              transition: 'all 0.2s',
-              '&:hover': {
-                backgroundColor: '#ffffff',
-                borderColor: active === tab.id ? '#0f8a8d' : '#cbd5e1',
-                transform: 'translateY(-1px)',
-              },
-            }}
-          >
-            {tab.label}
-          </Box>
-        ))}
-      </Box> */}
+      </Box>
 
       {safeTabs.map((tab) => (
 
@@ -616,7 +454,7 @@ function useSelectOptions(
 
       for (const [lookupKey, { fields: lookupFields, lookup }] of lookupsToFetch.entries()) {
 
-        const query = lookup.schema
+        const query = lookup.schema && lookup.schema !== 'public'
 
           ? (supabase as any).schema(lookup.schema).from(lookup.table)
 
@@ -754,6 +592,21 @@ function DetailCard({ block, tab, entityId, details, fieldMeta }: { block: Detai
 
   );
 
+  function columnAllowsEdit(meta?: TableColumnMeta): boolean {
+    if (!meta) return true;
+    const upd = (meta as any).update as 'no' | 'yes' | 'newOnly' | undefined;
+    if (upd === 'no' || upd === 'newOnly') return false;
+    if ((meta as any).edit === false) return false;
+    return true;
+  }
+
+  function columnIncludeInCreate(meta?: TableColumnMeta): boolean {
+    if (!meta) return true;
+    const upd = (meta as any).update as 'no' | 'yes' | 'newOnly' | undefined;
+    if (upd === 'no') return false;
+    return true;
+  }
+
 
 
   const selectOptionsMap = useSelectOptions(block.fields, getMetaForField);
@@ -779,6 +632,39 @@ function DetailCard({ block, tab, entityId, details, fieldMeta }: { block: Detai
     for (const key of Object.keys(values)) {
       const val = (values as any)[key];
       sanitized[key] = Array.isArray(val) ? (val as any[]).filter((v) => v !== '') : val;
+    }
+
+    // Validate and normalize phone numbers and EINs before saving
+    try {
+      for (const key of Object.keys(sanitized)) {
+        const raw = sanitized[key];
+        if (raw == null || raw === '') continue;
+        const meta = getMetaForField(key);
+        const label = String(meta?.label ?? key);
+        const lname = label.toLowerCase();
+        const kname = String(key).toLowerCase();
+        const isPhoneField = kname.includes('phone') || lname.includes('phone');
+        const isEinField = kname === 'ein' || lname.includes('ein');
+        if (isPhoneField) {
+          const str = String(raw).trim();
+          const normalized = normalizePhoneToE164(str);
+          if (!normalized || !isPhoneE164(normalized)) {
+            alert(`${label}: please enter a valid phone number`);
+            return;
+          }
+          sanitized[key] = normalized;
+        } else if (isEinField) {
+          const str = String(raw).trim();
+          const normalized = normalizeEIN(str);
+          if (!normalized || !isEIN(normalized)) {
+            alert(`${label}: please enter a valid EIN`);
+            return;
+          }
+          sanitized[key] = normalized;
+        }
+      }
+    } catch (_) {
+      // fall through; safety net to avoid blocking save due to unexpected validator errors
     }
 
     const explicitTarget = block.editSource;
@@ -1250,8 +1136,8 @@ function renderEditor(
       <textarea
         value={current ?? ''}
         onChange={(event) => onChange(event.target.value)}
-        rows={4}
-        style={{ width: '100%', minHeight: 80, resize: 'vertical' }}
+        rows={field === 'item' || field === 'text' ? 8 : 4}
+        style={{ width: '100%', minHeight: field === 'item' || field === 'text' ? 140 : 80, resize: 'vertical' }}
       />
     );
   }
@@ -1290,10 +1176,88 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
   const [optionsVersion, setOptionsVersion] = React.useState<number>(0);
   const [editingRow, setEditingRow] = React.useState<number | null>(null);
   const [editingValues, setEditingValues] = React.useState<any>({});
+  const columnAllowsEditLocal = (meta?: TableColumnMeta): boolean => {
+    if (!meta) return true;
+    const upd = (meta as any).update as 'no' | 'yes' | 'newOnly' | undefined;
+    if (upd === 'no' || upd === 'newOnly') return false;
+    if ((meta as any).edit === false) return false;
+    return true;
+  };
+  const columnIncludeInCreateLocal = (meta?: TableColumnMeta): boolean => {
+    if (!meta) return true;
+    const upd = (meta as any).update as 'no' | 'yes' | 'newOnly' | undefined;
+    if (upd === 'no') return false;
+    return true;
+  };
+
+  // Lightweight Guide modal (fetch by email_or_name)
+  const [showGuideModal, setShowGuideModal] = React.useState<boolean>(false);
+  const [guideKey, setGuideKey] = React.useState<string>("");
+  const [guideLoading, setGuideLoading] = React.useState<boolean>(false);
+  const [guideData, setGuideData] = React.useState<any>(null);
+  const [guideError, setGuideError] = React.useState<string>("");
+
+  const openGuideModal = async (key: string) => {
+    setGuideKey(key);
+    setGuideLoading(true);
+    setGuideError("");
+    setShowGuideModal(true);
+    try {
+      const { data, error } = await (supabase as any).from('guides').select('*').eq('email_or_name', key).maybeSingle();
+      if (error) throw error;
+      setGuideData(data);
+    } catch (e: any) {
+      setGuideError(e?.message || 'Unable to load guide');
+    } finally {
+      setGuideLoading(false);
+    }
+  };
   const [showCreate, setShowCreate] = React.useState<boolean>(false);
+  const [createTitle, setCreateTitle] = React.useState<string>("Add Record");
+  // Ensure select options exist for a given meta (enum or lookup)
+  async function ensureOptionsForMeta(meta?: FieldMetadata | TableColumnMeta) {
+    try {
+      if (!meta) return;
+      const enumName = (meta as any)?.enumName || (meta as any)?.edit?.enumName;
+      if (enumName && !ENUM_OPTION_CACHE.get(enumName)) {
+        const { data, error } = await (supabase as any).rpc('enum_values', { enum_type: enumName });
+        if (!error && Array.isArray(data)) {
+          const opts = data.map((entry: any) => {
+            const raw = entry?.value ?? entry?.name ?? entry;
+            const s = String(raw ?? '');
+            return s ? ({ value: s, label: s } as SelectOption) : null;
+          }).filter(Boolean) as SelectOption[];
+          ENUM_OPTION_CACHE.set(enumName, opts);
+          setOptionsVersion((v) => v + 1);
+        }
+      }
+      const lookup = (meta as any)?.lookup as FieldLookup | undefined;
+      if (lookup) {
+        const key = buildLookupKey(lookup);
+        if (!LOOKUP_OPTION_CACHE.get(key)) {
+          const client = lookup.schema && lookup.schema !== 'public' ? (supabase as any).schema(lookup.schema) : (supabase as any);
+          const { data, error } = await client.from(lookup.table).select(`${lookup.valueColumn}, ${lookup.labelColumn}`).order(lookup.labelColumn, { ascending: true });
+          if (!error && Array.isArray(data)) {
+            const opts = (data as any[]).map((row) => {
+              const v = row?.[lookup.valueColumn];
+              const l = row?.[lookup.labelColumn];
+              const sv = String(v ?? '');
+              const sl = String(l ?? sv);
+              return sv ? ({ value: sv, label: sl } as SelectOption) : null;
+            }).filter(Boolean) as SelectOption[];
+            LOOKUP_OPTION_CACHE.set(key, opts);
+            setOptionsVersion((v) => v + 1);
+          }
+        }
+      }
+    } catch {}
+  }
   const [createValues, setCreateValues] = React.useState<Record<string, any>>({});
   const [createSaving, setCreateSaving] = React.useState<boolean>(false);
   const [createError, setCreateError] = React.useState<string>("");
+
+  // Simple view-in-modal for table rows
+  const [viewRowIndex, setViewRowIndex] = React.useState<number | null>(null);
 
   // Lightweight modal state for adding an email row
   const [showAddEmail, setShowAddEmail] = React.useState<boolean>(false);
@@ -1448,7 +1412,9 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
           const valueCol = lookup.valueColumn;
           const labelCol = lookup.labelColumn;
           const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
-          const { data, error } = await client.from(table).select(`${valueCol}, ${labelCol}`).order(labelCol, { ascending: true });
+          let q: any = client.from(table).select(`${valueCol}, ${labelCol}`).order(labelCol, { ascending: true });
+          if (table === 'guides') q = q.eq('is_active', true);
+          const { data, error } = await q;
           if (!cancelled && !error && Array.isArray(data)) {
             const opts = (data as any[])
               .map((row) => {
@@ -1490,18 +1456,26 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                 const rs = (effective as any).readSource ?? (effective as any).source;
                 if (!rs?.table) return;
                 const { table } = rs;
-                // Special-case legacy email modal
+  // Special-case email modal
                 if (actionId === 'addEmail' && table === 'email_addresses') { setShowAddEmail(true); return; }
                 if (String(actionId).startsWith('add')) {
                   const init: Record<string, any> = {};
                   for (const c of (((effective as any).columns) ?? [])) {
                     const col = typeof c === 'string' ? c : (c as any).field;
                     const meta = columnMetaMap.get(col);
-                    if (meta && (meta as any).edit === false) continue;
-                    init[col] = meta?.array ? [] : undefined;
+                    if (!columnIncludeInCreateLocal(meta as any)) continue;
+                    // Defaults
+                    if (col === 'item_status') init[col] = 'Incomplete';
+                    else if (col === 'assigned_date') init[col] = new Date().toISOString().slice(0,10);
+                    else if (col === 'created_date') init[col] = new Date().toISOString().slice(0,10);
+                    else init[col] = meta?.array ? [] : undefined;
+                    // Proactively ensure select options exist for this field
+                    ensureOptionsForMeta(meta as any);
                   }
                   setCreateValues(init);
                   setCreateError('');
+                  // Use the action label if available for the modal title
+                  setCreateTitle(label || 'Add Record');
                   setShowCreate(true);
                 }
               };
@@ -1589,7 +1563,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
                       <td key={column} style={{ padding: 6, borderBottom: '1px solid #f1f5f9' }}>
 
-                        {editingRow === index && (meta?.edit !== false) ? (
+                        {editingRow === index && columnAllowsEditLocal(meta as any) ? (
                           renderEditor(
                             column,
                             editingValues[column] ?? row[column],
@@ -1611,10 +1585,151 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                     <td style={{ padding: 6 }}>
                       <Select
                         value=""
-                        onValueChange={(value) => {
+                        onValueChange={async (value) => {
                           if (value === 'inline_edit') {
                             setEditingRow(index);
                             setEditingValues({ ...(row as any) });
+                          } else if (value === 'view_in_modal') {
+                            setViewRowIndex(index);
+                          } else if (value === 'email') {
+                            const emails: string[] = [];
+                            const push = (v: any) => { if (typeof v === 'string' && v.includes('@')) emails.push(v); };
+                            const r: any = row;
+                            // Known fields
+                            ;['email_address','email','primary_email','contact_email','school_email','charter_email'].forEach((k) => push(r[k]));
+                            // Arrays
+                            ;['to_emails','cc_emails','bcc_emails','attendees'].forEach((k) => {
+                              const arr = r[k];
+                              if (Array.isArray(arr)) arr.forEach(push);
+                            });
+
+                            // If none found on the row, try resolving via people_id from the primary_emails view
+                            if (emails.length === 0) {
+                              const pid = r['people_id'] ?? r['person_id'] ?? r['educator_id'];
+                              if (pid != null) {
+                                try {
+                                  const { data, error } = await (supabase as any)
+                                    .from('primary_emails')
+                                    .select('email_address')
+                                    .eq('people_id', pid)
+                                    .maybeSingle();
+                                  if (!error && data?.email_address) push(String(data.email_address));
+                                } catch {}
+                              }
+                            }
+
+                            const to = encodeURIComponent(Array.from(new Set(emails)).join(','));
+                            if (!to) { alert('No email address is available for this record.'); return; }
+                            window.location.assign(`/email/compose?to=${to}`);
+                          } else if (value === 'toggle_private_public') {
+                            const wr: any = (effective as any).writeDefaults ?? {};
+                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
+                            const schema = wr.schema ?? rs.schema;
+                            const table = wr.table ?? rs.table;
+                            const pk = wr.pkColumn ?? 'id';
+                            if (!table) { console.warn('No write target for toggle_private_public'); return; }
+                            const pkValue = (row as any)[pk];
+                            const next = !(row as any)?.is_private;
+                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
+                            const { error } = await client.from(table).update({ is_private: next }).eq(pk, pkValue);
+                            if (!error) setRefreshToken((t) => t + 1);
+                          } else if (value === 'toggle_complete') {
+                            const wr: any = (effective as any).writeDefaults ?? {};
+                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
+                            const schema = wr.schema ?? rs.schema;
+                            const table = wr.table ?? rs.table;
+                            const pk = wr.pkColumn ?? 'id';
+                            if (!table) { console.warn('No write target for toggle_complete'); return; }
+                            const pkValue = (row as any)[pk];
+                            const current = String((row as any)?.item_status ?? 'Incomplete');
+                            const completing = current !== 'Complete';
+                            const payload: any = { item_status: completing ? 'Complete' : 'Incomplete' };
+                            payload.completed_date = completing ? new Date().toISOString() : null;
+                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
+                            const { error } = await client.from(table).update(payload).eq(pk, pkValue);
+                            if (!error) setRefreshToken((t) => t + 1);
+                          } else if (value === 'end_stint') {
+                            const wr: any = (effective as any).writeDefaults ?? {};
+                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
+                            const schema = wr.schema ?? rs.schema;
+                            const table = wr.table ?? rs.table;
+                            const pk = wr.pkColumn ?? 'id';
+                            if (!table) { console.warn('No write target for end_stint'); return; }
+                            const pkValue = (row as any)[pk];
+                            const payload: any = { is_active: false, end_date: new Date().toISOString() };
+                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
+                            const { error } = await client.from(table).update(payload).eq(pk, pkValue);
+                            if (!error) setRefreshToken((t) => t + 1);
+                          } else if (value === 'toggle_valid') {
+                            const wr: any = (effective as any).writeDefaults ?? {};
+                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
+                            const schema = wr.schema ?? rs.schema;
+                            const table = wr.table ?? rs.table;
+                            const pk = wr.pkColumn ?? 'id';
+                            if (!table) { console.warn('No write target for toggle_valid'); return; }
+                            const pkValue = (row as any)[pk];
+                            const next = !(row as any)?.is_valid;
+                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
+                            const { error } = await client.from(table).update({ is_valid: next }).eq(pk, pkValue);
+                            if (!error) setRefreshToken((t) => t + 1);
+                          } else if (value === 'make_primary') {
+                            const wr: any = (effective as any).writeDefaults ?? {};
+                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
+                            const schema = wr.schema ?? rs.schema;
+                            const table = wr.table ?? rs.table;
+                            const pk = wr.pkColumn ?? 'id';
+                            if (!table) { console.warn('No write target for make_primary'); return; }
+                            const pkValue = (row as any)[pk];
+                            let personId = (row as any)?.people_id;
+                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
+                            if (personId == null) {
+                              try {
+                                const res = await client.from(table).select('people_id').eq(pk, pkValue).maybeSingle();
+                                if (!res.error) personId = (res.data as any)?.people_id;
+                              } catch {}
+                            }
+                            if (personId == null) { alert('Unable to determine person for this email.'); return; }
+                            // Unset others, then set this one
+                            await client.from(table).update({ is_primary: false }).eq('people_id', personId);
+                            const { error } = await client.from(table).update({ is_primary: true }).eq(pk, pkValue);
+                            if (!error) setRefreshToken((t) => t + 1);
+                          } else if (value === 'end_occupancy') {
+                            const wr: any = (effective as any).writeDefaults ?? {};
+                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
+                            const schema = wr.schema ?? rs.schema;
+                            const table = wr.table ?? rs.table;
+                            const pk = wr.pkColumn ?? 'id';
+                            if (!table) { console.warn('No write target for end_occupancy'); return; }
+                            const pkValue = (row as any)[pk];
+                            const now = new Date().toISOString();
+                            const payload: any = { end_date: now, current_mail_address: false, current_physical_address: false };
+                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
+                            const { error } = await client.from(table).update(payload).eq(pk, pkValue);
+                            if (!error) setRefreshToken((t) => t + 1);
+                          } else if (value === 'jump_to_modal') {
+                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
+                            const fk = rs?.fkColumn as string | undefined;
+                            const r: any = row;
+                            let targetEntity: 'educators' | 'schools' | 'charters' | null = null;
+                            let targetId: string | number | null = null;
+                            if (fk === 'people_id') {
+                              // Likely listing a person's related schools/charters -> jump to school/charter
+                              if (r.school_id != null) { targetEntity = 'schools'; targetId = r.school_id; }
+                              else if (r.charter_id != null) { targetEntity = 'charters'; targetId = r.charter_id; }
+                            } else if (fk === 'school_id' || fk === 'charter_id') {
+                              // Likely listing a school's/charter's people -> jump to educator
+                              if (r.people_id != null) { targetEntity = 'educators'; targetId = r.people_id; }
+                            }
+                            // Fallbacks: infer from available ids
+                            if (!targetEntity) {
+                              if (r.people_id != null) { targetEntity = 'educators'; targetId = r.people_id; }
+                              else if (r.school_id != null) { targetEntity = 'schools'; targetId = r.school_id; }
+                              else if (r.charter_id != null) { targetEntity = 'charters'; targetId = r.charter_id; }
+                            }
+                            if (targetEntity && targetId != null) {
+                              const id = encodeURIComponent(String(targetId));
+                              window.location.assign(`/${targetEntity}/${id}?action=view_in_modal`);
+                            }
                           } else {
                             console.log('Row action selected:', value);
                           }
@@ -1681,7 +1796,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                   const col = typeof c === 'string' ? c : c.field;
                   if (!(col in editingValues)) continue;
                   const meta = columnMetaMap.get(col) as any;
-                  if (meta && meta.edit === false) continue;
+                  if (!columnIncludeInCreateLocal(meta as any)) return null;
                   const wt = meta?.writeTo as any;
                   const table = wt?.table ?? wr?.table; if (!table) continue;
                   const schema = wt?.schema ?? wr?.schema;
@@ -1724,14 +1839,14 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #e2e8f0', fontWeight: 600 }}>
-              <span>Add {((effective as any).title ?? '').toString() || 'Record'}</span>
+              <span>{createTitle}</span>
               <button type="button" onClick={() => !createSaving && setShowCreate(false)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer' }}>×</button>
             </div>
             <div style={{ padding: 16, display: 'grid', gap: 10 }}>
               {(((effective as any).columns) ?? []).map((c: any) => {
                 const field = typeof c === 'string' ? c : c.field;
                 const meta = columnMetaMap.get(field);
-                if (meta && (meta as any).edit === false) return null;
+                if (!columnIncludeInCreateLocal(meta as any)) return null;
                 const selectOptions = getCachedOptionsForMeta(meta);
                 return (
                   <label key={field} style={{ display: 'grid', gap: 6 }}>
@@ -1763,8 +1878,27 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                       for (const c of (((effective as any).columns) ?? [])) {
                         const col = typeof c === 'string' ? c : c.field;
                         const meta = columnMetaMap.get(col);
-                        if (meta && (meta as any).edit === false) continue;
+                        if (!columnIncludeInCreateLocal(meta as any)) continue;
                         if (createValues[col] !== undefined) payload[col] = createValues[col];
+                      }
+                      // Apply sensible defaults if not set
+                      if ('item_status' in (payload as any) === false && ((effective as any).columns as any[]).some((c:any)=> (typeof c==='string'?c:c.field)==='item_status')) {
+                        payload['item_status'] = 'Incomplete';
+                      }
+                      if ('assigned_date' in (payload as any) === false && ((effective as any).columns as any[]).some((c:any)=> (typeof c==='string'?c:c.field)==='assigned_date')) {
+                        payload['assigned_date'] = new Date().toISOString().slice(0,10);
+                      }
+                      if ('created_date' in (payload as any) === false && ((effective as any).columns as any[]).some((c:any)=> (typeof c==='string'?c:c.field)==='created_date')) {
+                        payload['created_date'] = new Date().toISOString().slice(0,10);
+                      }
+                      // created_by default to current user if available
+                      if ('created_by' in (payload as any) === false && ((effective as any).columns as any[]).some((c:any)=> (typeof c==='string'?c:c.field)==='created_by')) {
+                        try {
+                          const { data } = await (supabase as any).auth.getUser();
+                          const u = data?.user;
+                          if (u?.email) payload['created_by'] = u.email;
+                          else if (u?.id) payload['created_by'] = u.id;
+                        } catch {}
                       }
                       const { error } = await client.from(targetTable).insert(payload);
                       if (error) throw error;
@@ -1780,6 +1914,41 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                   {createSaving ? 'Saving…' : 'Save'}
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {viewRowIndex !== null ? (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}
+          onClick={() => setViewRowIndex(null)}
+        >
+          <div
+            style={{ minWidth: 480, maxWidth: '90vw', maxHeight: '90vh', overflow: 'auto', background: '#ffffff', borderRadius: 8, boxShadow: '0 12px 32px rgba(15,23,42,0.2)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #e2e8f0', fontWeight: 600 }}>
+              <span>View Record</span>
+              <button type="button" onClick={() => setViewRowIndex(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer' }}>x</button>
+            </div>
+            <div style={{ padding: 16, display: 'grid', gap: 8 }}>
+              {(() => {
+                const r = rows[viewRowIndex!];
+                if (!r) return <div style={{ color: '#64748b', fontSize: 12 }}>Record unavailable.</div>;
+                const cols = ((effective as any).columns ?? []) as any[];
+                return cols.map((c: any) => {
+                  const field = typeof c === 'string' ? c : c.field;
+                  const meta = columnMetaMap.get(field);
+                  const label = meta?.label ?? formatLabel(field);
+                  return (
+                    <div key={field} style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 8, alignItems: 'baseline' }}>
+                      <div style={{ fontSize: 12, color: '#334155' }}>{label}</div>
+                      <div style={{ fontSize: 13, color: '#0f172a' }}>{renderDisplayValue(r[field], meta as any)}</div>
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
         </div>
@@ -1883,37 +2052,99 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
 
 function DetailMap({ block, details }: { block: DetailMapBlock; details: any }) {
-
   const latField = block.fields[0];
-
   const lngField = block.fields[1];
-
   const labelField = block.fields[2];
 
-  const lat = latField ? details?.[latField] : undefined;
-
-  const lng = lngField ? details?.[lngField] : undefined;
-
+  const rawLat = latField ? details?.[latField] : undefined;
+  const rawLng = lngField ? details?.[lngField] : undefined;
   const label = labelField ? details?.[labelField] : undefined;
 
+  const lat = rawLat != null && rawLat !== '' ? Number(rawLat) : NaN;
+  const lng = rawLng != null && rawLng !== '' ? Number(rawLng) : NaN;
 
+  // Prefer coordinates when both are numeric; otherwise fall back to address label
+  let src = '';
+  if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+    const q = encodeURIComponent(`${lat},${lng}`);
+    src = `https://maps.google.com/maps?q=${q}&z=13&output=embed`;
+  } else if (typeof label === 'string' && label.trim().length > 0) {
+    const q = encodeURIComponent(label.trim());
+    src = `https://maps.google.com/maps?q=${q}&z=13&output=embed`;
+  }
 
   return (
-
     <div style={{ border: '1px solid #e2e8f0', borderRadius: 6, padding: 10 }}>
-
       <div style={{ fontWeight: 600, marginBottom: 6 }}>{block.title ?? 'Location'}</div>
-
-      <div style={{ fontSize: 14 }}>Latitude: {lat ?? '-'}</div>
-
-      <div style={{ fontSize: 14 }}>Longitude: {lng ?? '-'}</div>
-
-      {labelField ? <div style={{ fontSize: 14 }}>Address: {label ?? '-'}</div> : null}
-
+      {src ? (
+        <div style={{ position: 'relative', width: '100%', height: 300, borderRadius: 6, overflow: 'hidden', background: '#f8fafc' }}>
+          <iframe
+            title={(block.title ?? 'Location') + ' map'}
+            src={src}
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+          {/* Top-left info box showing address/label */}
+          {typeof label === 'string' && label.trim().length > 0 ? (
+            <div
+              style={{
+                position: 'absolute',
+                top: 8,
+                left: 8,
+                background: '#ffffff',
+                color: '#0f172a',
+                border: '1px solid #e2e8f0',
+                borderRadius: 8,
+                padding: '6px 10px',
+                fontSize: 12,
+                boxShadow: '0 8px 16px rgba(15, 23, 42, 0.08)',
+                maxWidth: '70%',
+                pointerEvents: 'none',
+              }}
+            >
+              {label}
+            </div>
+          ) : null}
+          {/* Centered custom marker using logo if available */}
+          {(() => {
+            const logoUrl = (details?.logo_url || details?.logo) as string | undefined;
+            const size = 40;
+            return (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -100%)',
+                  width: size,
+                  height: size,
+                  borderRadius: 8,
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 6px 14px rgba(0,0,0,0.15)',
+                  pointerEvents: 'none',
+                }}
+              >
+                {logoUrl ? (
+                  <img src={logoUrl} alt="School logo" style={{ maxWidth: '88%', maxHeight: '88%', objectFit: 'contain', borderRadius: 4 }} />
+                ) : (
+                  <div style={{ width: 10, height: 10, borderRadius: 999, background: '#0f8a8d' }} />
+                )}
+              </div>
+            );
+          })()}
+        </div>
+      ) : (
+        <div style={{ fontSize: 13, color: '#64748b' }}>No location to display.</div>
+      )}
     </div>
-
   );
-
 }
 
 
@@ -2098,7 +2329,12 @@ function renderDisplayValue(
 
   }
 
-  if (value instanceof Date) return value.toISOString();
+  if (value instanceof Date) {
+    const y = value.getFullYear();
+    const m = value.getMonth() + 1;
+    const d = value.getDate();
+    return `${m}/${d}/${y}`;
+  }
 
   if (Array.isArray(value)) return value.length > 0 ? value.join(', ') : placeholder;
 
@@ -2110,32 +2346,36 @@ function renderDisplayValue(
 
   const fieldName = meta && 'field' in meta ? meta.field : '';
 
+  // Format date strings as M/D/YYYY when type is date or value looks like a date
+  if (
+    baseType === 'date' ||
+    (typeof value === 'string' && /^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/.test(String(value)))
+  ) {
+    const m = String(value).match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/);
+    if (m) {
+      const y = Number(m[1]);
+      const mm = Number(m[2]);
+      const dd = Number(m[3]);
+      if (!Number.isNaN(y) && !Number.isNaN(mm) && !Number.isNaN(dd)) {
+        return `${mm}/${dd}/${y}`;
+      }
+    }
+  }
+
 
 
   // Format currency fields (amount, amount_issued, etc.)
 
-  if (baseType === 'number' && (fieldName === 'amount' || fieldName === 'amount_issued' ||
-
-      fieldName === 'total_grants_issued' || fieldName === 'total_loans_issued')) {
-
-    const numValue = typeof value === 'number' ? value : parseFloat(value);
-
-    if (!isNaN(numValue)) {
-
-      return new Intl.NumberFormat('en-US', {
-
-        style: 'currency',
-
-        currency: 'USD',
-
-        minimumFractionDigits: 0,
-
-        maximumFractionDigits: 0
-
-      }).format(numValue);
-
-    }
-
+  if (
+    baseType === 'number' && (
+      fieldName === 'amount' ||
+      fieldName === 'amount_issued' ||
+      fieldName === 'total_grants_issued' ||
+      fieldName === 'total_loans_issued'
+    )
+  ) {
+    const formatted = formatCurrencyUSD(value as any, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    if (formatted) return formatted;
   }
 
 

@@ -80,8 +80,10 @@ export type TableColumnMeta = {
   enumName?: string;
   lookup?: FieldLookup;
   reference?: FieldReference;
-  // If present, disables inline editing for this column
+// If present, disables inline editing for this column
   edit?: boolean;
+  // New: Controls update/create behavior. Defaults to 'yes' when omitted.
+  update?: 'no' | 'yes' | 'newOnly';
   // Optional write target override for view-backed fields
   writeTo?: { schema?: string; table: string; pk?: string; column?: string };
 };

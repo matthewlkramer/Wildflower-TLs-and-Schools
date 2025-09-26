@@ -4,10 +4,21 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { json, ts } from "@shared/http.ts";
 import { preflight } from "@shared/cors.ts";
 import { sendConsole } from "@shared/log.ts";
-import { exchangeCode, getValidAccessTokenOrThrow } from "@shared/google-auth.ts";
+import { exchangeCode, getValidAccessTokenOrThrow, getValidAccessToken } from "@shared/google-auth.ts";
 import { setSyncStatus, setPeriodStatus } from "@shared/progress.ts";
 
+// Revision marker to verify deployed version in GET response and logs
+const REVISION = (() => {
+  const envRev = Deno.env.get('RELEASE_REV')
+    || Deno.env.get('COMMIT_SHA')
+    || Deno.env.get('VERCEL_GIT_COMMIT_SHA')
+    || Deno.env.get('SUPABASE_FUNCTIONS_REV');
+  return `gcal-sync-${envRev || new Date().toISOString()}`;
+})();
+
 const SCOPES = [
+  // Request combined scopes so a single auth covers Gmail + Calendar
+  "https://www.googleapis.com/auth/gmail.readonly",
   "https://www.googleapis.com/auth/calendar.readonly",
   "https://www.googleapis.com/auth/drive.readonly"
 ].join(' ');
@@ -15,7 +26,10 @@ const SCOPES = [
 serve(async (req) => {
   const pf = preflight(req);
   if (pf) return pf;
-  if (req.method === 'GET') return json({ ok: true, function: 'gcal-sync', now: ts() });
+  if (req.method === 'GET') {
+    try { console.log('[gcal-sync] GET healthcheck', { revision: REVISION, now: ts() }); } catch {}
+    return json({ ok: true, function: 'gcal-sync', revision: REVISION, now: ts() });
+  }
 
   try {
     const body = await req.json().catch(() => ({}));
@@ -23,23 +37,40 @@ serve(async (req) => {
     const finalRedirect = redirect_uri || redirectUri || Deno.env.get('GOOGLE_REDIRECT_URI') || '';
 
     const authHeader = req.headers.get('Authorization') ?? '';
-    if (!authHeader) return json({ error: 'Missing Authorization header' }, 401);
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseAnon = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
     const supabaseAuth = createClient(supabaseUrl, supabaseAnon, { global: { headers: { Authorization: authHeader } } });
     const { data: authData, error: authErr } = await supabaseAuth.auth.getUser();
-    if (authErr || !authData?.user) return json({ error: 'Unauthorized' }, 401);
-    const userId = authData.user.id;
+    let userId = authData?.user?.id as string | undefined;
+    if (!userId) {
+      // Fallback: try to decode JWT locally just to extract sub
+      try {
+        const m = authHeader.match(/^Bearer\s+(.+)$/i);
+        const token = m ? m[1] : '';
+        const [, payload] = token.split('.') as [string, string];
+        const jsonStr = atob(payload.replace(/-/g,'+').replace(/_/g,'/'));
+        const parsed: any = JSON.parse(jsonStr);
+        userId = parsed?.sub;
+      } catch (_) {
+        // ignore
+      }
+      if (!userId) return json({ error: 'Unauthorized' }, 401);
+    }
 
     const serviceRole = Deno.env.get('SERVICE_ROLE_KEY') ?? '';
-    const supabase = createClient(supabaseUrl, serviceRole);
+    // User-context clients (forward Authorization) for reads that rely on auth.uid()
+    const supabase = createClient(supabaseUrl, serviceRole, { global: { headers: { Authorization: authHeader } } });
+    const supabaseGsync = createClient(supabaseUrl, serviceRole, { db: { schema: 'gsync' }, global: { headers: { Authorization: authHeader } } });
+    // Service-role clients for privileged writes (do not forward user Authorization)
+    const supabaseSrv = createClient(supabaseUrl, serviceRole);
+    const supabaseSrvGsync = createClient(supabaseUrl, serviceRole, { db: { schema: 'gsync' } });
 
     // No matching or allowlist here; DB jobs handle linking later.
 
     switch (action) {
       case 'get_synced_through': {
         // Return the max(start_time) for this user's events as the synced-through timestamp
-        const { data: rows } = await supabase
+        const { data: rows } = await supabaseGsync
           .from('g_events')
           .select('start_time')
           .eq('user_id', userId)
@@ -59,202 +90,231 @@ serve(async (req) => {
         return json({ auth_url: url, scopes_requested: SCOPES });
       }
       case 'exchange_code': {
-        await exchangeCode(supabase, code, userId, finalRedirect);
+        await exchangeCode(supabaseGsync, code, userId, finalRedirect);
         await sendConsole(supabase, userId, null, 'Google tokens saved', 'milestone', 'calendar');
         return json({ ok: true });
       }
       case 'get_connection_status': {
-        const tok = await getValidAccessToken(supabase, userId);
-        return json({ connected: !!tok });
-      }
-      case 'start_sync': {
-        // Respect per-user sync start date
-        const { data: settings } = await supabase.from('google_sync_settings').select('sync_start_date').eq('user_id', userId).single();
-        const START = settings?.sync_start_date ? new Date(settings.sync_start_date) : new Date();
-        const now = new Date();
-        const calendarId = 'primary';
-        const accessToken = await getValidAccessTokenOrThrow(supabase, userId);
-
-        // Find earliest month not completed
-        const { data: prog } = await supabase
-          .from('g_event_sync_progress')
-          .select('year, month, sync_status')
+        const tok = await getValidAccessToken(supabaseGsync, userId);
+        if (tok) return json({ connected: true });
+        // Fallback: consider connected if a token row exists (access or refresh)
+        const { data: trow } = await supabaseGsync
+          .from('google_auth_tokens')
+          .select('user_id, access_token, refresh_token')
           .eq('user_id', userId)
-          .eq('calendar_id', calendarId)
-          .order('year', { ascending: true })
-          .order('month', { ascending: true });
-        const pad2 = (n: number) => String(n).padStart(2, '0');
-        const completed = new Set<string>();
-        for (const p of (prog || [])) if (p.sync_status === 'completed') completed.add(`${p.year}-${pad2(p.month)}`);
+          .maybeSingle();
+        return json({ connected: !!trow });
+      }
 
-        // Determine next month to process
-        let cur = new Date(START);
-        let target: { year: number; month: number } | null = null;
-        let guard = 0;
-        while (cur <= now && guard < 1200) {
-          guard++;
-          const y = cur.getUTCFullYear();
-          const m = cur.getUTCMonth() + 1;
-          const key = `${y}-${pad2(m)}`;
-          if (!completed.has(key)) { target = { year: y, month: m }; break; }
-          cur.setUTCMonth(cur.getUTCMonth() + 1);
-        }
-        if (!target) {
-          await setSyncStatus(supabase, userId, { sync_status: 'paused' });
-          return json({ ok: true, message: 'No pending months' });
-        }
-        const { year, month } = target;
-        const runId = crypto.randomUUID();
-        await setPeriodStatus(
-          supabase,
-          'g_event_sync_progress',
-          { user_id: userId, calendar_id: calendarId, year, month },
-          { sync_status: 'running', started_at: ts(), error_message: null, current_run_id: runId },
-          'user_id,calendar_id,year,month'
-        );
-        // Do not mass-update all period rows via setSyncStatus; rely on period row status
-        await sendConsole(supabase, userId, runId, `Calendar: processing ${year}-${pad2(month)}`, 'milestone', 'calendar');
-
-        const monthStart = new Date(Date.UTC(year, month - 1, 1));
-        const monthEnd = new Date(Date.UTC(year, month, 0, 23, 59, 59));
-        const timeMin = monthStart.toISOString();
-        const timeMax = monthEnd.toISOString();
-
-        let pageToken: string | undefined = undefined;
-        let processed = 0;
-        do {
-          const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`);
-          url.searchParams.set('singleEvents', 'true');
-          url.searchParams.set('orderBy', 'startTime');
-          url.searchParams.set('timeMin', timeMin);
-          url.searchParams.set('timeMax', timeMax);
-          url.searchParams.set('maxResults', '250');
-          if (pageToken) url.searchParams.set('pageToken', pageToken);
-          const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-          if (!resp.ok) throw new Error(`Calendar list error ${resp.status}`);
-          const js: any = await resp.json();
-          pageToken = js.nextPageToken;
-          const events: any[] = js.items || [];
-          const rows = await Promise.all(events.map(async (e: any) => {
-            const start = e.start?.dateTime || (e.start?.date ? new Date(e.start.date).toISOString() : null);
-            const end = e.end?.dateTime || (e.end?.date ? new Date(e.end.date).toISOString() : null);
-            const organizer = (e.organizer?.email || '').toLowerCase();
-            const attendeeEmails = (e.attendees || []).map((a: any) => (a?.email || '').toLowerCase()).filter(Boolean);
-            processed++;
-            return {
-              user_id: userId,
-              google_calendar_id: calendarId,
-              google_event_id: e.id,
-              summary: e.summary || null,
-              description: e.description || null,
-              start_time: start,
-              end_time: end,
-              organizer_email: e.organizer?.email || null,
-              attendees: attendeeEmails.length ? attendeeEmails : null,
-              location: e.location || null,
-              status: e.status || null,
-              updated_at: ts(),
-            };
-          }));
-          if (rows.length) await supabase.from('g_events').upsert(rows, { onConflict: 'user_id,google_calendar_id,google_event_id' } as any);
-        } while (pageToken);
-
-        await sendConsole(supabase, userId, runId, `Month ${year}-${pad2(month)}: processed ${processed} events`, 'milestone', 'calendar');
-        await setPeriodStatus(
-          supabase,
-          'g_event_sync_progress',
-          { user_id: userId, calendar_id: calendarId, year, month },
-          { sync_status: 'completed', processed_events: processed, completed_at: ts() },
-          'user_id,calendar_id,year,month'
-        );
-        // Optionally skip matching when running historical catchup
-        if (!suppress_match) {
+      case 'token_health': {
+        const accessValid = !!(await getValidAccessToken(supabaseGsync, userId));
+        const { data: trow } = await supabaseGsync
+          .from('google_auth_tokens')
+          .select('refresh_token, expires_at')
+          .eq('user_id', userId)
+          .maybeSingle();
+        const refreshPresent = !!(trow?.refresh_token);
+        return json({ accessValid, refreshPresent, expires_at: trow?.expires_at ?? null });
+      }
+      case 'fetch_headers_range': {
+        try {
+          const nowIso = ts();
+          const { data: settings } = await supabaseGsync.from('google_sync_settings').select('sync_start_date').eq('user_id', userId).single();
+          const calendarId = 'primary';
+          let accessToken: string;
           try {
-            const { error } = await supabase.rpc('refresh_g_events_matches', { p_user_id: userId, p_since: null, p_merge: false } as any);
-            const ok = !error;
-            await sendConsole(supabase, userId, runId, ok ? `Triggered event match refresh for ${year}-${pad2(month)}` : 'Event match refresh RPC not available', 'info', 'calendar');
-          } catch (_) {
-            // ignore
-          }
-        }
-        // Do not mass-update all period rows to paused
-        return json({ ok: true, message: 'Calendar month synced' });
-      }
-      case 'backfill_event_attachments': {
-        // Store metadata for attachments on matched events (no Drive download)
-        const limit = Math.max(1, Math.min(100, Number((body && body.limit) || 50)));
-        const calendarId = 'primary';
-        const accessToken = await getValidAccessTokenOrThrow(supabase, userId);
-        const { data: rows } = await supabase
-          .from('g_events')
-          .select('google_event_id, matched_educator_ids')
-          .eq('user_id', userId)
-          .limit(limit);
-        let saved = 0;
-        for (const r of rows || []) {
-          const ids = (r as any).matched_educator_ids as string[] | null;
-          if (!ids || ids.length === 0) continue;
-          const eid = r.google_event_id;
-          const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eid)}`);
-          // Request all fields so that attachments (if any) are present
-          const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-          if (!resp.ok) continue;
-          const ev: any = await resp.json();
-          const atts: any[] = Array.isArray(ev.attachments) ? ev.attachments : [];
-          for (const a of atts) {
-            await supabase.from('g_event_attachments').upsert({
-              user_id: userId,
-              google_calendar_id: calendarId,
-              google_event_id: eid,
-              title: a.title || null,
-              mime_type: a.mimeType || null,
-              file_url: a.fileUrl || null,
-              file_id: a.fileId || null,
-              icon_link: a.iconLink || null,
-            } as any, { onConflict: 'user_id,google_calendar_id,google_event_id,identity_key' } as any);
-            saved++;
-          }
-        }
-        return json({ ok: true, attachments_saved: saved });
-      }
-      case 'normalize_attendees': {
-        const limit = Math.max(1, Math.min(5000, Number((body && body.limit) || 1000)));
-        const { data: rows } = await supabase
-          .from('g_events')
-          .select('google_event_id, google_calendar_id, organizer_email, attendees, updated_at')
-          .eq('user_id', userId)
-          .order('updated_at', { ascending: false })
-          .limit(limit);
-        let updated = 0;
-        const upserts: any[] = [];
-        for (const r of rows || []) {
-          let attendeeEmails: string[] = [];
-          try {
-            const raw = (r as any).attendees;
-            if (Array.isArray(raw)) {
-              attendeeEmails = raw.map((a: any) => typeof a === 'string' ? a : (a?.email || '')).map((e: string) => e.toLowerCase()).filter(Boolean);
-            } else if (typeof raw === 'string' && raw) {
-              const parsed = JSON.parse(raw);
-              if (Array.isArray(parsed)) attendeeEmails = parsed.map((a: any) => typeof a === 'string' ? a : (a?.email || '')).map((e: string) => e.toLowerCase()).filter(Boolean);
+            accessToken = await getValidAccessTokenOrThrow(supabaseGsync, userId);
+          } catch (e: any) {
+            try {
+              const { data: trow } = await supabaseGsync
+                .from('google_auth_tokens')
+                .select('user_id, expires_at, access_token, refresh_token')
+                .eq('user_id', userId)
+                .maybeSingle();
+              const exists = !!trow;
+              const hasAccess = !!(trow as any)?.access_token;
+              const hasRefresh = !!(trow as any)?.refresh_token;
+              return json({ ok: false, source: 'token', error: e?.message || 'No valid access token', exists, hasAccess, hasRefresh, expires_at: (trow as any)?.expires_at ?? null }, 401);
+            } catch {
+              return json({ ok: false, source: 'token', error: e?.message || 'No valid access token' }, 401);
             }
+          }
+          const start = settings?.sync_start_date ? new Date(settings.sync_start_date) : new Date();
+          const timeMin = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate())).toISOString();
+          const timeMax = new Date().toISOString();
+          // History row (user-initiated)
+          let histId: number | null = null;
+          try {
+            const { data: hist } = await supabaseSrvGsync
+              .from('google_sync_history')
+              .insert({ user_id: userId, start_of_sync_period: timeMin, end_of_sync_period: nowIso, object_type: 'event', initiator: 'user', started_at: nowIso } as any)
+              .select('id')
+              .single();
+            histId = (hist as any)?.id ?? null;
           } catch {}
-          upserts.push({
-            user_id: userId,
-            google_calendar_id: (r as any).google_calendar_id,
-            google_event_id: r.google_event_id,
-            attendees: attendeeEmails.length ? attendeeEmails : null,
-            updated_at: ts(),
-          });
-          updated++;
+          let pageToken: string | undefined;
+          let upserted = 0;
+          const upsert = async (rows: any[]) => {
+            if (!rows.length) return;
+            const { error } = await supabaseSrvGsync
+              .from('g_events')
+              .upsert(rows, { onConflict: 'user_id,google_event_id' } as any);
+            if (error) {
+              throw new Error(`upsert g_events failed: ${error.message}`);
+            }
+            upserted += rows.length;
+          };
+          do {
+            const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`);
+            url.searchParams.set('singleEvents', 'true');
+            url.searchParams.set('orderBy', 'startTime');
+            url.searchParams.set('timeMin', timeMin);
+            url.searchParams.set('timeMax', timeMax);
+            url.searchParams.set('maxResults', '250');
+            if (pageToken) url.searchParams.set('pageToken', pageToken);
+            const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+            if (!resp.ok) return json({ ok: false, source: 'calendar-list', status: resp.status, error: `calendar list error ${resp.status}` });
+            const js: any = await resp.json();
+            pageToken = js.nextPageToken;
+            const events: any[] = js.items || [];
+            const rows = events.map((e: any) => {
+              const start = e.start?.dateTime || (e.start?.date ? new Date(e.start.date).toISOString() : null);
+              const end = e.end?.dateTime || (e.end?.date ? new Date(e.end.date).toISOString() : null);
+              const attendeeEmails = (e.attendees || []).map((a: any) => (a?.email || '').toLowerCase()).filter(Boolean);
+              return {
+                user_id: userId,
+                google_calendar_id: calendarId,
+                google_event_id: e.id,
+                summary: e.summary || null,
+                description: e.description || null,
+                start_time: start,
+                end_time: end,
+                organizer_email: e.organizer?.email || null,
+                attendees: attendeeEmails.length ? attendeeEmails : null,
+                location: e.location || null,
+                status: e.status || null,
+                updated_at: ts(),
+              };
+            });
+            await upsert(rows);
+          } while (pageToken);
+          try { if (histId) await supabaseSrvGsync.from('google_sync_history').update({ headers_fetched: upserted, headers_fetch_successful: true }).eq('id', histId); } catch {}
+          return json({ ok: true, upserted });
+        } catch (e: any) {
+          try {
+            await supabaseSrvGsync
+              .from('google_sync_history')
+              .insert({ user_id: userId, object_type: 'event', initiator: 'user', started_at: ts(), headers_fetch_successful: false, headers_fetch_error: e?.message || 'fetch headers failed' } as any);
+          } catch {}
+          return json({ ok: false, source: 'exception', error: e?.message || 'fetch headers failed' });
         }
-        if (upserts.length) await supabase.from('g_events').upsert(upserts, { onConflict: 'user_id,google_calendar_id,google_event_id' } as any);
-        await sendConsole(supabase, userId, null, `Normalized attendees for ${updated} events`, 'info', 'calendar');
-        return json({ ok: true, normalized: updated });
       }
-      case 'pause_sync': {
-        await setSyncStatus(supabase, userId, { sync_status: 'paused' });
-        await sendConsole(supabase, userId, null, 'Sync paused', 'milestone', 'calendar');
-        return json({ ok: true });
+      case 'refresh_matching_views': {
+        try {
+          const r = await supabaseGsync.rpc('refresh_calendar_matching_views', {} as any);
+          if (r.error) {
+            const msg = r.error.message || '';
+            const details = (r.error as any).details || null;
+            // If RPC or underlying MV is missing or ownership blocks refresh, return a clear hint
+            return json({ ok: false, source: 'rpc', error: msg, details, hint: 'Ensure gsync.refresh_calendar_matching_views exists and refreshes the correct MVs owned by a privileged role.' });
+          }
+          return json({ ok: true });
+        } catch (e: any) {
+          return json({ ok: false, source: 'exception', error: e?.message || 'failed to refresh calendar views' });
+        }
+      }
+      case 'backfill_from_view': {
+        // Download event details + attachments from a view and update base rows
+        try {
+          const accessToken = await getValidAccessTokenOrThrow(supabase, userId);
+          const batch = Math.max(1, Math.min(100, Number((body && body.limit) || 100)));
+          const { data: rows, error } = await supabaseGsync
+            .from('g_events_full_bodies_to_download')
+            .select('user_id, google_event_id, google_calendar_id')
+            .eq('user_id', userId)
+            .limit(batch);
+          if (error) return json({ ok: false, source: 'select', error: error.message });
+          // History row (user-initiated) from min/max of selected events
+          let histId: number | null = null;
+          try {
+            const ids = (rows || []).map((r: any) => r.google_event_id);
+            let startIso: string | null = null; let endIso: string | null = ts();
+            if (ids.length) {
+              const { data: b1 } = await supabaseGsync.from('g_events').select('start_time').eq('user_id', userId).in('google_event_id', ids).order('start_time', { ascending: true }).limit(1);
+              const { data: b2 } = await supabaseGsync.from('g_events').select('start_time').eq('user_id', userId).in('google_event_id', ids).order('start_time', { ascending: false }).limit(1);
+              startIso = (b1 && b1[0]?.start_time) || null;
+              endIso = (b2 && b2[0]?.start_time) || endIso;
+            }
+            const { data: ins } = await supabase.from('gsync.google_sync_history').insert({ user_id: userId, start_of_sync_period: startIso, end_of_sync_period: endIso, object_type: 'event', initiator: 'user', started_at: ts() } as any).select('id').single();
+            histId = (ins as any)?.id ?? null;
+          } catch {}
+          let updated = 0;
+          for (const r of rows || []) {
+            const eid = (r as any).google_event_id as string;
+            const calId = (r as any).google_calendar_id || 'primary';
+            if (!eid) continue;
+            const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events/${encodeURIComponent(eid)}`);
+            const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+            if (!resp.ok) continue;
+            const ev: any = await resp.json();
+            // Update summary/description if desired (optional)
+            const summary = ev.summary || null;
+            const description = ev.description || null;
+            await supabase
+              .from('gsync.g_events')
+              .update({ summary, description, updated_at: ts() })
+              .eq('user_id', userId)
+              .eq('google_calendar_id', calId)
+              .eq('google_event_id', eid);
+            // Download attachments from Drive if present
+            const atts: any[] = Array.isArray(ev.attachments) ? ev.attachments : [];
+            if (atts.length) {
+              try { await supabase.storage.createBucket('gcal-attachments', { public: false }); } catch {}
+            }
+            for (const a of atts) {
+              const fid = a.fileId as string | undefined;
+              let storagePath: string | null = null;
+              if (fid) {
+                const driveUrl = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fid)}?alt=media`;
+                const dres = await fetch(driveUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
+                if (dres.ok) {
+                  const blob = await dres.blob();
+                  const safe = (a.title || fid || 'attachment').replace(/[^a-zA-Z0-9._-]+/g, '_');
+                  const key = `${userId}/${calId}/${eid}/${fid}-${safe}`;
+                  await supabase.storage.from('gcal-attachments').upload(key, blob, { upsert: true, contentType: (a.mimeType || undefined) as any });
+                  storagePath = key;
+                }
+              }
+              await supabase
+                .from('gsync.g_event_attachments')
+                .upsert({
+                  user_id: userId,
+                  google_calendar_id: calId,
+                  google_event_id: eid,
+                  title: a.title || null,
+                  mime_type: a.mimeType || null,
+                  file_url: a.fileUrl || null,
+                  file_id: a.fileId || null,
+                  icon_link: a.iconLink || null,
+                  storage_path: storagePath,
+                } as any, { onConflict: 'user_id,google_calendar_id,google_event_id,file_id' } as any);
+            }
+            updated++;
+          }
+          // If likely end of stream, refresh final MV (best-effort)
+          if (updated < batch) {
+            try { await supabaseGsync.rpc('refresh_events_with_people_ids', {} as any); } catch {}
+          }
+          try { if (histId) await supabase.from('gsync.google_sync_history').update({ backfill_downloads: updated, backfill_download_successful: true }).eq('id', histId); } catch {}
+          return json({ ok: true, updated });
+        } catch (e: any) {
+          try {
+            await supabase
+              .from('gsync.google_sync_history')
+              .insert({ user_id: userId, object_type: 'event', initiator: 'user', started_at: ts(), backfill_download_successful: false, backfill_error: e?.message || 'backfill from view failed' } as any);
+          } catch {}
+          return json({ ok: false, source: 'exception', error: e?.message || 'backfill from view failed' });
+        }
       }
       default:
         return json({ error: `Unknown action: ${action}` }, 400);

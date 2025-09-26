@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button as MButton, Menu, MenuItem } from '@mui/material';
@@ -31,9 +32,9 @@ const ACTION_LABELS: Record<RowActionId, string> = {
 };
 
 const GRID_ACTIONS: Record<GridRowEntity, RowActionId[]> = {
-  educator: ['inline_edit', 'view_in_modal', 'email', 'add_note', 'add_task', 'archive'],
-  school: ['inline_edit', 'view_in_modal', 'email', 'add_note', 'add_task', 'archive'],
-  charter: ['inline_edit', 'view_in_modal', 'email', 'add_note', 'add_task', 'archive'],
+  educator: ['email', 'add_note', 'add_task', 'archive'],
+  school: ['add_note', 'add_task', 'archive'],
+  charter: ['add_note', 'add_task', 'archive'],
 };
 
 const CREATE_CONFIGS: Record<
@@ -291,13 +292,14 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
           break;
         }
         case 'email': {
-          const email = findEmailAddress(data);
+          const email = await resolveEmailAddress(data as any, entity);
           if (!email) {
             window.alert('No email address is available for this record.');
             break;
           }
           if (typeof window !== 'undefined') {
-            window.location.href = `mailto:${email}`;
+            const to = encodeURIComponent(email);
+            window.location.assign(`/email/compose?to=${to}`);
           }
           break;
         }
@@ -450,8 +452,29 @@ function CreateActionModal({
   }, [onClose, submitting]);
 
   const isNote = config.createType === 'note';
+  const [guideOptions, setGuideOptions] = React.useState<string[]>([]);
+  React.useEffect(() => {
+    if (isNote) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await (supabase as any)
+          .from('guides')
+          .select('email_or_name, is_active')
+          .eq('is_active', true)
+          .order('email_or_name', { ascending: true });
+        if (!cancelled && !error && Array.isArray(data)) {
+          setGuideOptions((data as any[])
+            .map((r) => String(r?.email_or_name ?? ''))
+            .filter((s) => s.length > 0)
+          );
+        }
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [isNote]);
 
-  return (
+  return (typeof document !== 'undefined' ? ReactDOM.createPortal(
     <div
       style={{
         position: 'fixed',
@@ -468,7 +491,7 @@ function CreateActionModal({
     >
       <div
         style={{
-          minWidth: 360,
+          minWidth: 520,
           maxWidth: '90vw',
           background: '#ffffff',
           borderRadius: 8,
@@ -504,10 +527,11 @@ function CreateActionModal({
                   <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <span style={{ color: '#475569', fontSize: 12 }}>{formatLabel(noteConfig.textField)}</span>
                     <textarea
-                      rows={3}
+                      rows={8}
                       value={values[noteConfig.textField] ?? ''}
                       onChange={(event) => onChange(noteConfig.textField, event.target.value)}
                       autoFocus
+                      style={{ minHeight: 140 }}
                     />
                   </label>
                 );
@@ -536,19 +560,24 @@ function CreateActionModal({
                   <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <span style={{ color: '#475569', fontSize: 12 }}>{formatLabel(taskConfig.textField)}</span>
                     <textarea
-                      rows={3}
+                      rows={8}
                       value={values[taskConfig.textField] ?? ''}
                       onChange={(event) => onChange(taskConfig.textField, event.target.value)}
                       autoFocus
+                      style={{ minHeight: 140 }}
                     />
                   </label>
                   <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <span style={{ color: '#475569', fontSize: 12 }}>{formatLabel(taskConfig.assignedToField)}</span>
-                    <input
-                      type="text"
+                    <select
                       value={values[taskConfig.assignedToField] ?? ''}
                       onChange={(event) => onChange(taskConfig.assignedToField, event.target.value)}
-                    />
+                    >
+                      <option value="">--</option>
+                      {guideOptions.map((g) => (
+                        <option key={g} value={g}>{g}</option>
+                      ))}
+                    </select>
                   </label>
                   <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <span style={{ color: '#475569', fontSize: 12 }}>{formatLabel(taskConfig.dueDateField)}</span>
@@ -573,7 +602,7 @@ function CreateActionModal({
         </form>
       </div>
     </div>
-  );
+  , document.body) : null);
 }
 
 export function createGridActionColumn(entity: GridRowEntity): ColDef<any> {
@@ -585,6 +614,8 @@ export function createGridActionColumn(entity: GridRowEntity): ColDef<any> {
     cellRendererParams: { entity },
     sortable: false,
     filter: false,
+    suppressColumnsToolPanel: true,
+    suppressFiltersToolPanel: true,
     suppressHeaderMenuButton: true,
     resizable: false,
     pinned: 'right',
@@ -682,5 +713,19 @@ function findEmailAddress(record: Record<string, any> | null | undefined): strin
       if (match) return match;
     }
   }
+  return null;
+}
+
+async function resolveEmailAddress(record: Record<string, any> | null | undefined, entity?: GridRowEntity): Promise<string | null> {
+  const direct = findEmailAddress(record);
+  if (direct) return direct;
+  if (!record) return null;
+  let pid = record['people_id'] ?? record['person_id'] ?? record['educator_id'];
+  if (pid == null && entity === 'educator' && record['id']) pid = record['id'];
+  if (pid == null) return null;
+  try {
+    const { data, error } = await (supabase as any).from('primary_emails').select('email_address').eq('people_id', pid).maybeSingle();
+    if (!error && data?.email_address) return String(data.email_address);
+  } catch {}
   return null;
 }

@@ -1,6 +1,5 @@
 // Config model: field name, display name, visibility, order, and value type/options.
 import type { ColumnVisibility, GridValueKind, GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailMapBlock, DetailTabSpec as SharedDetailTabSpec, FieldMetadataMap } from '../shared/detail-types';
-// Legacy bundles removed; presets are self-contained
 import { TABLE_PRESETS } from '../shared/table-presets';
 
 export type { ColumnVisibility, GridValueKind } from '../shared/detail-types';
@@ -12,12 +11,15 @@ export type DetailTabSpec = SharedDetailTabSpec;
 
 export const SCHOOL_GRID: SchoolColumnConfig[] = [
   { field: 'school_name', headerName: 'Name', visibility: 'show', valueType: 'string' , sortKey: true},
-  { field: 'stage_status', headerName: 'Stage/Status', visibility: 'show', valueType: 'select', lookupField: 'ref_stage_statuses' , kanbanKey: true },
-  { field: 'current_tls', headerName: 'Status', visibility: 'show', valueType: 'string' },
-  { field: 'governance_model', headerName: 'City', visibility: 'show', valueType: 'select', enumName: 'governance_models' },
-  { field: 'ages_served', headerName: 'Ages served', visibility: 'show', valueType: 'multi', enumName: 'age_spans' },
-  { field: 'membership_status', headerName: 'Membership status', visibility: 'show', valueType: 'select', lookupField: 'ref_membership_statuses' },
-  { field: 'projected_open', headerName: 'Projected open', visibility: 'show', valueType: 'date' },
+  { field: 'stage_status', headerName: 'Stage/Status', visibility: 'show', valueType: 'select', lookupField: 'ref_stage_statuses.value' , kanbanKey: true },
+  { field: 'current_tls', headerName: 'Curr. TLs', visibility: 'show', valueType: 'string' },
+  { field: 'current_tls_race_ethnicity', headerName: 'TLs Race/ Ethnicity', visibility: 'show', valueType: 'multi', lookupField: 'ref_race_and_ethnicity.english_label_short' },
+  { field: 'governance_model', headerName: 'Model', visibility: 'show', valueType: 'select', enumName: 'governance_models' },
+  { field: 'ages_served', headerName: 'Ages', visibility: 'show', valueType: 'multi', enumName: 'age_spans' },
+  { field: 'membership_status', headerName: 'Member?', visibility: 'show', valueType: 'select', lookupField: 'ref_membership_statuses.value' },
+  { field: 'open', headerName: 'Open/Proj. open', visibility: 'show', valueType: 'date' },
+  { field: 'active_guides', headerName: 'Guides', visibility: 'show', valueType: 'multi' },
+  { field: 'people_id', headerName: 'People ID', visibility: 'suppress'},
   { field: 'id', headerName: 'ID', visibility: 'suppress' }
 ];
 
@@ -28,9 +30,10 @@ export const SCHOOL_DETAIL_TABS: DetailTabSpec[] = [
     id: 'overview',
     label: 'Overview',
     blocks: [
-      { kind: 'map', title: 'Location', fields: ['physical_lat','physical_long','physical_address'] },
-      { kind: 'card', title: 'Name(s)', fields: ['short_name', 'long_name', 'prior_names','founding_tls'], editable: true },
+      { kind: 'card', title: 'Name(s)', fields: ['short_name', 'long_name', 'prior_names'], editable: true },
+      { kind: 'card', title: 'People', fields: ['current_tls','founding_tls'], editable: true },
       { kind: 'card', title: 'Status', fields: ['stage_status', 'open_date','membership_status'], editable: false },
+      { kind: 'map', title: 'Location', fields: ['physical_lat','physical_long','physical_address'] },
       { kind: 'card', title: 'About', fields: ['about','about_spanish'], editable: true },
       { kind: 'card', title: 'Support', fields: ['current_tls','current_guide_name','current_cohort'], editable: false },
       { kind: 'card', title: 'School Model', fields: ['governance_model','public_funding','program_focus','institutional_partner','ages_served', 'number_of_classrooms','enrollment_at_full_capacity'], editable: true },

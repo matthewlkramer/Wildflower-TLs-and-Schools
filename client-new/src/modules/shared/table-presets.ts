@@ -12,7 +12,7 @@ export type TablePreset = {
 
 const TABLE_COLUMNS = {
   educators: [
-    { field: 'full_name', label: 'Educator', type: 'string' , edit: false},
+    { field: 'full_name', label: 'Educator', type: 'string' , update: 'newOnly'},
     { field: 'role', label: 'Role', type: 'string', array: true, lookup: { table: 'ref_roles', valueColumn: 'value', labelColumn: 'value' }},
     { field: 'start_date', label: 'Start Date', type: 'date' },
     { field: 'end_date', label: 'End Date', type: 'date' },
@@ -20,27 +20,27 @@ const TABLE_COLUMNS = {
   ],
 
   schools: [
-    { field: 'school_name', label: 'School', type: 'string', edit: false },
+    { field: 'school_name', label: 'School', type: 'string', update: 'newOnly' },
     { field: 'role', label: 'Role', type: 'string', array: true, lookup: { table: 'ref_roles', valueColumn: 'value', labelColumn: 'value' } },
     { field: 'start_date', label: 'Start Date', type: 'date' },
     { field: 'end_date', label: 'End Date', type: 'date' },
     { field: 'is_active', label: 'Active?', type: 'boolean' },
-    { field: 'stage_status', label: 'Stage/Status', type: 'string' , edit: false},
+    { field: 'stage_status', label: 'Stage/Status', type: 'string' , update: 'no'},
   ],
 
   gmails: [
-    { field: 'sent_at', label: 'Sent At', type: 'date', edit: false },
-    { field: 'from', label: 'From', type: 'string', edit: false },
-    { field: 'to_emails', label: 'To', type: 'string', array: true, edit: false },
-    { field: 'cc_emails', label: 'CC', type: 'string', array: true, edit: false },
-    { field: 'subject', label: 'Subject', type: 'string', edit: false },
+    { field: 'sent_at', label: 'Sent At', type: 'date', update: 'no' },
+    { field: 'from', label: 'From', type: 'string', update: 'no' },
+    { field: 'to_emails', label: 'To', type: 'string', array: true, update: 'no' },
+    { field: 'cc_emails', label: 'CC', type: 'string', array: true, update: 'no' },
+    { field: 'subject', label: 'Subject', type: 'string', update: 'no' },
     { field: 'is_private', label: 'Private?', type: 'boolean' },
   ],
 
   calendarEvents: [
-    { field: 'summary', label: 'Summary', type: 'string', edit: false },
-    { field: 'start_date', label: 'Start Date', type: 'date', edit: false },
-    { field: 'attendees', label: 'Attendees', type: 'string', array: true, edit: false },
+    { field: 'summary', label: 'Summary', type: 'string', update: 'no' },
+    { field: 'start_date', label: 'Start Date', type: 'date', update: 'no' },
+    { field: 'attendees', label: 'Attendees', type: 'string', array: true, update: 'no' },
     { field: 'is_private', label: 'Private?', type: 'boolean' },
   ],
 
@@ -55,7 +55,7 @@ const TABLE_COLUMNS = {
 
   notes: [
     { field: 'text', label: 'Note', type: 'string', multiline: true },
-    { field: 'created_by', label: 'Created By', type: 'string' },
+    { field: 'created_by', label: 'Created By', type: 'string', lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
     { field: 'created_date', label: 'Created Date', type: 'date' },
     { field: 'is_private', label: 'Private?', type: 'boolean' },
   ],
@@ -77,7 +77,7 @@ const TABLE_COLUMNS = {
   ],
 
   nine_nineties: [
-    { field: 'form_year', label: 'Year', type: 'string' },
+    { field: 'form_year', label: 'Year', type: 'string', lookup: { table: 'school_years', valueColumn: 'starting_calendar_year', labelColumn: 'starting_calendar_year' } },
     { field: 'pdf', label: 'Document', type: 'attachment' },
   ],
 
@@ -115,9 +115,9 @@ export const TABLE_PRESETS = {
 
   charterEducators: {
     readSource: { table: 'details_associations', fkColumn: 'charter_id' },
-    writeDefaults: { table: 'people', pkColumn: 'id' },
+    writeDefaults: { table: 'people_roles_associations', pkColumn: 'id' },
     columns: [
-      { field: 'school_name', label: 'School', type: 'string' , edit: false},
+      { field: 'school_name', label: 'School', type: 'string' , update: 'newOnly'},
       ...TABLE_COLUMNS.educators,
     ] as const,
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'email', 'add_note','add_task','archive'] as const,
@@ -127,9 +127,9 @@ export const TABLE_PRESETS = {
 
   charterSchools: {
     readSource: { table: 'details_associations', fkColumn: 'charter_id' },
-    writeDefaults: { table: 'schools', pkColumn: 'id' },
+    writeDefaults: { table: 'people_roles_associations', pkColumn: 'id' },
     columns: [
-      { field: 'full_name', label: 'Educator', type: 'string', edit: false },
+      { field: 'full_name', label: 'Educator', type: 'string', update: 'newOnly' },
       ...TABLE_COLUMNS.schools
     ],
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'add_note','add_task','archive'] as const,
@@ -270,7 +270,7 @@ export const TABLE_PRESETS = {
       { field: 'is_primary', label: 'Primary?', type: 'boolean' },
       { field: 'is_valid', label: 'Valid?', type: 'boolean' },
     ] as const,
-    rowActions: ['inline_edit', 'make_primary', 'toggle_valid','archive'] as const,
+    rowActions: ['inline_edit', 'make_primary', 'toggle_valid', 'email','archive'] as const,
     tableActions: ['addEmail'] as const,
     tableActionLabels: ['Add Email'] as const,
   },
@@ -307,14 +307,14 @@ export const TABLE_PRESETS = {
     readSource: { table: 'event_attendance', fkColumn: 'people_id' },
     writeDefaults: { table: 'event_attendance', pkColumn: 'id' },
     columns: [
-      { field: 'event_name', label: 'Event Name', type: 'string' },
+      { field: 'event_name', label: 'Event Name', type: 'string', lookup: { table: 'event_list', valueColumn: 'event_name', labelColumn: 'event_name' } },
       { field: 'event_date', label: 'Event Date', type: 'date' },
       { field: 'attended_event', label: 'Attended?', type: 'boolean' },
       { field: 'registration_date', label: 'Registration Date', type: 'date' },
     ] as const,
     rowActions: ['inline_edit', 'view_in_modal', 'archive'] as const,
     tableActions: ['addEvent'] as const,
-    tableActionLabels: ['Add Event Attendance'] as const,
+    tableActionLabels: ['Add Attendance at Event'] as const,
   },
 
   educatorActionSteps: {
@@ -377,7 +377,7 @@ export const TABLE_PRESETS = {
     readSource: { table: 'details_associations', fkColumn: 'school_id' },
     writeDefaults: { table: 'people_roles_associations', pkColumn: 'id' },
     columns: [...TABLE_COLUMNS.educators] as const,
-    rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'archive'] as const,
+    rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'email','archive'] as const,
     tableActions: ['addExistingEducatorToSchool','addNewEducatorToSchool'] as const,
     tableActionLabels: ['Add Existing Educator','Add New Educator'] as const,
   },

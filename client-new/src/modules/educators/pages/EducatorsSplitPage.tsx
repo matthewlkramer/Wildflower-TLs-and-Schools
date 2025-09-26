@@ -241,17 +241,15 @@ export function EducatorsSplitPage() {
         </div>
 
         {/* Right side - Detail view */}
-        <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+        <div style={{ flex: 1, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '8px', padding: 12 }}>
           {selectedEducatorId && selectedEducatorData ? (
-            <div style={{ transform: 'scale(0.9)', transformOrigin: 'top left', width: '111%', height: '111%' }}>
-              <DetailsRenderer
-                entityId={selectedEducatorId}
-                details={selectedEducatorData as any}
-                tabs={EDUCATOR_DETAIL_TABS}
-                fieldMeta={EDUCATOR_FIELD_METADATA}
-                resolveTitle={(details) => details.full_name ?? details.name ?? selectedEducatorId}
-              />
-            </div>
+            <DetailsRenderer
+              entityId={selectedEducatorId}
+              details={selectedEducatorData as any}
+              tabs={EDUCATOR_DETAIL_TABS}
+              fieldMeta={EDUCATOR_FIELD_METADATA}
+              resolveTitle={(details) => details.full_name ?? details.name ?? selectedEducatorId}
+            />
           ) : (
             <div style={{ padding: '20px', color: '#6b7280' }}>
               Select an educator from the list to view details

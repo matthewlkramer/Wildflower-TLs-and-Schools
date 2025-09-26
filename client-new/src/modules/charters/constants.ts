@@ -1,4 +1,4 @@
-// Legacy bundles removed; presets are self-contained
+// Presets are self-contained
 import { TABLE_PRESETS } from '../shared/table-presets';
 import type { ColumnVisibility, GridValueKind, GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailMapBlock, DetailTabSpec as SharedDetailTabSpec, FieldMetadataMap } from '../shared/detail-types';
 
@@ -16,6 +16,8 @@ export const CHARTER_GRID: CharterColumnConfig[] = [
   { field: 'non_tl_roles', headerName: 'Non-TL leadership', visibility: 'show', valueType: 'string' },
   { field: 'initial_target_planes', headerName: 'Target planes', visibility: 'show', valueType: 'multi', lookupField: 'ref_planes.label' },
   { field: 'initial_target_geo', headerName: 'Target geography', visibility: 'show', valueType: 'string' },
+  { field: 'schools', headerName: 'Schools', visibility: 'show', valueType: 'multi' },
+  { field: 'active_guides', headerName: 'Guides', visibility: 'show', valueType: 'multi' },
   { field: 'id', headerName: 'ID', visibility: 'suppress' }
 ];    
 

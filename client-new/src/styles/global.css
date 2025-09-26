@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Brand display font to match wildflowerschools.org banner */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap');
+
 * {
   box-sizing: border-box;
 }
@@ -166,6 +169,11 @@ main {
   padding: 8px;
 }
 
+/* Hide AG Grid side bar icon buttons; we open tool panels via header buttons */
+.ag-theme-material .ag-side-buttons {
+  display: none !important;
+}
+
 /* Remove the outer gray border around AG Grid */
 .ag-theme-material .ag-root-wrapper,
 .ag-theme-material .ag-root-wrapper-body,
@@ -191,8 +199,69 @@ main {
   border-left: none !important;
 }
 
+/* Allow grid header text to wrap to a second line */
+.ag-theme-material .ag-header-cell-text {
+  white-space: normal !important;
+  line-height: 1.2 !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* Vertically center header label block within the header row */
+.ag-theme-material .ag-header-cell-label {
+  align-items: center !important;
+  height: auto !important;
+}
+
+/* Slightly more breathing room for wrapped headers */
+.ag-theme-material .ag-header-cell {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+/* Hide per-column header filter icons; use menu option instead */
+.ag-theme-material .ag-header-cell .ag-header-icon.ag-icon-filter,
+.ag-theme-material .ag-header-cell .ag-header-cell-filter-button,
+.ag-theme-material .ag-header-cell .ag-header-icon[ref="eFilterButton"] {
+  display: none !important;
+}
+
+/* Hide the three-dot menu on the checkbox selection column */
+.ag-theme-material .ag-header-cell[col-id="__select"] .ag-header-cell-menu-button,
+.ag-theme-material .ag-header-cell[col-id="__select"] .ag-icon-menu {
+  display: none !important;
+}
+
+/* Nudge the three-dot menu slightly closer to the right edge */
+.ag-theme-material .ag-header-cell .ag-header-cell-menu-button {
+  margin-right: -12px !important;
+}
+
+/* (label flex uses theme defaults) */
+
 .ag-theme-material .no-left-border.ag-cell {
   border-left: none !important;
+}
+
+/* Hide the right-side divider of the last data column before the Actions column */
+.ag-theme-material .no-right-border.ag-header-cell::after {
+  display: none !important;
+}
+.ag-theme-material .no-right-border.ag-header-cell {
+  border-right: none !important;
+}
+
+/* Remove the separator between center and pinned-right header/body (vertical divider before Actions) */
+.ag-theme-material .ag-pinned-right-header {
+  border-left: none !important;
+}
+.ag-theme-material .ag-pinned-right-cols-container {
+  border-left: none !important;
+}
+/* Some themes draw a separator via a ::before pseudo-element on pinned containers */
+.ag-theme-material .ag-pinned-right-header::before,
+.ag-theme-material .ag-pinned-right-cols-container::before {
+  display: none !important;
 }
 
 .app-header {
@@ -241,6 +310,8 @@ main {
 .app-header__brand-name {
   font-size: 0.95rem;
   color: #101828;
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-weight: 600;
 }
 
 .app-header__brand-tagline {

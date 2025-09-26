@@ -6,3 +6,5 @@ vite.config.ts.*
 *.tar.gz
 .env
 .pnpm-store
+client-new/scripts/type_archives/
+client-new/src/modules/shared/schema-metadata.archives/
