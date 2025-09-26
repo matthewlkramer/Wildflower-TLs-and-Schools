@@ -282,17 +282,16 @@ export function DashboardPage() {
     return cols.map((c) => {
       if (c.field === 'sent_at') return { ...c, valueFormatter: (p: any) => fmtDate(p.value), width: 100, flex: 0 } as ColDef<any>;
       if (c.field === 'is_private') {
-        const renderer = (p: any) => {
-          const input = document.createElement('input');
-          input.type = 'checkbox';
-          input.checked = !!p.value;
-          input.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleEmailPrivacy(p.data);
-          });
-          return input;
-        };
-        return { ...c, width: 72, flex: 0, cellRenderer: renderer } as ColDef<any>;
+        const Renderer = (p: any) => (
+          <input
+            type="checkbox"
+            checked={!!p.value}
+            onChange={() => { /* AG Grid will re-render after state update */ }}
+            onClick={(e) => { e.stopPropagation(); toggleEmailPrivacy(p.data); }}
+            style={{ cursor: 'pointer' }}
+          />
+        );
+        return { ...c, width: 72, flex: 0, cellRenderer: Renderer as any } as ColDef<any>;
       }
       if (c.field === 'subject') return { ...c, flex: 2, minWidth: 240 } as ColDef<any>;
       return c;
@@ -304,17 +303,16 @@ export function DashboardPage() {
       if (c.field === 'start_time') return { ...c, valueFormatter: (p: any) => fmtDateWithShortTime(p.value), width: 120, flex: 0 } as ColDef<any>;
       if (c.field === 'end_time') return { ...c, valueFormatter: (p: any) => fmtDate(p.value), width: 100, flex: 0 } as ColDef<any>;
       if (c.field === 'is_private') {
-        const renderer = (p: any) => {
-          const input = document.createElement('input');
-          input.type = 'checkbox';
-          input.checked = !!p.value;
-          input.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleEventPrivacy(p.data);
-          });
-          return input;
-        };
-        return { ...c, width: 72, flex: 0, cellRenderer: renderer } as ColDef<any>;
+        const Renderer = (p: any) => (
+          <input
+            type="checkbox"
+            checked={!!p.value}
+            onChange={() => {}}
+            onClick={(e) => { e.stopPropagation(); toggleEventPrivacy(p.data); }}
+            style={{ cursor: 'pointer' }}
+          />
+        );
+        return { ...c, width: 72, flex: 0, cellRenderer: Renderer as any } as ColDef<any>;
       }
       if (c.field === 'summary') return { ...c, flex: 2, minWidth: 240 } as ColDef<any>;
       return c;
