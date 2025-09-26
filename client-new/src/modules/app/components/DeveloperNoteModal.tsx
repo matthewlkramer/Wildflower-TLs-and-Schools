@@ -156,6 +156,18 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       const fullW = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, window.innerWidth);
       const fullH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, window.innerHeight);
 
+      // Pre-pass: scroll through the page to encourage virtualized lists/images to render
+      try {
+        const step = Math.max(200, Math.floor(window.innerHeight * 0.8));
+        for (let sy = 0; sy < fullH; sy += step) {
+          window.scrollTo(0, sy);
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((r) => setTimeout(r, 30));
+        }
+        window.scrollTo(0, 0);
+        await new Promise((r) => setTimeout(r, 50));
+      } catch {}
+
       // Stitch the page in tiles to ensure content beyond viewport renders
       const viewportH = window.innerHeight || 900;
       const tileH = Math.max(600, Math.min(viewportH, 1200));
@@ -192,11 +204,29 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
         const onclone = (doc: Document) => {
           try {
             const w: any = doc.defaultView as any;
-            if (w && typeof w.scrollTo === 'function') w.scrollTo(0, y);
-            (doc.documentElement as any).scrollTop = y;
-            (doc.body as any).scrollTop = y;
-            // Ensure FO path shifts content for the current tile
-            (doc.body as any).style.transform = `translateY(-${y}px)`;
+            if (w && typeof w.scrollTo === 'function') w.scrollTo(0, 0);
+            // Disable sticky/fixed behavior which can repeat across tiles
+            try {
+              doc.querySelectorAll('*').forEach((el) => {
+                const s = (el as HTMLElement).style as CSSStyleDeclaration;
+                if (!s) return;
+                const cs = doc.defaultView?.getComputedStyle(el as Element);
+                const pos = cs?.position || '';
+                if (pos === 'sticky') (el as HTMLElement).style.position = 'static';
+                if (pos === 'fixed') (el as HTMLElement).style.position = 'absolute';
+              });
+            } catch {}
+            // Encourage images to load eagerly in the clone
+            doc.querySelectorAll('img').forEach((img) => {
+              try {
+                const i = img as HTMLImageElement;
+                (i as any).loading = 'eager';
+                if (!i.src && (i as any).dataset?.src) i.src = (i as any).dataset.src;
+              } catch {}
+            });
+            // Shift the cloned body upward to expose the slice starting at y
+            (doc.body as any).style.position = 'relative';
+            (doc.body as any).style.top = `-${y}px`;
           } catch {}
         };
         const optsFO = { ...baseOpts, height: h, windowHeight: h, scrollX: 0, scrollY: 0, foreignObjectRendering: true, onclone } as any;
