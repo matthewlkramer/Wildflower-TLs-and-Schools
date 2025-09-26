@@ -18,12 +18,18 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
   const [screenshotUrl, setScreenshotUrl] = React.useState<string>('');
   const [saving, setSaving] = React.useState(false);
 
-  // Load enum options for dev_notes_type
+  // Load enum options for dev_note_type (enum array)
   React.useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const { data, error } = await (supabase as any).rpc('enum_values', { enum_type: 'dev_notes_type' });
+        // Prefer singular enum name per schema: dev_note_type
+        let { data, error } = await (supabase as any).rpc('enum_values', { enum_type: 'dev_note_type' });
+        if (error) {
+          // Fallback to legacy name if present
+          const res = await (supabase as any).rpc('enum_values', { enum_type: 'dev_notes_type' });
+          data = res.data; error = res.error;
+        }
         if (!cancelled && !error) {
           const opts = Array.isArray(data) ? data.map((r: any) => String(r?.value ?? r)).filter(Boolean) : [];
           setAvailableTypes(opts);
@@ -110,20 +116,18 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
     setSaving(true);
     try {
       let finalComment = comment;
-      // Append recent client logs
+      // Capture recent client logs for dedicated column
       const logs = getBufferedLogsText(200);
-      if (logs) finalComment += `\n\n[Logs]\n${logs}`;
+      let link: string | null = screenshotUrl || null;
+      if (!link) link = await captureScreenshot();
 
-      if (!screenshotUrl) {
-        const url = await captureScreenshot();
-        if (url) setScreenshotUrl(url);
-      }
       const payload: any = {
         notes_type: noteTypes,
         comment: finalComment,
         user_priority: priority,
         focus_area: focusSelector || (focusBox ? JSON.stringify(focusBox) : null),
-        screenshot_link: screenshotUrl || null,
+        screenshot_link: link || null,
+        logs: logs || null,
       };
       const { error } = await (supabase as any).from('developer_notes').insert(payload);
       if (error) throw error;
@@ -137,7 +141,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
   };
 
   return (
-    <Dialog open={open} onClose={() => { if (!saving) onClose(); }} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={() => { if (!saving) onClose(); }} maxWidth="md" fullWidth>
       <DialogTitle>Developer Note</DialogTitle>
       <DialogContent sx={{ display: 'grid', gap: 1.5, pt: 2 }}>
         <TextField
@@ -160,7 +164,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
         </TextField>
         <TextField
           label="Comment"
-          multiline minRows={6}
+          multiline minRows={12}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
