@@ -152,30 +152,60 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       // Dynamic import to avoid upfront bundle cost
       const mod: any = await import('html2canvas');
       const html2canvas = mod.default || mod;
-      // Try with foreignObjectRendering first to avoid CSS parser limitations (e.g., CSS Color 4 functions)
+
       const fullW = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, window.innerWidth);
       const fullH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, window.innerHeight);
+
+      // Stitch the page in tiles to ensure content beyond viewport renders
+      const viewportH = window.innerHeight || 900;
+      const tileH = Math.max(600, Math.min(viewportH, 1200));
+
+      // Guard against huge canvases by scaling down if necessary
+      const MAX_DIM = 16384; // conservative cross-browser limit
+      const scale = Math.min(1, MAX_DIM / fullW, MAX_DIM / fullH);
+      const outW = Math.floor(fullW * scale);
+      const outH = Math.floor(fullH * scale);
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = outW;
+      outCanvas.height = outH;
+      const outCtx = outCanvas.getContext('2d');
+      if (!outCtx) throw new Error('Canvas unavailable');
+
       const baseOpts = {
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        // Ensure we render the full page, not just the viewport
         windowWidth: fullW,
-        windowHeight: fullH,
+        windowHeight: tileH,
         width: fullW,
-        height: fullH,
+        height: tileH,
         scrollX: 0,
-        scrollY: 0,
       } as const;
-      let canvas: HTMLCanvasElement;
-      try {
-        canvas = await html2canvas(document.body, { ...baseOpts, foreignObjectRendering: true });
-      } catch (err: any) {
-        // Retry without foreignObjectRendering as a fallback
-        console.warn('html2canvas foreignObjectRendering failed; retrying without it', err);
-        canvas = await html2canvas(document.body, { ...baseOpts, foreignObjectRendering: false });
+
+      let y = 0;
+      while (y < fullH) {
+        const h = Math.min(tileH, fullH - y);
+        // Each tile renders the slice starting at y by offsetting scrollY negatively
+        const optsFO = { ...baseOpts, height: h, windowHeight: h, scrollY: -y, foreignObjectRendering: true } as any;
+        const optsCanvas = { ...baseOpts, height: h, windowHeight: h, scrollY: -y, foreignObjectRendering: false } as any;
+        let tile: HTMLCanvasElement | null = null;
+        try {
+          tile = await html2canvas(document.body, optsFO);
+        } catch {
+          tile = await html2canvas(document.body, optsCanvas);
+        }
+        if (!tile) break;
+        // Draw the tile into the output canvas at scaled position
+        const destY = Math.floor(y * scale);
+        const destH = Math.floor(h * scale);
+        outCtx.drawImage(tile, 0, 0, tile.width, tile.height, 0, destY, outW, destH);
+        y += h;
+        // Yield occasionally to keep UI responsive
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((r) => setTimeout(r, 10));
       }
-      const blob: Blob | null = await new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/png'));
+
+      const blob: Blob | null = await new Promise((resolve) => outCanvas.toBlob((b) => resolve(b), 'image/png'));
       if (!blob) throw new Error('Snapshot failed');
       setShotBlob(blob);
       const url = URL.createObjectURL(blob);
