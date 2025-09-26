@@ -152,7 +152,16 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       // Dynamic import to avoid upfront bundle cost
       const mod: any = await import('html2canvas');
       const html2canvas = mod.default || mod;
-      const canvas: HTMLCanvasElement = await html2canvas(document.body, { useCORS: true, logging: false, windowWidth: document.documentElement.scrollWidth, windowHeight: document.documentElement.scrollHeight });
+      // Try with foreignObjectRendering first to avoid CSS parser limitations (e.g., CSS Color 4 functions)
+      const baseOpts = { useCORS: true, logging: false, windowWidth: document.documentElement.scrollWidth, windowHeight: document.documentElement.scrollHeight, backgroundColor: '#ffffff' } as const;
+      let canvas: HTMLCanvasElement;
+      try {
+        canvas = await html2canvas(document.body, { ...baseOpts, foreignObjectRendering: true });
+      } catch (err: any) {
+        // Retry without foreignObjectRendering as a fallback
+        console.warn('html2canvas foreignObjectRendering failed; retrying without it', err);
+        canvas = await html2canvas(document.body, { ...baseOpts, foreignObjectRendering: false });
+      }
       const blob: Blob | null = await new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/png'));
       if (!blob) throw new Error('Snapshot failed');
       setShotBlob(blob);
