@@ -254,13 +254,20 @@ export function DashboardPage() {
   const stepsCols = useMemo(() => buildCols(spec.my_action_steps.columns), [spec]);
   const emailsCols = useMemo(() => {
     const cols = buildCols(spec.my_emails.columns);
-    return cols.map((c) => (c.field === 'sent_at' ? { ...c, valueFormatter: (p: any) => fmtDate(p.value) } : c));
+    return cols.map((c) => {
+      if (c.field === 'sent_at') return { ...c, valueFormatter: (p: any) => fmtDate(p.value), width: 100, flex: 0 } as ColDef<any>;
+      if (c.field === 'is_private') return { ...c, width: 72, flex: 0 } as ColDef<any>;
+      if (c.field === 'subject') return { ...c, flex: 2, minWidth: 240 } as ColDef<any>;
+      return c;
+    });
   }, [spec]);
   const eventsCols = useMemo(() => {
     const cols = buildCols(spec.my_meetings.columns);
     return cols.map((c) => {
-      if (c.field === 'start_time') return { ...c, valueFormatter: (p: any) => fmtDateWithShortTime(p.value) };
-      if (c.field === 'end_time') return { ...c, valueFormatter: (p: any) => fmtDate(p.value) };
+      if (c.field === 'start_time') return { ...c, valueFormatter: (p: any) => fmtDateWithShortTime(p.value), width: 120, flex: 0 } as ColDef<any>;
+      if (c.field === 'end_time') return { ...c, valueFormatter: (p: any) => fmtDate(p.value), width: 100, flex: 0 } as ColDef<any>;
+      if (c.field === 'is_private') return { ...c, width: 72, flex: 0 } as ColDef<any>;
+      if (c.field === 'summary') return { ...c, flex: 2, minWidth: 240 } as ColDef<any>;
       return c;
     });
   }, [spec]);

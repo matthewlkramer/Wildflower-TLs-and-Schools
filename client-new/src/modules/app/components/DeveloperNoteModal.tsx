@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button as MButton, TextField, FormControlLabel, Checkbox, MenuItem } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button as MButton, TextField, FormControlLabel, Checkbox, MenuItem, FormControl, Select, ListItemText } from '@mui/material';
 import { supabase } from '@/lib/supabase/client';
 import { getBufferedLogsText } from '@/lib/log-buffer';
 
@@ -17,6 +17,8 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
   const [focusBox, setFocusBox] = React.useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [screenshotUrl, setScreenshotUrl] = React.useState<string>('');
   const [saving, setSaving] = React.useState(false);
+  const [typesOpen, setTypesOpen] = React.useState(false);
+  const [hideWhilePicking, setHideWhilePicking] = React.useState(false);
 
   // Load enum options for dev_note_type (enum array)
   React.useEffect(() => {
@@ -50,6 +52,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       setFocusSelector(sel);
       setFocusBox({ x: Math.round(rect.left), y: Math.round(rect.top), width: Math.round(rect.width), height: Math.round(rect.height) });
       setPicking(false);
+      setHideWhilePicking(false);
     };
     document.addEventListener('click', onClick, true);
     document.body.style.cursor = 'crosshair';
@@ -58,6 +61,9 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
 
   async function captureScreenshot(): Promise<string | null> {
     try {
+      // Temporarily hide the modal to avoid capturing it
+      setHideWhilePicking(true);
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
       // Try to capture tab via getDisplayMedia (user will be prompted)
       // Fallback: return null
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -99,6 +105,8 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       return signed?.signedUrl || null;
     } catch {
       return null;
+    } finally {
+      setHideWhilePicking(false);
     }
   }
 
@@ -141,19 +149,51 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
   };
 
   return (
-    <Dialog open={open} onClose={() => { if (!saving) onClose(); }} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={() => { if (!saving) onClose(); }} maxWidth="md" fullWidth sx={{ display: hideWhilePicking ? 'none' : 'block' }}>
       <DialogTitle>Developer Note</DialogTitle>
-      <DialogContent sx={{ display: 'grid', gap: 1.5, pt: 2 }}>
-        <TextField
-          label="Note Types"
-          select
-          SelectProps={{ multiple: true, value: noteTypes, onChange: (e) => setNoteTypes(Array.isArray(e.target.value) ? (e.target.value as string[]) : []) }}
-          size="small"
-        >
-          {availableTypes.map((t) => (
-            <MenuItem key={t} value={t}>{t}</MenuItem>
-          ))}
-        </TextField>
+      <DialogContent sx={{ display: 'grid', gap: 1.5, pt: 4 }}>
+        <div>
+          <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>Note Types</div>
+          <FormControl size="small" fullWidth>
+            <Select
+              multiple
+              value={noteTypes}
+              open={typesOpen}
+              onOpen={() => setTypesOpen(true)}
+              onClose={() => setTypesOpen(false)}
+              onChange={(e) => {
+                const val = e.target.value as string[];
+                setNoteTypes(val);
+              }}
+              renderValue={(selected) => (selected as string[]).join(', ')}
+              MenuProps={{ PaperProps: { sx: { maxHeight: 320 } } }}
+            >
+              {availableTypes.map((t) => (
+                <MenuItem
+                  key={t}
+                  value={t}
+                  onClick={(ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    setNoteTypes((prev) => {
+                      const set = new Set(prev);
+                      if (set.has(t)) set.delete(t); else set.add(t);
+                      return Array.from(set);
+                    });
+                  }}
+                >
+                  <Checkbox checked={noteTypes.indexOf(t) > -1} />
+                  <ListItemText primary={t} />
+                </MenuItem>
+              ))}
+              <MenuItem onClick={() => setTypesOpen(false)}>
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+                  <MButton variant="outlined" size="small">Done</MButton>
+                </div>
+              </MenuItem>
+            </Select>
+          </FormControl>
+        </div>
         <TextField
           label="Priority"
           select size="small"
@@ -168,16 +208,32 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <MButton variant="outlined" size="small" onClick={() => setPicking((v) => !v)}>{picking ? 'Click an element…' : 'Pick Focus Area'}</MButton>
-          <TextField label="Focus Selector" size="small" value={focusSelector} onChange={(e) => setFocusSelector(e.target.value)} fullWidth />
+        <div style={{ display: 'grid', gap: 4 }}>
+          <div style={{ fontSize: 12, color: '#475569' }}>
+            To set a focus area: click "Pick Focus Area", then click on any part of the interface. The modal will temporarily disappear while you pick and reappear after selection.
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <MButton
+              variant="outlined"
+              size="small"
+              onClick={() => { setPicking(true); setHideWhilePicking(true); }}
+            >
+              {picking ? 'Click any element…' : 'Pick Focus Area'}
+            </MButton>
+            <TextField label="Focus Selector" size="small" value={focusSelector} fullWidth InputProps={{ readOnly: true }} />
+          </div>
         </div>
         {focusBox ? (
           <div style={{ fontSize: 12, color: '#334155' }}>Focus Box: {focusBox.width}×{focusBox.height} at ({focusBox.x},{focusBox.y})</div>
         ) : null}
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <MButton variant="outlined" size="small" onClick={async () => { const url = await captureScreenshot(); if (url) setScreenshotUrl(url); }}>Capture Screenshot</MButton>
-          <TextField label="Screenshot URL" size="small" value={screenshotUrl} onChange={(e) => setScreenshotUrl(e.target.value)} fullWidth />
+        <div style={{ display: 'grid', gap: 4 }}>
+          <div style={{ fontSize: 12, color: '#475569' }}>
+            To capture a screenshot (without the modal), click "Capture Screenshot" and choose the tab or screen. The modal will temporarily disappear during capture and then return.
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <MButton variant="outlined" size="small" onClick={async () => { const url = await captureScreenshot(); if (url) setScreenshotUrl(url || ''); }}>Capture Screenshot</MButton>
+            <TextField label="Screenshot URL" size="small" value={screenshotUrl} fullWidth InputProps={{ readOnly: true }} />
+          </div>
         </div>
       </DialogContent>
       <DialogActions>
