@@ -48,8 +48,9 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       e.stopPropagation();
       const el = e.target as Element;
       const sel = cssPath(el);
+      const label = describeElement(el);
       const rect = (el as HTMLElement).getBoundingClientRect();
-      setFocusSelector(sel);
+      setFocusSelector(`${label}  (${sel})`);
       setFocusBox({ x: Math.round(rect.left), y: Math.round(rect.top), width: Math.round(rect.width), height: Math.round(rect.height) });
       setPicking(false);
       setHideWhilePicking(false);
@@ -68,7 +69,10 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       // Fallback: return null
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const nav: any = navigator;
-      if (!nav?.mediaDevices?.getDisplayMedia) return null;
+      if (!nav?.mediaDevices?.getDisplayMedia) {
+        alert('Screen capture API is not available in this browser.');
+        return null;
+      }
       const stream: MediaStream = await nav.mediaDevices.getDisplayMedia({ video: true });
       const track = stream.getVideoTracks()[0];
       const IC = (window as any).ImageCapture;
@@ -100,10 +104,11 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       const key = `${uid}/${Date.now()}.png`;
       try { await supabase.storage.createBucket('developer-notes', { public: false }); } catch {}
       const { error: upErr } = await supabase.storage.from('developer-notes').upload(key, blob, { upsert: true, contentType: 'image/png' });
-      if (upErr) return null;
+      if (upErr) { alert(`Upload failed: ${upErr.message}`); return null; }
       const { data: signed } = await supabase.storage.from('developer-notes').createSignedUrl(key, 7 * 24 * 3600);
       return signed?.signedUrl || null;
     } catch {
+      alert('Screenshot capture was cancelled or failed.');
       return null;
     } finally {
       setHideWhilePicking(false);
@@ -210,7 +215,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
         />
         <div style={{ display: 'grid', gap: 4 }}>
           <div style={{ fontSize: 12, color: '#475569' }}>
-            To set a focus area: click "Pick Focus Area", then click on any part of the interface. The modal will temporarily disappear while you pick and reappear after selection.
+            To set a focus area: first click <strong>Pick Focus Area</strong>, then click the element in the interface to highlight. The modal will temporarily disappear while you pick and reappear after selection.
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <MButton
@@ -220,7 +225,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
             >
               {picking ? 'Click any element…' : 'Pick Focus Area'}
             </MButton>
-            <TextField label="Focus Selector" size="small" value={focusSelector} fullWidth InputProps={{ readOnly: true }} />
+            <TextField label="Focus Area" size="small" value={focusSelector} fullWidth InputProps={{ readOnly: true }} />
           </div>
         </div>
         {focusBox ? (
@@ -228,7 +233,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
         ) : null}
         <div style={{ display: 'grid', gap: 4 }}>
           <div style={{ fontSize: 12, color: '#475569' }}>
-            To capture a screenshot (without the modal), click "Capture Screenshot" and choose the tab or screen. The modal will temporarily disappear during capture and then return.
+            To capture a screenshot (without the modal), click <strong>Capture Screenshot</strong> and choose the app tab/screen in the browser prompt. The modal will temporarily disappear during capture and then return.
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <MButton variant="outlined" size="small" onClick={async () => { const url = await captureScreenshot(); if (url) setScreenshotUrl(url || ''); }}>Capture Screenshot</MButton>
@@ -264,4 +269,23 @@ function cssPath(el: Element): string {
     el = el.parentElement as Element;
   }
   return path.join(' > ');
+}
+
+function describeElement(el: Element): string {
+  try {
+    const tag = el.tagName.toLowerCase();
+    const id = (el as HTMLElement).id ? `#${(el as HTMLElement).id}` : '';
+    const clsRaw = (el as HTMLElement).className || '';
+    const cls = typeof clsRaw === 'string' && clsRaw.trim() ? '.' + clsRaw.trim().split(/\s+/).slice(0, 2).join('.') : '';
+    const aria = (el as HTMLElement).getAttribute('aria-label') || '';
+    const title = (el as HTMLElement).getAttribute('title') || '';
+    const pl = (el as HTMLElement).getAttribute('placeholder') || '';
+    let text = (el as HTMLElement).textContent || '';
+    text = text.replace(/\s+/g, ' ').trim();
+    if (text.length > 60) text = text.slice(0, 57) + '…';
+    const label = aria || title || pl || text;
+    return `${tag}${id}${cls}${label ? ` “${label}”` : ''}`;
+  } catch {
+    return 'element';
+  }
 }
