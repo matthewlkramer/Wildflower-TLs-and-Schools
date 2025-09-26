@@ -385,10 +385,10 @@ export function DashboardPage() {
       </DashCard>
 
       {/* Action Step Modal */}
-      <Dialog open={!!editStep} onClose={() => setEditStep(null)} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit Action Step</DialogTitle>
+      <Dialog open={!!editStep} onClose={() => setEditStep(null)} maxWidth="md" fullWidth PaperProps={{ sx: { maxWidth: 720 } }}>
+        <DialogTitle sx={{ pb: 1 }}>Edit Action Step</DialogTitle>
         {editStep ? (
-          <DialogContent sx={{ display: 'grid', gap: 2, pt: 4 }}>
+          <DialogContent sx={{ display: 'grid', gap: 2, pt: 6 }}>
             <TextField
               label="Due Date"
               type="date"
@@ -458,10 +458,10 @@ export function DashboardPage() {
       </Dialog>
 
       {/* Email Modal */}
-      <Dialog open={!!editEmail} onClose={() => setEditEmail(null)} maxWidth="md" fullWidth>
-        <DialogTitle>Email</DialogTitle>
+      <Dialog open={!!editEmail} onClose={() => setEditEmail(null)} maxWidth="lg" fullWidth PaperProps={{ sx: { maxWidth: 980 } }}>
+        <DialogTitle sx={{ pb: 1 }}>Email</DialogTitle>
         {editEmail ? (
-          <DialogContent sx={{ display: 'grid', gap: 2, pt: 4 }}>
+          <DialogContent sx={{ display: 'grid', gap: 2, pt: 6 }}>
             <TextField label="Sent Date" size="small" value={fmtDate(editEmail.sent_at)} InputProps={{ readOnly: true }} />
             <TextField label="From" size="small" value={String(editEmail.from_email || '')} InputProps={{ readOnly: true }} />
             <TextField label="To" size="small" value={Array.isArray(editEmail.to_emails) ? editEmail.to_emails.join(', ') : ''} InputProps={{ readOnly: true }} />
@@ -475,8 +475,15 @@ export function DashboardPage() {
                 value={String(editEmail.body_text || editEmail.body_html || '')}
                 InputProps={{ readOnly: true }}
                 multiline
-                minRows={16}
-                sx={{ '& .MuiInputBase-inputMultiline': { whiteSpace: 'pre-wrap', lineHeight: 1.4 } }}
+                rows={20}
+                sx={{
+                  '& .MuiInputBase-inputMultiline': {
+                    whiteSpace: 'pre-wrap',
+                    lineHeight: 1.4,
+                    overflow: 'auto',
+                    maxHeight: 600,
+                  },
+                }}
               />
             ) : null}
             <FormControlLabel
@@ -536,10 +543,10 @@ export function DashboardPage() {
       </Dialog>
 
       {/* Event Modal */}
-      <Dialog open={!!editEvent} onClose={() => setEditEvent(null)} maxWidth="md" fullWidth>
-        <DialogTitle>Event</DialogTitle>
+      <Dialog open={!!editEvent} onClose={() => setEditEvent(null)} maxWidth="lg" fullWidth PaperProps={{ sx: { maxWidth: 980 } }}>
+        <DialogTitle sx={{ pb: 1 }}>Event</DialogTitle>
         {editEvent ? (
-          <DialogContent sx={{ display: 'grid', gap: 2, pt: 4 }}>
+          <DialogContent sx={{ display: 'grid', gap: 2, pt: 6 }}>
             <TextField label="Start Date" size="small" value={fmtDate(editEvent.start_time)} InputProps={{ readOnly: true }} />
             <TextField label="End Date" size="small" value={fmtDate(editEvent.end_time)} InputProps={{ readOnly: true }} />
             <TextField label="Location" size="small" value={String(editEvent.location || '')} InputProps={{ readOnly: true }} />
@@ -553,8 +560,15 @@ export function DashboardPage() {
                 value={String(editEvent.description || '')}
                 InputProps={{ readOnly: true }}
                 multiline
-                minRows={12}
-                sx={{ '& .MuiInputBase-inputMultiline': { whiteSpace: 'pre-wrap', lineHeight: 1.4 } }}
+                rows={16}
+                sx={{
+                  '& .MuiInputBase-inputMultiline': {
+                    whiteSpace: 'pre-wrap',
+                    lineHeight: 1.4,
+                    overflow: 'auto',
+                    maxHeight: 600,
+                  },
+                }}
               />
             ) : null}
             <FormControlLabel
