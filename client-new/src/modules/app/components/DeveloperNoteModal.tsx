@@ -298,7 +298,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
             <TextField label="Screenshot URL" size="small" value={screenshotUrl} fullWidth InputProps={{ readOnly: true }} />
           </div>
           {shotPreview ? (
-            <div style={{ border: '1px solid #e2e8f0', borderRadius: 4, overflow: 'hidden', maxHeight: 360 }}>
+            <div style={{ border: '1px solid #e2e8f0', borderRadius: 4, overflow: 'auto', maxHeight: '65vh' }}>
               <ScreenshotCanvas imageUrl={shotPreview} pin={pin} onPick={(pt) => setPin(pt)} />
             </div>
           ) : null}
@@ -410,5 +410,5 @@ function ScreenshotCanvas({ imageUrl, pin, onPick }: { imageUrl: string; pin: { 
     onPick({ x, y });
   }
 
-  return <canvas ref={ref} width={size.w} height={size.h} style={{ width: size.w, height: size.h, display: 'block', cursor: 'crosshair' }} onClick={handleClick} />;
+  return <canvas ref={ref} width={size.w} height={size.h} style={{ width: '100%', height: 'auto', display: 'block', cursor: 'crosshair' }} onClick={handleClick} />;
 }
