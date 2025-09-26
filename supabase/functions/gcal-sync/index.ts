@@ -45,7 +45,7 @@ serve(async (req) => {
     if (!userId) {
       // Fallback: try to decode JWT locally just to extract sub
       try {
-        const m = authHeader.match(/^Bearersummary: sanitizeText(e.summary || null),s+(.+)$/i);
+        const m = authHeader.match(/^Bearer\s+(.+)$/i);
         const token = m ? m[1] : '';
         const [, payload] = token.split('.') as [string, string];
         const jsonStr = atob(payload.replace(/-/g,'+').replace(/_/g,'/'));
@@ -91,7 +91,7 @@ serve(async (req) => {
       }
       case 'exchange_code': {
         await exchangeCode(supabaseGsync, code, userId, finalRedirect);
-        await sendConsole(supabase, userId,summary: sanitizeText(e.summary || null), 'Google tokens saved', 'milestone', 'calendar');
+        await sendConsole(supabase, userId, 'Google tokens saved', 'milestone', 'calendar');
         return json({ ok: true });
       }
       case 'get_connection_status': {
@@ -185,14 +185,14 @@ serve(async (req) => {
                 user_id: userId,
                 google_calendar_id: calendarId,
                 google_event_id: e.id,
-                summary: e.summary ||summary: sanitizeText(e.summary || null),
-                description: e.description ||summary: sanitizeText(e.summary || null),
+                summary: sanitizeText(e.summary || null),
+                description: sanitizeText(e.description || null),
                 start_time: start,
                 end_time: end,
-                organizer_email: e.organizer?.email ||summary: sanitizeText(e.summary || null),
-                attendees: attendeeEmails.length ? attendeeEmails :summary: sanitizeText(e.summary || null),
-                location: e.location ||summary: sanitizeText(e.summary || null),
-                status: e.status ||summary: sanitizeText(e.summary || null),
+                organizer_email: e.organizer?.email || null,
+                attendees: attendeeEmails.length ? attendeeEmails : null,
+                location: e.location || null,
+                status: e.status || null,
                 updated_at: ts(),
               };
             });
@@ -291,11 +291,11 @@ serve(async (req) => {
                   user_id: userId,
                   google_calendar_id: calId,
                   google_event_id: eid,
-                  title: a.title ||summary: sanitizeText(e.summary || null),
-                  mime_type: a.mimeType ||summary: sanitizeText(e.summary || null),
-                  file_url: a.fileUrl ||summary: sanitizeText(e.summary || null),
-                  file_id: a.fileId ||summary: sanitizeText(e.summary || null),
-                  icon_link: a.iconLink ||summary: sanitizeText(e.summary || null),
+                  title: sanitizeText(a.title || null),
+                  mime_type: sanitizeText(a.mimeType || null),
+                  file_url: sanitizeText(a.fileUrl || null),
+                  file_id: sanitizeText(a.fileId || null),
+                  icon_link: sanitizeText(a.iconLink || null),
                   storage_path: storagePath,
                 } as any, { onConflict: 'user_id,google_calendar_id,google_event_id,file_id' } as any);
             }
