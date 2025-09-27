@@ -54,7 +54,8 @@ const TABLE_COLUMNS = {
   ],
 
   notes: [
-    { field: 'text', label: 'Note', type: 'string', multiline: true },
+    { field: 'title', label: 'Title', type: 'string' },
+    { field: 'full_text', label: 'Text', type: 'string', multiline: true },
     { field: 'created_by', label: 'Created By', type: 'string', lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
     { field: 'created_date', label: 'Created Date', type: 'date' },
     { field: 'is_private', label: 'Private?', type: 'boolean' },
