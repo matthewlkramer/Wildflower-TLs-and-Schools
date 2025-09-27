@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase/client';
 import { getBufferedLogsText } from '@/lib/log-buffer';
 
 type Props = { open: boolean; onClose: () => void };
-
+ 
 type EnumOption = string;
 
 export function DeveloperNoteModal({ open, onClose }: Props) {
