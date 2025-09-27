@@ -33,4 +33,4 @@ npm run airtable:sync:dry
 - Existing records with differing field values are reported with field-level diffs so you can review them before overwriting Supabase manually.
 - After a successful non-dry run, the script updates `airtable-sync-state.json` with the current timestamp.
 
-> **Note:** To capture human-friendly “last modified” timestamps in the diff report, add a formula field in Airtable (e.g. `DATETIME_FORMAT(LAST_MODIFIED_TIME(), 'YYYY-MM-DDTHH:mm:ssZ')`) and reference it via `lastModifiedField` in the config.
+> **Note:** To capture human-friendly “last modified” timestamps in the diff report, add a formula field in Airtable (e.g. `DATETIME_FORMAT(LAST_MODIFIED_TIME(), 'YYYY-MM-DDTHH:mm:ssZ')`) and reference it via `lastModifiedField` in the config. 
