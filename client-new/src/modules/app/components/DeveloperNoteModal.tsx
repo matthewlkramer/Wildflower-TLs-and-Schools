@@ -3,11 +3,11 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button as MButton, T
 import { supabase } from '@/lib/supabase/client';
 import { getBufferedLogsText } from '@/lib/log-buffer';
 
-type Props = { open: boolean; onClose: () => void };
+type Props = { open: boolean; onClose: () => void; initialBlob?: Blob | null; initialUrl?: string | null };
  
 type EnumOption = string;
 
-export function DeveloperNoteModal({ open, onClose }: Props) {
+export function DeveloperNoteModal({ open, onClose, initialBlob, initialUrl }: Props) {
   const [noteTypes, setNoteTypes] = React.useState<EnumOption[]>([]);
   const [availableTypes, setAvailableTypes] = React.useState<EnumOption[]>([]);
   const [comment, setComment] = React.useState('');
@@ -19,6 +19,22 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
   const [saving, setSaving] = React.useState(false);
   const [typesOpen, setTypesOpen] = React.useState(false);
   const [hideWhilePicking, setHideWhilePicking] = React.useState(false);
+
+  // If we were provided an initial pre-captured image, preload it when opening
+  React.useEffect(() => {
+    if (!open) return;
+    try {
+      if (initialBlob && !shotBlob) {
+        setShotBlob(initialBlob);
+        const url = URL.createObjectURL(initialBlob);
+        setShotPreview(url);
+        setScreenshotUrl('');
+      } else if (initialUrl && !shotPreview) {
+        setShotPreview(initialUrl);
+        setScreenshotUrl(initialUrl);
+      }
+    } catch {}
+  }, [open, initialBlob, initialUrl]);
 
   // Load enum options for dev_note_type (enum array)
   React.useEffect(() => {
@@ -209,17 +225,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       const fullW = Math.max((scroller as any).scrollWidth || 0, (scroller as any).clientWidth || 0);
       const fullH = Math.max((scroller as any).scrollHeight || 0, (scroller as any).clientHeight || 0);
 
-      // Pre-pass: scroll through the page to encourage virtualized lists/images to render
-      try {
-        const step = Math.max(200, Math.floor(window.innerHeight * 0.8));
-        for (let sy = 0; sy < fullH; sy += step) {
-          window.scrollTo(0, sy);
-          // eslint-disable-next-line no-await-in-loop
-          await new Promise((r) => setTimeout(r, 30));
-        }
-        window.scrollTo(0, 0);
-        await new Promise((r) => setTimeout(r, 50));
-      } catch {}
+      // Do not pre-scroll; we want the exact viewport as-is.
 
       // Preferred: capture only the current viewport without moving scroll
       const vx = (scroller as any).scrollLeft || 0;
@@ -236,7 +242,16 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       // 1) Try dom-to-image-more (SVG foreignObject)
       try {
         try { console.log('[DevNotes] Quick Snapshot: trying dom-to-image-more (viewport)'); } catch {}
-        const node = targetNode;
+        // Render a cloned subtree inside an offscreen wrapper to avoid any interaction with live scroll
+        const wrapper1 = document.createElement('div');
+        wrapper1.style.position = 'fixed';
+        wrapper1.style.inset = '0';
+        wrapper1.style.overflow = 'hidden';
+        wrapper1.style.pointerEvents = 'none';
+        wrapper1.style.opacity = '0';
+        const node = targetNode.cloneNode(true) as HTMLElement;
+        wrapper1.appendChild(node);
+        document.body.appendChild(wrapper1);
         const style = {
           width: `${fullW}px`,
           height: `${fullH}px`,
@@ -257,14 +272,24 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
           const url = URL.createObjectURL(blob);
           setShotPreview(url);
           setScreenshotUrl('');
+          try { document.body.removeChild(wrapper1); } catch {}
           return;
         }
+        try { document.body.removeChild(wrapper1); } catch {}
       } catch {}
 
       // 2) Try html-to-image (similar FO approach)
       try {
         try { console.log('[DevNotes] Quick Snapshot: trying html-to-image (viewport)'); } catch {}
-        const node = targetNode;
+        const wrapper2 = document.createElement('div');
+        wrapper2.style.position = 'fixed';
+        wrapper2.style.inset = '0';
+        wrapper2.style.overflow = 'hidden';
+        wrapper2.style.pointerEvents = 'none';
+        wrapper2.style.opacity = '0';
+        const node = targetNode.cloneNode(true) as HTMLElement;
+        wrapper2.appendChild(node);
+        document.body.appendChild(wrapper2);
         const style = {
           width: `${fullW}px`,
           height: `${fullH}px`,
@@ -287,8 +312,10 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
           const url = URL.createObjectURL(blob);
           setShotPreview(url);
           setScreenshotUrl('');
+          try { document.body.removeChild(wrapper2); } catch {}
           return;
         }
+        try { document.body.removeChild(wrapper2); } catch {}
       } catch {}
 
       // 3) Try html2canvas viewport with scroll offsets (non-FO; may fail on CSS4 color())

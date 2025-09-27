@@ -22,6 +22,118 @@ export function Header() {
   const { user, signOut } = useAuth();
   const [location] = useLocation();
   const [noteOpen, setNoteOpen] = React.useState(false);
+  const [preShotUrl, setPreShotUrl] = React.useState<string>('');
+  const [preShotBlob, setPreShotBlob] = React.useState<Blob | null>(null);
+
+  // Capture the current viewport before opening Dev Notes
+  const handleQuickCaptureAndOpen = React.useCallback(async () => {
+    try {
+      console.log('[DevNotes] Header capture: start');
+      const [h2cMod, htiMod, dtiMod]: any = await Promise.all([
+        import('html2canvas'),
+        import('html-to-image'),
+        import('dom-to-image-more'),
+      ]);
+      const html2canvas = h2cMod.default || h2cMod;
+      const htmlToImage = htiMod;
+      const domToImage = dtiMod;
+
+      // Find active scroller (center of viewport)
+      const centerX = Math.max(0, Math.min(window.innerWidth - 1, Math.floor(window.innerWidth / 2)));
+      const centerY = Math.max(0, Math.min(window.innerHeight - 1, Math.floor(window.innerHeight / 2)));
+      let el = document.elementFromPoint(centerX, centerY) as HTMLElement | null;
+      const chain: HTMLElement[] = [];
+      while (el && el !== document.body && el !== document.documentElement) { chain.push(el); el = el.parentElement; }
+      if (document.body) chain.push(document.body);
+      if (document.documentElement) chain.push(document.documentElement);
+      const isScrollable = (node: HTMLElement) => {
+        try {
+          const cs = getComputedStyle(node);
+          const oy = cs.overflowY, ox = cs.overflowX;
+          const sy = node.scrollHeight - node.clientHeight;
+          const sx = node.scrollWidth - node.clientWidth;
+          return ((oy === 'auto' || oy === 'scroll') && sy > 1) || ((ox === 'auto' || ox === 'scroll') && sx > 1);
+        } catch { return false; }
+      };
+      let scroller = chain.find(isScrollable) || (document.scrollingElement as HTMLElement) || document.documentElement;
+      const vx = scroller.scrollLeft || 0;
+      const vy = scroller.scrollTop || 0;
+      const vw = scroller.clientWidth || window.innerWidth;
+      const vh = scroller.clientHeight || window.innerHeight;
+      const fullW = Math.max(scroller.scrollWidth || vw, vw);
+      const fullH = Math.max(scroller.scrollHeight || vh, vh);
+      console.log('[DevNotes] Header capture: viewport', { vx, vy, vw, vh, scroller: scroller.tagName, fullW, fullH });
+
+      // Clone into an invisible wrapper and render the clone, so live scroll never moves
+      const withWrapper = async (render: (node: HTMLElement) => Promise<Blob | null>) => {
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'fixed'; wrapper.style.inset = '0'; wrapper.style.overflow = 'hidden';
+        wrapper.style.pointerEvents = 'none'; wrapper.style.opacity = '0';
+        const node = scroller.cloneNode(true) as HTMLElement;
+        wrapper.appendChild(node); document.body.appendChild(wrapper);
+        try { return await render(node); } finally { try { document.body.removeChild(wrapper); } catch {} }
+      };
+
+      // Try dom-to-image-more
+      try {
+        const blob = await withWrapper(async (node) => (domToImage as any).toBlob(node, {
+          cacheBust: true,
+          width: vw,
+          height: vh,
+          style: { width: `${fullW}px`, height: `${fullH}px`, background: '#ffffff', transform: `translate(${-vx}px, ${-vy}px)`, transformOrigin: 'top left' },
+          bgcolor: '#ffffff',
+        }));
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          setPreShotBlob(blob); setPreShotUrl(url); setNoteOpen(true);
+          console.log('[DevNotes] Header capture: used dom-to-image-more');
+          return;
+        }
+      } catch {}
+
+      // Try html-to-image
+      try {
+        const blob = await withWrapper(async (node) => (htmlToImage as any).toBlob(node, {
+          cacheBust: true,
+          pixelRatio: 1,
+          backgroundColor: '#ffffff',
+          width: vw,
+          height: vh,
+          style: { width: `${fullW}px`, height: `${fullH}px`, background: '#ffffff', transform: `translate(${-vx}px, ${-vy}px)`, transformOrigin: 'top left' },
+          skipFonts: false,
+        }));
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          setPreShotBlob(blob); setPreShotUrl(url); setNoteOpen(true);
+          console.log('[DevNotes] Header capture: used html-to-image');
+          return;
+        }
+      } catch {}
+
+      // Fallback: html2canvas on scroller
+      try {
+        const canvas: HTMLCanvasElement = await html2canvas(scroller, {
+          useCORS: true, logging: false, backgroundColor: '#ffffff',
+          windowWidth: fullW, windowHeight: fullH,
+          width: vw, height: vh,
+          scrollX: -vx, scrollY: -vy, foreignObjectRendering: false,
+        } as any);
+        const blob: Blob | null = await new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/png'));
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          setPreShotBlob(blob); setPreShotUrl(url); setNoteOpen(true);
+          console.log('[DevNotes] Header capture: used html2canvas');
+          return;
+        }
+      } catch {}
+
+      // If all fail, open modal without pre-shot
+      setPreShotBlob(null); setPreShotUrl(''); setNoteOpen(true);
+    } catch (e) {
+      console.warn('[DevNotes] Header capture failed', e);
+      setNoteOpen(true);
+    }
+  }, []);
 
   return (
     <header className="app-header">
@@ -56,7 +168,7 @@ export function Header() {
               type="button"
               title="Add Developer Note"
               aria-label="Add Developer Note"
-              onClick={() => setNoteOpen(true)}
+              onClick={handleQuickCaptureAndOpen}
               style={{
                 border: 'none', background: 'transparent', cursor: 'pointer',
                 color: '#0f172a', padding: 6, borderRadius: 6
@@ -81,7 +193,7 @@ export function Header() {
         )}
       </div>
 
-      <DeveloperNoteModal open={noteOpen} onClose={() => setNoteOpen(false)} />
+      <DeveloperNoteModal open={noteOpen} onClose={() => setNoteOpen(false)} initialBlob={preShotBlob || undefined} initialUrl={preShotUrl || undefined} />
     </header>
   );
 }
