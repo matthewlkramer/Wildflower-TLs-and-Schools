@@ -159,8 +159,35 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       const htmlToImage = htiMod;
       const domToImage = dtiMod;
 
-      const fullW = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, window.innerWidth);
-      const fullH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, window.innerHeight);
+      // Determine the primary scroll container and capture target
+      const pickScroller = () => {
+        const candidates: Element[] = [];
+        const byId = (id: string) => document.getElementById(id);
+        const bySel = (sel: string) => document.querySelector(sel) as Element | null;
+        const push = (el: Element | null | undefined) => { if (el) candidates.push(el); };
+        push(document.scrollingElement as Element | null);
+        push(bySel('main'));
+        push(byId('root'));
+        push(bySel('#app'));
+        push(document.body);
+        push(document.documentElement);
+        // Choose the element with the largest scrollable overflow
+        let best: Element = document.documentElement;
+        let bestOverflow = -1;
+        for (const el of candidates) {
+          try {
+            const sh = (el as HTMLElement).scrollHeight || 0;
+            const ch = (el as HTMLElement).clientHeight || 0;
+            const overflow = sh - ch;
+            if (overflow > bestOverflow) { bestOverflow = overflow; best = el; }
+          } catch {}
+        }
+        return best as HTMLElement;
+      };
+      const scroller = pickScroller();
+      const targetNode = (document.getElementById('root') as HTMLElement) || document.documentElement;
+      const fullW = Math.max((targetNode as any).scrollWidth || 0, window.innerWidth);
+      const fullH = Math.max((targetNode as any).scrollHeight || 0, window.innerHeight);
 
       // Pre-pass: scroll through the page to encourage virtualized lists/images to render
       try {
@@ -175,16 +202,16 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       } catch {}
 
       // Preferred: capture only the current viewport without moving scroll
-      const vx = window.scrollX || window.pageXOffset || 0;
-      const vy = window.scrollY || window.pageYOffset || 0;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      try { console.log('[DevNotes] Quick Snapshot: starting viewport capture', { vx, vy, vw, vh }); } catch {}
+      const vx = (scroller as any).scrollLeft || window.scrollX || window.pageXOffset || 0;
+      const vy = (scroller as any).scrollTop || window.scrollY || window.pageYOffset || 0;
+      const vw = (scroller as any).clientWidth || window.innerWidth;
+      const vh = (scroller as any).clientHeight || window.innerHeight;
+      try { console.log('[DevNotes] Quick Snapshot: starting viewport capture', { vx, vy, vw, vh, scroller: scroller.tagName }); } catch {}
 
       // 1) Try dom-to-image-more (SVG foreignObject)
       try {
         try { console.log('[DevNotes] Quick Snapshot: trying dom-to-image-more (viewport)'); } catch {}
-        const node = document.documentElement;
+        const node = targetNode;
         const style = {
           width: `${fullW}px`,
           height: `${fullH}px`,
@@ -212,7 +239,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       // 2) Try html-to-image (similar FO approach)
       try {
         try { console.log('[DevNotes] Quick Snapshot: trying html-to-image (viewport)'); } catch {}
-        const node = document.documentElement;
+        const node = targetNode;
         const style = {
           width: `${fullW}px`,
           height: `${fullH}px`,
@@ -242,7 +269,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       // 3) Try html2canvas viewport with scroll offsets (non-FO; may fail on CSS4 color())
       try {
         try { console.log('[DevNotes] Quick Snapshot: trying html2canvas (viewport)'); } catch {}
-        const canvas: HTMLCanvasElement = await html2canvas(document.documentElement, {
+        const canvas: HTMLCanvasElement = await html2canvas(targetNode, {
           useCORS: true,
           logging: false,
           backgroundColor: '#ffffff',
