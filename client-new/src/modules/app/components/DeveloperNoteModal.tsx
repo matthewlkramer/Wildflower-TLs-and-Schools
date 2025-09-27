@@ -201,41 +201,29 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       let y = 0;
       while (y < fullH) {
         const h = Math.min(tileH, fullH - y);
-        const onclone = (doc: Document) => {
-          try {
-            const w: any = doc.defaultView as any;
-            if (w && typeof w.scrollTo === 'function') w.scrollTo(0, 0);
-            // Disable sticky/fixed behavior which can repeat across tiles
-            try {
-              doc.querySelectorAll('*').forEach((el) => {
-                const s = (el as HTMLElement).style as CSSStyleDeclaration;
-                if (!s) return;
-                const cs = doc.defaultView?.getComputedStyle(el as Element);
-                const pos = cs?.position || '';
-                if (pos === 'sticky') (el as HTMLElement).style.position = 'static';
-                if (pos === 'fixed') (el as HTMLElement).style.position = 'absolute';
-              });
-            } catch {}
-            // Encourage images to load eagerly in the clone
-            doc.querySelectorAll('img').forEach((img) => {
-              try {
-                const i = img as HTMLImageElement;
-                (i as any).loading = 'eager';
-                if (!i.src && (i as any).dataset?.src) i.src = (i as any).dataset.src;
-              } catch {}
-            });
-            // Shift the cloned body upward to expose the slice starting at y
-            (doc.body as any).style.position = 'relative';
-            (doc.body as any).style.top = `-${y}px`;
-          } catch {}
-        };
-        const optsFO = { ...baseOpts, height: h, windowHeight: h, scrollX: 0, scrollY: 0, foreignObjectRendering: true, onclone } as any;
-        const optsCanvas = { ...baseOpts, height: h, windowHeight: h, scrollX: 0, scrollY: 0, foreignObjectRendering: false, onclone } as any;
+        // Scroll live window to the tile start to coerce virtualized content to render
+        window.scrollTo(0, y);
+        // Wait a frame to allow layout/paint
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        // Capture the viewport-sized tile, offsetting with scrollY so html2canvas crops the correct slice
+        const optsViewport = {
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          windowWidth: window.innerWidth,
+          windowHeight: h,
+          width: window.innerWidth,
+          height: h,
+          scrollX: 0,
+          scrollY: -y,
+          foreignObjectRendering: false,
+        } as any;
         let tile: HTMLCanvasElement | null = null;
         try {
-          tile = await html2canvas(document.documentElement, optsFO);
+          tile = await html2canvas(document.documentElement, optsViewport);
         } catch {
-          tile = await html2canvas(document.documentElement, optsCanvas);
+          tile = await html2canvas(document.body, optsViewport);
         }
         if (!tile) break;
         // Draw the tile into the output canvas at scaled position
