@@ -29,13 +29,7 @@ export function Header() {
   const handleQuickCaptureAndOpen = React.useCallback(async () => {
     try {
       console.log('[DevNotes] Header capture: start');
-      const [h2cMod, htiMod, dtiMod]: any = await Promise.all([
-        import('html2canvas'),
-        import('html-to-image'),
-        import('dom-to-image-more'),
-      ]);
-      const html2canvas = h2cMod.default || h2cMod;
-      const htmlToImage = htiMod;
+      const dtiMod: any = await import('dom-to-image-more');
       const domToImage = dtiMod;
 
       // Find active scroller (center of viewport)
@@ -74,7 +68,7 @@ export function Header() {
         try { return await render(node); } finally { try { document.body.removeChild(wrapper); } catch {} }
       };
 
-      // Try dom-to-image-more
+      // Use dom-to-image-more only (FO)
       try {
         const blob = await withWrapper(async (node) => (domToImage as any).toBlob(node, {
           cacheBust: true,
@@ -87,42 +81,6 @@ export function Header() {
           const url = URL.createObjectURL(blob);
           setPreShotBlob(blob); setPreShotUrl(url); setNoteOpen(true);
           console.log('[DevNotes] Header capture: used dom-to-image-more');
-          return;
-        }
-      } catch {}
-
-      // Try html-to-image
-      try {
-        const blob = await withWrapper(async (node) => (htmlToImage as any).toBlob(node, {
-          cacheBust: true,
-          pixelRatio: 1,
-          backgroundColor: '#ffffff',
-          width: vw,
-          height: vh,
-          style: { width: `${fullW}px`, height: `${fullH}px`, background: '#ffffff', transform: `translate(${-vx}px, ${-vy}px)`, transformOrigin: 'top left' },
-          skipFonts: false,
-        }));
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          setPreShotBlob(blob); setPreShotUrl(url); setNoteOpen(true);
-          console.log('[DevNotes] Header capture: used html-to-image');
-          return;
-        }
-      } catch {}
-
-      // Fallback: html2canvas on scroller
-      try {
-        const canvas: HTMLCanvasElement = await html2canvas(scroller, {
-          useCORS: true, logging: false, backgroundColor: '#ffffff',
-          windowWidth: fullW, windowHeight: fullH,
-          width: vw, height: vh,
-          scrollX: -vx, scrollY: -vy, foreignObjectRendering: false,
-        } as any);
-        const blob: Blob | null = await new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/png'));
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          setPreShotBlob(blob); setPreShotUrl(url); setNoteOpen(true);
-          console.log('[DevNotes] Header capture: used html2canvas');
           return;
         }
       } catch {}
@@ -224,10 +182,23 @@ function SettingsIcon() {
 }
 
 function DeltaIcon() {
-  // Simple triangle/delta icon
+  // Outline delta (triangle) icon for better visual affordance
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 3l9 18H3L12 3z" />
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      aria-hidden
+      focusable="false"
+      style={{ display: 'block' }}
+    >
+      <path
+        d="M12 4 L21 20 H3 Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
