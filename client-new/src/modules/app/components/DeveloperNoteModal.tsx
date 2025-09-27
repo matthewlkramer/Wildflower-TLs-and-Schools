@@ -149,9 +149,13 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
     try {
       setHideWhilePicking(true);
       await new Promise((r) => requestAnimationFrame(() => r(null)));
-      // Dynamic import to avoid upfront bundle cost
-      const mod: any = await import('html2canvas');
-      const html2canvas = mod.default || mod;
+      // Dynamic import libraries to avoid upfront bundle cost
+      const [h2cMod, htiMod]: any = await Promise.all([
+        import('html2canvas'),
+        import('html-to-image'),
+      ]);
+      const html2canvas = h2cMod.default || h2cMod;
+      const htmlToImage = htiMod;
 
       const fullW = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, window.innerWidth);
       const fullH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, window.innerHeight);
@@ -168,7 +172,31 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
         await new Promise((r) => setTimeout(r, 50));
       } catch {}
 
-      // Stitch the page in tiles to ensure content beyond viewport renders
+      // First attempt: use html-to-image to render full document via foreignObject without CSS parsing
+      try {
+        const node = document.documentElement;
+        const style = { width: `${fullW}px`, height: `${fullH}px`, background: '#ffffff' } as any;
+        const blob = await (htmlToImage as any).toBlob(node, {
+          cacheBust: true,
+          pixelRatio: 1,
+          backgroundColor: '#ffffff',
+          width: fullW,
+          height: fullH,
+          style,
+          skipFonts: false,
+        });
+        if (blob) {
+          setShotBlob(blob);
+          const url = URL.createObjectURL(blob);
+          setShotPreview(url);
+          setScreenshotUrl('');
+          return;
+        }
+      } catch (_) {
+        // Fall through to tiling when FO path isn't sufficient
+      }
+
+      // Stitch the page in tiles (fallback) to ensure content beyond viewport renders
       const viewportH = window.innerHeight || 900;
       const tileH = Math.max(600, Math.min(viewportH, 1200));
 
