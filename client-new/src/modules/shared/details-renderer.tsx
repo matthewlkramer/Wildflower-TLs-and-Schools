@@ -1584,7 +1584,18 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                             selectOptions
                           )
                         ) : (
-                          renderDisplayValue(row[column], meta, undefined, selectOptions)
+                          (() => {
+                            const m: any = meta as any;
+                            const linkField = m && m.linkToField;
+                            if (linkField && typeof row[column] === 'string') {
+                              const linkVal: any = (row as any)[linkField];
+                              let href: string | undefined;
+                              if (typeof linkVal === 'string') href = linkVal;
+                              else if (linkVal && typeof linkVal === 'object') href = linkVal.url ?? linkVal.href ?? linkVal.link ?? linkVal.download_url;
+                              if (href) return (<a href={String(href)} target="_blank" rel="noreferrer" style={{ color: '#0ea5e9', textDecoration: 'underline' }}>{String(row[column])}</a>);
+                            }
+                            return renderDisplayValue(row[column], meta, undefined, selectOptions);
+                          })()
                         )}
 
                       </td>
@@ -1948,15 +1959,14 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
               {(() => {
                 const r = rows[viewRowIndex!];
                 if (!r) return <div style={{ color: '#64748b', fontSize: 12 }}>Record unavailable.</div>;
-                const cols = ((effective as any).columns ?? []) as any[];
-                return cols.map((c: any) => {
-                  const field = typeof c === 'string' ? c : c.field;
+                const fields = Object.keys(r as any);
+                return fields.map((field: string) => {
                   const meta = columnMetaMap.get(field);
                   const label = meta?.label ?? formatLabel(field);
                   return (
                     <div key={field} style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 8, alignItems: 'baseline' }}>
                       <div style={{ fontSize: 12, color: '#334155' }}>{label}</div>
-                      <div style={{ fontSize: 13, color: '#0f172a' }}>{renderDisplayValue(r[field], meta as any)}</div>
+                      <div style={{ fontSize: 13, color: '#0f172a' }}>{renderDisplayValue((r as any)[field], meta as any)}</div>
                     </div>
                   );
                 });
@@ -2178,21 +2188,11 @@ function getInitialValues(fields: string[], details: any) {
 
 
 function renderDisplayValue(
-
   value: any,
-
   meta?: FieldMetadata | TableColumnMeta,
-
   referenceLabels?: string[],
-
   selectOptions?: SelectOption[],
-
 ) {
-
-  const placeholder = <span style={{ color: '#94a3b8' }}>-</span>;
-
-  const isArray = Boolean(meta && 'array' in meta && meta.array);
-
   const baseType = meta?.type ?? 'string';
 
 
@@ -2242,9 +2242,25 @@ function renderDisplayValue(
     return resolved.length > 0 ? resolved.join(', ') : placeholder;
 
   }
-
-
-
+    // Custom: string column linking to another field (e.g., show doc_type but link to pdf)
+  if (meta && (meta as any).linkToField && typeof value === 'string') {
+    try {
+      const lf = (meta as any).linkToField as string;
+      const linkVal = row ? row[lf] : undefined;
+      let href: string | undefined;
+      if (typeof linkVal === 'string') href = linkVal;
+      else if (linkVal && typeof linkVal === 'object') {
+        href = linkVal.url ?? linkVal.href ?? linkVal.link ?? linkVal.download_url ?? undefined;
+      }
+      if (href) {
+        return (
+          <a href={String(href)} target="_blank" rel="noreferrer" style={{ color: '#0ea5e9', textDecoration: 'underline' }}>
+            {value}
+          </a>
+        );
+      }
+    } catch {}
+  }
   const optionLabel = optionLabelFor(value);
 
   if (optionLabel !== undefined) {
@@ -2874,3 +2890,9 @@ function MostRecentFilloutFormLink({ formId, title }: { formId?: string; title: 
     </>
   );
 }
+
+
+
+
+
+
