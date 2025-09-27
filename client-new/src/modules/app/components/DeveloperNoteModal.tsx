@@ -179,9 +179,11 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       const vy = window.scrollY || window.pageYOffset || 0;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
+      try { console.log('[DevNotes] Quick Snapshot: starting viewport capture', { vx, vy, vw, vh }); } catch {}
 
       // 1) Try dom-to-image-more (SVG foreignObject)
       try {
+        try { console.log('[DevNotes] Quick Snapshot: trying dom-to-image-more (viewport)'); } catch {}
         const node = document.documentElement;
         const style = {
           width: `${fullW}px`,
@@ -198,6 +200,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
           bgcolor: '#ffffff',
         });
         if (blob) {
+          try { console.log('[DevNotes] Quick Snapshot: used dom-to-image-more (viewport)'); } catch {}
           setShotBlob(blob);
           const url = URL.createObjectURL(blob);
           setShotPreview(url);
@@ -208,6 +211,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
 
       // 2) Try html-to-image (similar FO approach)
       try {
+        try { console.log('[DevNotes] Quick Snapshot: trying html-to-image (viewport)'); } catch {}
         const node = document.documentElement;
         const style = {
           width: `${fullW}px`,
@@ -226,6 +230,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
           skipFonts: false,
         });
         if (blob) {
+          try { console.log('[DevNotes] Quick Snapshot: used html-to-image (viewport)'); } catch {}
           setShotBlob(blob);
           const url = URL.createObjectURL(blob);
           setShotPreview(url);
@@ -236,6 +241,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
 
       // 3) Try html2canvas viewport with scroll offsets (non-FO; may fail on CSS4 color())
       try {
+        try { console.log('[DevNotes] Quick Snapshot: trying html2canvas (viewport)'); } catch {}
         const canvas: HTMLCanvasElement = await html2canvas(document.documentElement, {
           useCORS: true,
           logging: false,
@@ -250,6 +256,7 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
         } as any);
         const blob: Blob | null = await new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/png'));
         if (blob) {
+          try { console.log('[DevNotes] Quick Snapshot: used html2canvas (viewport)'); } catch {}
           setShotBlob(blob);
           const url = URL.createObjectURL(blob);
           setShotPreview(url);
@@ -257,6 +264,8 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
           return;
         }
       } catch {}
+
+      try { console.log('[DevNotes] Quick Snapshot: falling back to tiled full-page capture'); } catch {}
 
       // Stitch the page in tiles (fallback) to ensure content beyond viewport renders
       const viewportH = window.innerHeight || 900;
