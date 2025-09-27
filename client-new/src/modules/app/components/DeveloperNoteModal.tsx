@@ -150,12 +150,14 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       setHideWhilePicking(true);
       await new Promise((r) => requestAnimationFrame(() => r(null)));
       // Dynamic import libraries to avoid upfront bundle cost
-      const [h2cMod, htiMod]: any = await Promise.all([
+      const [h2cMod, htiMod, dtiMod]: any = await Promise.all([
         import('html2canvas'),
         import('html-to-image'),
+        import('dom-to-image-more'),
       ]);
       const html2canvas = h2cMod.default || h2cMod;
       const htmlToImage = htiMod;
+      const domToImage = dtiMod;
 
       const fullW = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, window.innerWidth);
       const fullH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, window.innerHeight);
@@ -172,16 +174,54 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
         await new Promise((r) => setTimeout(r, 50));
       } catch {}
 
-      // First attempt: use html-to-image to render full document via foreignObject without CSS parsing
+      // Preferred: capture only the current viewport without moving scroll
+      const vx = window.scrollX || window.pageXOffset || 0;
+      const vy = window.scrollY || window.pageYOffset || 0;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // 1) Try dom-to-image-more (SVG foreignObject)
       try {
         const node = document.documentElement;
-        const style = { width: `${fullW}px`, height: `${fullH}px`, background: '#ffffff' } as any;
+        const style = {
+          width: `${fullW}px`,
+          height: `${fullH}px`,
+          background: '#ffffff',
+          transform: `translate(${-vx}px, ${-vy}px)`,
+          transformOrigin: 'top left',
+        } as any;
+        const blob = await (domToImage as any).toBlob(node, {
+          cacheBust: true,
+          width: vw,
+          height: vh,
+          style,
+          bgcolor: '#ffffff',
+        });
+        if (blob) {
+          setShotBlob(blob);
+          const url = URL.createObjectURL(blob);
+          setShotPreview(url);
+          setScreenshotUrl('');
+          return;
+        }
+      } catch {}
+
+      // 2) Try html-to-image (similar FO approach)
+      try {
+        const node = document.documentElement;
+        const style = {
+          width: `${fullW}px`,
+          height: `${fullH}px`,
+          background: '#ffffff',
+          transform: `translate(${-vx}px, ${-vy}px)`,
+          transformOrigin: 'top left',
+        } as any;
         const blob = await (htmlToImage as any).toBlob(node, {
           cacheBust: true,
           pixelRatio: 1,
           backgroundColor: '#ffffff',
-          width: fullW,
-          height: fullH,
+          width: vw,
+          height: vh,
           style,
           skipFonts: false,
         });
@@ -192,9 +232,31 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
           setScreenshotUrl('');
           return;
         }
-      } catch (_) {
-        // Fall through to tiling when FO path isn't sufficient
-      }
+      } catch {}
+
+      // 3) Try html2canvas viewport with scroll offsets (non-FO; may fail on CSS4 color())
+      try {
+        const canvas: HTMLCanvasElement = await html2canvas(document.documentElement, {
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          windowWidth: fullW,
+          windowHeight: fullH,
+          width: vw,
+          height: vh,
+          scrollX: -vx,
+          scrollY: -vy,
+          foreignObjectRendering: false,
+        } as any);
+        const blob: Blob | null = await new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/png'));
+        if (blob) {
+          setShotBlob(blob);
+          const url = URL.createObjectURL(blob);
+          setShotPreview(url);
+          setScreenshotUrl('');
+          return;
+        }
+      } catch {}
 
       // Stitch the page in tiles (fallback) to ensure content beyond viewport renders
       const viewportH = window.innerHeight || 900;
