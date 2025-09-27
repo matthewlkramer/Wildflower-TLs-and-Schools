@@ -159,32 +159,52 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       const htmlToImage = htiMod;
       const domToImage = dtiMod;
 
-      // Determine the primary scroll container and capture target
-      const pickScroller = () => {
-        const candidates: Element[] = [];
-        const byId = (id: string) => document.getElementById(id);
-        const bySel = (sel: string) => document.querySelector(sel) as Element | null;
-        const push = (el: Element | null | undefined) => { if (el) candidates.push(el); };
-        push(document.scrollingElement as Element | null);
-        push(bySel('main'));
-        push(byId('root'));
-        push(bySel('#app'));
-        push(document.body);
-        push(document.documentElement);
-        // Choose the element with the largest scrollable overflow
-        let best: Element = document.documentElement;
-        let bestOverflow = -1;
-        for (const el of candidates) {
+      // Determine the primary scroll container at the current viewport
+      const findActiveScroller = () => {
+        const centerX = Math.max(0, Math.min(window.innerWidth - 1, Math.floor(window.innerWidth / 2)));
+        const centerY = Math.max(0, Math.min(window.innerHeight - 1, Math.floor(window.innerHeight / 2)));
+        let el = document.elementFromPoint(centerX, centerY) as HTMLElement | null;
+        const chain: HTMLElement[] = [];
+        while (el && el !== document.body && el !== document.documentElement) {
+          chain.push(el);
+          el = el.parentElement;
+        }
+        if (document.body) chain.push(document.body);
+        if (document.documentElement) chain.push(document.documentElement as any);
+        const isScrollable = (node: HTMLElement) => {
           try {
-            const sh = (el as HTMLElement).scrollHeight || 0;
-            const ch = (el as HTMLElement).clientHeight || 0;
-            const overflow = sh - ch;
-            if (overflow > bestOverflow) { bestOverflow = overflow; best = el; }
+            const cs = getComputedStyle(node);
+            const oy = cs.overflowY;
+            const ox = cs.overflowX;
+            const scrollY = node.scrollHeight - node.clientHeight;
+            const scrollX = node.scrollWidth - node.clientWidth;
+            return ((oy === 'auto' || oy === 'scroll') && scrollY > 1) || ((ox === 'auto' || ox === 'scroll') && scrollX > 1);
+          } catch { return false; }
+        };
+        // Prefer the nearest ancestor that is actually scrollable
+        for (const n of chain) {
+          if (isScrollable(n)) return n;
+        }
+        // Fallback: element with the largest overflow among common containers
+        const candidates: HTMLElement[] = [
+          (document.scrollingElement as HTMLElement | null) || undefined,
+          document.getElementById('root') as HTMLElement | null,
+          document.querySelector('main') as HTMLElement | null,
+          document.querySelector('#app') as HTMLElement | null,
+          document.body as any,
+          document.documentElement as any,
+        ].filter(Boolean) as HTMLElement[];
+        let best: HTMLElement = document.documentElement as any;
+        let bestOverflow = -1;
+        for (const c of candidates) {
+          try {
+            const overflow = (c.scrollHeight - c.clientHeight) + (c.scrollWidth - c.clientWidth);
+            if (overflow > bestOverflow) { bestOverflow = overflow; best = c; }
           } catch {}
         }
-        return best as HTMLElement;
+        return best;
       };
-      const scroller = pickScroller();
+      const scroller = findActiveScroller();
       const targetNode = scroller; // capture the primary scrolling container directly
       const fullW = Math.max((scroller as any).scrollWidth || 0, (scroller as any).clientWidth || 0);
       const fullH = Math.max((scroller as any).scrollHeight || 0, (scroller as any).clientHeight || 0);
@@ -209,7 +229,8 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       try {
         const id = (scroller as HTMLElement).id ? '#' + (scroller as HTMLElement).id : '';
         const cls = (scroller as HTMLElement).className ? '.' + String((scroller as HTMLElement).className).split(/\s+/).slice(0,2).join('.') : '';
-        console.log('[DevNotes] Quick Snapshot: starting viewport capture', { vx, vy, vw, vh, scroller: scroller.tagName + id + cls });
+        const sh = (scroller as any).scrollHeight, ch = (scroller as any).clientHeight;
+        console.log('[DevNotes] Quick Snapshot: starting viewport capture', { vx, vy, vw, vh, scroller: scroller.tagName + id + cls, scrollHeight: sh, clientHeight: ch });
       } catch {}
 
       // 1) Try dom-to-image-more (SVG foreignObject)
