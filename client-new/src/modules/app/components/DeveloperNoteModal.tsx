@@ -185,9 +185,9 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
         return best as HTMLElement;
       };
       const scroller = pickScroller();
-      const targetNode = (document.getElementById('root') as HTMLElement) || document.documentElement;
-      const fullW = Math.max((targetNode as any).scrollWidth || 0, window.innerWidth);
-      const fullH = Math.max((targetNode as any).scrollHeight || 0, window.innerHeight);
+      const targetNode = scroller; // capture the primary scrolling container directly
+      const fullW = Math.max((scroller as any).scrollWidth || 0, (scroller as any).clientWidth || 0);
+      const fullH = Math.max((scroller as any).scrollHeight || 0, (scroller as any).clientHeight || 0);
 
       // Pre-pass: scroll through the page to encourage virtualized lists/images to render
       try {
@@ -202,11 +202,15 @@ export function DeveloperNoteModal({ open, onClose }: Props) {
       } catch {}
 
       // Preferred: capture only the current viewport without moving scroll
-      const vx = (scroller as any).scrollLeft || window.scrollX || window.pageXOffset || 0;
-      const vy = (scroller as any).scrollTop || window.scrollY || window.pageYOffset || 0;
-      const vw = (scroller as any).clientWidth || window.innerWidth;
-      const vh = (scroller as any).clientHeight || window.innerHeight;
-      try { console.log('[DevNotes] Quick Snapshot: starting viewport capture', { vx, vy, vw, vh, scroller: scroller.tagName }); } catch {}
+      const vx = (scroller as any).scrollLeft || 0;
+      const vy = (scroller as any).scrollTop || 0;
+      const vw = (scroller as any).clientWidth || 0;
+      const vh = (scroller as any).clientHeight || 0;
+      try {
+        const id = (scroller as HTMLElement).id ? '#' + (scroller as HTMLElement).id : '';
+        const cls = (scroller as HTMLElement).className ? '.' + String((scroller as HTMLElement).className).split(/\s+/).slice(0,2).join('.') : '';
+        console.log('[DevNotes] Quick Snapshot: starting viewport capture', { vx, vy, vw, vh, scroller: scroller.tagName + id + cls });
+      } catch {}
 
       // 1) Try dom-to-image-more (SVG foreignObject)
       try {
