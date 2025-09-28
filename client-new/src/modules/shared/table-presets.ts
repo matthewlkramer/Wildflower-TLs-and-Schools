@@ -73,13 +73,11 @@ const TABLE_COLUMNS = {
   ],
 
   governance_docs: [
-    { field: 'doc_type', label: 'Document Type', type: 'string', lookup: { table: 'ref_gov_docs', valueColumn: 'value', labelColumn: 'value' } },
-    { field: 'pdf', label: 'PDF', type: 'attachment' },
+    { field: 'doc_type', label: 'Document Type', type: 'string', linkToField: 'pdf' },
   ],
 
   nine_nineties: [
-    { field: 'form_year', label: 'Year', type: 'string', lookup: { table: 'school_years', valueColumn: 'starting_calendar_year', labelColumn: 'starting_calendar_year' } },
-    { field: 'pdf', label: 'Document', type: 'attachment' },
+    { field: 'form_year', label: 'Year', type: 'string', linkToField: 'pdf' },
   ],
 
   enrollment: [
@@ -463,4 +461,5 @@ export const TABLE_PRESETS = {
 } as const;
 
 export type TablePresetId = keyof typeof TABLE_PRESETS;
+
 

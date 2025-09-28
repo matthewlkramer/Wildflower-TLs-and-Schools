@@ -86,6 +86,9 @@ export type TableColumnMeta = {
   update?: 'no' | 'yes' | 'newOnly';
   // Optional write target override for view-backed fields
   writeTo?: { schema?: string; table: string; pk?: string; column?: string };
+  // Optional: render this string column as a link to a URL/attachment
+  // contained in another field on the same row (e.g., show doc_type but link to pdf)
+  linkToField?: string;
 };
 
 export type DetailCardBlock = {

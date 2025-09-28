@@ -1584,7 +1584,19 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                             selectOptions
                           )
                         ) : (
-                          renderDisplayValue(row[column], meta, undefined, selectOptions)
+                          (() => {
+                            const m = meta as any;
+                            const lf: string | undefined = m?.linkToField;
+                            const cell = row[column];
+                            if (lf && typeof cell === 'string') {
+                              const linkVal: any = (row as any)[lf];
+                              let href: string | undefined;
+                              if (typeof linkVal === 'string') href = linkVal;
+                              else if (linkVal && typeof linkVal === 'object') href = linkVal.url ?? linkVal.href ?? linkVal.link ?? linkVal.download_url;
+                              if (href) return (<a href={String(href)} target="_blank" rel="noreferrer" style={{ color: '#0ea5e9', textDecoration: 'underline' }}>{String(cell)}</a>);
+                            }
+                            return renderDisplayValue(cell, meta, undefined, selectOptions);
+                          })()
                         )}
 
                       </td>
@@ -1948,15 +1960,14 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
               {(() => {
                 const r = rows[viewRowIndex!];
                 if (!r) return <div style={{ color: '#64748b', fontSize: 12 }}>Record unavailable.</div>;
-                const cols = ((effective as any).columns ?? []) as any[];
-                return cols.map((c: any) => {
-                  const field = typeof c === 'string' ? c : c.field;
+                const allFields = Object.keys(r as any);
+                return allFields.map((field: string) => {
                   const meta = columnMetaMap.get(field);
                   const label = meta?.label ?? formatLabel(field);
                   return (
                     <div key={field} style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 8, alignItems: 'baseline' }}>
                       <div style={{ fontSize: 12, color: '#334155' }}>{label}</div>
-                      <div style={{ fontSize: 13, color: '#0f172a' }}>{renderDisplayValue(r[field], meta as any)}</div>
+                      <div style={{ fontSize: 13, color: '#0f172a' }}>{renderDisplayValue((r as any)[field], meta as any)}</div>
                     </div>
                   );
                 });
