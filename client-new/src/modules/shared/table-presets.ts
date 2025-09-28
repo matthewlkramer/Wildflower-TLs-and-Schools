@@ -138,8 +138,8 @@ export const TABLE_PRESETS = {
 
 
   charterGmails: {
-    readSource: { schema: 'gsync', table: 'g_emails', fkColumn: 'charter_id' },
-    writeDefaults: { schema: 'gsync', table: 'g_emails', pkColumn: 'id' },
+    readSource: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', fkColumn: 'charter_id' },
+    writeDefaults: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', pkColumn: 'id' },
     columns: [...TABLE_COLUMNS.gmails] as const,
     rowActions: ['view_in_modal', 'toggle_private_public', 'email'] as const,
   },
@@ -147,8 +147,8 @@ export const TABLE_PRESETS = {
 
 
   charterCalendarEvents: {
-    readSource: { schema: 'gsync', table: 'g_events', fkColumn: 'charter_id' },
-    writeDefaults: { schema: 'gsync', table: 'g_events', pkColumn: 'id' },
+    readSource: { schema: 'gsync', table: 'g_events_with_people_ids_mv', fkColumn: 'charter_id' },
+    writeDefaults: { schema: 'gsync', table: 'g_events_with_people_ids_mv', pkColumn: 'id' },
     columns: [...TABLE_COLUMNS.calendarEvents] as const,
     rowActions: ['view_in_modal', 'toggle_private_public'] as const,
   },
@@ -337,15 +337,15 @@ export const TABLE_PRESETS = {
   },
 
   educatorGmails: {
-    readSource: { schema: 'gsync', table: 'g_emails', fkColumn: 'people_id' },
-    writeDefaults: { schema: 'gsync', table: 'g_emails', pkColumn: 'id' },
+    readSource: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', fkColumn: 'people_id' },
+    writeDefaults: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', pkColumn: 'id' },
     columns: [...TABLE_COLUMNS.gmails] as const,
     rowActions: ['view_in_modal', 'toggle_private_public','email'] as const,
   },
 
   educatorCalendarEvents: {
-    readSource: { schema: 'gsync', table: 'g_events', fkColumn: 'people_id' },
-    writeDefaults: { schema: 'gsync', table: 'g_events', pkColumn: 'id' },
+    readSource: { schema: 'gsync', table: 'g_events_with_people_ids_mv', fkColumn: 'people_id' },
+    writeDefaults: { schema: 'gsync', table: 'g_events_with_people_ids_mv', pkColumn: 'id' },
     columns: [...TABLE_COLUMNS.calendarEvents] as const,
     rowActions: ['view_in_modal', 'toggle_private_public'] as const,
   },
@@ -361,15 +361,15 @@ export const TABLE_PRESETS = {
   },
 
   schoolGmails: {
-    readSource: { schema: 'gsync', table: 'g_emails', fkColumn: 'school_id' },
-    writeDefaults: { schema: 'gsync', table: 'g_emails', pkColumn: 'id' },
+    readSource: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', fkColumn: 'school_id' },
+    writeDefaults: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', pkColumn: 'id' },
     columns: [...TABLE_COLUMNS.gmails] as const,
     rowActions: ['view_in_modal', 'toggle_private_public','email'] as const,
   },
 
   schoolCalendarEvents: {
-    readSource: { schema: 'gsync', table: 'g_events', fkColumn: 'school_id' },
-    writeDefaults: { schema: 'gsync', table: 'g_events', pkColumn: 'id' },
+    readSource: { schema: 'gsync', table: 'g_events_with_people_ids_mv', fkColumn: 'school_id' },
+    writeDefaults: { schema: 'gsync', table: 'g_events_with_people_ids_mv', pkColumn: 'id' },
     columns: [...TABLE_COLUMNS.calendarEvents] as const,
     rowActions: ['view_in_modal', 'toggle_private_public'] as const,
   },
@@ -463,3 +463,4 @@ export const TABLE_PRESETS = {
 } as const;
 
 export type TablePresetId = keyof typeof TABLE_PRESETS;
+
