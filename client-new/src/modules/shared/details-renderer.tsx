@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Tabs, Tab, Box } from '@mui/material';
+import { Tabs, Tab, Box, FormControlLabel, Switch } from '@mui/material';
 
 import { supabase } from '@/lib/supabase/client';
 import { isEmail, normalizeEmail, isPhoneE164, normalizePhoneToE164, isEIN, normalizeEIN } from './validators';
@@ -1188,6 +1188,16 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
   const [optionsVersion, setOptionsVersion] = React.useState<number>(0);
   const [editingRow, setEditingRow] = React.useState<number | null>(null);
   const [editingValues, setEditingValues] = React.useState<any>({});
+  // On/off filter toggle per table type
+  const rsInfo: any = (effective as any).readSource ?? (effective as any).source ?? {};
+  const tableName: string | undefined = rsInfo?.table as string | undefined;
+  const toggleKind: 'active' | 'locations' | 'action_steps' | null = React.useMemo(() => {
+    if (tableName === 'details_associations' || tableName === 'guide_assignments') return 'active';
+    if (tableName === 'locations') return 'locations';
+    if (tableName === 'action_steps') return 'action_steps';
+    return null;
+  }, [tableName]);
+  const [toggleOn, setToggleOn] = React.useState<boolean>(true);
   const columnAllowsEditLocal = (meta?: TableColumnMeta): boolean => {
     if (!meta) return true;
     const upd = (meta as any).update as 'no' | 'yes' | 'newOnly' | undefined;
@@ -1334,7 +1344,11 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
         : (supabase as any).from(table);
 
-      let { data, error } = await query.select('*').eq(fkColumn, entityId).limit(200);
+      let q = query.select('*').eq(fkColumn, entityId);
+      if (toggleKind === 'active' && toggleOn) { q = q.eq('is_active', true); }
+      if (toggleKind === 'locations' && toggleOn) { q = q.or('current_physical_address.is.true,current_mail_address.is.true'); }
+      if (toggleKind === 'action_steps' && toggleOn) { q = q.eq('item_status', 'Incomplete'); }
+      let { data, error } = await q.limit(200);
       if (!error && Array.isArray(data) && data.length === 0) {
         const asNum = Number(entityId);
         if (!Number.isNaN(asNum)) {
@@ -1364,7 +1378,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
     };
 
-  }, [((effective as any).readSource ?? (effective as any).source)?.schema, ((effective as any).readSource ?? (effective as any).source)?.table, ((effective as any).readSource ?? (effective as any).source)?.fkColumn, entityId, refreshToken]);
+  }, [((effective as any).readSource ?? (effective as any).source)?.schema, ((effective as any).readSource ?? (effective as any).source)?.table, ((effective as any).readSource ?? (effective as any).source)?.fkColumn, entityId, refreshToken, toggleKind, toggleOn]);
 
 
 
@@ -1455,11 +1469,19 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
     <>
       <div style={{ border: '1px solid #e2e8f0', borderRadius: 6 }}>
 
-      <div style={{ padding: 8, borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: 8, borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <div style={{ fontWeight: 600 }}>{(effective as any).title ?? ''}</div>
-        {(effective as any).tableActions && (effective as any).tableActions.length > 0 ? (
-          <div>
-            {(effective as any).tableActions.map((action: any, idx: number) => {
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {toggleKind ? (
+            <FormControlLabel
+              control={<Switch size="small" checked={toggleOn} onChange={(e) => setToggleOn(e.target.checked)} />}
+              label={toggleKind === 'active' ? 'Active only' : toggleKind === 'locations' ? 'Current only' : 'Incomplete only'}
+              sx={{ m: 0, mr: ((effective as any).tableActions && (effective as any).tableActions.length > 0) ? 1 : 0, '& .MuiFormControlLabel-label': { fontSize: 12, color: '#475569' } }}
+            />
+          ) : null}
+          {(effective as any).tableActions && (effective as any).tableActions.length > 0 ? (
+            <div>
+              {(effective as any).tableActions.map((action: any, idx: number) => {
               const label = Array.isArray((effective as any).tableActionLabels) && (effective as any).tableActionLabels[idx]
                 ? (effective as any).tableActionLabels[idx]!
                 : formatLabel(action);
@@ -1497,8 +1519,9 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                 </Button>
               );
             })}
-          </div>
-        ) : null}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <div style={{ overflowX: 'auto' }}>
@@ -2885,3 +2908,6 @@ function MostRecentFilloutFormLink({ formId, title }: { formId?: string; title: 
     </>
   );
 }
+
+
+
