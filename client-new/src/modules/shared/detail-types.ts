@@ -79,6 +79,8 @@ export type TableColumnMeta = {
   options?: string[];
   enumName?: string;
   lookup?: FieldLookup;
+  // Optional: apply a boolean or equality filter when loading lookup options
+  lookupFilter?: { column: string; value: any };
   reference?: FieldReference;
 // If present, disables inline editing for this column
   edit?: boolean;

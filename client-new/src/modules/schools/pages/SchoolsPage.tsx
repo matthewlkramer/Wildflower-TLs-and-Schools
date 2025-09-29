@@ -6,6 +6,7 @@ import type { ColDef } from 'ag-grid-community';
 import { useGridSchools } from '../api/queries';
 import { useLocation } from 'wouter';
 import { SCHOOL_GRID, type SchoolColumnConfig, SCHOOL_FIELD_METADATA } from '../constants';
+import { CreateSchoolModal } from '../components/CreateSchoolModal';
 import { supabase } from '@/lib/supabase/client';
 import { GridPageHeader } from '@/components/shared/GridPageHeader';
 import type { SavedView } from '@/hooks/useSavedViews';
@@ -117,6 +118,7 @@ export function SchoolsPage() {
     };
   }, [data, getUniqueValuesFromData]);
 
+  const [showCreate, setShowCreate] = useState(false);
   const cols = useMemo<ColDef<any>[]>(() => {
     if (!data || data.length === 0) return [];
     const sample = data.slice(0, 50);
@@ -380,7 +382,7 @@ export function SchoolsPage() {
         selectedCount={selectedCount}
         currentViewMode="table"
         onViewModeChange={handleViewModeChange}
-        onAddNew={handleAddNew}
+        onAddNew={() => setShowCreate(true)}
         onApplySavedView={handleApplySavedView}
         onSaveCurrentView={handleSaveCurrentView}
         onOpenColumnsPanel={() => {
@@ -404,6 +406,14 @@ export function SchoolsPage() {
             gridApi.setSideBarVisible(true);
             gridApi.openToolPanel('filters');
           }
+        }}
+      />
+      <CreateSchoolModal
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        onCreated={(id) => {
+          // After create, navigate to detail page
+          navigate(`/schools/${id}`);
         }}
       />
       <GridBase

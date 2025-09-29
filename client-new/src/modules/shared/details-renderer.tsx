@@ -1408,13 +1408,13 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
       try {
         // Collect enum names and lookups from column meta
         const enums = new Set<string>();
-        const lookups: { key: string; lookup: FieldLookup }[] = [];
+        const lookups: { key: string; lookup: FieldLookup; meta: TableColumnMeta }[] = [];
         for (const [field, meta] of columnMetaMap.entries()) {
           const enumName = (meta as any)?.enumName || (meta as any)?.edit?.enumName;
           if (enumName && !ENUM_OPTION_CACHE.get(enumName)) enums.add(enumName);
           if (meta.lookup) {
             const key = buildLookupKey(meta.lookup);
-            if (!LOOKUP_OPTION_CACHE.get(key)) lookups.push({ key, lookup: meta.lookup });
+            if (!LOOKUP_OPTION_CACHE.get(key)) lookups.push({ key, lookup: meta.lookup, meta });
           }
         }
         // Load enums
@@ -1432,7 +1432,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
           }
         }
         // Load lookups
-        for (const { key, lookup } of lookups) {
+        for (const { key, lookup, meta } of lookups) {
           const schema = lookup.schema;
           const table = lookup.table;
           const valueCol = lookup.valueColumn;
@@ -1440,6 +1440,10 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
           const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
           let q: any = client.from(table).select(`${valueCol}, ${labelCol}`).order(labelCol, { ascending: true });
           if (table === 'guides') q = q.eq('is_active', true);
+          const filter = (meta as any)?.lookupFilter as { column: string; value: any } | undefined;
+          if (filter && filter.column !== undefined) {
+            q = q.eq(filter.column, filter.value);
+          }
           const { data, error } = await q;
           if (!cancelled && !error && Array.isArray(data)) {
             const opts = (data as any[])

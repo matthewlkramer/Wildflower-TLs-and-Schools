@@ -13,15 +13,21 @@ export type TablePreset = {
 const TABLE_COLUMNS = {
   educators: [
     { field: 'full_name', label: 'Educator', type: 'string' , update: 'newOnly'},
-    { field: 'role', label: 'Role', type: 'string', array: true, lookup: { table: 'ref_roles', valueColumn: 'value', labelColumn: 'value' }},
+    { field: 'role', label: 'Role', type: 'string', array: true, lookup: { table: 'ref_roles', valueColumn: 'value', labelColumn: 'value' }, lookupFilter: { column: 'show_in_educator_grid', value: true }},
     { field: 'start_date', label: 'Start Date', type: 'date' },
     { field: 'end_date', label: 'End Date', type: 'date' },
     { field: 'is_active', label: 'Active?', type: 'boolean' },
   ],
-
+  boardMembers: [
+    { field: 'full_name', label: 'Name', type: 'string'},
+    { field: 'role', label: 'Role', type: 'string', array: true, lookup: { table: 'ref_roles', valueColumn: 'value', labelColumn: 'value' }, lookupFilter: { column: 'show_in_board_tables', value: true }},
+    { field: 'start_date', label: 'Start Date', type: 'date' },
+    { field: 'end_date', label: 'End Date', type: 'date' },
+    { field: 'is_active', label: 'Active?', type: 'boolean' },
+  ],
   schools: [
     { field: 'school_name', label: 'School', type: 'string', update: 'newOnly' },
-    { field: 'role', label: 'Role', type: 'string', array: true, lookup: { table: 'ref_roles', valueColumn: 'value', labelColumn: 'value' } },
+    { field: 'role', label: 'Role', type: 'select', array: true, lookup: { table: 'ref_roles', valueColumn: 'value', labelColumn: 'value' } },
     { field: 'start_date', label: 'Start Date', type: 'date' },
     { field: 'end_date', label: 'End Date', type: 'date' },
     { field: 'is_active', label: 'Active?', type: 'boolean' },
@@ -259,6 +265,14 @@ export const TABLE_PRESETS = {
     tableActionLabels: ['Assign Guide', 'Add Guide & Assignment'] as const,
   },
 
+  charterBoardMembers: {
+    readSource: { table: 'people', fkColumn: 'charter_id' },
+    writeDefaults: { table: 'people', pkColumn: 'id' },
+    columns: [...TABLE_COLUMNS.boardMembers] as const,
+    rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'email','archive'] as const,
+    tableActions: ['addPersonToBoard','addNewPersonToBoard'] as const,
+    tableActionLabels: ['Add Person to Board','Add New Person to Board'] as const,
+  },
   // Educator module presets
   educatorEmails: {
     readSource: { table: 'email_addresses', fkColumn: 'people_id' },
@@ -457,6 +471,15 @@ export const TABLE_PRESETS = {
     rowActions: ['inline_edit', 'view_in_modal', 'toggle_complete', 'archive'] as const,
     tableActions: ['addActionStep'] as const,
     tableActionLabels: ['Add Action Step'] as const,
+  },
+  // fix this and above
+  schoolBoardMembers: {
+    readSource: { table: 'people', fkColumn: 'school_id' },
+    writeDefaults: { table: 'people', pkColumn: 'id' },
+    columns: [...TABLE_COLUMNS.boardMembers] as const,
+    rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'email','archive'] as const,
+    tableActions: ['addPersonToBoard','addNewPersonToBoard'] as const,
+    tableActionLabels: ['Add Person to Board','Add New Person to Board'] as const,
   },
 } as const;
 
