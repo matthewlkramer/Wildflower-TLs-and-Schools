@@ -59,6 +59,24 @@ const LOOKUP_OPTION_CACHE = new Map<string, SelectOption[]>();
 
 const DEFAULT_SCHEMA = 'public';
 
+// Debug helper: enable by setting window.__WF_DEBUG_DETAILS__ = true or
+// localStorage.setItem('wf.debug.details','1') in the browser console.
+const DEBUG_DETAILS = (() => {
+  try {
+    if (typeof window !== 'undefined') {
+      // @ts-ignore
+      if ((window as any).__WF_DEBUG_DETAILS__) return true;
+      if (localStorage.getItem('wf.debug.details') === '1') return true;
+    }
+  } catch {}
+  return false;
+})();
+function dbg(...args: any[]) {
+  if (!DEBUG_DETAILS) return;
+  // eslint-disable-next-line no-console
+  console.debug('[Details]', ...args);
+}
+
 
 
 const normalizeOptionValue = (value: unknown): string => String(value ?? '');
@@ -662,7 +680,10 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
   const getMetaForField = React.useCallback(
     (field: string) => {
       const manual = resolvedFieldMeta[field] ?? fieldMeta?.[field];
-      if (manual) return manual;
+      if (manual) {
+        dbg('meta(manual)', field, manual);
+        return manual;
+      }
       // Try default write order tables first
       if (defaultWriteOrder && defaultWriteOrder.length) {
         for (const t of defaultWriteOrder) {
@@ -670,7 +691,9 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
           if (cm) {
             const isEnum = !!cm?.enumRef;
             const type: any = isEnum ? 'enum' : (cm?.baseType === 'boolean' ? 'boolean' : (cm?.baseType === 'number' ? 'number' : 'string'));
-            return { type, array: !!cm.isArray } as FieldMetadata;
+            const meta = { type, array: !!cm.isArray } as FieldMetadata;
+            dbg('meta(derived-order)', field, { table: t, cm, meta });
+            return meta;
           }
         }
       }
@@ -680,9 +703,12 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
         if (cm) {
           const isEnum = !!cm?.enumRef;
           const type: any = isEnum ? 'enum' : (cm?.baseType === 'boolean' ? 'boolean' : (cm?.baseType === 'number' ? 'number' : 'string'));
-          return { type, array: !!cm.isArray } as FieldMetadata;
+          const meta = { type, array: !!cm.isArray } as FieldMetadata;
+          dbg('meta(derived-default)', field, { table: defaultWriteTo.table, cm, meta });
+          return meta;
         }
       }
+      dbg('meta(undefined)', field);
       return undefined;
     },
     [resolvedFieldMeta, fieldMeta, defaultWriteOrder, defaultWriteTo],
@@ -859,7 +885,8 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
 
           const meta = getMetaForField(field);
 
-          const label = meta?.label ?? normalizeAbbrev(formatLabel(field));
+          const label = meta?.label ?? labelFromField(field);
+          dbg('label', { field, label, meta });
           console.log(`Rendering field: ${field} ${label}`);
 
           // Field-level visibility (evaluated against current values)
@@ -886,6 +913,7 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
             const cm = getColumnMetadata(defaultWriteTo.schema, defaultWriteTo.table, field);
             editableField = !!cm;
           }
+          dbg('editableField', field, editableField);
 
           const selectOptions = selectOptionsMap[field] ?? getCachedOptionsForMeta(meta);
 
@@ -1671,7 +1699,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
                   <th key={column} style={{ textAlign: 'left', padding: 6, borderBottom: '1px solid #e2e8f0' }}>
 
-                    {meta?.label ?? normalizeAbbrev(formatLabel(column))}
+                    {meta?.label ?? labelFromField(column)}
 
                   </th>
 
@@ -1890,7 +1918,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                 const selectOptions = getCachedOptionsForMeta(meta);
                 return (
                   <label key={field} style={{ display: 'grid', gap: 6 }}>
-                    <span style={{ fontSize: 12, color: '#334155' }}>{meta?.label ?? normalizeAbbrev(formatLabel(field))}</span>
+                    <span style={{ fontSize: 12, color: '#334155' }}>{meta?.label ?? labelFromField(field)}</span>
                     {renderEditor(field, createValues[field], (next) => setCreateValues((prev) => ({ ...prev, [field]: next })), meta as any, selectOptions)}
                   </label>
                 );
@@ -1979,7 +2007,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                 const allFields = Object.keys(r as any);
                 return allFields.map((field: string) => {
                   const meta = columnMetaMap.get(field);
-                  const label = meta?.label ?? normalizeAbbrev(formatLabel(field));
+                  const label = meta?.label ?? labelFromField(field);
                   return (
                     <div key={field} style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 8, alignItems: 'baseline' }}>
                       <div style={{ fontSize: 12, color: '#334155' }}>{label}</div>
@@ -2478,6 +2506,18 @@ function normalizeAbbrev(label: string): string {
     return w;
   });
   return words.join(' ');
+}
+
+// Build a human-friendly label from a field id, applying Title Case and
+// then fixing common abbreviations without lowercasing the rest of the words.
+function labelFromField(field: string): string {
+  const sepNormalized = String(field)
+    .replace(/[._-]+/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .trim()
+    .toLowerCase()
+    .replace(/\b([a-z])/g, (_: any, c: string) => c.toUpperCase());
+  return normalizeAbbrev(sepNormalized);
 }
 
 
