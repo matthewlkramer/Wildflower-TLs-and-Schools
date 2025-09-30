@@ -2475,6 +2475,15 @@ function normalizeAbbrev(label: string): string {
     if (lower === 'tl') return 'TL';
     if (lower === 'tls') return 'TLs';
     if (lower === 'fy') return 'FY';
+    if (lower === 'id') return 'ID';
+    if (lower === 'ein') return 'EIN';
+    if (lower === 'loi') return 'LOI';
+    if (lower === 'url') return 'URL';
+    if (lower === 'pm') return 'PM';
+    if (lower === 'wf') return 'WF';
+    if (lower === 'gcal') return 'gCal';
+    if (lower === 'gmail') return 'Gmail';
+    if (lower === 'gsuite') return 'G Suite';
     return w;
   });
   return words.join(' ');

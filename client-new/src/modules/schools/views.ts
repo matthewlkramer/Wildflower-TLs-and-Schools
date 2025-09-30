@@ -124,7 +124,7 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
       ['governance_model', 'public_funding', 'program_focus', 'institutional_partner', 'ages_served', 'number_of_classrooms', 'enrollment_at_full_capacity'],
       { title: 'School Model', editable: true },
     ),
-    card(['school_email', 'school_phone', 'domain_name', 'website', 'facebook', 'instagram'], { title: 'Marketing & Comms', editable: true }),
+    card(['school_email', 'school_phone', 'website', 'facebook', 'instagram'], { title: 'Marketing & Comms', editable: true }),
     card(['total_grants_issued', 'total_loans_issued'], { title: 'Grants and Loans' }),
     card(['risk_factors', 'watchlist'], { title: 'Warnings', editable: true }),
   ),
