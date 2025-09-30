@@ -860,7 +860,25 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
 
           const value = values[field];
 
-          const editableField = Boolean(meta?.edit);
+          // Determine if this field is editable when card is in editing mode
+          let editableField = false;
+          if (meta?.editable === false) {
+            editableField = false;
+          } else if (meta?.edit) {
+            editableField = true;
+          } else if ((meta as any)?.writeTable) {
+            const t = (meta as any).writeTable as string;
+            const cm = getColumnMetadata(undefined, t, field);
+            editableField = !!cm;
+          } else if (defaultWriteOrder && defaultWriteOrder.length) {
+            for (const t of defaultWriteOrder) {
+              const cm = getColumnMetadata(undefined, t, field);
+              if (cm) { editableField = true; break; }
+            }
+          } else if (defaultWriteTo) {
+            const cm = getColumnMetadata(defaultWriteTo.schema, defaultWriteTo.table, field);
+            editableField = !!cm;
+          }
 
           const selectOptions = selectOptionsMap[field] ?? getCachedOptionsForMeta(meta);
 

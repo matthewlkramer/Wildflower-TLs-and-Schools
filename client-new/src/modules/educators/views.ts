@@ -77,7 +77,7 @@ export const ADD_NEW_EDUCATOR_INPUT = [
     id: 'personal_email',
     label: 'Personal Email',
     directWrite: false,
-    postInsert: { table: 'email_addresses', columns: { people_id: '$newId', email_address: 'personal_email' } },
+    postInsert: { table: 'email_addresses', columns: { people_id: '$newId', email_address: 'personal_email' , category: 'Personal' } },
   },
 ] as const;
 
