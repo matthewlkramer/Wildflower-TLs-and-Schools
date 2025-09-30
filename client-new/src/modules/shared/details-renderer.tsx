@@ -430,25 +430,17 @@ function useSelectOptions(
 
 
       if (meta.lookup) {
-
-        const key = buildLookupKey(meta.lookup);
-
+        const lk = { ...meta.lookup } as any;
+        if (!lk.schema && typeof lk.table === 'string' && lk.table.startsWith('ref_')) lk.schema = 'ref_tables';
+        const key = buildLookupKey(lk);
         const cached = LOOKUP_OPTION_CACHE.get(key);
-
         if (cached) {
-
           baseMap[field] = cached;
-
         } else {
-
           const entry = lookupsToFetch.get(key);
-
           if (entry) entry.fields.push(field);
-
-          else lookupsToFetch.set(key, { fields: [field], lookup: meta.lookup });
-
+          else lookupsToFetch.set(key, { fields: [field], lookup: lk });
         }
-
       }
 
       // Fallback: infer enum from schema metadata when not provided via meta
@@ -538,11 +530,9 @@ function useSelectOptions(
 
 
       for (const [lookupKey, { fields: lookupFields, lookup }] of lookupsToFetch.entries()) {
-
-        const query = lookup.schema && lookup.schema !== 'public'
-
-          ? (supabase as any).schema(lookup.schema).from(lookup.table)
-
+        const schemaName = lookup.schema || (typeof lookup.table === 'string' && lookup.table.startsWith('ref_') ? 'ref_tables' : undefined);
+        const query = schemaName && schemaName !== 'public'
+          ? (supabase as any).schema(schemaName).from(lookup.table)
           : (supabase as any).from(lookup.table);
 
         const { data, error } = await query

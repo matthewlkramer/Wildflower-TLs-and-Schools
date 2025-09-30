@@ -57,7 +57,9 @@ export function SchoolsPage() {
               const valueColumn = lookupMeta?.valueColumn ?? 'value';
               const labelColumn = lookupMeta?.labelColumn ?? rawColumn;
               const selectCols = valueColumn === labelColumn ? valueColumn : `${valueColumn}, ${labelColumn}`;
-              const { data: rows, error } = await (supabase as any)
+              const isRef = table.startsWith('ref_');
+              const svc = isRef ? (supabase as any).schema('ref_tables') : (supabase as any);
+              const { data: rows, error } = await svc
                 .from(table)
                 .select(selectCols)
                 .order(labelColumn, { ascending: true });

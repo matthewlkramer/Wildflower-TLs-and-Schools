@@ -73,7 +73,8 @@ export function ChartersSplitPage() {
             const [table, column] = config.lookupField.split('.');
             def.filterParams = {
               values: (p: any) => {
-                (supabase as any).from(table).select(column).order(column, { ascending: true }).then(({ data, error }: any) => {
+                const svc = table.startsWith('ref_') ? (supabase as any).schema('ref_tables') : (supabase as any);
+                svc.from(table).select(column).order(column, { ascending: true }).then(({ data, error }: any) => {
                   if (error) { p.success([]); return; }
                   const vals = Array.from(new Set((data || []).map((r: any) => r?.[column]).filter((v: any) => v != null))).map((v: any) => String(v));
                   p.success(vals);

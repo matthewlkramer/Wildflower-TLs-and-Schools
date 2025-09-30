@@ -296,13 +296,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "annual_assessment_and_metrics_data_assessment_or_metric_fkey"
-            columns: ["assessment_or_metric"]
-            isOneToOne: false
-            referencedRelation: "ref_assessments_and_metrics"
-            referencedColumns: ["value"]
-          },
-          {
             foreignKeyName: "annual_assessment_and_metrics_data_charter_id_fkey"
             columns: ["charter_id"]
             isOneToOne: false
@@ -343,13 +336,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "schools"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "annual_assessment_and_metrics_data_school_year_fkey"
-            columns: ["school_year"]
-            isOneToOne: false
-            referencedRelation: "ref_school_years"
-            referencedColumns: ["value"]
           },
         ]
       }
@@ -432,13 +418,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "schools"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "annual_enrollment_and_demographics_school_year_fkey"
-            columns: ["school_year"]
-            isOneToOne: false
-            referencedRelation: "ref_school_years"
-            referencedColumns: ["value"]
           },
         ]
       }
@@ -632,13 +611,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "charter_authorization_actions_action_fkey"
-            columns: ["action"]
-            isOneToOne: false
-            referencedRelation: "ref_charter_authorizer_actions"
-            referencedColumns: ["action"]
-          },
-          {
             foreignKeyName: "charter_authorization_actions_authorizer_fkey"
             columns: ["authorizer"]
             isOneToOne: false
@@ -790,15 +762,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["charter_status"] | null
           website?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "charters_membership_status_fkey"
-            columns: ["membership_status"]
-            isOneToOne: false
-            referencedRelation: "ref_membership_statuses"
-            referencedColumns: ["value"]
-          },
-        ]
+        Relationships: []
       }
       cohort_participation: {
         Row: {
@@ -1156,15 +1120,7 @@ export type Database = {
           is_archived?: boolean | null
           type?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "event_list_type_fkey"
-            columns: ["type"]
-            isOneToOne: false
-            referencedRelation: "ref_event_types"
-            referencedColumns: ["value"]
-          },
-        ]
+        Relationships: []
       }
       governance_docs: {
         Row: {
@@ -2041,13 +1997,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "membership_actions_membership_status_after_action_fkey"
-            columns: ["membership_status_after_action"]
-            isOneToOne: false
-            referencedRelation: "ref_membership_statuses"
-            referencedColumns: ["value"]
-          },
-          {
             foreignKeyName: "membership_actions_school_id_fkey"
             columns: ["school_id"]
             isOneToOne: false
@@ -2789,13 +2738,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "people_educator_early_cultiva_one_on_one_scheduling_status_fkey"
-            columns: ["one_on_one_scheduling_status"]
-            isOneToOne: false
-            referencedRelation: "ref_one_on_one_status"
-            referencedColumns: ["value"]
-          },
-          {
             foreignKeyName: "people_educator_early_cultiva_person_responsible_for_follo_fkey"
             columns: ["person_responsible_for_follow_up"]
             isOneToOne: false
@@ -2916,13 +2858,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "people_roles_associations_role_fkey"
-            columns: ["role"]
-            isOneToOne: false
-            referencedRelation: "ref_roles"
-            referencedColumns: ["value"]
-          },
-          {
             foreignKeyName: "people_roles_join_charter_id_fkey"
             columns: ["charter_id"]
             isOneToOne: false
@@ -3026,423 +2961,6 @@ export type Database = {
           },
         ]
       }
-      ref_assessments_and_metrics: {
-        Row: {
-          value: string
-        }
-        Insert: {
-          value: string
-        }
-        Update: {
-          value?: string
-        }
-        Relationships: []
-      }
-      ref_boolean: {
-        Row: {
-          category: string
-          english: string | null
-          is_archived: boolean | null
-          spanish: string | null
-        }
-        Insert: {
-          category: string
-          english?: string | null
-          is_archived?: boolean | null
-          spanish?: string | null
-        }
-        Update: {
-          category?: string
-          english?: string | null
-          is_archived?: boolean | null
-          spanish?: string | null
-        }
-        Relationships: []
-      }
-      ref_certifications: {
-        Row: {
-          admin_training: boolean | null
-          ages: Database["public"]["Enums"]["age_spans_rev"][] | null
-          credential_level: string
-          is_archived: boolean | null
-          lead_guide_training: boolean | null
-          synonyms: string[] | null
-        }
-        Insert: {
-          admin_training?: boolean | null
-          ages?: Database["public"]["Enums"]["age_spans_rev"][] | null
-          credential_level: string
-          is_archived?: boolean | null
-          lead_guide_training?: boolean | null
-          synonyms?: string[] | null
-        }
-        Update: {
-          admin_training?: boolean | null
-          ages?: Database["public"]["Enums"]["age_spans_rev"][] | null
-          credential_level?: string
-          is_archived?: boolean | null
-          lead_guide_training?: boolean | null
-          synonyms?: string[] | null
-        }
-        Relationships: []
-      }
-      ref_charter_authorizer_actions: {
-        Row: {
-          action: string
-          is_archived: boolean | null
-        }
-        Insert: {
-          action: string
-          is_archived?: boolean | null
-        }
-        Update: {
-          action?: string
-          is_archived?: boolean | null
-        }
-        Relationships: []
-      }
-      ref_charter_statuses: {
-        Row: {
-          is_archived: boolean | null
-          label: string | null
-          order: number | null
-          value: Database["public"]["Enums"]["charter_status"]
-        }
-        Insert: {
-          is_archived?: boolean | null
-          label?: string | null
-          order?: number | null
-          value: Database["public"]["Enums"]["charter_status"]
-        }
-        Update: {
-          is_archived?: boolean | null
-          label?: string | null
-          order?: number | null
-          value?: Database["public"]["Enums"]["charter_status"]
-        }
-        Relationships: []
-      }
-      ref_educator_statuses: {
-        Row: {
-          is_archived: boolean | null
-          kanban_visibility:
-            | Database["public"]["Enums"]["kanban_visibility"]
-            | null
-          label: string | null
-          order: number | null
-          value: string
-        }
-        Insert: {
-          is_archived?: boolean | null
-          kanban_visibility?:
-            | Database["public"]["Enums"]["kanban_visibility"]
-            | null
-          label?: string | null
-          order?: number | null
-          value: string
-        }
-        Update: {
-          is_archived?: boolean | null
-          kanban_visibility?:
-            | Database["public"]["Enums"]["kanban_visibility"]
-            | null
-          label?: string | null
-          order?: number | null
-          value?: string
-        }
-        Relationships: []
-      }
-      ref_errors: {
-        Row: {
-          error_type: string | null
-        }
-        Insert: {
-          error_type?: string | null
-        }
-        Update: {
-          error_type?: string | null
-        }
-        Relationships: []
-      }
-      ref_event_types: {
-        Row: {
-          is_archived: boolean | null
-          value: string
-        }
-        Insert: {
-          is_archived?: boolean | null
-          value: string
-        }
-        Update: {
-          is_archived?: boolean | null
-          value?: string
-        }
-        Relationships: []
-      }
-      ref_gender: {
-        Row: {
-          category: string
-          english: string | null
-          is_archived: boolean | null
-          spanish: string | null
-        }
-        Insert: {
-          category: string
-          english?: string | null
-          is_archived?: boolean | null
-          spanish?: string | null
-        }
-        Update: {
-          category?: string
-          english?: string | null
-          is_archived?: boolean | null
-          spanish?: string | null
-        }
-        Relationships: []
-      }
-      ref_gov_docs: {
-        Row: {
-          label_short: string
-          required_to_open: boolean | null
-          required_to_transition_to_startup: boolean | null
-          value: string
-        }
-        Insert: {
-          label_short: string
-          required_to_open?: boolean | null
-          required_to_transition_to_startup?: boolean | null
-          value: string
-        }
-        Update: {
-          label_short?: string
-          required_to_open?: boolean | null
-          required_to_transition_to_startup?: boolean | null
-          value?: string
-        }
-        Relationships: []
-      }
-      ref_membership_agreement_versions: {
-        Row: {
-          end_date: string | null
-          is_archived: boolean | null
-          start_date: string | null
-          version: string
-        }
-        Insert: {
-          end_date?: string | null
-          is_archived?: boolean | null
-          start_date?: string | null
-          version: string
-        }
-        Update: {
-          end_date?: string | null
-          is_archived?: boolean | null
-          start_date?: string | null
-          version?: string
-        }
-        Relationships: []
-      }
-      ref_membership_statuses: {
-        Row: {
-          is_archived: boolean | null
-          value: string
-        }
-        Insert: {
-          is_archived?: boolean | null
-          value: string
-        }
-        Update: {
-          is_archived?: boolean | null
-          value?: string
-        }
-        Relationships: []
-      }
-      ref_one_on_one_status: {
-        Row: {
-          label: string | null
-          value: string
-        }
-        Insert: {
-          label?: string | null
-          value: string
-        }
-        Update: {
-          label?: string | null
-          value?: string
-        }
-        Relationships: []
-      }
-      ref_planes: {
-        Row: {
-          age_ranges: Database["public"]["Enums"]["ages-grades"][] | null
-          age_spans: Database["public"]["Enums"]["age_spans_rev"] | null
-          credentials: string[] | null
-          is_archived: boolean | null
-          label: string | null
-          synonyms: string[] | null
-          value: Database["public"]["Enums"]["developmental_planes"]
-        }
-        Insert: {
-          age_ranges?: Database["public"]["Enums"]["ages-grades"][] | null
-          age_spans?: Database["public"]["Enums"]["age_spans_rev"] | null
-          credentials?: string[] | null
-          is_archived?: boolean | null
-          label?: string | null
-          synonyms?: string[] | null
-          value: Database["public"]["Enums"]["developmental_planes"]
-        }
-        Update: {
-          age_ranges?: Database["public"]["Enums"]["ages-grades"][] | null
-          age_spans?: Database["public"]["Enums"]["age_spans_rev"] | null
-          credentials?: string[] | null
-          is_archived?: boolean | null
-          label?: string | null
-          synonyms?: string[] | null
-          value?: Database["public"]["Enums"]["developmental_planes"]
-        }
-        Relationships: []
-      }
-      ref_public_funding_sources: {
-        Row: {
-          description: string | null
-          is_archived: boolean | null
-          planes: Database["public"]["Enums"]["developmental_planes"][] | null
-          value: string
-        }
-        Insert: {
-          description?: string | null
-          is_archived?: boolean | null
-          planes?: Database["public"]["Enums"]["developmental_planes"][] | null
-          value: string
-        }
-        Update: {
-          description?: string | null
-          is_archived?: boolean | null
-          planes?: Database["public"]["Enums"]["developmental_planes"][] | null
-          value?: string
-        }
-        Relationships: []
-      }
-      ref_race_and_ethnicity: {
-        Row: {
-          english_label: string | null
-          english_label_short: string | null
-          is_archived: boolean | null
-          spanish: string | null
-          value: Database["public"]["Enums"]["race_ethnicity_categories"]
-        }
-        Insert: {
-          english_label?: string | null
-          english_label_short?: string | null
-          is_archived?: boolean | null
-          spanish?: string | null
-          value: Database["public"]["Enums"]["race_ethnicity_categories"]
-        }
-        Update: {
-          english_label?: string | null
-          english_label_short?: string | null
-          is_archived?: boolean | null
-          spanish?: string | null
-          value?: Database["public"]["Enums"]["race_ethnicity_categories"]
-        }
-        Relationships: []
-      }
-      ref_roles: {
-        Row: {
-          contexts: string[] | null
-          is_archived: boolean | null
-          show_in_board_tables: boolean | null
-          show_in_educator_grid: boolean | null
-          value: string
-          value_long: string
-        }
-        Insert: {
-          contexts?: string[] | null
-          is_archived?: boolean | null
-          show_in_board_tables?: boolean | null
-          show_in_educator_grid?: boolean | null
-          value: string
-          value_long: string
-        }
-        Update: {
-          contexts?: string[] | null
-          is_archived?: boolean | null
-          show_in_board_tables?: boolean | null
-          show_in_educator_grid?: boolean | null
-          value?: string
-          value_long?: string
-        }
-        Relationships: []
-      }
-      ref_school_years: {
-        Row: {
-          end_date: string | null
-          ending_calendar_year: string
-          fiscal_year: string | null
-          is_archived: boolean | null
-          start_date: string | null
-          starting_calendar_year: string
-          value: string
-        }
-        Insert: {
-          end_date?: string | null
-          ending_calendar_year?: string
-          fiscal_year?: string | null
-          is_archived?: boolean | null
-          start_date?: string | null
-          starting_calendar_year?: string
-          value: string
-        }
-        Update: {
-          end_date?: string | null
-          ending_calendar_year?: string
-          fiscal_year?: string | null
-          is_archived?: boolean | null
-          start_date?: string | null
-          starting_calendar_year?: string
-          value?: string
-        }
-        Relationships: []
-      }
-      ref_sources: {
-        Row: {
-          label: string | null
-          value: string
-        }
-        Insert: {
-          label?: string | null
-          value: string
-        }
-        Update: {
-          label?: string | null
-          value?: string
-        }
-        Relationships: []
-      }
-      ref_stage_statuses: {
-        Row: {
-          is_archived: boolean | null
-          kanban_visibility: Database["public"]["Enums"]["kanban_visibility"]
-          label: string | null
-          order: number | null
-          value: string
-        }
-        Insert: {
-          is_archived?: boolean | null
-          kanban_visibility?: Database["public"]["Enums"]["kanban_visibility"]
-          label?: string | null
-          order?: number | null
-          value: string
-        }
-        Update: {
-          is_archived?: boolean | null
-          kanban_visibility?: Database["public"]["Enums"]["kanban_visibility"]
-          label?: string | null
-          order?: number | null
-          value?: string
-        }
-        Relationships: []
-      }
       school_reports_and_submissions: {
         Row: {
           attachments: string | null
@@ -3489,13 +3007,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "grid_charter"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "school_reports_and_submissions_school_year_fkey"
-            columns: ["school_year"]
-            isOneToOne: false
-            referencedRelation: "ref_school_years"
-            referencedColumns: ["value"]
           },
         ]
       }
@@ -4064,13 +3575,6 @@ export type Database = {
             referencedRelation: "grid_charter"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "schools_membership_status_fkey"
-            columns: ["membership_status"]
-            isOneToOne: false
-            referencedRelation: "ref_membership_statuses"
-            referencedColumns: ["value"]
-          },
         ]
       }
       ssj_fillout_forms: {
@@ -4350,24 +3854,6 @@ export type Database = {
           },
         ]
       }
-      stage_transition_checklist: {
-        Row: {
-          checklist_type: string | null
-          item_name: string
-          stage: string | null
-        }
-        Insert: {
-          checklist_type?: string | null
-          item_name: string
-          stage?: string | null
-        }
-        Update: {
-          checklist_type?: string | null
-          item_name?: string
-          stage?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       details_associations: {
@@ -4441,13 +3927,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "people_roles_associations_role_fkey"
-            columns: ["role"]
-            isOneToOne: false
-            referencedRelation: "ref_roles"
-            referencedColumns: ["value"]
-          },
-          {
             foreignKeyName: "people_roles_join_charter_id_fkey"
             columns: ["charter_id"]
             isOneToOne: false
@@ -4467,13 +3946,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "grid_charter"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "schools_membership_status_fkey"
-            columns: ["membership_status"]
-            isOneToOne: false
-            referencedRelation: "ref_membership_statuses"
-            referencedColumns: ["value"]
           },
         ]
       }
@@ -4546,13 +4018,6 @@ export type Database = {
           website: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "charter_authorization_actions_action_fkey"
-            columns: ["action"]
-            isOneToOne: false
-            referencedRelation: "ref_charter_authorizer_actions"
-            referencedColumns: ["action"]
-          },
           {
             foreignKeyName: "cohort_participation_cohort_fkey"
             columns: ["current_cohort"]
@@ -4644,13 +4109,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "event_list"
             referencedColumns: ["event_name"]
-          },
-          {
-            foreignKeyName: "people_educator_early_cultiva_one_on_one_scheduling_status_fkey"
-            columns: ["one_on_one_scheduling_status"]
-            isOneToOne: false
-            referencedRelation: "ref_one_on_one_status"
-            referencedColumns: ["value"]
           },
           {
             foreignKeyName: "people_educator_early_cultiva_person_responsible_for_follo_fkey"
@@ -4923,15 +4381,7 @@ export type Database = {
           school_name: string | null
           stage_status: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "schools_membership_status_fkey"
-            columns: ["membership_status"]
-            isOneToOne: false
-            referencedRelation: "ref_membership_statuses"
-            referencedColumns: ["value"]
-          },
-        ]
+        Relationships: []
       }
       preview_people_duplicates: {
         Row: {

@@ -342,7 +342,7 @@ function RaceMultiSelect({ value, onChange }: { value: string[]; onChange: (v: s
   React.useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data, error } = await (supabase as any).from('ref_race_and_ethnicity').select('value, english_label_short').order('english_label_short', { ascending: true });
+      const { data, error } = await (supabase as any).schema('ref_tables').from('ref_race_and_ethnicity').select('value, english_label_short').order('english_label_short', { ascending: true });
       if (!cancelled && !error && Array.isArray(data)) setOpts(data.map((r: any) => ({ value: String(r.value), label: String(r.english_label_short || r.value) })));
     })();
     return () => { cancelled = true; };
