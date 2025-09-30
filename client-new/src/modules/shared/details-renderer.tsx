@@ -25,6 +25,7 @@ import {
   type FieldLookup,
 
   type TableColumnMeta,
+  type FilterExpr,
 
 } from './detail-types';
 
@@ -32,6 +33,9 @@ import { mergeTableColumnMeta, mergeFieldMetadata } from './schema-metadata';
 
 import { saveCardValues, type ExceptionMap, type WriteTarget } from '../educators/helpers/write-helpers';
 import { formatCurrencyUSD } from '@/lib/utils';
+import { getRowActionLabel, formatActionLabel } from './actions/registry';
+import { getTableActionLabel } from './actions/table-actions';
+import { handleRowAction } from './actions/handlers';
 import { TABLE_PRESETS } from './table-presets';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -192,6 +196,42 @@ export function DetailsRenderer({ entityId, details, tabs, resolveTitle, default
 
   );
 
+}
+
+// Apply a simple filter expression to a Supabase query builder
+function applyFilterExprToQuery(q: any, expr: FilterExpr): any {
+  if ((expr as any).eq) {
+    const { column, value } = (expr as any).eq;
+    return q.eq(column, value);
+  }
+  if ((expr as any).neq) {
+    const { column, value } = (expr as any).neq;
+    return q.neq(column, value);
+  }
+  if ((expr as any).or) {
+    const parts: string[] = [];
+    for (const sub of (expr as any).or as FilterExpr[]) {
+      if ((sub as any).eq) {
+        const { column, value } = (sub as any).eq;
+        const v = value === true ? 'true' : value === false ? 'false' : String(value);
+        parts.push(`${column}.eq.${v}`);
+      } else if ((sub as any).neq) {
+        const { column, value } = (sub as any).neq;
+        const v = value === true ? 'true' : value === false ? 'false' : String(value);
+        parts.push(`${column}.neq.${v}`);
+      }
+    }
+    if (parts.length) return q.or(parts.join(','));
+    return q;
+  }
+  if ((expr as any).and) {
+    let out = q;
+    for (const sub of (expr as any).and as FilterExpr[]) {
+      out = applyFilterExprToQuery(out, sub);
+    }
+    return out;
+  }
+  return q;
 }
 
 
@@ -1188,16 +1228,18 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
   const [optionsVersion, setOptionsVersion] = React.useState<number>(0);
   const [editingRow, setEditingRow] = React.useState<number | null>(null);
   const [editingValues, setEditingValues] = React.useState<any>({});
-  // On/off filter toggle per table type
-  const rsInfo: any = (effective as any).readSource ?? (effective as any).source ?? {};
-  const tableName: string | undefined = rsInfo?.table as string | undefined;
-  const toggleKind: 'active' | 'locations' | 'action_steps' | null = React.useMemo(() => {
-    if (tableName === 'details_associations' || tableName === 'guide_assignments') return 'active';
-    if (tableName === 'locations') return 'locations';
-    if (tableName === 'action_steps') return 'action_steps';
-    return null;
-  }, [tableName]);
-  const [toggleOn, setToggleOn] = React.useState<boolean>(true);
+  // Config-driven toggles
+  const toggles: any[] = React.useMemo(() => (effective as any).toggles ?? [], [effective]);
+  const [toggleState, setToggleState] = React.useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {};
+    for (const t of (toggles as any[])) init[(t as any).id] = !!(t as any).defaultOn;
+    return init;
+  });
+  React.useEffect(() => {
+    const init: Record<string, boolean> = {};
+    for (const t of (toggles as any[])) init[(t as any).id] = !!(t as any).defaultOn;
+    setToggleState(init);
+  }, [JSON.stringify(toggles)]);
   const columnAllowsEditLocal = (meta?: TableColumnMeta): boolean => {
     if (!meta) return true;
     const upd = (meta as any).update as 'no' | 'yes' | 'newOnly' | undefined;
@@ -1345,9 +1387,11 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
         : (supabase as any).from(table);
 
       let q = query.select('*').eq(fkColumn, entityId);
-      if (toggleKind === 'active' && toggleOn) { q = q.eq('is_active', true); }
-      if (toggleKind === 'locations' && toggleOn) { q = q.or('current_physical_address.is.true,current_mail_address.is.true'); }
-      if (toggleKind === 'action_steps' && toggleOn) { q = q.eq('item_status', 'Incomplete'); }
+      // Apply active toggles
+      const activeToggles = (toggles as any[]).filter((t) => toggleState[(t as any).id]);
+      for (const t of activeToggles) {
+        q = applyFilterExprToQuery(q, (t as any).expr);
+      }
       let { data, error } = await q.limit(200);
       if (!error && Array.isArray(data) && data.length === 0) {
         const asNum = Number(entityId);
@@ -1378,7 +1422,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
     };
 
-  }, [((effective as any).readSource ?? (effective as any).source)?.schema, ((effective as any).readSource ?? (effective as any).source)?.table, ((effective as any).readSource ?? (effective as any).source)?.fkColumn, entityId, refreshToken, toggleKind, toggleOn]);
+  }, [((effective as any).readSource ?? (effective as any).source)?.schema, ((effective as any).readSource ?? (effective as any).source)?.table, ((effective as any).readSource ?? (effective as any).source)?.fkColumn, entityId, refreshToken, JSON.stringify(toggleState)]);
 
 
 
@@ -1475,20 +1519,21 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
       <div style={{ padding: 8, borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <div style={{ fontWeight: 600 }}>{(effective as any).title ?? ''}</div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          {toggleKind ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {(toggles as any[]).map((t) => (
             <FormControlLabel
-              control={<Switch size="small" checked={toggleOn} onChange={(e) => setToggleOn(e.target.checked)} />}
-              label={toggleKind === 'active' ? 'Active only' : toggleKind === 'locations' ? 'Current only' : 'Incomplete only'}
-              sx={{ m: 0, mr: ((effective as any).tableActions && (effective as any).tableActions.length > 0) ? 1 : 0, '& .MuiFormControlLabel-label': { fontSize: 12, color: '#475569' } }}
+              key={(t as any).id}
+              control={<Switch size="small" checked={!!toggleState[(t as any).id]} onChange={(e) => setToggleState((s) => ({ ...s, [(t as any).id]: e.target.checked }))} />}
+              label={(t as any).label}
+              sx={{ m: 0, '& .MuiFormControlLabel-label': { fontSize: 12, color: '#475569' } }}
             />
-          ) : null}
+          ))}
           {(effective as any).tableActions && (effective as any).tableActions.length > 0 ? (
             <div>
               {(effective as any).tableActions.map((action: any, idx: number) => {
               const label = Array.isArray((effective as any).tableActionLabels) && (effective as any).tableActionLabels[idx]
                 ? (effective as any).tableActionLabels[idx]!
-                : formatLabel(action);
+                : getTableActionLabel(String(action));
               const handleClick = async () => {
                 const actionId = typeof action === 'string' ? action : String(action);
                 const rs = (effective as any).readSource ?? (effective as any).source;
@@ -1637,153 +1682,16 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                       <Select
                         value=""
                         onValueChange={async (value) => {
-                          if (value === 'inline_edit') {
-                            setEditingRow(index);
-                            setEditingValues({ ...(row as any) });
-                          } else if (value === 'view_in_modal') {
-                            setViewRowIndex(index);
-                          } else if (value === 'email') {
-                            const emails: string[] = [];
-                            const push = (v: any) => { if (typeof v === 'string' && v.includes('@')) emails.push(v); };
-                            const r: any = row;
-                            // Known fields
-                            ;['email_address','email','primary_email','contact_email','school_email','charter_email'].forEach((k) => push(r[k]));
-                            // Arrays
-                            ;['to_emails','cc_emails','bcc_emails','attendees'].forEach((k) => {
-                              const arr = r[k];
-                              if (Array.isArray(arr)) arr.forEach(push);
-                            });
-
-                            // If none found on the row, try resolving via people_id from the primary_emails view
-                            if (emails.length === 0) {
-                              const pid = r['people_id'] ?? r['person_id'] ?? r['educator_id'];
-                              if (pid != null) {
-                                try {
-                                  const { data, error } = await (supabase as any)
-                                    .from('primary_emails')
-                                    .select('email_address')
-                                    .eq('people_id', pid)
-                                    .maybeSingle();
-                                  if (!error && data?.email_address) push(String(data.email_address));
-                                } catch {}
-                              }
-                            }
-
-                            const to = encodeURIComponent(Array.from(new Set(emails)).join(','));
-                            if (!to) { alert('No email address is available for this record.'); return; }
-                            window.location.assign(`/email/compose?to=${to}`);
-                          } else if (value === 'toggle_private_public') {
-                            const wr: any = (effective as any).writeDefaults ?? {};
-                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
-                            const schema = wr.schema ?? rs.schema;
-                            const table = wr.table ?? rs.table;
-                            const pk = wr.pkColumn ?? 'id';
-                            if (!table) { console.warn('No write target for toggle_private_public'); return; }
-                            const pkValue = (row as any)[pk];
-                            const next = !(row as any)?.is_private;
-                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
-                            const { error } = await client.from(table).update({ is_private: next }).eq(pk, pkValue);
-                            if (!error) setRefreshToken((t) => t + 1);
-                          } else if (value === 'toggle_complete') {
-                            const wr: any = (effective as any).writeDefaults ?? {};
-                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
-                            const schema = wr.schema ?? rs.schema;
-                            const table = wr.table ?? rs.table;
-                            const pk = wr.pkColumn ?? 'id';
-                            if (!table) { console.warn('No write target for toggle_complete'); return; }
-                            const pkValue = (row as any)[pk];
-                            const current = String((row as any)?.item_status ?? 'Incomplete');
-                            const completing = current !== 'Complete';
-                            const payload: any = { item_status: completing ? 'Complete' : 'Incomplete' };
-                            payload.completed_date = completing ? new Date().toISOString() : null;
-                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
-                            const { error } = await client.from(table).update(payload).eq(pk, pkValue);
-                            if (!error) setRefreshToken((t) => t + 1);
-                          } else if (value === 'end_stint') {
-                            const wr: any = (effective as any).writeDefaults ?? {};
-                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
-                            const schema = wr.schema ?? rs.schema;
-                            const table = wr.table ?? rs.table;
-                            const pk = wr.pkColumn ?? 'id';
-                            if (!table) { console.warn('No write target for end_stint'); return; }
-                            const pkValue = (row as any)[pk];
-                            const payload: any = { is_active: false, end_date: new Date().toISOString() };
-                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
-                            const { error } = await client.from(table).update(payload).eq(pk, pkValue);
-                            if (!error) setRefreshToken((t) => t + 1);
-                          } else if (value === 'toggle_valid') {
-                            const wr: any = (effective as any).writeDefaults ?? {};
-                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
-                            const schema = wr.schema ?? rs.schema;
-                            const table = wr.table ?? rs.table;
-                            const pk = wr.pkColumn ?? 'id';
-                            if (!table) { console.warn('No write target for toggle_valid'); return; }
-                            const pkValue = (row as any)[pk];
-                            const next = !(row as any)?.is_valid;
-                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
-                            const { error } = await client.from(table).update({ is_valid: next }).eq(pk, pkValue);
-                            if (!error) setRefreshToken((t) => t + 1);
-                          } else if (value === 'make_primary') {
-                            const wr: any = (effective as any).writeDefaults ?? {};
-                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
-                            const schema = wr.schema ?? rs.schema;
-                            const table = wr.table ?? rs.table;
-                            const pk = wr.pkColumn ?? 'id';
-                            if (!table) { console.warn('No write target for make_primary'); return; }
-                            const pkValue = (row as any)[pk];
-                            let personId = (row as any)?.people_id;
-                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
-                            if (personId == null) {
-                              try {
-                                const res = await client.from(table).select('people_id').eq(pk, pkValue).maybeSingle();
-                                if (!res.error) personId = (res.data as any)?.people_id;
-                              } catch {}
-                            }
-                            if (personId == null) { alert('Unable to determine person for this email.'); return; }
-                            // Unset others, then set this one
-                            await client.from(table).update({ is_primary: false }).eq('people_id', personId);
-                            const { error } = await client.from(table).update({ is_primary: true }).eq(pk, pkValue);
-                            if (!error) setRefreshToken((t) => t + 1);
-                          } else if (value === 'end_occupancy') {
-                            const wr: any = (effective as any).writeDefaults ?? {};
-                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
-                            const schema = wr.schema ?? rs.schema;
-                            const table = wr.table ?? rs.table;
-                            const pk = wr.pkColumn ?? 'id';
-                            if (!table) { console.warn('No write target for end_occupancy'); return; }
-                            const pkValue = (row as any)[pk];
-                            const now = new Date().toISOString();
-                            const payload: any = { end_date: now, current_mail_address: false, current_physical_address: false };
-                            const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
-                            const { error } = await client.from(table).update(payload).eq(pk, pkValue);
-                            if (!error) setRefreshToken((t) => t + 1);
-                          } else if (value === 'jump_to_modal') {
-                            const rs: any = (effective as any).readSource ?? (effective as any).source ?? {};
-                            const fk = rs?.fkColumn as string | undefined;
-                            const r: any = row;
-                            let targetEntity: 'educators' | 'schools' | 'charters' | null = null;
-                            let targetId: string | number | null = null;
-                            if (fk === 'people_id') {
-                              // Likely listing a person's related schools/charters -> jump to school/charter
-                              if (r.school_id != null) { targetEntity = 'schools'; targetId = r.school_id; }
-                              else if (r.charter_id != null) { targetEntity = 'charters'; targetId = r.charter_id; }
-                            } else if (fk === 'school_id' || fk === 'charter_id') {
-                              // Likely listing a school's/charter's people -> jump to educator
-                              if (r.people_id != null) { targetEntity = 'educators'; targetId = r.people_id; }
-                            }
-                            // Fallbacks: infer from available ids
-                            if (!targetEntity) {
-                              if (r.people_id != null) { targetEntity = 'educators'; targetId = r.people_id; }
-                              else if (r.school_id != null) { targetEntity = 'schools'; targetId = r.school_id; }
-                              else if (r.charter_id != null) { targetEntity = 'charters'; targetId = r.charter_id; }
-                            }
-                            if (targetEntity && targetId != null) {
-                              const id = encodeURIComponent(String(targetId));
-                              window.location.assign(`/${targetEntity}/${id}?action=view_in_modal`);
-                            }
-                          } else {
-                            console.log('Row action selected:', value);
-                          }
+                          await handleRowAction({
+                            actionId: value as any,
+                            row,
+                            index,
+                            effective,
+                            setEditingRow,
+                            setEditingValues,
+                            setViewRowIndex,
+                            setRefreshToken,
+                          });
                         }}
                       >
                         <SelectTrigger 
@@ -1801,9 +1709,9 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                           style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', zIndex: 9999 }}
                         >
                           {(effective as any).rowActions.map((action: any) => {
-                            const value = typeof action === 'string' ? action : action.id;
-                            const label = typeof action === 'string' ? formatLabel(action) : action.label;
-                            return (
+                              const value = typeof action === 'string' ? action : action.id;
+                              const label = typeof action === 'string' ? getRowActionLabel(action as any) : action.label;
+                              return (
                               <SelectItem 
                                 key={value}
                                 value={value}

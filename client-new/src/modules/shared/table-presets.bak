@@ -51,7 +51,7 @@ export const TABLE_PRESETS = {
   charterGmails: {
     readSource: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', fkColumn: 'charter_id' },
     writeDefaults: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', pkColumn: 'id' },
-    columns: cols('gmails'),
+    columns: [...TABLE_COLUMNS.gmails] as const,
     rowActions: ['view_in_modal', 'toggle_private_public', 'email'] as const,
   },
 
@@ -60,7 +60,7 @@ export const TABLE_PRESETS = {
   charterCalendarEvents: {
     readSource: { schema: 'gsync', table: 'g_events_with_people_ids_mv', fkColumn: 'charter_id' },
     writeDefaults: { schema: 'gsync', table: 'g_events_with_people_ids_mv', pkColumn: 'id' },
-    columns: cols('calendarEvents'),
+    columns: [...TABLE_COLUMNS.calendarEvents] as const,
     rowActions: ['view_in_modal', 'toggle_private_public'] as const,
   },
 
@@ -69,7 +69,7 @@ export const TABLE_PRESETS = {
   charterActionSteps: {
     readSource: { table: 'action_steps', fkColumn: 'charter_id' },
     writeDefaults: { table: 'action_steps', pkColumn: 'id' },
-    columns: cols('actionSteps'),
+    columns: [...TABLE_COLUMNS.actionSteps] as const,
     rowActions: ['inline_edit', 'view_in_modal', 'toggle_complete', 'archive'] as const,
     tableActions: ['addActionStep'] as const,
     tableActionLabels: ['Add Action Step'] as const,
@@ -80,7 +80,7 @@ export const TABLE_PRESETS = {
   charterNotes: {
     readSource: { table: 'notes', fkColumn: 'charter_id' },
     writeDefaults: { table: 'notes', pkColumn: 'id' },
-    columns: cols('notes'),
+    columns: [...TABLE_COLUMNS.notes] as const,
     rowActions: ['inline_edit', 'view_in_modal', 'toggle_private_public', 'archive'] as const,
     tableActions: ['addNote'] as const,
     tableActionLabels: ['Add Note'] as const,
@@ -92,7 +92,7 @@ export const TABLE_PRESETS = {
   charterGrants: {
     readSource: { table: 'grants', fkColumn: 'charter_id' },
     writeDefaults: { table: 'grants', pkColumn: 'id' },
-    columns: cols('grants'),
+    columns: [...TABLE_COLUMNS.grants] as const,
     rowActions: ['inline_edit', 'view_in_modal','archive'] as const,
     tableActions: ['addGrant'] as const,
     tableActionLabels: ['Add Grant'] as const,
@@ -102,7 +102,7 @@ export const TABLE_PRESETS = {
   charterLoans: {
     readSource: { table: 'loans', fkColumn: 'charter_id' },
     writeDefaults: { table: 'loans', pkColumn: 'id' },
-    columns: cols('loans'),
+    columns: [...TABLE_COLUMNS.loans] as const,
     rowActions: ['view_in_modal'] as const,
     tableActionLabels: [] as const,
   },
@@ -111,7 +111,7 @@ export const TABLE_PRESETS = {
   charterGovernanceDocs: {
     readSource: { table: 'governance_docs', fkColumn: 'charter_id' },
     writeDefaults: { table: 'governance_docs', pkColumn: 'id' },
-    columns: cols('governance_docs'),
+    columns: [...TABLE_COLUMNS.governance_docs] as const,
     rowActions: ['view_in_modal', 'archive'] as const,
     tableActions: ['addGovDoc'] as const,
     tableActionLabels: ['Add Document'] as const,
@@ -122,7 +122,7 @@ export const TABLE_PRESETS = {
   charterNineNineties: {
     readSource: { table: 'nine_nineties', fkColumn: 'charter_id' },
     writeDefaults: { table: 'nine_nineties', pkColumn: 'id' },
-    columns: cols('nine_nineties'),
+    columns: cols('nine_nineties') as const,
     rowActions: ['view_in_modal', 'archive'] as const,
     tableActions: ['addNineNinety'] as const,
     tableActionLabels: ['Add 990'] as const,
@@ -157,7 +157,7 @@ export const TABLE_PRESETS = {
   charterEnrollment: {
     readSource: { table: 'annual_enrollment_and_demographics', fkColumn: 'charter_id' },
     writeDefaults: { table: 'annual_enrollment_and_demographics', pkColumn: 'id' },
-    columns: cols('enrollment'),
+    columns: cols('enrollment') as const,
     rowActions: ['inline_edit', 'view_in_modal','archive'] as const,
     tableActions: ['addEnrollmentData'] as const,
     tableActionLabels: ['Add Data'] as const,
@@ -166,7 +166,7 @@ export const TABLE_PRESETS = {
   charterGuideAssignments: {
     readSource: { table: 'guide_assignments', fkColumn: 'charter_id' },
     writeDefaults: { table: 'guide_assignments', pkColumn: 'id' },
-    columns: cols('guideAssignments'),
+    columns: cols('guideAssignments') as const,
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'archive'] as const,
     tableActions: ['addGuideLink', 'addNewGuide'] as const,
     tableActionLabels: ['Assign Guide', 'Add Guide & Assignment'] as const,
@@ -176,19 +176,10 @@ export const TABLE_PRESETS = {
   charterBoardMembers: {
     readSource: { table: 'people', fkColumn: 'charter_id' },
     writeDefaults: { table: 'people', pkColumn: 'id' },
-    columns: cols('boardMembers'),
+    columns: cols('boardMembers') as const,
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'email','archive'] as const,
     tableActions: ['addPersonToBoard','addNewPersonToBoard'] as const,
     tableActionLabels: ['Add Person to Board','Add New Person to Board'] as const,
-  },
-  // Generic preset for Ops Guide tab: Advice Givers linked to a school
-  advice: {
-    readSource: { table: 'advice', fkColumn: 'school_id' },
-    writeDefaults: { table: 'advice', pkColumn: 'id' },
-    columns: cols('advice'),
-    rowActions: ['view_in_modal', 'archive'] as const,
-    tableActions: [] as const,
-    tableActionLabels: [] as const,
   },
   // Educator module presets
   educatorEmails: {
@@ -208,7 +199,7 @@ export const TABLE_PRESETS = {
   educatorSchools: {
     readSource: { table: 'details_associations', fkColumn: 'people_id' },
     writeDefaults: { table: 'people_roles_associations', pkColumn: 'id' },
-    columns: cols('schools'),
+    columns: cols('schools') as const,
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'archive'] as const,
     tableActions: ['addStintAtSchool', 'addSchoolAndStint'] as const,
     tableActionLabels: ['Add Role at School', 'Add School & Role'] as const,
@@ -251,7 +242,7 @@ export const TABLE_PRESETS = {
   educatorActionSteps: {
     readSource: { table: 'action_steps', fkColumn: 'people_id' },
     writeDefaults: { table: 'action_steps', pkColumn: 'id' },
-    columns: cols('actionSteps'),
+    columns: [...TABLE_COLUMNS.actionSteps] as const,
     rowActions: ['inline_edit', 'view_in_modal', 'toggle_complete', 'archive'] as const,
     tableActions: ['addActionStep'] as const,
     tableActionLabels: ['Add Action Step'] as const,
@@ -261,7 +252,7 @@ export const TABLE_PRESETS = {
   educatorNotes: {
     readSource: { table: 'notes', fkColumn: 'people_id' },
     writeDefaults: { table: 'notes', pkColumn: 'id' },
-    columns: cols('notes'),
+    columns: [...TABLE_COLUMNS.notes] as const,
     rowActions: ['inline_edit', 'view_in_modal', 'toggle_private_public', 'archive'] as const,
     tableActions: ['addNote'] as const,
     tableActionLabels: ['Add Note'] as const,
@@ -270,14 +261,14 @@ export const TABLE_PRESETS = {
   educatorGmails: {
     readSource: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', fkColumn: 'people_id' },
     writeDefaults: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', pkColumn: 'id' },
-    columns: cols('gmails'),
+    columns: cols('gmails') as const,
     rowActions: ['view_in_modal', 'toggle_private_public','email'] as const,
   },
 
   educatorCalendarEvents: {
     readSource: { schema: 'gsync', table: 'g_events_with_people_ids_mv', fkColumn: 'people_id' },
     writeDefaults: { schema: 'gsync', table: 'g_events_with_people_ids_mv', pkColumn: 'id' },
-    columns: cols('calendarEvents'),
+    columns: cols('calendarEvents') as const,
     rowActions: ['view_in_modal', 'toggle_private_public'] as const,
   },
 
@@ -285,7 +276,7 @@ export const TABLE_PRESETS = {
   schoolNotes: {
     readSource: { table: 'notes', fkColumn: 'school_id' },
     writeDefaults: { table: 'notes', pkColumn: 'id' },
-    columns: cols('notes'),
+    columns: cols('notes') as const,
     rowActions: ['inline_edit', 'view_in_modal', 'toggle_private_public','archive'] as const,
     tableActions: ['addNote'] as const,
     tableActionLabels: ['Add Note'] as const,
@@ -294,21 +285,21 @@ export const TABLE_PRESETS = {
   schoolGmails: {
     readSource: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', fkColumn: 'school_id' },
     writeDefaults: { schema: 'gsync', table: 'g_emails_with_people_ids_mv', pkColumn: 'id' },
-    columns: cols('gmails'),
+    columns: cols('gmails') as const,
     rowActions: ['view_in_modal', 'toggle_private_public','email'] as const,
   },
 
   schoolCalendarEvents: {
     readSource: { schema: 'gsync', table: 'g_events_with_people_ids_mv', fkColumn: 'school_id' },
     writeDefaults: { schema: 'gsync', table: 'g_events_with_people_ids_mv', pkColumn: 'id' },
-    columns: cols('calendarEvents'),
+    columns: cols('calendarEvents') as const,
     rowActions: ['view_in_modal', 'toggle_private_public'] as const,
   },
 
   schoolEducators: {
     readSource: { table: 'details_associations', fkColumn: 'school_id' },
     writeDefaults: { table: 'people_roles_associations', pkColumn: 'id' },
-    columns: cols('educators'),
+    columns: cols('educators') as const,
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'email','archive'] as const,
     tableActions: ['addExistingEducatorToSchool','addNewEducatorToSchool'] as const,
     tableActionLabels: ['Add Existing Educator','Add New Educator'] as const,
@@ -319,7 +310,7 @@ export const TABLE_PRESETS = {
   schoolGrants: {
     readSource: { table: 'grants', fkColumn: 'school_id' },
     writeDefaults: { table: 'grants', pkColumn: 'id' },
-    columns: cols('grants'),
+    columns: cols('grants') as const,
     rowActions: ['inline_edit', 'view_in_modal', 'archive'] as const,
     tableActions: ['addGrant'] as const,
     tableActionLabels: ['Add Grant'] as const,
@@ -328,7 +319,7 @@ export const TABLE_PRESETS = {
   schoolLoans: {
     readSource: { table: 'loans', fkColumn: 'school_id' },
     writeDefaults: { table: 'loans', pkColumn: 'id' },
-    columns: cols('loans'),
+    columns: cols('loans') as const,
     rowActions: ['view_in_modal'] as const,
     tableActionLabels: [] as const,
   },
@@ -352,7 +343,7 @@ export const TABLE_PRESETS = {
   schoolGovernanceDocs: {
     readSource: { table: 'governance_docs', fkColumn: 'school_id' },
     writeDefaults: { table: 'governance_docs', pkColumn: 'id' },
-    columns: cols('governance_docs'),
+    columns: cols('governance_docs') as const,
     rowActions: ['inline_edit', 'view_in_modal'] as const,
     tableActions: ['addDocument'] as const,
     tableActionLabels: ['Add Document'] as const,
@@ -361,7 +352,7 @@ export const TABLE_PRESETS = {
   schoolNineNineties: {
     readSource: { table: 'nine_nineties', fkColumn: 'school_id' },
     writeDefaults: { table: 'nine_nineties', pkColumn: 'id' },
-    columns: cols('nine_nineties'),
+    columns: [...TABLE_COLUMNS.nine_nineties] as const,
     rowActions: ['archive'] as const,
     tableActions: ['addNineNinety'] as const,
     tableActionLabels: ['Add 990'] as const,
@@ -370,7 +361,7 @@ export const TABLE_PRESETS = {
   schoolEnrollment: {
     readSource: { table: 'annual_enrollment_and_demographics', fkColumn: 'school_id' },
     writeDefaults: { table: 'annual_enrollment_and_demographics', pkColumn: 'id' },
-    columns: cols('enrollment'),
+    columns: [...TABLE_COLUMNS.enrollment]   as const,
     rowActions: ['inline_edit'] as const,
     tableActions: ['addRecord'] as const,
     tableActionLabels: ['Add Data'] as const,
@@ -379,7 +370,7 @@ export const TABLE_PRESETS = {
   schoolGuideAssignments: {
     readSource: { table: 'guide_assignments', fkColumn: 'school_id' },
     writeDefaults: { table: 'guide_assignments', pkColumn: 'id' },
-    columns: cols('guideAssignments'),
+    columns: [...TABLE_COLUMNS.guideAssignments] as const,
     rowActions: ['inline_edit','view_in_modal','jump_to_modal','end_stint','archive'] as const,
     tableActions: ['addGuideLink', 'addNewGuide'] as const,
     tableActionLabels: ['Assign Guide', 'Add Guide & Assignment'] as const,
@@ -388,31 +379,23 @@ export const TABLE_PRESETS = {
   schoolActionSteps: {
     readSource: { table: 'action_steps', fkColumn: 'school_id' },
     writeDefaults: { table: 'action_steps', pkColumn: 'id' },
-    columns: cols('actionSteps'),
+    columns: [...TABLE_COLUMNS.actionSteps] as const,
     rowActions: ['inline_edit', 'view_in_modal', 'toggle_complete', 'archive'] as const,
     tableActions: ['addActionStep'] as const,
     tableActionLabels: ['Add Action Step'] as const,
     toggles: [ { id: 'incomplete', label: 'Incomplete only', expr: { eq: { column: 'item_status', value: 'Incomplete' } }, defaultOn: true } ],
   },
-
+  // fix this and above
   schoolBoardMembers: {
     readSource: { table: 'people', fkColumn: 'school_id' },
     writeDefaults: { table: 'people', pkColumn: 'id' },
-    columns: cols('boardMembers'),
+    columns: [...TABLE_COLUMNS.boardMembers] as const,
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'email','archive'] as const,
     tableActions: ['addPersonToBoard','addNewPersonToBoard'] as const,
     tableActionLabels: ['Add Person to Board','Add New Person to Board'] as const,
   },
-
-  schoolAdvice: {
-    readSource: { table: 'advice', fkColumn: 'school_id' },
-    writeDefaults: { table: 'advice', pkColumn: 'id' },
-    columns: cols('advice'),
-    rowActions: ['inline_edit', 'view_in_modal', 'archive'] as const,
-    tableActions: ['addAdvice'] as const,
-    tableActionLabels: ['Add Advice'] as const,
-  },
 } as const;
 
 export type TablePresetId = keyof typeof TABLE_PRESETS;
+
 

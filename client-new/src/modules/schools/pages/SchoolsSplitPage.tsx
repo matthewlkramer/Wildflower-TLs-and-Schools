@@ -3,7 +3,9 @@ import { useGridSchools, useSchoolDetails } from '../api/queries';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef } from 'ag-grid-community';
 import { useLocation } from 'wouter';
-import { SCHOOL_GRID, SCHOOL_DETAIL_TABS, SCHOOL_FIELD_METADATA } from '../constants';
+import { SCHOOL_GRID, SCHOOL_FIELD_METADATA } from '../constants';
+import { SCHOOL_VIEW_SPEC } from '../views';
+import { asTabs } from '../../shared/views/types';
 import { supabase } from '@/lib/supabase/client';
 import { SavedViewsManager } from '@/components/shared/SavedViewsManager';
 import { GridPageHeader } from '@/components/shared/GridPageHeader';
@@ -246,7 +248,7 @@ export function SchoolsSplitPage() {
             <DetailsRenderer
               entityId={selectedSchoolId}
               details={selectedSchoolData as any}
-              tabs={SCHOOL_DETAIL_TABS}
+              tabs={asTabs(SCHOOL_VIEW_SPEC)}
               fieldMeta={SCHOOL_FIELD_METADATA}
               resolveTitle={(details) => details.school_name ?? details.name ?? selectedSchoolId}
             />

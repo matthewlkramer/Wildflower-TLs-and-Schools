@@ -1,0 +1,69 @@
+import { view, tab, card, table, map } from '../shared/views/builders';
+import type { ViewSpec } from '../shared/views/types';
+
+// Pilot migration of School detail tabs to the new ViewSpec format
+export const SCHOOL_VIEW_SPEC: ViewSpec = view(
+  'schools',
+  tab(
+    'overview',
+    'Overview',
+    card(['short_name', 'long_name', 'prior_names'], { title: 'Name(s)', editable: true }),
+    card(['current_tls', 'founding_tls', 'wf_tls_on_board'], { title: 'People', editable: false }),
+    card(['stage_status', 'open_date', 'membership_status'], { title: 'Status', editable: false }),
+    map(['physical_lat', 'physical_long', 'physical_address'], { title: 'Location' }),
+    card(['about', 'about_spanish'], { title: 'About', editable: true }),
+    card(['current_tls', 'current_guide_name', 'current_cohort'], { title: 'Support', editable: false }),
+    card(
+      ['governance_model', 'public_funding', 'program_focus', 'institutional_partner', 'ages_served', 'number_of_classrooms', 'enrollment_at_full_capacity'],
+      { title: 'School Model', editable: true },
+    ),
+    card(['school_email', 'school_phone', 'domain_name', 'website', 'facebook', 'instagram'], { title: 'Contact Info', editable: true }),
+    card(['total_grants_issued', 'total_loans_issued'], { title: 'Grants and Loans', editable: false }),
+    card(['risk_factors', 'watchlist'], { title: 'Warnings', editable: true }),
+  ),
+  tab(
+    'details',
+    'Details',
+    card(['status', 'legal_structure', 'ein', 'incorporation_date', 'current_fy_end', 'loan_report_name'], { title: 'Legal entity', editable: true }),
+    card(['nonprofit_status', 'group_exemption_status'], { title: 'Nonprofit status', editable: true }),
+    card(['founders'], { title: 'Founders', editable: true }),
+    card(['logo', 'logo_url', 'logo_square', 'logo_flower_only', 'logo_rectangle'], { title: 'Logo(s)', editable: true }),
+    table('schoolBoardMembers', { title: 'Board Members' }),
+  ),
+  tab(
+    'ssj',
+    'SSJ',
+    card(['ssj_target_city', 'ssj_target_state'], { title: 'Target location', editable: true }),
+    card(['entered_visioning_date', 'visioning_album_complete', 'visioning_album', 'entered_planning_date', 'planning_album', 'entered_startup_date'], { title: 'Milestones', editable: true }),
+    card(['ssj_ops_guide_support_track', 'ssj_readiness_to_open_rating', 'ssj_has_partner', 'ssj_board_development', 'ssj_on_track_for_enrollment'], { title: 'Readiness', editable: true }),
+    card(['ssj_name_reserved', 'name_selection_proposal', 'trademark_files', 'logo_designer', 'on_national_website'], { title: 'Branding', editable: true }),
+    card(['ssj_facility', 'ssj_building4good_status', 'date_shared_with_n4g', 'building4good_firm_and_attorney'], { title: 'Facilities', editable: true }),
+    card(['ssj_budget_ready_for_next_steps', 'ssj_seeking_wf_funding', 'ssj_fundraising_narrative', 'ssj_pathway_to_funding', 'ssj_total_startup_funding_needed', 'ssj_loan_eligibility', 'ssj_loan_approved_amt', 'ssj_amount_raised', 'ssj_gap_in_funding'], { title: 'Fundraising', editable: true }),
+    card(['business_insurance', 'budget_utility', 'bill_account'], { title: 'Systems', editable: true }),
+  ),
+  tab('educators', 'Educators', table('schoolEducators')),
+  tab('enrollment', 'Enrollment', table('schoolEnrollment')),
+  tab('grants_and_loans', 'Grants & Loans', table('schoolLoans', { title: 'Loans', width: 'half' }), table('schoolGrants', { title: 'Grants', width: 'half' })),
+  tab('locations', 'Locations', table('schoolLocations')),
+  tab('guides', 'Guides', table('schoolGuideAssignments')),
+  tab('documents', 'Docs', table('schoolGovernanceDocs', { title: 'Documents', width: 'half' }), table('schoolNineNineties', { title: '990s', width: 'half' })),
+  tab('action_steps', 'Action Steps', table('schoolActionSteps')),
+  tab('notes', 'Notes', table('schoolNotes')),
+  tab('google_sync', 'gmail/gCal', table('schoolGmails', { title: 'Gmails', width: 'half' }), table('schoolCalendarEvents', { title: 'Calendar Events', width: 'half' })),
+  tab(
+    'ops_guide_tab',
+    'Ops Guide',
+    card(['short_name', 'long_name', 'prior_names'], { title: 'Name(s)', editable: true }),
+    card(['current_tls','founding_tls','wf_tls_on_board'], { title: 'People', editable: false }),
+    card(['stage_status', 'open_date','membership_status'], { title: 'Status', editable: false }),
+    card(['current_guide_name','current_cohort'], { title: 'Support', editable: false }),
+    card(['address', 'current_mail_address','current_physical_address','lease_doc','lease_end_date'], { title: 'Location', editable: true }),
+    card(['governance_model','public_funding','program_focus','institutional_partner','ages_served', 'number_of_classrooms','enrollment_at_full_capacity'], { title: 'School Model', editable: true }),
+    card(['school_email', 'school_phone','website','facebook','instagram'], { title: 'Contact Info', editable: true }),
+    card(['budget_link'], { title: 'Files', editable: true }),
+    card(['visioning_album','planning_album'], { title: 'Albums', editable: true }),
+    card(['risk_factors','watchlist'], { title: 'Warnings', editable: true }),
+    // Presumes a preset named 'adviceGivers' exists in TABLE_PRESETS
+    table('adviceGivers', { title: 'Advice Givers' })
+  ),
+);

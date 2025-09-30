@@ -93,6 +93,20 @@ export type TableColumnMeta = {
   linkToField?: string;
 };
 
+// Simple filter expression DSL used by table toggles
+export type FilterExpr =
+  | { eq: { column: string; value: any } }
+  | { neq: { column: string; value: any } }
+  | { or: FilterExpr[] }
+  | { and: FilterExpr[] };
+
+export type TableToggleSpec = {
+  id: string;
+  label: string;
+  expr: FilterExpr;
+  defaultOn?: boolean;
+};
+
 export type DetailCardBlock = {
   kind: 'card';
   title?: string;
@@ -121,6 +135,8 @@ export type DetailTableBlock = {
   rowActions?: readonly (RowAction | string)[];
   tableActions?: readonly string[];
   tableActionLabels?: readonly string[];
+  // Optional on/off filters controlled by header switches
+  toggles?: readonly TableToggleSpec[];
 };
 
 export type DetailMapBlock = {
