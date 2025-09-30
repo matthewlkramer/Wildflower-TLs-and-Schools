@@ -102,3 +102,4 @@ export const CHARTER_VIEW_SPEC: ViewSpec = view(
   tab('action_steps', 'Action Steps', table('charterActionSteps')),
   tab('grants_loans', 'Grants & Loans', table('charterGrantsLoans')),
   tab('gmail_gCCal', 'Gmail/gCal', table('charterGmails', { title: 'Gmails', width: 'half' }), table('charterCalendarEvents', { title: 'Calendar Events', width: 'half' }))
+);
