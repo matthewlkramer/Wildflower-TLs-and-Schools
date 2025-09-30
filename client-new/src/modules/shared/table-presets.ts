@@ -1,4 +1,4 @@
-import type { TableColumnMeta, RowActionId, TableToggleSpec } from './detail-types';
+import type { TableColumnMeta, RowActionId, TableToggleSpec, FilterExpr } from './detail-types';
 import { COLUMN_TEMPLATES as TABLE_COLUMNS } from './schema/registry';
 import { cols } from './schema/helpers';
 // Presets are now self-contained; no external column/action bundles
@@ -11,6 +11,7 @@ export type TablePreset = {
   tableActions?: readonly string[];
   tableActionLabels?: readonly string[];
   toggles?: readonly TableToggleSpec[];
+  baseFilter?: FilterExpr;
 };
 
 // Column templates now come from the Domain Registry
@@ -35,6 +36,7 @@ export const TABLE_PRESETS = {
     columns: [ { field: 'school_name', label: 'School', type: 'string' , update: 'newOnly'}, ...cols('educators') ] as const,
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'email', 'add_note','add_task','archive'] as const,
     toggles: [ { id: 'active', label: 'Active only', expr: { eq: { column: 'is_active', value: true } }, defaultOn: true } ],
+    baseFilter: { eq: { column: 'show_in_educator_grid', value: true } },
   },
 
 
@@ -45,6 +47,7 @@ export const TABLE_PRESETS = {
     columns: [ { field: 'full_name', label: 'Educator', type: 'string', update: 'newOnly' }, ...cols('schools') ] as const,
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'add_note','add_task','archive'] as const,
     toggles: [ { id: 'active', label: 'Active only', expr: { eq: { column: 'is_active', value: true } }, defaultOn: true } ],
+    baseFilter: { eq: { column: 'show_in_educator_grid', value: true } },
   },
 
 
@@ -213,6 +216,7 @@ export const TABLE_PRESETS = {
     tableActions: ['addStintAtSchool', 'addSchoolAndStint'] as const,
     tableActionLabels: ['Add Role at School', 'Add School & Role'] as const,
     toggles: [ { id: 'active', label: 'Active only', expr: { eq: { column: 'is_active', value: true } }, defaultOn: true } ],
+    baseFilter: { eq: { column: 'show_in_educator_grid', value: true } },
   },
 
   educatorMontessoriCerts: {
@@ -313,6 +317,7 @@ export const TABLE_PRESETS = {
     tableActions: ['addExistingEducatorToSchool','addNewEducatorToSchool'] as const,
     tableActionLabels: ['Add Existing Educator','Add New Educator'] as const,
     toggles: [ { id: 'active', label: 'Active only', expr: { eq: { column: 'is_active', value: true } }, defaultOn: true } ],
+    baseFilter: { eq: { column: 'show_in_educator_grid', value: true } },
   },
 
   // School recurring tables
@@ -402,6 +407,7 @@ export const TABLE_PRESETS = {
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'email','archive'] as const,
     tableActions: ['addPersonToBoard','addNewPersonToBoard'] as const,
     tableActionLabels: ['Add Person to Board','Add New Person to Board'] as const,
+    baseFilter: { eq: { column: 'show_in_board_tables', value: true } },
   },
 
   schoolAdvice: {

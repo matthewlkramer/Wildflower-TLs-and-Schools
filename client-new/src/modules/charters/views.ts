@@ -1,5 +1,65 @@
 import { view, tab, card, table } from '../shared/views/builders';
 import type { ViewSpec } from '../shared/views/types';
+import type { GridColumnConfig, FieldMetadataMap } from '../shared/detail-types';
+
+// Grid + Kanban
+export const CHARTER_GRID: GridColumnConfig[] = [
+  { field: 'charter_name', headerName: 'Name', sortKey: true },
+  { field: 'status', headerName: 'Status', valueType: 'select', enumName: 'charter_status', kanbanKey: true },
+  { field: 'proj_open', headerName: 'Projected open', valueType: 'date' },
+  { field: 'non_tl_roles', headerName: 'Non-TL leadership' },
+  { field: 'initial_target_planes', headerName: 'Target planes', valueType: 'multi', lookupField: 'ref_planes.label' },
+  { field: 'initial_target_geo', headerName: 'Target geography' },
+  { field: 'schools', headerName: 'Schools', valueType: 'multi' },
+  { field: 'active_guides', headerName: 'Guides', valueType: 'multi' },
+  { field: 'id', headerName: 'ID', visibility: 'suppress' }
+];
+
+export const CHARTER_KANBAN_CONSTANTS_TABLE = 'ref_charter_statuses';
+
+export const CHARTER_FIELD_METADATA: FieldMetadataMap = {
+  application: { type: 'attachment' },
+  auth_decision: { label: 'Authorization Decision'},
+  authorizer: { lookup: { table: 'charter_authorizers', valueColumn: 'authorizer_name', labelColumn: 'authorizer_name' } },
+  beg_age: { label: 'Beginning Age'},
+  budget_exercises: { type: 'attachment'},
+  budget_final: { label: 'Final Budget', type: 'attachment'},
+  capacity_intv_completed_date: { label: 'Capacity Interview Completed Date'},
+  capacity_intv_proj_complete: { label: 'Capacity Interview Projected Complete'},
+  capacity_intv_training_date: { label: 'Capacity Interview Training Date'},
+  charter_app_pm_plan_complete: { label: 'PM Plan Complete'},
+  charter_app_roles_set: { label: 'Roles Set'},
+  comm_engagement_underway: { label: 'Community Engagement Underway'},
+  current_fy_end: { label: 'Current Fiscal Year End'},
+  design_album: { type: 'attachment'},
+  end_age: { label: 'Ending Age'},
+  incorp_date: { label: 'Incorporation Date' },
+  landscape_analysis: { type: 'attachment'},
+  loi: { label: 'LOI Document', type: 'attachment'},
+  loi_deadline: { label: 'LOI Deadline'},
+  loi_required: { label: 'LOI Required'},
+  loi_submitted: { label: 'LOI Submitted'},
+  num_students: { label: 'Projected Students'},
+  opps_challenges: { label: 'Opportunities & Challenges', multiline: true},
+  proj_open_date: { label: 'Projected Open Date'},
+  target_open: { label: 'Target Open Date'},
+  team: { label: 'Team', type: 'string', multiline: true},
+};
+
+// Create Charter Modal configuration (declarative)
+// Inserts into charters; some application fields can live in charter_applications
+export const ADD_NEW_CHARTER_INPUT = [
+  { id: 'short_name', required: true },
+  { id: 'full_name', required: true },
+  { id: 'status', required: true },
+  { id: 'proj_open_date', label: 'Projected Open Date' },
+  {
+    id: 'authorizer',
+    type: 'select',
+    lookup: { table: 'charter_authorizers', valueColumn: 'authorizer_name', labelColumn: 'authorizer_name' },
+    writeTable: 'charter_applications',
+  },
+] as const;
 
 export const CHARTER_VIEW_SPEC: ViewSpec = view(
   'charters',
@@ -7,10 +67,10 @@ export const CHARTER_VIEW_SPEC: ViewSpec = view(
     'overview',
     'Overview',
     card(['short_name', 'full_name'], { title: 'Name(s)', editable: true }),
-    card(['status', 'membership_status', 'currently_authorized', 'authorizer'], { title: 'Status', editable: false }),
+    card(['status', 'membership_status', 'currently_authorized', 'authorizer'], { title: 'Status' }),
     card(['non_tl_roles'], { title: 'People', editable: true }),
-    card(['current_cohort', 'support_timeline'], { title: 'Support', editable: false }),
-    card(['total_grants_issued', 'total_loans_issued'], { title: 'Grants and Loans', editable: false }),
+    card(['current_cohort', 'support_timeline'], { title: 'Support' }),
+    card(['total_grants_issued', 'total_loans_issued'], { title: 'Grants and Loans' }),
     card(['initial_target_geo', 'initial_target_planes'], { title: 'Initial Vision', editable: true }),
   ),
   tab(
@@ -37,6 +97,5 @@ export const CHARTER_VIEW_SPEC: ViewSpec = view(
   tab('educators', 'Educators', table('charterEducators')),
   tab('schools', 'Schools', table('charterSchools')),
   tab('enrollment', 'Enrollment', table('charterEnrollment')),
-  tab('docs', 'Docs', table('charterGovernanceDocs', { title: 'Governance Docs' }), table('charterNineNineties', { title: '990s' })),
+  tab('docs', 'Docs', table('charterGovernanceDocs', { title: 'Governance Docs', width: 'half' }), table('charterNineNineties', { title: '990s', width: 'half' })),
 );
-

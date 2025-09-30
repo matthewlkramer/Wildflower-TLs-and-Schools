@@ -1,5 +1,113 @@
 import { view, tab, card, table, map } from '../shared/views/builders';
 import type { ViewSpec } from '../shared/views/types';
+import type { GridColumnConfig, FieldMetadataMap } from '../shared/detail-types';
+
+// Grid + Kanban
+export const SCHOOL_GRID: GridColumnConfig[] = [
+  { field: 'school_name', headerName: 'Name', sortKey: true},
+  { field: 'stage_status', headerName: 'Stage/Status', valueType: 'select', lookupField: 'ref_stage_statuses.value' , kanbanKey: true },
+  { field: 'current_tls', headerName: 'Curr. TLs' },
+  { field: 'current_tls_race_ethnicity', headerName: 'TLs Race/ Ethnicity', valueType: 'multi', lookupField: 'ref_race_and_ethnicity.english_label_short' },
+  { field: 'governance_model', headerName: 'Model', valueType: 'select', enumName: 'governance_models' },
+  { field: 'ages_served', headerName: 'Ages', valueType: 'multi', enumName: 'age_spans_rev' },
+  { field: 'membership_status', headerName: 'Member?', valueType: 'select', lookupField: 'ref_membership_statuses.value' },
+  { field: 'open', headerName: 'Open/Proj. open', valueType: 'date' },
+  { field: 'active_guides', headerName: 'Guides', valueType: 'multi' },
+  { field: 'people_id', headerName: 'People ID', visibility: 'suppress'},
+  { field: 'id', headerName: 'ID', visibility: 'suppress' }
+];
+
+export const SCHOOL_KANBAN_CONSTANTS_TABLE = 'ref_stage_statuses';
+
+// Field metadata (only non-defaults retained)
+export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {
+  about: { multiline: true },
+  about_spanish: { label: 'About (Spanish)', multiline: true },
+  address: { multiline: true, editable: false },
+  current_guide_name: { editable: false },
+  current_tls: { editable: false },
+  founding_tls: { lookup: { table: 'people', valueColumn: 'id', labelColumn: 'full_name' } },
+  logo: { type: 'attachment' },
+  logo_square: { label: 'Logo (Square)', type: 'attachment' },
+  logo_flower_only: { label: 'Logo (Flower Only)', type: 'attachment' },
+  logo_rectangle: { label: 'Logo (Rectangle)', type: 'attachment' },
+  mailing_address: { label: 'Mailing Address', multiline: true, editable: false },
+  physical_address: { label: 'Physical Address', multiline: true, editable: false },
+  physical_lat: { label: 'Latitude', editable: false },
+  physical_long: { label: 'Longitude', editable: false },
+  planning_album: { writeTable: 'school_ssj_data', type: 'attachment' },
+  stage_status: { editable: false },
+  total_grants_issued: { editable: false },
+  total_loans_issued: { editable: false },
+  visioning_album: { type: 'attachment', writeTable: 'school_ssj_data' },
+  wf_tls_on_board: { editable: false },
+};
+
+// Create School Modal configuration (declarative)
+export const ADD_NEW_SCHOOL_INPUT = [
+  { id: 'legal_name', required: true },
+  { id: 'long_name', label: 'Name', required: true },
+  { id: 'short_name', required: true },
+  { id: 'governance_model', required: true },
+  {
+    id: 'charter_id',
+    label: 'Charter',
+    type: 'select',
+    visibleIf: { field: 'governance_model', in: ['Charter', 'Exploring Charter'] },
+    lookup: { table: 'charters', valueColumn: 'id', labelColumn: 'short_name' },
+    writeTo: { table: 'schools', column: 'charter_id' },
+  },
+  { id: 'ages_served' },
+  { id: 'program_focus', multiline: true },
+  {
+    id: 'proj_open_date',
+    label: 'Projected Open Date',
+    directWrite: false,
+    postInsert: { table: 'open_date_revisions', columns: { school_id: '$newId', proj_open_date: 'proj_open_date' } },
+  },
+  {
+    id: 'cohort',
+    label: 'Cohort',
+    type: 'select',
+    lookup: { table: 'cohorts', valueColumn: 'cohort_title', labelColumn: 'cohort_title' },
+    directWrite: false,
+    postInsert: { table: 'cohort_participation', columns: { school_id: '$newId', cohort: 'cohort' } },
+  },
+  {
+    id: 'school_address',
+    multiline: true,
+    directWrite: false,
+    postInsert: { table: 'locations', columns: { school_id: '$newId', address: 'school_address', current_mail_address: 'current_mail_address', current_physical_address: 'current_physical_address' } },
+  },
+  {
+    id: 'current_mail_address',
+    label: 'Current Mailing Address?',
+    type: 'boolean',
+    visibleIf: { field: 'school_address', notEmpty: true },
+    directWrite: false,
+  },
+  {
+    id: 'current_physical_address',
+    label: 'Current Physical Address?',
+    type: 'boolean',
+    visibleIf: { field: 'school_address', notEmpty: true },
+    directWrite: false,
+  },
+  { id: 'ssj_target_city', writeTable: 'schools_ssj_data' },
+  { id: 'ssj_target_state', label: 'Target State (2-letter)', writeTable: 'schools_ssj_data' },
+  {
+    id: 'assigned_ops_guide',
+    type: 'select',
+    lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' },
+    postInsert: { table: 'guide_assignments', columns: { school_id: '$newId', email_or_name: 'assigned_ops_guide', type: 'Ops Guide', is_active: true } },
+  },
+  {
+    id: 'assigned_entrepreneur_guide',
+    type: 'select',
+    lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' },
+    postInsert: { table: 'guide_assignments', columns: { school_id: '$newId', email_or_name: 'assigned_entrepreneur_guide', type: 'Entrepreneur', is_active: true } },
+  },
+] as const;
 
 // Pilot migration of School detail tabs to the new ViewSpec format
 export const SCHOOL_VIEW_SPEC: ViewSpec = view(
@@ -8,25 +116,23 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     'overview',
     'Overview',
     card(['short_name', 'long_name', 'prior_names'], { title: 'Name(s)', editable: true }),
-    card(['current_tls', 'founding_tls', 'wf_tls_on_board'], { title: 'People', editable: false }),
-    card(['stage_status', 'open_date', 'membership_status'], { title: 'Status', editable: false }),
+    card(['stage_status', 'current_tls', 'wf_tls_on_board', 'current_guide_name', 'current_cohort'], { title: 'Calculated' }),
+    card(['founding_tls', 'open_date', 'membership_status'], { title: 'History/Status' , editable: true }),
     map(['physical_lat', 'physical_long', 'physical_address'], { title: 'Location' }),
     card(['about', 'about_spanish'], { title: 'About', editable: true }),
-    card(['current_tls', 'current_guide_name', 'current_cohort'], { title: 'Support', editable: false }),
     card(
       ['governance_model', 'public_funding', 'program_focus', 'institutional_partner', 'ages_served', 'number_of_classrooms', 'enrollment_at_full_capacity'],
       { title: 'School Model', editable: true },
     ),
-    card(['school_email', 'school_phone', 'domain_name', 'website', 'facebook', 'instagram'], { title: 'Contact Info', editable: true }),
-    card(['total_grants_issued', 'total_loans_issued'], { title: 'Grants and Loans', editable: false }),
+    card(['school_email', 'school_phone', 'domain_name', 'website', 'facebook', 'instagram'], { title: 'Marketing & Comms', editable: true }),
+    card(['total_grants_issued', 'total_loans_issued'], { title: 'Grants and Loans' }),
     card(['risk_factors', 'watchlist'], { title: 'Warnings', editable: true }),
   ),
   tab(
     'details',
     'Details',
-    card(['status', 'legal_structure', 'ein', 'incorporation_date', 'current_fy_end', 'loan_report_name'], { title: 'Legal entity', editable: true }),
-    card(['nonprofit_status', 'group_exemption_status'], { title: 'Nonprofit status', editable: true }),
-    card(['founders'], { title: 'Founders', editable: true }),
+    card(['governance_model','legal_structure', 'ein', 'incorporation_date', 'current_fy_end', 'loan_report_name'], { title: 'Legal entity', editable: true }),
+    card(['nonprofit_path','nonprofit_status', 'group_exemption_status'], { title: 'Nonprofit status', editable: true }),
     card(['logo', 'logo_url', 'logo_square', 'logo_flower_only', 'logo_rectangle'], { title: 'Logo(s)', editable: true }),
     table('schoolBoardMembers', { title: 'Board Members' }),
   ),
@@ -40,6 +146,7 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     card(['ssj_facility', 'ssj_building4good_status', 'date_shared_with_n4g', 'building4good_firm_and_attorney'], { title: 'Facilities', editable: true }),
     card(['ssj_budget_ready_for_next_steps', 'ssj_seeking_wf_funding', 'ssj_fundraising_narrative', 'ssj_pathway_to_funding', 'ssj_total_startup_funding_needed', 'ssj_loan_eligibility', 'ssj_loan_approved_amt', 'ssj_amount_raised', 'ssj_gap_in_funding'], { title: 'Fundraising', editable: true }),
     card(['business_insurance', 'budget_utility', 'bill_account'], { title: 'Systems', editable: true }),
+    table('advice', { title: 'Advice' })
   ),
   tab('educators', 'Educators', table('schoolEducators')),
   tab('enrollment', 'Enrollment', table('schoolEnrollment')),
@@ -54,15 +161,16 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     'ops_guide_tab',
     'Ops Guide',
     card(['short_name', 'long_name', 'prior_names'], { title: 'Name(s)', editable: true }),
-    card(['current_tls','founding_tls','wf_tls_on_board'], { title: 'People', editable: false }),
-    card(['stage_status', 'open_date','membership_status'], { title: 'Status', editable: false }),
-    card(['current_guide_name','current_cohort'], { title: 'Support', editable: false }),
-    card(['address', 'current_mail_address','current_physical_address','lease_doc','lease_end_date'], { title: 'Location', editable: true }),
+    card(['current_tls','stage_status','wf_tls_on_board','current_guide_name','current_cohort'], { title: 'Calculated' }),
+    card(['founding_tls', 'status', 'ssj_stage','open_date','membership_status'], { title: 'History/Status' , editable: true }),
     card(['governance_model','public_funding','program_focus','institutional_partner','ages_served', 'number_of_classrooms','enrollment_at_full_capacity'], { title: 'School Model', editable: true }),
     card(['school_email', 'school_phone','website','facebook','instagram'], { title: 'Contact Info', editable: true }),
-    card(['budget_link'], { title: 'Files', editable: true }),
-    card(['visioning_album','planning_album'], { title: 'Albums', editable: true }),
+    card(['budget_link', 'visioning_album', 'planning_album'], { title: 'Files', editable: true }),
     card(['risk_factors','watchlist'], { title: 'Warnings', editable: true }),
-    table('advice', { title: 'Advice Givers' }),
+    table('schoolEducators', { title: 'Educators' , width: 'half' }),
+    table('schoolBoardMembers', { title: 'Board' , width: 'half' }),
+    table('schoolGuideAssignments', { title: 'Guides' , width: 'half' }),
+    table('schoolLocations', { title: 'Locations' , width: 'half' }),
+    table('advice', { title: 'Advice' }),
   ),
 );

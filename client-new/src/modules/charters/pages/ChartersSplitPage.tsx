@@ -3,7 +3,8 @@ import { useGridCharters, useCharterDetails } from '../api/queries';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef } from 'ag-grid-community';
 import { useLocation } from 'wouter';
-import { CHARTER_GRID, CHARTER_FIELD_METADATA } from '../constants';
+import { CHARTER_GRID } from '../views';
+import { CHARTER_FIELD_METADATA } from '../views';
 import { CHARTER_VIEW_SPEC } from '../views';
 import { asTabs } from '../../shared/views/types';
 import { supabase } from '@/lib/supabase/client';
@@ -250,6 +251,8 @@ export function ChartersSplitPage() {
               details={selectedCharterData as any}
               tabs={asTabs(CHARTER_VIEW_SPEC)}
               fieldMeta={CHARTER_FIELD_METADATA}
+              defaultWriteOrder={['charters','charter_applications']}
+              defaultWriteTo={{ table: 'charters', pk: 'id' }}
               resolveTitle={(details) => details.charter_name ?? details.full_name ?? details.short_name ?? selectedCharterId}
             />
           ) : (

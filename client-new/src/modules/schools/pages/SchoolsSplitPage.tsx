@@ -3,7 +3,8 @@ import { useGridSchools, useSchoolDetails } from '../api/queries';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef } from 'ag-grid-community';
 import { useLocation } from 'wouter';
-import { SCHOOL_GRID, SCHOOL_FIELD_METADATA } from '../constants';
+import { SCHOOL_GRID } from '../views';
+import { SCHOOL_FIELD_METADATA } from '../views';
 import { SCHOOL_VIEW_SPEC } from '../views';
 import { asTabs } from '../../shared/views/types';
 import { supabase } from '@/lib/supabase/client';
@@ -250,6 +251,8 @@ export function SchoolsSplitPage() {
               details={selectedSchoolData as any}
               tabs={asTabs(SCHOOL_VIEW_SPEC)}
               fieldMeta={SCHOOL_FIELD_METADATA}
+              defaultWriteTo={{ table: 'schools', pk: 'id' }}
+              defaultWriteOrder={['schools','schools_ssj_data']}
               resolveTitle={(details) => details.school_name ?? details.name ?? selectedSchoolId}
             />
           ) : (

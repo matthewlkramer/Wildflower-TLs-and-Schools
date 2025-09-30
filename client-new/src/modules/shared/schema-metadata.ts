@@ -34,6 +34,35 @@ export function getColumnMetadata(schema: string | undefined, table: string, col
   return tableEntry.columns[column];
 }
 
+export function listColumns(schema: string | undefined, table: string): Record<string, ColumnMetadata> | undefined {
+  const schemaKey = resolveSchema(schema);
+  const schemaEntry = schemaRecord[schemaKey];
+  if (!schemaEntry) return undefined;
+  const tableEntry = schemaEntry[table];
+  return tableEntry?.columns;
+}
+
+// Try to infer the foreign key column in `table` that references parentTable.parentPk
+export function findForeignKeyColumn(options: { schema?: string; table: string; parentSchema?: string; parentTable: string; parentPk: string }): string | undefined {
+  const { schema, table, parentSchema, parentTable, parentPk } = options;
+  const cols = listColumns(schema, table);
+  if (!cols) return undefined;
+  for (const [colName, meta] of Object.entries(cols)) {
+    const refs = (meta as any).references as Array<{ relation: string; referencedColumns: string[]; isOneToOne?: boolean }> | undefined;
+    if (!Array.isArray(refs)) continue;
+    for (const r of refs) {
+      // relation is the referenced table name (without schema)
+      if (r.relation === parentTable && r.referencedColumns?.includes(parentPk)) return colName;
+    }
+  }
+  return undefined;
+}
+
+export function getEnumName(schema: string | undefined, table: string, column: string): string | undefined {
+  const cm = getColumnMetadata(schema, table, column) as any;
+  return cm?.enumRef?.name as string | undefined;
+}
+
 export function mergeTableColumnMeta(options: {
   schema?: string;
   table: string;

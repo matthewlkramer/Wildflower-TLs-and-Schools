@@ -3,7 +3,7 @@ import { useGridEducators } from '../api/queries';
 import KanbanBoard from '@/components/shared/KanbanBoard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { EDUCATOR_KANBAN_CONSTANTS_TABLE, EDUCATOR_GRID } from '../constants';
+import { EDUCATOR_KANBAN_CONSTANTS_TABLE, EDUCATOR_GRID } from '../views';
 import { GridPageHeader } from '@/components/shared/GridPageHeader';
 import { useLocation } from 'wouter';
 import type { SavedView } from '@/hooks/useSavedViews';

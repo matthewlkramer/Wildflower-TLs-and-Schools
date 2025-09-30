@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useGridSchools } from '../api/queries';
 import KanbanBoard from '@/components/shared/KanbanBoard';
-import { SCHOOL_KANBAN_CONSTANTS_TABLE, SCHOOL_GRID } from '../constants';
+import { SCHOOL_KANBAN_CONSTANTS_TABLE, SCHOOL_GRID } from '../views';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
 import { GridPageHeader } from '@/components/shared/GridPageHeader';

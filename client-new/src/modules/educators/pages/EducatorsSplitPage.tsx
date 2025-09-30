@@ -3,7 +3,8 @@ import { useGridEducators, useEducatorDetails } from '../api/queries';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef } from 'ag-grid-community';
 import { useLocation } from 'wouter';
-import { EDUCATOR_GRID, EDUCATOR_FIELD_METADATA } from '../constants';
+import { EDUCATOR_GRID } from '../views';
+import { EDUCATOR_FIELD_METADATA } from '../views';
 import { EDUCATOR_VIEW_SPEC } from '../views';
 import { asTabs } from '../../shared/views/types';
 import { supabase } from '@/lib/supabase/client';
@@ -250,6 +251,8 @@ export function EducatorsSplitPage() {
               details={selectedEducatorData as any}
               tabs={asTabs(EDUCATOR_VIEW_SPEC)}
               fieldMeta={EDUCATOR_FIELD_METADATA}
+              defaultWriteOrder={['people','people_educator_early_cultivation','people_systems']}
+              defaultWriteTo={{ table: 'people', pk: 'id' }}
               resolveTitle={(details) => details.full_name ?? details.name ?? selectedEducatorId}
             />
           ) : (

@@ -58,7 +58,7 @@ export type FieldLookup = {
 };
 
 export type FieldMetadata = {
-  label: string;
+  label?: string;
   type?: DetailFieldType;
   array?: boolean;
   multiline?: boolean;
@@ -66,6 +66,12 @@ export type FieldMetadata = {
   lookup?: FieldLookup;
   edit?: FieldEditConfig;
   reference?: FieldReference;
+  // New: explicitly mark a field as not editable even if it has an inferred/default write target
+  editable?: boolean;
+  // New: shorthand to indicate a typical write target table; pk inferred by table name (e.g., schools_ssj_data -> school_id)
+  writeTable?: string;
+  // Optional: field-level visibility
+  visibleIf?: VisibleIf;
 };
 
 export type FieldMetadataMap = Record<string, FieldMetadata>;
@@ -138,6 +144,8 @@ export type DetailTableBlock = {
   tableActionLabels?: readonly string[];
   // Optional on/off filters controlled by header switches
   toggles?: readonly TableToggleSpec[];
+  // Always-applied filter expression when fetching rows
+  baseFilter?: FilterExpr;
   visibleIf?: VisibleIf;
 };
 

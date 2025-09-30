@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useGridCharters } from '../api/queries';
 import KanbanBoard from '@/components/shared/KanbanBoard';
-import { CHARTER_KANBAN_CONSTANTS_TABLE, CHARTER_GRID } from '../constants';
+import { CHARTER_KANBAN_CONSTANTS_TABLE, CHARTER_GRID } from '../views';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
 import { GridPageHeader } from '@/components/shared/GridPageHeader';

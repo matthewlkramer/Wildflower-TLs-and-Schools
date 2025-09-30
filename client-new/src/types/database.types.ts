@@ -104,29 +104,8 @@ export type Database = {
             foreignKeyName: "action_steps_people_id_fkey"
             columns: ["people_id"]
             isOneToOne: false
-            referencedRelation: "mont_certs_complete_summary"
-            referencedColumns: ["people_id"]
-          },
-          {
-            foreignKeyName: "action_steps_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "mont_certs_in_process_summary"
-            referencedColumns: ["person_id"]
-          },
-          {
-            foreignKeyName: "action_steps_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
             referencedRelation: "people"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "action_steps_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "select_teacher"
-            referencedColumns: ["person_id"]
           },
           {
             foreignKeyName: "action_steps_school_id_fkey"
@@ -144,6 +123,112 @@ export type Database = {
           },
           {
             foreignKeyName: "action_steps_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      advice: {
+        Row: {
+          advice_doc: string | null
+          advice_given_date: string | null
+          advice_giver_people_id: string | null
+          advice_loop_closed_date: string | null
+          advice_requested_date: string | null
+          advice_text: string | null
+          charter_id: string | null
+          created_at: string
+          id: number
+          school_id: string | null
+          stage: Database["public"]["Enums"]["advice_panel_stages"] | null
+        }
+        Insert: {
+          advice_doc?: string | null
+          advice_given_date?: string | null
+          advice_giver_people_id?: string | null
+          advice_loop_closed_date?: string | null
+          advice_requested_date?: string | null
+          advice_text?: string | null
+          charter_id?: string | null
+          created_at?: string
+          id?: number
+          school_id?: string | null
+          stage?: Database["public"]["Enums"]["advice_panel_stages"] | null
+        }
+        Update: {
+          advice_doc?: string | null
+          advice_given_date?: string | null
+          advice_giver_people_id?: string | null
+          advice_loop_closed_date?: string | null
+          advice_requested_date?: string | null
+          advice_text?: string | null
+          charter_id?: string | null
+          created_at?: string
+          id?: number
+          school_id?: string | null
+          stage?: Database["public"]["Enums"]["advice_panel_stages"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advice_advice_giver_people_id_fkey"
+            columns: ["advice_giver_people_id"]
+            isOneToOne: false
+            referencedRelation: "details_educators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advice_advice_giver_people_id_fkey"
+            columns: ["advice_giver_people_id"]
+            isOneToOne: false
+            referencedRelation: "grid_educator"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advice_advice_giver_people_id_fkey"
+            columns: ["advice_giver_people_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advice_charter_id_fkey"
+            columns: ["charter_id"]
+            isOneToOne: false
+            referencedRelation: "charters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advice_charter_id_fkey"
+            columns: ["charter_id"]
+            isOneToOne: false
+            referencedRelation: "details_charters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advice_charter_id_fkey"
+            columns: ["charter_id"]
+            isOneToOne: false
+            referencedRelation: "grid_charter"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advice_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "details_schools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advice_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "grid_school"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advice_school_id_fkey"
             columns: ["school_id"]
             isOneToOne: false
             referencedRelation: "schools"
@@ -210,6 +295,13 @@ export type Database = {
           school_year?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "annual_assessment_and_metrics_data_assessment_or_metric_fkey"
+            columns: ["assessment_or_metric"]
+            isOneToOne: false
+            referencedRelation: "ref_assessments_and_metrics"
+            referencedColumns: ["value"]
+          },
           {
             foreignKeyName: "annual_assessment_and_metrics_data_charter_id_fkey"
             columns: ["charter_id"]
@@ -538,7 +630,22 @@ export type Database = {
           id?: string
           is_archived?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "charter_authorization_actions_action_fkey"
+            columns: ["action"]
+            isOneToOne: false
+            referencedRelation: "ref_charter_authorizer_actions"
+            referencedColumns: ["action"]
+          },
+          {
+            foreignKeyName: "charter_authorization_actions_authorizer_fkey"
+            columns: ["authorizer"]
+            isOneToOne: false
+            referencedRelation: "charter_authorizers"
+            referencedColumns: ["authorizer_name"]
+          },
+        ]
       }
       charter_authorizers: {
         Row: {
@@ -755,6 +862,69 @@ export type Database = {
         }
         Relationships: []
       }
+      developer_notes: {
+        Row: {
+          comment: string | null
+          created_at: string
+          created_by: string | null
+          developer_target_fix_date: string | null
+          focus_area: string | null
+          id: number
+          logs: string | null
+          notes_type: Database["public"]["Enums"]["dev_note_type"][] | null
+          screenshot_link: string | null
+          status: Database["public"]["Enums"]["action_step_status"] | null
+          user_priority: Database["public"]["Enums"]["high_med_low"] | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          created_by?: string | null
+          developer_target_fix_date?: string | null
+          focus_area?: string | null
+          id?: number
+          logs?: string | null
+          notes_type?: Database["public"]["Enums"]["dev_note_type"][] | null
+          screenshot_link?: string | null
+          status?: Database["public"]["Enums"]["action_step_status"] | null
+          user_priority?: Database["public"]["Enums"]["high_med_low"] | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          created_by?: string | null
+          developer_target_fix_date?: string | null
+          focus_area?: string | null
+          id?: number
+          logs?: string | null
+          notes_type?: Database["public"]["Enums"]["dev_note_type"][] | null
+          screenshot_link?: string | null
+          status?: Database["public"]["Enums"]["action_step_status"] | null
+          user_priority?: Database["public"]["Enums"]["high_med_low"] | null
+        }
+        Relationships: []
+      }
+      document_checklist: {
+        Row: {
+          document_name: string
+          group: string | null
+          order_within_group: number | null
+          required_by: string | null
+        }
+        Insert: {
+          document_name: string
+          group?: string | null
+          order_within_group?: number | null
+          required_by?: string | null
+        }
+        Update: {
+          document_name?: string
+          group?: string | null
+          order_within_group?: number | null
+          required_by?: string | null
+        }
+        Relationships: []
+      }
       email_addresses: {
         Row: {
           category:
@@ -767,6 +937,7 @@ export type Database = {
           is_primary: boolean | null
           is_valid: boolean
           people_id: string | null
+          people_roles_associations_id: string | null
         }
         Insert: {
           category?:
@@ -779,6 +950,7 @@ export type Database = {
           is_primary?: boolean | null
           is_valid?: boolean
           people_id?: string | null
+          people_roles_associations_id?: string | null
         }
         Update: {
           category?:
@@ -791,6 +963,7 @@ export type Database = {
           is_primary?: boolean | null
           is_valid?: boolean
           people_id?: string | null
+          people_roles_associations_id?: string | null
         }
         Relationships: [
           {
@@ -811,29 +984,22 @@ export type Database = {
             foreignKeyName: "email_addresses_people_id_fkey"
             columns: ["people_id"]
             isOneToOne: false
-            referencedRelation: "mont_certs_complete_summary"
-            referencedColumns: ["people_id"]
-          },
-          {
-            foreignKeyName: "email_addresses_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "mont_certs_in_process_summary"
-            referencedColumns: ["person_id"]
-          },
-          {
-            foreignKeyName: "email_addresses_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
             referencedRelation: "people"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "email_addresses_people_id_fkey"
-            columns: ["people_id"]
+            foreignKeyName: "email_addresses_people_roles_associations_id_fkey"
+            columns: ["people_roles_associations_id"]
             isOneToOne: false
-            referencedRelation: "select_teacher"
-            referencedColumns: ["person_id"]
+            referencedRelation: "details_associations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_addresses_people_roles_associations_id_fkey"
+            columns: ["people_roles_associations_id"]
+            isOneToOne: false
+            referencedRelation: "people_roles_associations"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -876,6 +1042,36 @@ export type Database = {
           to_emails?: string[] | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      errors: {
+        Row: {
+          charter_id: string | null
+          created_at: string
+          error_type: string | null
+          id: number
+          people_id: string | null
+          resolved_datetime: string | null
+          school_id: string | null
+        }
+        Insert: {
+          charter_id?: string | null
+          created_at?: string
+          error_type?: string | null
+          id?: number
+          people_id?: string | null
+          resolved_datetime?: string | null
+          school_id?: string | null
+        }
+        Update: {
+          charter_id?: string | null
+          created_at?: string
+          error_type?: string | null
+          id?: number
+          people_id?: string | null
+          resolved_datetime?: string | null
+          school_id?: string | null
         }
         Relationships: []
       }
@@ -936,29 +1132,8 @@ export type Database = {
             foreignKeyName: "event_attendance_people_id_fkey"
             columns: ["people_id"]
             isOneToOne: false
-            referencedRelation: "mont_certs_complete_summary"
-            referencedColumns: ["people_id"]
-          },
-          {
-            foreignKeyName: "event_attendance_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "mont_certs_in_process_summary"
-            referencedColumns: ["person_id"]
-          },
-          {
-            foreignKeyName: "event_attendance_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
             referencedRelation: "people"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "event_attendance_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "select_teacher"
-            referencedColumns: ["person_id"]
           },
         ]
       }
@@ -999,6 +1174,7 @@ export type Database = {
           is_archived: boolean | null
           pdf: string | null
           school_id: string | null
+          upload_date: string | null
         }
         Insert: {
           charter_id?: string | null
@@ -1007,6 +1183,7 @@ export type Database = {
           is_archived?: boolean | null
           pdf?: string | null
           school_id?: string | null
+          upload_date?: string | null
         }
         Update: {
           charter_id?: string | null
@@ -1015,6 +1192,7 @@ export type Database = {
           is_archived?: boolean | null
           pdf?: string | null
           school_id?: string | null
+          upload_date?: string | null
         }
         Relationships: [
           {
@@ -1093,6 +1271,7 @@ export type Database = {
           label: string | null
           ledger_entry: string | null
           notes: string | null
+          old_school_id: string | null
           people_id: string | null
           prelim_advice_request_timestamp: string | null
           qbo_number: number | null
@@ -1134,6 +1313,7 @@ export type Database = {
           label?: string | null
           ledger_entry?: string | null
           notes?: string | null
+          old_school_id?: string | null
           people_id?: string | null
           prelim_advice_request_timestamp?: string | null
           qbo_number?: number | null
@@ -1175,6 +1355,7 @@ export type Database = {
           label?: string | null
           ledger_entry?: string | null
           notes?: string | null
+          old_school_id?: string | null
           people_id?: string | null
           prelim_advice_request_timestamp?: string | null
           qbo_number?: number | null
@@ -1186,69 +1367,6 @@ export type Database = {
           unsigned_grant_agreement?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "grants_charter_id_fkey"
-            columns: ["charter_id"]
-            isOneToOne: false
-            referencedRelation: "charters"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grants_charter_id_fkey"
-            columns: ["charter_id"]
-            isOneToOne: false
-            referencedRelation: "details_charters"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grants_charter_id_fkey"
-            columns: ["charter_id"]
-            isOneToOne: false
-            referencedRelation: "grid_charter"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grants_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "details_educators"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grants_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "grid_educator"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grants_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "mont_certs_complete_summary"
-            referencedColumns: ["people_id"]
-          },
-          {
-            foreignKeyName: "grants_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "mont_certs_in_process_summary"
-            referencedColumns: ["person_id"]
-          },
-          {
-            foreignKeyName: "grants_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "people"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grants_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "select_teacher"
-            referencedColumns: ["person_id"]
-          },
           {
             foreignKeyName: "grants_school_id_fkey"
             columns: ["school_id"]
@@ -1359,12 +1477,12 @@ export type Database = {
       }
       guide_assignments: {
         Row: {
-          active: boolean | null
           charter_id: string | null
           email_or_name: string | null
           end_date: string | null
           guide_id: string | null
           id: string
+          is_active: boolean | null
           is_archived: boolean | null
           old_id: string
           school_id: string | null
@@ -1372,12 +1490,12 @@ export type Database = {
           type: Database["public"]["Enums"]["guide_types"] | null
         }
         Insert: {
-          active?: boolean | null
           charter_id?: string | null
           email_or_name?: string | null
           end_date?: string | null
           guide_id?: string | null
           id?: string
+          is_active?: boolean | null
           is_archived?: boolean | null
           old_id: string
           school_id?: string | null
@@ -1385,12 +1503,12 @@ export type Database = {
           type?: Database["public"]["Enums"]["guide_types"] | null
         }
         Update: {
-          active?: boolean | null
           charter_id?: string | null
           email_or_name?: string | null
           end_date?: string | null
           guide_id?: string | null
           id?: string
+          is_active?: boolean | null
           is_archived?: boolean | null
           old_id?: string
           school_id?: string | null
@@ -1459,13 +1577,13 @@ export type Database = {
       guides: {
         Row: {
           birthdate: string | null
-          currently_active: boolean | null
           email: string | null
           email_or_name: string
           full_name: string | null
           home_address: string | null
           id: string
           image_url: string | null
+          is_active: boolean | null
           is_archived: boolean | null
           old_id: string | null
           partner_roles: Database["public"]["Enums"]["partner_roles"][] | null
@@ -1474,13 +1592,13 @@ export type Database = {
         }
         Insert: {
           birthdate?: string | null
-          currently_active?: boolean | null
           email?: string | null
           email_or_name: string
           full_name?: string | null
           home_address?: string | null
           id?: string
           image_url?: string | null
+          is_active?: boolean | null
           is_archived?: boolean | null
           old_id?: string | null
           partner_roles?: Database["public"]["Enums"]["partner_roles"][] | null
@@ -1489,13 +1607,13 @@ export type Database = {
         }
         Update: {
           birthdate?: string | null
-          currently_active?: boolean | null
           email?: string | null
           email_or_name?: string
           full_name?: string | null
           home_address?: string | null
           id?: string
           image_url?: string | null
+          is_active?: boolean | null
           is_archived?: boolean | null
           old_id?: string | null
           partner_roles?: Database["public"]["Enums"]["partner_roles"][] | null
@@ -1700,6 +1818,7 @@ export type Database = {
           is_archived: boolean | null
           lat: number | null
           lease: string | null
+          lease_doc: string | null
           lease_end_date: string | null
           long: number | null
           mailable: boolean | null
@@ -1732,6 +1851,7 @@ export type Database = {
           is_archived?: boolean | null
           lat?: number | null
           lease?: string | null
+          lease_doc?: string | null
           lease_end_date?: string | null
           long?: number | null
           mailable?: boolean | null
@@ -1764,6 +1884,7 @@ export type Database = {
           is_archived?: boolean | null
           lat?: number | null
           lease?: string | null
+          lease_doc?: string | null
           lease_end_date?: string | null
           long?: number | null
           mailable?: boolean | null
@@ -1960,6 +2081,7 @@ export type Database = {
             | Database["public"]["Enums"]["certification_completion_status"]
             | null
           cert_level: Database["public"]["Enums"]["age_spans"][] | null
+          cert_level_rev: Database["public"]["Enums"]["age_spans_rev"][] | null
           created_date: string | null
           id: string
           is_archived: boolean | null
@@ -1979,6 +2101,7 @@ export type Database = {
             | Database["public"]["Enums"]["certification_completion_status"]
             | null
           cert_level?: Database["public"]["Enums"]["age_spans"][] | null
+          cert_level_rev?: Database["public"]["Enums"]["age_spans_rev"][] | null
           created_date?: string | null
           id?: string
           is_archived?: boolean | null
@@ -1998,6 +2121,7 @@ export type Database = {
             | Database["public"]["Enums"]["certification_completion_status"]
             | null
           cert_level?: Database["public"]["Enums"]["age_spans"][] | null
+          cert_level_rev?: Database["public"]["Enums"]["age_spans_rev"][] | null
           created_date?: string | null
           id?: string
           is_archived?: boolean | null
@@ -2026,29 +2150,8 @@ export type Database = {
             foreignKeyName: "montessori_certs_people_id_fkey"
             columns: ["people_id"]
             isOneToOne: false
-            referencedRelation: "mont_certs_complete_summary"
-            referencedColumns: ["people_id"]
-          },
-          {
-            foreignKeyName: "montessori_certs_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "mont_certs_in_process_summary"
-            referencedColumns: ["person_id"]
-          },
-          {
-            foreignKeyName: "montessori_certs_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
             referencedRelation: "people"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "montessori_certs_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "select_teacher"
-            referencedColumns: ["person_id"]
           },
         ]
       }
@@ -2141,6 +2244,7 @@ export type Database = {
           charter_id: string | null
           created_by: string | null
           created_date: string | null
+          full_text: string | null
           governance_doc_id: string | null
           grant_id: string | null
           guide_id: string | null
@@ -2153,7 +2257,7 @@ export type Database = {
           people_id: string | null
           school_id: string | null
           ssj_fillout_form_id: string | null
-          text: string | null
+          title: string | null
         }
         Insert: {
           action_step_id?: string | null
@@ -2161,6 +2265,7 @@ export type Database = {
           charter_id?: string | null
           created_by?: string | null
           created_date?: string | null
+          full_text?: string | null
           governance_doc_id?: string | null
           grant_id?: string | null
           guide_id?: string | null
@@ -2173,7 +2278,7 @@ export type Database = {
           people_id?: string | null
           school_id?: string | null
           ssj_fillout_form_id?: string | null
-          text?: string | null
+          title?: string | null
         }
         Update: {
           action_step_id?: string | null
@@ -2181,6 +2286,7 @@ export type Database = {
           charter_id?: string | null
           created_by?: string | null
           created_date?: string | null
+          full_text?: string | null
           governance_doc_id?: string | null
           grant_id?: string | null
           guide_id?: string | null
@@ -2193,7 +2299,7 @@ export type Database = {
           people_id?: string | null
           school_id?: string | null
           ssj_fillout_form_id?: string | null
-          text?: string | null
+          title?: string | null
         }
         Relationships: [
           {
@@ -2256,6 +2362,13 @@ export type Database = {
             foreignKeyName: "notes_ssj_fillout_form_id_fkey"
             columns: ["ssj_fillout_form_id"]
             isOneToOne: false
+            referencedRelation: "details_educators"
+            referencedColumns: ["most_recent_fillout_form_id"]
+          },
+          {
+            foreignKeyName: "notes_ssj_fillout_form_id_fkey"
+            columns: ["ssj_fillout_form_id"]
+            isOneToOne: false
             referencedRelation: "ssj_fillout_forms"
             referencedColumns: ["id"]
           },
@@ -2298,29 +2411,8 @@ export type Database = {
             foreignKeyName: "school_notes_people_id_fkey"
             columns: ["people_id"]
             isOneToOne: false
-            referencedRelation: "mont_certs_complete_summary"
-            referencedColumns: ["people_id"]
-          },
-          {
-            foreignKeyName: "school_notes_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "mont_certs_in_process_summary"
-            referencedColumns: ["person_id"]
-          },
-          {
-            foreignKeyName: "school_notes_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
             referencedRelation: "people"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "school_notes_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "select_teacher"
-            referencedColumns: ["person_id"]
           },
           {
             foreignKeyName: "school_notes_school_id_fkey"
@@ -2446,6 +2538,9 @@ export type Database = {
           last_name: string | null
           lgbtqia: boolean | null
           middle_name: string | null
+          montessori_certs:
+            | Database["public"]["Enums"]["age_spans_rev"][]
+            | null
           nickname: string | null
           other_languages: Database["public"]["Enums"]["languages"][] | null
           primary_languages: Database["public"]["Enums"]["languages"][] | null
@@ -2488,6 +2583,9 @@ export type Database = {
           last_name?: string | null
           lgbtqia?: boolean | null
           middle_name?: string | null
+          montessori_certs?:
+            | Database["public"]["Enums"]["age_spans_rev"][]
+            | null
           nickname?: string | null
           other_languages?: Database["public"]["Enums"]["languages"][] | null
           primary_languages?: Database["public"]["Enums"]["languages"][] | null
@@ -2530,6 +2628,9 @@ export type Database = {
           last_name?: string | null
           lgbtqia?: boolean | null
           middle_name?: string | null
+          montessori_certs?:
+            | Database["public"]["Enums"]["age_spans_rev"][]
+            | null
           nickname?: string | null
           other_languages?: Database["public"]["Enums"]["languages"][] | null
           primary_languages?: Database["public"]["Enums"]["languages"][] | null
@@ -2684,29 +2785,29 @@ export type Database = {
             foreignKeyName: "people_educator_details_people_id_fkey"
             columns: ["people_id"]
             isOneToOne: true
-            referencedRelation: "mont_certs_complete_summary"
-            referencedColumns: ["people_id"]
-          },
-          {
-            foreignKeyName: "people_educator_details_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: true
-            referencedRelation: "mont_certs_in_process_summary"
-            referencedColumns: ["person_id"]
-          },
-          {
-            foreignKeyName: "people_educator_details_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: true
             referencedRelation: "people"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "people_educator_details_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: true
-            referencedRelation: "select_teacher"
-            referencedColumns: ["person_id"]
+            foreignKeyName: "people_educator_early_cultiva_one_on_one_scheduling_status_fkey"
+            columns: ["one_on_one_scheduling_status"]
+            isOneToOne: false
+            referencedRelation: "ref_one_on_one_status"
+            referencedColumns: ["value"]
+          },
+          {
+            foreignKeyName: "people_educator_early_cultiva_person_responsible_for_follo_fkey"
+            columns: ["person_responsible_for_follow_up"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["email_or_name"]
+          },
+          {
+            foreignKeyName: "people_educator_early_cultivatio_assigned_partner_override_fkey"
+            columns: ["assigned_partner_override"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["email_or_name"]
           },
         ]
       }
@@ -2715,60 +2816,60 @@ export type Database = {
           authorizer_id: string | null
           charter_id: string | null
           created_date: string | null
-          currently_active: boolean | null
-          email_status: Database["public"]["Enums"]["active_inactive"] | null
           end_date: string | null
           gsuite_roles:
             | Database["public"]["Enums"]["gsuite_roles_options"]
             | null
           id: string
+          is_active: boolean | null
           is_archived: boolean | null
           loan_fund: boolean | null
           people_id: string | null
           role: string | null
-          role_specific_email: string | null
           school_id: string | null
           start_date: string | null
+          tl_membership_acknowledgement_date: string | null
+          tl_membership_acknowledgement_doc: string | null
           who_initiated_tl_removal: string | null
         }
         Insert: {
           authorizer_id?: string | null
           charter_id?: string | null
           created_date?: string | null
-          currently_active?: boolean | null
-          email_status?: Database["public"]["Enums"]["active_inactive"] | null
           end_date?: string | null
           gsuite_roles?:
             | Database["public"]["Enums"]["gsuite_roles_options"]
             | null
           id: string
+          is_active?: boolean | null
           is_archived?: boolean | null
           loan_fund?: boolean | null
           people_id?: string | null
           role?: string | null
-          role_specific_email?: string | null
           school_id?: string | null
           start_date?: string | null
+          tl_membership_acknowledgement_date?: string | null
+          tl_membership_acknowledgement_doc?: string | null
           who_initiated_tl_removal?: string | null
         }
         Update: {
           authorizer_id?: string | null
           charter_id?: string | null
           created_date?: string | null
-          currently_active?: boolean | null
-          email_status?: Database["public"]["Enums"]["active_inactive"] | null
           end_date?: string | null
           gsuite_roles?:
             | Database["public"]["Enums"]["gsuite_roles_options"]
             | null
           id?: string
+          is_active?: boolean | null
           is_archived?: boolean | null
           loan_fund?: boolean | null
           people_id?: string | null
           role?: string | null
-          role_specific_email?: string | null
           school_id?: string | null
           start_date?: string | null
+          tl_membership_acknowledgement_date?: string | null
+          tl_membership_acknowledgement_doc?: string | null
           who_initiated_tl_removal?: string | null
         }
         Relationships: [
@@ -2811,29 +2912,8 @@ export type Database = {
             foreignKeyName: "people_roles_associations_people_id_fkey"
             columns: ["people_id"]
             isOneToOne: false
-            referencedRelation: "mont_certs_complete_summary"
-            referencedColumns: ["people_id"]
-          },
-          {
-            foreignKeyName: "people_roles_associations_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "mont_certs_in_process_summary"
-            referencedColumns: ["person_id"]
-          },
-          {
-            foreignKeyName: "people_roles_associations_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
             referencedRelation: "people"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "people_roles_associations_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "select_teacher"
-            referencedColumns: ["person_id"]
           },
           {
             foreignKeyName: "people_roles_associations_role_fkey"
@@ -2941,31 +3021,22 @@ export type Database = {
             foreignKeyName: "people_systems_people_id_fkey"
             columns: ["people_id"]
             isOneToOne: false
-            referencedRelation: "mont_certs_complete_summary"
-            referencedColumns: ["people_id"]
-          },
-          {
-            foreignKeyName: "people_systems_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "mont_certs_in_process_summary"
-            referencedColumns: ["person_id"]
-          },
-          {
-            foreignKeyName: "people_systems_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
             referencedRelation: "people"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "people_systems_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "select_teacher"
-            referencedColumns: ["person_id"]
-          },
         ]
+      }
+      ref_assessments_and_metrics: {
+        Row: {
+          value: string
+        }
+        Insert: {
+          value: string
+        }
+        Update: {
+          value?: string
+        }
+        Relationships: []
       }
       ref_boolean: {
         Row: {
@@ -3017,15 +3088,15 @@ export type Database = {
       }
       ref_charter_authorizer_actions: {
         Row: {
-          action: string | null
+          action: string
           is_archived: boolean | null
         }
         Insert: {
-          action?: string | null
+          action: string
           is_archived?: boolean | null
         }
         Update: {
-          action?: string | null
+          action?: string
           is_archived?: boolean | null
         }
         Relationships: []
@@ -3034,16 +3105,19 @@ export type Database = {
         Row: {
           is_archived: boolean | null
           label: string | null
+          order: number | null
           value: Database["public"]["Enums"]["charter_status"]
         }
         Insert: {
           is_archived?: boolean | null
           label?: string | null
+          order?: number | null
           value: Database["public"]["Enums"]["charter_status"]
         }
         Update: {
           is_archived?: boolean | null
           label?: string | null
+          order?: number | null
           value?: Database["public"]["Enums"]["charter_status"]
         }
         Relationships: []
@@ -3075,6 +3149,18 @@ export type Database = {
           label?: string | null
           order?: number | null
           value?: string
+        }
+        Relationships: []
+      }
+      ref_errors: {
+        Row: {
+          error_type: string | null
+        }
+        Insert: {
+          error_type?: string | null
+        }
+        Update: {
+          error_type?: string | null
         }
         Relationships: []
       }
@@ -3114,6 +3200,27 @@ export type Database = {
         }
         Relationships: []
       }
+      ref_gov_docs: {
+        Row: {
+          label_short: string
+          required_to_open: boolean | null
+          required_to_transition_to_startup: boolean | null
+          value: string
+        }
+        Insert: {
+          label_short: string
+          required_to_open?: boolean | null
+          required_to_transition_to_startup?: boolean | null
+          value: string
+        }
+        Update: {
+          label_short?: string
+          required_to_open?: boolean | null
+          required_to_transition_to_startup?: boolean | null
+          value?: string
+        }
+        Relationships: []
+      }
       ref_membership_agreement_versions: {
         Row: {
           end_date: string | null
@@ -3150,30 +3257,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ref_one_on_one_status: {
+        Row: {
+          label: string | null
+          value: string
+        }
+        Insert: {
+          label?: string | null
+          value: string
+        }
+        Update: {
+          label?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       ref_planes: {
         Row: {
           age_ranges: Database["public"]["Enums"]["ages-grades"][] | null
           age_spans: Database["public"]["Enums"]["age_spans_rev"] | null
           credentials: string[] | null
           is_archived: boolean | null
+          label: string | null
           synonyms: string[] | null
-          value: string
+          value: Database["public"]["Enums"]["developmental_planes"]
         }
         Insert: {
           age_ranges?: Database["public"]["Enums"]["ages-grades"][] | null
           age_spans?: Database["public"]["Enums"]["age_spans_rev"] | null
           credentials?: string[] | null
           is_archived?: boolean | null
+          label?: string | null
           synonyms?: string[] | null
-          value: string
+          value: Database["public"]["Enums"]["developmental_planes"]
         }
         Update: {
           age_ranges?: Database["public"]["Enums"]["ages-grades"][] | null
           age_spans?: Database["public"]["Enums"]["age_spans_rev"] | null
           credentials?: string[] | null
           is_archived?: boolean | null
+          label?: string | null
           synonyms?: string[] | null
-          value?: string
+          value?: Database["public"]["Enums"]["developmental_planes"]
         }
         Relationships: []
       }
@@ -3200,25 +3325,25 @@ export type Database = {
       }
       ref_race_and_ethnicity: {
         Row: {
-          category: string
-          english: string | null
-          english_short: string | null
+          english_label: string | null
+          english_label_short: string | null
           is_archived: boolean | null
           spanish: string | null
+          value: Database["public"]["Enums"]["race_ethnicity_categories"]
         }
         Insert: {
-          category: string
-          english?: string | null
-          english_short?: string | null
+          english_label?: string | null
+          english_label_short?: string | null
           is_archived?: boolean | null
           spanish?: string | null
+          value: Database["public"]["Enums"]["race_ethnicity_categories"]
         }
         Update: {
-          category?: string
-          english?: string | null
-          english_short?: string | null
+          english_label?: string | null
+          english_label_short?: string | null
           is_archived?: boolean | null
           spanish?: string | null
+          value?: Database["public"]["Enums"]["race_ethnicity_categories"]
         }
         Relationships: []
       }
@@ -3226,6 +3351,7 @@ export type Database = {
         Row: {
           contexts: string[] | null
           is_archived: boolean | null
+          show_in_board_tables: boolean | null
           show_in_educator_grid: boolean | null
           value: string
           value_long: string
@@ -3233,6 +3359,7 @@ export type Database = {
         Insert: {
           contexts?: string[] | null
           is_archived?: boolean | null
+          show_in_board_tables?: boolean | null
           show_in_educator_grid?: boolean | null
           value: string
           value_long: string
@@ -3240,6 +3367,7 @@ export type Database = {
         Update: {
           contexts?: string[] | null
           is_archived?: boolean | null
+          show_in_board_tables?: boolean | null
           show_in_educator_grid?: boolean | null
           value?: string
           value_long?: string
@@ -3272,6 +3400,21 @@ export type Database = {
           is_archived?: boolean | null
           start_date?: string | null
           starting_calendar_year?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      ref_sources: {
+        Row: {
+          label: string | null
+          value: string
+        }
+        Insert: {
+          label?: string | null
+          value: string
+        }
+        Update: {
+          label?: string | null
           value?: string
         }
         Relationships: []
@@ -3367,6 +3510,7 @@ export type Database = {
             | Database["public"]["Enums"]["logo_designer_options"]
             | null
           name_selection_proposal: string | null
+          planning_advice_loop_closed: boolean | null
           school_id: string
           ssj_advice_givers_partners: string | null
           ssj_advice_givers_tls: string | null
@@ -3391,10 +3535,10 @@ export type Database = {
           ssj_loan_eligibility: string | null
           ssj_name_reserved: boolean | null
           ssj_on_track_for_enrollment:
-            | Database["public"]["Enums"]["school_ssj_data_ssj_on_track_for_enrollment_enum"]
+            | Database["public"]["Enums"]["ssj_on_track_for_enrollment_enum"]
             | null
           ssj_ops_guide_support_track:
-            | Database["public"]["Enums"]["ops_guide_support_track_options"]
+            | Database["public"]["Enums"]["ssj_ops_guide_support_track_enum"]
             | null
           ssj_pathway_to_funding:
             | Database["public"]["Enums"]["ssj_pathway_to_funding_enum"]
@@ -3414,6 +3558,7 @@ export type Database = {
           ssj_tool: Database["public"]["Enums"]["ssj_tool_enum"] | null
           ssj_total_startup_funding_needed: string | null
           trademark_filed: boolean | null
+          visioning_advice_loop_closed: boolean | null
           visioning_album: string | null
           visioning_album_complete: string | null
         }
@@ -3427,6 +3572,7 @@ export type Database = {
             | Database["public"]["Enums"]["logo_designer_options"]
             | null
           name_selection_proposal?: string | null
+          planning_advice_loop_closed?: boolean | null
           school_id: string
           ssj_advice_givers_partners?: string | null
           ssj_advice_givers_tls?: string | null
@@ -3451,10 +3597,10 @@ export type Database = {
           ssj_loan_eligibility?: string | null
           ssj_name_reserved?: boolean | null
           ssj_on_track_for_enrollment?:
-            | Database["public"]["Enums"]["school_ssj_data_ssj_on_track_for_enrollment_enum"]
+            | Database["public"]["Enums"]["ssj_on_track_for_enrollment_enum"]
             | null
           ssj_ops_guide_support_track?:
-            | Database["public"]["Enums"]["ops_guide_support_track_options"]
+            | Database["public"]["Enums"]["ssj_ops_guide_support_track_enum"]
             | null
           ssj_pathway_to_funding?:
             | Database["public"]["Enums"]["ssj_pathway_to_funding_enum"]
@@ -3474,6 +3620,7 @@ export type Database = {
           ssj_tool?: Database["public"]["Enums"]["ssj_tool_enum"] | null
           ssj_total_startup_funding_needed?: string | null
           trademark_filed?: boolean | null
+          visioning_advice_loop_closed?: boolean | null
           visioning_album?: string | null
           visioning_album_complete?: string | null
         }
@@ -3487,6 +3634,7 @@ export type Database = {
             | Database["public"]["Enums"]["logo_designer_options"]
             | null
           name_selection_proposal?: string | null
+          planning_advice_loop_closed?: boolean | null
           school_id?: string
           ssj_advice_givers_partners?: string | null
           ssj_advice_givers_tls?: string | null
@@ -3511,10 +3659,10 @@ export type Database = {
           ssj_loan_eligibility?: string | null
           ssj_name_reserved?: boolean | null
           ssj_on_track_for_enrollment?:
-            | Database["public"]["Enums"]["school_ssj_data_ssj_on_track_for_enrollment_enum"]
+            | Database["public"]["Enums"]["ssj_on_track_for_enrollment_enum"]
             | null
           ssj_ops_guide_support_track?:
-            | Database["public"]["Enums"]["ops_guide_support_track_options"]
+            | Database["public"]["Enums"]["ssj_ops_guide_support_track_enum"]
             | null
           ssj_pathway_to_funding?:
             | Database["public"]["Enums"]["ssj_pathway_to_funding_enum"]
@@ -3534,6 +3682,7 @@ export type Database = {
           ssj_tool?: Database["public"]["Enums"]["ssj_tool_enum"] | null
           ssj_total_startup_funding_needed?: string | null
           trademark_filed?: boolean | null
+          visioning_advice_loop_closed?: boolean | null
           visioning_album?: string | null
           visioning_album_complete?: string | null
         }
@@ -3565,32 +3714,40 @@ export type Database = {
         Row: {
           about: string | null
           about_spanish: string | null
-          admissions_system: string | null
-          ages_served: Database["public"]["Enums"]["age_spans"][] | null
+          admissions_system:
+            | Database["public"]["Enums"]["admissions_system_options"]
+            | null
+          ages_served: Database["public"]["Enums"]["age_spans_rev"][] | null
           automation_notes: string | null
           bill_account: string | null
           bookkeeper_or_accountant: string | null
           budget_link: string | null
-          budget_utility: string | null
-          business_insurance: string | null
+          budget_utility:
+            | Database["public"]["Enums"]["budget_utility_options"]
+            | null
+          business_insurance:
+            | Database["public"]["Enums"]["business_insurance_options"]
+            | null
           charter_id: string | null
           created: string | null
           created_by: string | null
           current_fy_end: string | null
-          domain_name: string | null
+          domain_name: Database["public"]["Enums"]["domain_name_options"] | null
           ein: string | null
           email_domain: string | null
           enrollment_at_full_capacity: string | null
           facebook: string | null
           flexible_tuition_model: string | null
           founding_tls: string[] | null
-          google_voice: string | null
+          google_voice:
+            | Database["public"]["Enums"]["google_voice_options"]
+            | null
           google_workspace_org_unit_path: string | null
           governance_model:
             | Database["public"]["Enums"]["governance_models"]
             | null
-          guidestar_listing_requested: string | null
-          gusto: string | null
+          guidestar_listing_requested: boolean | null
+          gusto: Database["public"]["Enums"]["gusto_options"] | null
           hero_image_2_url: string | null
           hero_image_url: string | null
           id: string
@@ -3601,27 +3758,39 @@ export type Database = {
           last_modified: string | null
           last_modified_by: string | null
           legal_name: string | null
-          legal_structure: string | null
+          legal_structure:
+            | Database["public"]["Enums"]["legal_structure_options"]
+            | null
           loan_report_name: string | null
           logo: string | null
+          logo_flower_only: string | null
+          logo_rectangle: string | null
+          logo_square: string | null
           logo_url: string | null
           long_name: string | null
+          membership_agreement_version: string | null
+          membership_revoked_date: string | null
+          membership_status: string | null
           membership_termination_steps: string | null
           narrative: string | null
-          nondiscrimination_policy_on_application: string | null
-          nondiscrimination_policy_on_website: string | null
-          nonprofit_status: string | null
+          nondiscrimination_policy_on_application: boolean | null
+          nondiscrimination_policy_on_website: boolean | null
+          nonprofit_path: Database["public"]["Enums"]["nonprofit_paths"] | null
+          nonprofit_status: boolean | null
           number_of_classrooms: number | null
           old_id: string
-          on_national_website: string | null
+          on_national_website:
+            | Database["public"]["Enums"]["on_national_website_options"]
+            | null
           open_date: string | null
           planning_album: string | null
           pod: string | null
           primary_contact_id: string | null
           prior_names: string | null
           program_focus: string | null
+          projected_open: string | null
           public_funding: string[] | null
-          qbo: string | null
+          qbo: Database["public"]["Enums"]["qbo_options"] | null
           qbo_school_codes: string | null
           risk_factors: string | null
           school_calendar:
@@ -3633,44 +3802,63 @@ export type Database = {
             | Database["public"]["Enums"]["school_schedule_options"][]
             | null
           short_name: string | null
+          signed_membership_agreement_date: string | null
           status: Database["public"]["Enums"]["school_statuses"] | null
-          tc_admissions: string | null
-          tc_recordkeeping: string | null
+          tc_admissions:
+            | Database["public"]["Enums"]["tc_admissions_options"]
+            | null
+          tc_recordkeeping:
+            | Database["public"]["Enums"]["tc_recordkeeping_options"]
+            | null
           tc_school_id: string | null
-          transparent_classroom: string | null
+          transparent_classroom:
+            | Database["public"]["Enums"]["transparent_classroom_options"]
+            | null
           watchlist: string | null
           website: string | null
-          website_tool: string | null
+          website_tool:
+            | Database["public"]["Enums"]["website_tool_options"]
+            | null
         }
         Insert: {
           about?: string | null
           about_spanish?: string | null
-          admissions_system?: string | null
-          ages_served?: Database["public"]["Enums"]["age_spans"][] | null
+          admissions_system?:
+            | Database["public"]["Enums"]["admissions_system_options"]
+            | null
+          ages_served?: Database["public"]["Enums"]["age_spans_rev"][] | null
           automation_notes?: string | null
           bill_account?: string | null
           bookkeeper_or_accountant?: string | null
           budget_link?: string | null
-          budget_utility?: string | null
-          business_insurance?: string | null
+          budget_utility?:
+            | Database["public"]["Enums"]["budget_utility_options"]
+            | null
+          business_insurance?:
+            | Database["public"]["Enums"]["business_insurance_options"]
+            | null
           charter_id?: string | null
           created?: string | null
           created_by?: string | null
           current_fy_end?: string | null
-          domain_name?: string | null
+          domain_name?:
+            | Database["public"]["Enums"]["domain_name_options"]
+            | null
           ein?: string | null
           email_domain?: string | null
           enrollment_at_full_capacity?: string | null
           facebook?: string | null
           flexible_tuition_model?: string | null
           founding_tls?: string[] | null
-          google_voice?: string | null
+          google_voice?:
+            | Database["public"]["Enums"]["google_voice_options"]
+            | null
           google_workspace_org_unit_path?: string | null
           governance_model?:
             | Database["public"]["Enums"]["governance_models"]
             | null
-          guidestar_listing_requested?: string | null
-          gusto?: string | null
+          guidestar_listing_requested?: boolean | null
+          gusto?: Database["public"]["Enums"]["gusto_options"] | null
           hero_image_2_url?: string | null
           hero_image_url?: string | null
           id?: string
@@ -3681,27 +3869,39 @@ export type Database = {
           last_modified?: string | null
           last_modified_by?: string | null
           legal_name?: string | null
-          legal_structure?: string | null
+          legal_structure?:
+            | Database["public"]["Enums"]["legal_structure_options"]
+            | null
           loan_report_name?: string | null
           logo?: string | null
+          logo_flower_only?: string | null
+          logo_rectangle?: string | null
+          logo_square?: string | null
           logo_url?: string | null
           long_name?: string | null
+          membership_agreement_version?: string | null
+          membership_revoked_date?: string | null
+          membership_status?: string | null
           membership_termination_steps?: string | null
           narrative?: string | null
-          nondiscrimination_policy_on_application?: string | null
-          nondiscrimination_policy_on_website?: string | null
-          nonprofit_status?: string | null
+          nondiscrimination_policy_on_application?: boolean | null
+          nondiscrimination_policy_on_website?: boolean | null
+          nonprofit_path?: Database["public"]["Enums"]["nonprofit_paths"] | null
+          nonprofit_status?: boolean | null
           number_of_classrooms?: number | null
           old_id: string
-          on_national_website?: string | null
+          on_national_website?:
+            | Database["public"]["Enums"]["on_national_website_options"]
+            | null
           open_date?: string | null
           planning_album?: string | null
           pod?: string | null
           primary_contact_id?: string | null
           prior_names?: string | null
           program_focus?: string | null
+          projected_open?: string | null
           public_funding?: string[] | null
-          qbo?: string | null
+          qbo?: Database["public"]["Enums"]["qbo_options"] | null
           qbo_school_codes?: string | null
           risk_factors?: string | null
           school_calendar?:
@@ -3713,44 +3913,63 @@ export type Database = {
             | Database["public"]["Enums"]["school_schedule_options"][]
             | null
           short_name?: string | null
+          signed_membership_agreement_date?: string | null
           status?: Database["public"]["Enums"]["school_statuses"] | null
-          tc_admissions?: string | null
-          tc_recordkeeping?: string | null
+          tc_admissions?:
+            | Database["public"]["Enums"]["tc_admissions_options"]
+            | null
+          tc_recordkeeping?:
+            | Database["public"]["Enums"]["tc_recordkeeping_options"]
+            | null
           tc_school_id?: string | null
-          transparent_classroom?: string | null
+          transparent_classroom?:
+            | Database["public"]["Enums"]["transparent_classroom_options"]
+            | null
           watchlist?: string | null
           website?: string | null
-          website_tool?: string | null
+          website_tool?:
+            | Database["public"]["Enums"]["website_tool_options"]
+            | null
         }
         Update: {
           about?: string | null
           about_spanish?: string | null
-          admissions_system?: string | null
-          ages_served?: Database["public"]["Enums"]["age_spans"][] | null
+          admissions_system?:
+            | Database["public"]["Enums"]["admissions_system_options"]
+            | null
+          ages_served?: Database["public"]["Enums"]["age_spans_rev"][] | null
           automation_notes?: string | null
           bill_account?: string | null
           bookkeeper_or_accountant?: string | null
           budget_link?: string | null
-          budget_utility?: string | null
-          business_insurance?: string | null
+          budget_utility?:
+            | Database["public"]["Enums"]["budget_utility_options"]
+            | null
+          business_insurance?:
+            | Database["public"]["Enums"]["business_insurance_options"]
+            | null
           charter_id?: string | null
           created?: string | null
           created_by?: string | null
           current_fy_end?: string | null
-          domain_name?: string | null
+          domain_name?:
+            | Database["public"]["Enums"]["domain_name_options"]
+            | null
           ein?: string | null
           email_domain?: string | null
           enrollment_at_full_capacity?: string | null
           facebook?: string | null
           flexible_tuition_model?: string | null
           founding_tls?: string[] | null
-          google_voice?: string | null
+          google_voice?:
+            | Database["public"]["Enums"]["google_voice_options"]
+            | null
           google_workspace_org_unit_path?: string | null
           governance_model?:
             | Database["public"]["Enums"]["governance_models"]
             | null
-          guidestar_listing_requested?: string | null
-          gusto?: string | null
+          guidestar_listing_requested?: boolean | null
+          gusto?: Database["public"]["Enums"]["gusto_options"] | null
           hero_image_2_url?: string | null
           hero_image_url?: string | null
           id?: string
@@ -3761,27 +3980,39 @@ export type Database = {
           last_modified?: string | null
           last_modified_by?: string | null
           legal_name?: string | null
-          legal_structure?: string | null
+          legal_structure?:
+            | Database["public"]["Enums"]["legal_structure_options"]
+            | null
           loan_report_name?: string | null
           logo?: string | null
+          logo_flower_only?: string | null
+          logo_rectangle?: string | null
+          logo_square?: string | null
           logo_url?: string | null
           long_name?: string | null
+          membership_agreement_version?: string | null
+          membership_revoked_date?: string | null
+          membership_status?: string | null
           membership_termination_steps?: string | null
           narrative?: string | null
-          nondiscrimination_policy_on_application?: string | null
-          nondiscrimination_policy_on_website?: string | null
-          nonprofit_status?: string | null
+          nondiscrimination_policy_on_application?: boolean | null
+          nondiscrimination_policy_on_website?: boolean | null
+          nonprofit_path?: Database["public"]["Enums"]["nonprofit_paths"] | null
+          nonprofit_status?: boolean | null
           number_of_classrooms?: number | null
           old_id?: string
-          on_national_website?: string | null
+          on_national_website?:
+            | Database["public"]["Enums"]["on_national_website_options"]
+            | null
           open_date?: string | null
           planning_album?: string | null
           pod?: string | null
           primary_contact_id?: string | null
           prior_names?: string | null
           program_focus?: string | null
+          projected_open?: string | null
           public_funding?: string[] | null
-          qbo?: string | null
+          qbo?: Database["public"]["Enums"]["qbo_options"] | null
           qbo_school_codes?: string | null
           risk_factors?: string | null
           school_calendar?:
@@ -3793,14 +4024,23 @@ export type Database = {
             | Database["public"]["Enums"]["school_schedule_options"][]
             | null
           short_name?: string | null
+          signed_membership_agreement_date?: string | null
           status?: Database["public"]["Enums"]["school_statuses"] | null
-          tc_admissions?: string | null
-          tc_recordkeeping?: string | null
+          tc_admissions?:
+            | Database["public"]["Enums"]["tc_admissions_options"]
+            | null
+          tc_recordkeeping?:
+            | Database["public"]["Enums"]["tc_recordkeeping_options"]
+            | null
           tc_school_id?: string | null
-          transparent_classroom?: string | null
+          transparent_classroom?:
+            | Database["public"]["Enums"]["transparent_classroom_options"]
+            | null
           watchlist?: string | null
           website?: string | null
-          website_tool?: string | null
+          website_tool?:
+            | Database["public"]["Enums"]["website_tool_options"]
+            | null
         }
         Relationships: [
           {
@@ -3824,22 +4064,14 @@ export type Database = {
             referencedRelation: "grid_charter"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "schools_membership_status_fkey"
+            columns: ["membership_status"]
+            isOneToOne: false
+            referencedRelation: "ref_membership_statuses"
+            referencedColumns: ["value"]
+          },
         ]
-      }
-      sources: {
-        Row: {
-          is_archived: boolean | null
-          ref_sources: string
-        }
-        Insert: {
-          is_archived?: boolean | null
-          ref_sources: string
-        }
-        Update: {
-          is_archived?: boolean | null
-          ref_sources?: string
-        }
-        Relationships: []
       }
       ssj_fillout_forms: {
         Row: {
@@ -4113,64 +4345,57 @@ export type Database = {
             foreignKeyName: "ssj_fillout_forms_people_id_fkey"
             columns: ["people_id"]
             isOneToOne: false
-            referencedRelation: "mont_certs_complete_summary"
-            referencedColumns: ["people_id"]
-          },
-          {
-            foreignKeyName: "ssj_fillout_forms_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "mont_certs_in_process_summary"
-            referencedColumns: ["person_id"]
-          },
-          {
-            foreignKeyName: "ssj_fillout_forms_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
             referencedRelation: "people"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "ssj_fillout_forms_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "select_teacher"
-            referencedColumns: ["person_id"]
-          },
         ]
+      }
+      stage_transition_checklist: {
+        Row: {
+          checklist_type: string | null
+          item_name: string
+          stage: string | null
+        }
+        Insert: {
+          checklist_type?: string | null
+          item_name: string
+          stage?: string | null
+        }
+        Update: {
+          checklist_type?: string | null
+          item_name?: string
+          stage?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
       details_associations: {
         Row: {
-          ages_served: Database["public"]["Enums"]["age_spans"][] | null
-          authorizer_id: string | null
+          ages_served: Database["public"]["Enums"]["age_spans_rev"][] | null
           charter_id: string | null
           created_date: string | null
-          currently_active: boolean | null
-          email_status: Database["public"]["Enums"]["active_inactive"] | null
           end_date: string | null
           full_name: string | null
           governance_model:
             | Database["public"]["Enums"]["governance_models"]
             | null
-          gsuite_roles:
-            | Database["public"]["Enums"]["gsuite_roles_options"]
-            | null
           has_montessori_cert: boolean | null
           id: string | null
-          loan_fund: boolean | null
+          is_active: boolean | null
           membership_status: string | null
           people_id: string | null
           projected_open: string | null
-          race_ethnicity_display: string[] | null
+          race_ethnicity:
+            | Database["public"]["Enums"]["race_ethnicity_categories"][]
+            | null
           role: string | null
-          role_specific_email: string | null
           school_id: string | null
           school_name: string | null
+          show_in_board_tables: boolean | null
+          show_in_educator_grid: boolean | null
           stage_status: string | null
           start_date: string | null
-          who_initiated_tl_removal: string | null
         }
         Relationships: [
           {
@@ -4195,13 +4420,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "membership_actions_membership_status_after_action_fkey"
-            columns: ["membership_status"]
-            isOneToOne: false
-            referencedRelation: "ref_membership_statuses"
-            referencedColumns: ["value"]
-          },
-          {
             foreignKeyName: "people_roles_associations_people_id_fkey"
             columns: ["people_id"]
             isOneToOne: false
@@ -4219,29 +4437,8 @@ export type Database = {
             foreignKeyName: "people_roles_associations_people_id_fkey"
             columns: ["people_id"]
             isOneToOne: false
-            referencedRelation: "mont_certs_complete_summary"
-            referencedColumns: ["people_id"]
-          },
-          {
-            foreignKeyName: "people_roles_associations_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "mont_certs_in_process_summary"
-            referencedColumns: ["person_id"]
-          },
-          {
-            foreignKeyName: "people_roles_associations_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
             referencedRelation: "people"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "people_roles_associations_people_id_fkey"
-            columns: ["people_id"]
-            isOneToOne: false
-            referencedRelation: "select_teacher"
-            referencedColumns: ["person_id"]
           },
           {
             foreignKeyName: "people_roles_associations_role_fkey"
@@ -4270,6 +4467,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "grid_charter"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schools_membership_status_fkey"
+            columns: ["membership_status"]
+            isOneToOne: false
+            referencedRelation: "ref_membership_statuses"
+            referencedColumns: ["value"]
           },
         ]
       }
@@ -4343,6 +4547,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "charter_authorization_actions_action_fkey"
+            columns: ["action"]
+            isOneToOne: false
+            referencedRelation: "ref_charter_authorizer_actions"
+            referencedColumns: ["action"]
+          },
+          {
             foreignKeyName: "cohort_participation_cohort_fkey"
             columns: ["current_cohort"]
             isOneToOne: false
@@ -4369,7 +4580,6 @@ export type Database = {
             | null
           exclude_from_email_logging: boolean | null
           first_contact_ages: string | null
-          first_contact_form_notes: string | null
           first_contact_governance_model: string | null
           first_contact_interests: string | null
           first_contact_notes_on_pre_wf_employment: string | null
@@ -4379,7 +4589,6 @@ export type Database = {
           full_name: string | null
           gender: Database["public"]["Enums"]["gender_categories"] | null
           gender_other: string | null
-          has_montessori_cert: boolean | null
           hh_income: Database["public"]["Enums"]["income_categories"] | null
           home_address: string | null
           id: string | null
@@ -4388,13 +4597,17 @@ export type Database = {
           last_name: string | null
           lgbtqia: boolean | null
           middle_name: string | null
-          mont_cert_summary: string | null
+          montessori_certs:
+            | Database["public"]["Enums"]["age_spans_rev"][]
+            | null
           most_recent_event_date: string | null
           most_recent_event_name: string | null
           most_recent_fillout_form_date: string | null
+          most_recent_fillout_form_id: string | null
           most_recent_note: string | null
           most_recent_note_date: string | null
           most_recent_note_from: string | null
+          most_recent_note_id: string | null
           nickname: string | null
           one_on_one_scheduling_status: string | null
           opsguide_checklist: string | null
@@ -4412,7 +4625,9 @@ export type Database = {
           primary_phone_other_info: string | null
           pronouns: Database["public"]["Enums"]["pronouns"] | null
           pronouns_other: string | null
-          race_ethnicity_display: string[] | null
+          race_ethnicity:
+            | Database["public"]["Enums"]["race_ethnicity_categories"][]
+            | null
           race_ethnicity_other: string | null
           routed_to: string | null
           secondary_phone: string | null
@@ -4430,25 +4645,56 @@ export type Database = {
             referencedRelation: "event_list"
             referencedColumns: ["event_name"]
           },
+          {
+            foreignKeyName: "people_educator_early_cultiva_one_on_one_scheduling_status_fkey"
+            columns: ["one_on_one_scheduling_status"]
+            isOneToOne: false
+            referencedRelation: "ref_one_on_one_status"
+            referencedColumns: ["value"]
+          },
+          {
+            foreignKeyName: "people_educator_early_cultiva_person_responsible_for_follo_fkey"
+            columns: ["person_responsible_for_follow_up"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["email_or_name"]
+          },
+          {
+            foreignKeyName: "people_educator_early_cultivatio_assigned_partner_override_fkey"
+            columns: ["assigned_partner_override"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["email_or_name"]
+          },
         ]
       }
       details_schools: {
         Row: {
           about: string | null
           about_spanish: string | null
-          admissions_system: string | null
-          ages_served: Database["public"]["Enums"]["age_spans"][] | null
+          admissions_system:
+            | Database["public"]["Enums"]["admissions_system_options"]
+            | null
+          ages_served_rev: Database["public"]["Enums"]["age_spans_rev"][] | null
           bill_account: string | null
           bookkeeper_or_accountant: string | null
           budget_link: string | null
-          budget_utility: string | null
+          budget_utility:
+            | Database["public"]["Enums"]["budget_utility_options"]
+            | null
           building4good_firm_and_attorney: string | null
-          business_insurance: string | null
+          business_insurance:
+            | Database["public"]["Enums"]["business_insurance_options"]
+            | null
           charter_id: string | null
           current_cohort: string | null
           current_fy_end: string | null
           current_guide_name: string | null
-          domain_name: string | null
+          current_tls: string | null
+          current_tls_race_ethnicity:
+            | Database["public"]["Enums"]["race_ethnicity_categories"][]
+            | null
+          domain_name: Database["public"]["Enums"]["domain_name_options"] | null
           ein: string | null
           email_domain: string | null
           enrollment_at_full_capacity: string | null
@@ -4458,19 +4704,23 @@ export type Database = {
           facebook: string | null
           flexible_tuition_model: string | null
           founding_tls: string[] | null
-          google_voice: string | null
+          google_voice:
+            | Database["public"]["Enums"]["google_voice_options"]
+            | null
           google_workspace_org_unit_path: string | null
           governance_model:
             | Database["public"]["Enums"]["governance_models"]
             | null
-          guidestar_listing_requested: string | null
-          gusto: string | null
+          guidestar_listing_requested: boolean | null
+          gusto: Database["public"]["Enums"]["gusto_options"] | null
           id: string | null
           incorporation_date: string | null
           instagram: string | null
           institutional_partner: string | null
           legal_name: string | null
-          legal_structure: string | null
+          legal_structure:
+            | Database["public"]["Enums"]["legal_structure_options"]
+            | null
           loan_report_name: string | null
           logo: string | null
           logo_designer:
@@ -4482,11 +4732,14 @@ export type Database = {
           membership_termination_steps: string | null
           name_selection_proposal: string | null
           narrative: string | null
-          nondiscrimination_policy_on_application: string | null
-          nondiscrimination_policy_on_website: string | null
-          nonprofit_status: string | null
+          nondiscrimination_policy_on_application: boolean | null
+          nondiscrimination_policy_on_website: boolean | null
+          nonprofit_path: Database["public"]["Enums"]["nonprofit_paths"] | null
+          nonprofit_status: boolean | null
           number_of_classrooms: number | null
-          on_national_website: string | null
+          on_national_website:
+            | Database["public"]["Enums"]["on_national_website_options"]
+            | null
           open_date: string | null
           physical_address: string | null
           physical_lat: number | null
@@ -4496,7 +4749,7 @@ export type Database = {
           prior_names: string | null
           program_focus: string | null
           public_funding: string[] | null
-          qbo: string | null
+          qbo: Database["public"]["Enums"]["qbo_options"] | null
           qbo_school_codes: string | null
           risk_factors: string | null
           school_calendar:
@@ -4531,10 +4784,10 @@ export type Database = {
           ssj_loan_eligibility: string | null
           ssj_name_reserved: boolean | null
           ssj_on_track_for_enrollment:
-            | Database["public"]["Enums"]["school_ssj_data_ssj_on_track_for_enrollment_enum"]
+            | Database["public"]["Enums"]["ssj_on_track_for_enrollment_enum"]
             | null
           ssj_ops_guide_support_track:
-            | Database["public"]["Enums"]["ops_guide_support_track_options"]
+            | Database["public"]["Enums"]["ssj_ops_guide_support_track_enum"]
             | null
           ssj_pathway_to_funding:
             | Database["public"]["Enums"]["ssj_pathway_to_funding_enum"]
@@ -4554,17 +4807,26 @@ export type Database = {
           ssj_tool: Database["public"]["Enums"]["ssj_tool_enum"] | null
           ssj_total_startup_funding_needed: string | null
           status: Database["public"]["Enums"]["school_statuses"] | null
-          tc_admissions: string | null
-          tc_recordkeeping: string | null
+          tc_admissions:
+            | Database["public"]["Enums"]["tc_admissions_options"]
+            | null
+          tc_recordkeeping:
+            | Database["public"]["Enums"]["tc_recordkeeping_options"]
+            | null
           total_grants_issued: number | null
           total_loans_issued: number | null
           trademark_filed: boolean | null
-          transparent_classroom: string | null
+          transparent_classroom:
+            | Database["public"]["Enums"]["transparent_classroom_options"]
+            | null
           visioning_album: string | null
           visioning_album_complete: string | null
           watchlist: string | null
           website: string | null
-          website_tool: string | null
+          website_tool:
+            | Database["public"]["Enums"]["website_tool_options"]
+            | null
+          wf_tls_on_board: string | null
         }
         Relationships: [
           {
@@ -4599,6 +4861,7 @@ export type Database = {
       }
       grid_charter: {
         Row: {
+          active_guides: string[] | null
           charter_name: string | null
           id: string | null
           initial_target_geo: string | null
@@ -4606,33 +4869,17 @@ export type Database = {
             | Database["public"]["Enums"]["developmental_planes"][]
             | null
           non_tl_roles: string | null
+          schools: string[] | null
           status: Database["public"]["Enums"]["charter_status"] | null
-        }
-        Insert: {
-          charter_name?: never
-          id?: string | null
-          initial_target_geo?: string | null
-          initial_target_planes?:
-            | Database["public"]["Enums"]["developmental_planes"][]
-            | null
-          non_tl_roles?: string | null
-          status?: Database["public"]["Enums"]["charter_status"] | null
-        }
-        Update: {
-          charter_name?: never
-          id?: string | null
-          initial_target_geo?: string | null
-          initial_target_planes?:
-            | Database["public"]["Enums"]["developmental_planes"][]
-            | null
-          non_tl_roles?: string | null
-          status?: Database["public"]["Enums"]["charter_status"] | null
         }
         Relationships: []
       }
       grid_educator: {
         Row: {
           active_school: string | null
+          active_school_id: string | null
+          assigned_partner: string | null
+          assigned_partner_override: string | null
           current_role: string | null
           current_role_at_active_school: string | null
           discovery_status:
@@ -4643,48 +4890,48 @@ export type Database = {
           id: string | null
           indiv_type: string | null
           kanban_group: string | null
-          race_ethnicity_display: string[] | null
+          race_ethnicity:
+            | Database["public"]["Enums"]["race_ethnicity_categories"][]
+            | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "people_educator_early_cultivatio_assigned_partner_override_fkey"
+            columns: ["assigned_partner_override"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["email_or_name"]
+          },
+        ]
       }
       grid_school: {
         Row: {
-          ages_served: Database["public"]["Enums"]["age_spans"][] | null
+          active_guides: string[] | null
+          ages_served_rev: Database["public"]["Enums"]["age_spans_rev"][] | null
+          current_tl_pairs: Json | null
           current_tls: string | null
+          current_tls_race_ethnicity:
+            | Database["public"]["Enums"]["race_ethnicity_categories"][]
+            | null
           governance_model:
             | Database["public"]["Enums"]["governance_models"]
             | null
           id: string | null
           membership_status: string | null
-          projected_open: string | null
+          open: string | null
+          people_id: string[] | null
           school_name: string | null
           stage_status: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "membership_actions_membership_status_after_action_fkey"
+            foreignKeyName: "schools_membership_status_fkey"
             columns: ["membership_status"]
             isOneToOne: false
             referencedRelation: "ref_membership_statuses"
             referencedColumns: ["value"]
           },
         ]
-      }
-      mont_certs_complete_summary: {
-        Row: {
-          cert_summary: string | null
-          full_name: string | null
-          people_id: string | null
-        }
-        Relationships: []
-      }
-      mont_certs_in_process_summary: {
-        Row: {
-          cert_summary: string | null
-          full_name_new: string | null
-          person_id: string | null
-        }
-        Relationships: []
       }
       preview_people_duplicates: {
         Row: {
@@ -4702,45 +4949,43 @@ export type Database = {
           email_address: string | null
           people_id: string | null
         }
-        Relationships: []
-      }
-      select_teacher: {
-        Row: {
-          educator_name: string | null
-          person_id: string | null
-          race_ethnicity:
-            | Database["public"]["Enums"]["race_ethnicity_categories"][]
+        Insert: {
+          category?:
+            | Database["public"]["Enums"]["email_address_categories"]
             | null
-          role: string | null
-          school_name: string | null
+          email_address?: string | null
+          people_id?: string | null
+        }
+        Update: {
+          category?:
+            | Database["public"]["Enums"]["email_address_categories"]
+            | null
+          email_address?: string | null
+          people_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "people_roles_associations_role_fkey"
-            columns: ["role"]
+            foreignKeyName: "email_addresses_people_id_fkey"
+            columns: ["people_id"]
             isOneToOne: false
-            referencedRelation: "ref_roles"
-            referencedColumns: ["value"]
+            referencedRelation: "details_educators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_addresses_people_id_fkey"
+            columns: ["people_id"]
+            isOneToOne: false
+            referencedRelation: "grid_educator"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_addresses_people_id_fkey"
+            columns: ["people_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
           },
         ]
-      }
-      z_email_filter_addresses_filtered: {
-        Row: {
-          educator_id: string | null
-          email: string | null
-          last_synced_at: string | null
-        }
-        Insert: {
-          educator_id?: string | null
-          email?: string | null
-          last_synced_at?: string | null
-        }
-        Update: {
-          educator_id?: string | null
-          email?: string | null
-          last_synced_at?: string | null
-        }
-        Relationships: []
       }
     }
     Functions: {
@@ -4751,68 +4996,27 @@ export type Database = {
         }
         Returns: string
       }
+      end_of_planning_checklist: {
+        Args: { p_school_id: string }
+        Returns: boolean
+      }
+      end_of_startup_checklist: {
+        Args: { p_school_id: string }
+        Returns: boolean
+      }
       enum_values: {
         Args: { enum_type: string }
         Returns: {
+          label: string
           value: string
         }[]
-      }
-      extract_emails_from_text_array: {
-        Args: { arr: string[] }
-        Returns: {
-          email: string
-        }[]
-      }
-      extract_phone_ext: {
-        Args: { raw: string }
-        Returns: string
-      }
-      is_ein_format: {
-        Args: { t: string }
-        Returns: boolean
-      }
-      is_school_year_yyyy_yy: {
-        Args: { t: string }
-        Returns: boolean
-      }
-      is_year4: {
-        Args: { t: string }
-        Returns: boolean
-      }
-      map_race_ethnicity: {
-        Args: {
-          categories: Database["public"]["Enums"]["race_ethnicity_categories"][]
-        }
-        Returns: string[]
-      }
-      normalize_email: {
-        Args: { raw: string }
-        Returns: string
-      }
-      normalize_phone: {
-        Args: { default_country?: string; raw: string }
-        Returns: string
-      }
-      refresh_g_emails_matches: {
-        Args: { p_merge?: boolean; p_since?: string; p_user_id?: string }
-        Returns: number
-      }
-      refresh_g_events_matches: {
-        Args: { p_merge?: boolean; p_since?: string; p_user_id?: string }
-        Returns: number
-      }
-      sync_ref_charter_statuses: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      sync_ref_stage_statuses: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
       }
     }
     Enums: {
       action_step_status: "Complete" | "Incomplete"
       active_inactive: "Active" | "Inactive" | "Removed"
+      admissions_system_options: "TC" | "School Cues"
+      advice_panel_stages: "Visioning" | "Planning"
       age_spans: "0-3" | "3-6" | "6-9" | "9-12" | "12-15" | "15-18"
       age_spans_rev: "0-1" | "1-3" | "3-6" | "6-9" | "9-12" | "12-15" | "15-18"
       "ages-grades":
@@ -4847,6 +5051,11 @@ export type Database = {
         | "Processing"
         | "Waiting for prereqs"
         | "Complete"
+      budget_utility_options: "WF v4"
+      business_insurance_options:
+        | "Alliant"
+        | "other (in process w/ Alliant)"
+        | "other"
       certification_completion_status: "Certified" | "Training"
       charter_app_status:
         | "Pre application"
@@ -4861,6 +5070,13 @@ export type Database = {
         | "Approved - Year 0"
         | "Application Submitted - Waiting"
       cohort_type: "Charter" | "Blooms"
+      dev_note_type:
+        | "crash"
+        | "unexpected search results"
+        | "unexpected behavior"
+        | "UI refinement"
+        | "new functionality request"
+        | "other"
       developmental_planes:
         | "Infants"
         | "Toddlers"
@@ -4870,6 +5086,7 @@ export type Database = {
         | "Adolescent / JH"
         | "High School"
       discovery_statuses: "Complete" | "In process" | "Paused"
+      domain_name_options: "internal" | "external"
       educ_attainment_options:
         | "Did not graduate high school"
         | "Graduated high school or GED"
@@ -4890,6 +5107,7 @@ export type Database = {
         | "Change likelihood of payment"
       fiscal_year_end: "06/30" | "12/31"
       gender_categories: "Female" | "Male" | "Gender Non-Conforming" | "Other"
+      google_voice_options: "internal license" | "external license"
       governance_models:
         | "Independent"
         | "Charter"
@@ -4909,6 +5127,12 @@ export type Database = {
         | "Entrepreneur"
         | "Equity Coach"
         | "Open Schools Support"
+      gusto_options:
+        | "yes (under WF)"
+        | "yes (independent)"
+        | "yes"
+        | "no- local system"
+        | "no"
       high_med_low: "Low" | "Medium" | "High"
       income_categories:
         | "Very low"
@@ -4919,26 +5143,31 @@ export type Database = {
       kanban_visibility: "expanded" | "collapsed" | "suppressed"
       languages:
         | "English"
-        | "Spanish - Español"
-        | "Mandarin - 中文"
-        | "Hindi - हिन्दी"
-        | "French - Français"
-        | "Japanese - 日本語"
-        | "Arabic - العَرَبِيَّة"
-        | "Urdu - اُردُو"
+        | "Spanish - Espa├▒ol"
+        | "Mandarin - Σ╕¡µûç"
+        | "Hindi - αñ╣αñ┐αñ¿αÑìαñªαÑÇ"
+        | "French - Fran├ºais"
+        | "Japanese - µùÑµ£¼Φ¬₧"
+        | "Arabic - ╪º┘ä╪╣┘Ä╪▒┘Ä╪¿┘É┘è┘Ä┘æ╪⌐"
+        | "Urdu - ╪º┘Å╪▒╪»┘Å┘ê"
         | "Hungarian - Hungarian"
         | "Haitian Creole - Kreyol Ayisyen"
-        | "Gujarati - ગુજરાતી"
+        | "Gujarati - α¬ùα½üα¬£α¬░α¬╛α¬ñα½Ç"
         | "Fujian- Fujian"
-        | "Russian - русский язык"
-        | "Korean - 한국어"
-        | "Cantonese - Gwóngdūng wá"
-        | "Tai-Kadai - ไทย / ພາສາລາວ"
-        | "Portuguese - Português"
-        | "Tami - தமிழ்"
-        | "Burmese - မြန်မာစာ"
+        | "Russian - ╤Ç╤â╤ü╤ü╨║╨╕╨╣ ╤Å╨╖╤ï╨║"
+        | "Korean - φò£Ω╡¡∞û┤"
+        | "Cantonese - Gw├│ngd┼½ng w├í"
+        | "Tai-Kadai - α╣äα╕ùα╕ó / α║₧α║▓α║¬α║▓α║Ñα║▓α║º"
+        | "Portuguese - Portugu├¬s"
+        | "Tami - α«ñα««α«┐α«┤α»ì"
+        | "Burmese - ßÇÖßÇ╝ßÇößÇ║ßÇÖßÇ¼ßÇàßÇ¼"
         | "Yoruba"
         | "Other"
+      legal_structure_options:
+        | "Independent organization"
+        | "Part of another organization"
+        | "Part of a charter"
+        | "Multiple WF schools in a single entity"
       loan_status_options:
         | "Interest Only Period"
         | "Paid Off"
@@ -4966,8 +5195,9 @@ export type Database = {
         | "PAMS"
         | "Independent"
         | "Other"
+      nonprofit_paths: "Group exemption" | "Direct" | "Charter" | "Partner"
       nps: "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10"
-      ops_guide_support_track_options: "Cohort" | "1:1 support"
+      on_national_website_options: "added" | "removed" | "ready to add"
       partner_roles:
         | "TL"
         | "Affiliate of Charter Partner"
@@ -4979,6 +5209,10 @@ export type Database = {
         | "Finance Administrator"
       pre_wf_employment_statuses: "1"
       pronouns: "he/him/his" | "she/her/hers" | "they/them/theirs" | "other"
+      qbo_options:
+        | "internal license - active"
+        | "external license"
+        | "Not WF - Unknown software"
       race_ethnicity_categories:
         | "african_american"
         | "asian_american"
@@ -5001,10 +5235,6 @@ export type Database = {
         | "Morning Care"
         | "Afternoon Care"
         | "After Care"
-      school_ssj_data_ssj_on_track_for_enrollment_enum:
-        | "Maybe (process is ready, no prospective students)"
-        | "No (process unclear/unpublished, limited/no family engagement)"
-        | "Yes - tuition published, plan and community engagement underway"
       school_statuses:
         | "Emerging"
         | "Open"
@@ -5036,6 +5266,11 @@ export type Database = {
         | "No partner"
         | "Partnership established"
         | "Partnership In development"
+      ssj_on_track_for_enrollment_enum:
+        | "Maybe (process is ready, no prospective students)"
+        | "No (process unclear/unpublished, limited/no family engagement)"
+        | "Yes - tuition published, plan and community engagement underway"
+      ssj_ops_guide_support_track_enum: "Cohort" | "1:1 support"
       ssj_pathway_to_funding_enum:
         | "Maybe, prospects identified but not secured"
         | "No, startup funding unlikely"
@@ -5105,7 +5340,14 @@ export type Database = {
         | "WI"
         | "WY"
         | "PR"
+      tc_admissions_options: "v1" | "yes"
+      tc_recordkeeping_options: "yes (under WF)"
       training_types: "Lead Guide" | "Assistant" | "Administrator"
+      transparent_classroom_options:
+        | "Internal license"
+        | "Internal License - removed"
+        | "External license"
+        | "Other record keeping system"
       use_of_proceeds_options:
         | "Combine 2 loans"
         | "Expansion"
@@ -5114,6 +5356,13 @@ export type Database = {
         | "Renovations / Construction"
         | "Security deposit"
         | "Start-up"
+      website_tool_options:
+        | "external platform"
+        | "wordpress v1"
+        | "wordpress v2"
+        | "wordpress original"
+        | "Wix v1"
+        | "Wix v2"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -5243,6 +5492,8 @@ export const Constants = {
     Enums: {
       action_step_status: ["Complete", "Incomplete"],
       active_inactive: ["Active", "Inactive", "Removed"],
+      admissions_system_options: ["TC", "School Cues"],
+      advice_panel_stages: ["Visioning", "Planning"],
       age_spans: ["0-3", "3-6", "6-9", "9-12", "12-15", "15-18"],
       age_spans_rev: ["0-1", "1-3", "3-6", "6-9", "9-12", "12-15", "15-18"],
       "ages-grades": [
@@ -5280,6 +5531,12 @@ export const Constants = {
         "Waiting for prereqs",
         "Complete",
       ],
+      budget_utility_options: ["WF v4"],
+      business_insurance_options: [
+        "Alliant",
+        "other (in process w/ Alliant)",
+        "other",
+      ],
       certification_completion_status: ["Certified", "Training"],
       charter_app_status: [
         "Pre application",
@@ -5296,6 +5553,14 @@ export const Constants = {
         "Application Submitted - Waiting",
       ],
       cohort_type: ["Charter", "Blooms"],
+      dev_note_type: [
+        "crash",
+        "unexpected search results",
+        "unexpected behavior",
+        "UI refinement",
+        "new functionality request",
+        "other",
+      ],
       developmental_planes: [
         "Infants",
         "Toddlers",
@@ -5306,6 +5571,7 @@ export const Constants = {
         "High School",
       ],
       discovery_statuses: ["Complete", "In process", "Paused"],
+      domain_name_options: ["internal", "external"],
       educ_attainment_options: [
         "Did not graduate high school",
         "Graduated high school or GED",
@@ -5329,6 +5595,7 @@ export const Constants = {
       ],
       fiscal_year_end: ["06/30", "12/31"],
       gender_categories: ["Female", "Male", "Gender Non-Conforming", "Other"],
+      google_voice_options: ["internal license", "external license"],
       governance_models: [
         "Independent",
         "Charter",
@@ -5351,6 +5618,13 @@ export const Constants = {
         "Equity Coach",
         "Open Schools Support",
       ],
+      gusto_options: [
+        "yes (under WF)",
+        "yes (independent)",
+        "yes",
+        "no- local system",
+        "no",
+      ],
       high_med_low: ["Low", "Medium", "High"],
       income_categories: [
         "Very low",
@@ -5362,26 +5636,32 @@ export const Constants = {
       kanban_visibility: ["expanded", "collapsed", "suppressed"],
       languages: [
         "English",
-        "Spanish - Español",
-        "Mandarin - 中文",
-        "Hindi - हिन्दी",
-        "French - Français",
-        "Japanese - 日本語",
-        "Arabic - العَرَبِيَّة",
-        "Urdu - اُردُو",
+        "Spanish - Espa├▒ol",
+        "Mandarin - Σ╕¡µûç",
+        "Hindi - αñ╣αñ┐αñ¿αÑìαñªαÑÇ",
+        "French - Fran├ºais",
+        "Japanese - µùÑµ£¼Φ¬₧",
+        "Arabic - ╪º┘ä╪╣┘Ä╪▒┘Ä╪¿┘É┘è┘Ä┘æ╪⌐",
+        "Urdu - ╪º┘Å╪▒╪»┘Å┘ê",
         "Hungarian - Hungarian",
         "Haitian Creole - Kreyol Ayisyen",
-        "Gujarati - ગુજરાતી",
+        "Gujarati - α¬ùα½üα¬£α¬░α¬╛α¬ñα½Ç",
         "Fujian- Fujian",
-        "Russian - русский язык",
-        "Korean - 한국어",
-        "Cantonese - Gwóngdūng wá",
-        "Tai-Kadai - ไทย / ພາສາລາວ",
-        "Portuguese - Português",
-        "Tami - தமிழ்",
-        "Burmese - မြန်မာစာ",
+        "Russian - ╤Ç╤â╤ü╤ü╨║╨╕╨╣ ╤Å╨╖╤ï╨║",
+        "Korean - φò£Ω╡¡∞û┤",
+        "Cantonese - Gw├│ngd┼½ng w├í",
+        "Tai-Kadai - α╣äα╕ùα╕ó / α║₧α║▓α║¬α║▓α║Ñα║▓α║º",
+        "Portuguese - Portugu├¬s",
+        "Tami - α«ñα««α«┐α«┤α»ì",
+        "Burmese - ßÇÖßÇ╝ßÇößÇ║ßÇÖßÇ¼ßÇàßÇ¼",
         "Yoruba",
         "Other",
+      ],
+      legal_structure_options: [
+        "Independent organization",
+        "Part of another organization",
+        "Part of a charter",
+        "Multiple WF schools in a single entity",
       ],
       loan_status_options: [
         "Interest Only Period",
@@ -5415,8 +5695,9 @@ export const Constants = {
         "Independent",
         "Other",
       ],
+      nonprofit_paths: ["Group exemption", "Direct", "Charter", "Partner"],
       nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-      ops_guide_support_track_options: ["Cohort", "1:1 support"],
+      on_national_website_options: ["added", "removed", "ready to add"],
       partner_roles: [
         "TL",
         "Affiliate of Charter Partner",
@@ -5429,6 +5710,11 @@ export const Constants = {
       ],
       pre_wf_employment_statuses: ["1"],
       pronouns: ["he/him/his", "she/her/hers", "they/them/theirs", "other"],
+      qbo_options: [
+        "internal license - active",
+        "external license",
+        "Not WF - Unknown software",
+      ],
       race_ethnicity_categories: [
         "african_american",
         "asian_american",
@@ -5453,11 +5739,6 @@ export const Constants = {
         "Morning Care",
         "Afternoon Care",
         "After Care",
-      ],
-      school_ssj_data_ssj_on_track_for_enrollment_enum: [
-        "Maybe (process is ready, no prospective students)",
-        "No (process unclear/unpublished, limited/no family engagement)",
-        "Yes - tuition published, plan and community engagement underway",
       ],
       school_statuses: [
         "Emerging",
@@ -5495,6 +5776,12 @@ export const Constants = {
         "Partnership established",
         "Partnership In development",
       ],
+      ssj_on_track_for_enrollment_enum: [
+        "Maybe (process is ready, no prospective students)",
+        "No (process unclear/unpublished, limited/no family engagement)",
+        "Yes - tuition published, plan and community engagement underway",
+      ],
+      ssj_ops_guide_support_track_enum: ["Cohort", "1:1 support"],
       ssj_pathway_to_funding_enum: [
         "Maybe, prospects identified but not secured",
         "No, startup funding unlikely",
@@ -5568,7 +5855,15 @@ export const Constants = {
         "WY",
         "PR",
       ],
+      tc_admissions_options: ["v1", "yes"],
+      tc_recordkeeping_options: ["yes (under WF)"],
       training_types: ["Lead Guide", "Assistant", "Administrator"],
+      transparent_classroom_options: [
+        "Internal license",
+        "Internal License - removed",
+        "External license",
+        "Other record keeping system",
+      ],
       use_of_proceeds_options: [
         "Combine 2 loans",
         "Expansion",
@@ -5577,6 +5872,14 @@ export const Constants = {
         "Renovations / Construction",
         "Security deposit",
         "Start-up",
+      ],
+      website_tool_options: [
+        "external platform",
+        "wordpress v1",
+        "wordpress v2",
+        "wordpress original",
+        "Wix v1",
+        "Wix v2",
       ],
     },
   },

@@ -1,15 +1,95 @@
 import { view, tab, card, table } from '../shared/views/builders';
 import type { ViewSpec } from '../shared/views/types';
+import type { GridColumnConfig, FieldMetadataMap } from '../shared/detail-types';
+
+// Grid + Kanban
+export const EDUCATOR_GRID: GridColumnConfig[] = [
+  { field: 'full_name', headerName: 'Name', sortKey: true },
+  { field: 'current_role_at_active_school', headerName: 'Role at Curr. School' },
+  { field: 'active_school', headerName: 'Curr. School', visibility: 'hide' },
+  { field: 'current_role', headerName: 'Curr. Role', visibility: 'hide', valueType: 'select' },
+  { field: 'discovery_status', headerName: 'Discovery', valueType: 'select', selectOptions: ['In Process', 'Complete'] },
+  { field: 'race_ethnicity', headerName: 'Race/Ethnicity', valueType: 'multi', lookupField: 'ref_race_and_ethnicity.english_label_short' },
+  { field: 'has_montessori_cert', headerName: 'Trained?', valueType: 'boolean' },
+  { field: 'indiv_type', headerName: 'Type', valueType: 'select', selectOptions: ['Educator', 'Community Member'] },
+  { field: 'id', headerName: 'ID', visibility: 'suppress' },
+  { field: 'active_school_id', headerName: 'Active School ID', visibility: 'suppress' },
+  { field: 'kanban_group', headerName: 'Kanban Group', visibility: 'suppress', kanbanKey: true },
+];
+
+export const EDUCATOR_KANBAN_CONSTANTS_TABLE = 'ref_educator_statuses';
+
+// Field metadata (non-defaults only)
+export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
+  full_name: { editable: false },
+  primary_phone_other_info: { label: 'Extension or other info (for Primary Phone)' },
+  secondary_phone_other_info: { label: 'Extension or other info (for Secondary Phone)' },
+  home_address: { multiline: true },
+  educ_attainment: { label: 'Educational Attainment' },
+  race_ethnicity: { label: 'Race/Ethnicity', lookup: { table: 'ref_race_and_ethnicity', valueColumn: 'value', labelColumn: 'english_label_short' } },
+  race_ethnicity_other: { label: 'Race/Ethnicity - if Other, please specify', visibleIf: { field: 'race_ethnicity', in: ['Other'] } },
+  gender_other: { label: 'Gender - if Other, please specify', visibleIf: { field: 'gender', in: ['Other'] } },
+  hh_income: { label: 'Household Income' },
+  lgbtqia: { label: 'LGBTQIA+' },
+  pronouns_other: { label: 'Pronouns - if Other, please specify' },
+  indiv_type: { label: 'Type' },
+  assigned_partner: { editable: false },
+  first_contact_ages: { label: 'Initial Interest: Ages' },
+  first_contact_governance_model: { label: 'Initial Interest: Governance Model' },
+  first_contact_interests: { label: 'Initial Interest' },
+  first_contact_notes_on_pre_wf_employment: { label: 'Notes on Pre-WF Employment' },
+  first_contact_wf_employment_status: { label: 'Notes on WF Employment Status at first contact' },
+  first_contact_willingness_to_relocate: { label: 'Initial Willingness to Relocate' },
+  target_geo_combined: { label: 'Target Geography' },
+  self_reflection_doc: { label: 'Self Reflection Document', type: 'attachment' },
+  opsguide_initial_contact_date: { label: 'Ops Guide - Initial Contact Date' },
+  opsguide_checklist: { label: 'Ops Guide - Checklist' },
+  opsguide_fundraising_opps: { label: 'Ops Guide - Fundraising Opportunities' },
+  opsguide_meeting_prefs: { label: 'Ops Guide - Meeting Preferences' },
+  opsguide_request_pertinent_info: { label: 'Ops Guide - Request Pertinent Info' },
+  opsguide_support_type_needed: { label: 'Ops Guide - Support Type Needed' },
+  routed_to: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
+  assigned_partner_override: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
+  person_responsible_for_follow_up: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
+  one_on_one_scheduling_status: { label: 'One-on-One Scheduling Status', lookup: { table: 'ref_one_on_one_status', valueColumn: 'value', labelColumn: 'label' } },
+  current_role_at_active_school: { label: 'Current Role at Active School', editable: false },
+  current_role: { editable: false },
+  active_school: { editable: false },
+  has_montessori_cert: { label: 'Montessori Certified?', type: 'boolean', editable: false },
+  cert_levels_rev: { label: 'Montessori Certifications' },
+  primary_email: { editable: false },
+  most_recent_fillout_form_date: { editable: false },
+  most_recent_event_name: { editable: false },
+  most_recent_event_date: { editable: false },
+  most_recent_note: { editable: false },
+  most_recent_note_date: { editable: false },
+  most_recent_note_from: { editable: false },
+};
+
+// Create Educator Modal configuration (declarative)
+// Inserts into people; related records (emails) via postInsert
+export const ADD_NEW_EDUCATOR_INPUT = [
+  { id: 'full_name', required: true },
+  { id: 'primary_phone' },
+  { id: 'home_address', multiline: true },
+  { id: 'race_ethnicity' },
+  {
+    id: 'personal_email',
+    label: 'Personal Email',
+    directWrite: false,
+    postInsert: { table: 'email_addresses', columns: { people_id: '$newId', email_address: 'personal_email' } },
+  },
+] as const;
 
 export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
   'educators',
   tab(
     'overview',
     'Overview',
-    card(['full_name', 'primary_phone', 'primary_email'], { title: 'Name and Contact Info', editable: false }),
-    card(['current_role', 'active_school'], { title: 'Current Role and School', editable: false }),
-    card(['discovery_status', 'assigned_partner', 'has_montessori_cert', 'mont_cert_summary'], { title: 'SSJ and Training', editable: false }),
-    card(['most_recent_fillout_form_date', 'most_recent_event_name', 'most_recent_event_date', 'most_recent_note', 'most_recent_note_date', 'most_recent_note_from'], { title: 'Recent Activity', editable: false }),
+    card(['full_name', 'primary_phone', 'primary_email'], { title: 'Name and Contact Info' }),
+    card(['current_role', 'active_school'], { title: 'Current Role and School' }),
+    card(['discovery_status', 'assigned_partner', 'montessori_certs'], { title: 'SSJ and Training' }),
+    card(['most_recent_fillout_form_date', 'most_recent_event_name', 'most_recent_event_date', 'most_recent_note', 'most_recent_note_date', 'most_recent_note_from'], { title: 'Recent Activity' }),
   ),
   tab(
     'name_and_background',
@@ -39,4 +119,3 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
   tab('events', 'Events', table('educatorEvents')),
   tab('systems', 'Systems', card(['on_connected', 'on_slack', 'in_tl_google_grp', 'in_wf_directory', 'who_initiated_tl_removal', 'on_natl_website', 'gsuite_roles'], { editable: true })),
 );
-

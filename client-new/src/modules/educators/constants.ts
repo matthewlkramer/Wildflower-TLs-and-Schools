@@ -1,190 +1,58 @@
 // Grid section
-import type { GridColumnConfig, DetailCardBlock, DetailTableBlock, DetailTabSpec as SharedDetailTabSpec, FieldMetadataMap } from '../shared/detail-types';
+import type { GridColumnConfig, FieldMetadataMap } from '../shared/detail-types';
 
 export type { ColumnVisibility, GridValueKind } from '../shared/detail-types';
 export type EducatorColumnConfig = GridColumnConfig;
-export type DetailCardSpec = DetailCardBlock;
-export type DetailTableSpec = DetailTableBlock;
-export type DetailTabSpec = SharedDetailTabSpec;
+// Legacy detail tab types removed; views define tabs now.
 
-export const EDUCATOR_GRID: EducatorColumnConfig[] = [
-  { field: 'full_name', headerName: 'Name', valueType: 'string', sortKey: true },
-  { field: 'current_role_at_active_school', headerName: 'Role at Curr. School', valueType: 'string' },
-  { field: 'active_school', headerName: 'Curr. School', visibility: 'hide', valueType: 'string' },
-  { field: 'current_role', headerName: 'Curr. Role', visibility: 'hide', valueType: 'select' },
-  { field: 'discovery_status', headerName: 'Discovery', valueType: 'select', selectOptions: ['In Process', 'Complete'] },
-  { field: 'race_ethnicity', headerName: 'Race/Ethnicity', valueType: 'multi', lookupField: 'ref_race_and_ethnicity.english_label_short' },
-  { field: 'has_montessori_cert', headerName: 'Trained?', valueType: 'boolean' },
-  { field: 'indiv_type', headerName: 'Type', valueType: 'select', selectOptions: ['Educator', 'Community Member'] },
-  { field: 'id', headerName: 'ID', visibility: 'suppress' },
-  { field: 'active_school_id', headerName: 'Active School ID', visibility: 'suppress', valueType: 'string' },
-  { field: 'kanban_group', headerName: 'Kanban Group', visibility: 'suppress', kanbanKey: true },
-];
-
-export const EDUCATOR_KANBAN_CONSTANTS_TABLE = 'ref_educator_statuses';
-
-export const EDUCATOR_DETAIL_TABS: DetailTabSpec[] = [
-  {
-    id: 'overview',
-    label: 'Overview',
-    blocks: [
-      { kind: 'card', title: 'Name and Contact Info', fields: ['full_name', 'primary_phone', 'primary_email'], editable: false },
-      { kind: 'card', title: 'Current Role and School', fields: ['current_role', 'active_school'], editable: false },
-      { kind: 'card', title: 'SSJ and Training', fields: ['discovery_status', 'assigned_partner', 'has_montessori_cert', 'mont_cert_summary'], editable: false },
-      { kind: 'card', title: 'Recent Activity', fields: ['most_recent_fillout_form_date', 'most_recent_event_name', 'most_recent_event_date', 'most_recent_note', 'most_recent_note_date', 'most_recent_note_from'], editable: false },
-    ],
-  },
-  {
-    id: 'name_and_background',
-    label: 'Name/Background',
-    blocks: [
-      { kind: 'card', title: 'Name', fields: ['first_name', 'nickname', 'middle_name', 'last_name', 'pronunciation'], editable: true },
-      { kind: 'card', title: 'Background', fields: ['race_ethnicity', 'race_ethnicity_other', 'educ_attainment', 'hh_income', 'childhood_income', 'indiv_type'], editable: true}, 
-      { kind: 'card', title: 'Gender', fields: ['gender', 'gender_other', 'pronouns', 'pronouns_other', 'lgbtqia'], editable: true},
-      { kind: 'card', title: 'Languages', fields: ['primary_languages', 'other_languages'], editable: true},
-    ],
-  },
-  {
-    id: 'contact_info',
-    label: 'Contact Info',
-    blocks: [
-      { kind: 'table', title: 'Emails', preset: 'educatorEmails' },
-      { kind: 'card', title: 'Phone', fields: ['primary_phone', 'primary_phone_other_info', 'secondary_phone', 'secondary_phone_other_info'], editable: true},
-      { kind: 'card', title: 'Address', fields: ['home_address'], editable: true},
-    ],
-  },
-  {
-    id: 'schools',
-    label: 'Schools',
-    blocks: [
-      { kind: 'table', preset: 'educatorSchools' },
-    ],
-  },
-  {
-    id: 'certifications',
-    label: 'Certs',
-    blocks: [
-      { kind: 'table', preset: 'educatorMontessoriCerts' },
-    ],
-  },
-  {
-    id: 'early_cultivation',
-    label: 'Early Cultivation',
-    blocks: [
-      { kind: 'card', title: 'Progress', fields: ['discovery_status', 'assigned_partner','target_geo_combined', 'self_reflection_doc'], editable: true },
-      { kind: 'card', title: 'First Contact', fields: ['first_contact_ages', 'first_contact_governance_model', 'first_contact_interests', 'first_contact_notes_on_pre_wf_employment', 'first_contact_wf_employment_status', 'first_contact_willingness_to_relocate'], editable: true },
-      { kind: 'card', title: 'Ops Guide Prefs', fields: ['opsguide_checklist', 'opsguide_fundraising_opps', 'opsguide_meeting_prefs', 'opsguide_request_pertinent_info', 'opsguide_support_type_needed'], editable: true },
-      { kind: 'card', title: 'Follow Up', fields: ['sendgrid_template_selected', 'sendgrid_send_date','person_responsible_for_follow_up', 'one_on_one_scheduling_status', 'personal_email_sent', 'personal_email_sent_date'], editable: true },
-    ],
-  },
-  {
-    id: 'events',
-    label: 'Events',
-    blocks: [
-      { kind: 'table', preset: 'educatorEvents' },
-    ],
-  },
-  {
-    id: 'systems',
-    label: 'Systems',
-    blocks: [
-      { kind: 'card', fields: ['on_connected','on_slack','in_tl_google_grp','in_wf_directory','who_initiated_tl_removal','on_natl_website','gsuite_roles'], editable: true },
-    ],
-  },
-  {
-    id: 'action_steps',
-    label: 'Action Steps',
-    blocks: [
-      { kind: 'table', preset: 'educatorActionSteps' },
-    ],
-  },
-  {
-    id: 'notes',
-    label: 'Notes',
-    blocks: [
-      { kind: 'table', preset: 'educatorNotes' },
-    ],
-  },
-  {
-    id: 'google_sync',
-    label: 'gmail/gCal',
-    blocks: [
-      { kind: 'card', title: 'Google Sync Settings', fields: ['exclude_from_calendar_logging'], editable: true},
-      { kind: 'table', title: 'Gmails', preset: 'educatorGmails' },
-      { kind: 'table', title: 'Calendar Events', preset: 'educatorCalendarEvents' },
-    ],
-  },
-];
-
-
-
+// Grid and kanban constants now live in views.ts
 export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {  
-  'id': { label: 'ID', type: 'string' },  
-  'full_name': { label: 'Full Name', type: 'string' },
-  'first_name': { label: 'First Name', type: 'string', edit: { table: 'people' } },
-  'nickname': { label: 'Nickname', type: 'string', edit: { table: 'people' } },
-  'middle_name': { label: 'Middle Name', type: 'string', edit: { table: 'people' } },
-  'last_name': { label: 'Last Name', type: 'string', edit: { table: 'people' } },
-  'pronunciation': { label: 'Pronunciation', type: 'string', edit: { table: 'people' } },
-  'primary_phone': { label: 'Primary Phone', type: 'string', edit: { table: 'people' } },
-  'primary_phone_other_info': { label: 'Extension or other info (for Primary Phone)', type: 'string', edit: { table: 'people' } },
-  'secondary_phone': { label: 'Secondary Phone', type: 'string', edit: { table: 'people' } },
-  'secondary_phone_other_info': { label: 'Extension or other info (for Secondary Phone)', type: 'string', edit: { table: 'people' } },
-  'home_address': { label: 'Home Address', type: 'string', multiline: true, edit: { table: 'people' } },
-  'educ_attainment': { label: 'Educational Attainment', type: 'enum', edit: { table: 'people' , enumName: 'educ_attainment_options'} },
-  'primary_languages': { label: 'Primary Languages', type: 'enum', array: true, edit: { table: 'people', enumName: 'languages' } },
-  'other_languages': { label: 'Other Languages', type: 'enum', array: true, edit: { table: 'people' , enumName: 'languages'} },
-  'race_ethnicity': { label: 'Race/Ethnicity', type: 'enum', array: true, edit: {table: 'people', enumName: 'race_ethnicity_categories'}, lookup: {table: 'ref_race_and_ethnicity', valueColumn: 'value', labelColumn: 'english_label_short'}},
-  'race_ethnicity_other': { label: 'Race/Ethnicity - if Other, please specify', type: 'string', edit: { table: 'people' } },
-  'gender': { label: 'Gender', type: 'enum', edit: { table: 'people' , enumName: 'gender_categories'} },
-  'gender_other': { label: 'Gender - if Other, please specify', type: 'string', edit: { table: 'people' } },
-  'hh_income': { label: 'Household Income', type: 'enum', edit: { table: 'people', enumName: 'income_categories' } },
-  'childhood_income': { label: 'Childhood Income', type: 'enum', edit: { table: 'people', enumName: 'income_categories' } },
-  'lgbtqia': { label: 'LGBTQIA+', type: 'boolean', edit: { table: 'people' } },
-  'pronouns': { label: 'Pronouns', type: 'enum', edit: { table: 'people' , enumName: 'pronouns'} },
-  'pronouns_other': { label: 'Pronouns - if Other, please specify', type: 'string', edit: { table: 'people' } },
-  'indiv_type': { label: 'Type', type: 'string', edit: { table: 'people' } },
-  'exclude_from_email_logging': { label: 'Exclude from Email Logging', type: 'boolean', edit: { table: 'people' } },
-  'discovery_status': { label: 'Discovery Status', type: 'enum', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' , enumName: 'discovery_statuses'} },
-  'assigned_partner': { label: 'Assigned Partner', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id'}, lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
-  'first_contact_ages': { label: 'Initial Interest: Ages', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'first_contact_governance_model': { label: 'Initial Interest: Governance Model', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'first_contact_interests': { label: 'Initial Interest', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'first_contact_notes_on_pre_wf_employment': { label: 'Notes on Pre-WF Employment', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'first_contact_wf_employment_status': { label: 'Notes on WF Employment Status at first contact', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'first_contact_willingness_to_relocate': { label: 'Initial Willingness to Relocate', type: 'boolean', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'target_geo_combined': { label: 'Target Geography', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'self_reflection_doc': { label: 'Self Reflection Document', type: 'attachment', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'opsguide_checklist': { label: 'Ops Guide - Checklist', type: 'boolean', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'opsguide_fundraising_opps': { label: 'Ops Guide - Fundraising Opportunities', type: 'string', array: true, edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'opsguide_meeting_prefs': { label: 'Ops Guide - Meeting Preferences', type: 'string', array: true, edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'opsguide_request_pertinent_info': { label: 'Ops Guide - Request Pertinent Info', type: 'string', array: true, edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'opsguide_support_type_needed': { label: 'Ops Guide - Support Type Needed', type: 'string', array: true, edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'sendgrid_template_selected': { label: 'SendGrid Template Selected', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'sendgrid_send_date': { label: 'SendGrid Send Date', type: 'date', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'routed_to': { label: 'Routed To', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' },lookup: {table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name'} },
-  'assigned_partner_override': { label: 'Assigned Partner Override', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id'}, lookup: {table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name'} },
-  'person_responsible_for_follow_up': { label: 'Person Responsible for Follow Up', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' ,}, lookup: {table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name'} }, 
-  'one_on_one_scheduling_status': { label: 'One-on-One Scheduling Status', type: 'string', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' }, lookup: { table: 'ref_one_on_one_status', valueColumn: 'value', labelColumn: 'label' } },
-  'personal_email_sent': { label: 'Personal Email Sent', type: 'boolean', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },
-  'personal_email_sent_date': { label: 'Personal Email Sent Date', type: 'date', edit: { table: 'people_educator_early_cultivation', pk: 'people_id' } },  
-  'current_role_at_active_school': { label: 'Current Role at Active School', type: 'string' },  
-  'current_role': { label: 'Current Role', type: 'string' },  
-  'active_school': { label: 'Active School', type: 'string' },  
-  'has_montessori_cert': { label: 'Montessori Certified?', type: 'boolean' },  
-  'mont_cert_summary': { label: 'Montessori Certifications', type: 'string' },  
-  'primary_email': { label: 'Primary Email', type: 'string' },  
-  'most_recent_fillout_form_date': { label: 'Most Recent Fillout Form Date', type: 'date' },  
-  'most_recent_event_name': { label: 'Most Recent Event Name', type: 'string' },  
-  'most_recent_event_date': { label: 'Most Recent Event Date', type: 'date' },  
-  'most_recent_note': { label: 'Most Recent Note', type: 'string' },  
-  'most_recent_note_date': { label: 'Most Recent Note Date', type: 'date' },
-  'on_connected': { label: 'On Connected', type: 'boolean', edit: { table: 'people_systems', pk: 'people_id' } },
-  'on_slack': { label: 'On Slack', type: 'boolean', edit: { table: 'people_systems', pk: 'people_id' } },
-  'in_tl_google_grp': { label: 'In TL Google Group', type: 'boolean', edit: { table: 'people_systems', pk: 'people_id' } },
-  'in_wf_directory': { label: 'In WF Directory', type: 'boolean', edit: { table: 'people_systems', pk: 'people_id' } },
-  'who_initiated_tl_removal': { label: 'Who Initiated TL Removal', type: 'string', edit: { table: 'people_systems', pk: 'people_id' } },
-  'on_natl_website': { label: 'On National Website', type: 'enum', edit: { table: 'people_systems', pk: 'people_id',enumName: 'on_national_website_options' } },
-  'gsuite_roles': { label: 'G Suite Roles', type: 'enum', edit: { table: 'people_systems', pk: 'people_id',enumName:'gsuite_roles_options' } },
-  'most_recent_note_from': { label: 'Most Recent Note From', type: 'string' },
+  'full_name': { editable: false},
+  'primary_phone_other_info': { label: 'Extension or other info (for Primary Phone)'},
+  'secondary_phone_other_info': { label: 'Extension or other info (for Secondary Phone)'},
+  'home_address': { multiline: true },
+  'educ_attainment': { label: 'Educational Attainment' },
+  'race_ethnicity': { label: 'Race/Ethnicity', lookup: {table: 'ref_race_and_ethnicity', valueColumn: 'value', labelColumn: 'english_label_short'}},
+  'race_ethnicity_other': { label: 'Race/Ethnicity - if Other, please specify', visibleIf: { field: 'race_ethnicity', in: ['Other'] } },
+  'gender_other': { label: 'Gender - if Other, please specify', visibleIf: { field: 'gender', in: ['Other'] } },
+  'hh_income': { label: 'Household Income'},
+  'lgbtqia': { label: 'LGBTQIA+'},
+  'pronouns_other': { label: 'Pronouns - if Other, please specify'},
+  'indiv_type': { label: 'Type'},
+  'discovery_status': { writeTable: 'people_educator_early_cultivation' },
+  'assigned_partner': { editable: false},
+  'first_contact_ages': { label: 'Initial Interest: Ages', writeTable: 'people_educator_early_cultivation'},
+  'first_contact_governance_model': { label: 'Initial Interest: Governance Model', writeTable: 'people_educator_early_cultivation'},
+  'first_contact_interests': { label: 'Initial Interest', writeTable: 'people_educator_early_cultivation'},
+  'first_contact_notes_on_pre_wf_employment': { label: 'Notes on Pre-WF Employment', writeTable: 'people_educator_early_cultivation'},
+  'first_contact_wf_employment_status': { label: 'Notes on WF Employment Status at first contact', writeTable: 'people_educator_early_cultivation' },
+  'first_contact_willingness_to_relocate': { label: 'Initial Willingness to Relocate', writeTable: 'people_educator_early_cultivation' },
+  'target_geo_combined': { label: 'Target Geography', writeTable: 'people_educator_early_cultivation' },
+  'self_reflection_doc': { label: 'Self Reflection Document', type: 'attachment', writeTable: 'people_educator_early_cultivation' },
+  'opsguide_initial_contact_date': { label: 'Ops Guide - Initial Contact Date', writeTable: 'people_educator_early_cultivation' },
+  'opsguide_checklist': { label: 'Ops Guide - Checklist', writeTable: 'people_educator_early_cultivation' },
+  'opsguide_fundraising_opps': { label: 'Ops Guide - Fundraising Opportunities', writeTable: 'people_educator_early_cultivation'} ,
+  'opsguide_meeting_prefs': { label: 'Ops Guide - Meeting Preferences', writeTable: 'people_educator_early_cultivation' },
+  'opsguide_request_pertinent_info': { label: 'Ops Guide - Request Pertinent Info', writeTable: 'people_educator_early_cultivation'},
+  'opsguide_support_type_needed': { label: 'Ops Guide - Support Type Needed', writeTable: 'people_educator_early_cultivation'},
+  'sendgrid_template_selected': { writeTable: 'people_educator_early_cultivation'},
+  'sendgrid_send_date': { writeTable: 'people_educator_early_cultivation' },
+  'routed_to': { writeTable: 'people_educator_early_cultivation', lookup: {table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name'} },
+  'assigned_partner_override': { writeTable: 'people_educator_early_cultivation', lookup: {table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name'} },
+  'person_responsible_for_follow_up': { writeTable: 'people_educator_early_cultivation', lookup: {table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name'} }, 
+  'one_on_one_scheduling_status': { label: 'One-on-One Scheduling Status', writeTable: 'people_educator_early_cultivation', lookup: { table: 'ref_one_on_one_status', valueColumn: 'value', labelColumn: 'label' } },
+  'personal_email_sent': { writeTable: 'people_educator_early_cultivation'},
+  'personal_email_sent_date': { writeTable: 'people_educator_early_cultivation'},  
+  'current_role_at_active_school': { label: 'Current Role at Active School' , editable: false },  
+  'current_role': { editable: false },  
+  'active_school': { editable: false },  
+  'has_montessori_cert': { label: 'Montessori Certified?', type: 'boolean' ,editable: false },  
+  'cert_levels_rev': { label: 'Montessori Certifications'},  
+  'primary_email': { editable: false },  
+  'most_recent_fillout_form_date': { editable: false},  
+  'most_recent_event_name': { editable: false},   
+  'most_recent_event_date': { editable: false},   
+  'most_recent_note': { editable: false},  
+  'most_recent_note_date': { editable: false},
+  'most_recent_note_from': { editable: false }
 };

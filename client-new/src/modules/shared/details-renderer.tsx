@@ -32,7 +32,9 @@ import {
 import type { ViewSpec } from './views/types';
 import { asTabs as asTabsFromView } from './views/types';
 
-import { mergeTableColumnMeta, mergeFieldMetadata } from './schema-metadata';
+import { mergeTableColumnMeta, mergeFieldMetadata, getColumnMetadata } from './schema-metadata';
+import { getDefaultForTable } from './write-targets';
+import { findForeignKeyColumn } from './schema-metadata';
 
 import { saveCardValues, type ExceptionMap, type WriteTarget } from '../educators/helpers/write-helpers';
 import { formatCurrencyUSD } from '@/lib/utils';
@@ -99,12 +101,15 @@ export type DetailsRendererProps = {
   defaultTabId?: string;
 
   fieldMeta?: FieldMetadataMap;
-
+  // Default write target for fields without explicit edit config
+  defaultWriteTo?: any;
+  // Ordered list of tables to probe for implicit write targets (first match wins)
+  defaultWriteOrder?: string[];
 };
 
 
 
-export function DetailsRenderer({ entityId, details, tabs, view, resolveTitle, defaultTabId, fieldMeta }: DetailsRendererProps) {
+export function DetailsRenderer({ entityId, details, tabs, view, resolveTitle, defaultTabId, fieldMeta, defaultWriteTo, defaultWriteOrder }: DetailsRendererProps) {
 
   const computedTabs: DetailTabSpec[] = React.useMemo(() => {
     if (Array.isArray(tabs) && tabs.length > 0) return tabs;
@@ -195,7 +200,7 @@ export function DetailsRenderer({ entityId, details, tabs, view, resolveTitle, d
 
           {tab.id === active ? (
 
-            <TabContent tab={tab} entityId={entityId} details={details} fieldMeta={fieldMeta} />
+            <TabContent tab={tab} entityId={entityId} details={details} fieldMeta={fieldMeta} defaultWriteTo={defaultWriteTo} />
 
           ) : null}
 
@@ -247,7 +252,7 @@ function applyFilterExprToQuery(q: any, expr: FilterExpr): any {
 
 
 
-function TabContent({ tab, entityId, details, fieldMeta }: { tab: DetailTabSpec; entityId: string; details: any; fieldMeta?: FieldMetadataMap }) {
+function TabContent({ tab, entityId, details, fieldMeta, defaultWriteTo, defaultWriteOrder }: { tab: DetailTabSpec; entityId: string; details: any; fieldMeta?: FieldMetadataMap; defaultWriteTo?: WriteTarget; defaultWriteOrder?: string[] }) {
 
   return (
 
@@ -278,19 +283,14 @@ function TabContent({ tab, entityId, details, fieldMeta }: { tab: DetailTabSpec;
           return (
 
             <div key={`${tab.id}-card-${index}`} style={containerStyle}>
-
               <DetailCard
-
                 block={block}
-
                 tab={tab}
-
                 entityId={entityId}
-
                 details={details}
-
                 fieldMeta={fieldMeta}
-
+                defaultWriteTo={defaultWriteTo}
+                defaultWriteOrder={defaultWriteOrder}
               />
 
             </div>
@@ -357,6 +357,9 @@ function useSelectOptions(
   fields: readonly string[],
 
   getMetaForField: (field: string) => FieldMetadata | undefined,
+
+  defaultWriteTo?: any,
+  defaultWriteOrder?: string[],
 
 ) {
 
@@ -446,6 +449,18 @@ function useSelectOptions(
 
         }
 
+      }
+
+      // Fallback: infer enum from schema metadata when not provided via meta
+      if (!baseMap[field] && !meta.options && !meta.lookup && !meta.edit?.enumName && defaultWriteTo) {
+        const column = meta.edit?.column ?? field;
+        const cm = getColumnMetadata(meta.edit?.schema ?? defaultWriteTo.schema, meta.edit?.table ?? defaultWriteTo.table, column);
+        const enumName = (cm as any)?.enumRef?.name as string | undefined;
+        if (enumName) {
+          const list = enumsToFetch.get(enumName);
+          if (list) list.push(field);
+          else enumsToFetch.set(enumName, [field]);
+        }
       }
 
     }
@@ -598,7 +613,7 @@ function useSelectOptions(
 
 
 
-function DetailCard({ block, tab, entityId, details, fieldMeta }: { block: DetailCardBlock; tab: DetailTabSpec; entityId: string; details: any; fieldMeta?: FieldMetadataMap }) {
+function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, defaultWriteOrder }: { block: DetailCardBlock; tab: DetailTabSpec; entityId: string; details: any; fieldMeta?: FieldMetadataMap; defaultWriteTo?: WriteTarget; defaultWriteOrder?: string[] }) {
 
   const [editing, setEditing] = React.useState(false);
 
@@ -655,11 +670,16 @@ function DetailCard({ block, tab, entityId, details, fieldMeta }: { block: Detai
 
 
   const getMetaForField = React.useCallback(
-
-    (field: string) => resolvedFieldMeta[field] ?? fieldMeta?.[field],
-
-    [resolvedFieldMeta, fieldMeta],
-
+    (field: string) => {
+      const manual = resolvedFieldMeta[field] ?? fieldMeta?.[field];
+      if (manual) return manual;
+      if (defaultWriteTo) {
+        const cm = getColumnMetadata(defaultWriteTo.schema, defaultWriteTo.table, field);
+        if (cm) return { array: cm.isArray } as FieldMetadata;
+      }
+      return undefined;
+    },
+    [resolvedFieldMeta, fieldMeta, defaultWriteTo],
   );
 
   function columnAllowsEdit(meta?: TableColumnMeta): boolean {
@@ -679,7 +699,7 @@ function DetailCard({ block, tab, entityId, details, fieldMeta }: { block: Detai
 
 
 
-  const selectOptionsMap = useSelectOptions(block.fields, getMetaForField);
+  const selectOptionsMap = useSelectOptions(block.fields, getMetaForField, defaultWriteTo, defaultWriteOrder);
 
 
 
@@ -749,7 +769,7 @@ function DetailCard({ block, tab, entityId, details, fieldMeta }: { block: Detai
 
     }
 
-    const grouped = groupFieldUpdates(block.fields, sanitized, resolvedFieldMeta, tab.writeToExceptions);
+    const grouped = groupFieldUpdates(block.fields, sanitized, resolvedFieldMeta, tab.writeToExceptions, defaultWriteTo);
 
     if (grouped.length === 0) {
 
@@ -784,7 +804,16 @@ function DetailCard({ block, tab, entityId, details, fieldMeta }: { block: Detai
 
 
 
-  const canEditAnyField = block.fields.some((field) => Boolean(getMetaForField(field)?.edit));
+  const canEditAnyField = block.fields.some((field) => {
+    const meta = getMetaForField(field);
+    if (meta?.editable === false) return false;
+    if (meta?.edit) return true;
+    if (defaultWriteTo) {
+      const cm = getColumnMetadata(defaultWriteTo.schema, defaultWriteTo.table, meta?.edit?.column ?? field);
+      if (cm) return true;
+    }
+    return false;
+  });
 
 
 
@@ -824,7 +853,10 @@ function DetailCard({ block, tab, entityId, details, fieldMeta }: { block: Detai
 
           const meta = getMetaForField(field);
 
-          const label = meta?.label ?? formatLabel(field);
+          const label = meta?.label ?? normalizeAbbrev(formatLabel(field));
+
+          // Field-level visibility (evaluated against current values)
+          if (meta?.visibleIf && !evaluateVisibleIf(meta.visibleIf, values)) return null;
 
           const value = values[field];
 
@@ -1247,6 +1279,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
       rowActions: (block as any).rowActions ?? preset?.rowActions ?? [],
       tableActions: (block as any).tableActions ?? preset?.tableActions ?? [],
       tableActionLabels: (block as any).tableActionLabels ?? preset?.tableActionLabels ?? [],
+      baseFilter: (block as any).baseFilter ?? (preset as any)?.baseFilter,
     } as DetailTableBlock & any;
   }, [block]);
 
@@ -1417,11 +1450,17 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
         : (supabase as any).from(table);
 
       let q = query.select('*').eq(fkColumn, entityId);
+      // Apply base filter if configured
+      const baseFilter = (effective as any).baseFilter as FilterExpr | undefined;
+      if (baseFilter) {
+        q = applyFilterExprToQuery(q, baseFilter);
+      }
       // Apply active toggles
       const activeToggles = (toggles as any[]).filter((t) => toggleState[(t as any).id]);
       for (const t of activeToggles) {
         q = applyFilterExprToQuery(q, (t as any).expr);
       }
+
       let { data, error } = await q.limit(200);
       if (!error && Array.isArray(data) && data.length === 0) {
         const asNum = Number(entityId);
@@ -1607,7 +1646,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
                   <th key={column} style={{ textAlign: 'left', padding: 6, borderBottom: '1px solid #e2e8f0' }}>
 
-                    {meta?.label ?? formatLabel(column)}
+                    {meta?.label ?? normalizeAbbrev(formatLabel(column))}
 
                   </th>
 
@@ -1826,7 +1865,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                 const selectOptions = getCachedOptionsForMeta(meta);
                 return (
                   <label key={field} style={{ display: 'grid', gap: 6 }}>
-                    <span style={{ fontSize: 12, color: '#334155' }}>{meta?.label ?? formatLabel(field)}</span>
+                    <span style={{ fontSize: 12, color: '#334155' }}>{meta?.label ?? normalizeAbbrev(formatLabel(field))}</span>
                     {renderEditor(field, createValues[field], (next) => setCreateValues((prev) => ({ ...prev, [field]: next })), meta as any, selectOptions)}
                   </label>
                 );
@@ -1915,7 +1954,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                 const allFields = Object.keys(r as any);
                 return allFields.map((field: string) => {
                   const meta = columnMetaMap.get(field);
-                  const label = meta?.label ?? formatLabel(field);
+                  const label = meta?.label ?? normalizeAbbrev(formatLabel(field));
                   return (
                     <div key={field} style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 8, alignItems: 'baseline' }}>
                       <div style={{ fontSize: 12, color: '#334155' }}>{label}</div>
@@ -2395,6 +2434,18 @@ function formatLabel(field: string): string {
 
 }
 
+function normalizeAbbrev(label: string): string {
+  const words = label.split(' ').map((w) => {
+    const lower = w.toLowerCase();
+    if (lower === 'ssj') return 'SSJ';
+    if (lower === 'tl') return 'TL';
+    if (lower === 'tls') return 'TLs';
+    if (lower === 'fy') return 'FY';
+    return w;
+  });
+  return words.join(' ');
+}
+
 
 
 function groupFieldUpdates(
@@ -2406,46 +2457,59 @@ function groupFieldUpdates(
   fieldMeta?: FieldMetadataMap,
 
   tabExceptions?: LookupException[],
+  defaultWriteTo?: WriteTarget,
 
 ): Array<{ writeTo: WriteTarget; payload: Record<string, any>; exceptions?: ExceptionMap[] }> {
-
-  if (!fieldMeta) return [];
-
   const groups = new Map<string, { writeTo: WriteTarget; payload: Record<string, any>; exceptions: ExceptionMap[] }>();
 
   for (const field of fields) {
 
-    const meta = fieldMeta[field];
+    const meta = fieldMeta?.[field];
 
-    if (!meta?.edit) continue;
+    if (meta?.editable === false) continue;
 
-    const { schema, table, pk, column, exceptions } = meta.edit;
+    // Resolve write target via explicit edit, shorthand writeTable, or defaultWriteTo
+    let target: WriteTarget | undefined;
+    let columnName: string | undefined;
+    if (meta?.edit) {
+      target = { schema: meta.edit.schema, table: meta.edit.table, pk: meta.edit.pk };
+      columnName = meta.edit.column ?? field;
+    } else if ((meta as any)?.writeTable) {
+      const table = (meta as any).writeTable as string;
+      const pk = inferPkForTable(table, defaultWriteTo);
+      target = { table, pk };
+      columnName = field;
+    }
 
-    const key = `${schema ?? 'public'}|${table}|${pk ?? 'id'}`;
+    if (!target) {
+      if (defaultWriteTo) {
+        const cm = getColumnMetadata(defaultWriteTo.schema, defaultWriteTo.table, field);
+        if (cm) {
+          const key = `${defaultWriteTo.schema ?? 'public'}|${defaultWriteTo.table}|${defaultWriteTo.pk ?? 'id'}`;
+          let entry = groups.get(key);
+          if (!entry) {
+            entry = { writeTo: { ...defaultWriteTo }, payload: {}, exceptions: [] };
+            groups.set(key, entry);
+          }
+          entry.payload[field] = values[field];
+        }
+      }
+      continue;
+    }
 
+    // With target resolved
+    const key = `${target.schema ?? 'public'}|${target.table}|${target.pk ?? 'id'}`;
     let entry = groups.get(key);
-
     if (!entry) {
-
-      entry = { writeTo: { schema, table, pk }, payload: {}, exceptions: [] };
-
+      entry = { writeTo: target, payload: {}, exceptions: [] };
       groups.set(key, entry);
-
+    }
+    entry.payload[columnName ?? field] = values[field];
+    if ((columnName ?? field) !== field) {
+      entry.exceptions.push({ field, mapsToField: columnName });
     }
 
-    entry.payload[column ?? field] = values[field];
-
-    if (column && column !== field) {
-
-      entry.exceptions.push({ field, mapsToField: column });
-
-    }
-
-    if (exceptions) {
-
-      entry.exceptions.push(...exceptions);
-
-    }
+    // Note: additional exceptions can be provided at tab level below
 
   }
 
@@ -2471,6 +2535,18 @@ function groupFieldUpdates(
 
   }));
 
+}
+
+function inferPkForTable(table: string, fallbackParent?: { schema?: string; table: string; pk?: string }): string | undefined {
+  // Prefer schema-based inference when we know the parent table
+  if (fallbackParent) {
+    const fk = findForeignKeyColumn({ schema: undefined, table, parentSchema: fallbackParent.schema, parentTable: fallbackParent.table, parentPk: fallbackParent.pk ?? 'id' });
+    if (fk) return fk;
+  }
+  // Fallback to explicit defaults map
+  const def = getDefaultForTable(table);
+  if (def?.pk) return def.pk;
+  return undefined;
 }
 
 
