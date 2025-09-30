@@ -59,23 +59,6 @@ const LOOKUP_OPTION_CACHE = new Map<string, SelectOption[]>();
 
 const DEFAULT_SCHEMA = 'public';
 
-// Debug helper: enable by setting window.__WF_DEBUG_DETAILS__ = true or
-// localStorage.setItem('wf.debug.details','1') in the browser console.
-const DEBUG_DETAILS = (() => {
-  try {
-    if (typeof window !== 'undefined') {
-      // @ts-ignore
-      if ((window as any).__WF_DEBUG_DETAILS__) return true;
-      if (localStorage.getItem('wf.debug.details') === '1') return true;
-    }
-  } catch {}
-  return false;
-})();
-function dbg(...args: any[]) {
-  if (!DEBUG_DETAILS) return;
-  // eslint-disable-next-line no-console
-  console.debug('[Details]', ...args);
-}
 
 
 
@@ -461,15 +444,23 @@ function useSelectOptions(
         }
       }
 
-      // Fallback: infer enum from schema metadata when not provided via meta
-      if (!baseMap[field] && !meta.options && !meta.lookup && !meta.edit?.enumName && defaultWriteTo) {
+      // Fallback: infer enum from schema when not specified in meta
+      if (!baseMap[field] && !meta.options && !meta.lookup && !meta.edit?.enumName) {
         const column = meta.edit?.column ?? field;
-        const cm = getColumnMetadata(meta.edit?.schema ?? defaultWriteTo.schema, meta.edit?.table ?? defaultWriteTo.table, column);
-        const enumName = (cm as any)?.enumRef?.name as string | undefined;
-        if (enumName) {
-          const list = enumsToFetch.get(enumName);
+        let inferred: string | undefined;
+        if (defaultWriteOrder && defaultWriteOrder.length) {
+          for (const t of defaultWriteOrder) {
+            const cm = getColumnMetadata(undefined, t, column) as any;
+            if (cm?.enumRef?.name) { inferred = cm.enumRef.name as string; break; }
+          }
+        } else if (defaultWriteTo) {
+          const cm = getColumnMetadata(defaultWriteTo.schema, defaultWriteTo.table, column) as any;
+          inferred = cm?.enumRef?.name as string | undefined;
+        }
+        if (inferred) {
+          const list = enumsToFetch.get(inferred);
           if (list) list.push(field);
-          else enumsToFetch.set(enumName, [field]);
+          else enumsToFetch.set(inferred, [field]);
         }
       }
 
@@ -680,10 +671,7 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
   const getMetaForField = React.useCallback(
     (field: string) => {
       const manual = resolvedFieldMeta[field] ?? fieldMeta?.[field];
-      if (manual) {
-        dbg('meta(manual)', field, manual);
-        return manual;
-      }
+      if (manual) return manual;
       // Try default write order tables first
       if (defaultWriteOrder && defaultWriteOrder.length) {
         for (const t of defaultWriteOrder) {
@@ -691,9 +679,7 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
           if (cm) {
             const isEnum = !!cm?.enumRef;
             const type: any = isEnum ? 'enum' : (cm?.baseType === 'boolean' ? 'boolean' : (cm?.baseType === 'number' ? 'number' : 'string'));
-            const meta = { type, array: !!cm.isArray } as FieldMetadata;
-            dbg('meta(derived-order)', field, { table: t, cm, meta });
-            return meta;
+            return { type, array: !!cm.isArray } as FieldMetadata;
           }
         }
       }
@@ -703,12 +689,9 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
         if (cm) {
           const isEnum = !!cm?.enumRef;
           const type: any = isEnum ? 'enum' : (cm?.baseType === 'boolean' ? 'boolean' : (cm?.baseType === 'number' ? 'number' : 'string'));
-          const meta = { type, array: !!cm.isArray } as FieldMetadata;
-          dbg('meta(derived-default)', field, { table: defaultWriteTo.table, cm, meta });
-          return meta;
+          return { type, array: !!cm.isArray } as FieldMetadata;
         }
       }
-      dbg('meta(undefined)', field);
       return undefined;
     },
     [resolvedFieldMeta, fieldMeta, defaultWriteOrder, defaultWriteTo],
@@ -886,7 +869,6 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
           const meta = getMetaForField(field);
 
           const label = meta?.label ?? labelFromField(field);
-          dbg('label', { field, label, meta });
           console.log(`Rendering field: ${field} ${label}`);
 
           // Field-level visibility (evaluated against current values)
@@ -913,7 +895,7 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
             const cm = getColumnMetadata(defaultWriteTo.schema, defaultWriteTo.table, field);
             editableField = !!cm;
           }
-          dbg('editableField', field, editableField);
+          
 
           const selectOptions = selectOptionsMap[field] ?? getCachedOptionsForMeta(meta);
 
@@ -1131,7 +1113,7 @@ function renderEditor(
 
 
 
-  if (hasOptions) {
+  if (baseType === 'enum' || hasOptions) {
 
     if (isArray) {
 
@@ -1151,7 +1133,7 @@ function renderEditor(
       return (
         <MultiSelectDropdown
           value={Array.from(selectedSet)}
-          options={selectOptions}
+          options={selectOptions || []}
           onChange={(vals) => onChange(vals)}
         />
       );
@@ -1159,7 +1141,8 @@ function renderEditor(
     }
 
     const normalized = current == null ? '' : normalizeOptionValue(current);
-    const match = selectOptions!.find((opt) => opt.value === normalized || opt.label === normalized);
+    const options = selectOptions || [];
+    const match = options.find((opt) => opt.value === normalized || opt.label === normalized);
     const stringValue = match ? match.value : normalized;
 
     return (
@@ -1168,7 +1151,7 @@ function renderEditor(
           <SelectValue placeholder="--" />
         </SelectTrigger>
         <SelectContent className="bg-white">
-          {selectOptions.map((option) => (
+          {(selectOptions || []).map((option) => (
             <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
           ))}
         </SelectContent>
