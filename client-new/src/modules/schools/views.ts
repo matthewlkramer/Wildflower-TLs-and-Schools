@@ -35,7 +35,7 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     'SSJ',
     card(['ssj_target_city', 'ssj_target_state'], { title: 'Target location', editable: true }),
     card(['entered_visioning_date', 'visioning_album_complete', 'visioning_album', 'entered_planning_date', 'planning_album', 'entered_startup_date'], { title: 'Milestones', editable: true }),
-    card(['ssj_ops_guide_support_track', 'ssj_readiness_to_open_rating', 'ssj_has_partner', 'ssj_board_development', 'ssj_on_track_for_enrollment'], { title: 'Readiness', editable: true }),
+    card(['ssj_readiness_to_open_rating', 'ssj_has_partner', 'ssj_board_development', 'ssj_on_track_for_enrollment'], { title: 'Readiness', editable: true }),
     card(['ssj_name_reserved', 'name_selection_proposal', 'trademark_files', 'logo_designer', 'on_national_website'], { title: 'Branding', editable: true }),
     card(['ssj_facility', 'ssj_building4good_status', 'date_shared_with_n4g', 'building4good_firm_and_attorney'], { title: 'Facilities', editable: true }),
     card(['ssj_budget_ready_for_next_steps', 'ssj_seeking_wf_funding', 'ssj_fundraising_narrative', 'ssj_pathway_to_funding', 'ssj_total_startup_funding_needed', 'ssj_loan_eligibility', 'ssj_loan_approved_amt', 'ssj_amount_raised', 'ssj_gap_in_funding'], { title: 'Fundraising', editable: true }),
@@ -63,7 +63,6 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     card(['budget_link'], { title: 'Files', editable: true }),
     card(['visioning_album','planning_album'], { title: 'Albums', editable: true }),
     card(['risk_factors','watchlist'], { title: 'Warnings', editable: true }),
-    // Presumes a preset named 'adviceGivers' exists in TABLE_PRESETS
-    table('adviceGivers', { title: 'Advice Givers' })
+    table('advice', { title: 'Advice Givers' }),
   ),
 );

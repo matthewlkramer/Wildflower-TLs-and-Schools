@@ -1,6 +1,8 @@
 import React from 'react';
 import { useEducatorDetails } from '../api/queries';
-import { EDUCATOR_DETAIL_TABS, EDUCATOR_FIELD_METADATA } from '../constants';
+import { EDUCATOR_FIELD_METADATA } from '../constants';
+import { EDUCATOR_VIEW_SPEC } from '../views';
+import { asTabs } from '../../shared/views/types';
 import { DetailsRenderer } from '../../shared/details-renderer';
 
 export function EducatorDetailPage({ params }: { params: { id: string } }) {
@@ -14,7 +16,7 @@ export function EducatorDetailPage({ params }: { params: { id: string } }) {
     <DetailsRenderer
       entityId={educatorId}
       details={data as any}
-      tabs={EDUCATOR_DETAIL_TABS}
+      tabs={asTabs(EDUCATOR_VIEW_SPEC)}
       fieldMeta={EDUCATOR_FIELD_METADATA}
       resolveTitle={(details) => details.full_name ?? details.name ?? educatorId}
     />

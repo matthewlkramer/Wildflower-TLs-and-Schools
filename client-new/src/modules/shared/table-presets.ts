@@ -174,8 +174,8 @@ export const TABLE_PRESETS = {
   },
 
   charterBoardMembers: {
-    readSource: { table: 'people', fkColumn: 'charter_id' },
-    writeDefaults: { table: 'people', pkColumn: 'id' },
+    readSource: { table: 'details_associations', fkColumn: 'charter_id' },
+    writeDefaults: { table: 'people_roles_associations', pkColumn: 'id' },
     columns: cols('boardMembers'),
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'email','archive'] as const,
     tableActions: ['addPersonToBoard','addNewPersonToBoard'] as const,
@@ -396,8 +396,8 @@ export const TABLE_PRESETS = {
   },
 
   schoolBoardMembers: {
-    readSource: { table: 'people', fkColumn: 'school_id' },
-    writeDefaults: { table: 'people', pkColumn: 'id' },
+    readSource: { table: 'details_associations', fkColumn: 'school_id' },
+    writeDefaults: { table: 'people_roles_associations', pkColumn: 'id' },
     columns: cols('boardMembers'),
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'email','archive'] as const,
     tableActions: ['addPersonToBoard','addNewPersonToBoard'] as const,
@@ -415,4 +415,3 @@ export const TABLE_PRESETS = {
 } as const;
 
 export type TablePresetId = keyof typeof TABLE_PRESETS;
-

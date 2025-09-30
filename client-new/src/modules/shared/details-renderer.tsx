@@ -26,8 +26,11 @@ import {
 
   type TableColumnMeta,
   type FilterExpr,
+  type VisibleIf,
 
 } from './detail-types';
+import type { ViewSpec } from './views/types';
+import { asTabs as asTabsFromView } from './views/types';
 
 import { mergeTableColumnMeta, mergeFieldMetadata } from './schema-metadata';
 
@@ -35,6 +38,7 @@ import { saveCardValues, type ExceptionMap, type WriteTarget } from '../educator
 import { formatCurrencyUSD } from '@/lib/utils';
 import { getRowActionLabel, formatActionLabel } from './actions/registry';
 import { getTableActionLabel } from './actions/table-actions';
+import { handleTableAction as handleTableActionClick } from './actions/table-handlers';
 import { handleRowAction } from './actions/handlers';
 import { TABLE_PRESETS } from './table-presets';
 import { Button } from '@/components/ui/button';
@@ -87,7 +91,8 @@ export type DetailsRendererProps = {
 
   details: any;
 
-  tabs: DetailTabSpec[];
+  tabs?: DetailTabSpec[];
+  view?: ViewSpec;
 
   resolveTitle: (details: any, entityId: string) => string;
 
@@ -99,9 +104,15 @@ export type DetailsRendererProps = {
 
 
 
-export function DetailsRenderer({ entityId, details, tabs, resolveTitle, defaultTabId, fieldMeta }: DetailsRendererProps) {
+export function DetailsRenderer({ entityId, details, tabs, view, resolveTitle, defaultTabId, fieldMeta }: DetailsRendererProps) {
 
-  const safeTabs = Array.isArray(tabs) ? tabs : [];
+  const computedTabs: DetailTabSpec[] = React.useMemo(() => {
+    if (Array.isArray(tabs) && tabs.length > 0) return tabs;
+    if (view && (view as any).tabs) return asTabsFromView(view);
+    return [];
+  }, [tabs, view]);
+
+  const safeTabs = Array.isArray(computedTabs) ? computedTabs : [];
 
   const initialTab = React.useMemo(() => {
 
@@ -256,6 +267,12 @@ function TabContent({ tab, entityId, details, fieldMeta }: { tab: DetailTabSpec;
 
 
 
+        // Evaluate visibility conditions if any
+        const visibleIf: VisibleIf | undefined = (block as any).visibleIf;
+        if (visibleIf && !evaluateVisibleIf(visibleIf, details)) {
+          return null;
+        }
+
         if (block.kind === 'card') {
 
           return (
@@ -318,6 +335,19 @@ function TabContent({ tab, entityId, details, fieldMeta }: { tab: DetailTabSpec;
 
   );
 
+}
+
+function evaluateVisibleIf(v: VisibleIf, details: any): boolean {
+  const evalClause = (c: any): boolean => {
+    const val = details?.[c.field];
+    if (c.notEmpty) return val != null && String(val).trim() !== '' && !(Array.isArray(val) && val.length === 0);
+    if (c.eq !== undefined) return val === c.eq;
+    if (Array.isArray(c.in)) return c.in.includes(val);
+    return !!val;
+  };
+  if ((v as any).anyOf) return ((v as any).anyOf as any[]).some(evalClause);
+  if ((v as any).allOf) return ((v as any).allOf as any[]).every(evalClause);
+  return evalClause(v as any);
 }
 
 
@@ -1536,31 +1566,18 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                 : getTableActionLabel(String(action));
               const handleClick = async () => {
                 const actionId = typeof action === 'string' ? action : String(action);
-                const rs = (effective as any).readSource ?? (effective as any).source;
-                if (!rs?.table) return;
-                const { table } = rs;
-  // Special-case email modal
-                if (actionId === 'addEmail' && table === 'email_addresses') { setShowAddEmail(true); return; }
-                if (String(actionId).startsWith('add')) {
-                  const init: Record<string, any> = {};
-                  for (const c of (((effective as any).columns) ?? [])) {
-                    const col = typeof c === 'string' ? c : (c as any).field;
-                    const meta = columnMetaMap.get(col);
-                    if (!columnIncludeInCreateLocal(meta as any)) continue;
-                    // Defaults
-                    if (col === 'item_status') init[col] = 'Incomplete';
-                    else if (col === 'assigned_date') init[col] = new Date().toISOString().slice(0,10);
-                    else if (col === 'created_date') init[col] = new Date().toISOString().slice(0,10);
-                    else init[col] = meta?.array ? [] : undefined;
-                    // Proactively ensure select options exist for this field
-                    ensureOptionsForMeta(meta as any);
-                  }
-                  setCreateValues(init);
-                  setCreateError('');
-                  // Use the action label if available for the modal title
-                  setCreateTitle(label || 'Add Record');
-                  setShowCreate(true);
-                }
+                const handled = await handleTableActionClick({
+                  actionId,
+                  effective,
+                  columnMetaMap,
+                  ensureOptionsForMeta,
+                  setShowAddEmail,
+                  setCreateValues,
+                  setCreateError,
+                  setCreateTitle: (t) => setCreateTitle((label || t || 'Add Record')),
+                  setShowCreate,
+                });
+                if (handled) return;
               };
               return (
                 <Button key={String(action)} onClick={handleClick} variant="outline" size="sm" className="ml-2">

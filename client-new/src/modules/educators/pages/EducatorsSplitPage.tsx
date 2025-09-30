@@ -3,7 +3,9 @@ import { useGridEducators, useEducatorDetails } from '../api/queries';
 import { GridBase } from '@/components/shared/GridBase';
 import type { ColDef } from 'ag-grid-community';
 import { useLocation } from 'wouter';
-import { EDUCATOR_GRID, EDUCATOR_DETAIL_TABS, EDUCATOR_FIELD_METADATA } from '../constants';
+import { EDUCATOR_GRID, EDUCATOR_FIELD_METADATA } from '../constants';
+import { EDUCATOR_VIEW_SPEC } from '../views';
+import { asTabs } from '../../shared/views/types';
 import { supabase } from '@/lib/supabase/client';
 import { SavedViewsManager } from '@/components/shared/SavedViewsManager';
 import { GridPageHeader } from '@/components/shared/GridPageHeader';
@@ -246,7 +248,7 @@ export function EducatorsSplitPage() {
             <DetailsRenderer
               entityId={selectedEducatorId}
               details={selectedEducatorData as any}
-              tabs={EDUCATOR_DETAIL_TABS}
+              tabs={asTabs(EDUCATOR_VIEW_SPEC)}
               fieldMeta={EDUCATOR_FIELD_METADATA}
               resolveTitle={(details) => details.full_name ?? details.name ?? selectedEducatorId}
             />

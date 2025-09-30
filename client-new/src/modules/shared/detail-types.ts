@@ -114,6 +114,7 @@ export type DetailCardBlock = {
   fields: string[];
   editable: boolean;
   editSource?: CardEditSource;
+  visibleIf?: VisibleIf;
 };
 
 export type DetailTableBlock = {
@@ -137,6 +138,7 @@ export type DetailTableBlock = {
   tableActionLabels?: readonly string[];
   // Optional on/off filters controlled by header switches
   toggles?: readonly TableToggleSpec[];
+  visibleIf?: VisibleIf;
 };
 
 export type DetailMapBlock = {
@@ -144,9 +146,14 @@ export type DetailMapBlock = {
   title?: string;
   width?: 'half' | 'full';
   fields: string[];
+  visibleIf?: VisibleIf;
 };
 
 export type DetailBlock = DetailCardBlock | DetailTableBlock | DetailMapBlock;
+
+// Visibility DSL for blocks
+export type VisibleIfClause = { field: string; eq?: any; in?: any[]; notEmpty?: boolean };
+export type VisibleIf = VisibleIfClause | { anyOf: VisibleIfClause[] } | { allOf: VisibleIfClause[] };
 
 export type DetailTabSpec = {
   id: string;

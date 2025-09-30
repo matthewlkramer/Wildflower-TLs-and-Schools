@@ -1,6 +1,8 @@
 import React from 'react';
 import { useCharterDetails } from '../api/queries';
-import { CHARTER_DETAIL_TABS, CHARTER_FIELD_METADATA } from '../constants';
+import { CHARTER_FIELD_METADATA } from '../constants';
+import { CHARTER_VIEW_SPEC } from '../views';
+import { asTabs } from '../../shared/views/types';
 import { DetailsRenderer } from '../../shared/details-renderer';
 
 export function CharterDetailPage({ params }: { params: { id: string } }) {
@@ -14,7 +16,7 @@ export function CharterDetailPage({ params }: { params: { id: string } }) {
     <DetailsRenderer
       entityId={charterId}
       details={data as any}
-      tabs={CHARTER_DETAIL_TABS}
+      tabs={asTabs(CHARTER_VIEW_SPEC)}
       fieldMeta={CHARTER_FIELD_METADATA}
       resolveTitle={(details) => details.short_name ?? details.full_name ?? charterId}
     />
