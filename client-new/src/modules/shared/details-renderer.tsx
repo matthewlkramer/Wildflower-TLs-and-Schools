@@ -673,13 +673,29 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
     (field: string) => {
       const manual = resolvedFieldMeta[field] ?? fieldMeta?.[field];
       if (manual) return manual;
+      // Try default write order tables first
+      if (defaultWriteOrder && defaultWriteOrder.length) {
+        for (const t of defaultWriteOrder) {
+          const cm: any = getColumnMetadata(undefined, t, field);
+          if (cm) {
+            const isEnum = !!cm?.enumRef;
+            const type: any = isEnum ? 'enum' : (cm?.baseType === 'boolean' ? 'boolean' : (cm?.baseType === 'number' ? 'number' : 'string'));
+            return { type, array: !!cm.isArray } as FieldMetadata;
+          }
+        }
+      }
+      // Fallback: single default write target
       if (defaultWriteTo) {
-        const cm = getColumnMetadata(defaultWriteTo.schema, defaultWriteTo.table, field);
-        if (cm) return { array: cm.isArray } as FieldMetadata;
+        const cm: any = getColumnMetadata(defaultWriteTo.schema, defaultWriteTo.table, field);
+        if (cm) {
+          const isEnum = !!cm?.enumRef;
+          const type: any = isEnum ? 'enum' : (cm?.baseType === 'boolean' ? 'boolean' : (cm?.baseType === 'number' ? 'number' : 'string'));
+          return { type, array: !!cm.isArray } as FieldMetadata;
+        }
       }
       return undefined;
     },
-    [resolvedFieldMeta, fieldMeta, defaultWriteTo],
+    [resolvedFieldMeta, fieldMeta, defaultWriteOrder, defaultWriteTo],
   );
 
   function columnAllowsEdit(meta?: TableColumnMeta): boolean {

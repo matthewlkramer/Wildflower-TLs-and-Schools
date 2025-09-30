@@ -31,7 +31,7 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   gender_other: { label: 'Gender - if Other, please specify', visibleIf: { field: 'gender', in: ['Other'] } },
   hh_income: { label: 'Household Income' },
   lgbtqia: { label: 'LGBTQIA+' },
-  pronouns_other: { label: 'Pronouns - if Other, please specify' },
+  pronouns_other: { label: 'Pronouns - if Other, please specify' , visibleIf: { field: 'pronouns', in: ['Other'] } },
   indiv_type: { label: 'Type' },
   assigned_partner: { editable: false },
   first_contact_ages: { label: 'Initial Interest: Ages' },
@@ -118,4 +118,7 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
   ),
   tab('events', 'Events', table('educatorEvents')),
   tab('systems', 'Systems', card(['on_connected', 'on_slack', 'in_tl_google_grp', 'in_wf_directory', 'who_initiated_tl_removal', 'on_natl_website', 'gsuite_roles'], { editable: true })),
+  tab('notes', 'Notes', table('educatorNotes')),
+  tab('actionSteps', 'Action Steps', table('educatorActionSteps')),
+  tab('google_sync', 'Gmail/gCal', table('educatorGmails', { title: 'Gmails', width: 'half' }), table('educatorCalendarEvents', { title: 'Calendar Events', width: 'half' })),
 );
