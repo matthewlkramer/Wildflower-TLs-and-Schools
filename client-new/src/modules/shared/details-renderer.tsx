@@ -860,6 +860,7 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
           const meta = getMetaForField(field);
 
           const label = meta?.label ?? normalizeAbbrev(formatLabel(field));
+          console.log(`Rendering field: ${field} ${label}`);
 
           // Field-level visibility (evaluated against current values)
           if (meta?.visibleIf && !evaluateVisibleIf(meta.visibleIf, values)) return null;

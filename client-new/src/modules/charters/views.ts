@@ -100,6 +100,6 @@ export const CHARTER_VIEW_SPEC: ViewSpec = view(
   tab('docs', 'Docs', table('charterGovernanceDocs', { title: 'Governance Docs', width: 'half' }), table('charterNineNineties', { title: '990s', width: 'half' })),
   tab('notes', 'Notes', table('charterNotes')),
   tab('action_steps', 'Action Steps', table('charterActionSteps')),
-  tab('grants_loans', 'Grants & Loans', table('charterGrantsLoans')),
+  tab('grants_loans', 'Grants & Loans', table('charterGrants', { title: 'Grants', width: 'half' }), table('charterLoans', { title: 'Loans', width: 'half' })),
   tab('gmail_gCCal', 'Gmail/gCal', table('charterGmails', { title: 'Gmails', width: 'half' }), table('charterCalendarEvents', { title: 'Calendar Events', width: 'half' }))
 );
