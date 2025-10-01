@@ -133,7 +133,7 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     'Details',
     card(['governance_model','legal_structure', 'ein', 'incorporation_date', 'current_fy_end', 'loan_report_name'], { title: 'Legal entity', editable: true }),
     card(['nonprofit_path','nonprofit_status', 'group_exemption_status'], { title: 'Nonprofit status', editable: true }),
-    card(['logo', 'logo_url', 'logo_square', 'logo_flower_only', 'logo_rectangle'], { title: 'Logo(s)', editable: true }),
+    card(['logo', 'logo_square', 'logo_flower_only', 'logo_rectangle'], { title: 'Logo(s)', editable: true }),
     table('schoolBoardMembers', { title: 'Board Members' }),
   ),
   tab(

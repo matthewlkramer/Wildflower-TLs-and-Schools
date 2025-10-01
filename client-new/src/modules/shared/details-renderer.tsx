@@ -58,13 +58,6 @@ const ENUM_OPTION_CACHE = new Map<string, SelectOption[]>();
 
 const LOOKUP_OPTION_CACHE = new Map<string, SelectOption[]>();
 const STORAGE_OBJECT_CACHE = new Map<string, { bucket: string; name: string; url?: string | null }>();
-const LOGO_BUCKET = 'logos';
-const LOGO_FIELD_DIR: Record<string, string> = {
-  logo: 'main',
-  logo_square: 'square',
-  logo_flower_only: 'flower',
-  logo_rectangle: 'rectangle',
-};
 
 const DEFAULT_SCHEMA = 'public';
 
@@ -826,7 +819,7 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
         const meta = getMetaForField(field);
         if (meta?.type === 'attachment') {
           const raw = values[field];
-          const resolved = await resolveAttachmentValue(field, raw, entityId, values);
+          const resolved = await resolveAttachmentValue(field, raw);
           if (!cancelled && resolved !== undefined) updates[field] = resolved;
         }
       }
@@ -836,7 +829,7 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
     return () => {
       cancelled = true;
     };
-  }, [block.fields, values, getMetaForField, entityId]);
+  }, [block.fields, values, getMetaForField]);
 
   function columnAllowsEdit(meta?: TableColumnMeta): boolean {
     if (!meta) return true;
@@ -2671,44 +2664,16 @@ function renderDisplayValue(
 
 
 
-async function resolveAttachmentValue(field: string, value: any, entityId: string, allValues: Record<string, any>): Promise<any> {
-  if (value) {
-    if (Array.isArray(value)) {
-      const resolved = await Promise.all(value.map((entry) => resolveAttachmentEntry(field, entityId, entry)));
-      return resolved.filter((entry) => entry != null);
-    }
-    const resolved = await resolveAttachmentEntry(field, entityId, value);
-    if (typeof resolved === 'string' && !resolved.startsWith('http')) {
-      const fallbackField = field === 'logo' ? 'logo_url' : undefined;
-      if (fallbackField && typeof allValues[fallbackField] === 'string' && allValues[fallbackField]) {
-        return allValues[fallbackField];
-      }
-    }
-    return resolved;
+async function resolveAttachmentValue(field: string, value: any): Promise<any> {
+  if (!value) return value;
+  if (Array.isArray(value)) {
+    const resolved = await Promise.all(value.map((entry) => resolveAttachmentEntry(entry)));
+    return resolved.filter((entry) => entry != null);
   }
-
-  const subdir = LOGO_FIELD_DIR[field];
-  if (subdir && entityId) {
-    try {
-      const { data, error } = await (supabase as any).storage.from(LOGO_BUCKET).list(`${entityId}/${subdir}`);
-      if (!error && Array.isArray(data) && data.length > 0) {
-        const urls: string[] = [];
-        for (const obj of data) {
-          const path = `${entityId}/${subdir}/${obj.name}`;
-          const { data: publicUrl } = (supabase as any).storage.from(LOGO_BUCKET).getPublicUrl(path);
-          if (publicUrl?.publicUrl) urls.push(publicUrl.publicUrl);
-        }
-        if (urls.length) return urls;
-      }
-    } catch {}
-  }
-  if (field === 'logo' && typeof allValues['logo_url'] === 'string' && allValues['logo_url']) {
-    return allValues['logo_url'];
-  }
-  return value;
+  return await resolveAttachmentEntry(value);
 }
 
-async function resolveAttachmentEntry(field: string, entityId: string, entry: any): Promise<any> {
+async function resolveAttachmentEntry(entry: any): Promise<any> {
   if (!entry) return entry;
   if (typeof entry === 'string') {
     if (entry.startsWith('http')) return entry;
