@@ -126,6 +126,11 @@ export type DetailCardBlock = {
   visibleIf?: VisibleIf;
 };
 
+export type TableOrderBy = {
+  column: string;
+  ascending?: boolean;
+};
+
 export type DetailTableBlock = {
   kind: 'table';
   title?: string;
@@ -149,6 +154,10 @@ export type DetailTableBlock = {
   toggles?: readonly TableToggleSpec[];
   // Always-applied filter expression when fetching rows
   baseFilter?: FilterExpr;
+  // Optional limit override (defaults to 200 rows)
+  limit?: number;
+  // Optional ordering directives applied before limiting
+  orderBy?: readonly TableOrderBy[];
   visibleIf?: VisibleIf;
 };
 
@@ -160,7 +169,21 @@ export type DetailMapBlock = {
   visibleIf?: VisibleIf;
 };
 
-export type DetailBlock = DetailCardBlock | DetailTableBlock | DetailMapBlock;
+export type DetailListLayout = {
+  titleField?: string;
+  subtitleFields?: readonly string[];
+  bodyFields?: readonly string[];
+  badgeFields?: readonly string[];
+  footerFields?: readonly string[];
+  showFieldLabels?: boolean;
+};
+
+export type DetailListBlock = Omit<DetailTableBlock, 'kind'> & {
+  kind: 'list';
+  listLayout?: DetailListLayout;
+};
+
+export type DetailBlock = DetailCardBlock | DetailTableBlock | DetailListBlock | DetailMapBlock;
 
 // Visibility DSL for blocks
 export type VisibleIfClause = { field: string; eq?: any; in?: any[]; notEmpty?: boolean };
@@ -229,3 +252,4 @@ export type CreateTaskConfig = {
   incompleteValue?: any;
   defaults?: Record<string, any>;
 };
+

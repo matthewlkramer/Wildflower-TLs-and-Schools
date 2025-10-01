@@ -12,9 +12,7 @@ import {
 
   type DetailCardBlock,
 
-  type DetailTableBlock,
-
-  type DetailMapBlock,
+  type DetailTableBlock,\r\n\r\n  type DetailListBlock,\r\n\r\n  type DetailListLayout,\r\n\r\n  type DetailMapBlock,
 
   type LookupException,
 
@@ -24,8 +22,7 @@ import {
 
   type FieldLookup,
 
-  type TableColumnMeta,
-  type FilterExpr,
+  type TableColumnMeta,\r\n  type TableOrderBy,\r\n  type FilterExpr,
   type VisibleIf,
 
 } from './detail-types';
@@ -1487,7 +1484,7 @@ function renderEditor(
 
 
 
-function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: string }) {
+function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailListBlock; entityId: string }) {
 
   // Resolve preset (if provided) into an effective config
   const effective = React.useMemo(() => {
@@ -1768,11 +1765,26 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
         q = applyFilterExprToQuery(q, (t as any).expr);
       }
 
-      let { data, error } = await q.limit(200);
+      const orderByConfig = Array.isArray((effective as any).orderBy) ? ((effective as any).orderBy as TableOrderBy[]) : undefined;
+      const applyOrder = (query: any) => {
+        if (!orderByConfig || orderByConfig.length === 0) return query;
+        let ordered = query;
+        for (const order of orderByConfig) {
+          if (!order || !order.column) continue;
+          ordered = ordered.order(order.column, { ascending: order.ascending !== false });
+        }
+        return ordered;
+      };
+
+      const maxRows = typeof (effective as any).limit === 'number' && (effective as any).limit > 0 ? (effective as any).limit : 200;
+
+      let orderedQuery = applyOrder(q);
+      let { data, error } = await orderedQuery.limit(maxRows);
       if (!error && Array.isArray(data) && data.length === 0) {
         const asNum = Number(entityId);
         if (!Number.isNaN(asNum)) {
-          const res2 = await query.select('*').eq(fkColumn, asNum).limit(200);
+          let fallbackQuery = applyOrder(query.select('*').eq(fkColumn, asNum));
+          const res2 = await fallbackQuery.limit(maxRows);
           if (!res2.error) {
             data = res2.data as any[];
             error = undefined as any;
@@ -1825,6 +1837,225 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
     }
     return resolvedMap;
   }, [ (effective as any).columns, ((effective as any).readSource ?? (effective as any).source)?.schema, ((effective as any).readSource ?? (effective as any).source)?.table]);
+
+  const columnOrder = React.useMemo(() => {
+    const cols = (effective as any).columns ?? [];
+    return ((cols as any[]) || []).map((c: any) => (typeof c === 'string' ? c : c.field));
+  }, [(effective as any).columns]);
+
+  function hasRenderableValue(value: any): boolean {
+    if (value === null || value === undefined) return false;
+    if (Array.isArray(value)) return value.some((entry) => hasRenderableValue(entry));
+    if (typeof value === 'string') return value.trim() !== '';
+    return true;
+  }
+
+  const renderListCards = () => {
+    if (!isListVariant) return null;
+    if (loading) {
+      return <div style={{ padding: 8, fontSize: 13, color: '#64748b' }}>Loading...</div>;
+    }
+    if (rows.length === 0) {
+      return <div style={{ padding: 8, fontSize: 13, color: '#64748b' }}>No records.</div>;
+    }
+
+    const layout = listLayout;
+    const safeColumns = columnOrder;
+
+    return (
+      <div style={{ display: 'grid', gap: 12 }}>
+        {rows.map((row, index) => {
+          const claimed = new Set<string>();
+          const takeField = (field?: string) => {
+            if (!field) return undefined;
+            if (!safeColumns.includes(field)) return undefined;
+            if (claimed.has(field)) return undefined;
+            claimed.add(field);
+            return field;
+          };
+          const takeFields = (fields?: readonly string[]) => {
+            const list: string[] = [];
+            if (!fields) return list;
+            for (const field of fields) {
+              const picked = takeField(field);
+              if (picked) list.push(picked);
+            }
+            return list;
+          };
+
+          let titleField = layout?.titleField ? takeField(layout.titleField) : undefined;
+          if (!titleField) {
+            titleField = takeField(safeColumns[0]);
+          }
+
+          const subtitleFields = takeFields(layout?.subtitleFields);
+          const badgeFields = takeFields(layout?.badgeFields);
+          const footerFields = takeFields(layout?.footerFields);
+
+          let bodyFields: string[] = [];
+          if (layout?.bodyFields && layout.bodyFields.length) {
+            bodyFields = takeFields(layout.bodyFields);
+          } else {
+            bodyFields = safeColumns.filter((field) => {
+              if (claimed.has(field)) return false;
+              claimed.add(field);
+              return true;
+            });
+          }
+
+          const showLabels = layout?.showFieldLabels !== false;
+
+          const buildDisplay = (field: string) => {
+            const meta = columnMetaMap.get(field);
+            const value = row?.[field];
+            if (!hasRenderableValue(value)) {
+              return { field, meta, node: null as React.ReactNode | null };
+            }
+            const selectOptions = getCachedOptionsForMeta(meta);
+            const node = renderDisplayValue(value, meta, undefined, selectOptions);
+            return { field, meta, node };
+          };
+
+          const titleDisplay = titleField ? buildDisplay(titleField) : null;
+          const subtitleDisplays = subtitleFields.map(buildDisplay).filter((entry) => entry.node != null);
+          const badgeDisplays = badgeFields.map(buildDisplay).filter((entry) => entry.node != null);
+          const bodyDisplays = bodyFields.map(buildDisplay).filter((entry) => entry.node != null);
+          const footerDisplays = footerFields.map(buildDisplay).filter((entry) => entry.node != null);
+
+          const rowKey = row?.id ?? row?.uuid ?? `${index}`;
+
+          return (
+            <div
+              key={`${rowKey}-${index}`}
+              style={{
+                border: '1px solid #e2e8f0',
+                borderRadius: 8,
+                padding: 12,
+                background: '#ffffff',
+                boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
+                display: 'grid',
+                gap: 8,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+                  {titleField ? (
+                    <div style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', marginBottom: subtitleDisplays.length ? 4 : 0 }}>
+                      {titleDisplay?.node ?? <span style={{ color: '#94a3b8' }}>--</span>}
+                    </div>
+                  ) : null}
+                  {subtitleDisplays.length ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 12, color: '#475569' }}>
+                      {subtitleDisplays.map(({ field, meta, node }) => (
+                        <span key={field} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <span style={{ color: '#94a3b8' }}>{meta?.label ?? labelFromField(field)}:</span>
+                          <span style={{ color: '#0f172a' }}>{node}</span>
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+                {(effective as any).rowActions && (effective as any).rowActions.length > 0 ? (
+                  <Select
+                    value=""
+                    onValueChange={async (value) => {
+                      await handleRowAction({
+                        actionId: value as any,
+                        row,
+                        index,
+                        effective,
+                        setEditingRow,
+                        setEditingValues,
+                        setViewRowIndex,
+                        setRefreshToken,
+                      });
+                    }}
+                  >
+                    <SelectTrigger
+                      className="w-[92px] text-xs border-slate-300 hover:border-slate-400 focus:ring-1 focus:ring-slate-400 [&_svg]:hidden"
+                      style={{ height: '24px', minHeight: '24px', padding: '2px 8px', fontSize: '12px' }}
+                      onMouseDown={(event) => event.stopPropagation()}
+                      onMouseUp={(event) => event.stopPropagation()}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <SelectValue placeholder="Actions" />
+                      <span style={{ marginLeft: 6, opacity: 0.9 }}>v</span>
+                    </SelectTrigger>
+                    <SelectContent
+                      className="bg-white border border-slate-200 shadow-lg z-50"
+                      style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', zIndex: 9999 }}
+                    >
+                      {(effective as any).rowActions.map((action: any) => {
+                        const value = typeof action === 'string' ? action : action.id;
+                        const label = typeof action === 'string' ? getRowActionLabel(action as any) : action.label;
+                        return (
+                          <SelectItem
+                            key={value}
+                            value={value}
+                            className="text-xs"
+                            style={{ backgroundColor: '#ffffff', color: '#1f2937', fontSize: '11px', padding: '4px 8px' }}
+                          >
+                            {label}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                ) : null}
+              </div>
+              {badgeDisplays.length ? (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: 12 }}>
+                  {badgeDisplays.map(({ field, node }) => (
+                    <span
+                      key={field}
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: 999,
+                        background: '#eff6ff',
+                        color: '#1e3a8a',
+                        border: '1px solid #bfdbfe',
+                      }}
+                    >
+                      {node}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+              {bodyDisplays.length ? (
+                <div style={{ display: 'grid', gap: 8 }}>
+                  {bodyDisplays.map(({ field, meta, node }) => (
+                    <div
+                      key={field}
+                      style={
+                        showLabels
+                          ? { display: 'grid', gridTemplateColumns: '150px 1fr', gap: 8, alignItems: 'start' }
+                          : { display: 'block' }
+                      }
+                    >
+                      {showLabels ? (
+                        <div style={{ fontSize: 12, color: '#94a3b8' }}>{meta?.label ?? labelFromField(field)}</div>
+                      ) : null}
+                      <div style={{ fontSize: 13, color: '#0f172a', whiteSpace: 'pre-wrap' }}>{node}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              {footerDisplays.length ? (
+                <div style={{ fontSize: 12, color: '#64748b', display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                  {footerDisplays.map(({ field, meta, node }) => (
+                    <span key={field}>
+                      <span style={{ color: '#94a3b8' }}>{meta?.label ?? labelFromField(field)}:</span>{' '}
+                      <span>{node}</span>
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   // Ensure select/lookup options are available for table inline editors
   React.useEffect(() => {
@@ -1947,9 +2178,14 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
         </div>
       </div>
 
-      <div style={{ overflowX: 'auto' }}>
+      {isListVariant ? (
+        <div style={{ padding: 12 }}>
+          {renderListCards()}
+        </div>
+      ) : (
+        <div style={{ overflowX: 'auto' }}>
 
-        <table style={{ width: '100%', fontSize: 14 }}>
+          <table style={{ width: '100%', fontSize: 14 }}>
 
           <thead>
 
@@ -1990,7 +2226,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
                 <td colSpan={(((effective as any).columns?.length) ?? 0) + (((effective as any).rowActions && (effective as any).rowActions.length > 0) ? 1 : 0)} style={{ padding: 6 }}>
 
-                  Loadingï¿½
+                  Loading...
 
                 </td>
 
@@ -2124,7 +2360,9 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
         </table>
 
-      </div>
+        </div>
+      )}
+
 
       {editingRow !== null ? (
         <div style={{ padding: 8, borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
@@ -3262,6 +3500,15 @@ function MostRecentFilloutFormLink({ formId, title }: { formId?: string; title: 
     </>
   );
 }
+
+
+
+
+
+
+
+
+
 
 
 

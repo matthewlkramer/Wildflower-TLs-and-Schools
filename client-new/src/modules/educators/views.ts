@@ -1,4 +1,4 @@
-import { view, tab, card, table } from '../shared/views/builders';
+import { view, tab, card, table, list } from '../shared/views/builders';
 import type { ViewSpec } from '../shared/views/types';
 import type { GridColumnConfig, FieldMetadataMap } from '../shared/detail-types';
 
@@ -19,7 +19,7 @@ export const EDUCATOR_GRID: GridColumnConfig[] = [
 
 export const EDUCATOR_KANBAN_CONSTANTS_TABLE = 'ref_educator_statuses';
 
-// Field metadata (non-defaults only)
+const GMAIL_LIST_OPTIONS = {\n  title: 'Gmails',\n  width: 'half' as const,\n  orderBy: [{ column: 'sent_at', ascending: false }] as const,\n  limit: 50,\n  layout: {\n    titleField: 'subject',\n    subtitleFields: ['from'] as const,\n    badgeFields: ['is_private'] as const,\n    bodyFields: ['to_emails', 'cc_emails'] as const,\n    footerFields: ['sent_at'] as const,\n    showFieldLabels: true,\n  },\n} as const;\n\n// Field metadata (non-defaults only)
 export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   full_name: { editable: false },
   primary_phone_other_info: { label: 'Extension or other info (for Primary Phone)' },
@@ -126,3 +126,6 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
   tab('actionSteps', 'Action Steps', table('educatorActionSteps')),
   tab('google_sync', 'Gmail/gCal', table('educatorGmails', { title: 'Gmails', width: 'half' }), table('educatorCalendarEvents', { title: 'Calendar Events', width: 'half' })),
 );
+
+
+

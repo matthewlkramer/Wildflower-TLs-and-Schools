@@ -1,4 +1,4 @@
-import { view, tab, card, table } from '../shared/views/builders';
+import { view, tab, card, table, list } from '../shared/views/builders';
 import type { ViewSpec } from '../shared/views/types';
 import type { GridColumnConfig, FieldMetadataMap } from '../shared/detail-types';
 
@@ -17,7 +17,7 @@ export const CHARTER_GRID: GridColumnConfig[] = [
 
 export const CHARTER_KANBAN_CONSTANTS_TABLE = 'ref_charter_statuses';
 
-export const CHARTER_FIELD_METADATA: FieldMetadataMap = {
+const GMAIL_LIST_OPTIONS = {\n  title: 'Gmails',\n  width: 'half' as const,\n  orderBy: [{ column: 'sent_at', ascending: false }] as const,\n  limit: 50,\n  layout: {\n    titleField: 'subject',\n    subtitleFields: ['from'] as const,\n    badgeFields: ['is_private'] as const,\n    bodyFields: ['to_emails', 'cc_emails'] as const,\n    footerFields: ['sent_at'] as const,\n    showFieldLabels: true,\n  },\n} as const;\n\nexport const CHARTER_FIELD_METADATA: FieldMetadataMap = {
   application: { type: 'attachment' },
   auth_decision: { label: 'Authorization Decision'},
   authorizer: { lookup: { table: 'charter_authorizers', valueColumn: 'authorizer_name', labelColumn: 'authorizer_name' } },
@@ -101,5 +101,8 @@ export const CHARTER_VIEW_SPEC: ViewSpec = view(
   tab('notes', 'Notes', table('charterNotes')),
   tab('action_steps', 'Action Steps', table('charterActionSteps')),
   tab('grants_loans', 'Grants & Loans', table('charterGrants', { title: 'Grants', width: 'half' }), table('charterLoans', { title: 'Loans', width: 'half' })),
-  tab('gmail_gCCal', 'Gmail/gCal', table('charterGmails', { title: 'Gmails', width: 'half' }), table('charterCalendarEvents', { title: 'Calendar Events', width: 'half' }))
+  tab('gmail_gCCal', 'Gmail/gCal', list('charterGmails', GMAIL_LIST_OPTIONS), table('charterCalendarEvents', { title: 'Calendar Events', width: 'half' }))
 );
+
+
+

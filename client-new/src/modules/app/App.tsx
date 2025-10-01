@@ -7,7 +7,6 @@ import { Header } from './components/Header';
 import { RequireAuth, useAuth } from '../auth/auth-context';
 import { useLocation } from 'wouter';
 import { LoginPage } from '../auth/pages/LoginPage';
-import { ResetPage } from '../auth/pages/ResetPage';
 import { EducatorDetailPage } from '../educators/pages/EducatorDetailPage';
 import { SchoolDetailPage } from '../schools/pages/SchoolDetailPage';
 import { CharterDetailPage } from '../charters/pages/CharterDetailPage';
@@ -37,7 +36,6 @@ export function App() {
             </RequireAuth>
           </Route>
           <Route path="/login" component={LoginPage} />
-          <Route path="/reset" component={ResetPage} />
 
           <Route path="/educators">
             <RequireAuth>

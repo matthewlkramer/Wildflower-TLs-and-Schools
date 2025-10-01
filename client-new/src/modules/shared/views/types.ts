@@ -1,13 +1,33 @@
-import type { DetailTabSpec, DetailCardBlock, DetailTableBlock, DetailMapBlock, TableToggleSpec } from '../detail-types';
+import type { DetailTabSpec, DetailCardBlock, DetailTableBlock, DetailListBlock, DetailMapBlock, DetailListLayout, TableToggleSpec, TableOrderBy } from '../detail-types';
 import type { TablePresetId } from '../table-presets';
 
 export type ViewId = 'schools' | 'educators' | 'charters' | (string & {});
 
 export type CardSpec = { kind: 'card'; title?: string; width?: 'half' | 'full'; fields: string[]; editable?: boolean };
-export type TableSpec = { kind: 'table'; title?: string; width?: 'half' | 'full'; preset: TablePresetId; columns?: string[]; toggles?: readonly TableToggleSpec[] };
+export type TableSpec = {
+  kind: 'table';
+  title?: string;
+  width?: 'half' | 'full';
+  preset: TablePresetId;
+  columns?: string[];
+  toggles?: readonly TableToggleSpec[];
+  orderBy?: readonly TableOrderBy[];
+  limit?: number;
+};
+export type ListSpec = {
+  kind: 'list';
+  title?: string;
+  width?: 'half' | 'full';
+  preset: TablePresetId;
+  columns?: string[];
+  toggles?: readonly TableToggleSpec[];
+  orderBy?: readonly TableOrderBy[];
+  limit?: number;
+  layout?: DetailListLayout;
+};
 export type MapSpec = { kind: 'map'; title?: string; width?: 'half' | 'full'; fields: [string, string, string] | string[] };
 
-export type BlockSpec = CardSpec | TableSpec | MapSpec;
+export type BlockSpec = CardSpec | TableSpec | ListSpec | MapSpec;
 
 export type TabSpec = { id: string; label: string; blocks: BlockSpec[] };
 
@@ -28,6 +48,18 @@ export function asTabs(view: ViewSpec): DetailTabSpec[] {
         const out: DetailTableBlock = { kind: 'table', title: tb.title, width: tb.width, preset: tb.preset } as any;
         if (tb.toggles) (out as any).toggles = tb.toggles;
         if (tb.columns) (out as any).columns = tb.columns;
+        if (tb.orderBy) (out as any).orderBy = tb.orderBy;
+        if (tb.limit != null) (out as any).limit = tb.limit;
+        return out;
+      }
+      if (b.kind === 'list') {
+        const lb = b as ListSpec;
+        const out: DetailListBlock = { kind: 'list', title: lb.title, width: lb.width, preset: lb.preset } as any;
+        if (lb.toggles) (out as any).toggles = lb.toggles;
+        if (lb.columns) (out as any).columns = lb.columns;
+        if (lb.orderBy) (out as any).orderBy = lb.orderBy;
+        if (lb.limit != null) (out as any).limit = lb.limit;
+        if (lb.layout) (out as any).listLayout = lb.layout;
         return out;
       }
       const m = b as MapSpec;
@@ -35,4 +67,3 @@ export function asTabs(view: ViewSpec): DetailTabSpec[] {
     }),
   }));
 }
-
