@@ -2480,15 +2480,17 @@ function renderDisplayValue(
 
         {attachments.filter(Boolean).map((att: any, idx: number) => {
 
+
           if (typeof att === 'string') {
 
+            const href = toPublicUrl(att) || att;
             return (
 
               <div key={idx}>
 
-                <a href={toPublicUrl(att) || att} target="_blank" rel="noreferrer">
+                <a href={href} target="_blank" rel="noreferrer" style={{ display: 'inline-block', maxWidth: 160 }}>
 
-                  {att}
+                  <img src={href} alt="attachment" style={{ maxWidth: '160px', maxHeight: '120px', borderRadius: 6, display: 'block' }} />
 
                 </a>
 
@@ -2510,9 +2512,9 @@ function renderDisplayValue(
 
                 <div key={idx}>
 
-                  <a href={String(url)} target="_blank" rel="noreferrer">
+                  <a href={String(url)} target="_blank" rel="noreferrer" style={{ display: 'inline-block', maxWidth: 160 }}>
 
-                    {label}
+                    <img src={String(url)} alt={label} style={{ maxWidth: '160px', maxHeight: '120px', borderRadius: 6, display: 'block' }} />
 
                   </a>
 
