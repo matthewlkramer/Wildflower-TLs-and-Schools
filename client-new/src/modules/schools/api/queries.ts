@@ -17,8 +17,8 @@ export function useSchoolDetails(id: string) {
     enabled: !!id,
     queryFn: async () => {
       const { data, error } = await supabase.from('details_schools').select('*').eq('id', id).maybeSingle();
-      if (error) throw error; return data;
+      if (error) throw error;
+      return data;
     }
   });
 }
-

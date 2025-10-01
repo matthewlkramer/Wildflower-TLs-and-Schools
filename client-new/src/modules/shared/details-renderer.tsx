@@ -57,7 +57,6 @@ type SelectOption = { value: string; label: string };
 const ENUM_OPTION_CACHE = new Map<string, SelectOption[]>();
 
 const LOOKUP_OPTION_CACHE = new Map<string, SelectOption[]>();
-const STORAGE_OBJECT_CACHE = new Map<string, { bucket: string; name: string; url?: string | null }>();
 
 const DEFAULT_SCHEMA = 'public';
 
@@ -136,42 +135,6 @@ function isFileLikePath(s: string): boolean {
   // Common file extensions
   if (/\.(pdf|png|jpe?g|gif|svg|webp|docx?|xlsx?|pptx?|txt|csv|zip)$/i.test(str)) return true;
   return false;
-}
-
-const UUID_REGEX = /^[0-9a-fA-F-]{36}$/;
-
-async function resolveStorageObjectUrl(id: string): Promise<string | undefined> {
-  if (!id || !UUID_REGEX.test(id)) return undefined;
-  const cached = STORAGE_OBJECT_CACHE.get(id);
-  if (cached) {
-    if (cached.url) return cached.url;
-    if (cached.url === null) return undefined;
-    const { bucket, name } = cached;
-    const { data } = (supabase as any).storage.from(bucket).getPublicUrl(name);
-    const url = data?.publicUrl as string | undefined;
-    STORAGE_OBJECT_CACHE.set(id, { bucket, name, url: url ?? null });
-    return url ?? undefined;
-  }
-  try {
-    const { data, error } = await (supabase as any)
-      .schema('storage')
-      .from('objects')
-      .select('bucket_id,name')
-      .eq('id', id)
-      .maybeSingle();
-    if (error || !data?.name || !data?.bucket_id) {
-      STORAGE_OBJECT_CACHE.set(id, { bucket: '', name: '', url: null });
-      return undefined;
-    }
-    STORAGE_OBJECT_CACHE.set(id, { bucket: data.bucket_id, name: data.name });
-    const { data: publicUrl } = (supabase as any).storage.from(data.bucket_id).getPublicUrl(data.name);
-    const url = publicUrl?.publicUrl as string | undefined;
-    STORAGE_OBJECT_CACHE.set(id, { bucket: data.bucket_id, name: data.name, url: url ?? null });
-    return url ?? undefined;
-  } catch {
-    STORAGE_OBJECT_CACHE.set(id, { bucket: '', name: '', url: null });
-    return undefined;
-  }
 }
 
 
@@ -812,24 +775,18 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
   );
 
   React.useEffect(() => {
-    let cancelled = false;
-    async function loadAttachments() {
-      const updates: Record<string, any> = {};
-      for (const field of block.fields) {
-        const meta = getMetaForField(field);
-        if (meta?.type === 'attachment') {
-          const raw = values[field];
-          const resolved = await resolveAttachmentValue(field, raw);
-          if (!cancelled && resolved !== undefined) updates[field] = resolved;
+    const overrides: Record<string, any> = {};
+    for (const field of block.fields) {
+      const meta = getMetaForField(field);
+      if (meta?.type === 'attachment') {
+        const fullKey = `${field}_full_url`;
+        if (fullKey in details && details[fullKey] != null && details[fullKey] !== '') {
+          overrides[field] = details[fullKey];
         }
       }
-      if (!cancelled) setDisplayOverrides(updates);
     }
-    loadAttachments();
-    return () => {
-      cancelled = true;
-    };
-  }, [block.fields, values, getMetaForField]);
+    setDisplayOverrides(overrides);
+  }, [block.fields, details, getMetaForField]);
 
   function columnAllowsEdit(meta?: TableColumnMeta): boolean {
     if (!meta) return true;
@@ -2660,38 +2617,6 @@ function renderDisplayValue(
 
   return String(value);
 
-}
-
-
-
-async function resolveAttachmentValue(field: string, value: any): Promise<any> {
-  if (!value) return value;
-  if (Array.isArray(value)) {
-    const resolved = await Promise.all(value.map((entry) => resolveAttachmentEntry(entry)));
-    return resolved.filter((entry) => entry != null);
-  }
-  return await resolveAttachmentEntry(value);
-}
-
-async function resolveAttachmentEntry(entry: any): Promise<any> {
-  if (!entry) return entry;
-  if (typeof entry === 'string') {
-    if (entry.startsWith('http')) return entry;
-    if (entry.includes('/')) return toPublicUrl(entry) ?? entry;
-    const url = await resolveStorageObjectUrl(entry);
-    return url ?? entry;
-  }
-  if (typeof entry === 'object') {
-    const direct = toPublicUrl(entry);
-    if (direct) return { ...entry, url: direct };
-    if ((entry as any).url) return entry;
-    if (typeof (entry as any).id === 'string') {
-      const url = await resolveStorageObjectUrl((entry as any).id);
-      if (url) return { ...entry, url };
-    }
-    return entry;
-  }
-  return entry;
 }
 
 
