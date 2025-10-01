@@ -2152,7 +2152,6 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
                     )}
                   </div>
                 );
-              }
             }
 
             const privateMeta = columnMetaMap.get('is_private');
@@ -3770,6 +3769,7 @@ function MostRecentFilloutFormLink({ formId, title }: { formId?: string; title: 
     </>
   );
 }
+
 
 
 
