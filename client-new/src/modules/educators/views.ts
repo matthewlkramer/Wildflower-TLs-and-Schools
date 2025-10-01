@@ -114,7 +114,7 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
     card(['home_address'], { title: 'Address', editable: true }),
   ),
   tab('schools', 'Schools', table('educatorSchools')),
-  tab('certifications_events', 'Certs & Events', list('educatorMontessoriCerts', CERTIFICATION_LIST_OPTIONS), list('educatorEvents', EVENT_LIST_OPTIONS)),
+  tab('certifications_events', 'Certs & Events', list('educatorMontessoriCerts', LIST_PRESETS.CERTIFICATION_LIST_OPTIONS), list('educatorEvents', LIST_PRESETS.EVENTS_LIST_OPTIONS)),
   tab(
     'early_cultivation',
     'Early Cultivation',
