@@ -34,6 +34,48 @@ const GMAIL_LIST_OPTIONS = {
   },
 } as const;
 
+const GCAL_LIST_OPTIONS = {
+  title: 'gCal',
+  width: 'half' as const,
+  orderBy: [{ column: 'start_time', ascending: false }] as const,
+  limit: 50,
+  layout: {
+    titleField: 'summary',
+    badgeFields: ['is_private'] as const,
+    bodyFields: ['start_time', 'end_time', 'location', 'organizer_email', 'attendees'] as const,
+    showFieldLabels: true,
+  },
+} as const;
+
+const NOTES_LIST_OPTIONS = {
+  title: 'Notes',
+  width: 'half' as const,
+  orderBy: [{ column: 'created_date', ascending: false }] as const,
+  limit: 50,
+  layout: {
+    titleField: 'title',
+    badgeFields: ['is_private'] as const,
+    bodyFields: ['full_text'] as const,
+    footerFields: ['created_date'] as const,
+    showFieldLabels: true,
+  },
+} as const;
+
+const ACTION_STEPS_LIST_OPTIONS = {
+  title: 'Action Steps',
+  width: 'half' as const,
+  orderBy: [{ column: 'created_date', ascending: false }] as const,
+  limit: 50,
+  layout: {
+    titleField: 'item',
+    subtitleFields: ['assignee'] as const,
+    badgeFields: ['item_status'] as const,
+    bodyFields: ['assigned_date', 'due_date','completed_date'] as const,
+    footerFields: ['created_date'] as const,
+    showFieldLabels: true,
+  },
+} as const;
+
 // Field metadata (only non-defaults retained)
 export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {
   about: { multiline: true },
@@ -169,9 +211,8 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
   tab('locations', 'Locations', table('schoolLocations')),
   tab('guides', 'Guides', table('schoolGuideAssignments')),
   tab('documents', 'Docs', table('schoolGovernanceDocs', { title: 'Documents', width: 'half' }), table('schoolNineNineties', { title: '990s', width: 'half' })),
-  tab('action_steps', 'Action Steps', table('schoolActionSteps')),
-  tab('notes', 'Notes', table('schoolNotes')),
-  tab('google_sync', 'gmail/gCal', list('schoolGmails', GMAIL_LIST_OPTIONS), table('schoolCalendarEvents', { title: 'Calendar Events', width: 'half' })),
+  tab('actions_notes', 'Actions & Notes', list('schoolActionSteps', ACTION_STEPS_LIST_OPTIONS), list('schoolNotes', NOTES_LIST_OPTIONS)),
+  tab('google_sync', 'gmail/gCal', list('schoolGmails', GMAIL_LIST_OPTIONS), list('schoolCalendarEvents', GCAL_LIST_OPTIONS)),
   tab(
     'ops_guide_tab',
     'Ops Guide',

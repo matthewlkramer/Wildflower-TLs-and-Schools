@@ -3017,6 +3017,44 @@ function getInitialValues(fields: string[], details: any) {
 
 
 
+// Normalize Gmail body/subject text to fix mojibake and HTML entities
+function normalizeTextForEmail(input: string): string {
+  if (input == null) return '';
+  let text = String(input);
+  // Decode basic HTML entities
+  try {
+    const div = document.createElement('div');
+    div.innerHTML = text;
+    const decoded = (div.textContent || div.innerText || '') as string;
+    if (decoded) text = decoded;
+  } catch {}
+  // Remove zero-width chars
+  text = text.replace(/[\u200B-\u200D\uFEFF]/g, '');
+  // If typical mojibake sequences exist, attempt Latin1->UTF8 fix
+  const looksMojibake = /(?:Ã\.|Â|â€™|â€œ|â€\u001d|â€“|â€”|â€¢)/.test(text);
+  if (looksMojibake && typeof TextDecoder !== 'undefined') {
+    try {
+      const bytes = new Uint8Array(text.length);
+      for (let i = 0; i < text.length; i++) bytes[i] = text.charCodeAt(i) & 0xff;
+      const fixed = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+      if (fixed && fixed !== text) text = fixed;
+    } catch {}
+  }
+  // Clean up a few common leftovers
+  text = text
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s{3,}/g, ' ')
+    .trim();
+  return text;
+}
+
+function maybeNormalizeEmailField(fieldName: string | undefined, value: string): string {
+  const f = (fieldName || '').toLowerCase();
+  if (f === 'subject' || f === 'body_text' || f === 'body' || f === 'text_body') {
+    return normalizeTextForEmail(value);
+  }
+  return value;
+}
 function renderDisplayValue(
 
   value: any,
@@ -3191,9 +3229,19 @@ function renderDisplayValue(
 
 
 
-  // Get the field name to check for currency/percentage fields
+    // Get the field name to check for currency/percentage fields
 
-  const fieldName = meta && 'field' in meta ? meta.field : '';
+  const fieldName = meta && 'field' in meta ? (meta as any).field : '';
+
+  // For email subject/body fields, normalize special chars and mojibake
+  if (typeof value === 'string') {
+    const normalized = maybeNormalizeEmailField(fieldName, value);
+    if (!isFileLikePath(normalized)) {
+      if (normalized !== value) return normalized;
+    }
+  }
+
+  // fieldName declared above (normalized block)
 
   // Format date strings as M/D/YYYY when type is date or value looks like a date
   if (
@@ -3769,6 +3817,8 @@ function MostRecentFilloutFormLink({ formId, title }: { formId?: string; title: 
     </>
   );
 }
+
+
 
 
 
