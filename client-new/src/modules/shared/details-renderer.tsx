@@ -38,6 +38,7 @@ import { findForeignKeyColumn } from './schema-metadata';
 
 import { saveCardValues, type ExceptionMap, type WriteTarget } from '../educators/helpers/write-helpers';
 import { formatCurrencyUSD } from '@/lib/utils';
+import { ENUM_OPTIONS, FIELD_ENUMS } from './enums.generated';
 import { getRowActionLabel, formatActionLabel } from './actions/registry';
 import { getTableActionLabel } from './actions/table-actions';
 import { handleTableAction as handleTableActionClick } from './actions/table-handlers';
@@ -458,24 +459,21 @@ function useSelectOptions(
 
 
 
-      if (meta.edit?.enumName) {
-
-        const cached = ENUM_OPTION_CACHE.get(meta.edit.enumName);
-
+      // Explicit enum on meta (either at column level or edit config)
+      const declaredEnum = (meta as any).enumName || meta.edit?.enumName;
+      if (declaredEnum) {
+        const cached = ENUM_OPTION_CACHE.get(declaredEnum);
         if (cached) {
-
           baseMap[field] = cached;
-
+        } else if (Array.isArray(ENUM_OPTIONS[declaredEnum]) && ENUM_OPTIONS[declaredEnum]!.length) {
+          const options = asSelectOptions(ENUM_OPTIONS[declaredEnum]!);
+          ENUM_OPTION_CACHE.set(declaredEnum, options);
+          baseMap[field] = options;
         } else {
-
-          const list = enumsToFetch.get(meta.edit.enumName);
-
+          const list = enumsToFetch.get(declaredEnum);
           if (list) list.push(field);
-
-          else enumsToFetch.set(meta.edit.enumName, [field]);
-
+          else enumsToFetch.set(declaredEnum, [field]);
         }
-
       }
 
 
@@ -495,9 +493,10 @@ function useSelectOptions(
       }
 
       // Fallback: infer enum from schema when not specified in meta
-      if (!baseMap[field] && !meta.options && !meta.lookup && !meta.edit?.enumName) {
+      if (!baseMap[field] && !meta.options && !meta.lookup && !declaredEnum) {
         const column = meta.edit?.column ?? field;
         let inferred: string | undefined;
+        // 1) metadata tables (schema snapshot)
         if (defaultWriteOrder && defaultWriteOrder.length) {
           for (const t of defaultWriteOrder) {
             const cm = getColumnMetadata(undefined, t, column) as any;
@@ -507,10 +506,25 @@ function useSelectOptions(
           const cm = getColumnMetadata(defaultWriteTo.schema, defaultWriteTo.table, column) as any;
           inferred = cm?.enumRef?.name as string | undefined;
         }
+        // 2) generated types map
+        if (!inferred) {
+          const tables = defaultWriteOrder && defaultWriteOrder.length ? defaultWriteOrder : (defaultWriteTo?.table ? [defaultWriteTo.table] : []);
+          for (const t of tables) {
+            const key = `public.${t}.${column}`;
+            const name = FIELD_ENUMS[key];
+            if (name) { inferred = name; break; }
+          }
+        }
         if (inferred) {
-          const list = enumsToFetch.get(inferred);
-          if (list) list.push(field);
-          else enumsToFetch.set(inferred, [field]);
+          if (Array.isArray(ENUM_OPTIONS[inferred]) && ENUM_OPTIONS[inferred]!.length) {
+            const options = asSelectOptions(ENUM_OPTIONS[inferred]!);
+            ENUM_OPTION_CACHE.set(inferred, options);
+            baseMap[field] = options;
+          } else {
+            const list = enumsToFetch.get(inferred);
+            if (list) list.push(field);
+            else enumsToFetch.set(inferred, [field]);
+          }
         }
       }
 
@@ -555,35 +569,26 @@ function useSelectOptions(
 
 
       for (const [enumName, enumFields] of enumsToFetch.entries()) {
-
-        const { data, error } = await (supabase as any).rpc('enum_values', { enum_type: enumName });
-
-        if (!error && Array.isArray(data)) {
-
-          const options = data.map((entry: any) => {
-
-            const rawValue = entry.value ?? entry.name ?? entry;
-
-            const rawLabel = entry.label ?? rawValue;
-
-            const value = normalizeOptionValue(rawValue);
-
-            const label = normalizeOptionValue(rawLabel);
-
-            return { value, label };
-
-          });
-
-          ENUM_OPTION_CACHE.set(enumName, options);
-
-          for (const field of enumFields) {
-
-            updates[field] = options;
-
+        let options: SelectOption[] | undefined;
+        const fromMap = ENUM_OPTIONS[enumName];
+        if (Array.isArray(fromMap) && fromMap.length) {
+          options = asSelectOptions(fromMap);
+        } else {
+          const { data, error } = await (supabase as any).rpc('enum_values', { enum_type: enumName });
+          if (!error && Array.isArray(data)) {
+            options = data.map((entry: any) => {
+              const rawValue = entry.value ?? entry.name ?? entry;
+              const rawLabel = entry.label ?? rawValue;
+              const value = normalizeOptionValue(rawValue);
+              const label = normalizeOptionValue(rawLabel);
+              return { value, label };
+            });
           }
-
         }
-
+        if (options && options.length) {
+          ENUM_OPTION_CACHE.set(enumName, options);
+          for (const field of enumFields) updates[field] = options;
+        }
       }
 
 
@@ -1483,13 +1488,21 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
       if (!meta) return;
       const enumName = (meta as any)?.enumName || (meta as any)?.edit?.enumName;
       if (enumName && !ENUM_OPTION_CACHE.get(enumName)) {
-        const { data, error } = await (supabase as any).rpc('enum_values', { enum_type: enumName });
-        if (!error && Array.isArray(data)) {
-          const opts = data.map((entry: any) => {
-            const raw = entry?.value ?? entry?.name ?? entry;
-            const s = String(raw ?? '');
-            return s ? ({ value: s, label: s } as SelectOption) : null;
-          }).filter(Boolean) as SelectOption[];
+        let opts: SelectOption[] | undefined;
+        const local = ENUM_OPTIONS[enumName];
+        if (Array.isArray(local) && local.length) {
+          opts = asSelectOptions(local);
+        } else {
+          const { data, error } = await (supabase as any).rpc('enum_values', { enum_type: enumName });
+          if (!error && Array.isArray(data)) {
+            opts = data.map((entry: any) => {
+              const raw = entry?.value ?? entry?.name ?? entry;
+              const s = String(raw ?? '');
+              return s ? ({ value: s, label: s } as SelectOption) : null;
+            }).filter(Boolean) as SelectOption[];
+          }
+        }
+        if (opts && opts.length) {
           ENUM_OPTION_CACHE.set(enumName, opts);
           setOptionsVersion((v) => v + 1);
         }
@@ -1673,17 +1686,23 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
         }
         // Load enums
         for (const enumName of enums) {
-          const { data, error } = await (supabase as any).rpc('enum_values', { enum_type: enumName });
-          if (!cancelled && !error && Array.isArray(data)) {
-            const opts = data
-              .map((entry: any) => {
-                const raw = entry?.value ?? entry?.name ?? entry;
-                const s = String(raw ?? '');
-                return s ? ({ value: s, label: s } as SelectOption) : null;
-              })
-              .filter(Boolean) as SelectOption[];
-            ENUM_OPTION_CACHE.set(enumName, opts);
+          let opts: SelectOption[] | undefined;
+          const local = ENUM_OPTIONS[enumName];
+          if (Array.isArray(local) && local.length) {
+            opts = asSelectOptions(local);
+          } else {
+            const { data, error } = await (supabase as any).rpc('enum_values', { enum_type: enumName });
+            if (!cancelled && !error && Array.isArray(data)) {
+              opts = data
+                .map((entry: any) => {
+                  const raw = entry?.value ?? entry?.name ?? entry;
+                  const s = String(raw ?? '');
+                  return s ? ({ value: s, label: s } as SelectOption) : null;
+                })
+                .filter(Boolean) as SelectOption[];
+            }
           }
+          if (opts && opts.length) ENUM_OPTION_CACHE.set(enumName, opts);
         }
         // Load lookups
         for (const { key, lookup, meta } of lookups) {

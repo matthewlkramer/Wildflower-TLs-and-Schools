@@ -30,14 +30,13 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   // Show the free-text field when the selected value includes "other" (handle both cases defensively)
   race_ethnicity_other: { label: 'Race/Ethnicity - if Other, please specify', visibleIf: { field: 'race_ethnicity', in: ['other', 'Other'] } },
   gender_other: { label: 'Gender - if Other, please specify', visibleIf: { field: 'gender', in: ['Other'] } },
-  // Drive select from enum for HH Income
-  hh_income: { label: 'Household Income', edit: { table: 'people', enumName: 'income_categories' } },
-  // Ensure pronouns edits as a select via enum
-  pronouns: { edit: { table: 'people', enumName: 'pronouns' } },
+  // Drive select for HH Income (renderer infers enum)
+  hh_income: { label: 'Household Income' },
   lgbtqia: { label: 'LGBTQIA+' },
   // Pronouns enum uses lowercase 'other' in the database
-  pronouns_other: { label: 'Pronouns - if Other, please specify' , visibleIf: { field: 'pronouns', in: ['other'] } },
-  indiv_type: { label: 'Type' },
+  pronouns_other: { label: 'Pronouns - if other, please specify' , visibleIf: { field: 'pronouns', in: ['other'] } },
+  // Not an enum in DB; offer common options
+  indiv_type: { label: 'Type', options: ['Educator', 'Community Member'] },
   assigned_partner: { editable: false },
   first_contact_ages: { label: 'Initial Interest: Ages' },
   first_contact_governance_model: { label: 'Initial Interest: Governance Model' },
@@ -56,7 +55,7 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   routed_to: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
   assigned_partner_override: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
   person_responsible_for_follow_up: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
-  one_on_one_scheduling_status: { label: 'One-on-One Scheduling Status', lookup: { table: 'ref_one_on_one_status', valueColumn: 'value', labelColumn: 'label' } },
+  one_on_one_scheduling_status: { label: 'One-on-One Scheduling Status', lookup: { schema: 'ref_tables', table: 'ref_one_on_one_status', valueColumn: 'value', labelColumn: 'label' } },
   current_role_at_active_school: { label: 'Current Role at Active School', editable: false },
   current_role: { editable: false },
   active_school: { editable: false },
