@@ -721,7 +721,27 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
   const getMetaForField = React.useCallback(
     (field: string) => {
       const manual = resolvedFieldMeta[field] ?? fieldMeta?.[field];
-      if (manual) return manual;
+      if (manual) {
+        // Enrich manual meta with inferred type/array from default write targets when missing
+        if ((manual.type == null || manual.array == null)) {
+          let cm: any | undefined;
+          if (defaultWriteOrder && defaultWriteOrder.length) {
+            for (const t of defaultWriteOrder) {
+              const found = getColumnMetadata(undefined, t, (manual.edit?.column ?? field));
+              if (found) { cm = found; break; }
+            }
+          } else if (defaultWriteTo) {
+            cm = getColumnMetadata(defaultWriteTo.schema, defaultWriteTo.table, (manual.edit?.column ?? field));
+          }
+          if (cm) {
+            const isEnum = !!cm?.enumRef;
+            const type: any = manual.type ?? (isEnum ? 'enum' : (cm?.baseType === 'boolean' ? 'boolean' : (cm?.baseType === 'number' ? 'number' : 'string')));
+            const array = manual.array ?? !!cm.isArray;
+            return { ...manual, type, array } as FieldMetadata;
+          }
+        }
+        return manual;
+      }
       // Try default write order tables first
       if (defaultWriteOrder && defaultWriteOrder.length) {
         for (const t of defaultWriteOrder) {

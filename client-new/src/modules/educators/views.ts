@@ -30,7 +30,10 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   // Show the free-text field when the selected value includes "other" (handle both cases defensively)
   race_ethnicity_other: { label: 'Race/Ethnicity - if Other, please specify', visibleIf: { field: 'race_ethnicity', in: ['other', 'Other'] } },
   gender_other: { label: 'Gender - if Other, please specify', visibleIf: { field: 'gender', in: ['Other'] } },
-  hh_income: { label: 'Household Income' },
+  // Drive select from enum for HH Income
+  hh_income: { label: 'Household Income', edit: { table: 'people', enumName: 'income_categories' } },
+  // Ensure pronouns edits as a select via enum
+  pronouns: { edit: { table: 'people', enumName: 'pronouns' } },
   lgbtqia: { label: 'LGBTQIA+' },
   // Pronouns enum uses lowercase 'other' in the database
   pronouns_other: { label: 'Pronouns - if Other, please specify' , visibleIf: { field: 'pronouns', in: ['other'] } },
