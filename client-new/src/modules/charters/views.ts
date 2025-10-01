@@ -1,5 +1,6 @@
 import { view, tab, card, table, list } from '../shared/views/builders';
 import type { ViewSpec } from '../shared/views/types';
+import { LIST_PRESETS } from '../shared/views/list-presets';
 import type { GridColumnConfig, FieldMetadataMap } from '../shared/detail-types';
 
 // Grid + Kanban
@@ -17,20 +18,7 @@ export const CHARTER_GRID: GridColumnConfig[] = [
 
 export const CHARTER_KANBAN_CONSTANTS_TABLE = 'ref_charter_statuses';
 
-const GMAIL_LIST_OPTIONS = {
-  title: 'Gmails',
-  width: 'half' as const,
-  orderBy: [{ column: 'sent_at', ascending: false }] as const,
-  limit: 50,
-  layout: {
-    titleField: 'subject',
-    subtitleFields: ['from'] as const,
-    badgeFields: ['is_private'] as const,
-    bodyFields: ['to_emails', 'cc_emails'] as const,
-    footerFields: ['sent_at'] as const,
-    showFieldLabels: true,
-  },
-} as const;
+// Gmail list options imported from shared presets
 
 export const CHARTER_FIELD_METADATA: FieldMetadataMap = {
   application: { type: 'attachment' },
@@ -111,12 +99,11 @@ export const CHARTER_VIEW_SPEC: ViewSpec = view(
   ),
   tab('educators', 'Educators', table('charterEducators')),
   tab('schools', 'Schools', table('charterSchools')),
-  tab('enrollment', 'Enrollment', table('charterEnrollment')),
+  tab('enrollment_data', 'Annual Data', list('charterEnrollment', LIST_PRESETS.ENROLLMENT_LIST_OPTIONS), list('charterAnnualData', LIST_PRESETS.ASSESSMENTS_LIST_OPTIONS)),
   tab('docs', 'Docs', table('charterGovernanceDocs', { title: 'Governance Docs', width: 'half' }), table('charterNineNineties', { title: '990s', width: 'half' })),
-  tab('notes', 'Notes', table('charterNotes')),
-  tab('action_steps', 'Action Steps', table('charterActionSteps')),
-  tab('grants_loans', 'Grants & Loans', table('charterGrants', { title: 'Grants', width: 'half' }), table('charterLoans', { title: 'Loans', width: 'half' })),
-  tab('gmail_gCCal', 'Gmail/gCal', list('charterGmails', GMAIL_LIST_OPTIONS), table('charterCalendarEvents', { title: 'Calendar Events', width: 'half' }))
+  tab('action_notes', 'Actions & Notes', list('charterActionSteps', LIST_PRESETS.ACTION_STEPS_LIST_OPTIONS), list('charterNotes', LIST_PRESETS.NOTES_LIST_OPTIONS)),
+  tab('grants_loans', 'Grants & Loans', list('charterGrants', LIST_PRESETS.GRANTS_LIST_OPTIONS), list('charterLoans', LIST_PRESETS.LOANS_LIST_OPTIONS)),
+  tab('google_sync', 'gmail/gCal', list('educatorGmails', LIST_PRESETS.GMAIL_LIST_OPTIONS), list('educatorCalendarEvents', LIST_PRESETS.GCAL_LIST_OPTIONS))
 );
 
 

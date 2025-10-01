@@ -51,8 +51,6 @@ const MANUAL_OVERRIDES: Record<string, { primaryKey?: string; labelColumn?: stri
   'mailing_lists': { labelColumn: 'name' },
   'locations': { labelColumn: 'address' },
 
-  // ref_tables that also have enums (enum for values, ref_table for display labels)
-  'ref_race_and_ethnicity': { labelColumn: 'english_label_short' },
 
   // Tables to skip (not useful as lookups)
   'action_steps': { skip: true },

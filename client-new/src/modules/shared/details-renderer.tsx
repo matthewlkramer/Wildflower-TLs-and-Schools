@@ -1949,6 +1949,30 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
 
           const showLabels = layout?.showFieldLabels !== false;
 
+          const attachmentFields = Array.isArray((layout as any)?.attachmentFields) ? takeFields((layout as any).attachmentFields as any) : [];
+          const bodyFieldFullWidth = Boolean((layout as any)?.bodyFieldFullWidth);
+
+          const tryHrefForAttachment = (field: string, value: any, rowObj: any): string | undefined => {
+            // Use resolveAttachmentDisplay first
+            const { url } = resolveAttachmentDisplay(value);
+            if (url) return url;
+            // Try common sibling naming conventions
+            const base = field.replace(/_id$/i, '');
+            const altKeys = [
+              `${field}_url`, `${field}_full_url`, `${field}_download_url`,
+              `${base}_url`, `${base}_full_url`, `${base}_download_url`
+            ];
+            for (const k of altKeys) {
+              const v = rowObj?.[k];
+              if (typeof v === 'string' && v) {
+                const href = toPublicUrl(v) || (v.startsWith('http') ? v : undefined);
+                if (href) return href;
+              }
+            }
+            // As a last resort, turn raw strings that look like URLs into links
+            if (typeof value === 'string' && value.startsWith('http')) return value;
+            return undefined;
+          };
           const getEffectiveValue = (field: string) =>
             editingRow === index && Object.prototype.hasOwnProperty.call(editingValues, field)
               ? editingValues[field]
@@ -1984,6 +2008,22 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
           let badgeDisplaysToRender = badgeDisplays;
           let bodyDisplaysToRender = bodyDisplays;
           let gmailAddressSection: React.ReactNode = null;
+          let bodyFullWidthSection: React.ReactNode = null;
+          if (!isGmailList && bodyFieldFullWidth) {
+            const pick = (layout?.bodyFields && layout.bodyFields.length ? layout.bodyFields[0] : (bodyFields.find((f) => /body/i.test(f)) || bodyFields[0])) as string | undefined;
+            if (pick) {
+              bodyDisplaysToRender = bodyDisplaysToRender.filter((e) => e.field !== pick);
+              const meta = columnMetaMap.get(pick);
+              const value = (editingRow === index && Object.prototype.hasOwnProperty.call(editingValues, pick) ? (editingValues as any)[pick] : (row as any)?.[pick]);
+              const selectOptions = getCachedOptionsForMeta(meta);
+              const node = hasRenderableValue(value) ? renderDisplayValue(value, meta, undefined, selectOptions) : null;
+              bodyFullWidthSection = (
+                <div style={{ fontSize: 13, color: '#0f172a', whiteSpace: 'pre-wrap' }}>
+                  {node ?? <span style={{ color: '#94a3b8' }}>--</span>}
+                </div>
+              );
+            }
+          }
           let gmailBodySection: React.ReactNode = null;
           let gmailPrivateIndicator: React.ReactNode = null;
 
@@ -2268,6 +2308,34 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
                   </Select>
                 ) : null}
               </div>
+              {attachmentFields.length ? (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, fontSize: 12 }}>
+                  {attachmentFields.map((field) => {
+                    const meta = columnMetaMap.get(field);
+                    const raw = (row as any)?.[field];
+                    if (raw == null) return null;
+                    const entries = normalizeAttachmentEntries(raw);
+                    if (entries.length === 0) return null;
+                    return (
+                      <div key={field} style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
+                        {showLabels ? (<div style={{ fontSize: 12, color: '#94a3b8' }}>{meta?.label ?? labelFromField(field)}:</div>) : null}
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                          {entries.map((entry, idx) => {
+                            const disp = resolveAttachmentDisplay(entry);
+                            const href = disp.url || tryHrefForAttachment(field, entry, row);
+                            const label = disp.label || 'attachment';
+                            return href ? (
+                              <a key={String(idx)} href={href} target="_blank" rel="noreferrer" style={{ color: '#0ea5e9', textDecoration: 'underline' }}>{label}</a>
+                            ) : (
+                              <span key={String(idx)} style={{ color: '#0f172a' }}>{label}</span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
               {badgeDisplaysToRender.length ? (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: 12 }}>
                   {badgeDisplaysToRender.map(({ field, node }) => (
@@ -2286,7 +2354,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
                   ))}
                 </div>
               ) : null}
-              {bodyDisplaysToRender.length ? (
+              {bodyFullWidthSection}\n              {bodyDisplaysToRender.length ? (
                 <div style={{ display: 'grid', gap: 8 }}>
                   {bodyDisplaysToRender.map(({ field, meta, node }) => (
                     <div
@@ -3817,6 +3885,8 @@ function MostRecentFilloutFormLink({ formId, title }: { formId?: string; title: 
     </>
   );
 }
+
+
 
 
 

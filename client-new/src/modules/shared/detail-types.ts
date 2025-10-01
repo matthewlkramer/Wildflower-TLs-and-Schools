@@ -176,6 +176,8 @@ export type DetailListLayout = {
   badgeFields?: readonly string[];
   footerFields?: readonly string[];
   showFieldLabels?: boolean;
+  attachmentFields?: readonly string[];
+  bodyFieldFullWidth?: boolean;
 };
 
 export type DetailListBlock = Omit<DetailTableBlock, 'kind'> & {
@@ -252,4 +254,5 @@ export type CreateTaskConfig = {
   incompleteValue?: any;
   defaults?: Record<string, any>;
 };
+
 

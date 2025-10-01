@@ -1,5 +1,6 @@
 import { view, tab, card, table, list } from '../shared/views/builders';
 import type { ViewSpec } from '../shared/views/types';
+import { LIST_PRESETS } from '../shared/views/list-presets';
 import type { GridColumnConfig, FieldMetadataMap } from '../shared/detail-types';
 
 // Grid + Kanban
@@ -19,20 +20,7 @@ export const EDUCATOR_GRID: GridColumnConfig[] = [
 
 export const EDUCATOR_KANBAN_CONSTANTS_TABLE = 'ref_educator_statuses';
 
-const GMAIL_LIST_OPTIONS = {
-  title: 'Gmails',
-  width: 'half' as const,
-  orderBy: [{ column: 'sent_at', ascending: false }] as const,
-  limit: 50,
-  layout: {
-    titleField: 'subject',
-    subtitleFields: ['from'] as const,
-    badgeFields: ['is_private'] as const,
-    bodyFields: ['to_emails', 'cc_emails'] as const,
-    footerFields: ['sent_at'] as const,
-    showFieldLabels: true,
-  },
-} as const;
+// GMAIL_LIST_OPTIONS and other list options are imported from shared presets
 
 // Field metadata (non-defaults only)
 export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
@@ -126,7 +114,7 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
     card(['home_address'], { title: 'Address', editable: true }),
   ),
   tab('schools', 'Schools', table('educatorSchools')),
-  tab('certifications', 'Certs', table('educatorMontessoriCerts')),
+  tab('certifications_events', 'Certs & Events', list('educatorMontessoriCerts', CERTIFICATION_LIST_OPTIONS), list('educatorEvents', EVENT_LIST_OPTIONS)),
   tab(
     'early_cultivation',
     'Early Cultivation',
@@ -135,12 +123,8 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
     card(['opsguide_checklist', 'opsguide_fundraising_opps', 'opsguide_meeting_prefs', 'opsguide_request_pertinent_info', 'opsguide_support_type_needed'], { title: 'Ops Guide Prefs', editable: true }),
     card(['sendgrid_template_selected', 'sendgrid_send_date', 'person_responsible_for_follow_up', 'one_on_one_scheduling_status', 'personal_email_sent', 'personal_email_sent_date'], { title: 'Follow Up', editable: true }),
   ),
-  tab('events', 'Events', table('educatorEvents')),
   tab('systems', 'Systems', card(['on_connected', 'on_slack', 'in_tl_google_grp', 'in_wf_directory', 'who_initiated_tl_removal', 'on_natl_website', 'gsuite_roles'], { editable: true })),
-  tab('notes', 'Notes', table('educatorNotes')),
-  tab('actionSteps', 'Action Steps', table('educatorActionSteps')),
-  tab('google_sync', 'Gmail/gCal', table('educatorGmails', { title: 'Gmails', width: 'half' }), table('educatorCalendarEvents', { title: 'Calendar Events', width: 'half' })),
+  tab('actions_notes', 'Actions & Notes', list('educatorActionSteps', LIST_PRESETS.ACTION_STEPS_LIST_OPTIONS), list('educatorNotes', LIST_PRESETS.NOTES_LIST_OPTIONS)),
+  tab('google_sync', 'gmail/gCal', list('educatorGmails', LIST_PRESETS.GMAIL_LIST_OPTIONS), list('educatorCalendarEvents', LIST_PRESETS.GCAL_LIST_OPTIONS))
 );
-
-
 

@@ -19,115 +19,7 @@ export const SCHOOL_GRID: GridColumnConfig[] = [
 
 export const SCHOOL_KANBAN_CONSTANTS_TABLE = 'ref_stage_statuses';
 
-const GMAIL_LIST_OPTIONS = {
-  title: 'Gmails',
-  width: 'half' as const,
-  orderBy: [{ column: 'sent_at', ascending: false }] as const,
-  limit: 50,
-  layout: {
-    titleField: 'subject',
-    subtitleFields: ['from'] as const,
-    badgeFields: ['is_private'] as const,
-    bodyFields: ['to_emails', 'cc_emails'] as const,
-    footerFields: ['sent_at'] as const,
-    showFieldLabels: true,
-  },
-} as const;
-
-const GCAL_LIST_OPTIONS = {
-  title: 'gCal',
-  width: 'half' as const,
-  orderBy: [{ column: 'start_time', ascending: false }] as const,
-  limit: 50,
-  layout: {
-    titleField: 'summary',
-    badgeFields: ['is_private'] as const,
-    bodyFields: ['start_time', 'end_time', 'location', 'organizer_email', 'attendees'] as const,
-    showFieldLabels: true,
-  },
-} as const;
-
-const NOTES_LIST_OPTIONS = {
-  title: 'Notes',
-  width: 'half' as const,
-  orderBy: [{ column: 'created_date', ascending: false }] as const,
-  limit: 50,
-  layout: {
-    titleField: 'title',
-    badgeFields: ['is_private'] as const,
-    bodyFields: ['full_text'] as const,
-    footerFields: ['created_date'] as const,
-    showFieldLabels: true,
-  },
-} as const;
-
-const ACTION_STEPS_LIST_OPTIONS = {
-  title: 'Action Steps',
-  width: 'half' as const,
-  orderBy: [{ column: 'created_date', ascending: false }] as const,
-  limit: 50,
-  layout: {
-    titleField: 'item',
-    subtitleFields: ['assignee'] as const,
-    badgeFields: ['item_status'] as const,
-    bodyFields: ['assigned_date', 'due_date','completed_date'] as const,
-    footerFields: ['created_date'] as const,
-    showFieldLabels: true,
-  },
-} as const;
-
-const EDUCATOR_LIST_OPTIONS = {
-  title: 'Educators',
-  width: 'half' as const,
-  orderBy: [{ column: 'start_date', ascending: false }] as const,
-  limit: 50,
-  layout: {
-    titleField: 'full_name',
-    subtitleFields: ['role'] as const,
-    badgeFields: ['is_active'] as const,
-    bodyFields: ['start_date', 'end_date'] as const,
-    showFieldLabels: true,
-  },
-} as const;
-
-const BOARD_MEMBER_LIST_OPTIONS = {
-  title: 'Board Members',
-  width: 'half' as const,
-  orderBy: [{ column: 'start_date', ascending: false }] as const,
-  limit: 50,
-  layout: {
-    titleField: 'full_name',
-    subtitleFields: ['role'] as const,
-    badgeFields: ['is_active'] as const,
-    bodyFields: ['start_date','end_date'] as const,
-    showFieldLabels: true,
-  },
-} as const;
-
-const ENROLLMENT_LIST_OPTIONS = {
-  title: 'Enrollment',
-  width: 'half' as const,
-  orderBy: [{ column: 'school_year', ascending: false }] as const,
-  limit: 50,
-  layout: {
-    titleField: 'school_year',
-    bodyFields: ['enrolled_students_total','enrolled_frl','enrolled_bipoc','enrolled_ell','enrolled_sped'] as const,
-    showFieldLabels: true,
-  },
-} as const;
-
-const ASSESSMENTS_LIST_OPTIONS = {
-  title: 'Assessments',
-  width: 'half' as const,
-  orderBy: [{ column: 'school_year', ascending: false }] as const,
-  limit: 50,
-  layout: {
-    titleField: 'assessment_or_metric',
-    subtitleFields: ['school_year'] as const,
-    bodyFields: ['metric_data','assessed_total','met_plus_total'] as const,
-    showFieldLabels: true,
-  },
-} as const;
+import { LIST_PRESETS, LOANS_LIST_OPTIONS, GRANTS_LIST_OPTIONS } from '../shared/views/list-presets';
 
 const DOCUMENT_LIST_OPTIONS = {
   title: 'Documents',
@@ -137,7 +29,7 @@ const DOCUMENT_LIST_OPTIONS = {
   layout: {
     titleField: 'doc_type',
     subtitleFields: ['upload_date'] as const,
-    bodyFields: ['object_id'] as const,
+    attachmentFields: ['object_id'] as const,
     showFieldLabels: true,
   },
 } as const;
@@ -149,7 +41,7 @@ const NINE_NINETIES_LIST_OPTIONS = {
   limit: 50,
   layout: {
     titleField: 'form_year',
-    bodyFields: ['object_id'] as const,
+    attachmentFields: ['object_id'] as const,
     showFieldLabels: true,
   },
 } as const;
@@ -282,14 +174,14 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     card(['business_insurance', 'budget_utility', 'bill_account'], { title: 'Systems', editable: true }),
     table('advice', { title: 'Advice' })
   ),
-  tab('educators_board', 'Educators & Board', list('schoolEducators', EDUCATOR_LIST_OPTIONS), list('schoolBoardMembers', BOARD_MEMBER_LIST_OPTIONS)),
-  tab('enrollment_assessments', 'Annual Data', list('schoolEnrollment', ENROLLMENT_LIST_OPTIONS), list('schoolAssessments', ASSESSMENTS_LIST_OPTIONS)),
-  tab('grants_loans', 'Grants & Loans', table('schoolLoans', { title: 'Loans', width: 'half' }), table('schoolGrants', { title: 'Grants', width: 'half' })),
+  tab('educators_board', 'Educators & Board', list('schoolEducators', LIST_PRESETS.EDUCATOR_LIST_OPTIONS), list('schoolBoardMembers', LIST_PRESETS.BOARD_MEMBER_LIST_OPTIONS)),
+  tab('enrollment_assessments', 'Annual Data', list('schoolEnrollment', LIST_PRESETS.ENROLLMENT_LIST_OPTIONS), list('schoolAssessments', LIST_PRESETS.ASSESSMENTS_LIST_OPTIONS)),
+  tab('grants_loans', 'Grants & Loans', list('schoolGrants', GRANTS_LIST_OPTIONS),list('schoolLoans', LOANS_LIST_OPTIONS)),
   tab('locations', 'Locations', table('schoolLocations')),
   tab('guides', 'Guides', table('schoolGuideAssignments')),
   tab('documents', 'Docs', list('schoolGovernanceDocs', DOCUMENT_LIST_OPTIONS), list('schoolNineNineties', NINE_NINETIES_LIST_OPTIONS)),
-  tab('actions_notes', 'Actions & Notes', list('schoolActionSteps', ACTION_STEPS_LIST_OPTIONS), list('schoolNotes', NOTES_LIST_OPTIONS)),
-  tab('google_sync', 'gmail/gCal', list('schoolGmails', GMAIL_LIST_OPTIONS), list('schoolCalendarEvents', GCAL_LIST_OPTIONS)),
+  tab('actions_notes', 'Actions & Notes', list('schoolActionSteps', LIST_PRESETS.ACTION_STEPS_LIST_OPTIONS), list('schoolNotes', LIST_PRESETS.NOTES_LIST_OPTIONS)),
+  tab('google_sync', 'gmail/gCal', list('schoolGmails', LIST_PRESETS.GMAIL_LIST_OPTIONS), list('schoolCalendarEvents', LIST_PRESETS.GCAL_LIST_OPTIONS)),
   tab(
     'ops_guide_tab',
     'Ops Guide',
