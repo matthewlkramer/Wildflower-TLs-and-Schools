@@ -76,6 +76,84 @@ const ACTION_STEPS_LIST_OPTIONS = {
   },
 } as const;
 
+const EDUCATOR_LIST_OPTIONS = {
+  title: 'Educators',
+  width: 'half' as const,
+  orderBy: [{ column: 'start_date', ascending: false }] as const,
+  limit: 50,
+  layout: {
+    titleField: 'full_name',
+    subtitleFields: ['role'] as const,
+    badgeFields: ['is_active'] as const,
+    bodyFields: ['start_date', 'end_date'] as const,
+    showFieldLabels: true,
+  },
+} as const;
+
+const BOARD_MEMBER_LIST_OPTIONS = {
+  title: 'Board Members',
+  width: 'half' as const,
+  orderBy: [{ column: 'start_date', ascending: false }] as const,
+  limit: 50,
+  layout: {
+    titleField: 'full_name',
+    subtitleFields: ['role'] as const,
+    badgeFields: ['is_active'] as const,
+    bodyFields: ['start_date','end_date'] as const,
+    showFieldLabels: true,
+  },
+} as const;
+
+const ENROLLMENT_LIST_OPTIONS = {
+  title: 'Enrollment',
+  width: 'half' as const,
+  orderBy: [{ column: 'school_year', ascending: false }] as const,
+  limit: 50,
+  layout: {
+    titleField: 'school_year',
+    bodyFields: ['enrolled_students_total','enrolled_frl','enrolled_bipoc','enrolled_ell','enrolled_sped'] as const,
+    showFieldLabels: true,
+  },
+} as const;
+
+const ASSESSMENTS_LIST_OPTIONS = {
+  title: 'Assessments',
+  width: 'half' as const,
+  orderBy: [{ column: 'school_year', ascending: false }] as const,
+  limit: 50,
+  layout: {
+    titleField: 'assessment_or_metric',
+    subtitleFields: ['school_year'] as const,
+    bodyFields: ['metric_data','assessed_total','met_plus_total'] as const,
+    showFieldLabels: true,
+  },
+} as const;
+
+const DOCUMENT_LIST_OPTIONS = {
+  title: 'Documents',
+  width: 'half' as const,
+  orderBy: [{ column: 'upload_date', ascending: false }] as const,
+  limit: 50,
+  layout: {
+    titleField: 'doc_type',
+    subtitleFields: ['upload_date'] as const,
+    bodyFields: ['object_id'] as const,
+    showFieldLabels: true,
+  },
+} as const;
+
+const NINE_NINETIES_LIST_OPTIONS = {
+  title: '990s',
+  width: 'half' as const,
+  orderBy: [{ column: 'form_year', ascending: false }] as const,
+  limit: 50,
+  layout: {
+    titleField: 'form_year',
+    bodyFields: ['object_id'] as const,
+    showFieldLabels: true,
+  },
+} as const;
+
 // Field metadata (only non-defaults retained)
 export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {
   about: { multiline: true },
@@ -191,7 +269,6 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     card(['governance_model','legal_structure', 'ein', 'incorporation_date', 'current_fy_end', 'loan_report_name'], { title: 'Legal entity', editable: true }),
     card(['nonprofit_path','nonprofit_status', 'group_exemption_status'], { title: 'Nonprofit status', editable: true }),
     card(['logo', 'logo_square', 'logo_flower_only', 'logo_rectangle'], { title: 'Logo(s)', editable: true }),
-    table('schoolBoardMembers', { title: 'Board Members' }),
   ),
   tab(
     'ssj',
@@ -205,18 +282,19 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     card(['business_insurance', 'budget_utility', 'bill_account'], { title: 'Systems', editable: true }),
     table('advice', { title: 'Advice' })
   ),
-  tab('educators', 'Educators', table('schoolEducators')),
-  tab('enrollment', 'Enrollment', table('schoolEnrollment')),
-  tab('grants_and_loans', 'Grants & Loans', table('schoolLoans', { title: 'Loans', width: 'half' }), table('schoolGrants', { title: 'Grants', width: 'half' })),
+  tab('educators_board', 'Educators & Board', list('schoolEducators', EDUCATOR_LIST_OPTIONS), list('schoolBoardMembers', BOARD_MEMBER_LIST_OPTIONS)),
+  tab('enrollment_assessments', 'Annual Data', list('schoolEnrollment', ENROLLMENT_LIST_OPTIONS), list('schoolAssessments', ASSESSMENTS_LIST_OPTIONS)),
+  tab('grants_loans', 'Grants & Loans', table('schoolLoans', { title: 'Loans', width: 'half' }), table('schoolGrants', { title: 'Grants', width: 'half' })),
   tab('locations', 'Locations', table('schoolLocations')),
   tab('guides', 'Guides', table('schoolGuideAssignments')),
-  tab('documents', 'Docs', table('schoolGovernanceDocs', { title: 'Documents', width: 'half' }), table('schoolNineNineties', { title: '990s', width: 'half' })),
+  tab('documents', 'Docs', list('schoolGovernanceDocs', DOCUMENT_LIST_OPTIONS), list('schoolNineNineties', NINE_NINETIES_LIST_OPTIONS)),
   tab('actions_notes', 'Actions & Notes', list('schoolActionSteps', ACTION_STEPS_LIST_OPTIONS), list('schoolNotes', NOTES_LIST_OPTIONS)),
   tab('google_sync', 'gmail/gCal', list('schoolGmails', GMAIL_LIST_OPTIONS), list('schoolCalendarEvents', GCAL_LIST_OPTIONS)),
   tab(
     'ops_guide_tab',
     'Ops Guide',
     card(['short_name', 'long_name', 'prior_names'], { title: 'Name(s)', editable: true }),
+    card(['ssj_readiness_to_open_rating', 'proj_open_date'], { title: 'SSJ', editable: true }),
     card(['current_tls','stage_status','wf_tls_on_board','current_guide_name','current_cohort'], { title: 'Calculated' }),
     card(['founding_tls', 'status', 'ssj_stage','open_date','membership_status'], { title: 'History/Status' , editable: true }),
     card(['governance_model','public_funding','program_focus','institutional_partner','ages_served', 'number_of_classrooms','enrollment_at_full_capacity'], { title: 'School Model', editable: true }),

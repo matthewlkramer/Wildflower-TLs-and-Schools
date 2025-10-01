@@ -38,7 +38,6 @@ const MANUAL_OVERRIDES: Record<string, { primaryKey?: string; labelColumn?: stri
   'guides': { primaryKey: 'email_or_name', labelColumn: 'email_or_name' },
 
   // Special label column mappings
-  'ref_race_and_ethnicity': { labelColumn: 'english_label_short' },
   'people': { labelColumn: 'full_name' },
   'schools': { labelColumn: 'short_name' },
   'charters': { labelColumn: 'short_name' },

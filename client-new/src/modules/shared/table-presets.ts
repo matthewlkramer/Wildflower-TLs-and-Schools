@@ -320,6 +320,20 @@ export const TABLE_PRESETS = {
     baseFilter: { eq: { column: 'show_in_educator_grid', value: true } },
   },
 
+  schoolAssessments: {
+    readSource: { table: 'annual_assessment_and_metrics_data', fkColumn: 'school_id' },
+    writeDefaults: { table: 'annual_assessment_and_metrics_data', pkColumn: 'id' },
+    columns: [
+      { field: 'school_year', label: 'School Year', type: 'string', lookup: { table: 'ref_school_years', valueColumn: 'value', labelColumn: 'value' } },
+      { field: 'assessment_or_metric', label: 'Assessment or Metric', type: 'string' },
+      { field: 'metric_data', label: 'Data', type: 'string' },
+    ] as const,
+    rowActions: ['inline_edit','view_in_modal'] as const,
+    tableActions: ['addRecord'] as const,
+    tableActionLabels: ['Add Data'] as const,
+  },
+
+
   // School recurring tables
   schoolGrants: {
     readSource: { table: 'grants', fkColumn: 'school_id' },
