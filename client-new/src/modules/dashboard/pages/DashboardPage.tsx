@@ -256,21 +256,31 @@ export function DashboardPage() {
         }
         // My Emails (gsync)
         if (userId) {
-          const { data } = await (fromGsync('g_emails_without_people_ids') as any)
-            .select('id:gmail_message_id,sent_at,subject,body_text,from_email,to_emails,cc_emails,bcc_emails,is_private,user_id')
-            .eq('user_id', userId)
-            .order('sent_at', { ascending: false })
-            .limit(100);
-          if (!cancelled) setEmails(Array.isArray(data) ? data : []);
+          try {
+            const { data } = await (fromGsync('g_emails_without_people_ids') as any)
+              .select('id:gmail_message_id,sent_at,subject,body_text,from_email,to_emails,cc_emails,bcc_emails,is_private,user_id')
+              .eq('user_id', userId)
+              .order('sent_at', { ascending: false })
+              .limit(100);
+            if (!cancelled) setEmails(Array.isArray(data) ? data : []);
+          } catch (error) {
+            console.error('Error fetching emails:', error);
+            if (!cancelled) setEmails([]);
+          }
         }
         // My Meetings (events)
         if (userId) {
-          const { data } = await (fromGsync('g_events_without_people_ids') as any)
-            .select('id:google_event_id,start_time,end_time,location,organizer_email,attendees,summary,description,is_private,user_id')
-            .eq('user_id', userId)
-            .order('start_time', { ascending: false })
-            .limit(100);
-          if (!cancelled) setEvents(Array.isArray(data) ? data : []);
+          try {
+            const { data } = await (fromGsync('g_events_without_people_ids') as any)
+              .select('id:google_event_id,start_time,end_time,location,organizer_email,attendees,summary,description,is_private,user_id')
+              .eq('user_id', userId)
+              .order('start_time', { ascending: false })
+              .limit(100);
+            if (!cancelled) setEvents(Array.isArray(data) ? data : []);
+          } catch (error) {
+            console.error('Error fetching events:', error);
+            if (!cancelled) setEvents([]);
+          }
         }
       } catch (_) {}
     }
