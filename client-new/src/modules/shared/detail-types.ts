@@ -61,7 +61,9 @@ export type FieldMetadata = {
   label?: string;
   type?: DetailFieldType;
   array?: boolean;
+  maxArrayEntries?: number;
   multiline?: boolean;
+  width?: number | string;
   options?: string[];
   lookup?: FieldLookup;
   edit?: FieldEditConfig;
@@ -97,6 +99,7 @@ export type TableColumnMeta = {
   // Optional: render this string column as a link to a URL/attachment
   // contained in another field on the same row (e.g., show doc_type but link to pdf)
   linkToField?: string;
+  [key: string]: unknown;
 };
 
 // Simple filter expression DSL used by table toggles

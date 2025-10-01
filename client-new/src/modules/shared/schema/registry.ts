@@ -30,12 +30,12 @@ export const COLUMN_TEMPLATES = {
   ] as readonly TableColumnMeta[],
 
   gmails: [
-    { field: 'sent_at', label: 'Sent At', type: 'date', update: 'no' },
-    { field: 'from', label: 'From', type: 'string', update: 'no' },
-    { field: 'to_emails', label: 'To', type: 'string', array: true, update: 'no' },
-    { field: 'cc_emails', label: 'CC', type: 'string', array: true, update: 'no' },
-    { field: 'subject', label: 'Subject', type: 'string', update: 'no' },
-    { field: 'is_private', label: 'Private?', type: 'boolean' },
+    { field: 'sent_at', label: 'Sent', type: 'date', update: 'no', width: '120px' },
+    { field: 'subject', label: 'Subject', type: 'string', update: 'no', multiline: true, width: '320px' },
+    { field: 'from', label: 'From', type: 'string', update: 'no', width: '200px' },
+    { field: 'to_emails', label: 'Recipients', type: 'string', array: true, update: 'no', maxArrayEntries: 2, multiline: true, width: '240px' },
+    { field: 'cc_emails', label: 'CC', type: 'string', array: true, update: 'no', maxArrayEntries: 2, multiline: true, width: '200px' },
+    { field: 'is_private', label: 'Private?', type: 'boolean', width: '90px' },
   ] as readonly TableColumnMeta[],
 
   calendarEvents: [

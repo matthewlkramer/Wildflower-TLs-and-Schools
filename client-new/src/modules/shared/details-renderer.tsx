@@ -137,6 +137,63 @@ function isFileLikePath(s: string): boolean {
   return false;
 }
 
+function normalizeAttachmentEntries(input: any): any[] {
+  if (input == null || input === '') return [];
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    if (!trimmed) return [];
+    if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        return normalizeAttachmentEntries(parsed);
+      } catch {
+        return [trimmed];
+      }
+    }
+    return [trimmed];
+  }
+  if (Array.isArray(input)) {
+    return input.flatMap((entry) => normalizeAttachmentEntries(entry));
+  }
+  if (typeof input === 'object') {
+    return [input];
+  }
+  return [input];
+}
+
+function resolveAttachmentDisplay(raw: any): { url?: string; label: string } {
+  if (raw == null) return { label: '' };
+  if (typeof raw === 'string') {
+    const href = toPublicUrl(raw) || raw;
+    return { url: href, label: raw };
+  }
+  if (typeof raw === 'object') {
+    const url =
+      toPublicUrl(raw) ||
+      (raw as any).url ||
+      (raw as any).href ||
+      (raw as any).link ||
+      (raw as any).download_url;
+    const label =
+      (raw as any).name ||
+      (raw as any).filename ||
+      (raw as any).title ||
+      (raw as any).label ||
+      url ||
+      'attachment';
+    return { url: url ? String(url) : undefined, label: String(label ?? 'attachment') };
+  }
+  const str = String(raw);
+  const href = toPublicUrl(str) || (isFileLikePath(str) ? str : undefined);
+  return { url: href, label: str };
+}
+
+function attachmentToEditorValue(raw: any): string | null {
+  const { url, label } = resolveAttachmentDisplay(raw);
+  if (url) return url;
+  return label ? String(label) : null;
+}
+
 
 
 export type DetailsRendererProps = {
@@ -1296,16 +1353,22 @@ function renderEditor(
 
   if (baseType === 'attachment') {
 
-    // Basic editing for attachment fields. Treat strings as single URL values
-    // and arrays as newline-delimited lists of URLs.
-    if (Array.isArray(current)) {
-      const text = current.filter(Boolean).map((v: any) => String(v)).join('\n');
+    const normalized = normalizeAttachmentEntries(current);
+    const editorValues = normalized
+      .map((entry) => attachmentToEditorValue(entry))
+      .filter((v): v is string => typeof v === 'string' && v.length > 0);
+
+    if ((Array.isArray(current) && current.length > 1) || editorValues.length > 1) {
+      const textValue = editorValues.join('\n');
       return (
         <textarea
-          value={text}
+          value={textValue}
           onChange={(e) => {
-            const lines = e.target.value.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
-            onChange(lines);
+            const lines = e.target.value
+              .split(/\r?\n/)
+              .map((s) => s.trim())
+              .filter(Boolean);
+            onChange(lines.length > 0 ? lines : null);
           }}
           rows={3}
           style={{ width: '100%', minHeight: 60, resize: 'vertical' }}
@@ -1313,20 +1376,23 @@ function renderEditor(
         />
       );
     }
-    const value = current == null ? '' : String(current);
+
+    const value = editorValues[0] ?? (typeof current === 'string' ? current : '');
     return (
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         <Input
           className="h-8 px-3"
           placeholder="https://..."
           value={value}
-          onChange={(e) => onChange(e.target.value || null)}
+          onChange={(e) => onChange(e.target.value ? e.target.value : null)}
         />
         {value ? (
           <Button size="sm" variant="outline" onClick={() => onChange(null)}>Clear</Button>
         ) : null}
       </div>
     );
+
+  
 
   }
 
@@ -1602,6 +1668,77 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
     async function fetchRows() {
 
+      async function hydrateDocUrls(tableName: string, rows: any[]): Promise<any[]> {
+        if (!Array.isArray(rows) || rows.length === 0) return rows;
+        try {
+          if (tableName === 'governance_docs') {
+            const missing = rows.filter((row: any) => !row?.pdf && row?.school_id);
+            if (missing.length === 0) return rows;
+            const schoolIds = Array.from(new Set(missing.map((row: any) => row.school_id).filter(Boolean)));
+            const docTypes = Array.from(new Set(missing.map((row: any) => row.doc_type).filter(Boolean)));
+            if (schoolIds.length === 0 || docTypes.length === 0) return rows;
+            const { data: urlRows, error: urlError } = await (supabase as any)
+              .from('docs_urls')
+              .select('school_id, doc_type, gov_doc_full_url')
+              .in('school_id', schoolIds)
+              .in('doc_type', docTypes)
+              .neq('gov_doc_full_url', null);
+            if (urlError || !Array.isArray(urlRows)) return rows;
+            const map = new Map<string, string>();
+            for (const entry of urlRows as any[]) {
+              const schoolId = entry?.school_id as string | undefined;
+              const docType = entry?.doc_type as string | undefined;
+              const rawUrl = typeof entry?.gov_doc_full_url === 'string' ? entry.gov_doc_full_url.trim() : '';
+              if (!schoolId || !docType || !rawUrl || rawUrl.endsWith('/')) continue;
+              map.set(`${schoolId}::${docType}`, rawUrl);
+            }
+            if (map.size === 0) return rows;
+            return rows.map((row: any) => {
+              if (row?.pdf) return row;
+              const key = `${row?.school_id}::${row?.doc_type}`;
+              const url = map.get(key);
+              return url ? { ...row, pdf: url } : row;
+            });
+          }
+          if (tableName === 'nine_nineties') {
+            const missing = rows.filter((row: any) => !row?.pdf && row?.school_id);
+            if (missing.length === 0) return rows;
+            const schoolIds = Array.from(new Set(missing.map((row: any) => row.school_id).filter(Boolean)));
+            const years = Array.from(new Set(missing
+              .map((row: any) => row?.form_year ?? row?.upload_date ?? row?.tax_year)
+              .filter((value: any) => value != null)
+              .map((value: any) => String(value))));
+            if (schoolIds.length === 0 || years.length === 0) return rows;
+            const { data: urlRows, error: urlError } = await (supabase as any)
+              .from('docs_urls')
+              .select('school_id, upload_date, gov_doc_full_url')
+              .in('school_id', schoolIds)
+              .in('upload_date', years)
+              .ilike('doc_type', '990%')
+              .neq('gov_doc_full_url', null);
+            if (urlError || !Array.isArray(urlRows)) return rows;
+            const map = new Map<string, string>();
+            for (const entry of urlRows as any[]) {
+              const schoolId = entry?.school_id as string | undefined;
+              const uploadYear = entry?.upload_date != null ? String(entry.upload_date) : undefined;
+              const rawUrl = typeof entry?.gov_doc_full_url === 'string' ? entry.gov_doc_full_url.trim() : '';
+              if (!schoolId || !uploadYear || !rawUrl || rawUrl.endsWith('/')) continue;
+              map.set(`${schoolId}::${uploadYear}`, rawUrl);
+            }
+            if (map.size === 0) return rows;
+            return rows.map((row: any) => {
+              if (row?.pdf) return row;
+              const key = `${row?.school_id}::${String(row?.form_year ?? '')}`;
+              const url = map.get(key);
+              return url ? { ...row, pdf: url } : row;
+            });
+          }
+        } catch (err) {
+          console.warn('Unable to hydrate doc URLs', err);
+        }
+        return rows;
+      }
+
       setLoading(true);
 
       const readSource = (effective as any).readSource ?? (effective as any).source;
@@ -1645,7 +1782,12 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
       if (isMounted && !error) {
 
-        setRows(data || []);
+        let processed = (data as any[]) || [];
+        processed = await hydrateDocUrls(table, processed);
+
+        if (isMounted) {
+          setRows(processed);
+        }
 
       }
 
@@ -1818,9 +1960,13 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
                 const meta = columnMetaMap.get(column);
 
+                const headerStyle: React.CSSProperties = { textAlign: 'left', padding: 6, borderBottom: '1px solid #e2e8f0' };
+                if (meta && (meta as any).width !== undefined) {
+                  headerStyle.width = (meta as any).width as any;
+                }
                 return (
 
-                  <th key={column} style={{ textAlign: 'left', padding: 6, borderBottom: '1px solid #e2e8f0' }}>
+                  <th key={column} style={headerStyle}>
 
                     {meta?.label ?? labelFromField(column)}
 
@@ -1875,9 +2021,18 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
 
                     const selectOptions = getCachedOptionsForMeta(meta);
 
+                    const cellStyle: React.CSSProperties = { padding: 6, borderBottom: '1px solid #f1f5f9', verticalAlign: 'top' };
+                    if (meta && (meta as any).width !== undefined) {
+                      cellStyle.width = (meta as any).width as any;
+                      cellStyle.maxWidth = (meta as any).width as any;
+                    }
+                    if ((meta as any)?.multiline || (meta as any)?.array) {
+                      cellStyle.whiteSpace = 'normal';
+                      cellStyle.wordBreak = 'break-word';
+                    }
                     return (
 
-                      <td key={column} style={{ padding: 6, borderBottom: '1px solid #f1f5f9' }}>
+                      <td key={column} style={cellStyle}>
 
                         {editingRow === index && columnAllowsEditLocal(meta as any) ? (
                           renderEditor(
@@ -2434,7 +2589,16 @@ function renderDisplayValue(
 
       : value.map((entry) => normalizeOptionValue(entry));
 
-    return resolved.length > 0 ? resolved.join(', ') : placeholder;
+    const maxEntries = typeof (meta as any)?.maxArrayEntries === 'number' ? (meta as any).maxArrayEntries : undefined;
+    let displayValues = resolved;
+    if (typeof maxEntries === 'number' && maxEntries > 0 && resolved.length > maxEntries) {
+      const limited = resolved.slice(0, maxEntries);
+      const remaining = resolved.length - maxEntries;
+      limited.push(`+${remaining} more`);
+      displayValues = limited;
+    }
+
+    return displayValues.length > 0 ? displayValues.join(', ') : placeholder;
 
   }
 
@@ -2471,71 +2635,32 @@ function renderDisplayValue(
   if (baseType === 'boolean') return value ? 'Yes' : 'No';
 
   if (baseType === 'attachment') {
-
-    const attachments = Array.isArray(value) ? value : [value];
-
+    const attachments = normalizeAttachmentEntries(value);
+    if (attachments.length === 0) {
+      return placeholder;
+    }
     return (
-
       <div>
-
-        {attachments.filter(Boolean).map((att: any, idx: number) => {
-
-
-          if (typeof att === 'string') {
-
-            const href = toPublicUrl(att) || att;
+        {attachments.map((att: any, idx: number) => {
+          const { url, label } = resolveAttachmentDisplay(att);
+          if (url) {
             return (
-
               <div key={idx}>
-
-                <a href={href} target="_blank" rel="noreferrer" style={{ display: 'inline-block', maxWidth: 160 }}>
-
-                  <img src={href} alt="attachment" style={{ maxWidth: '160px', maxHeight: '120px', borderRadius: 6, display: 'block' }} />
-
+                <a href={url} target="_blank" rel="noreferrer" style={{ display: 'inline-block', maxWidth: 160 }}>
+                  <img src={url} alt={label || 'attachment'} style={{ maxWidth: '160px', maxHeight: '120px', borderRadius: 6, display: 'block' }} />
                 </a>
-
               </div>
-
             );
-
           }
-
-          if (att && typeof att === 'object') {
-
-            const url = toPublicUrl(att) || att.url || att.href || att.link || att.download_url;
-
-            const label = att.name ?? att.filename ?? url ?? 'attachment';
-
-            if (url) {
-
-              return (
-
-                <div key={idx}>
-
-                  <a href={String(url)} target="_blank" rel="noreferrer" style={{ display: 'inline-block', maxWidth: 160 }}>
-
-                    <img src={String(url)} alt={label} style={{ maxWidth: '160px', maxHeight: '120px', borderRadius: 6, display: 'block' }} />
-
-                  </a>
-
-                </div>
-
-              );
-
-            }
-
-            return <div key={idx}>{JSON.stringify(att)}</div>;
-
+          if (label) {
+            return (
+              <div key={idx} style={{ fontSize: 12, color: '#475569' }}>{label}</div>
+            );
           }
-
           return null;
-
         })}
-
       </div>
-
     );
-
   }
 
   if (value instanceof Date) {
