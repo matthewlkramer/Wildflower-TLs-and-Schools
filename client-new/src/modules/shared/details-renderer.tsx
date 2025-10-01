@@ -38,7 +38,7 @@ import { findForeignKeyColumn } from './schema-metadata';
 
 import { saveCardValues, type ExceptionMap, type WriteTarget } from '../educators/helpers/write-helpers';
 import { formatCurrencyUSD } from '@/lib/utils';
-import { ENUM_OPTIONS, FIELD_ENUMS } from './enums.generated';
+import { ENUM_OPTIONS, FIELD_TYPES } from './enums.generated';
 import { getRowActionLabel, formatActionLabel } from './actions/registry';
 import { getTableActionLabel } from './actions/table-actions';
 import { handleTableAction as handleTableActionClick } from './actions/table-handlers';
@@ -511,8 +511,8 @@ function useSelectOptions(
           const tables = defaultWriteOrder && defaultWriteOrder.length ? defaultWriteOrder : (defaultWriteTo?.table ? [defaultWriteTo.table] : []);
           for (const t of tables) {
             const key = `public.${t}.${column}`;
-            const name = FIELD_ENUMS[key];
-            if (name) { inferred = name; break; }
+            const info = FIELD_TYPES[key];
+            if (info?.baseType === 'enum' && info.enumName) { inferred = info.enumName; break; }
           }
         }
         if (inferred) {
