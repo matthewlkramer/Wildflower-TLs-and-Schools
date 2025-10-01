@@ -17,7 +17,22 @@ export const CHARTER_GRID: GridColumnConfig[] = [
 
 export const CHARTER_KANBAN_CONSTANTS_TABLE = 'ref_charter_statuses';
 
-const GMAIL_LIST_OPTIONS = {\n  title: 'Gmails',\n  width: 'half' as const,\n  orderBy: [{ column: 'sent_at', ascending: false }] as const,\n  limit: 50,\n  layout: {\n    titleField: 'subject',\n    subtitleFields: ['from'] as const,\n    badgeFields: ['is_private'] as const,\n    bodyFields: ['to_emails', 'cc_emails'] as const,\n    footerFields: ['sent_at'] as const,\n    showFieldLabels: true,\n  },\n} as const;\n\nexport const CHARTER_FIELD_METADATA: FieldMetadataMap = {
+const GMAIL_LIST_OPTIONS = {
+  title: 'Gmails',
+  width: 'half' as const,
+  orderBy: [{ column: 'sent_at', ascending: false }] as const,
+  limit: 50,
+  layout: {
+    titleField: 'subject',
+    subtitleFields: ['from'] as const,
+    badgeFields: ['is_private'] as const,
+    bodyFields: ['to_emails', 'cc_emails'] as const,
+    footerFields: ['sent_at'] as const,
+    showFieldLabels: true,
+  },
+} as const;
+
+export const CHARTER_FIELD_METADATA: FieldMetadataMap = {
   application: { type: 'attachment' },
   auth_decision: { label: 'Authorization Decision'},
   authorizer: { lookup: { table: 'charter_authorizers', valueColumn: 'authorizer_name', labelColumn: 'authorizer_name' } },

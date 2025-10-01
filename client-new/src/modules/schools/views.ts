@@ -19,7 +19,22 @@ export const SCHOOL_GRID: GridColumnConfig[] = [
 
 export const SCHOOL_KANBAN_CONSTANTS_TABLE = 'ref_stage_statuses';
 
-const GMAIL_LIST_OPTIONS = {\n  title: 'Gmails',\n  width: 'half' as const,\n  orderBy: [{ column: 'sent_at', ascending: false }] as const,\n  limit: 50,\n  layout: {\n    titleField: 'subject',\n    subtitleFields: ['from'] as const,\n    badgeFields: ['is_private'] as const,\n    bodyFields: ['to_emails', 'cc_emails'] as const,\n    footerFields: ['sent_at'] as const,\n    showFieldLabels: true,\n  },\n} as const;\n\n// Field metadata (only non-defaults retained)
+const GMAIL_LIST_OPTIONS = {
+  title: 'Gmails',
+  width: 'half' as const,
+  orderBy: [{ column: 'sent_at', ascending: false }] as const,
+  limit: 50,
+  layout: {
+    titleField: 'subject',
+    subtitleFields: ['from'] as const,
+    badgeFields: ['is_private'] as const,
+    bodyFields: ['to_emails', 'cc_emails'] as const,
+    footerFields: ['sent_at'] as const,
+    showFieldLabels: true,
+  },
+} as const;
+
+// Field metadata (only non-defaults retained)
 export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {
   about: { multiline: true },
   about_spanish: { label: 'About (Spanish)', multiline: true },
@@ -125,7 +140,7 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
       { title: 'School Model', editable: true },
     ),
     card(['school_email', 'school_phone', 'website', 'facebook', 'instagram'], { title: 'Marketing & Comms', editable: true }),
-    card([ {'total_grants_issued', format: currency} {'total_loans_issued',format: currency}], { title: 'Grants and Loans' }),
+    card(['total_grants_issued', 'total_loans_issued'], { title: 'Grants and Loans' }),
     card(['risk_factors', 'watchlist'], { title: 'Warnings', editable: true }),
   ),
   tab(

@@ -7,24 +7,20 @@ import { supabase } from '@/lib/supabase/client';
 import { isEmail, normalizeEmail, isPhoneE164, normalizePhoneToE164, isEIN, normalizeEIN } from './validators';
 
 import {
-
   type DetailTabSpec,
-
   type DetailCardBlock,
-
-  type DetailTableBlock,\r\n\r\n  type DetailListBlock,\r\n\r\n  type DetailListLayout,\r\n\r\n  type DetailMapBlock,
-
+  type DetailTableBlock,
+  type DetailListBlock,
+  type DetailListLayout,
+  type DetailMapBlock,
   type LookupException,
-
   type FieldMetadataMap,
-
   type FieldMetadata,
-
   type FieldLookup,
-
-  type TableColumnMeta,\r\n  type TableOrderBy,\r\n  type FilterExpr,
+  type TableColumnMeta,
+  type TableOrderBy,
+  type FilterExpr,
   type VisibleIf,
-
 } from './detail-types';
 import type { ViewSpec } from './views/types';
 import { asTabs as asTabsFromView } from './views/types';
@@ -1502,6 +1498,9 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
       baseFilter: (block as any).baseFilter ?? (preset as any)?.baseFilter,
     } as DetailTableBlock & any;
   }, [block]);
+
+  const isListVariant = block.kind === 'list';
+  const listLayout = isListVariant ? ((effective as any).listLayout as DetailListLayout | undefined) : undefined;
 
   const [rows, setRows] = React.useState<any[]>([]);
 
@@ -3500,6 +3499,26 @@ function MostRecentFilloutFormLink({ formId, title }: { formId?: string; title: 
     </>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
