@@ -57,6 +57,7 @@ type SelectOption = { value: string; label: string };
 const ENUM_OPTION_CACHE = new Map<string, SelectOption[]>();
 
 const LOOKUP_OPTION_CACHE = new Map<string, SelectOption[]>();
+const STORAGE_OBJECT_CACHE = new Map<string, { bucket: string; name: string; url?: string | null }>();
 
 const DEFAULT_SCHEMA = 'public';
 
@@ -135,6 +136,42 @@ function isFileLikePath(s: string): boolean {
   // Common file extensions
   if (/\.(pdf|png|jpe?g|gif|svg|webp|docx?|xlsx?|pptx?|txt|csv|zip)$/i.test(str)) return true;
   return false;
+}
+
+const UUID_REGEX = /^[0-9a-fA-F-]{36}$/;
+
+async function resolveStorageObjectUrl(id: string): Promise<string | undefined> {
+  if (!id || !UUID_REGEX.test(id)) return undefined;
+  const cached = STORAGE_OBJECT_CACHE.get(id);
+  if (cached) {
+    if (cached.url) return cached.url;
+    if (cached.url === null) return undefined;
+    const { bucket, name } = cached;
+    const { data } = (supabase as any).storage.from(bucket).getPublicUrl(name);
+    const url = data?.publicUrl as string | undefined;
+    STORAGE_OBJECT_CACHE.set(id, { bucket, name, url: url ?? null });
+    return url ?? undefined;
+  }
+  try {
+    const { data, error } = await (supabase as any)
+      .schema('storage')
+      .from('objects')
+      .select('bucket_id,name')
+      .eq('id', id)
+      .maybeSingle();
+    if (error || !data?.name || !data?.bucket_id) {
+      STORAGE_OBJECT_CACHE.set(id, { bucket: '', name: '', url: null });
+      return undefined;
+    }
+    STORAGE_OBJECT_CACHE.set(id, { bucket: data.bucket_id, name: data.name });
+    const { data: publicUrl } = (supabase as any).storage.from(data.bucket_id).getPublicUrl(data.name);
+    const url = publicUrl?.publicUrl as string | undefined;
+    STORAGE_OBJECT_CACHE.set(id, { bucket: data.bucket_id, name: data.name, url: url ?? null });
+    return url ?? undefined;
+  } catch {
+    STORAGE_OBJECT_CACHE.set(id, { bucket: '', name: '', url: null });
+    return undefined;
+  }
 }
 
 
@@ -672,6 +709,7 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
   const [editing, setEditing] = React.useState(false);
 
   const [values, setValues] = React.useState<Record<string, any>>(() => getInitialValues(block.fields, details));
+  const [displayOverrides, setDisplayOverrides] = React.useState<Record<string, any>>({});
 
   const queryClient = useQueryClient();
 
@@ -682,6 +720,7 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
     setValues(getInitialValues(block.fields, details));
 
   }, [block.fields, details]);
+
 
 
 
@@ -771,6 +810,26 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
     },
     [resolvedFieldMeta, fieldMeta, defaultWriteOrder, defaultWriteTo],
   );
+
+  React.useEffect(() => {
+    let cancelled = false;
+    async function loadAttachments() {
+      const updates: Record<string, any> = {};
+      for (const field of block.fields) {
+        const meta = getMetaForField(field);
+        if (meta?.type === 'attachment') {
+          const raw = values[field];
+          const resolved = await resolveAttachmentValue(raw);
+          if (!cancelled && resolved !== undefined) updates[field] = resolved;
+        }
+      }
+      if (!cancelled) setDisplayOverrides(updates);
+    }
+    loadAttachments();
+    return () => {
+      cancelled = true;
+    };
+  }, [block.fields, values, getMetaForField]);
 
   function columnAllowsEdit(meta?: TableColumnMeta): boolean {
     if (!meta) return true;
@@ -944,12 +1003,12 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
           const meta = getMetaForField(field);
 
           const label = meta?.label ?? labelFromField(field);
-          console.log(`Rendering field: ${field} ${label}`);
 
           // Field-level visibility (evaluated against current values)
           if (meta?.visibleIf && !evaluateVisibleIf(meta.visibleIf, values)) return null;
 
-          const value = values[field];
+          const rawValue = values[field];
+          const displayValue = displayOverrides[field] ?? rawValue;
 
           // Determine if this field is editable when card is in editing mode
           let editableField = false;
@@ -982,21 +1041,21 @@ function DetailCard({ block, tab, entityId, details, fieldMeta, defaultWriteTo, 
 
               {editing && editableField ? (
 
-                renderEditor(field, value, (next) => handleFieldChange(field, next), meta, selectOptions)
+                renderEditor(field, rawValue, (next) => handleFieldChange(field, next), meta, selectOptions)
 
               ) : (
 
                 <div style={{ fontSize: 12 }}>
-                  {field === 'most_recent_note' && typeof value === 'string' && value ? (
+                  {field === 'most_recent_note' && typeof rawValue === 'string' && rawValue ? (
                     details?.most_recent_note_id ? (
-                      <MostRecentNoteLinkById noteId={String(details.most_recent_note_id)} title={String(value)} />
+                      <MostRecentNoteLinkById noteId={String(details.most_recent_note_id)} title={String(rawValue)} />
                     ) : (
-                      <MostRecentNoteLink entityDetails={details} entityId={entityId} title={String(value)} />
+                      <MostRecentNoteLink entityDetails={details} entityId={entityId} title={String(rawValue)} />
                     )
-                  ) : field === 'most_recent_fillout_form_date' && typeof value === 'string' && value && details?.most_recent_fillout_form_id ? (
-                    <MostRecentFilloutFormLink formId={String(details.most_recent_fillout_form_id)} title={String(value)} />
+                  ) : field === 'most_recent_fillout_form_date' && typeof rawValue === 'string' && rawValue && details?.most_recent_fillout_form_id ? (
+                    <MostRecentFilloutFormLink formId={String(details.most_recent_fillout_form_id)} title={String(rawValue)} />
                   ) : (
-                    renderDisplayValue(value, meta, referenceLabels[field], selectOptions)
+                    renderDisplayValue(displayValue, meta, referenceLabels[field], selectOptions)
                   )}
                 </div>
 
@@ -2601,6 +2660,38 @@ function renderDisplayValue(
 
   return String(value);
 
+}
+
+
+
+async function resolveAttachmentValue(value: any): Promise<any> {
+  if (!value) return value;
+  if (Array.isArray(value)) {
+    const resolved = await Promise.all(value.map(resolveAttachmentEntry));
+    return resolved.filter((entry) => entry != null);
+  }
+  return await resolveAttachmentEntry(value);
+}
+
+async function resolveAttachmentEntry(entry: any): Promise<any> {
+  if (!entry) return entry;
+  if (typeof entry === 'string') {
+    if (entry.startsWith('http')) return entry;
+    if (entry.includes('/')) return toPublicUrl(entry) ?? entry;
+    const url = await resolveStorageObjectUrl(entry);
+    return url ?? entry;
+  }
+  if (typeof entry === 'object') {
+    const direct = toPublicUrl(entry);
+    if (direct) return { ...entry, url: direct };
+    if ((entry as any).url) return entry;
+    if (typeof (entry as any).id === 'string') {
+      const url = await resolveStorageObjectUrl((entry as any).id);
+      if (url) return { ...entry, url };
+    }
+    return entry;
+  }
+  return entry;
 }
 
 

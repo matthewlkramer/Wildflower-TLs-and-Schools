@@ -9,7 +9,7 @@ export const EDUCATOR_GRID: GridColumnConfig[] = [
   { field: 'active_school', headerName: 'Curr. School', visibility: 'hide' },
   { field: 'current_role', headerName: 'Curr. Role', visibility: 'hide', valueType: 'select' },
   { field: 'discovery_status', headerName: 'Discovery', valueType: 'select', selectOptions: ['In Process', 'Complete'] },
-  { field: 'race_ethnicity', headerName: 'Race/Ethnicity', valueType: 'multi', lookupField: 'ref_race_and_ethnicity.english_short' },
+  { field: 'race_ethnicity', headerName: 'Race/Ethnicity', valueType: 'multi', lookupField: 'ref_race_and_ethnicity.english_label_short' },
   { field: 'has_montessori_cert', headerName: 'Trained?', valueType: 'boolean' },
   { field: 'indiv_type', headerName: 'Type', valueType: 'select', selectOptions: ['Educator', 'Community Member'] },
   { field: 'id', headerName: 'ID', visibility: 'suppress' },
@@ -26,7 +26,7 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   secondary_phone_other_info: { label: 'Extension or other info (for Secondary Phone)' },
   home_address: { multiline: true },
   educ_attainment: { label: 'Educational Attainment' },
-  race_ethnicity: { label: 'Race/Ethnicity', lookup: { table: 'ref_race_and_ethnicity', valueColumn: 'category', labelColumn: 'english_short' } },
+  race_ethnicity: { label: 'Race/Ethnicity', lookup: { table: 'ref_race_and_ethnicity', valueColumn: 'value', labelColumn: 'english_label_short' } },
   // Show the free-text field when the selected value includes "other" (handle both cases defensively)
   race_ethnicity_other: { label: 'Race/Ethnicity - if Other, please specify', visibleIf: { field: 'race_ethnicity', in: ['other', 'Other'] } },
   gender_other: { label: 'Gender - if Other, please specify', visibleIf: { field: 'gender', in: ['Other'] } },
