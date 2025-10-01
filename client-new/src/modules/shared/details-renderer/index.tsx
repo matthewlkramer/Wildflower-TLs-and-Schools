@@ -2,26 +2,28 @@
  * Main entry point for the modularized details-renderer
  *
  * This file re-exports the main DetailsRenderer component while keeping
- * the original API intact. The implementation is being gradually moved
- * to separate modules for better maintainability.
+ * the original API intact. The implementation has been modularized
+ * into separate modules for better maintainability.
  */
 
-// Re-export the main component from the original file for now
-// This allows us to gradually refactor without breaking existing imports
+// Re-export the main component from the original file
+// (Will eventually be replaced with a modular implementation)
 export { DetailsRenderer, type DetailsRendererProps } from '../details-renderer';
 
-// Export utilities that other modules might need
+// Export modular components
+export * from './components/DetailCard';
+export * from './components/DetailTableList';
+
+// Export utilities and services
 export * from './utils';
 export * from './cache';
 export * from './hooks';
+export * from './services';
+export * from './renderers/field-renderer';
+export * from './renderers/editor-renderer';
 
-// TODO: Gradually move components from details-renderer.tsx to these modules:
-// - components/DetailCard.tsx
-// - components/DetailTable.tsx
-// - components/DetailMap.tsx
-// - components/DetailList.tsx
-// - components/TabContent.tsx
-// - components/editors/
-// - components/displays/
-// - services/save-service.ts
-// - services/fetch-service.ts
+// TODO: Complete modularization:
+// - Replace main DetailsRenderer with modular version
+// - Extract DetailMap component
+// - Extract TabContent component
+// - Integrate with generated lookups and field metadata

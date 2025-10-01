@@ -1,6 +1,23 @@
 import fs from 'fs';
 import path from 'path';
 import ts from 'typescript';
+import { createClient } from '@supabase/supabase-js';
+
+// Load environment variables from .env.local
+try {
+  const envPath = path.join(process.cwd(), '.env.local');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    for (const line of envContent.split('\n')) {
+      const [key, value] = line.split('=');
+      if (key && value && !process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  }
+} catch (err) {
+  // Ignore env loading errors
+}
 
 type LookupConfig = {
   table: string;
@@ -337,12 +354,116 @@ export const LOOKUP_KEYS = Object.keys(GENERATED_LOOKUPS) as LookupKey[];
 `;
 }
 
-function main() {
-  try {
-    console.log('🔍 Parsing database types from', SRC_PATH);
+function convertEdgeFunctionDataToTables(schemaData: any): { public: TableInfo[], ref_tables: TableInfo[] } {
+  const result = { public: [] as TableInfo[], ref_tables: [] as TableInfo[] };
+  const { tables, columns_by_table, primary_keys_by_table } = schemaData;
 
-    const sourceFile = readSource(SRC_PATH);
-    const tables = extractTablesFromSchema(sourceFile);
+  for (const table of tables) {
+    const { schema_name, table_name, table_type } = table;
+
+    // Skip views and materialized views for lookups
+    if (table_type !== 'BASE TABLE') continue;
+
+    // Get columns for this table
+    const tableColumns = columns_by_table?.[`${schema_name}.${table_name}`] || [];
+    const columnNames = tableColumns.map((col: any) => col.column_name);
+
+    // Get primary key for this table
+    const primaryKeys = primary_keys_by_table?.[`${schema_name}.${table_name}`] || [];
+    const primaryKey = primaryKeys.length > 0 ? primaryKeys[0].column_name : 'id';
+
+    // Create TableInfo with rich data
+    const tableInfo: TableInfo = {
+      name: table_name,
+      columns: columnNames,
+      primaryKey,
+      relationships: [] // Could be populated from foreign_keys_by_table if needed
+    };
+
+    // Add to appropriate schema
+    if (schema_name === 'public') {
+      result.public.push(tableInfo);
+    } else if (schema_name === 'ref_tables') {
+      result.ref_tables.push(tableInfo);
+    }
+    // Note: gsync and storage schemas available but not used for lookups
+  }
+
+  return result;
+}
+
+async function fetchSchemaFromEdgeFunction(): Promise<{ public: TableInfo[], ref_tables: TableInfo[] } | null> {
+  try {
+    console.log('🌐 Fetching complete schema from edge function...');
+
+    const supabaseUrl = process.env.VITE_SUPABASE_URL;
+    const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.log('⚠️  No Supabase credentials found, falling back to local types file');
+      return null;
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const { data, error } = await supabase.functions.invoke('schema-types-export', {
+      method: 'GET'
+    });
+
+    if (error) {
+      console.log('⚠️  Edge function error, falling back to local types file:');
+      console.log('   Error:', error.message);
+      console.log('   Context:', error.context || 'No additional context');
+      return null;
+    }
+
+    if (!data || !data.tables) {
+      console.log('⚠️  No tables data from edge function, falling back to local types file');
+      console.log('   Received data structure:', JSON.stringify(data, null, 2).substring(0, 500) + '...');
+      return null;
+    }
+
+    console.log('✅ Successfully fetched schema from edge function');
+    console.log(`   Found ${data.tables.length} tables across schemas:`, data.requested_schemas);
+
+    // Log full response structure to see all available data
+    const responseKeys = Object.keys(data);
+    console.log('   Response contains keys:', responseKeys);
+
+    if (data.columns) {
+      console.log(`   Found ${data.columns.length} columns`);
+      const sampleColumn = data.columns.find((c: any) => c.table_name === 'ref_race_and_ethnicity') || data.columns[0];
+      if (sampleColumn) {
+        console.log('   Sample column structure:', JSON.stringify(sampleColumn, null, 2));
+      }
+    }
+
+    if (data.enums) {
+      console.log(`   Found ${data.enums.length} enums`);
+      const sampleEnum = data.enums[0];
+      if (sampleEnum) {
+        console.log('   Sample enum structure:', JSON.stringify(sampleEnum, null, 2));
+      }
+    }
+
+    // Convert edge function table metadata to our TableInfo format
+    return convertEdgeFunctionDataToTables(data);
+  } catch (err) {
+    console.log('⚠️  Error fetching from edge function, falling back to local types file:', err);
+    return null;
+  }
+}
+
+async function main() {
+  try {
+    // Try to fetch from edge function first
+    let tables = await fetchSchemaFromEdgeFunction();
+
+    // Fallback to local file
+    if (!tables) {
+      console.log('🔍 Parsing database types from', SRC_PATH);
+      const sourceFile = readSource(SRC_PATH);
+      tables = extractTablesFromSchema(sourceFile);
+    }
 
     console.log('📋 Found tables:');
     console.log(`   - ${tables.public.length} public tables`);
@@ -390,4 +511,7 @@ function main() {
 }
 
 // Run if this file is executed directly
-main();
+main().catch((error) => {
+  console.error('❌ Error in main:', error);
+  process.exit(1);
+});
