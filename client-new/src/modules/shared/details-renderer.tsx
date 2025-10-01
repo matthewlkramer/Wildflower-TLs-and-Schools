@@ -1510,6 +1510,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
   const [optionsVersion, setOptionsVersion] = React.useState<number>(0);
   const [editingRow, setEditingRow] = React.useState<number | null>(null);
   const [editingValues, setEditingValues] = React.useState<any>({});
+  const [listExpansion, setListExpansion] = React.useState<Record<string, { addresses: boolean; body: boolean }>>({});
   // Config-driven toggles
   const toggles: any[] = React.useMemo(() => (effective as any).toggles ?? [], [effective]);
   const [toggleState, setToggleState] = React.useState<Record<string, boolean>>(() => {
@@ -1860,6 +1861,50 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
 
     const layout = listLayout;
     const safeColumns = columnOrder;
+    const readSource = ((effective as any).readSource ?? (effective as any).source) as { table?: string } | undefined;
+    const listSourceTable = readSource?.table ? String(readSource.table) : undefined;
+    const isGmailList = Boolean(listSourceTable && listSourceTable.toLowerCase().includes('g_email'));
+    const isBodyField = (field?: string) => typeof field === 'string' && field.toLowerCase().includes('body');
+    const isAddressField = (field?: string) => {
+      if (!field) return false;
+      const key = field.toLowerCase();
+      if (key === 'from' || key === 'to' || key === 'cc' || key === 'bcc' || key === 'reply_to') return true;
+      if (key.endsWith('_email') || key.endsWith('_emails')) return true;
+      if (key.includes('recipient') || key.includes('address')) return true;
+      return false;
+    };
+    const getFieldLabel = (field: string, meta?: TableColumnMeta) => meta?.label ?? labelFromField(field);
+    const valueToPreview = (value: any): string => {
+      if (value === null || value === undefined) return '';
+      if (Array.isArray(value)) {
+        return value
+          .map((entry) => valueToPreview(entry))
+          .filter((entry) => entry.trim().length > 0)
+          .join(', ');
+      }
+      if (typeof value === 'string') return value;
+      if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+      if (value && typeof value === 'object') {
+        const possible = ['label', 'value', 'name'] as const;
+        for (const key of possible) {
+          const candidate = (value as Record<string, unknown>)[key];
+          if (typeof candidate === 'string' && candidate.trim().length > 0) return candidate;
+        }
+        try {
+          return JSON.stringify(value);
+        } catch {
+          return '';
+        }
+      }
+      return String(value);
+    };
+    const buildPreviewText = (value: any, limit = 200): string => {
+      const plain = valueToPreview(value).replace(/\s+/g, ' ').trim();
+      if (!plain) return '';
+      if (plain.length <= limit) return plain;
+      return `${plain.slice(0, limit).trimEnd()}...`;
+    };
+
 
     return (
       <div style={{ display: 'grid', gap: 12 }}>
@@ -1904,15 +1949,19 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
 
           const showLabels = layout?.showFieldLabels !== false;
 
+          const getEffectiveValue = (field: string) =>
+            editingRow === index && Object.prototype.hasOwnProperty.call(editingValues, field)
+              ? editingValues[field]
+              : row?.[field];
           const buildDisplay = (field: string) => {
             const meta = columnMetaMap.get(field);
-            const value = row?.[field];
+            const value = getEffectiveValue(field);
             if (!hasRenderableValue(value)) {
-              return { field, meta, node: null as React.ReactNode | null };
+              return { field, meta, node: null as React.ReactNode | null, value };
             }
             const selectOptions = getCachedOptionsForMeta(meta);
             const node = renderDisplayValue(value, meta, undefined, selectOptions);
-            return { field, meta, node };
+            return { field, meta, node, value };
           };
 
           const titleDisplay = titleField ? buildDisplay(titleField) : null;
@@ -1922,6 +1971,207 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
           const footerDisplays = footerFields.map(buildDisplay).filter((entry) => entry.node != null);
 
           const rowKey = row?.id ?? row?.uuid ?? `${index}`;
+          const rowKeyString = String(rowKey);
+          const expansion = listExpansion[rowKeyString] ?? { addresses: false, body: false };
+          const toggleExpansion = (segment: 'addresses' | 'body') => {
+            setListExpansion((prev) => {
+              const prevEntry = prev[rowKeyString] ?? { addresses: false, body: false };
+              return { ...prev, [rowKeyString]: { ...prevEntry, [segment]: !prevEntry[segment] } };
+            });
+          };
+
+          let subtitleDisplaysToRender = subtitleDisplays;
+          let badgeDisplaysToRender = badgeDisplays;
+          let bodyDisplaysToRender = bodyDisplays;
+          let gmailAddressSection: React.ReactNode = null;
+          let gmailBodySection: React.ReactNode = null;
+          let gmailPrivateIndicator: React.ReactNode = null;
+
+          if (isGmailList) {
+            subtitleDisplaysToRender = [];
+            badgeDisplaysToRender = badgeDisplays.filter((entry) => entry.field !== 'is_private');
+            bodyDisplaysToRender = bodyDisplays.filter(
+              (entry) => !isAddressField(entry.field) && !isBodyField(entry.field)
+            );
+
+            const addressFieldOrder: string[] = [];
+            const pushAddressField = (field?: string) => {
+              if (!field) return;
+              if (!safeColumns.includes(field)) return;
+              if (!isAddressField(field)) return;
+              if (addressFieldOrder.includes(field)) return;
+              addressFieldOrder.push(field);
+            };
+            pushAddressField('from');
+            (layout?.subtitleFields ?? []).forEach(pushAddressField);
+            (layout?.bodyFields ?? []).forEach(pushAddressField);
+            safeColumns.forEach(pushAddressField);
+
+            const addressEntries = addressFieldOrder
+              .map((field) => {
+                const meta = columnMetaMap.get(field);
+                if (!meta) return null;
+                const value = getEffectiveValue(field);
+                const selectOptions = getCachedOptionsForMeta(meta);
+                const node = hasRenderableValue(value) ? renderDisplayValue(value, meta, undefined, selectOptions) : null;
+                return { field, meta, node, value };
+              })
+              .filter(Boolean) as { field: string; meta: TableColumnMeta; node: React.ReactNode | null; value: any }[];
+
+            if (addressEntries.length) {
+              const fromEntry = addressEntries.find((entry) => entry.field === 'from');
+              const otherAddressEntries = addressEntries.filter((entry) => entry.field !== 'from');
+              const additionalCount = otherAddressEntries.filter((entry) => hasRenderableValue(entry.value)).length;
+              const fromPreview = buildPreviewText(fromEntry?.value ?? '', 160) || '--';
+              const addressSummary =
+                additionalCount > 0 ? `From ${fromPreview} +${additionalCount} more` : `From ${fromPreview}`;
+
+              gmailAddressSection = (
+                <div style={{ display: 'grid', gap: 6 }}>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      toggleExpansion('addresses');
+                    }}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                      padding: 0,
+                      border: 'none',
+                      background: 'none',
+                      fontSize: 13,
+                      color: '#0f172a',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <span style={{ fontWeight: 500, textAlign: 'left' }}>{addressSummary}</span>
+                    <span style={{ fontSize: 12, color: '#64748b' }}>{expansion.addresses ? 'Hide' : 'Show'}</span>
+                  </button>
+                  {expansion.addresses ? (
+                    <div
+                      style={{
+                        display: 'grid',
+                        gap: 6,
+                        padding: '8px 10px',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: 6,
+                      }}
+                    >
+                      {addressEntries.map((entry) => {
+                        if (!hasRenderableValue(entry.value) && entry.field !== 'from') return null;
+                        const label = getFieldLabel(entry.field, entry.meta);
+                        const valueNode = hasRenderableValue(entry.value)
+                          ? entry.node ?? buildPreviewText(entry.value, 160)
+                          : <span style={{ color: '#94a3b8' }}>--</span>;
+                        return (
+                          <div
+                            key={entry.field}
+                            style={
+                              showLabels
+                                ? { display: 'grid', gridTemplateColumns: '90px 1fr', gap: 8, alignItems: 'start' }
+                                : { display: 'block' }
+                            }
+                          >
+                            {showLabels ? (
+                              <div style={{ fontSize: 12, color: '#94a3b8' }}>{label}</div>
+                            ) : null}
+                            <div style={{ fontSize: 12, color: '#0f172a', wordBreak: 'break-word' }}>{valueNode}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            }
+
+            const bodyFieldOrder: string[] = [];
+            const pushBodyField = (field?: string) => {
+              if (!field) return;
+              if (!safeColumns.includes(field)) return;
+              if (!isBodyField(field)) return;
+              if (bodyFieldOrder.includes(field)) return;
+              bodyFieldOrder.push(field);
+            };
+            (layout?.bodyFields ?? []).forEach(pushBodyField);
+            safeColumns.forEach(pushBodyField);
+            const bodyField = bodyFieldOrder[0];
+
+            if (bodyField) {
+              const meta = columnMetaMap.get(bodyField);
+              if (meta) {
+                const value = getEffectiveValue(bodyField);
+                const selectOptions = getCachedOptionsForMeta(meta);
+                const node = hasRenderableValue(value) ? renderDisplayValue(value, meta, undefined, selectOptions) : null;
+                const preview = buildPreviewText(value, 360) || '--';
+                gmailBodySection = (
+                  <div style={{ display: 'grid', gap: 6 }}>
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        toggleExpansion('body');
+                      }}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        width: '100%',
+                        padding: 0,
+                        border: 'none',
+                        background: 'none',
+                        fontSize: 13,
+                        color: '#0f172a',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span style={{ fontWeight: 500, textAlign: 'left' }}>Message</span>
+                      <span style={{ fontSize: 12, color: '#64748b' }}>{expansion.body ? 'Hide' : 'Show'}</span>
+                    </button>
+                    {expansion.body ? (
+                      <div style={{ fontSize: 13, color: '#0f172a', whiteSpace: 'pre-wrap' }}>
+                        {node ?? <span style={{ color: '#94a3b8' }}>--</span>}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: 12, color: '#475569' }}>{preview}</div>
+                    )}
+                  </div>
+                );
+              }
+            }
+
+            const privateMeta = columnMetaMap.get('is_private');
+            const privateEditable = columnAllowsEditLocal(privateMeta as any);
+            const privateValue =
+              editingRow === index && Object.prototype.hasOwnProperty.call(editingValues, 'is_private')
+                ? Boolean(editingValues.is_private)
+                : Boolean(row?.is_private);
+
+            if (editingRow === index && privateEditable) {
+              gmailPrivateIndicator = (
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#0f172a' }}>
+                  <input
+                    type="checkbox"
+                    checked={privateValue}
+                    onChange={(event) => {
+                      const next = event.target.checked;
+                      setEditingValues((prev: any) => ({ ...prev, is_private: next }));
+                    }}
+                    onClick={(event) => event.stopPropagation()}
+                  />
+                  <span>Private</span>
+                </label>
+              );
+            } else if (privateValue) {
+              gmailPrivateIndicator = <span style={{ fontSize: 12, fontWeight: 500, color: '#334155' }}>Private</span>;
+            }
+          }
 
           return (
             <div
@@ -1939,13 +2189,20 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
                 <div style={{ flex: '1 1 auto', minWidth: 0 }}>
                   {titleField ? (
-                    <div style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', marginBottom: subtitleDisplays.length ? 4 : 0 }}>
+                    <div
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 600,
+                        color: '#0f172a',
+                        marginBottom: subtitleDisplaysToRender.length > 0 || Boolean(gmailAddressSection) ? 4 : 0,
+                      }}
+                    >
                       {titleDisplay?.node ?? <span style={{ color: '#94a3b8' }}>--</span>}
                     </div>
                   ) : null}
-                  {subtitleDisplays.length ? (
+                  {subtitleDisplaysToRender.length ? (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 12, color: '#475569' }}>
-                      {subtitleDisplays.map(({ field, meta, node }) => (
+                      {subtitleDisplaysToRender.map(({ field, meta, node }) => (
                         <span key={field} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                           <span style={{ color: '#94a3b8' }}>{meta?.label ?? labelFromField(field)}:</span>
                           <span style={{ color: '#0f172a' }}>{node}</span>
@@ -1953,6 +2210,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
                       ))}
                     </div>
                   ) : null}
+                  {gmailAddressSection}
                 </div>
                 {(effective as any).rowActions && (effective as any).rowActions.length > 0 ? (
                   <Select
@@ -2002,9 +2260,9 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
                   </Select>
                 ) : null}
               </div>
-              {badgeDisplays.length ? (
+              {badgeDisplaysToRender.length ? (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: 12 }}>
-                  {badgeDisplays.map(({ field, node }) => (
+                  {badgeDisplaysToRender.map(({ field, node }) => (
                     <span
                       key={field}
                       style={{
@@ -2020,9 +2278,9 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
                   ))}
                 </div>
               ) : null}
-              {bodyDisplays.length ? (
+              {bodyDisplaysToRender.length ? (
                 <div style={{ display: 'grid', gap: 8 }}>
-                  {bodyDisplays.map(({ field, meta, node }) => (
+                  {bodyDisplaysToRender.map(({ field, meta, node }) => (
                     <div
                       key={field}
                       style={
@@ -2039,6 +2297,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
                   ))}
                 </div>
               ) : null}
+              {gmailBodySection}
               {footerDisplays.length ? (
                 <div style={{ fontSize: 12, color: '#64748b', display: 'flex', flexWrap: 'wrap', gap: 12 }}>
                   {footerDisplays.map(({ field, meta, node }) => (
@@ -2048,6 +2307,9 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
                     </span>
                   ))}
                 </div>
+              ) : null}
+              {gmailPrivateIndicator ? (
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>{gmailPrivateIndicator}</div>
               ) : null}
             </div>
           );
