@@ -2100,12 +2100,21 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock | DetailList
             };
             (layout?.bodyFields ?? []).forEach(pushBodyField);
             safeColumns.forEach(pushBodyField);
-            const bodyField = bodyFieldOrder[0];
+            
+            let bodyField = bodyFieldOrder[0];
+            if (!bodyField) {
+              const r: any = row as any;
+              if (r && typeof r === 'object') {
+                if (typeof r['body_text'] !== 'undefined') bodyField = 'body_text';
+                else if (typeof r['body'] !== 'undefined') bodyField = 'body';
+                else if (typeof r['text_body'] !== 'undefined') bodyField = 'text_body';
+              }
+            }
+
 
             if (bodyField) {
               const meta = columnMetaMap.get(bodyField);
-              if (meta) {
-                const value = getEffectiveValue(bodyField);
+              const value = getEffectiveValue(bodyField);
                 const selectOptions = getCachedOptionsForMeta(meta);
                 const node = hasRenderableValue(value) ? renderDisplayValue(value, meta, undefined, selectOptions) : null;
                 const preview = buildPreviewText(value, 360) || '--';
@@ -3761,6 +3770,7 @@ function MostRecentFilloutFormLink({ formId, title }: { formId?: string; title: 
     </>
   );
 }
+
 
 
 
