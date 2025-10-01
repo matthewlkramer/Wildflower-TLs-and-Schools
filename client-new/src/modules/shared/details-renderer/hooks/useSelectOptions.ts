@@ -46,7 +46,13 @@ export function useSelectOptions(
     // 3. Handle lookup configuration
     const lookup = exception?.lookup || meta.lookup;
     if (lookup) {
-      const cacheKey = buildLookupKey(lookup);
+      // Apply the same fallback logic as the main details-renderer for cache key consistency
+      const lookupWithSchema = { ...lookup };
+      if (!lookupWithSchema.schema && typeof lookupWithSchema.table === 'string' && lookupWithSchema.table.startsWith('ref_')) {
+        lookupWithSchema.schema = 'ref_tables';
+      }
+
+      const cacheKey = buildLookupKey(lookupWithSchema);
       const cachedLookup = LOOKUP_OPTION_CACHE.get(cacheKey);
       if (cachedLookup) {
         setOptions(cachedLookup);
@@ -59,12 +65,12 @@ export function useSelectOptions(
 
       const fetchOptions = async () => {
         try {
-          const schema = lookup.schema ?? DEFAULT_SCHEMA;
+          const schema = lookupWithSchema.schema ?? DEFAULT_SCHEMA;
           const query = supabase
             .schema(schema as any)
-            .from(lookup.table)
-            .select(`${lookup.valueColumn}, ${lookup.labelColumn}`)
-            .order(lookup.labelColumn);
+            .from(lookupWithSchema.table)
+            .select(`${lookupWithSchema.valueColumn}, ${lookupWithSchema.labelColumn}`)
+            .order(lookupWithSchema.labelColumn);
 
           const { data, error: fetchError } = await query;
 
@@ -80,8 +86,8 @@ export function useSelectOptions(
           }
 
           const selectOpts = data.map((row: any) => ({
-            value: normalizeOptionValue(row[lookup.valueColumn]),
-            label: String(row[lookup.labelColumn] ?? row[lookup.valueColumn] ?? ''),
+            value: normalizeOptionValue(row[lookupWithSchema.valueColumn]),
+            label: String(row[lookupWithSchema.labelColumn] ?? row[lookupWithSchema.valueColumn] ?? ''),
           }));
 
           LOOKUP_OPTION_CACHE.set(cacheKey, selectOpts);
@@ -131,7 +137,12 @@ function getCachedOptionsForMeta(meta?: FieldMetadata | TableColumnMeta): Select
 
   // Check lookup cache
   if (meta.lookup) {
-    const cacheKey = buildLookupKey(meta.lookup);
+    // Apply the same fallback logic as the main details-renderer
+    const lookupWithSchema = { ...meta.lookup };
+    if (!lookupWithSchema.schema && typeof lookupWithSchema.table === 'string' && lookupWithSchema.table.startsWith('ref_')) {
+      lookupWithSchema.schema = 'ref_tables';
+    }
+    const cacheKey = buildLookupKey(lookupWithSchema);
     const cached = LOOKUP_OPTION_CACHE.get(cacheKey);
     if (cached) return cached;
   }

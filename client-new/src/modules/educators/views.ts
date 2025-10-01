@@ -2,6 +2,7 @@ import { view, tab, card, table, list } from '../shared/views/builders';
 import type { ViewSpec } from '../shared/views/types';
 import { LIST_PRESETS } from '../shared/views/list-presets';
 import type { GridColumnConfig, FieldMetadataMap } from '../shared/detail-types';
+import { GENERATED_LOOKUPS } from '../../generated/lookups.generated';
 
 // Grid + Kanban
 export const EDUCATOR_GRID: GridColumnConfig[] = [
@@ -29,7 +30,7 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   secondary_phone_other_info: { label: 'Extension or other info (for Secondary Phone)' },
   home_address: { multiline: true },
   educ_attainment: { label: 'Educational Attainment' },
-  race_ethnicity: { label: 'Race/Ethnicity', lookup: { table: 'ref_race_and_ethnicity', valueColumn: 'value', labelColumn: 'english_label_short' } },
+  race_ethnicity: { label: 'Race/Ethnicity', lookup: GENERATED_LOOKUPS.ref_race_and_ethnicity },
   // Show the free-text field when the selected value includes "other" (handle both cases defensively)
   race_ethnicity_other: { label: 'Race/Ethnicity - if Other, please specify', visibleIf: { field: 'race_ethnicity', in: ['other', 'Other'] } },
   gender_other: { label: 'Gender - if Other, please specify', visibleIf: { field: 'gender', in: ['Other'] } },
@@ -58,7 +59,7 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   routed_to: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
   assigned_partner_override: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
   person_responsible_for_follow_up: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
-  one_on_one_scheduling_status: { label: 'One-on-One Scheduling Status', lookup: { schema: 'ref_tables', table: 'ref_one_on_one_status', valueColumn: 'value', labelColumn: 'label' } },
+  one_on_one_scheduling_status: { label: 'One-on-One Scheduling Status', lookup: GENERATED_LOOKUPS.ref_one_on_one_status },
   current_role_at_active_school: { label: 'Current Role at Active School', editable: false },
   current_role: { editable: false },
   active_school: { editable: false },
