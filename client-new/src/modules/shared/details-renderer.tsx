@@ -362,7 +362,7 @@ function TabContent({ tab, entityId, details, fieldMeta, defaultWriteTo, default
 
       {tab.blocks.map((block, index) => {
 
-        const width = block.width ?? (block.kind === 'table' ? 'full' : 'half');
+        const width = block.width ?? (block.kind === 'table' ? 'full' : block.kind === 'list' ? 'half' : 'half');
 
         const containerStyle: React.CSSProperties = {
 
@@ -401,13 +401,13 @@ function TabContent({ tab, entityId, details, fieldMeta, defaultWriteTo, default
 
         }
 
-        if (block.kind === 'table') {
+        if (block.kind === 'table' || block.kind === 'list') {
 
           return (
 
-            <div key={`${tab.id}-table-${index}`} style={containerStyle}>
+            <div key={`${tab.id}-${block.kind}-${index}`} style={containerStyle}>
 
-              <DetailTable block={block} entityId={entityId} />
+              <DetailTable block={block as DetailTableBlock | DetailListBlock} entityId={entityId} />
 
             </div>
 
