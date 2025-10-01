@@ -49,16 +49,33 @@ function parseFieldEnums(src: string): FieldEnumMap {
   const pBlock = extractBlock(src, pIdx); if (!pBlock) return res;
   const tIdx = pBlock.block.indexOf('Tables:'); if (tIdx === -1) return res;
   const tBlock = extractBlock(pBlock.block, tIdx); if (!tBlock) return res;
-  const tableRe = /(\w+)\s*:\s*\{[\s\S]*?Row:\s*\{([\s\S]*?)\}/g;
+
+  // Iterate table entries by finding name: { ... } blocks at the top level of Tables
+  const tablesSrc = tBlock.block;
+  const nameRe = /(\w+)\s*:\s*\{/g;
   let m: RegExpExecArray | null;
-  while ((m = tableRe.exec(tBlock.block))) {
-    const table = m[1]; const rowBody = m[2];
-    const colRe = /(\w+)\s*:\s*([^\n;]+)/g; let c: RegExpExecArray | null;
-    while ((c = colRe.exec(rowBody))) {
-      const col = c[1]; const typeStr = c[2];
+  while ((m = nameRe.exec(tablesSrc))) {
+    const tableName = m[1];
+    const start = m.index + m[0].length - 1; // position at '{'
+    const tableBlock = extractBlock(tablesSrc, start);
+    if (!tableBlock) continue;
+    // Find Row: { ... } inside this table block
+    const rowIdx = tableBlock.block.indexOf('Row:');
+    if (rowIdx === -1) { continue; }
+    const rowBlock = extractBlock(tableBlock.block, rowIdx);
+    if (!rowBlock) { continue; }
+    // Scan fields in Row body
+    const lines = rowBlock.block.split(/\r?\n/);
+    for (const raw of lines) {
+      const line = raw.trim();
+      const m2 = line.match(/^(\w+)\s*:\s*([^;]+);?/);
+      if (!m2) continue;
+      const col = m2[1]; const typeStr = m2[2];
       const em = typeStr.match(/Database\[\"public\"\]\[\"Enums\"\]\[\"([^\"]+)\"\]/);
-      if (em) res[`public.${table}.${col}`] = em[1];
+      if (em) res[`public.${tableName}.${col}`] = em[1];
     }
+    // advance regex index to end of this table block to avoid overlapping
+    nameRe.lastIndex = m.index + (tableBlock.end || 0);
   }
   return res;
 }
@@ -78,4 +95,3 @@ export const FIELD_ENUMS: Record<string, string> = ${JSON.stringify(fields, null
 }
 
 generate();
-
