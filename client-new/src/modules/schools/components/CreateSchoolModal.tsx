@@ -146,8 +146,13 @@ export function CreateSchoolModal({ open, onClose, onCreated }: { open: boolean;
             if (type === 'boolean') return <FieldCheckbox key={id} label={label} checked={!!values[id]} onChange={(v) => set(id, v)} />;
             if (type === 'select' && lookup) {
               if (!optionsMap[id]) (async () => {
-                const rel = lookup.schema ? `${lookup.schema}.${lookup.table}` : lookup.table;
-                const { data, error } = await (supabase as any).from(rel).select(`${lookup.valueColumn}, ${lookup.labelColumn}`).order(lookup.labelColumn, { ascending: true });
+                const table = lookup.table as string;
+                const schema = lookup.schema || (table.startsWith('ref_') ? 'ref_tables' : undefined);
+                const client = schema && schema !== 'public' ? (supabase as any).schema(schema) : (supabase as any);
+                const { data, error } = await client
+                  .from(table)
+                  .select(`${lookup.valueColumn}, ${lookup.labelColumn}`)
+                  .order(lookup.labelColumn, { ascending: true });
                 if (!error && Array.isArray(data)) setOptionsMap((prev) => ({ ...prev, [id]: data.map((r: any) => ({ value: String(r[lookup.valueColumn]), label: String(r[lookup.labelColumn]) })) }));
               })();
               return <FieldSelect key={id} label={label} options={optionsMap[id] || []} value={values[id] || ''} onChange={(v) => set(id, v)} />;

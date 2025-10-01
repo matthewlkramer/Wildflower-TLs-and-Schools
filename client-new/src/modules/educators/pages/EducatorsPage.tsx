@@ -32,7 +32,8 @@ export function EducatorsPage() {
         const [table, labelColumn] = key.split('.');
         if (!table || !labelColumn) continue;
         const sel = `value, ${labelColumn}`;
-        const { data, error } = await (supabase as any).from(table).select(sel).order(labelColumn, { ascending: true });
+        const svc = table.startsWith('ref_') ? (supabase as any).schema('ref_tables') : (supabase as any);
+        const { data, error } = await svc.from(table).select(sel).order(labelColumn, { ascending: true });
         if (cancelled) return;
         if (!error && Array.isArray(data)) {
           const map: Record<string, string> = {};

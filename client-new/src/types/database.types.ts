@@ -454,6 +454,7 @@ export type Database = {
           logic_model_complete: boolean | null
           loi: string | null
           loi_deadline: string | null
+          loi_doc: string | null
           loi_required: boolean | null
           loi_submitted: boolean | null
           most_recent_app: boolean | null
@@ -499,6 +500,7 @@ export type Database = {
           logic_model_complete?: boolean | null
           loi?: string | null
           loi_deadline?: string | null
+          loi_doc?: string | null
           loi_required?: boolean | null
           loi_submitted?: boolean | null
           most_recent_app?: boolean | null
@@ -544,6 +546,7 @@ export type Database = {
           logic_model_complete?: boolean | null
           loi?: string | null
           loi_deadline?: string | null
+          loi_doc?: string | null
           loi_required?: boolean | null
           loi_submitted?: boolean | null
           most_recent_app?: boolean | null
@@ -1128,6 +1131,7 @@ export type Database = {
           doc_type: string | null
           id: string
           is_archived: boolean | null
+          object_id: string | null
           pdf: string | null
           school_id: string | null
           upload_date: string | null
@@ -1137,6 +1141,7 @@ export type Database = {
           doc_type?: string | null
           id?: string
           is_archived?: boolean | null
+          object_id?: string | null
           pdf?: string | null
           school_id?: string | null
           upload_date?: string | null
@@ -1146,6 +1151,7 @@ export type Database = {
           doc_type?: string | null
           id?: string
           is_archived?: boolean | null
+          object_id?: string | null
           pdf?: string | null
           school_id?: string | null
           upload_date?: string | null
@@ -1773,8 +1779,7 @@ export type Database = {
           id: string
           is_archived: boolean | null
           lat: number | null
-          lease: string | null
-          lease_doc: string | null
+          lease_docs: string[] | null
           lease_end_date: string | null
           long: number | null
           mailable: boolean | null
@@ -1806,8 +1811,7 @@ export type Database = {
           id?: string
           is_archived?: boolean | null
           lat?: number | null
-          lease?: string | null
-          lease_doc?: string | null
+          lease_docs?: string[] | null
           lease_end_date?: string | null
           long?: number | null
           mailable?: boolean | null
@@ -1839,8 +1843,7 @@ export type Database = {
           id?: string
           is_archived?: boolean | null
           lat?: number | null
-          lease?: string | null
-          lease_doc?: string | null
+          lease_docs?: string[] | null
           lease_end_date?: string | null
           long?: number | null
           mailable?: boolean | null
@@ -2029,8 +2032,7 @@ export type Database = {
           cert_completion_status:
             | Database["public"]["Enums"]["certification_completion_status"]
             | null
-          cert_level: Database["public"]["Enums"]["age_spans"][] | null
-          cert_level_rev: Database["public"]["Enums"]["age_spans_rev"][] | null
+          cert_level: Database["public"]["Enums"]["age_spans_rev"][] | null
           created_date: string | null
           id: string
           is_archived: boolean | null
@@ -2049,8 +2051,7 @@ export type Database = {
           cert_completion_status?:
             | Database["public"]["Enums"]["certification_completion_status"]
             | null
-          cert_level?: Database["public"]["Enums"]["age_spans"][] | null
-          cert_level_rev?: Database["public"]["Enums"]["age_spans_rev"][] | null
+          cert_level?: Database["public"]["Enums"]["age_spans_rev"][] | null
           created_date?: string | null
           id?: string
           is_archived?: boolean | null
@@ -2069,8 +2070,7 @@ export type Database = {
           cert_completion_status?:
             | Database["public"]["Enums"]["certification_completion_status"]
             | null
-          cert_level?: Database["public"]["Enums"]["age_spans"][] | null
-          cert_level_rev?: Database["public"]["Enums"]["age_spans_rev"][] | null
+          cert_level?: Database["public"]["Enums"]["age_spans_rev"][] | null
           created_date?: string | null
           id?: string
           is_archived?: boolean | null
@@ -2112,7 +2112,6 @@ export type Database = {
           form_year: string | null
           id: string
           is_archived: boolean | null
-          link: string | null
           notes: string | null
           pdf: string | null
           school_id: string | null
@@ -2124,7 +2123,6 @@ export type Database = {
           form_year?: string | null
           id?: string
           is_archived?: boolean | null
-          link?: string | null
           notes?: string | null
           pdf?: string | null
           school_id?: string | null
@@ -2136,7 +2134,6 @@ export type Database = {
           form_year?: string | null
           id?: string
           is_archived?: boolean | null
-          link?: string | null
           notes?: string | null
           pdf?: string | null
           school_id?: string | null
@@ -3259,8 +3256,6 @@ export type Database = {
             | null
           guidestar_listing_requested: boolean | null
           gusto: Database["public"]["Enums"]["gusto_options"] | null
-          hero_image_2_url: string | null
-          hero_image_url: string | null
           id: string
           incorporation_date: string | null
           instagram: string | null
@@ -3325,6 +3320,7 @@ export type Database = {
           transparent_classroom:
             | Database["public"]["Enums"]["transparent_classroom_options"]
             | null
+          visioning_album: string | null
           watchlist: string | null
           website: string | null
           website_tool:
@@ -3370,8 +3366,6 @@ export type Database = {
             | null
           guidestar_listing_requested?: boolean | null
           gusto?: Database["public"]["Enums"]["gusto_options"] | null
-          hero_image_2_url?: string | null
-          hero_image_url?: string | null
           id?: string
           incorporation_date?: string | null
           instagram?: string | null
@@ -3436,6 +3430,7 @@ export type Database = {
           transparent_classroom?:
             | Database["public"]["Enums"]["transparent_classroom_options"]
             | null
+          visioning_album?: string | null
           watchlist?: string | null
           website?: string | null
           website_tool?:
@@ -3481,8 +3476,6 @@ export type Database = {
             | null
           guidestar_listing_requested?: boolean | null
           gusto?: Database["public"]["Enums"]["gusto_options"] | null
-          hero_image_2_url?: string | null
-          hero_image_url?: string | null
           id?: string
           incorporation_date?: string | null
           instagram?: string | null
@@ -3547,6 +3540,7 @@ export type Database = {
           transparent_classroom?:
             | Database["public"]["Enums"]["transparent_classroom_options"]
             | null
+          visioning_album?: string | null
           watchlist?: string | null
           website?: string | null
           website_tool?:
@@ -4202,7 +4196,6 @@ export type Database = {
           physical_address: string | null
           physical_lat: number | null
           physical_long: number | null
-          planning_album: string | null
           pod: string | null
           prior_names: string | null
           program_focus: string | null
@@ -4277,7 +4270,6 @@ export type Database = {
           transparent_classroom:
             | Database["public"]["Enums"]["transparent_classroom_options"]
             | null
-          visioning_album: string | null
           visioning_album_complete: string | null
           watchlist: string | null
           website: string | null

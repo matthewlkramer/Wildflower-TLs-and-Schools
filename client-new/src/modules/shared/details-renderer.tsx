@@ -87,6 +87,56 @@ const buildLookupKey = (lookup: FieldLookup): string => {
 };
 
 
+// Try to convert a storage path/object to a public URL using Supabase Storage.
+// Accepts
+// - string URLs (returned as-is)
+// - string storage references in the form "bucket/path/to/file"
+// - objects with { url|href|link|download_url } (returned as-is)
+// - objects with { bucket, path|key|name }
+function toPublicUrl(maybe: any): string | undefined {
+  try {
+    if (!maybe) return undefined;
+    if (typeof maybe === 'string') {
+      const s = String(maybe);
+      if (/^https?:\/\//i.test(s)) return s;
+      // Heuristic: treat "bucket/path..." as a storage reference
+      const idx = s.indexOf('/');
+      if (idx > 0) {
+        const bucket = s.slice(0, idx);
+        const path = s.slice(idx + 1);
+        if (bucket && path) {
+          const res = (supabase as any).storage.from(bucket).getPublicUrl(path);
+          const url = res?.data?.publicUrl as string | undefined;
+          return url || undefined;
+        }
+      }
+      return undefined;
+    }
+    if (typeof maybe === 'object') {
+      const direct = (maybe as any).url || (maybe as any).href || (maybe as any).link || (maybe as any).download_url;
+      if (typeof direct === 'string') return String(direct);
+      const bucket = (maybe as any).bucket || (maybe as any).bucket_id || (maybe as any).bucketName;
+      const path = (maybe as any).path || (maybe as any).key || (maybe as any).name;
+      if (bucket && path) {
+        const res = (supabase as any).storage.from(String(bucket)).getPublicUrl(String(path));
+        const url = res?.data?.publicUrl as string | undefined;
+        return url || undefined;
+      }
+    }
+  } catch {}
+  return undefined;
+}
+
+function isFileLikePath(s: string): boolean {
+  if (!s) return false;
+  const str = String(s);
+  if (/^https?:\/\//i.test(str)) return true;
+  // Common file extensions
+  if (/\.(pdf|png|jpe?g|gif|svg|webp|docx?|xlsx?|pptx?|txt|csv|zip)$/i.test(str)) return true;
+  return false;
+}
+
+
 
 export type DetailsRendererProps = {
 
@@ -1205,7 +1255,37 @@ function renderEditor(
 
   if (baseType === 'attachment') {
 
-    return <div style={{ color: '#64748b', fontSize: 12 }}>Attachments are read-only.</div>;
+    // Basic editing for attachment fields. Treat strings as single URL values
+    // and arrays as newline-delimited lists of URLs.
+    if (Array.isArray(current)) {
+      const text = current.filter(Boolean).map((v: any) => String(v)).join('\n');
+      return (
+        <textarea
+          value={text}
+          onChange={(e) => {
+            const lines = e.target.value.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+            onChange(lines);
+          }}
+          rows={3}
+          style={{ width: '100%', minHeight: 60, resize: 'vertical' }}
+          placeholder="One URL per line"
+        />
+      );
+    }
+    const value = current == null ? '' : String(current);
+    return (
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <Input
+          className="h-8 px-3"
+          placeholder="https://..."
+          value={value}
+          onChange={(e) => onChange(e.target.value || null)}
+        />
+        {value ? (
+          <Button size="sm" variant="outline" onClick={() => onChange(null)}>Clear</Button>
+        ) : null}
+      </div>
+    );
 
   }
 
@@ -1396,14 +1476,19 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
       }
       const lookup = (meta as any)?.lookup as FieldLookup | undefined;
       if (lookup) {
-        const key = buildLookupKey(lookup);
+        // Infer schema for ref_* tables if not specified
+        const normalizedLookup: FieldLookup = {
+          ...lookup,
+          schema: lookup.schema || (typeof lookup.table === 'string' && lookup.table.startsWith('ref_') ? 'ref_tables' : lookup.schema),
+        };
+        const key = buildLookupKey(normalizedLookup);
         if (!LOOKUP_OPTION_CACHE.get(key)) {
-          const client = lookup.schema && lookup.schema !== 'public' ? (supabase as any).schema(lookup.schema) : (supabase as any);
-          const { data, error } = await client.from(lookup.table).select(`${lookup.valueColumn}, ${lookup.labelColumn}`).order(lookup.labelColumn, { ascending: true });
+          const client = normalizedLookup.schema && normalizedLookup.schema !== 'public' ? (supabase as any).schema(normalizedLookup.schema) : (supabase as any);
+          const { data, error } = await client.from(normalizedLookup.table).select(`${normalizedLookup.valueColumn}, ${normalizedLookup.labelColumn}`).order(normalizedLookup.labelColumn, { ascending: true });
           if (!error && Array.isArray(data)) {
             const opts = (data as any[]).map((row) => {
-              const v = row?.[lookup.valueColumn];
-              const l = row?.[lookup.labelColumn];
+              const v = row?.[normalizedLookup.valueColumn];
+              const l = row?.[normalizedLookup.labelColumn];
               const sv = String(v ?? '');
               const sl = String(l ?? sv);
               return sv ? ({ value: sv, label: sl } as SelectOption) : null;
@@ -1582,7 +1667,7 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
         }
         // Load lookups
         for (const { key, lookup, meta } of lookups) {
-          const schema = lookup.schema;
+          const schema = lookup.schema || (typeof lookup.table === 'string' && lookup.table.startsWith('ref_') ? 'ref_tables' : undefined);
           const table = lookup.table;
           const valueCol = lookup.valueColumn;
           const labelCol = lookup.labelColumn;
@@ -1755,8 +1840,8 @@ function DetailTable({ block, entityId }: { block: DetailTableBlock; entityId: s
                             if (lf && typeof cell === 'string') {
                               const linkVal: any = (row as any)[lf];
                               let href: string | undefined;
-                              if (typeof linkVal === 'string') href = linkVal;
-                              else if (linkVal && typeof linkVal === 'object') href = linkVal.url ?? linkVal.href ?? linkVal.link ?? linkVal.download_url;
+                              if (typeof linkVal === 'string') href = toPublicUrl(linkVal) || linkVal;
+                              else if (linkVal && typeof linkVal === 'object') href = toPublicUrl(linkVal);
                               if (href) return (<a href={String(href)} target="_blank" rel="noreferrer" style={{ color: '#0ea5e9', textDecoration: 'underline' }}>{String(cell)}</a>);
                             }
                             return renderDisplayValue(cell, meta, undefined, selectOptions);
@@ -2267,6 +2352,23 @@ function renderDisplayValue(
 
     if (value.length === 0) return placeholder;
 
+    const allStrings = value.every((v: any) => typeof v === 'string');
+    if (allStrings && value.some((v: any) => isFileLikePath(String(v)))) {
+      return (
+        <div>
+          {value.map((v: any, idx: number) => {
+            const href = toPublicUrl(v) || String(v);
+            const label = String(v);
+            return (
+              <div key={idx}>
+                <a href={href} target="_blank" rel="noreferrer">{label}</a>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
     const resolved = selectOptions && selectOptions.length > 0
 
       ? value
@@ -2329,7 +2431,7 @@ function renderDisplayValue(
 
               <div key={idx}>
 
-                <a href={att} target="_blank" rel="noreferrer">
+                <a href={toPublicUrl(att) || att} target="_blank" rel="noreferrer">
 
                   {att}
 
@@ -2343,7 +2445,7 @@ function renderDisplayValue(
 
           if (att && typeof att === 'object') {
 
-            const url = att.url ?? att.href ?? att.link ?? att.download_url;
+            const url = toPublicUrl(att) || att.url || att.href || att.link || att.download_url;
 
             const label = att.name ?? att.filename ?? url ?? 'attachment';
 
@@ -2389,6 +2491,14 @@ function renderDisplayValue(
   if (Array.isArray(value)) return value.length > 0 ? value.join(', ') : placeholder;
 
   if (typeof value === 'object') return JSON.stringify(value);
+
+  // Linkify file-like string values
+  if (typeof value === 'string' && isFileLikePath(value)) {
+    const href = toPublicUrl(value) || value;
+    return (
+      <a href={href} target="_blank" rel="noreferrer">{String(value)}</a>
+    );
+  }
 
 
 

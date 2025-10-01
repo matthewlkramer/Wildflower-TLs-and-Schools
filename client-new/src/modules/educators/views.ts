@@ -27,11 +27,13 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   home_address: { multiline: true },
   educ_attainment: { label: 'Educational Attainment' },
   race_ethnicity: { label: 'Race/Ethnicity', lookup: { table: 'ref_race_and_ethnicity', valueColumn: 'value', labelColumn: 'english_label_short' } },
-  race_ethnicity_other: { label: 'Race/Ethnicity - if Other, please specify', visibleIf: { field: 'race_ethnicity', in: ['Other'] } },
+  // Show the free-text field when the selected value includes "other" (handle both cases defensively)
+  race_ethnicity_other: { label: 'Race/Ethnicity - if Other, please specify', visibleIf: { field: 'race_ethnicity', in: ['other', 'Other'] } },
   gender_other: { label: 'Gender - if Other, please specify', visibleIf: { field: 'gender', in: ['Other'] } },
   hh_income: { label: 'Household Income' },
   lgbtqia: { label: 'LGBTQIA+' },
-  pronouns_other: { label: 'Pronouns - if Other, please specify' , visibleIf: { field: 'pronouns', in: ['Other'] } },
+  // Pronouns enum uses lowercase 'other' in the database
+  pronouns_other: { label: 'Pronouns - if Other, please specify' , visibleIf: { field: 'pronouns', in: ['other'] } },
   indiv_type: { label: 'Type' },
   assigned_partner: { editable: false },
   first_contact_ages: { label: 'Initial Interest: Ages' },
