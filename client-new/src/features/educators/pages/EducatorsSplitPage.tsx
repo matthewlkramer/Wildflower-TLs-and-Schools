@@ -6,7 +6,6 @@ import { useLocation } from 'wouter';
 import { EDUCATOR_GRID } from '../views';
 import { EDUCATOR_FIELD_METADATA } from '../views';
 import { EDUCATOR_VIEW_SPEC } from '../views';
-import { asTabs } from '@/shared/views/types';
 import { supabase } from '@/core/supabase/client';
 import { SavedViewsManager } from '@/shared/components/SavedViewsManager';
 import { GridPageHeader } from '@/shared/components/GridPageHeader';
@@ -249,7 +248,7 @@ export function EducatorsSplitPage() {
           {selectedEducatorId && selectedEducatorData ? (
             <DetailsRenderer
               entityId={selectedEducatorId}
-              tabs={asTabs(EDUCATOR_VIEW_SPEC)}
+              view={EDUCATOR_VIEW_SPEC}
             />
           ) : (
             <div style={{ padding: '20px', color: '#6b7280' }}>

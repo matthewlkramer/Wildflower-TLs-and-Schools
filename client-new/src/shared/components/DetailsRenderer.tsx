@@ -5,21 +5,22 @@ import { ListRenderer } from './ListRenderer';
 import { CardRenderer } from './CardRenderer';
 import { tableService, type RenderableTableData } from '../services/table-service';
 import { cardService, type RenderableCard } from '../services/card-service';
-import type { DetailTabSpec, DetailBlock, DetailTableBlock, DetailListBlock, DetailCardBlock } from '../types/detail-types';
-import type { TablePresetId } from '../config/table-list-presets';
+import type { ViewSpec, TabSpec, BlockSpec, CardSpec, TableSpec, ListSpec, MapSpec } from '../views/types';
+import { TABLE_LIST_PRESETS } from '../config/table-list-presets';
 
 export type DetailsRendererProps = {
-  tabs: DetailTabSpec[];
+  view: ViewSpec;
   entityId: string;
   className?: string;
 };
 
 export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
-  tabs,
+  view,
   entityId,
   className = '',
 }) => {
   const [activeTab, setActiveTab] = useState(0);
+  const tabs = view.tabs;
 
   return (
     <div className={`details-renderer ${className}`}>
@@ -53,7 +54,7 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
 };
 
 type TabContentProps = {
-  tab: DetailTabSpec;
+  tab: TabSpec;
   entityId: string;
 };
 
@@ -65,7 +66,6 @@ const TabContent: React.FC<TabContentProps> = ({ tab, entityId }) => {
           key={index}
           block={block}
           entityId={entityId}
-          saveTarget={tab.writeTo}
         />
       ))}
     </div>
@@ -73,43 +73,50 @@ const TabContent: React.FC<TabContentProps> = ({ tab, entityId }) => {
 };
 
 type BlockRendererProps = {
-  block: DetailBlock;
+  block: BlockSpec;
   entityId: string;
-  saveTarget?: any;
 };
 
-const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, saveTarget }) => {
+const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId }) => {
   const [isVisible, setIsVisible] = useState(true);
 
-  // TODO: Implement visibility logic based on block.visibleIf
+  // TODO: Implement visibility logic
 
   if (!isVisible) return null;
 
+  // Get title from preset for table/list blocks
+  let title: string | undefined;
+  if (block.kind === 'table' || block.kind === 'list') {
+    const preset = TABLE_LIST_PRESETS[block.preset as keyof typeof TABLE_LIST_PRESETS];
+    title = preset?.title;
+  } else {
+    title = block.title;
+  }
+
   return (
     <div className={`block-renderer ${block.width === 'half' ? 'w-1/2' : 'w-full'}`}>
-      {block.title && (
-        <h3 className="text-lg font-semibold mb-4">{block.title}</h3>
+      {title && (
+        <h3 className="text-lg font-semibold mb-4">{title}</h3>
       )}
 
       {block.kind === 'table' && (
         <TableBlockRenderer
-          block={block as DetailTableBlock}
+          block={block as TableSpec}
           entityId={entityId}
         />
       )}
 
       {block.kind === 'list' && (
         <ListBlockRenderer
-          block={block as DetailListBlock}
+          block={block as ListSpec}
           entityId={entityId}
         />
       )}
 
       {block.kind === 'card' && (
         <CardBlockRenderer
-          block={block as DetailCardBlock}
+          block={block as CardSpec}
           entityId={entityId}
-          saveTarget={saveTarget}
         />
       )}
 
@@ -124,7 +131,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, saveTarg
 
 // Table Block Renderer
 const TableBlockRenderer: React.FC<{
-  block: DetailTableBlock;
+  block: TableSpec;
   entityId: string;
 }> = ({ block, entityId }) => {
   const [tableData, setTableData] = useState<RenderableTableData | null>(null);
@@ -141,7 +148,7 @@ const TableBlockRenderer: React.FC<{
       const data = await tableService.loadTableData(
         block.preset,
         entityId,
-        (block as any).module
+        block.module
       );
       setTableData(data);
     } catch (error) {
@@ -186,7 +193,7 @@ const TableBlockRenderer: React.FC<{
 
 // List Block Renderer
 const ListBlockRenderer: React.FC<{
-  block: DetailListBlock;
+  block: ListSpec;
   entityId: string;
 }> = ({ block, entityId }) => {
   const [tableData, setTableData] = useState<RenderableTableData | null>(null);
@@ -203,7 +210,7 @@ const ListBlockRenderer: React.FC<{
       const data = await tableService.loadTableData(
         block.preset,
         entityId,
-        (block as any).module
+        block.module
       );
       setTableData(data);
     } catch (error) {
@@ -231,22 +238,62 @@ const ListBlockRenderer: React.FC<{
     return <div>Loading list...</div>;
   }
 
+  // Generate list layout from preset
+  const preset = TABLE_LIST_PRESETS[block.preset as keyof typeof TABLE_LIST_PRESETS];
+  const listLayout = generateListLayoutFromPreset(preset);
+
   return (
     <ListRenderer
       data={tableData}
-      layout={block.listLayout}
+      layout={listLayout}
       onRowAction={handleRowAction}
       onTableAction={handleTableAction}
     />
   );
 };
 
+// Helper function to generate list layout from preset column listLayout values
+function generateListLayoutFromPreset(preset: any) {
+  if (!preset?.columns) return undefined;
+
+  const layout = {
+    titleField: undefined as string | undefined,
+    subtitleFields: [] as string[],
+    bodyFields: [] as string[],
+    badgeFields: [] as string[],
+    footerFields: [] as string[],
+  };
+
+  for (const column of preset.columns) {
+    if (typeof column === 'object' && column.listLayout) {
+      switch (column.listLayout) {
+        case 'title':
+          layout.titleField = column.field;
+          break;
+        case 'subtitle':
+          layout.subtitleFields.push(column.field);
+          break;
+        case 'body':
+          layout.bodyFields.push(column.field);
+          break;
+        case 'badge':
+          layout.badgeFields.push(column.field);
+          break;
+        case 'footer':
+          layout.footerFields.push(column.field);
+          break;
+      }
+    }
+  }
+
+  return layout;
+}
+
 // Card Block Renderer
 const CardBlockRenderer: React.FC<{
-  block: DetailCardBlock;
+  block: CardSpec;
   entityId: string;
-  saveTarget?: any;
-}> = ({ block, entityId, saveTarget }) => {
+}> = ({ block, entityId }) => {
   const [cardData, setCardData] = useState<RenderableCard | null>(null);
 
   useEffect(() => {

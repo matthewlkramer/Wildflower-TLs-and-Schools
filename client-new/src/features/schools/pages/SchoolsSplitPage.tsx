@@ -6,7 +6,6 @@ import { useLocation } from 'wouter';
 import { SCHOOL_GRID } from '../views';
 import { SCHOOL_FIELD_METADATA } from '../views';
 import { SCHOOL_VIEW_SPEC } from '../views';
-import { asTabs } from '@/shared/views/types';
 import { supabase } from '@/core/supabase/client';
 import { SavedViewsManager } from '@/shared/components/SavedViewsManager';
 import { GridPageHeader } from '@/shared/components/GridPageHeader';
@@ -249,7 +248,7 @@ export function SchoolsSplitPage() {
           {selectedSchoolId && selectedSchoolData ? (
             <DetailsRenderer
               entityId={selectedSchoolId}
-              tabs={asTabs(SCHOOL_VIEW_SPEC)}
+              view={SCHOOL_VIEW_SPEC}
             />
           ) : (
             <div style={{ padding: '20px', color: '#6b7280' }}>

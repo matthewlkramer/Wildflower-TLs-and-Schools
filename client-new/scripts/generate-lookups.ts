@@ -248,8 +248,22 @@ function generateLookupsFromTables(tables: { public: TableInfo[], ref_tables: Ta
     if (shouldSkipTable(table.name)) continue;
 
     const override = MANUAL_OVERRIDES[table.name];
-    const primaryKey = override?.primaryKey || table.primaryKey || 'id';
-    const labelColumn = determineLabelColumn(table, 'public');
+    let primaryKey = override?.primaryKey || table.primaryKey || 'id';
+
+    // For zref tables: if detected PK is 'id' but table doesn't have 'id' column and has 'value' column, use 'value'
+    if (table.name.startsWith('zref_') && primaryKey === 'id' && !table.columns.includes('id') && table.columns.includes('value')) {
+      primaryKey = 'value';
+    }
+
+    // For label column: use 'label' if it exists, otherwise use detected label column logic
+    let labelColumn: string;
+    if (override?.labelColumn) {
+      labelColumn = override.labelColumn;
+    } else if (table.columns.includes('label')) {
+      labelColumn = 'label';
+    } else {
+      labelColumn = determineLabelColumn(table, 'public');
+    }
 
     lookups[table.name] = {
       table: table.name,
@@ -335,6 +349,15 @@ function convertEdgeFunctionDataToTables(schemaData: any): { public: TableInfo[]
   const result = { public: [] as TableInfo[], ref_tables: [] as TableInfo[] };
   const { tables, columns_by_table, primary_keys_by_table } = schemaData;
 
+  // Debug: check what primary_keys_by_table contains for a specific table
+  if (primary_keys_by_table && primary_keys_by_table['public.zref_race_and_ethnicity']) {
+    console.log('🔍 Debug: primary_keys_by_table for zref_race_and_ethnicity:',
+      JSON.stringify(primary_keys_by_table['public.zref_race_and_ethnicity'], null, 2));
+  } else {
+    console.log('🔍 Debug: No primary key data found for zref_race_and_ethnicity');
+    console.log('🔍 Available keys in primary_keys_by_table:', Object.keys(primary_keys_by_table || {}).filter(k => k.includes('zref')).slice(0, 5));
+  }
+
   for (const table of tables) {
     const { schema_name, table_name, table_type } = table;
 
@@ -347,7 +370,13 @@ function convertEdgeFunctionDataToTables(schemaData: any): { public: TableInfo[]
 
     // Get primary key for this table
     const primaryKeys = primary_keys_by_table?.[`${schema_name}.${table_name}`] || [];
-    const primaryKey = primaryKeys.length > 0 ? primaryKeys[0].column_name : 'id';
+    // The edge function returns primary keys as an array of strings (column names)
+    const primaryKey = primaryKeys.length > 0 ? primaryKeys[0] : undefined;
+
+    // Debug: log tables without primary keys
+    if (!primaryKey && table_name.startsWith('zref_')) {
+      console.log(`⚠️  Table ${schema_name}.${table_name} has no primary key defined. Columns:`, columnNames);
+    }
 
     // Create TableInfo with rich data
     const tableInfo: TableInfo = {

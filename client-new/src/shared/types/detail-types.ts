@@ -25,12 +25,6 @@ export type LookupException = {
   };
 };
 
-export type CardEditSource = {
-  schema?: string;
-  table: string;
-  pk?: string;
-  exceptions?: LookupException[];
-};
 
 export type DetailFieldType = 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'attachment';
 
@@ -65,7 +59,7 @@ export type FieldMetadata = {
   multiline?: boolean;
   width?: number | string;
   options?: string[];
-  lookup?: FieldLookup;
+  lookupTable?: string; // Table name to look up in GENERATED_LOOKUPS
   edit?: FieldEditConfig;
   reference?: FieldReference;
   // New: explicitly mark a field as not editable even if it has an inferred/default write target
@@ -82,8 +76,7 @@ export type TableColumnMeta = {
   field: string;
   label?: string;
   multiline?: boolean;
-  // Simple boolean flag - actual lookup config comes from TABLE_LOOKUP_PRESETS or generated lookups
-  lookup?: boolean;
+  lookupTable?: string; // Table name to look up in GENERATED_LOOKUPS
   // Optional: apply a boolean or equality filter when loading lookup options
   lookupFilter?: { column: string; value: any };
   // If present, disables inline editing for this column
@@ -123,57 +116,9 @@ export type TableActionSpec = {
   label: string;
 };
 
-export type DetailCardBlock = {
-  kind: 'card';
-  title?: string;
-  width?: 'half' | 'full';
-  fields: string[];
-  editable: boolean;
-  editSource?: CardEditSource;
-  visibleIf?: VisibleIf;
-};
-
 export type TableOrderBy = {
   column: string;
   ascending?: boolean;
-};
-
-export type DetailTableBlock = {
-  kind: 'table';
-  title?: string;
-  width?: 'half' | 'full';
-  // Simplified reference to a shared table preset
-  preset?: string;
-  // New structure: read/write config colocated with columns meta
-  readSource?: {
-    schema?: string;
-    table: string;
-    fkColumn: string;
-  };
-  // Default write target (omitted for direct tables)
-  writeDefaults?: { schema?: string; table: string; pk?: string; pkColumn?: string };
-  // Columns can be specified as names or as rich meta
-  columns?: string[] | readonly TableColumnMeta[];
-  rowActions?: readonly (RowAction | string)[];
-  tableActions?: readonly string[];
-  tableActionLabels?: readonly string[];
-  // Optional on/off filters controlled by header switches
-  toggles?: readonly TableToggleSpec[];
-  // Always-applied filter expression when fetching rows
-  baseFilter?: FilterExpr;
-  // Optional limit override (defaults to 200 rows)
-  limit?: number;
-  // Optional ordering directives applied before limiting
-  orderBy?: readonly TableOrderBy[];
-  visibleIf?: VisibleIf;
-};
-
-export type DetailMapBlock = {
-  kind: 'map';
-  title?: string;
-  width?: 'half' | 'full';
-  fields: string[];
-  visibleIf?: VisibleIf;
 };
 
 export type DetailListLayout = {
@@ -187,28 +132,9 @@ export type DetailListLayout = {
   bodyFieldFullWidth?: boolean;
 };
 
-export type DetailListBlock = Omit<DetailTableBlock, 'kind'> & {
-  kind: 'list';
-  listLayout?: DetailListLayout;
-};
-
-export type DetailBlock = DetailCardBlock | DetailTableBlock | DetailListBlock | DetailMapBlock;
-
-// Visibility DSL for blocks
+// Visibility DSL
 export type VisibleIfClause = { field: string; eq?: any; in?: any[]; notEmpty?: boolean };
 export type VisibleIf = VisibleIfClause | { anyOf: VisibleIfClause[] } | { allOf: VisibleIfClause[] };
-
-export type DetailTabSpec = {
-  id: string;
-  label: string;
-  writeTo?: {
-    schema?: string;
-    table: string;
-    pk?: string;
-  };
-  writeToExceptions?: LookupException[];
-  blocks: DetailBlock[];
-};
 
 export type RowActionId =
   | 'inline_edit'
@@ -223,11 +149,6 @@ export type RowActionId =
   | 'add_note'
   | 'add_task'
   | 'email';
-
-export type RowAction = {
-  id: RowActionId;
-  label: string;
-};
 
 // Lightweight create action configs used by grid row action menus
 export type CreateNoteConfig = {

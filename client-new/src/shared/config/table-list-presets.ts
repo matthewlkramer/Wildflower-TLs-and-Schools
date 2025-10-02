@@ -23,7 +23,7 @@ export const TABLE_LIST_PRESETS = {
     cardLimit: 50,
     readSource: 'charter_authorization_actions',
     columns: [
-      { field: 'action', lookup: true , listLayout: 'title'},
+      { field: 'action', lookupTable: 'zref_charter_authorizer_actions', listLayout: 'title'},
       { field: 'action_date', listLayout: 'body'},
       { field: 'authorized_after_action', label: 'Authorized After?', listLayout: 'body'},
     ] as const,
@@ -39,7 +39,7 @@ export const TABLE_LIST_PRESETS = {
     writeDefaults: { table: 'people_roles_associations', pkColumn: 'id' },
     columns: [
       { field: 'full_name', label: 'Educator', update: 'newOnly' ,listLayout: 'title'},
-      { field: 'role', lookup: true, listLayout: 'subtitle' },
+      { field: 'role', lookupTable: 'zref_roles', listLayout: 'subtitle' },
       { field: 'start_date', listLayout: 'body' },
       { field: 'end_date', listLayout: 'body' },
       { field: 'is_active', label: 'Active?', listLayout: 'badge' },
@@ -55,7 +55,7 @@ export const TABLE_LIST_PRESETS = {
     writeDefaults: { table: 'people_roles_associations', pkColumn: 'id' },
     columns: [
       { field: 'school_name', label: 'School', update: 'newOnly' },
-      { field: 'role', lookup: true },
+      { field: 'role', lookupTable: 'zref_roles', listLayout: 'subtitle' },
       { field: 'start_date' },
       { field: 'end_date' },
       { field: 'is_active', label: 'Active?' },
@@ -104,7 +104,7 @@ export const TABLE_LIST_PRESETS = {
     readSource: 'action_steps',
     columns: [
       { field: 'item', label: 'Item', multiline: true , listLayout: 'title' },
-      { field: 'assignee', label: 'Assignee', lookup: true, listLayout: 'subtitle' },
+      { field: 'assignee', label: 'Assignee', lookupTable: 'guides', listLayout: 'subtitle' },
       { field: 'item_status', label: 'Status', listLayout: 'badge' },
       { field: 'assigned_date', label: 'Assigned Date', listLayout: 'body' },
       { field: 'due_date', listLayout: 'body' },
@@ -122,7 +122,7 @@ export const TABLE_LIST_PRESETS = {
     columns: [
       { field: 'title', label: 'Title' , listLayout: 'title'},
       { field: 'full_text', label: 'Text', multiline: true , listLayout: 'body', listFieldFullWidth: true },
-      { field: 'created_by', label: 'Created By', lookup: true, listLayout: 'subtitle' },
+      { field: 'created_by', label: 'Created By', lookupTable: 'guides', listLayout: 'subtitle' },
       { field: 'created_date', listLayout: 'footer' },
       { field: 'is_private', label: 'Private?' , listLayout: 'badge' },
     ] as const,
@@ -171,9 +171,8 @@ export const TABLE_LIST_PRESETS = {
     cardLimit: 50,
     readSource: 'governance_docs',
     columns: [
-      { field: 'doc_type', label: 'Document Type', linkToField: 'pdf' , listLayout: 'title'},
+      { field: 'doc_type', label: 'Document Type', lookupTable: 'zref_gov_docs', linkToAttachment: 'object_id', listLayout: 'title'},
       { field: 'upload_date', label: 'Upload Date' , listLayout: 'subtitle'},
-      { field: 'object_id', label: 'Attachment', attachment: true , listLayout: 'attachment'},
     ] as const,
     rowActions: ['view_in_modal', 'archive'] as const,
     tableActions: [{id: 'addGovDoc', label: 'Add Document'}] as const,
@@ -185,8 +184,7 @@ export const TABLE_LIST_PRESETS = {
     cardLimit: 50,
     readSource: 'nine_nineties',
     columns: [
-      { field: 'form_year', label: 'Year', linkToField: 'pdf' , listLayout: 'title'},
-      { field: 'object_id', label: 'Attachment', attachment: true , listLayout: 'attachment'},
+      { field: 'form_year', label: 'Year', linkToAttachment: 'object_id' , listLayout: 'title'},
     ] as const,
     rowActions: ['view_in_modal', 'archive'] as const,
     tableActions: [{id: 'addNineNinety', label: 'Add 990'}] as const,
@@ -198,9 +196,8 @@ export const TABLE_LIST_PRESETS = {
     cardLimit: 50,
     readSource: 'school_reports_and_submissions',
     columns: [
-      { field: 'school_year', lookup: true, listLayout: 'subtitle'},
-      { field: 'report_type', label: 'Report Type', listLayout: 'title'},
-      { field: 'attachment', label: 'Attachment', attachment: true, listLayout: 'attachment'},
+      { field: 'school_year', lookupTable: 'zref_school_years', listLayout: 'subtitle'},
+      { field: 'report_type', label: 'Report Type', linkToAttachment: 'object_id', listLayout: 'title'}
     ] as const,
     rowActions: ['view_in_modal','archive'] as const,
     tableActions: [{id: 'addReport', label: 'Add Report'}] as const,
@@ -212,7 +209,7 @@ export const TABLE_LIST_PRESETS = {
     cardLimit: 50,
     readSource: 'annual_assessment_and_metrics_data',
     columns: [
-      { field: 'school_year', lookup: true , listLayout: 'subtitle'},
+      { field: 'school_year', lookupTable: 'zref_school_years', listLayout: 'subtitle'},
       { field: 'assessment_or_metric', label: 'Assessment/Metric', listLayout: 'title'},
       { field: 'metric_data', label: 'Value', listLayout: 'body'},
       { field: 'assessed_total', label: 'Assessed Total', listLayout: 'body'},
@@ -229,7 +226,7 @@ export const TABLE_LIST_PRESETS = {
     cardLimit: 50,
     readSource: 'annual_enrollment_and_demographics',
     columns: [
-      { field: 'school_year', lookup: true , listLayout: 'title'},
+      { field: 'school_year', lookupTable: 'zref_school_years', listLayout: 'title'},
       { field: 'enrolled_students_total', label: 'Total Students', listLayout: 'body' },
       { field: 'enrolled_frl', label: 'Free/Reduced Lunch', listLayout: 'body' },
       { field: 'enrolled_ell', label: 'ELL', listLayout: 'body' },
@@ -246,8 +243,8 @@ export const TABLE_LIST_PRESETS = {
     cardLimit: 50,
     readSource: 'guide_assignments',
     columns: [
-      { field: 'email_or_name', label: 'Email or Name', lookup: true , listLayout: 'title'},
-      { field: 'type', label: 'Type' , lookup: true , listLayout: 'subtitle'},
+      { field: 'email_or_name', label: 'Email or Name', lookupTable: 'guides', listLayout: 'title'},
+      { field: 'type', label: 'Type', listLayout: 'subtitle'},
       { field: 'start_date', listLayout: 'body'},
       { field: 'end_date', listLayout: 'body'},
       { field: 'is_active', label: 'Active?' , listLayout: 'badge'},
@@ -266,7 +263,7 @@ export const TABLE_LIST_PRESETS = {
     writeDefaults: { table: 'people_roles_associations', pkColumn: 'id' },
     columns: [
       { field: 'full_name', label: 'Name', listLayout: 'title', update: 'newOnly' },
-      { field: 'role', label: 'Role', lookup: true, listLayout: 'subtitle' },
+      { field: 'role', label: 'Role', lookupTable: 'zref_roles', listLayout: 'subtitle' },
       { field: 'start_date', listLayout: 'body' },
       { field: 'end_date', listLayout: 'body' },
       { field: 'is_active', label: 'Active?', listLayout: 'badge' },
@@ -281,7 +278,7 @@ export const TABLE_LIST_PRESETS = {
     cardLimit: 50,
     readSource: 'advice',
     columns: [
-      { field: 'advice_giver', label: 'Advice Giver', lookup: true , listLayout: 'title'},
+      { field: 'advice_giver', label: 'Advice Giver', lookupTable: 'people', listLayout: 'title'},
       { field: 'advice_requested_date', label: 'Requested Date', listLayout: 'body' },
       { field: 'advice_given_date', label: 'Given Date', listLayout: 'body' },
       { field: 'advice_text', label: 'Advice Text', multiline: true, listLayout: 'body' },
@@ -313,7 +310,7 @@ export const TABLE_LIST_PRESETS = {
     columns: [
       { field: 'year', label: 'Year', listLayout: 'subtitle'},
       { field: 'association', label: 'Association', listLayout: 'body'},
-      { field: 'cert_level', label: 'Status', lookup: true, listLayout: 'title' },
+      { field: 'cert_level', label: 'Level', lookupTable: 'zref_certifications', listLayout: 'title' },
       { field: 'cert_completion_status', label: 'Status', listLayout: 'badge'},
       { field: 'macte_accredited', label: 'MACTE?', listLayout: 'badge'},
       { field: 'trainer', label: 'Trainer', listLayout: 'body'},
@@ -331,7 +328,7 @@ export const TABLE_LIST_PRESETS = {
     cardLimit: 50,
     readSource: 'event_attendance',
     columns: [
-      { field: 'event_name', label: 'Event Name', lookup: true, listLayout: 'title' },
+      { field: 'event_name', label: 'Event Name', lookupTable: 'event_list', listLayout: 'title' },
     //  { field: 'event_date', label: 'Event Date'},
       { field: 'attended_event', label: 'Attended?', listLayout: 'badge' },
       { field: 'registration_date', label: 'Registration Date' , listLayout: 'body'},

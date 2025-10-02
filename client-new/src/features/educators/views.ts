@@ -2,7 +2,6 @@ import { view, tab, card, table, list } from '@/shared/views/builders';
 import type { ViewSpec } from '@/shared/views/types';
 // Removed - consolidated into table-list-presets
 import type { GridColumnConfig, FieldMetadataMap } from '@/shared/types/detail-types';
-import { GENERATED_LOOKUPS } from '@/generated/lookups.generated';
 
 // Grid + Kanban
 export const EDUCATOR_GRID: GridColumnConfig[] = [
@@ -30,7 +29,7 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   secondary_phone_other_info: { label: 'Extension or other info (for Secondary Phone)' },
   home_address: { multiline: true },
   educ_attainment: { label: 'Educational Attainment' },
-  race_ethnicity: { label: 'Race/Ethnicity', lookup: GENERATED_LOOKUPS.zref_ref_race_and_ethnicity },
+  race_ethnicity: { label: 'Race/Ethnicity', lookupTable: 'zref_race_and_ethnicity' },
   // Show the free-text field when the selected value includes "other" (handle both cases defensively)
   race_ethnicity_other: { label: 'Race/Ethnicity - if Other, please specify', visibleIf: { field: 'race_ethnicity', in: ['other', 'Other'] } },
   gender_other: { label: 'Gender - if Other, please specify', visibleIf: { field: 'gender', in: ['Other'] } },
@@ -56,10 +55,10 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   opsguide_meeting_prefs: { label: 'Ops Guide - Meeting Preferences' },
   opsguide_request_pertinent_info: { label: 'Ops Guide - Request Pertinent Info' },
   opsguide_support_type_needed: { label: 'Ops Guide - Support Type Needed' },
-  routed_to: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
-  assigned_partner_override: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
-  person_responsible_for_follow_up: { lookup: { table: 'guides', valueColumn: 'email_or_name', labelColumn: 'email_or_name' } },
-  one_on_one_scheduling_status: { label: 'One-on-One Scheduling Status', lookup: GENERATED_LOOKUPS.zref_ref_one_on_one_status },
+  routed_to: { lookupTable: 'guides' },
+  assigned_partner_override: { lookupTable: 'guides' },
+  person_responsible_for_follow_up: { lookupTable: 'guides' },
+  one_on_one_scheduling_status: { label: 'One-on-One Scheduling Status', lookupTable: 'zref_one_on_one_status' },
   current_role_at_active_school: { label: 'Current Role at Active School', editable: false },
   current_role: { editable: false },
   active_school: { editable: false },

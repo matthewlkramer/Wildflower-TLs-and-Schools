@@ -1,10 +1,9 @@
 import { TABLE_LIST_PRESETS, type TablePreset } from '../config/table-list-presets';
-import { LOOKUPS } from '../utils/lookups';
+import { GENERATED_LOOKUPS } from '@/generated/lookups.generated';
 import { ENUM_OPTIONS, FIELD_TYPES } from '@/generated/enums.generated';
 import { getColumnMetadata } from '@/generated/schema-metadata';
 import type {
   TableColumnMeta,
-  DetailTableBlock,
   FieldLookup,
   FilterExpr
 } from './detail-types';
@@ -84,12 +83,13 @@ function resolveColumn(columnSpec: string | TableColumnMeta, readSource?: string
 
   // Resolve lookup configuration
   let resolvedLookup: FieldLookup | undefined;
-  if ((meta as any).lookup === true) {
-    const lookupConfig = LOOKUPS[field];
+  if ((meta as any).lookupTable) {
+    // Use lookupTable to get config from GENERATED_LOOKUPS
+    const lookupConfig = GENERATED_LOOKUPS[(meta as any).lookupTable];
     if (lookupConfig) {
       resolvedLookup = {
         table: lookupConfig.table,
-        valueColumn: lookupConfig.pkColumn,
+        valueColumn: lookupConfig.valueColumn,
         labelColumn: lookupConfig.labelColumn,
       };
     }
@@ -162,16 +162,3 @@ function labelFromField(field: string): string {
     .replace(/Api$/, 'API');
 }
 
-/**
- * Resolves a table block specification for detail views
- */
-export function resolveTableBlock(block: DetailTableBlock): DetailTableBlock & { resolvedSpec?: ResolvedTableSpec } {
-  if (block.preset) {
-    const resolvedSpec = resolveTableSpec(block.preset);
-    return {
-      ...block,
-      resolvedSpec,
-    };
-  }
-  return block;
-}

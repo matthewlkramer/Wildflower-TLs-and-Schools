@@ -1,8 +1,9 @@
 import { supabase } from '@/core/supabase/client';
 import { getColumnMetadata } from '@/generated/schema-metadata';
-import { LOOKUPS } from '../utils/lookups';
+import { GENERATED_LOOKUPS } from '@/generated/lookups.generated';
 import { ENUM_OPTIONS } from '@/generated/enums.generated';
-import type { DetailCardBlock, FieldMetadata, LookupException } from './detail-types';
+import type { FieldMetadata, LookupException } from './detail-types';
+import type { CardSpec } from '../views/types';
 
 export type SelectOption = { value: string; label: string };
 
@@ -50,7 +51,7 @@ export class CardService {
    * Load card data for a specific entity
    */
   async loadCardData(
-    block: DetailCardBlock,
+    block: CardSpec,
     entityId: string,
     sourceTable?: string
   ): Promise<RenderableCard> {
@@ -59,15 +60,15 @@ export class CardService {
       const entityData = await this.loadEntityData(sourceTable || 'people', entityId);
 
       // Load field metadata and options
-      const fields = await this.resolveFields(block.fields, entityData, block.editSource);
+      const fields = await this.resolveFields(block.fields, entityData, undefined);
 
       return {
         entityId,
         title: block.title,
         fields,
-        editable: block.editable,
+        editable: block.editable ?? false,
         loading: false,
-        saveTarget: block.editSource,
+        saveTarget: undefined, // CardSpec doesn't have editSource
       };
     } catch (error) {
       console.error('Failed to load card data:', error);
@@ -160,9 +161,9 @@ export class CardService {
     let fieldType: FieldValue['type'] = 'string';
 
     // Check for lookup configuration
-    if (LOOKUPS[fieldName]) {
-      const lookupConfig = LOOKUPS[fieldName];
-      options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.pkColumn, lookupConfig.labelColumn);
+    if (GENERATED_LOOKUPS[fieldName]) {
+      const lookupConfig = GENERATED_LOOKUPS[fieldName];
+      options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
       fieldType = 'enum';
     }
     // Check for enum options

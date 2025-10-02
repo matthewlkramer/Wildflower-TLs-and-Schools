@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/core/supabase/client';
-import { ENUM_OPTIONS } from '../../enums.generated';
+import { ENUM_OPTIONS } from '@/generated/enums.generated';
+import { GENERATED_LOOKUPS } from '@/generated/lookups.generated';
 import { ENUM_OPTION_CACHE, LOOKUP_OPTION_CACHE } from '../cache';
 import {
   asSelectOptions,
@@ -44,7 +45,16 @@ export function useSelectOptions(
     }
 
     // 3. Handle lookup configuration
-    const lookup = exception?.lookup || meta.lookup;
+    let lookup = exception?.lookup || meta.lookup;
+
+    // If lookupTable is specified, get the config from GENERATED_LOOKUPS
+    if (!lookup && meta.lookupTable) {
+      lookup = GENERATED_LOOKUPS[meta.lookupTable];
+      if (!lookup) {
+        console.warn(`Lookup table '${meta.lookupTable}' not found in GENERATED_LOOKUPS`);
+      }
+    }
+
     if (lookup) {
       // Apply the same fallback logic as the main details-renderer for cache key consistency
       const lookupWithSchema = { ...lookup };
@@ -136,9 +146,14 @@ function getCachedOptionsForMeta(meta?: FieldMetadata | TableColumnMeta): Select
   }
 
   // Check lookup cache
-  if (meta.lookup) {
+  let lookup = meta.lookup;
+  if (!lookup && meta.lookupTable) {
+    lookup = GENERATED_LOOKUPS[meta.lookupTable];
+  }
+
+  if (lookup) {
     // Apply the same fallback logic as the main details-renderer
-    const lookupWithSchema = { ...meta.lookup };
+    const lookupWithSchema = { ...lookup };
     if (!lookupWithSchema.schema && typeof lookupWithSchema.table === 'string' && lookupWithSchema.table.startsWith('ref_')) {
       lookupWithSchema.schema = 'ref_tables';
     }

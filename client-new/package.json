@@ -6,7 +6,8 @@
   "scripts": {
     "gen:enums": "tsx scripts/generate-field-metadata.ts",
     "gen:lookups": "tsx scripts/generate-lookups.ts",
-    "gen:all": "npm run gen:enums && npm run gen:lookups",
+    "gen:types": "tsx scripts/generate-database-types.ts",
+    "gen:all": "npm run gen:types && npm run gen:enums && npm run gen:lookups",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

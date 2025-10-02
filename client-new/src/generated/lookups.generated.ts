@@ -76,8 +76,8 @@ export const GENERATED_LOOKUPS = {
   'lead_routing_and_templates': {
     // Auto-detected public table lookup for lead_routing_and_templates
     table: 'lead_routing_and_templates',
-    valueColumn: 'id',
-    labelColumn: 'id',
+    valueColumn: 'rule',
+    labelColumn: 'rule',
   },
   'loans': {
     // Auto-detected public table lookup for loans
@@ -94,7 +94,7 @@ export const GENERATED_LOOKUPS = {
   'mailing_lists': {
     // Auto-detected public table lookup for mailing_lists
     table: 'mailing_lists',
-    valueColumn: 'id',
+    valueColumn: 'sub_name',
     labelColumn: 'name',
   },
   'notes': {
@@ -121,106 +121,106 @@ export const GENERATED_LOOKUPS = {
     valueColumn: 'id',
     labelColumn: 'full_name',
   },
-  'zref_ref_certifications': {
-    // Auto-detected public table lookup for zref_ref_certifications
-    table: 'zref_ref_certifications',
-    valueColumn: 'id',
-    labelColumn: 'id',
+  'zref_certifications': {
+    // Auto-detected public table lookup for zref_certifications
+    table: 'zref_certifications',
+    valueColumn: 'value',
+    labelColumn: 'value',
   },
-  'zref_ref_charter_authorizer_actions': {
-    // Auto-detected public table lookup for zref_ref_charter_authorizer_actions
-    table: 'zref_ref_charter_authorizer_actions',
-    valueColumn: 'id',
+  'zref_charter_authorizer_actions': {
+    // Auto-detected public table lookup for zref_charter_authorizer_actions
+    table: 'zref_charter_authorizer_actions',
+    valueColumn: 'value',
     labelColumn: 'label',
   },
-  'zref_ref_charter_statuses': {
-    // Auto-detected public table lookup for zref_ref_charter_statuses
-    table: 'zref_ref_charter_statuses',
-    valueColumn: 'id',
+  'zref_charter_statuses': {
+    // Auto-detected public table lookup for zref_charter_statuses
+    table: 'zref_charter_statuses',
+    valueColumn: 'value',
     labelColumn: 'label',
   },
-  'zref_ref_educator_statuses': {
-    // Auto-detected public table lookup for zref_ref_educator_statuses
-    table: 'zref_ref_educator_statuses',
-    valueColumn: 'id',
+  'zref_educator_statuses': {
+    // Auto-detected public table lookup for zref_educator_statuses
+    table: 'zref_educator_statuses',
+    valueColumn: 'value',
     labelColumn: 'label',
   },
-  'zref_ref_errors': {
-    // Auto-detected public table lookup for zref_ref_errors
-    table: 'zref_ref_errors',
-    valueColumn: 'id',
-    labelColumn: 'id',
+  'zref_errors': {
+    // Auto-detected public table lookup for zref_errors
+    table: 'zref_errors',
+    valueColumn: 'value',
+    labelColumn: 'value',
   },
-  'zref_ref_event_types': {
-    // Auto-detected public table lookup for zref_ref_event_types
-    table: 'zref_ref_event_types',
-    valueColumn: 'id',
-    labelColumn: 'id',
+  'zref_event_types': {
+    // Auto-detected public table lookup for zref_event_types
+    table: 'zref_event_types',
+    valueColumn: 'value',
+    labelColumn: 'value',
   },
-  'zref_ref_gov_docs': {
-    // Auto-detected public table lookup for zref_ref_gov_docs
-    table: 'zref_ref_gov_docs',
-    valueColumn: 'id',
+  'zref_gov_docs': {
+    // Auto-detected public table lookup for zref_gov_docs
+    table: 'zref_gov_docs',
+    valueColumn: 'value',
     labelColumn: 'label',
   },
-  'zref_ref_membership_agreement_versions': {
-    // Auto-detected public table lookup for zref_ref_membership_agreement_versions
-    table: 'zref_ref_membership_agreement_versions',
-    valueColumn: 'id',
-    labelColumn: 'id',
+  'zref_membership_agreement_versions': {
+    // Auto-detected public table lookup for zref_membership_agreement_versions
+    table: 'zref_membership_agreement_versions',
+    valueColumn: 'value',
+    labelColumn: 'value',
   },
-  'zref_ref_membership_statuses': {
-    // Auto-detected public table lookup for zref_ref_membership_statuses
-    table: 'zref_ref_membership_statuses',
-    valueColumn: 'id',
-    labelColumn: 'id',
+  'zref_membership_statuses': {
+    // Auto-detected public table lookup for zref_membership_statuses
+    table: 'zref_membership_statuses',
+    valueColumn: 'value',
+    labelColumn: 'value',
   },
-  'zref_ref_one_on_one_status': {
-    // Auto-detected public table lookup for zref_ref_one_on_one_status
-    table: 'zref_ref_one_on_one_status',
-    valueColumn: 'id',
+  'zref_one_on_one_status': {
+    // Auto-detected public table lookup for zref_one_on_one_status
+    table: 'zref_one_on_one_status',
+    valueColumn: 'value',
     labelColumn: 'label',
   },
-  'zref_ref_planes': {
-    // Auto-detected public table lookup for zref_ref_planes
-    table: 'zref_ref_planes',
-    valueColumn: 'id',
+  'zref_planes': {
+    // Auto-detected public table lookup for zref_planes
+    table: 'zref_planes',
+    valueColumn: 'value',
     labelColumn: 'label',
   },
-  'zref_ref_public_funding_sources': {
-    // Auto-detected public table lookup for zref_ref_public_funding_sources
-    table: 'zref_ref_public_funding_sources',
-    valueColumn: 'id',
+  'zref_public_funding_sources': {
+    // Auto-detected public table lookup for zref_public_funding_sources
+    table: 'zref_public_funding_sources',
+    valueColumn: 'value',
     labelColumn: 'label',
   },
-  'zref_ref_race_and_ethnicity': {
-    // Auto-detected public table lookup for zref_ref_race_and_ethnicity
-    table: 'zref_ref_race_and_ethnicity',
-    valueColumn: 'id',
+  'zref_race_and_ethnicity': {
+    // Auto-detected public table lookup for zref_race_and_ethnicity
+    table: 'zref_race_and_ethnicity',
+    valueColumn: 'value',
     labelColumn: 'label',
   },
-  'zref_ref_roles': {
-    // Auto-detected public table lookup for zref_ref_roles
-    table: 'zref_ref_roles',
-    valueColumn: 'id',
+  'zref_roles': {
+    // Auto-detected public table lookup for zref_roles
+    table: 'zref_roles',
+    valueColumn: 'value',
     labelColumn: 'label',
   },
-  'zref_ref_school_years': {
-    // Auto-detected public table lookup for zref_ref_school_years
-    table: 'zref_ref_school_years',
-    valueColumn: 'id',
-    labelColumn: 'id',
+  'zref_school_years': {
+    // Auto-detected public table lookup for zref_school_years
+    table: 'zref_school_years',
+    valueColumn: 'value',
+    labelColumn: 'value',
   },
-  'zref_ref_sources': {
-    // Auto-detected public table lookup for zref_ref_sources
-    table: 'zref_ref_sources',
-    valueColumn: 'id',
-    labelColumn: 'id',
+  'zref_sources': {
+    // Auto-detected public table lookup for zref_sources
+    table: 'zref_sources',
+    valueColumn: 'value',
+    labelColumn: 'value',
   },
-  'zref_ref_stage_statuses': {
-    // Auto-detected public table lookup for zref_ref_stage_statuses
-    table: 'zref_ref_stage_statuses',
-    valueColumn: 'id',
+  'zref_stage_statuses': {
+    // Auto-detected public table lookup for zref_stage_statuses
+    table: 'zref_stage_statuses',
+    valueColumn: 'value',
     labelColumn: 'label',
   }
 } as const;
