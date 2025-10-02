@@ -10,7 +10,7 @@ export const EDUCATOR_GRID: GridColumnConfig[] = [
   { field: 'active_school', headerName: 'Curr. School', visibility: 'hide' },
   { field: 'current_role', headerName: 'Curr. Role', visibility: 'hide', valueType: 'select' },
   { field: 'discovery_status', headerName: 'Discovery', valueType: 'select', selectOptions: ['In Process', 'Complete'] },
-  { field: 'race_ethnicity', headerName: 'Race/Ethnicity', valueType: 'multi', lookupField: 'zref_ref_race_and_ethnicity.english_label_short' },
+  { field: 'race_ethnicity', headerName: 'Race/Ethnicity', valueType: 'multi', lookupField: 'zref_race_and_ethnicity.label' },
   { field: 'has_montessori_cert', headerName: 'Trained?', valueType: 'boolean' },
   { field: 'indiv_type', headerName: 'Type', valueType: 'select', selectOptions: ['Educator', 'Community Member'] },
   { field: 'id', headerName: 'ID', visibility: 'suppress' },
@@ -18,7 +18,7 @@ export const EDUCATOR_GRID: GridColumnConfig[] = [
   { field: 'kanban_group', headerName: 'Kanban Group', visibility: 'suppress', kanbanKey: true },
 ];
 
-export const EDUCATOR_KANBAN_CONSTANTS_TABLE = 'zref_ref_educator_statuses';
+export const EDUCATOR_KANBAN_CONSTANTS_TABLE = 'zref_educator_statuses';
 
 // GMAIL_LIST_OPTIONS and other list options are imported from shared presets
 

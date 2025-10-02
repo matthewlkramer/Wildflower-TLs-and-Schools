@@ -5,19 +5,19 @@ import type { GridColumnConfig, FieldMetadataMap } from '@/shared/types/detail-t
 // Grid + Kanban
 export const SCHOOL_GRID: GridColumnConfig[] = [
   { field: 'school_name', headerName: 'Name', sortKey: true},
-  { field: 'stage_status', headerName: 'Stage/Status', valueType: 'select', lookupField: 'zref_ref_stage_statuses.value' , kanbanKey: true },
+  { field: 'stage_status', headerName: 'Stage/Status', valueType: 'select', lookupField: 'zref_stage_statuses.value' , kanbanKey: true },
   { field: 'current_tls', headerName: 'Curr. TLs' },
-  { field: 'current_tls_race_ethnicity', headerName: 'TLs Race/ Ethnicity', valueType: 'multi', lookupField: 'zref_ref_race_and_ethnicity.english_label_short' },
+  { field: 'current_tls_race_ethnicity', headerName: 'TLs Race/ Ethnicity', valueType: 'multi', lookupField: 'zref_race_and_ethnicity.label' },
   { field: 'governance_model', headerName: 'Model', valueType: 'select', enumName: 'governance_models' },
   { field: 'ages_served', headerName: 'Ages', valueType: 'multi', enumName: 'age_spans_rev' },
-  { field: 'membership_status', headerName: 'Member?', valueType: 'select', lookupField: 'zref_ref_membership_statuses.value' },
+  { field: 'membership_status', headerName: 'Member?', valueType: 'select', lookupField: 'zref_membership_statuses.value' },
   { field: 'open', headerName: 'Open/Proj. open', valueType: 'date' },
   { field: 'active_guides', headerName: 'Guides', valueType: 'multi' },
   { field: 'people_id', headerName: 'People ID', visibility: 'suppress'},
   { field: 'id', headerName: 'ID', visibility: 'suppress' }
 ];
 
-export const SCHOOL_KANBAN_CONSTANTS_TABLE = 'zref_ref_stage_statuses';
+export const SCHOOL_KANBAN_CONSTANTS_TABLE = 'zref_stage_statuses';
 
 // Field metadata (only non-defaults retained)
 export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {

@@ -9,14 +9,14 @@ export const CHARTER_GRID: GridColumnConfig[] = [
   { field: 'status', headerName: 'Status', valueType: 'select', enumName: 'charter_status', kanbanKey: true },
   { field: 'proj_open', headerName: 'Projected open', valueType: 'date' },
   { field: 'non_tl_roles', headerName: 'Non-TL leadership' },
-  { field: 'initial_target_planes', headerName: 'Target planes', valueType: 'multi', lookupField: 'zref_ref_planes.label' },
+  { field: 'initial_target_planes', headerName: 'Target planes', valueType: 'multi', lookupField: 'zref_planes.label' },
   { field: 'initial_target_geo', headerName: 'Target geography' },
   { field: 'schools', headerName: 'Schools', valueType: 'multi' },
   { field: 'active_guides', headerName: 'Guides', valueType: 'multi' },
   { field: 'id', headerName: 'ID', visibility: 'suppress' }
 ];
 
-export const CHARTER_KANBAN_CONSTANTS_TABLE = 'zref_ref_charter_statuses';
+export const CHARTER_KANBAN_CONSTANTS_TABLE = 'zref_charter_statuses';
 
 // Gmail list options imported from shared presets
 
