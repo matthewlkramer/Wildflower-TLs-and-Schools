@@ -67,6 +67,7 @@ const MANUAL_OVERRIDES: Record<string, { primaryKey?: string; labelColumn?: stri
   'ssj_fillout_forms': { labelColumn: 'full_name' },
   'mailing_lists': { labelColumn: 'name' },
   'locations': { labelColumn: 'address' },
+  'event_list': { primaryKey: 'event_name', labelColumn: 'event_name' },
 
 
   // Tables to skip (not useful as lookups)
