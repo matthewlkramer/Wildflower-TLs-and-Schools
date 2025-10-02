@@ -25,3 +25,9 @@ export function clearAllCaches() {
   ENUM_OPTION_CACHE.clear();
   LOOKUP_OPTION_CACHE.clear();
 }
+
+// Clear cache on startup to avoid stale ref_tables queries
+if (typeof window !== 'undefined') {
+  LOOKUP_OPTION_CACHE.clear();
+  console.log('[DEBUG] Cleared lookup cache on startup');
+}

@@ -530,7 +530,10 @@ function useSelectOptions(
 
       if (meta.lookup) {
         const lk = { ...meta.lookup } as any;
-        if (!lk.schema && typeof lk.table === 'string' && lk.table.startsWith('ref_')) lk.schema = 'ref_tables';
+        if (!lk.schema && typeof lk.table === 'string' && lk.table.startsWith('ref_')) {
+          console.log(`[DEBUG] Setting ref_tables schema for field ${field}, table: ${lk.table}`);
+          lk.schema = 'ref_tables';
+        }
         const key = buildLookupKey(lk);
         const cached = LOOKUP_OPTION_CACHE.get(key);
         if (cached) {
@@ -645,6 +648,12 @@ function useSelectOptions(
 
       for (const [lookupKey, { fields: lookupFields, lookup }] of lookupsToFetch.entries()) {
         const schemaName = lookup.schema || (typeof lookup.table === 'string' && lookup.table.startsWith('ref_') ? 'ref_tables' : undefined);
+
+        // Debug log for ref_tables access
+        if (lookup.table && lookup.table.startsWith('ref_')) {
+          console.log(`[DEBUG] Accessing ref_table: ${lookup.table}, schema: ${schemaName}, lookup.schema: ${lookup.schema}`);
+        }
+
         const query = schemaName && schemaName !== 'public'
           ? (supabase as any).schema(schemaName).from(lookup.table)
           : (supabase as any).from(lookup.table);
@@ -654,6 +663,11 @@ function useSelectOptions(
           .select(`${lookup.valueColumn}, ${lookup.labelColumn}`)
 
           .order(lookup.labelColumn, { ascending: true });
+
+        // Debug log for API calls
+        if (lookup.table && lookup.table.startsWith('ref_')) {
+          console.log(`[DEBUG] API call result for ${lookup.table} (schema: ${schemaName}):`, { error: error?.message, dataLength: data?.length });
+        }
 
         if (!error && Array.isArray(data)) {
 
