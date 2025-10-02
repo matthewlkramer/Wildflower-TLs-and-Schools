@@ -38,7 +38,7 @@ type TableInfo = {
   }>;
 };
 
-const SRC_PATH = path.join('src', 'types', 'database.types.ts');
+const SRC_PATH = path.join('src', 'shared', 'types', 'database.types.ts');
 const OUT_PATH = path.join('src', 'generated', 'lookups.generated.ts');
 
 // Common label column patterns to try

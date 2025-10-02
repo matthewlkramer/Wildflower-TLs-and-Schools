@@ -12,8 +12,8 @@ type FieldInfo = {
 
 type FieldMap = Record<string, FieldInfo>;
 
-const SRC_PATH = path.join('src', 'types', 'database.types.ts');
-const OUT_PATH = path.join('src', 'modules', 'shared', 'enums.generated.ts');
+const SRC_PATH = path.join('src', 'shared', 'types', 'database.types.ts');
+const OUT_PATH = path.join('src', 'generated', 'enums.generated.ts');
 
 function readSource(filePath: string): ts.SourceFile {
   const code = fs.readFileSync(filePath, 'utf8');
