@@ -274,30 +274,7 @@ function generateLookupsFromTables(tables: { public: TableInfo[], ref_tables: Ta
     };
   }
 
-  // Add known ref_tables as fallback (if not found in AST)
-  // These follow the standard ref_tables pattern: value (PK), label (display)
-  const knownRefTables = [
-    'ref_age_spans',
-    'ref_educator_statuses',
-    'ref_governance_models',
-    'ref_membership_statuses',
-    'ref_one_on_one_status',
-    'ref_race_and_ethnicity',
-    'ref_roles',
-    'ref_stage_statuses',
-  ];
-
-  for (const refTable of knownRefTables) {
-    if (!lookups[refTable]) {
-      lookups[refTable] = {
-        table: refTable,
-        valueColumn: 'value',
-        labelColumn: 'label',
-        schema: 'ref_tables',
-        description: `Known ref_tables lookup for ${refTable} (fallback)`
-      };
-    }
-  }
+  // No longer need fallback for ref_tables since they've been migrated to public schema as zref_ref_*
 
   // Note: Some tables like ref_race_and_ethnicity are both enums AND ref_tables
   // The enum provides the stored values, but we still need ref_table lookups for display labels
