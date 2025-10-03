@@ -100,6 +100,17 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
     const currentValue = isEditing ? (editValues[field.field] ?? field.value.raw) : field.value.raw;
     const hasError = errors[field.field];
 
+    // Check visibleIf condition
+    if (field.metadata.visibleIf) {
+      const { field: conditionField, in: allowedValues } = field.metadata.visibleIf;
+      const conditionValue = isEditing ? (editValues[conditionField] ?? card.fields.find(f => f.field === conditionField)?.value.raw) : card.fields.find(f => f.field === conditionField)?.value.raw;
+
+      // If the condition field's value is not in the allowed values, don't render this field
+      if (!conditionValue || !allowedValues?.includes(conditionValue)) {
+        return null;
+      }
+    }
+
     return (
       <div key={field.field} style={{ fontSize: 12 }}>
         <div style={{ color: '#64748b', fontSize: 12, marginBottom: 4 }}>

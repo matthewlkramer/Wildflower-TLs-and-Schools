@@ -87,6 +87,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
         value={dateValue}
         onChange={(e) => onChange(e.target.value)}
         className={`h-8 text-xs ${className}`}
+        style={{ fontSize: 12, fontWeight: 'normal' }}
       />
     );
   }
@@ -98,6 +99,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
         value={String(value || '')}
         onChange={(e) => onChange(e.target.value)}
         className={`w-full min-h-[60px] p-2 border border-gray-300 rounded-md resize-y text-xs ${className}`}
+        style={{ fontSize: 12, fontWeight: 'normal' }}
         rows={3}
       />
     );
@@ -111,6 +113,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
         value={String(value || '')}
         onChange={(e) => onChange(Number(e.target.value))}
         className={`h-8 text-xs ${className}`}
+        style={{ fontSize: 12, fontWeight: 'normal' }}
       />
     );
   }
@@ -122,6 +125,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
       value={String(value || '')}
       onChange={(e) => onChange(e.target.value)}
       className={`h-8 text-xs ${className}`}
+      style={{ fontSize: 12, fontWeight: 'normal' }}
     />
   );
 };
@@ -217,15 +221,15 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
               <label
                 key={opt.value}
                 className="flex cursor-pointer items-center hover:bg-slate-100"
-                style={{ gap: 4, padding: '1px 6px', lineHeight: '16px' }}
+                style={{ gap: 3, padding: '0 4px', lineHeight: '14px', height: '14px' }}
               >
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggleOption(opt.value)}
-                  style={{ width: 12, height: 12, margin: 0 }}
+                  style={{ width: 10, height: 10, margin: 0, flexShrink: 0 }}
                 />
-                <span style={{ fontSize: 11, lineHeight: '16px' }}>{opt.label}</span>
+                <span style={{ fontSize: 11, lineHeight: '14px', fontWeight: 'normal' }}>{opt.label}</span>
               </label>
             );
           })}
