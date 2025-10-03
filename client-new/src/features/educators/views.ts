@@ -40,7 +40,7 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   pronouns_other: { label: 'Pronouns - if other, please specify' , visibleIf: { field: 'pronouns', in: ['other'] } },
   // Not an enum in DB; offer common options
   indiv_type: { label: 'Type', options: ['Educator', 'Community Member'] },
-  assigned_partner: { editable: false },
+  assigned_partner: { editable: false, lookupTable: 'guides' },
   first_contact_ages: { label: 'Initial Interest: Ages' },
   first_contact_governance_model: { label: 'Initial Interest: Governance Model' },
   first_contact_interests: { label: 'Initial Interest' },

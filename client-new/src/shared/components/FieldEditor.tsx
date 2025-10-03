@@ -144,6 +144,8 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
 }) => {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement | null>(null);
+  const buttonRef = React.useRef<HTMLButtonElement | null>(null);
+  const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>({});
 
   React.useEffect(() => {
     function onDocClick(e: MouseEvent) {
@@ -153,6 +155,19 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
     }
     if (open) document.addEventListener('mousedown', onDocClick);
     return () => document.removeEventListener('mousedown', onDocClick);
+  }, [open]);
+
+  React.useEffect(() => {
+    if (open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        fontSize: 11,
+      });
+    }
   }, [open]);
 
   const selectedSet = React.useMemo(() => new Set(value.filter(Boolean)), [value]);
@@ -182,17 +197,18 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   return (
     <div ref={ref} style={{ position: 'relative' }}>
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`flex h-8 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 text-left text-xs text-slate-900 shadow-sm focus:outline-none focus:ring-1 focus:ring-slate-950 ${className}`}
+        className={`flex h-8 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 text-left text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-400 ${className}`}
       >
         <span className="truncate">{summary}</span>
         <span className="ml-2 opacity-60">▼</span>
       </button>
       {open && (
         <div
-          className="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white shadow-md border border-slate-200"
-          style={{ fontSize: 11 }}
+          className="z-[1000] max-h-56 overflow-auto rounded-md bg-white shadow-lg border border-slate-200"
+          style={dropdownStyle}
         >
           {options.map((opt) => {
             const checked = selectedSet.has(opt.value) || selectedSet.has(opt.label);
