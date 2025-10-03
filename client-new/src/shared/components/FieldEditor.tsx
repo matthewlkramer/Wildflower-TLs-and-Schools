@@ -200,23 +200,24 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
         ref={buttonRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`flex h-8 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 text-left text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-400 ${className}`}
+        className={`flex h-8 w-full items-center justify-between rounded-md border border-slate-300 px-3 text-left text-xs text-slate-900 focus:outline-none ${className}`}
+        style={{ backgroundColor: '#fff' }}
       >
         <span className="truncate">{summary}</span>
         <span className="ml-2 opacity-60">▼</span>
       </button>
       {open && (
         <div
-          className="z-[1000] max-h-56 overflow-auto rounded-md bg-white shadow-lg border border-slate-200"
-          style={dropdownStyle}
+          className="z-[1000] max-h-56 overflow-auto rounded-md shadow-lg border border-slate-200"
+          style={{ ...dropdownStyle, backgroundColor: '#fff' }}
         >
           {options.map((opt) => {
             const checked = selectedSet.has(opt.value) || selectedSet.has(opt.label);
             return (
               <label
                 key={opt.value}
-                className="flex cursor-pointer items-center px-2 py-1 hover:bg-slate-100"
-                style={{ gap: 6 }}
+                className="flex cursor-pointer items-center hover:bg-slate-100"
+                style={{ gap: 6, padding: '2px 8px' }}
               >
                 <input
                   type="checkbox"
