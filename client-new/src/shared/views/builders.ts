@@ -1,7 +1,19 @@
 import type { BlockSpec, CardSpec, ListSpec, MapSpec, TabSpec, TableSpec, ViewId, ViewSpec } from './types';
+import type { FieldMetadataMap } from '../types/detail-types';
 
-export function view(id: ViewId, ...tabs: TabSpec[]): ViewSpec {
-  return { id, tabs };
+export function view(id: ViewId, ...tabs: TabSpec[]): ViewSpec;
+export function view(id: ViewId, fieldMetadata: FieldMetadataMap, ...tabs: TabSpec[]): ViewSpec;
+export function view(id: ViewId, ...args: any[]): ViewSpec {
+  // Check if first arg is field metadata
+  const firstArg = args[0];
+  const isFieldMetadata = firstArg && typeof firstArg === 'object' && !firstArg.id && !firstArg.label && !firstArg.kind;
+
+  if (isFieldMetadata) {
+    const [fieldMetadata, ...tabs] = args;
+    return { id, tabs, fieldMetadata };
+  }
+
+  return { id, tabs: args };
 }
 
 export function tab(id: string, label: string, ...blocks: BlockSpec[]): TabSpec {

@@ -1,3 +1,5 @@
+import type { FieldMetadataMap } from '../types/detail-types';
+
 export type ViewId = 'schools' | 'educators' | 'charters' | (string & {});
 
 export type CardSpec = { kind: 'card'; title?: string; width?: 'half' | 'full'; fields: string[]; editable?: boolean };
@@ -19,4 +21,8 @@ export type BlockSpec = CardSpec | TableSpec | ListSpec | MapSpec;
 
 export type TabSpec = { id: string; label: string; blocks: BlockSpec[] };
 
-export type ViewSpec = { id: ViewId; tabs: TabSpec[] };
+export type ViewSpec = {
+  id: ViewId;
+  tabs: TabSpec[];
+  fieldMetadata?: FieldMetadataMap; // Optional manual field metadata overrides
+};

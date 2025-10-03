@@ -90,6 +90,7 @@ export const ADD_NEW_EDUCATOR_INPUT = [
 
 export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
   'educators',
+  EDUCATOR_FIELD_METADATA, // Pass field metadata to view
   tab(
     'overview',
     'Overview',

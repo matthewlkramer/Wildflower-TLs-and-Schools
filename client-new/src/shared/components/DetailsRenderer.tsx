@@ -28,7 +28,7 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
     <div className={`details-renderer ${className}`}>
       {tabs.length === 1 ? (
         // Single tab - render directly without tab headers
-        <TabContent tab={tabs[0]} entityId={entityId} sourceTable={sourceTable} />
+        <TabContent tab={tabs[0]} entityId={entityId} sourceTable={sourceTable} fieldMetadata={view.fieldMetadata} />
       ) : (
         // Multiple tabs
         <Box>
@@ -45,7 +45,7 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
               className="mt-4"
             >
               {activeTab === index && (
-                <TabContent tab={tab} entityId={entityId} sourceTable={sourceTable} />
+                <TabContent tab={tab} entityId={entityId} sourceTable={sourceTable} fieldMetadata={view.fieldMetadata} />
               )}
             </div>
           ))}
@@ -59,9 +59,10 @@ type TabContentProps = {
   tab: TabSpec;
   entityId: string;
   sourceTable: string;
+  fieldMetadata?: import('../types/detail-types').FieldMetadataMap;
 };
 
-const TabContent: React.FC<TabContentProps> = ({ tab, entityId, sourceTable }) => {
+const TabContent: React.FC<TabContentProps> = ({ tab, entityId, sourceTable, fieldMetadata }) => {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
       {tab.blocks.map((block, index) => (
@@ -70,6 +71,7 @@ const TabContent: React.FC<TabContentProps> = ({ tab, entityId, sourceTable }) =
           block={block}
           entityId={entityId}
           sourceTable={sourceTable}
+          fieldMetadata={fieldMetadata}
         />
       ))}
     </div>
@@ -80,9 +82,10 @@ type BlockRendererProps = {
   block: BlockSpec;
   entityId: string;
   sourceTable: string;
+  fieldMetadata?: import('../types/detail-types').FieldMetadataMap;
 };
 
-const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTable }) => {
+const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTable, fieldMetadata }) => {
   const [isVisible, setIsVisible] = useState(true);
 
   // TODO: Implement visibility logic
@@ -129,6 +132,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTa
           block={block as CardSpec}
           entityId={entityId}
           sourceTable={sourceTable}
+          fieldMetadata={fieldMetadata}
         />
       )}
 
@@ -306,7 +310,8 @@ const CardBlockRenderer: React.FC<{
   block: CardSpec;
   entityId: string;
   sourceTable: string;
-}> = ({ block, entityId, sourceTable }) => {
+  fieldMetadata?: import('../types/detail-types').FieldMetadataMap;
+}> = ({ block, entityId, sourceTable, fieldMetadata }) => {
   const [cardData, setCardData] = useState<RenderableCard | null>(null);
 
   useEffect(() => {
@@ -316,7 +321,7 @@ const CardBlockRenderer: React.FC<{
   const loadCardData = async () => {
     try {
       setCardData({ ...cardData!, loading: true });
-      const data = await cardService.loadCardData(block, entityId, sourceTable);
+      const data = await cardService.loadCardData(block, entityId, sourceTable, fieldMetadata);
       setCardData(data);
     } catch (error) {
       console.error('Failed to load card data:', error);

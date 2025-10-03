@@ -54,7 +54,8 @@ export class CardService {
   async loadCardData(
     block: CardSpec,
     entityId: string,
-    sourceTable?: string
+    sourceTable?: string,
+    viewFieldMetadata?: import('../types/detail-types').FieldMetadataMap
   ): Promise<RenderableCard> {
     try {
       const tableName = sourceTable || 'people';
@@ -63,7 +64,7 @@ export class CardService {
       const entityData = await this.loadEntityData(tableName, entityId);
 
       // Load field metadata and options
-      const fields = await this.resolveFields(block.fields, entityData, { table: tableName });
+      const fields = await this.resolveFields(block.fields, entityData, { table: tableName }, viewFieldMetadata);
 
       return {
         entityId,
@@ -108,13 +109,15 @@ export class CardService {
   private async resolveFields(
     fieldNames: string[],
     entityData: Record<string, any>,
-    editSource?: any
+    editSource?: any,
+    viewFieldMetadata?: import('../types/detail-types').FieldMetadataMap
   ): Promise<CardField[]> {
     const fields: CardField[] = [];
 
     for (const fieldName of fieldNames) {
       try {
-        const field = await this.resolveField(fieldName, entityData, editSource);
+        const manualMetadata = viewFieldMetadata?.[fieldName];
+        const field = await this.resolveField(fieldName, entityData, editSource, manualMetadata);
         if (field) {
           fields.push(field);
         }
@@ -132,12 +135,26 @@ export class CardService {
   private async resolveField(
     fieldName: string,
     entityData: Record<string, any>,
-    editSource?: any
+    editSource?: any,
+    manualMetadata?: import('../types/detail-types').FieldMetadata
   ): Promise<CardField | null> {
     // Get field metadata from schema
     const sourceTable = editSource?.table || 'people';
     const [schema, table] = sourceTable.includes('.') ? sourceTable.split('.') : ['public', sourceTable];
-    const metadata = getColumnMetadata(schema, table, fieldName);
+    const schemaMetadata = getColumnMetadata(schema, table, fieldName);
+
+    // Merge manual metadata with schema metadata using the existing merge function
+    const mergedMetadata = manualMetadata
+      ? (await import('@/generated/schema-metadata')).mergeFieldMetadata({
+          field: fieldName,
+          manual: manualMetadata,
+          schema,
+          table
+        })
+      : undefined;
+
+    // Use merged metadata if available, otherwise fall back to schema metadata
+    const metadata = mergedMetadata || schemaMetadata;
 
     if (!metadata) {
       // Create basic metadata for unknown fields
@@ -158,18 +175,36 @@ export class CardService {
     let options: SelectOption[] | undefined;
     let fieldType: FieldValue['type'] = 'string';
 
-    // Check for lookup configuration
-    if (GENERATED_LOOKUPS[fieldName]) {
-      const lookupConfig = GENERATED_LOOKUPS[fieldName];
-      options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
-      fieldType = 'enum';
-    }
-    // Check for enum options
-    else if (metadata.enumName && ENUM_OPTIONS[metadata.enumName]) {
-      options = ENUM_OPTIONS[metadata.enumName].map(value => ({
+    // Check for enum options first
+    if (metadata.enumRef && ENUM_OPTIONS[metadata.enumRef]) {
+      options = ENUM_OPTIONS[metadata.enumRef].map(value => ({
         value: String(value),
         label: String(value)
       }));
+      fieldType = 'enum';
+    }
+    // Check for explicit lookup table in metadata (from view field metadata)
+    else if ((metadata as any).lookupTable) {
+      const lookupTableName = (metadata as any).lookupTable;
+      if (GENERATED_LOOKUPS[lookupTableName]) {
+        const lookupConfig = GENERATED_LOOKUPS[lookupTableName];
+        options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
+        fieldType = 'enum';
+      }
+    }
+    // Check for foreign key references
+    else if (metadata.references && metadata.references.length > 0) {
+      const firstRef = metadata.references[0];
+      const refTable = firstRef.relation;
+      // Try to find the best label column - prefer 'name', 'label', or 'title' columns
+      const labelColumn = this.guessLabelColumn(refTable);
+      options = await this.loadLookupOptions(refTable, 'id', labelColumn);
+      fieldType = 'enum';
+    }
+    // Check for explicit lookup configuration by field name
+    else if (GENERATED_LOOKUPS[fieldName]) {
+      const lookupConfig = GENERATED_LOOKUPS[fieldName];
+      options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
       fieldType = 'enum';
     }
     // Determine type from schema metadata
@@ -362,6 +397,31 @@ export class CardService {
   private getFieldValidation(metadata: any): FieldValue['validation'] | undefined {
     // TODO: Extract validation rules from metadata
     return undefined;
+  }
+
+  /**
+   * Guess the best label column for a lookup table
+   */
+  private guessLabelColumn(table: string): string {
+    // Common label column patterns
+    const commonPatterns = [
+      'name', 'full_name', 'short_name', 'long_name', 'school_name',
+      'label', 'title', 'value', 'email', 'email_or_name'
+    ];
+
+    // Special cases for known tables
+    const tableSpecificColumns: Record<string, string> = {
+      'people': 'full_name',
+      'schools': 'school_name',
+      'details_schools': 'school_name',
+      'charters': 'short_name',
+      'guides': 'email_or_name',
+      'zref_stage_statuses': 'value',
+      'zref_membership_statuses': 'value',
+      'zref_race_and_ethnicity': 'label',
+    };
+
+    return tableSpecificColumns[table] || commonPatterns[0];
   }
 
   /**
