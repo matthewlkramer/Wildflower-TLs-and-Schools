@@ -190,7 +190,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
     <div
       className={className}
       style={{
-        background: '#e0f2f1',
+        background: '#b2dfdb',
         borderRadius: 8,
         boxShadow: '0 4px 16px rgba(15,23,42,0.06)',
         overflow: 'hidden'

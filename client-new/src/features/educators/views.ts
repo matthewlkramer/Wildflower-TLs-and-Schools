@@ -30,15 +30,11 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   home_address: { multiline: true },
   educ_attainment: { label: 'Educational Attainment' },
   race_ethnicity: { label: 'Race/Ethnicity', lookupTable: 'zref_race_and_ethnicity' },
-  // Show the free-text field when the selected value includes "other" (handle both cases defensively)
   race_ethnicity_other: { label: 'Race/Ethnicity - if Other, please specify', visibleIf: { field: 'race_ethnicity', in: ['other', 'Other'] } },
   gender_other: { label: 'Gender - if Other, please specify', visibleIf: { field: 'gender', in: ['Other'] } },
-  // Drive select for HH Income (renderer infers enum)
   hh_income: { label: 'Household Income' },
-  lgbtqia: { label: 'LGBTQIA+' },
-  // Pronouns enum uses lowercase 'other' in the database
+  lgbtqia: { label: 'LGBTQIA+', type: 'boolean' },
   pronouns_other: { label: 'Pronouns - if other, please specify' , visibleIf: { field: 'pronouns', in: ['other'] } },
-  // Not an enum in DB; offer common options
   indiv_type: { label: 'Type', options: ['Educator', 'Community Member'] },
   assigned_partner: { editable: false, lookupTable: 'guides' },
   first_contact_ages: { label: 'Initial Interest: Ages' },

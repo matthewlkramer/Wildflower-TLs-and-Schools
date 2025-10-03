@@ -24,7 +24,7 @@ import { DashboardPage } from '../dashboard/pages/DashboardPage';
 
 export function App() {
   return (
-    <div className="min-h-screen font-sans" style={{ background: '#fff' }}>
+    <div className="min-h-screen font-sans" style={{ background: '#e0f2f1' }}>
       <AgInit />
       <Header />
       <main className="p-4">

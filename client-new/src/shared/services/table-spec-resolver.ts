@@ -26,6 +26,7 @@ export type ResolvedTableColumn = {
 };
 
 export type ResolvedTableSpec = {
+  title?: string;
   readSource: string;
   readFilter?: FilterExpr;
   writeDefaults?: { table: string; pkColumn?: string };
@@ -49,6 +50,7 @@ export function resolveTableSpec(presetId: string, module?: string): ResolvedTab
 
   // Start with base configuration
   const resolved: ResolvedTableSpec = {
+    title: preset.title,
     readSource: preset.readSource!,
     readFilter: (preset as any).readFilter,
     writeDefaults: (preset as any).writeDefaults,
