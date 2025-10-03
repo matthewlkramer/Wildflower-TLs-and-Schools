@@ -7,6 +7,7 @@ import { tableService, type RenderableTableData } from '../services/table-servic
 import { cardService, type RenderableCard } from '../services/card-service';
 import type { ViewSpec, TabSpec, BlockSpec, CardSpec, TableSpec, ListSpec, MapSpec } from '../views/types';
 import { TABLE_LIST_PRESETS } from '../config/table-list-presets';
+import { getViewSourceTable } from '../views/view-table-mapping';
 
 export type DetailsRendererProps = {
   view: ViewSpec;
@@ -21,12 +22,13 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState(0);
   const tabs = view.tabs;
+  const sourceTable = getViewSourceTable(view.id);
 
   return (
     <div className={`details-renderer ${className}`}>
       {tabs.length === 1 ? (
         // Single tab - render directly without tab headers
-        <TabContent tab={tabs[0]} entityId={entityId} viewId={view.id} />
+        <TabContent tab={tabs[0]} entityId={entityId} sourceTable={sourceTable} />
       ) : (
         // Multiple tabs
         <Box>
@@ -43,7 +45,7 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
               className="mt-4"
             >
               {activeTab === index && (
-                <TabContent tab={tab} entityId={entityId} viewId={view.id} />
+                <TabContent tab={tab} entityId={entityId} sourceTable={sourceTable} />
               )}
             </div>
           ))}
@@ -56,10 +58,10 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
 type TabContentProps = {
   tab: TabSpec;
   entityId: string;
-  viewId: string;
+  sourceTable: string;
 };
 
-const TabContent: React.FC<TabContentProps> = ({ tab, entityId, viewId }) => {
+const TabContent: React.FC<TabContentProps> = ({ tab, entityId, sourceTable }) => {
   return (
     <div className="space-y-6">
       {tab.blocks.map((block, index) => (
@@ -67,7 +69,7 @@ const TabContent: React.FC<TabContentProps> = ({ tab, entityId, viewId }) => {
           key={index}
           block={block}
           entityId={entityId}
-          viewId={viewId}
+          sourceTable={sourceTable}
         />
       ))}
     </div>
@@ -77,10 +79,10 @@ const TabContent: React.FC<TabContentProps> = ({ tab, entityId, viewId }) => {
 type BlockRendererProps = {
   block: BlockSpec;
   entityId: string;
-  viewId: string;
+  sourceTable: string;
 };
 
-const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, viewId }) => {
+const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTable }) => {
   const [isVisible, setIsVisible] = useState(true);
 
   // TODO: Implement visibility logic
@@ -120,7 +122,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, viewId }
         <CardBlockRenderer
           block={block as CardSpec}
           entityId={entityId}
-          viewId={viewId}
+          sourceTable={sourceTable}
         />
       )}
 
@@ -297,8 +299,8 @@ function generateListLayoutFromPreset(preset: any) {
 const CardBlockRenderer: React.FC<{
   block: CardSpec;
   entityId: string;
-  viewId: string;
-}> = ({ block, entityId, viewId }) => {
+  sourceTable: string;
+}> = ({ block, entityId, sourceTable }) => {
   const [cardData, setCardData] = useState<RenderableCard | null>(null);
 
   useEffect(() => {
@@ -308,7 +310,7 @@ const CardBlockRenderer: React.FC<{
   const loadCardData = async () => {
     try {
       setCardData({ ...cardData!, loading: true });
-      const data = await cardService.loadCardData(block, entityId, viewId);
+      const data = await cardService.loadCardData(block, entityId, sourceTable);
       setCardData(data);
     } catch (error) {
       console.error('Failed to load card data:', error);
