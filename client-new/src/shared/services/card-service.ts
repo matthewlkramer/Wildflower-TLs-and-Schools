@@ -1,7 +1,7 @@
 import { supabase } from '@/core/supabase/client';
 import { getColumnMetadata } from '@/generated/schema-metadata';
 import { GENERATED_LOOKUPS } from '@/generated/lookups.generated';
-import { ENUM_OPTIONS } from '@/generated/enums.generated';
+import { ENUM_OPTIONS, FIELD_TYPES } from '@/generated/enums.generated';
 import type { FieldMetadata, LookupException } from './detail-types';
 import type { CardSpec } from '../views/types';
 import { fromTable } from '../utils/supabase-utils';
@@ -175,7 +175,7 @@ export class CardService {
     let options: SelectOption[] | undefined;
     let fieldType: FieldValue['type'] = 'string';
 
-    // Check for enum options first
+    // Check for enum options first (from schema metadata)
     if (metadata.enumRef && ENUM_OPTIONS[metadata.enumRef]) {
       options = ENUM_OPTIONS[metadata.enumRef].map(value => ({
         value: String(value),
@@ -183,8 +183,20 @@ export class CardService {
       }));
       fieldType = 'enum';
     }
+    // Check FIELD_TYPES mapping for enum fields (text columns with enum-like values)
+    else if (!metadata.enumRef) {
+      const fieldTypeKey = `${schema}.${table}.${fieldName}`;
+      const fieldTypeInfo = FIELD_TYPES[fieldTypeKey];
+      if (fieldTypeInfo?.baseType === 'enum' && fieldTypeInfo.enumName && ENUM_OPTIONS[fieldTypeInfo.enumName]) {
+        options = ENUM_OPTIONS[fieldTypeInfo.enumName].map(value => ({
+          value: String(value),
+          label: String(value)
+        }));
+        fieldType = 'enum';
+      }
+    }
     // Check for explicit lookup table in metadata (from view field metadata)
-    else if ((metadata as any).lookupTable) {
+    if (!options && (metadata as any).lookupTable) {
       const lookupTableName = (metadata as any).lookupTable;
       if (GENERATED_LOOKUPS[lookupTableName]) {
         const lookupConfig = GENERATED_LOOKUPS[lookupTableName];
@@ -193,7 +205,7 @@ export class CardService {
       }
     }
     // Check for foreign key references
-    else if (metadata.references && metadata.references.length > 0) {
+    if (!options && metadata.references && metadata.references.length > 0) {
       const firstRef = metadata.references[0];
       const refTable = firstRef.relation;
       // Try to find the best label column - prefer 'name', 'label', or 'title' columns
@@ -202,13 +214,13 @@ export class CardService {
       fieldType = 'enum';
     }
     // Check for explicit lookup configuration by field name
-    else if (GENERATED_LOOKUPS[fieldName]) {
+    if (!options && GENERATED_LOOKUPS[fieldName]) {
       const lookupConfig = GENERATED_LOOKUPS[fieldName];
       options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
       fieldType = 'enum';
     }
     // Determine type from schema metadata
-    else if (metadata.baseType) {
+    if (!options && metadata.baseType) {
       fieldType = this.mapSchemaType(metadata.baseType);
     }
 
