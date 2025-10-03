@@ -221,15 +221,15 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
               <label
                 key={opt.value}
                 className="flex cursor-pointer items-center hover:bg-slate-100"
-                style={{ gap: 3, padding: '0 4px', lineHeight: '14px', height: '14px' }}
+                style={{ gap: 4, padding: '1px 4px', lineHeight: '16px' }}
               >
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggleOption(opt.value)}
-                  style={{ width: 10, height: 10, margin: 0, flexShrink: 0 }}
+                  style={{ width: 11, height: 11, margin: 0, flexShrink: 0 }}
                 />
-                <span style={{ fontSize: 11, lineHeight: '14px', fontWeight: 'normal' }}>{opt.label}</span>
+                <span style={{ fontSize: 11, lineHeight: '16px', fontWeight: 'normal' }}>{opt.label}</span>
               </label>
             );
           })}
