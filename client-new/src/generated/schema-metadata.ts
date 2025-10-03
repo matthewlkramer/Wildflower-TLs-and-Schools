@@ -34,6 +34,26 @@ export function getColumnMetadata(schema: string | undefined, table: string, col
   return tableEntry.columns[column];
 }
 
+/**
+ * Find which table a column belongs to by searching through all tables
+ * Returns the column metadata with table information
+ */
+export function findColumnMetadata(schema: string | undefined, column: string): (ColumnMetadata & { foundTable: string }) | undefined {
+  const schemaKey = resolveSchema(schema);
+  const schemaEntry = schemaRecord[schemaKey];
+  if (!schemaEntry) return undefined;
+
+  // Search through all tables in the schema
+  for (const [tableName, tableEntry] of Object.entries(schemaEntry)) {
+    const columnMeta = tableEntry.columns[column];
+    if (columnMeta) {
+      return { ...columnMeta, foundTable: tableName };
+    }
+  }
+
+  return undefined;
+}
+
 export function listColumns(schema: string | undefined, table: string): Record<string, ColumnMetadata> | undefined {
   const schemaKey = resolveSchema(schema);
   const schemaEntry = schemaRecord[schemaKey];
