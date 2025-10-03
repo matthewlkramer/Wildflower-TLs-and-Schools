@@ -26,7 +26,7 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
     <div className={`details-renderer ${className}`}>
       {tabs.length === 1 ? (
         // Single tab - render directly without tab headers
-        <TabContent tab={tabs[0]} entityId={entityId} />
+        <TabContent tab={tabs[0]} entityId={entityId} viewId={view.id} />
       ) : (
         // Multiple tabs
         <Box>
@@ -43,7 +43,7 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
               className="mt-4"
             >
               {activeTab === index && (
-                <TabContent tab={tab} entityId={entityId} />
+                <TabContent tab={tab} entityId={entityId} viewId={view.id} />
               )}
             </div>
           ))}
@@ -56,9 +56,10 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
 type TabContentProps = {
   tab: TabSpec;
   entityId: string;
+  viewId: string;
 };
 
-const TabContent: React.FC<TabContentProps> = ({ tab, entityId }) => {
+const TabContent: React.FC<TabContentProps> = ({ tab, entityId, viewId }) => {
   return (
     <div className="space-y-6">
       {tab.blocks.map((block, index) => (
@@ -66,6 +67,7 @@ const TabContent: React.FC<TabContentProps> = ({ tab, entityId }) => {
           key={index}
           block={block}
           entityId={entityId}
+          viewId={viewId}
         />
       ))}
     </div>
@@ -75,9 +77,10 @@ const TabContent: React.FC<TabContentProps> = ({ tab, entityId }) => {
 type BlockRendererProps = {
   block: BlockSpec;
   entityId: string;
+  viewId: string;
 };
 
-const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId }) => {
+const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, viewId }) => {
   const [isVisible, setIsVisible] = useState(true);
 
   // TODO: Implement visibility logic
@@ -117,6 +120,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId }) => {
         <CardBlockRenderer
           block={block as CardSpec}
           entityId={entityId}
+          viewId={viewId}
         />
       )}
 
@@ -293,7 +297,8 @@ function generateListLayoutFromPreset(preset: any) {
 const CardBlockRenderer: React.FC<{
   block: CardSpec;
   entityId: string;
-}> = ({ block, entityId }) => {
+  viewId: string;
+}> = ({ block, entityId, viewId }) => {
   const [cardData, setCardData] = useState<RenderableCard | null>(null);
 
   useEffect(() => {
@@ -303,7 +308,7 @@ const CardBlockRenderer: React.FC<{
   const loadCardData = async () => {
     try {
       setCardData({ ...cardData!, loading: true });
-      const data = await cardService.loadCardData(block, entityId);
+      const data = await cardService.loadCardData(block, entityId, viewId);
       setCardData(data);
     } catch (error) {
       console.error('Failed to load card data:', error);

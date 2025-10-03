@@ -3,7 +3,8 @@ import { Button } from '@/shared/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
-import type { RenderableCard, CardField, FieldValue } from '../card-service';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import type { RenderableCard, CardField, FieldValue } from '../services/card-service';
 
 export type CardRendererProps = {
   card: RenderableCard;
@@ -287,67 +288,71 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
   }
 
   return (
-    <div className={`card-renderer ${className}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        {showTitle && card.title && (
-          <h3 className="text-lg font-semibold text-gray-900">{card.title}</h3>
-        )}
+    <Card className={className}>
+      <CardHeader>
+        {/* Header with title and edit controls */}
+        <div className="flex items-center justify-between">
+          {showTitle && card.title && (
+            <CardTitle className="text-lg">{card.title}</CardTitle>
+          )}
 
-        {/* Edit Controls */}
-        {card.editable && onSave && (
-          <div className="flex gap-2">
-            {isEditing ? (
-              <>
+          {/* Edit Controls */}
+          {card.editable && onSave && (
+            <div className="flex gap-2">
+              {isEditing ? (
+                <>
+                  <Button
+                    onClick={handleSaveEdit}
+                    disabled={saving}
+                    size="sm"
+                  >
+                    {saving ? 'Saving...' : 'Save'}
+                  </Button>
+                  <Button
+                    onClick={handleCancelEdit}
+                    variant="outline"
+                    disabled={saving}
+                    size="sm"
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
                 <Button
-                  onClick={handleSaveEdit}
-                  disabled={saving}
-                  size="sm"
-                >
-                  {saving ? 'Saving...' : 'Save'}
-                </Button>
-                <Button
-                  onClick={handleCancelEdit}
+                  onClick={handleStartEdit}
                   variant="outline"
-                  disabled={saving}
                   size="sm"
                 >
-                  Cancel
+                  Edit
                 </Button>
-              </>
-            ) : (
-              <Button
-                onClick={handleStartEdit}
-                variant="outline"
-                size="sm"
-              >
-                Edit
-              </Button>
-            )}
+              )}
+            </div>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        {/* Fields */}
+        <div className={`grid gap-6 ${
+          layout === 'two-column' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'
+        }`}>
+          {card.fields.map(field => renderField(field))}
+        </div>
+
+        {/* Validation Summary */}
+        {Object.keys(errors).length > 0 && (
+          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded">
+            <h4 className="text-sm font-medium text-red-800 mb-2">
+              Please fix the following errors:
+            </h4>
+            <ul className="text-sm text-red-700 space-y-1">
+              {Object.entries(errors).map(([field, error]) => (
+                <li key={field}>• {error}</li>
+              ))}
+            </ul>
           </div>
         )}
-      </div>
-
-      {/* Fields */}
-      <div className={`grid gap-6 ${
-        layout === 'two-column' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'
-      }`}>
-        {card.fields.map(field => renderField(field))}
-      </div>
-
-      {/* Validation Summary */}
-      {Object.keys(errors).length > 0 && (
-        <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded">
-          <h4 className="text-sm font-medium text-red-800 mb-2">
-            Please fix the following errors:
-          </h4>
-          <ul className="text-sm text-red-700 space-y-1">
-            {Object.entries(errors).map(([field, error]) => (
-              <li key={field}>• {error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };

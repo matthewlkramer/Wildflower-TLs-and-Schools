@@ -4,6 +4,7 @@ import type { TablePresetId } from './table-list-presets';
 import type { FilterExpr } from './detail-types';
 import { ENUM_OPTIONS } from '@/generated/enums.generated';
 import { formatCurrencyUSD } from '../utils/ui-utils';
+import { fromTable } from '../utils/supabase-utils';
 
 export type SelectOption = { value: string; label: string };
 
@@ -154,7 +155,7 @@ export class TableService {
     appliedFilters?: FilterExpr[],
     toggleStates?: Record<string, boolean>
   ): Promise<any[]> {
-    let query = supabase.from(spec.readSource).select('*');
+    let query = fromTable(spec.readSource).select('*');
 
     // Apply entity filter if provided
     if (entityId) {

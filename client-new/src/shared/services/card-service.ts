@@ -4,6 +4,7 @@ import { GENERATED_LOOKUPS } from '@/generated/lookups.generated';
 import { ENUM_OPTIONS } from '@/generated/enums.generated';
 import type { FieldMetadata, LookupException } from './detail-types';
 import type { CardSpec } from '../views/types';
+import { fromTable } from '../utils/supabase-utils';
 
 export type SelectOption = { value: string; label: string };
 
@@ -56,11 +57,13 @@ export class CardService {
     sourceTable?: string
   ): Promise<RenderableCard> {
     try {
+      const tableName = sourceTable || 'people';
+
       // Load entity data
-      const entityData = await this.loadEntityData(sourceTable || 'people', entityId);
+      const entityData = await this.loadEntityData(tableName, entityId);
 
       // Load field metadata and options
-      const fields = await this.resolveFields(block.fields, entityData, undefined);
+      const fields = await this.resolveFields(block.fields, entityData, { table: tableName });
 
       return {
         entityId,
@@ -68,7 +71,7 @@ export class CardService {
         fields,
         editable: block.editable ?? false,
         loading: false,
-        saveTarget: undefined, // CardSpec doesn't have editSource
+        saveTarget: block.editable ? { table: tableName, pk: 'id' } : undefined,
       };
     } catch (error) {
       console.error('Failed to load card data:', error);
@@ -87,15 +90,10 @@ export class CardService {
    * Load entity data from database
    */
   private async loadEntityData(table: string, entityId: string): Promise<Record<string, any>> {
-    const [schema, tableName] = table.includes('.') ? table.split('.') : ['public', table];
-
-    let query = supabase.from(tableName).select('*').eq('id', entityId);
-
-    if (schema !== 'public') {
-      query = supabase.schema(schema).from(tableName).select('*').eq('id', entityId);
-    }
-
-    const { data, error } = await query.maybeSingle();
+    const { data, error } = await fromTable(table)
+      .select('*')
+      .eq('id', entityId)
+      .maybeSingle();
 
     if (error) {
       throw new Error(`Failed to load entity data: ${error.message}`);
