@@ -55,11 +55,11 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
     );
 
     return showLabel ? (
-      <div className="flex gap-2">
-        <span className="font-medium text-gray-600 min-w-0 flex-shrink-0">
+      <div className="flex" style={{ gap: 6 }}>
+        <span style={{ fontWeight: 500, color: '#64748b', fontSize: 12 }} className="min-w-0 flex-shrink-0">
           {getFieldLabel(cell, data)}:
         </span>
-        <span className="min-w-0">{content}</span>
+        <span className="min-w-0" style={{ fontSize: 12 }}>{content}</span>
       </div>
     ) : content;
   };
@@ -77,33 +77,47 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
     } = layout || {};
 
     return (
-      <div className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
+      <div
+        style={{
+          background: '#fff',
+          borderRadius: 8,
+          boxShadow: '0 4px 16px rgba(15,23,42,0.06)',
+          padding: 16,
+          fontSize: 12
+        }}
+      >
         {/* Title */}
         {titleField && row.cells[titleField] && (
-          <div className="font-semibold text-lg mb-2">
+          <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 12, color: '#0f172a' }}>
             {renderFieldValue(row.cells[titleField], row)}
           </div>
         )}
 
         {/* Subtitle and Badges Row */}
         {(subtitleFields.length > 0 || badgeFields.length > 0) && (
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex flex-col gap-1">
+          <div className="flex items-center justify-between" style={{ marginBottom: 12 }}>
+            <div className="flex flex-col" style={{ gap: 4 }}>
               {subtitleFields.map(field =>
                 row.cells[field] && (
-                  <div key={field} className="text-gray-600">
+                  <div key={field} style={{ color: '#64748b', fontSize: 12 }}>
                     {renderFieldValue(row.cells[field], row, showFieldLabels)}
                   </div>
                 )
               )}
             </div>
             {badgeFields.length > 0 && (
-              <div className="flex gap-2">
+              <div className="flex" style={{ gap: 6 }}>
                 {badgeFields.map(field =>
                   row.cells[field] && (
                     <span
                       key={field}
-                      className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                      style={{
+                        padding: '2px 8px',
+                        background: '#f1f5f9',
+                        color: '#475569',
+                        borderRadius: 12,
+                        fontSize: 11
+                      }}
                     >
                       {renderFieldValue(row.cells[field], row)}
                     </span>
@@ -116,12 +130,12 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
 
         {/* Body Fields */}
         {bodyFields.length > 0 && (
-          <div className={`grid gap-2 mb-3 ${
+          <div className={`grid ${
             bodyFieldFullWidth ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
-          }`}>
+          }`} style={{ gap: 8, marginBottom: 12 }}>
             {bodyFields.map(field =>
               row.cells[field] && (
-                <div key={field} className="text-sm">
+                <div key={field} style={{ fontSize: 12 }}>
                   {renderFieldValue(row.cells[field], row, showFieldLabels)}
                 </div>
               )
@@ -131,7 +145,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
 
         {/* Attachment Fields */}
         {attachmentFields.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap" style={{ gap: 6, marginBottom: 12 }}>
             {attachmentFields.map(field =>
               row.cells[field] && (
                 <div key={field}>
@@ -143,8 +157,15 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
         )}
 
         {/* Footer and Actions */}
-        <div className="flex items-center justify-between pt-3 border-t">
-          <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+        <div
+          className="flex items-center justify-between"
+          style={{
+            paddingTop: 12,
+            borderTop: '1px solid #e2e8f0',
+            marginTop: 12
+          }}
+        >
+          <div className="flex flex-wrap" style={{ gap: 12, fontSize: 11, color: '#64748b' }}>
             {footerFields.map(field =>
               row.cells[field] && (
                 <span key={field}>
@@ -156,7 +177,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
 
           {/* Row Actions */}
           {data.spec.rowActions.length > 0 && (
-            <div className="flex gap-1">
+            <div className="flex" style={{ gap: 4 }}>
               {data.spec.rowActions.map(actionId => (
                 <Button
                   key={actionId}
