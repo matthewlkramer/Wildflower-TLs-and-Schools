@@ -205,7 +205,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
         }}
       >
         <h3 style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', margin: 0 }}>
-          {data.spec.title || 'TEST LIST TITLE'}
+          {data.spec.title || 'List'}
         </h3>
         {data.spec.tableActions && data.spec.tableActions.length > 0 && (
           <div className="flex" style={{ gap: 6 }}>
