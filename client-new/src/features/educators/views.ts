@@ -114,7 +114,7 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
     card(['home_address'], { title: 'Address', editable: true }),
   ),
   tab('schools', 'Schools', table('educators', 'schools')),
-  tab('certifications_events', 'Certs & Events', list('educators', 'educatorMontessoriCerts'), list('educators', 'educatorEvents')),
+  tab('certifications_events', 'Certs & Events', list('educators', 'educatorMontessoriCerts','half'), list('educators', 'educatorEvents','half')),
   tab(
     'early_cultivation',
     'Early Cultivation',
@@ -124,7 +124,7 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
     card(['sendgrid_template_selected', 'sendgrid_send_date', 'person_responsible_for_follow_up', 'one_on_one_scheduling_status', 'personal_email_sent', 'personal_email_sent_date'], { title: 'Follow Up', editable: true }),
   ),
   tab('systems', 'Systems', card(['on_connected', 'on_slack', 'in_tl_google_grp', 'in_wf_directory', 'who_initiated_tl_removal', 'on_natl_website', 'gsuite_roles'], { editable: true })),
-  tab('actions_notes', 'Actions & Notes', list('educators', 'actionSteps'), list('educators', 'notes')),
-  tab('google_sync', 'gmail/gCal', list('educators', 'gmails'), list('educators', 'gCal'))
+  tab('actions_notes', 'Actions & Notes', list('educators', 'actionSteps','half'), list('educators', 'notes', 'half')),
+  tab('google_sync', 'gmail/gCal', list('educators', 'gmails','half'), list('educators', 'gCal','half'))
 );
 

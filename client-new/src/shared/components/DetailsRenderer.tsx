@@ -63,7 +63,7 @@ type TabContentProps = {
 
 const TabContent: React.FC<TabContentProps> = ({ tab, entityId, sourceTable }) => {
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
       {tab.blocks.map((block, index) => (
         <BlockRenderer
           key={index}
@@ -98,8 +98,16 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTa
     title = block.title;
   }
 
+  // Determine width - default is 'half' for cards, 'full' for tables
+  const width = block.width ?? (block.kind === 'table' ? 'full' : 'half');
+
+  const containerStyle: React.CSSProperties = {
+    flex: width === 'full' ? '1 1 100%' : '1 1 calc(50% - 12px)',
+    minWidth: width === 'full' ? '100%' : '260px',
+  };
+
   return (
-    <div className={`block-renderer ${block.width === 'half' ? 'w-1/2' : 'w-full'}`}>
+    <div style={containerStyle}>
       {title && (
         <h3 className="text-lg font-semibold mb-4">{title}</h3>
       )}
