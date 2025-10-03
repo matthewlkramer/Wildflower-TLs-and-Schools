@@ -76,67 +76,48 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
       bodyFieldFullWidth = false,
     } = layout || {};
 
+    // Combine body fields and badge fields (badges should be shown with labels in body)
+    const allBodyFields = [...bodyFields, ...badgeFields];
+
     return (
       <div
         style={{
-          background: '#fff',
-          borderRadius: 8,
-          boxShadow: '0 4px 16px rgba(15,23,42,0.06)',
-          padding: 16,
+          background: '#f8fafc',
+          border: '1px solid #e2e8f0',
+          borderRadius: 6,
+          padding: 12,
           fontSize: 12
         }}
       >
         {/* Title */}
         {titleField && row.cells[titleField] && (
-          <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 12, color: '#0f172a' }}>
+          <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: '#0f172a' }}>
             {renderFieldValue(row.cells[titleField], row)}
           </div>
         )}
 
-        {/* Subtitle and Badges Row */}
-        {(subtitleFields.length > 0 || badgeFields.length > 0) && (
-          <div className="flex items-center justify-between" style={{ marginBottom: 12 }}>
-            <div className="flex flex-col" style={{ gap: 4 }}>
-              {subtitleFields.map(field =>
-                row.cells[field] && (
-                  <div key={field} style={{ color: '#64748b', fontSize: 12 }}>
-                    {renderFieldValue(row.cells[field], row, showFieldLabels)}
-                  </div>
-                )
-              )}
-            </div>
-            {badgeFields.length > 0 && (
-              <div className="flex" style={{ gap: 6 }}>
-                {badgeFields.map(field =>
-                  row.cells[field] && (
-                    <span
-                      key={field}
-                      style={{
-                        padding: '2px 8px',
-                        background: '#f1f5f9',
-                        color: '#475569',
-                        borderRadius: 12,
-                        fontSize: 11
-                      }}
-                    >
-                      {renderFieldValue(row.cells[field], row)}
-                    </span>
-                  )
-                )}
-              </div>
+        {/* Subtitle */}
+        {subtitleFields.length > 0 && (
+          <div className="flex flex-col" style={{ gap: 4, marginBottom: allBodyFields.length > 0 ? 8 : 0 }}>
+            {subtitleFields.map(field =>
+              row.cells[field] && (
+                <div key={field} style={{ color: '#64748b', fontSize: 12 }}>
+                  {renderFieldValue(row.cells[field], row, true)}
+                </div>
+              )
             )}
           </div>
         )}
 
-        {/* Body Fields */}
-        {bodyFields.length > 0 && (
+        {/* Body Fields (including former badge fields, all with labels) */}
+        {allBodyFields.length > 0 && (
           <div className={`grid ${
             bodyFieldFullWidth ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
-          }`} style={{ gap: 8, marginBottom: 12 }}>
-            {bodyFields.map(field =>
+          }`} style={{ gap: 8, marginBottom: 8 }}>
+            {allBodyFields.map(field =>
               row.cells[field] && (
                 <div key={field} style={{ fontSize: 12 }}>
-                  {renderFieldValue(row.cells[field], row, showFieldLabels)}
+                  {renderFieldValue(row.cells[field], row, true)}
                 </div>
               )
             )}
@@ -213,27 +194,47 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
   }
 
   return (
-    <div className={`list-renderer ${className}`}>
-      {/* Table Actions */}
-      {data.spec.tableActions && data.spec.tableActions.length > 0 && (
-        <div className="mb-4 flex gap-2">
-          {data.spec.tableActions.map(action => (
-            <Button
-              key={action.id}
-              variant="outline"
-              size="sm"
-              onClick={() => onTableAction?.(action.id)}
-            >
-              {action.label}
-            </Button>
-          ))}
-        </div>
-      )}
+    <div
+      className={className}
+      style={{
+        background: '#fff',
+        borderRadius: 8,
+        boxShadow: '0 4px 16px rgba(15,23,42,0.06)',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Container Header with Title and Actions */}
+      <div
+        className="flex items-center justify-between"
+        style={{
+          padding: '12px 16px',
+          borderBottom: '1px solid #e2e8f0'
+        }}
+      >
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', margin: 0 }}>
+          {data.spec.title || 'List'}
+        </h3>
+        {data.spec.tableActions && data.spec.tableActions.length > 0 && (
+          <div className="flex" style={{ gap: 6 }}>
+            {data.spec.tableActions.map(action => (
+              <Button
+                key={action.id}
+                variant="outline"
+                size="sm"
+                onClick={() => onTableAction?.(action.id)}
+                className="h-7 px-2 text-xs"
+              >
+                {action.label}
+              </Button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* List Cards */}
-      <div className="space-y-4">
+      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
         {data.rows.length === 0 ? (
-          <div className="text-center p-8 text-gray-500 bg-gray-50 rounded-lg">
+          <div style={{ textAlign: 'center', padding: 32, color: '#64748b', fontSize: 12 }}>
             No records found
           </div>
         ) : (
@@ -247,7 +248,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
 
       {/* Footer info */}
       {data.totalCount !== undefined && (
-        <div className="mt-6 text-sm text-gray-500 text-center">
+        <div style={{ padding: '8px 16px', borderTop: '1px solid #e2e8f0', fontSize: 11, color: '#64748b', textAlign: 'center' }}>
           Showing {data.rows.length} of {data.totalCount} records
         </div>
       )}
