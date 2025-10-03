@@ -16,6 +16,8 @@ export type FieldValue = {
   type: 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'attachment';
   options?: SelectOption[];
   multiline?: boolean;
+  bucket?: string; // Supabase storage bucket for attachments
+  isImage?: boolean; // Whether attachment is an image
   validation?: {
     minLength?: number;
     maxLength?: number;
@@ -241,6 +243,10 @@ export class CardService {
     const rawValue = entityData[fieldName];
     const displayValue = this.formatDisplayValue(rawValue, fieldType, options);
 
+    // Get bucket and isImage from manual metadata if available
+    const bucket = (manualMetadata as any)?.bucket;
+    const isImage = (manualMetadata as any)?.isImage;
+
     return {
       field: fieldName,
       label: metadata.label || this.fieldToLabel(fieldName),
@@ -251,6 +257,8 @@ export class CardService {
         type: fieldType,
         options,
         multiline: fieldName.includes('text') || fieldName.includes('description') || fieldName.includes('notes'),
+        bucket,
+        isImage,
         validation: this.getFieldValidation(metadata),
       },
       metadata: metadata as FieldMetadata,

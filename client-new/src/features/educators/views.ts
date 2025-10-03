@@ -48,7 +48,7 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   first_contact_wf_employment_status: { label: 'Notes on WF Employment Status at first contact' },
   first_contact_willingness_to_relocate: { label: 'Initial Willingness to Relocate' },
   target_geo_combined: { label: 'Target Geography' },
-  self_reflection_doc: { label: 'Self Reflection Document', type: 'attachment' },
+  self_reflection_doc: { label: 'Self Reflection Document', type: 'attachment', bucket: 'self-reflections' },
   opsguide_initial_contact_date: { label: 'Ops Guide - Initial Contact Date' },
   opsguide_checklist: { label: 'Ops Guide - Checklist' },
   opsguide_fundraising_opps: { label: 'Ops Guide - Fundraising Opportunities' },
