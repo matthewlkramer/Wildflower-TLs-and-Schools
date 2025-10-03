@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { FieldEditor } from './FieldEditor';
+import { RowActionsMenu } from './RowActionsMenu';
 import type { RenderableTableData, RenderableRow, CellValue } from '../services/table-service';
 import type { ResolvedTableColumn } from '../services/table-spec-resolver';
 
@@ -231,17 +232,12 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
                                 ✏️
                               </Button>
                             )}
-                            {data.spec.rowActions.map(actionId => (
-                              <Button
-                                key={actionId}
-                                size="sm"
-                                variant="outline"
-                                onClick={() => onRowAction?.(row.id, actionId)}
-                                className="h-7 px-2"
-                              >
-                                {getRowActionIcon(actionId)}
-                              </Button>
-                            ))}
+                            {data.spec.rowActions.length > 0 && (
+                              <RowActionsMenu
+                                actions={data.spec.rowActions}
+                                onAction={(actionId) => onRowAction?.(row.id, actionId)}
+                              />
+                            )}
                           </>
                         )}
                       </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/shared/components/ui/button';
+import { RowActionsMenu } from './RowActionsMenu';
 import type { RenderableTableData, RenderableRow, CellValue } from '../table-service';
 import type { DetailListLayout } from '../detail-types';
 
@@ -19,6 +20,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
   className = '',
 }) => {
   const renderFieldValue = (
+    fieldName: string,
     cell: CellValue,
     row: RenderableRow,
     showLabel: boolean = false
@@ -57,7 +59,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
     return showLabel ? (
       <div className="flex" style={{ gap: 6 }}>
         <span style={{ fontWeight: 500, color: '#64748b', fontSize: 12 }} className="min-w-0 flex-shrink-0">
-          {getFieldLabel(cell, data)}:
+          {getFieldLabel(fieldName, data)}:
         </span>
         <span className="min-w-0" style={{ fontSize: 12 }}>{content}</span>
       </div>
@@ -82,7 +84,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
     return (
       <div
         style={{
-          background: '#f8fafc',
+          background: '#fff',
           border: '1px solid #e2e8f0',
           borderRadius: 6,
           padding: 12,
@@ -92,7 +94,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
         {/* Title */}
         {titleField && row.cells[titleField] && (
           <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: '#0f172a' }}>
-            {renderFieldValue(row.cells[titleField], row)}
+            {renderFieldValue(titleField, row.cells[titleField], row)}
           </div>
         )}
 
@@ -102,7 +104,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
             {subtitleFields.map(field =>
               row.cells[field] && (
                 <div key={field} style={{ color: '#64748b', fontSize: 12 }}>
-                  {renderFieldValue(row.cells[field], row, true)}
+                  {renderFieldValue(field, row.cells[field], row, true)}
                 </div>
               )
             )}
@@ -117,7 +119,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
             {allBodyFields.map(field =>
               row.cells[field] && (
                 <div key={field} style={{ fontSize: 12 }}>
-                  {renderFieldValue(row.cells[field], row, true)}
+                  {renderFieldValue(field, row.cells[field], row, true)}
                 </div>
               )
             )}
@@ -130,7 +132,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
             {attachmentFields.map(field =>
               row.cells[field] && (
                 <div key={field}>
-                  {renderFieldValue(row.cells[field], row)}
+                  {renderFieldValue(field, row.cells[field], row, true)}
                 </div>
               )
             )}
@@ -150,7 +152,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
             {footerFields.map(field =>
               row.cells[field] && (
                 <span key={field}>
-                  {renderFieldValue(row.cells[field], row, showFieldLabels)}
+                  {renderFieldValue(field, row.cells[field], row, true)}
                 </span>
               )
             )}
@@ -158,19 +160,10 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
 
           {/* Row Actions */}
           {data.spec.rowActions.length > 0 && (
-            <div className="flex" style={{ gap: 4 }}>
-              {data.spec.rowActions.map(actionId => (
-                <Button
-                  key={actionId}
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onRowAction?.(row.id, actionId)}
-                  className="h-7 px-2 text-xs"
-                >
-                  {getRowActionIcon(actionId)}
-                </Button>
-              ))}
-            </div>
+            <RowActionsMenu
+              actions={data.spec.rowActions}
+              onAction={(actionId) => onRowAction?.(row.id, actionId)}
+            />
           )}
         </div>
       </div>
@@ -197,7 +190,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
     <div
       className={className}
       style={{
-        background: '#fff',
+        background: '#e0f2f1',
         borderRadius: 8,
         boxShadow: '0 4px 16px rgba(15,23,42,0.06)',
         overflow: 'hidden'
@@ -256,11 +249,10 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
   );
 };
 
-// Helper function to get field label
-function getFieldLabel(cell: CellValue, data: RenderableTableData): string {
-  // Find the column definition for this field
-  const column = data.spec.columns.find(col => col.field in data.rows[0]?.cells);
-  return column?.label || cell.display;
+// Helper function to get field label - finds the column label from the spec
+function getFieldLabel(fieldName: string, data: RenderableTableData): string {
+  const column = data.spec.columns.find(col => col.field === fieldName);
+  return column?.label || fieldName;
 }
 
 // Helper functions for row action icons
