@@ -45,14 +45,14 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
   if (options && options.length > 0) {
     return (
       <Select
-        value={String(value || '')}
-        onValueChange={onChange}
+        value={String(value || '__null__')}
+        onValueChange={(v) => onChange(v === '__null__' ? null : v)}
       >
         <SelectTrigger className={`h-8 text-xs ${className}`}>
           <SelectValue placeholder="--" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">--</SelectItem>
+          <SelectItem value="__null__">--</SelectItem>
           {options.map(option => (
             <SelectItem key={option.value} value={option.value} className="text-xs">
               {option.label}
