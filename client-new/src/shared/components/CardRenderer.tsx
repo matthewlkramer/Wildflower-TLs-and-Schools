@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Input } from '@/shared/components/ui/input';
-import { Label } from '@/shared/components/ui/label';
+import { FieldEditor } from './FieldEditor';
 import type { RenderableCard, CardField, FieldValue } from '../services/card-service';
 
 export type CardRendererProps = {
@@ -126,81 +124,11 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
   };
 
   const renderEditControl = (field: CardField, value: any): React.ReactNode => {
-    const { type, options, multiline } = field.value;
-
-    // Select dropdown for enum/lookup fields
-    if (options && options.length > 0) {
-      return (
-        <Select
-          value={String(value || '')}
-          onValueChange={(newValue) => handleFieldChange(field.field, newValue)}
-        >
-          <SelectTrigger className="h-8 text-xs">
-            <SelectValue placeholder="--" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">--</SelectItem>
-            {options.map(option => (
-              <SelectItem key={option.value} value={option.value} className="text-xs">
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      );
-    }
-
-    // Boolean checkbox
-    if (type === 'boolean') {
-      return (
-        <div className="flex items-center">
-          <input
-            id={field.field}
-            type="checkbox"
-            checked={Boolean(value)}
-            onChange={(e) => handleFieldChange(field.field, e.target.checked)}
-            className="rounded border-gray-300"
-            style={{ width: 14, height: 14 }}
-          />
-        </div>
-      );
-    }
-
-    // Date input
-    if (type === 'date') {
-      const dateValue = value ? new Date(value).toISOString().split('T')[0] : '';
-      return (
-        <Input
-          type="date"
-          value={dateValue}
-          onChange={(e) => handleFieldChange(field.field, e.target.value)}
-          className="h-8 text-xs"
-        />
-      );
-    }
-
-    // Multiline textarea
-    if (multiline) {
-      return (
-        <textarea
-          value={String(value || '')}
-          onChange={(e) => handleFieldChange(field.field, e.target.value)}
-          className="w-full min-h-[60px] p-2 border border-gray-300 rounded-md resize-y text-xs"
-          rows={3}
-        />
-      );
-    }
-
-    // Regular input
     return (
-      <Input
-        type={type === 'number' ? 'number' : 'text'}
-        value={String(value || '')}
-        onChange={(e) => {
-          const newValue = type === 'number' ? Number(e.target.value) : e.target.value;
-          handleFieldChange(field.field, newValue);
-        }}
-        className="h-8 text-xs"
+      <FieldEditor
+        value={value}
+        fieldValue={field.value}
+        onChange={(newValue) => handleFieldChange(field.field, newValue)}
       />
     );
   };

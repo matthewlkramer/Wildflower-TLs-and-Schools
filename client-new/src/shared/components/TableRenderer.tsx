@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Input } from '@/shared/components/ui/input';
-import type { RenderableTableData, RenderableRow, CellValue } from '../table-service';
-import type { ResolvedTableColumn } from '../table-spec-resolver';
+import { FieldEditor } from './FieldEditor';
+import type { RenderableTableData, RenderableRow, CellValue } from '../services/table-service';
+import type { ResolvedTableColumn } from '../services/table-spec-resolver';
 
 export type TableRendererProps = {
   data: RenderableTableData;
@@ -70,60 +69,11 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
   };
 
   const renderEditControl = (field: string, value: any, cell: CellValue): React.ReactNode => {
-    const onChange = (newValue: any) => {
-      setEditingValues(prev => ({ ...prev, [field]: newValue }));
-    };
-
-    // Select dropdown for enum/lookup fields
-    if (cell.options && cell.options.length > 0) {
-      return (
-        <Select value={String(value || '')} onValueChange={onChange}>
-          <SelectTrigger className="h-8">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">-- Select --</SelectItem>
-            {cell.options.map(option => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      );
-    }
-
-    // Boolean checkbox
-    if (cell.type === 'boolean') {
-      return (
-        <input
-          type="checkbox"
-          checked={Boolean(value)}
-          onChange={(e) => onChange(e.target.checked)}
-          className="rounded"
-        />
-      );
-    }
-
-    // Multiline textarea
-    if (cell.multiline) {
-      return (
-        <textarea
-          value={String(value || '')}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full min-h-[60px] p-2 border rounded resize-none"
-          rows={2}
-        />
-      );
-    }
-
-    // Regular input
     return (
-      <Input
-        type={cell.type === 'number' ? 'number' : 'text'}
-        value={String(value || '')}
-        onChange={(e) => onChange(cell.type === 'number' ? Number(e.target.value) : e.target.value)}
-        className="h-8"
+      <FieldEditor
+        value={value}
+        fieldValue={cell}
+        onChange={(newValue) => setEditingValues(prev => ({ ...prev, [field]: newValue }))}
       />
     );
   };

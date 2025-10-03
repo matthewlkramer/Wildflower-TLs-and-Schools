@@ -108,9 +108,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTa
 
   return (
     <div style={containerStyle}>
-      {title && (
-        <h3 className="text-lg font-semibold mb-4">{title}</h3>
-      )}
+      {/* Title is now handled inside each renderer component */}
 
       {block.kind === 'table' && (
         <TableBlockRenderer
