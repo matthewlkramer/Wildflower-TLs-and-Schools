@@ -200,10 +200,10 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
         ref={buttonRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`flex h-8 w-full items-center justify-between rounded-md border border-slate-300 px-3 text-left text-xs text-slate-900 focus:outline-none ${className}`}
-        style={{ backgroundColor: '#fff' }}
+        className={`flex h-8 w-full items-center justify-between rounded-md border border-slate-300 px-3 text-left text-xs focus:outline-none ${className}`}
+        style={{ backgroundColor: '#fff', color: '#000' }}
       >
-        <span className="truncate">{summary}</span>
+        <span className="truncate" style={{ color: '#000' }}>{summary}</span>
         <span className="ml-2 opacity-60">▼</span>
       </button>
       {open && (
@@ -217,15 +217,15 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
               <label
                 key={opt.value}
                 className="flex cursor-pointer items-center hover:bg-slate-100"
-                style={{ gap: 6, padding: '2px 8px' }}
+                style={{ gap: 4, padding: '1px 6px', lineHeight: '16px' }}
               >
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggleOption(opt.value)}
-                  style={{ width: 12, height: 12 }}
+                  style={{ width: 12, height: 12, margin: 0 }}
                 />
-                <span style={{ fontSize: 11 }}>{opt.label}</span>
+                <span style={{ fontSize: 11, lineHeight: '16px' }}>{opt.label}</span>
               </label>
             );
           })}
