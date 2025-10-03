@@ -3,7 +3,6 @@ import { Button } from '@/shared/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import type { RenderableCard, CardField, FieldValue } from '../services/card-service';
 
 export type CardRendererProps = {
@@ -288,17 +287,35 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
   }
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        {/* Header with title and edit controls */}
-        <div className="flex items-center justify-between">
+    <div
+      className={className}
+      style={{
+        background: '#fff',
+        borderRadius: 8,
+        boxShadow: '0 4px 16px rgba(15,23,42,0.06)',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Header */}
+      {(showTitle && card.title) || (card.editable && onSave) ? (
+        <div
+          style={{
+            padding: '16px 20px',
+            borderBottom: '1px solid #e2e8f0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
           {showTitle && card.title && (
-            <CardTitle className="text-lg">{card.title}</CardTitle>
+            <h3 style={{ fontWeight: 600, fontSize: '1rem', margin: 0 }}>
+              {card.title}
+            </h3>
           )}
 
           {/* Edit Controls */}
           {card.editable && onSave && (
-            <div className="flex gap-2">
+            <div style={{ display: 'flex', gap: 8 }}>
               {isEditing ? (
                 <>
                   <Button
@@ -329,9 +346,10 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
             </div>
           )}
         </div>
-      </CardHeader>
+      ) : null}
 
-      <CardContent>
+      {/* Content */}
+      <div style={{ padding: '20px' }}>
         {/* Fields */}
         <div className={`grid gap-6 ${
           layout === 'two-column' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'
@@ -352,7 +370,7 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
             </ul>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
