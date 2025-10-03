@@ -103,21 +103,21 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
     const hasError = errors[field.field];
 
     return (
-      <div key={field.field} className="space-y-2">
-        <Label htmlFor={field.field} className="text-sm font-medium text-gray-700">
+      <div key={field.field} style={{ fontSize: 12 }}>
+        <div style={{ color: '#64748b', fontSize: 12, marginBottom: 4 }}>
           {field.label}
           {field.value.required && <span className="text-red-500 ml-1">*</span>}
-        </Label>
+        </div>
 
         {isEditing && field.value.editable ? (
-          <div className="space-y-1">
+          <div>
             {renderEditControl(field, currentValue)}
             {hasError && (
-              <p className="text-sm text-red-600">{hasError}</p>
+              <p style={{ fontSize: 11, color: '#dc2626', marginTop: 2 }}>{hasError}</p>
             )}
           </div>
         ) : (
-          <div className="text-sm text-gray-900">
+          <div style={{ fontSize: 12 }}>
             {renderDisplayValue(field.value, field.field)}
           </div>
         )}
@@ -135,13 +135,13 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
           value={String(value || '')}
           onValueChange={(newValue) => handleFieldChange(field.field, newValue)}
         >
-          <SelectTrigger>
-            <SelectValue placeholder="-- Select --" />
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue placeholder="--" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">-- Select --</SelectItem>
+            <SelectItem value="">--</SelectItem>
             {options.map(option => (
-              <SelectItem key={option.value} value={option.value}>
+              <SelectItem key={option.value} value={option.value} className="text-xs">
                 {option.label}
               </SelectItem>
             ))}
@@ -153,17 +153,15 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
     // Boolean checkbox
     if (type === 'boolean') {
       return (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center">
           <input
             id={field.field}
             type="checkbox"
             checked={Boolean(value)}
             onChange={(e) => handleFieldChange(field.field, e.target.checked)}
             className="rounded border-gray-300"
+            style={{ width: 14, height: 14 }}
           />
-          <Label htmlFor={field.field} className="text-sm">
-            {field.label}
-          </Label>
         </div>
       );
     }
@@ -176,6 +174,7 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
           type="date"
           value={dateValue}
           onChange={(e) => handleFieldChange(field.field, e.target.value)}
+          className="h-8 text-xs"
         />
       );
     }
@@ -186,8 +185,8 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
         <textarea
           value={String(value || '')}
           onChange={(e) => handleFieldChange(field.field, e.target.value)}
-          className="w-full min-h-[100px] p-3 border border-gray-300 rounded-md resize-y"
-          rows={4}
+          className="w-full min-h-[60px] p-2 border border-gray-300 rounded-md resize-y text-xs"
+          rows={3}
         />
       );
     }
@@ -201,6 +200,7 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
           const newValue = type === 'number' ? Number(e.target.value) : e.target.value;
           handleFieldChange(field.field, newValue);
         }}
+        className="h-8 text-xs"
       />
     );
   };
@@ -300,7 +300,7 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
       {(showTitle && card.title) || (card.editable && onSave) ? (
         <div
           style={{
-            padding: '16px 20px',
+            padding: '10px 12px',
             borderBottom: '1px solid #e2e8f0',
             display: 'flex',
             alignItems: 'center',
@@ -308,20 +308,21 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
           }}
         >
           {showTitle && card.title && (
-            <h3 style={{ fontWeight: 600, fontSize: '1rem', margin: 0 }}>
+            <h3 style={{ fontWeight: 600, fontSize: 14, margin: 0 }}>
               {card.title}
             </h3>
           )}
 
           {/* Edit Controls */}
           {card.editable && onSave && (
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 6 }}>
               {isEditing ? (
                 <>
                   <Button
                     onClick={handleSaveEdit}
                     disabled={saving}
                     size="sm"
+                    style={{ fontSize: 11, height: 26, padding: '0 10px' }}
                   >
                     {saving ? 'Saving...' : 'Save'}
                   </Button>
@@ -330,6 +331,7 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
                     variant="outline"
                     disabled={saving}
                     size="sm"
+                    style={{ fontSize: 11, height: 26, padding: '0 10px' }}
                   >
                     Cancel
                   </Button>
@@ -339,6 +341,7 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
                   onClick={handleStartEdit}
                   variant="outline"
                   size="sm"
+                  style={{ fontSize: 11, height: 26, padding: '0 10px' }}
                 >
                   Edit
                 </Button>
@@ -349,11 +352,9 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
       ) : null}
 
       {/* Content */}
-      <div style={{ padding: '20px' }}>
-        {/* Fields */}
-        <div className={`grid gap-6 ${
-          layout === 'two-column' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'
-        }`}>
+      <div style={{ padding: '12px' }}>
+        {/* Fields - 2 column grid like old UI */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
           {card.fields.map(field => renderField(field))}
         </div>
 
