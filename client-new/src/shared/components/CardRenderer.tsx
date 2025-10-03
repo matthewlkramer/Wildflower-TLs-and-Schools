@@ -146,7 +146,7 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
 
   const renderDisplayValue = (fieldValue: FieldValue, fieldName: string): React.ReactNode => {
     if (!fieldValue.display) {
-      return <span className="text-gray-400 italic">No value</span>;
+      return '';
     }
 
     // Handle attachment fields

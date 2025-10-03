@@ -221,8 +221,8 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
         ref={buttonRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`flex h-8 w-full items-center justify-between rounded-md border border-slate-300 px-3 text-left text-xs focus:outline-none ${className}`}
-        style={{ backgroundColor: '#fff', color: '#000', fontWeight: 'normal', fontSize: 12 }}
+        className={`flex h-8 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 text-left text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-slate-950 ${className}`}
+        style={{ color: '#000', fontWeight: 'normal', fontSize: 12 }}
       >
         <span className="truncate" style={{ color: '#000', fontWeight: 'normal', fontSize: 12 }}>{summary}</span>
         <span className="ml-2 opacity-60">▼</span>
