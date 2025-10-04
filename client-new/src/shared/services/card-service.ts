@@ -141,8 +141,6 @@ export class CardService {
     editSource?: any,
     manualMetadata?: import('../types/detail-types').FieldMetadata
   ): Promise<CardField | null> {
-    console.log(`[card-service] resolveField: ${fieldName}, hasManualMetadata=${!!manualMetadata}, manualMetadata=`, manualMetadata);
-
     // Get field metadata from schema
     const sourceTable = editSource?.table || 'people';
     const [schema, table] = sourceTable.includes('.') ? sourceTable.split('.') : ['public', sourceTable];
@@ -202,15 +200,10 @@ export class CardService {
     // Check manual metadata first, then merged metadata
     const lookupTable = (manualMetadata as any)?.lookupTable || (metadata as any)?.lookupTable;
     if (lookupTable) {
-      console.log(`[card-service] Field ${fieldName}: Found lookupTable=${lookupTable}`);
       if (GENERATED_LOOKUPS[lookupTable]) {
         const lookupConfig = GENERATED_LOOKUPS[lookupTable];
-        console.log(`[card-service] Loading lookup options from ${lookupConfig.table}`);
         options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
-        console.log(`[card-service] Loaded ${options.length} options`);
         fieldType = isArrayField ? 'string' : 'enum';
-      } else {
-        console.warn(`[card-service] Field ${fieldName}: lookupTable ${lookupTable} not found in GENERATED_LOOKUPS`);
       }
     }
     // Check for enum options from schema metadata
@@ -257,8 +250,6 @@ export class CardService {
     const rawValue = entityData[fieldName];
     let displayValue = this.formatDisplayValue(rawValue, fieldType, options);
 
-    console.log(`[card-service] Field ${fieldName}: rawValue=${rawValue}, type=${fieldType}, displayValue=${displayValue}, hasOptions=${!!options}, optionsCount=${options?.length || 0}`);
-
     // Get bucket and isImage from manual metadata if available
     let bucket = (manualMetadata as any)?.bucket;
     const isImage = (manualMetadata as any)?.isImage;
@@ -271,12 +262,10 @@ export class CardService {
         bucket = getStorageBucket(fieldName);
       }
 
-      console.log(`[card-service] Field ${fieldName}: Converting attachment from bucket=${bucket}`);
       // Convert storage path to public URL
       const { data } = supabase.storage.from(bucket).getPublicUrl(rawValue);
       processedRawValue = data.publicUrl;
       displayValue = data.publicUrl;
-      console.log(`[card-service] Field ${fieldName}: Converted to URL=${processedRawValue}`);
     }
 
     return {

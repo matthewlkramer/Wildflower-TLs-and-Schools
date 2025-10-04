@@ -109,6 +109,7 @@ export const ADD_NEW_SCHOOL_INPUT = [
 
 export const SCHOOL_VIEW_SPEC: ViewSpec = view(
   'schools',
+  SCHOOL_FIELD_METADATA,
   banner({image: 'logo_square', title: 'school_name', fields: [ 'stage_status', 'current_tls', 'current_guide_name']}),
   tab(
     'overview',

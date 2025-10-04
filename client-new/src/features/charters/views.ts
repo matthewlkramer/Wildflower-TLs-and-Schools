@@ -66,6 +66,7 @@ export const ADD_NEW_CHARTER_INPUT = [
 
 export const CHARTER_VIEW_SPEC: ViewSpec = view(
   'charters',
+  CHARTER_FIELD_METADATA,
   banner({image: 'logo', title: 'full_name', fields: ['current_cohort', 'status']}),
   tab(
     'overview',
