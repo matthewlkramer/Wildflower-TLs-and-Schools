@@ -130,6 +130,7 @@ export type DetailListLayout = {
   showFieldLabels?: boolean;
   attachmentFields?: readonly string[];
   bodyFieldFullWidth?: boolean;
+  hideLabelsForFields?: readonly string[]; // Fields that should not show labels
 };
 
 // Visibility DSL

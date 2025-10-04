@@ -77,10 +77,13 @@ export const MapRenderer: React.FC<MapRendererProps> = ({
   const addressField = fields[2];
 
   console.log('[MapRenderer] Extracted fields - lat:', latField, 'lng:', lngField, 'address:', addressField);
+  console.log('[MapRenderer] Lat field value:', latField?.value);
+  console.log('[MapRenderer] Lng field value:', lngField?.value);
+  console.log('[MapRenderer] Address field value:', addressField?.value);
 
-  const lat = latField?.value.raw ? parseFloat(String(latField.value.raw)) : null;
-  const lng = lngField?.value.raw ? parseFloat(String(lngField.value.raw)) : null;
-  const address = addressField?.value.display || '';
+  const lat = latField?.value?.raw ? parseFloat(String(latField.value.raw)) : null;
+  const lng = lngField?.value?.raw ? parseFloat(String(lngField.value.raw)) : null;
+  const address = addressField?.value?.display || '';
 
   console.log('[MapRenderer] Parsed values - lat:', lat, 'lng:', lng, 'address:', address);
 
@@ -94,17 +97,23 @@ export const MapRenderer: React.FC<MapRendererProps> = ({
           background: '#fff',
           borderRadius: 8,
           boxShadow: '0 4px 16px rgba(15,23,42,0.06)',
-          padding: 16,
+          overflow: 'hidden',
         }}
       >
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', marginBottom: 12 }}>
-          {map.title || 'Location'}
-        </h3>
-        {address ? (
-          <div style={{ fontSize: 12, color: '#64748b' }}>{address}</div>
-        ) : (
-          <div style={{ fontSize: 12, color: '#94a3b8' }}>No location data available</div>
-        )}
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0' }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', margin: 0 }}>
+            {map.title || 'Location'}
+          </h3>
+        </div>
+        <div style={{ padding: 16 }}>
+          {address ? (
+            <div style={{ fontSize: 12, color: '#64748b' }}>{address}</div>
+          ) : (
+            <div style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', padding: '24px 0' }}>
+              No location coordinates available for this record
+            </div>
+          )}
+        </div>
       </div>
     );
   }

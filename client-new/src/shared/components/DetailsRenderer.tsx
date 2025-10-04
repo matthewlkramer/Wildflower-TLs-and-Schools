@@ -296,6 +296,7 @@ function generateListLayoutFromPreset(preset: any) {
     bodyFields: [] as string[],
     badgeFields: [] as string[],
     footerFields: [] as string[],
+    hideLabelsForFields: [] as string[],
   };
 
   for (const column of preset.columns) {
@@ -309,6 +310,10 @@ function generateListLayoutFromPreset(preset: any) {
           break;
         case 'body':
           layout.bodyFields.push(column.field);
+          // If this field has listFieldFullWidth, add it to hideLabelsForFields
+          if (column.listFieldFullWidth) {
+            layout.hideLabelsForFields.push(column.field);
+          }
           break;
         case 'badge':
           layout.badgeFields.push(column.field);

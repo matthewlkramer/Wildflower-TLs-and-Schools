@@ -128,6 +128,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
       showFieldLabels = false,
       attachmentFields = [],
       bodyFieldFullWidth = false,
+      hideLabelsForFields = [],
     } = layout || {};
 
     return (
@@ -192,7 +193,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
             {bodyFields.map(field =>
               row.cells[field] && (
                 <div key={field} style={{ fontSize: 11 }}>
-                  {renderFieldValue(field, row.cells[field], row, true, false)}
+                  {renderFieldValue(field, row.cells[field], row, !hideLabelsForFields.includes(field), false)}
                 </div>
               )
             )}

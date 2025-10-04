@@ -6,7 +6,7 @@ import type { ViewId } from './types';
  * comes from a different table (e.g., 'people').
  */
 export const VIEW_TABLE_MAPPING: Record<ViewId, string> = {
-  schools: 'schools',
+  schools: 'details_schools',
   educators: 'people',
   charters: 'charters',
 };
