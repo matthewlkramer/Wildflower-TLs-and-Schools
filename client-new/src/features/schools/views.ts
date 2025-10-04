@@ -1,4 +1,4 @@
-import { view, tab, card, table, list, map } from '@/shared/views/builders';
+import { view, tab, card, table, list, map, banner } from '@/shared/views/builders';
 import type { ViewSpec } from '@/shared/views/types';
 import type { GridColumnConfig, FieldMetadataMap } from '@/shared/types/detail-types';
 
