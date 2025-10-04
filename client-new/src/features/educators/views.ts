@@ -99,7 +99,7 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
     card(['primary_phone', 'primary_phone_other_info', 'secondary_phone', 'secondary_phone_other_info','home_address'], { title: 'Phone', editable: true }),
   //  card(['most_recent_fillout_form_date', 'most_recent_event_name', 'most_recent_event_date', 'most_recent_note', 'most_recent_note_date', 'most_recent_note_from'], { title: 'Recent Activity' }),
   ),
-  tab('schools', 'Schools', list('educators', 'schools', { width: 'half' }), list('educators','guide_assignments', { width: 'half' })),
+  tab('schools', 'Schools & Guides', list('educators', 'schools', { width: 'half' }), list('educators','guideAssignments', { width: 'half' })),
   tab('certifications_events', 'Certs & Events', list('educators', 'educatorMontessoriCerts', { width: 'half' }), list('educators', 'educatorEvents', { width: 'half' })),
   tab(
     'early_cultivation',
