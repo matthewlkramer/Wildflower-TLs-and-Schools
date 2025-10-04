@@ -1,3 +1,4 @@
+import { list } from '../views/builders';
 import type { TableColumnMeta, TableActionSpec, RowActionId, TableToggleSpec, FilterExpr } from './detail-types';
 export type TablePreset = {
   title?: string;
@@ -54,12 +55,13 @@ export const TABLE_LIST_PRESETS = {
     readFilter: {eq: { column: 'show_in_educator_grid', value: true } },
     writeDefaults: { table: 'people_roles_associations', pkColumn: 'id' },
     columns: [
-      { field: 'school_name', label: 'School', update: 'newOnly' },
-      { field: 'role', lookupTable: 'zref_roles', listLayout: 'subtitle' },
-      { field: 'start_date' },
-      { field: 'end_date' },
-      { field: 'is_active', label: 'Active?' },
-      { field: 'stage_status', label: 'Stage/Status', update: 'no' },
+      { field: 'school_name', label: 'School', update: 'newOnly' , listLayout: 'title'},
+      { field: 'stage_status', label: 'Stage/Status', update: 'no' , listLayout: 'subtitle'},
+      { field: 'role', lookupTable: 'zref_roles', listLayout: 'body' },
+      { field: 'start_date', listLayout: 'body' },
+      { field: 'end_date', listLayout: 'body' },
+      { field: 'is_active', label: 'Active?', listLayout: 'badge' },
+
     ] as const,
     rowActions: ['inline_edit', 'view_in_modal', 'jump_to_modal', 'end_stint', 'add_note','add_task','archive'] as const,
     toggles: [ { id: 'active', label: 'Active only', expr: { eq: { column: 'is_active', value: true } }, defaultOn: true } ],
