@@ -3,6 +3,7 @@ import { Tabs, Tab, Box } from '@mui/material';
 import { TableRenderer } from './TableRenderer';
 import { ListRenderer } from './ListRenderer';
 import { CardRenderer } from './CardRenderer';
+import { BannerRenderer } from './BannerRenderer';
 import { tableService, type RenderableTableData } from '../services/table-service';
 import { cardService, type RenderableCard } from '../services/card-service';
 import type { ViewSpec, TabSpec, BlockSpec, CardSpec, TableSpec, ListSpec, MapSpec } from '../views/types';
@@ -26,6 +27,17 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
 
   return (
     <div className={`details-renderer ${className}`}>
+      {/* Banner (if specified) */}
+      {view.banner && (
+        <BannerRenderer
+          banner={view.banner}
+          entityId={entityId}
+          sourceTable={sourceTable}
+          fieldMetadata={view.fieldMetadata}
+        />
+      )}
+
+      {/* Tabs */}
       {tabs.length === 1 ? (
         // Single tab - render directly without tab headers
         <TabContent tab={tabs[0]} entityId={entityId} sourceTable={sourceTable} fieldMetadata={view.fieldMetadata} />

@@ -203,8 +203,8 @@ export const TABLE_LIST_PRESETS = {
     tableActions: [{id: 'addReport', label: 'Add Report'}] as const,
   },
 
-  annualData: {
-    title: 'Annual Data',
+  assessments: {
+    title: 'Assessments & Metrics',
     orderBy: [{ column: 'school_year', ascending: false }] as const,
     cardLimit: 50,
     readSource: 'annual_assessment_and_metrics_data',
@@ -277,6 +277,7 @@ export const TABLE_LIST_PRESETS = {
     orderBy: [{ column: 'advice_requested_date', ascending: false }] as const,
     cardLimit: 50,
     readSource: 'advice',
+    writeDefaults: { table: 'advice', pkColumn: 'id' },
     columns: [
       { field: 'advice_giver', label: 'Advice Giver', lookupTable: 'people', listLayout: 'title'},
       { field: 'advice_requested_date', label: 'Requested Date', listLayout: 'body' },

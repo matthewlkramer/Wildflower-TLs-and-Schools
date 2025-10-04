@@ -9,7 +9,7 @@ export const SCHOOL_GRID: GridColumnConfig[] = [
   { field: 'current_tls', headerName: 'Curr. TLs' },
   { field: 'current_tls_race_ethnicity', headerName: 'TLs Race/ Ethnicity', valueType: 'multi', lookupField: 'zref_race_and_ethnicity.label' },
   { field: 'governance_model', headerName: 'Model', valueType: 'select', enumName: 'governance_models' },
-  { field: 'ages_served', headerName: 'Ages', valueType: 'multi', enumName: 'age_spans_rev' },
+  { field: 'ages_served', headerName: 'Ages', valueType: 'multi', enumName: 'age_spans' },
   { field: 'membership_status', headerName: 'Member?', valueType: 'select', lookupField: 'zref_membership_statuses.value' },
   { field: 'open', headerName: 'Open/Proj. open', valueType: 'date' },
   { field: 'active_guides', headerName: 'Guides', valueType: 'multi' },
@@ -23,7 +23,7 @@ export const SCHOOL_KANBAN_CONSTANTS_TABLE = 'zref_stage_statuses';
 export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {
   about: { multiline: true },
   about_spanish: { label: 'About (Spanish)', multiline: true },
-  address: { multiline: true, editable: false },
+  address: { multiline: true},
   current_guide_name: { editable: false },
   current_tls: { editable: false },
   founding_tls: { lookup: { table: 'people', valueColumn: 'id', labelColumn: 'full_name' } },
@@ -31,8 +31,6 @@ export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {
   logo_square: { label: 'Logo (Square)', type: 'attachment' },
   logo_flower_only: { label: 'Logo (Flower Only)', type: 'attachment' },
   logo_rectangle: { label: 'Logo (Rectangle)', type: 'attachment' },
-  mailing_address: { label: 'Mailing Address', multiline: true, editable: false },
-  physical_address: { label: 'Physical Address', multiline: true, editable: false },
   physical_lat: { label: 'Latitude', editable: false },
   physical_long: { label: 'Longitude', editable: false },
   planning_album: { writeTable: 'school_ssj_data', type: 'attachment' },
@@ -111,11 +109,11 @@ export const ADD_NEW_SCHOOL_INPUT = [
 
 export const SCHOOL_VIEW_SPEC: ViewSpec = view(
   'schools',
+  banner({image: 'logo_square', title: 'school_name', fields: [ 'stage_status', 'current_tls', 'current_guide_name']}),
   tab(
     'overview',
     'Overview',
     card(['short_name', 'long_name', 'prior_names'], { title: 'Name(s)', editable: true }),
-    card(['stage_status', 'current_tls', 'wf_tls_on_board', 'current_guide_name', 'current_cohort'], { title: 'Calculated' }),
     card(['founding_tls', 'open_date', 'membership_status'], { title: 'History/Status' , editable: true }),
     map(['physical_lat', 'physical_long', 'physical_address'], { title: 'Location' }),
     card(['about', 'about_spanish'], { title: 'About', editable: true }),
@@ -123,15 +121,10 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
       ['governance_model', 'public_funding', 'program_focus', 'institutional_partner', 'ages_served', 'number_of_classrooms', 'enrollment_at_full_capacity'],
       { title: 'School Model', editable: true },
     ),
-    card(['school_email', 'school_phone', 'website', 'facebook', 'instagram'], { title: 'Marketing & Comms', editable: true }),
+    card(['legal_structure', 'ein', 'incorporation_date', 'current_fy_end', 'loan_report_name', 'nonprofit_path','nonprofit_status', 'group_exemption_status'], { title: 'Legal entity', editable: true }),
+    card(['school_email', 'school_phone', 'website', 'facebook', 'instagram'], { title: 'Marketing & Comms', editable: true }),  
     card(['total_grants_issued', 'total_loans_issued'], { title: 'Grants and Loans' }),
     card(['risk_factors', 'watchlist'], { title: 'Warnings', editable: true }),
-  ),
-  tab(
-    'details',
-    'Details',
-    card(['governance_model','legal_structure', 'ein', 'incorporation_date', 'current_fy_end', 'loan_report_name'], { title: 'Legal entity', editable: true }),
-    card(['nonprofit_path','nonprofit_status', 'group_exemption_status'], { title: 'Nonprofit status', editable: true }),
     card(['logo', 'logo_square', 'logo_flower_only', 'logo_rectangle'], { title: 'Logo(s)', editable: true }),
   ),
   tab(
@@ -144,7 +137,7 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     card(['ssj_facility', 'ssj_building4good_status', 'date_shared_with_n4g', 'building4good_firm_and_attorney'], { title: 'Facilities', editable: true }),
     card(['ssj_budget_ready_for_next_steps', 'ssj_seeking_wf_funding', 'ssj_fundraising_narrative', 'ssj_pathway_to_funding', 'ssj_total_startup_funding_needed', 'ssj_loan_eligibility', 'ssj_loan_approved_amt', 'ssj_amount_raised', 'ssj_gap_in_funding'], { title: 'Fundraising', editable: true }),
     card(['business_insurance', 'budget_utility', 'bill_account'], { title: 'Systems', editable: true }),
-    table('advice', 'advice')
+    list('schools', 'advice', 'half')
   ),
   tab('educators_board', 'Educators & Board', list('schools', 'educators', 'half'), list('schools','boardMembers', 'half')),
   tab('enrollment_assessments', 'Annual Data', list('schools', 'enrollment', 'half'), list('schools', 'assessments', 'half')),
@@ -165,11 +158,11 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     card(['school_email', 'school_phone','website','facebook','instagram'], { title: 'Contact Info', editable: true }),
     card(['budget_link', 'visioning_album', 'planning_album'], { title: 'Files', editable: true }),
     card(['risk_factors','watchlist'], { title: 'Warnings', editable: true }),
-    table('schools', 'educators'),
-    table('schools', 'boardMembers'),
-    table('schools', 'guideAssignments'),
-    table('schools', 'locations'),
-    table('advice', 'advice'),
+    list('schools', 'educators', 'half'),
+    list('schools', 'boardMembers', 'half'),
+    list('schools', 'guideAssignments', 'half'),
+    list('schools', 'locations', 'half'),
+    list('schools', 'advice', 'half'),
   ),
 );
 
