@@ -5,6 +5,7 @@ import { ENUM_OPTIONS, FIELD_TYPES } from '@/generated/enums.generated';
 import type { FieldMetadata, LookupException } from './detail-types';
 import type { CardSpec } from '../views/types';
 import { fromTable } from '../utils/supabase-utils';
+import { getStorageBucket } from '../config/storage-buckets';
 
 export type SelectOption = { value: string; label: string };
 
@@ -196,10 +197,11 @@ export class CardService {
     }
 
     // Check for explicit lookup table in metadata (from view field metadata) - FIRST priority
-    if ((metadata as any).lookupTable) {
-      const lookupTableName = (metadata as any).lookupTable;
-      if (GENERATED_LOOKUPS[lookupTableName]) {
-        const lookupConfig = GENERATED_LOOKUPS[lookupTableName];
+    // Check manual metadata first, then merged metadata
+    const lookupTable = (manualMetadata as any)?.lookupTable || (metadata as any)?.lookupTable;
+    if (lookupTable) {
+      if (GENERATED_LOOKUPS[lookupTable]) {
+        const lookupConfig = GENERATED_LOOKUPS[lookupTable];
         options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
         fieldType = isArrayField ? 'string' : 'enum';
       }
@@ -241,17 +243,31 @@ export class CardService {
     }
 
     const rawValue = entityData[fieldName];
-    const displayValue = this.formatDisplayValue(rawValue, fieldType, options);
+    let displayValue = this.formatDisplayValue(rawValue, fieldType, options);
 
     // Get bucket and isImage from manual metadata if available
-    const bucket = (manualMetadata as any)?.bucket;
+    let bucket = (manualMetadata as any)?.bucket;
     const isImage = (manualMetadata as any)?.isImage;
+
+    // Handle attachment fields - convert storage path to public URL
+    let processedRawValue = rawValue;
+    if ((manualMetadata as any)?.type === 'attachment' && rawValue) {
+      // Get bucket from manual metadata, or use field-name-based mapping
+      if (!bucket) {
+        bucket = getStorageBucket(fieldName);
+      }
+
+      // Convert storage path to public URL
+      const { data } = supabase.storage.from(bucket).getPublicUrl(rawValue);
+      processedRawValue = data.publicUrl;
+      displayValue = data.publicUrl;
+    }
 
     return {
       field: fieldName,
       label: metadata.label || this.fieldToLabel(fieldName),
       value: {
-        raw: rawValue,
+        raw: processedRawValue,
         display: displayValue,
         editable: true, // TODO: Determine editability from metadata/permissions
         type: fieldType,
