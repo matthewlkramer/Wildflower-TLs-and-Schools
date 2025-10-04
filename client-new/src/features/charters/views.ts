@@ -77,7 +77,7 @@ export const CHARTER_VIEW_SPEC: ViewSpec = view(
     card(['total_grants_issued', 'total_loans_issued'], { title: 'Grants and Loans' }),
     card(['initial_target_geo', 'initial_target_planes'], { title: 'Initial Vision', editable: true }),
     card(['ein', 'incorp_date', 'current_fy_end', 'nonprofit_status', 'group_exemption_status'], { title: 'Legal entity', editable: true }),
-    list('charters', 'authorizerActions', 'half'),
+    list('charters', 'authorizerActions', { width: 'half' }),
     card(['non_discrimination_policy_on_website', 'school_provided_1023', 'guidestart_listing_requested', 'partnership_with_wf', 'first_site_opened_date', 'website'], { title: 'Other', editable: true }),
   ),
   tab(
@@ -93,12 +93,12 @@ export const CHARTER_VIEW_SPEC: ViewSpec = view(
     card(['charter_app_roles_set', 'charter_app_pm_plan_complete', 'logic_model_complete', 'comm_engagement_underway'], { title: 'Checklist', editable: true }),
     card(['joint_kickoff_meeting_date','internal_support_meeting_date','app_walkthrough_date','capacity_intv_training_date','capacity_intv_proj_complete','capacity_intv_completed_date','design_advice_session_complete','board_membership_signed_date'], { title: 'Schedule', editable: true }),
   ),
-  tab('educators_and_schools', 'Educators & Schools', list('charters', 'educators', 'half'), list('charters', 'schools', 'half')),
-  tab('grants_loans', 'Grants & Loans', list('charters', 'grants', 'half'), list('charters', 'loans', 'half')),
-  tab('enrollment_assessments', 'Annual Data', list('charters', 'enrollment', 'half'), list('charters', 'assessments', 'half')),
-  tab('docs', 'Docs', list('charters', 'governanceDocs', 'half'), list('charters', 'nineNineties', 'half')),
-  tab('action_notes', 'Actions & Notes', list('charters', 'actionSteps', 'half'), list('charters', 'notes', 'half')),
-  tab('google_sync', 'gmail/gCal', list('charters', 'gmails', 'half'), list('charters', 'gCal', 'half'))
+  tab('educators_and_schools', 'Educators & Schools', list('charters', 'educators', { width: 'half' }), list('charters', 'schools', { width: 'half' })),
+  tab('grants_loans', 'Grants & Loans', list('charters', 'grants', { width: 'half' }), list('charters', 'loans', { width: 'half' })),
+  tab('enrollment_assessments', 'Annual Data', list('charters', 'enrollment', { width: 'half' }), list('charters', 'assessments', { width: 'half' })),
+  tab('docs', 'Docs', list('charters', 'governanceDocs', { width: 'half' }), list('charters', 'nineNineties', { width: 'half' })),
+  tab('action_notes', 'Actions & Notes', list('charters', 'actionSteps', { width: 'half' }), list('charters', 'notes', { width: 'half' })),
+  tab('google_sync', 'gmail/gCal', list('charters', 'gmails', { width: 'half' }), list('charters', 'gCal', { width: 'half' }))
 );
 
 

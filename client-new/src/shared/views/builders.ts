@@ -42,30 +42,28 @@ export function card(fields: string[], opts?: { title?: string; width?: 'half' |
 export function table(
   module: string,
   preset: string,
-  width?: 'half',
-  activeFilter?: boolean
+  opts?: { width?: 'half' | 'full'; activeFilter?: boolean }
 ): TableSpec {
   return {
     kind: 'table',
     preset,
     module,
-    width: width || 'full',
-    activeFilter: activeFilter ?? false,
+    width: opts?.width || 'full',
+    activeFilter: opts?.activeFilter ?? false,
   } as TableSpec;
 }
 
 export function list(
   module: string,
   preset: string,
-  width?: 'half',
-  activeFilter?: boolean
+  opts?: { width?: 'half' | 'full'; activeFilter?: boolean }
 ): ListSpec {
   return {
     kind: 'list',
     preset,
     module,
-    width: width || 'full',
-    activeFilter: activeFilter ?? false,
+    width: opts?.width || 'full',
+    activeFilter: opts?.activeFilter ?? false,
   } as ListSpec;
 }
 

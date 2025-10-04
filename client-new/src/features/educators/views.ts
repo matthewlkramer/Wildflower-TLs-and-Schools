@@ -95,12 +95,12 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
     card(['race_ethnicity', 'race_ethnicity_other', 'educ_attainment', 'hh_income', 'childhood_income', 'indiv_type'], { title: 'Background', editable: true }),
     card(['gender', 'gender_other', 'pronouns', 'pronouns_other', 'lgbtqia'], { title: 'Gender', editable: true }),
     card(['primary_languages', 'other_languages'], { title: 'Languages', editable: true }),
-    list ('educators', 'educatorEmails', 'half'),
+    list('educators', 'educatorEmails', { width: 'half' }),
     card(['primary_phone', 'primary_phone_other_info', 'secondary_phone', 'secondary_phone_other_info','home_address'], { title: 'Phone', editable: true }),
   //  card(['most_recent_fillout_form_date', 'most_recent_event_name', 'most_recent_event_date', 'most_recent_note', 'most_recent_note_date', 'most_recent_note_from'], { title: 'Recent Activity' }),
   ),
-  tab('schools', 'Schools', list('educators', 'schools','half'), list('educators','guide_assignments','half')),
-  tab('certifications_events', 'Certs & Events', list('educators', 'educatorMontessoriCerts','half'), list('educators', 'educatorEvents','half')),
+  tab('schools', 'Schools', list('educators', 'schools', { width: 'half' }), list('educators','guide_assignments', { width: 'half' })),
+  tab('certifications_events', 'Certs & Events', list('educators', 'educatorMontessoriCerts', { width: 'half' }), list('educators', 'educatorEvents', { width: 'half' })),
   tab(
     'early_cultivation',
     'Early Cultivation',
@@ -110,7 +110,7 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
     card(['sendgrid_template_selected', 'sendgrid_send_date', 'person_responsible_for_follow_up', 'one_on_one_scheduling_status', 'personal_email_sent', 'personal_email_sent_date'], { title: 'Follow Up', editable: true }),
   ),
   tab('systems', 'Systems', card(['on_connected', 'on_slack', 'in_tl_google_grp', 'in_wf_directory', 'who_initiated_tl_removal', 'on_natl_website', 'gsuite_roles'], { editable: true })),
-  tab('actions_notes', 'Actions & Notes', list('educators', 'actionSteps','half'), list('educators', 'notes', 'half')),
-  tab('google_sync', 'gmail/gCal', list('educators', 'gmails','half'), list('educators', 'gCal','half'))
+  tab('actions_notes', 'Actions & Notes', list('educators', 'actionSteps', { width: 'half' }), list('educators', 'notes', { width: 'half' })),
+  tab('google_sync', 'gmail/gCal', list('educators', 'gmails', { width: 'half' }), list('educators', 'gCal', { width: 'half' }))
 );
 

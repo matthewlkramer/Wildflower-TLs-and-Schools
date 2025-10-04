@@ -3,6 +3,7 @@ import { Button } from '@/shared/components/ui/button';
 import { RowActionsMenu } from './RowActionsMenu';
 import type { RenderableTableData, RenderableRow, CellValue } from '../table-service';
 import type { DetailListLayout } from '../detail-types';
+import { BADGE_PRESETS } from '../config/badge-presets';
 
 export type ListRendererProps = {
   data: RenderableTableData;
@@ -19,12 +20,63 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
   onTableAction,
   className = '',
 }) => {
+  const renderBadge = (fieldName: string, cell: CellValue): React.ReactNode | null => {
+    const badgeConfig = BADGE_PRESETS[fieldName];
+    if (!badgeConfig) return null;
+
+    const value = cell.raw;
+
+    // If value is false and no falseLabel, don't show badge
+    if (!value && !badgeConfig.falseLabel) {
+      return null;
+    }
+
+    const label = value ? badgeConfig.trueLabel : badgeConfig.falseLabel;
+    if (!label) return null;
+
+    // Determine badge color based on value
+    const bgColor = value ? '#dcfce7' : '#fee2e2';
+    const textColor = value ? '#166534' : '#991b1b';
+
+    return (
+      <span
+        style={{
+          display: 'inline-block',
+          padding: '2px 8px',
+          borderRadius: 4,
+          fontSize: 11,
+          fontWeight: 500,
+          backgroundColor: bgColor,
+          color: textColor,
+        }}
+      >
+        {label}
+      </span>
+    );
+  };
+
   const renderFieldValue = (
     fieldName: string,
     cell: CellValue,
     row: RenderableRow,
-    showLabel: boolean = false
+    showLabel: boolean = false,
+    isBadgeField: boolean = false
   ): React.ReactNode => {
+    // Check if this field should be rendered as a badge
+    if (isBadgeField) {
+      const badge = renderBadge(fieldName, cell);
+      if (!badge) return null;
+
+      return showLabel ? (
+        <div className="flex" style={{ gap: 6 }}>
+          <span style={{ fontWeight: 500, color: '#64748b', fontSize: 12 }} className="min-w-0 flex-shrink-0">
+            {getFieldLabel(fieldName, data)}:
+          </span>
+          <span className="min-w-0">{badge}</span>
+        </div>
+      ) : badge;
+    }
+
     if (!cell.display) return null;
 
     const content = (
@@ -78,9 +130,6 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
       bodyFieldFullWidth = false,
     } = layout || {};
 
-    // Combine body fields and badge fields (badges should be shown with labels in body)
-    const allBodyFields = [...bodyFields, ...badgeFields];
-
     return (
       <div
         style={{
@@ -100,7 +149,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
 
         {/* Subtitle */}
         {subtitleFields.length > 0 && (
-          <div className="flex flex-col" style={{ gap: 4, marginBottom: allBodyFields.length > 0 ? 8 : 0 }}>
+          <div className="flex flex-col" style={{ gap: 4, marginBottom: (bodyFields.length > 0 || badgeFields.length > 0) ? 8 : 0 }}>
             {subtitleFields.map(field =>
               row.cells[field] && (
                 <div key={field} style={{ color: '#64748b', fontSize: 12 }}>
@@ -111,18 +160,28 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
           </div>
         )}
 
-        {/* Body Fields (including former badge fields, all with labels) */}
-        {allBodyFields.length > 0 && (
+        {/* Body Fields */}
+        {bodyFields.length > 0 && (
           <div className={`grid ${
             bodyFieldFullWidth ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
           }`} style={{ gap: 8, marginBottom: 8 }}>
-            {allBodyFields.map(field =>
+            {bodyFields.map(field =>
               row.cells[field] && (
                 <div key={field} style={{ fontSize: 12 }}>
-                  {renderFieldValue(field, row.cells[field], row, true)}
+                  {renderFieldValue(field, row.cells[field], row, true, false)}
                 </div>
               )
             )}
+          </div>
+        )}
+
+        {/* Badge Fields (rendered as badges) */}
+        {badgeFields.length > 0 && (
+          <div className="flex flex-wrap" style={{ gap: 6, marginBottom: 8 }}>
+            {badgeFields.map(field => {
+              const badge = row.cells[field] && renderFieldValue(field, row.cells[field], row, false, true);
+              return badge ? <div key={field}>{badge}</div> : null;
+            })}
           </div>
         )}
 

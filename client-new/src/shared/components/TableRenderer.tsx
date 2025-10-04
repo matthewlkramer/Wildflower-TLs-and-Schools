@@ -4,6 +4,7 @@ import { FieldEditor } from './FieldEditor';
 import { RowActionsMenu } from './RowActionsMenu';
 import type { RenderableTableData, RenderableRow, CellValue } from '../services/table-service';
 import type { ResolvedTableColumn } from '../services/table-spec-resolver';
+import { BADGE_PRESETS } from '../config/badge-presets';
 
 export type TableRendererProps = {
   data: RenderableTableData;
@@ -66,7 +67,7 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
       return renderEditControl(column.field, currentValue, cell);
     }
 
-    return renderDisplayValue(cell, row);
+    return renderDisplayValue(cell, row, column.field);
   };
 
   const renderEditControl = (field: string, value: any, cell: CellValue): React.ReactNode => {
@@ -79,7 +80,52 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
     );
   };
 
-  const renderDisplayValue = (cell: CellValue, row: RenderableRow): React.ReactNode => {
+  const renderBadge = (fieldName: string, cell: CellValue): React.ReactNode | null => {
+    const badgeConfig = BADGE_PRESETS[fieldName];
+    if (!badgeConfig) return null;
+
+    const value = cell.raw;
+
+    // If value is false and no falseLabel, don't show badge
+    if (!value && !badgeConfig.falseLabel) {
+      return null;
+    }
+
+    const label = value ? badgeConfig.trueLabel : badgeConfig.falseLabel;
+    if (!label) return null;
+
+    // Determine badge color based on value
+    const bgColor = value ? '#dcfce7' : '#fee2e2';
+    const textColor = value ? '#166534' : '#991b1b';
+
+    return (
+      <span
+        style={{
+          display: 'inline-block',
+          padding: '2px 8px',
+          borderRadius: 4,
+          fontSize: 11,
+          fontWeight: 500,
+          backgroundColor: bgColor,
+          color: textColor,
+        }}
+      >
+        {label}
+      </span>
+    );
+  };
+
+  const renderDisplayValue = (cell: CellValue, row: RenderableRow, fieldName?: string): React.ReactNode => {
+    // Check if this field should be rendered as a badge
+    if (fieldName && BADGE_PRESETS[fieldName]) {
+      const badge = renderBadge(fieldName, cell);
+      if (badge) return badge;
+      // If badge returns null (e.g., false value with no falseLabel), fall through to regular display
+      if (!BADGE_PRESETS[fieldName].falseLabel && !cell.raw) {
+        return null;
+      }
+    }
+
     // Handle link to field (e.g., doc_type links to pdf field)
     if (cell.linkToField && row.cells[cell.linkToField]) {
       const linkUrl = row.cells[cell.linkToField].raw;
