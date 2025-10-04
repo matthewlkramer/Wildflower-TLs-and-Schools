@@ -200,10 +200,15 @@ export class CardService {
     // Check manual metadata first, then merged metadata
     const lookupTable = (manualMetadata as any)?.lookupTable || (metadata as any)?.lookupTable;
     if (lookupTable) {
+      console.log(`[card-service] Field ${fieldName}: Found lookupTable=${lookupTable}`);
       if (GENERATED_LOOKUPS[lookupTable]) {
         const lookupConfig = GENERATED_LOOKUPS[lookupTable];
+        console.log(`[card-service] Loading lookup options from ${lookupConfig.table}`);
         options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
+        console.log(`[card-service] Loaded ${options.length} options`);
         fieldType = isArrayField ? 'string' : 'enum';
+      } else {
+        console.warn(`[card-service] Field ${fieldName}: lookupTable ${lookupTable} not found in GENERATED_LOOKUPS`);
       }
     }
     // Check for enum options from schema metadata
@@ -237,13 +242,20 @@ export class CardService {
       options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
       fieldType = 'enum';
     }
-    // Determine type from schema metadata
-    if (!options && metadata.baseType) {
+    // Check if this is an attachment field from manual metadata
+    const isAttachment = (manualMetadata as any)?.type === 'attachment';
+
+    // Determine type from manual metadata first, then schema metadata
+    if (isAttachment) {
+      fieldType = 'attachment';
+    } else if (!options && metadata.baseType) {
       fieldType = this.mapSchemaType(metadata.baseType);
     }
 
     const rawValue = entityData[fieldName];
     let displayValue = this.formatDisplayValue(rawValue, fieldType, options);
+
+    console.log(`[card-service] Field ${fieldName}: rawValue=${rawValue}, type=${fieldType}, displayValue=${displayValue}, hasOptions=${!!options}, optionsCount=${options?.length || 0}`);
 
     // Get bucket and isImage from manual metadata if available
     let bucket = (manualMetadata as any)?.bucket;
@@ -251,16 +263,18 @@ export class CardService {
 
     // Handle attachment fields - convert storage path to public URL
     let processedRawValue = rawValue;
-    if ((manualMetadata as any)?.type === 'attachment' && rawValue) {
+    if (isAttachment && rawValue) {
       // Get bucket from manual metadata, or use field-name-based mapping
       if (!bucket) {
         bucket = getStorageBucket(fieldName);
       }
 
+      console.log(`[card-service] Field ${fieldName}: Converting attachment from bucket=${bucket}`);
       // Convert storage path to public URL
       const { data } = supabase.storage.from(bucket).getPublicUrl(rawValue);
       processedRawValue = data.publicUrl;
       displayValue = data.publicUrl;
+      console.log(`[card-service] Field ${fieldName}: Converted to URL=${processedRawValue}`);
     }
 
     return {
