@@ -141,6 +141,8 @@ export class CardService {
     editSource?: any,
     manualMetadata?: import('../types/detail-types').FieldMetadata
   ): Promise<CardField | null> {
+    console.log(`[card-service] resolveField: ${fieldName}, hasManualMetadata=${!!manualMetadata}, manualMetadata=`, manualMetadata);
+
     // Get field metadata from schema
     const sourceTable = editSource?.table || 'people';
     const [schema, table] = sourceTable.includes('.') ? sourceTable.split('.') : ['public', sourceTable];
