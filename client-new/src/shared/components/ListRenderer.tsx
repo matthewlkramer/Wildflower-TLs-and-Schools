@@ -136,14 +136,14 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
           background: '#fff',
           border: '1px solid #e2e8f0',
           borderRadius: 6,
-          padding: 12,
+          padding: 10,
           fontSize: 12,
           position: 'relative',
         }}
       >
         {/* Row Actions - positioned in upper right */}
         {data.spec.rowActions.length > 0 && (
-          <div style={{ position: 'absolute', top: 8, right: 8 }}>
+          <div style={{ position: 'absolute', top: 6, right: 6 }}>
             <RowActionsMenu
               actions={data.spec.rowActions}
               onAction={(actionId) => onRowAction?.(row.id, actionId)}
@@ -151,19 +151,32 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
           </div>
         )}
 
-        {/* Title */}
-        {titleField && row.cells[titleField] && (
-          <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: '#0f172a', paddingRight: 32 }}>
-            {renderFieldValue(titleField, row.cells[titleField], row)}
-          </div>
-        )}
+        {/* Title and Badges Row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: subtitleFields.length > 0 ? 4 : (bodyFields.length > 0 ? 6 : 0) }}>
+          {/* Title */}
+          {titleField && row.cells[titleField] && (
+            <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a', paddingRight: 32, flex: 1, minWidth: 0 }}>
+              {renderFieldValue(titleField, row.cells[titleField], row)}
+            </div>
+          )}
+
+          {/* Badge Fields (rendered as badges) - moved up to title row */}
+          {badgeFields.length > 0 && (
+            <div className="flex flex-wrap" style={{ gap: 4, flexShrink: 0 }}>
+              {badgeFields.map(field => {
+                const badge = row.cells[field] && renderFieldValue(field, row.cells[field], row, false, true);
+                return badge ? <div key={field}>{badge}</div> : null;
+              })}
+            </div>
+          )}
+        </div>
 
         {/* Subtitle */}
         {subtitleFields.length > 0 && (
-          <div className="flex flex-col" style={{ gap: 4, marginBottom: (bodyFields.length > 0 || badgeFields.length > 0) ? 8 : 0 }}>
+          <div className="flex flex-col" style={{ gap: 2, marginBottom: bodyFields.length > 0 ? 6 : 0 }}>
             {subtitleFields.map(field =>
               row.cells[field] && (
-                <div key={field} style={{ color: '#64748b', fontSize: 12 }}>
+                <div key={field} style={{ color: '#64748b', fontSize: 11 }}>
                   {renderFieldValue(field, row.cells[field], row, true)}
                 </div>
               )
@@ -175,24 +188,14 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
         {bodyFields.length > 0 && (
           <div className={`grid ${
             bodyFieldFullWidth ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
-          }`} style={{ gap: 8, marginBottom: 8 }}>
+          }`} style={{ gap: 6 }}>
             {bodyFields.map(field =>
               row.cells[field] && (
-                <div key={field} style={{ fontSize: 12 }}>
+                <div key={field} style={{ fontSize: 11 }}>
                   {renderFieldValue(field, row.cells[field], row, true, false)}
                 </div>
               )
             )}
-          </div>
-        )}
-
-        {/* Badge Fields (rendered as badges) */}
-        {badgeFields.length > 0 && (
-          <div className="flex flex-wrap" style={{ gap: 6, marginBottom: 8 }}>
-            {badgeFields.map(field => {
-              const badge = row.cells[field] && renderFieldValue(field, row.cells[field], row, false, true);
-              return badge ? <div key={field}>{badge}</div> : null;
-            })}
           </div>
         )}
 
