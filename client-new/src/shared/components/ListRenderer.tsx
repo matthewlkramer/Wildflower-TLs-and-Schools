@@ -137,12 +137,23 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
           border: '1px solid #e2e8f0',
           borderRadius: 6,
           padding: 12,
-          fontSize: 12
+          fontSize: 12,
+          position: 'relative',
         }}
       >
+        {/* Row Actions - positioned in upper right */}
+        {data.spec.rowActions.length > 0 && (
+          <div style={{ position: 'absolute', top: 8, right: 8 }}>
+            <RowActionsMenu
+              actions={data.spec.rowActions}
+              onAction={(actionId) => onRowAction?.(row.id, actionId)}
+            />
+          </div>
+        )}
+
         {/* Title */}
         {titleField && row.cells[titleField] && (
-          <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: '#0f172a' }}>
+          <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: '#0f172a', paddingRight: 32 }}>
             {renderFieldValue(titleField, row.cells[titleField], row)}
           </div>
         )}
@@ -187,7 +198,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
 
         {/* Attachment Fields */}
         {attachmentFields.length > 0 && (
-          <div className="flex flex-wrap" style={{ gap: 6, marginBottom: 12 }}>
+          <div className="flex flex-wrap" style={{ gap: 6, marginBottom: 8 }}>
             {attachmentFields.map(field =>
               row.cells[field] && (
                 <div key={field}>
@@ -198,16 +209,9 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
           </div>
         )}
 
-        {/* Footer and Actions */}
-        <div
-          className="flex items-center justify-between"
-          style={{
-            paddingTop: 12,
-            borderTop: '1px solid #e2e8f0',
-            marginTop: 12
-          }}
-        >
-          <div className="flex flex-wrap" style={{ gap: 12, fontSize: 11, color: '#64748b' }}>
+        {/* Footer */}
+        {footerFields.length > 0 && (
+          <div className="flex flex-wrap" style={{ gap: 12, fontSize: 11, color: '#64748b', marginTop: 8 }}>
             {footerFields.map(field =>
               row.cells[field] && (
                 <span key={field}>
@@ -216,15 +220,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
               )
             )}
           </div>
-
-          {/* Row Actions */}
-          {data.spec.rowActions.length > 0 && (
-            <RowActionsMenu
-              actions={data.spec.rowActions}
-              onAction={(actionId) => onRowAction?.(row.id, actionId)}
-            />
-          )}
-        </div>
+        )}
       </div>
     );
   };

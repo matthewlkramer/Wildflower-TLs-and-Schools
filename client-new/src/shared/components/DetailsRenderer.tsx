@@ -4,6 +4,7 @@ import { TableRenderer } from './TableRenderer';
 import { ListRenderer } from './ListRenderer';
 import { CardRenderer } from './CardRenderer';
 import { BannerRenderer } from './BannerRenderer';
+import { MapRenderer } from './MapRenderer';
 import { tableService, type RenderableTableData } from '../services/table-service';
 import { cardService, type RenderableCard } from '../services/card-service';
 import type { ViewSpec, TabSpec, BlockSpec, CardSpec, TableSpec, ListSpec, MapSpec } from '../views/types';
@@ -149,9 +150,12 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTa
       )}
 
       {block.kind === 'map' && (
-        <div className="p-4 bg-gray-100 rounded">
-          Map rendering not yet implemented
-        </div>
+        <MapBlockRenderer
+          block={block as MapSpec}
+          entityId={entityId}
+          sourceTable={sourceTable}
+          fieldMetadata={fieldMetadata}
+        />
       )}
     </div>
   );
@@ -318,6 +322,23 @@ function generateListLayoutFromPreset(preset: any) {
 
   return layout;
 }
+
+// Map Block Renderer
+const MapBlockRenderer: React.FC<{
+  block: MapSpec;
+  entityId: string;
+  sourceTable: string;
+  fieldMetadata?: import('../types/detail-types').FieldMetadataMap;
+}> = ({ block, entityId, sourceTable, fieldMetadata }) => {
+  return (
+    <MapRenderer
+      map={block}
+      entityId={entityId}
+      sourceTable={sourceTable}
+      fieldMetadata={fieldMetadata}
+    />
+  );
+};
 
 // Card Block Renderer
 const CardBlockRenderer: React.FC<{

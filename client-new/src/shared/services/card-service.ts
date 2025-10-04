@@ -93,7 +93,7 @@ export class CardService {
   /**
    * Load entity data from database
    */
-  private async loadEntityData(table: string, entityId: string): Promise<Record<string, any>> {
+  async loadEntityData(table: string, entityId: string): Promise<Record<string, any>> {
     const { data, error } = await fromTable(table)
       .select('*')
       .eq('id', entityId)
@@ -109,7 +109,7 @@ export class CardService {
   /**
    * Resolve field specifications into renderable fields
    */
-  private async resolveFields(
+  async resolveFields(
     fieldNames: string[],
     entityData: Record<string, any>,
     editSource?: any,

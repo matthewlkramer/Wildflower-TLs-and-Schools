@@ -124,8 +124,7 @@ export const SCHOOL_VIEW_SPEC: ViewSpec = view(
     ),
     card(['legal_structure', 'ein', 'incorporation_date', 'current_fy_end', 'loan_report_name', 'nonprofit_path','nonprofit_status', 'group_exemption_status'], { title: 'Legal entity', editable: true }),
     card(['school_email', 'school_phone', 'website', 'facebook', 'instagram'], { title: 'Marketing & Comms', editable: true }),  
-    card(['total_grants_issued', 'total_loans_issued'], { title: 'Grants and Loans' }),
-    card(['risk_factors', 'watchlist'], { title: 'Warnings', editable: true }),
+    card(['risk_factors', 'watchlist'], { title: 'Warnings', editable: false }),
     card(['logo', 'logo_square', 'logo_flower_only', 'logo_rectangle'], { title: 'Logo(s)', editable: true }),
   ),
   tab(

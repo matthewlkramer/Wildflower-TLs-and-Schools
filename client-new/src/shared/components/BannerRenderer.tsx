@@ -28,6 +28,9 @@ export const BannerRenderer: React.FC<BannerRendererProps> = ({
   const loadBannerData = async () => {
     try {
       setLoading(true);
+      console.log('[BannerRenderer] Loading banner data for entityId:', entityId, 'sourceTable:', sourceTable);
+      console.log('[BannerRenderer] Banner spec:', banner);
+      console.log('[BannerRenderer] Field metadata:', fieldMetadata);
 
       // Build list of all fields to load
       const allFields = [
@@ -35,17 +38,20 @@ export const BannerRenderer: React.FC<BannerRendererProps> = ({
         banner.title,
         ...banner.fields,
       ];
+      console.log('[BannerRenderer] All fields to load:', allFields);
 
       // Load entity data
-      const entityData = await (cardService as any).loadEntityData(sourceTable, entityId);
+      const entityData = await cardService.loadEntityData(sourceTable, entityId);
+      console.log('[BannerRenderer] Entity data loaded:', entityData);
 
       // Resolve fields
-      const resolvedFields = await (cardService as any).resolveFields(
+      const resolvedFields = await cardService.resolveFields(
         allFields,
         entityData,
         { table: sourceTable },
         fieldMetadata
       );
+      console.log('[BannerRenderer] Resolved fields:', resolvedFields);
 
       setFields(resolvedFields);
       setLoading(false);
