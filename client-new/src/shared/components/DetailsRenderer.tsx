@@ -25,6 +25,8 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
   const tabs = view.tabs;
   const sourceTable = getViewSourceTable(view.id);
 
+  console.log('[DetailsRenderer] view.id=', view.id, 'fieldMetadata=', view.fieldMetadata);
+
   return (
     <div className={`details-renderer ${className}`}>
       {/* Banner (if specified) */}
