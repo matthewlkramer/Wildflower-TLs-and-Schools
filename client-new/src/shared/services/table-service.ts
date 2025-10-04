@@ -43,6 +43,7 @@ export class TableService {
     presetId: string,
     entityId?: string,
     module?: string,
+    activeFilter?: boolean,
     appliedFilters?: FilterExpr[],
     toggleStates?: Record<string, boolean>
   ): Promise<RenderableTableData> {
@@ -54,7 +55,7 @@ export class TableService {
       await this.preloadLookupOptions(spec.columns);
 
       // Load table rows (pass module for FK determination)
-      const rows = await this.loadRows(spec, entityId, module, appliedFilters, toggleStates);
+      const rows = await this.loadRows(spec, entityId, module, activeFilter, appliedFilters, toggleStates);
 
       // Transform to renderable format
       const renderableRows = rows.map(row => this.transformRow(row, spec.columns));
@@ -152,6 +153,7 @@ export class TableService {
     spec: ResolvedTableSpec,
     entityId?: string,
     module?: string,
+    activeFilter?: boolean,
     appliedFilters?: FilterExpr[],
     toggleStates?: Record<string, boolean>
   ): Promise<any[]> {
@@ -162,6 +164,11 @@ export class TableService {
       // Use module to determine FK column
       const fkColumn = this.inferForeignKeyColumn(spec.readSource, module);
       query = query.eq(fkColumn, entityId);
+    }
+
+    // Apply active filter if requested
+    if (activeFilter) {
+      query = query.eq('is_active', true);
     }
 
     // Apply base filters from spec

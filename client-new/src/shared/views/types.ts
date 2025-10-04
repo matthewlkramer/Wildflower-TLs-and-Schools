@@ -14,12 +14,14 @@ export type TableSpec = {
   module: string;
   preset: string;
   width?: 'half' | 'full';
+  activeFilter?: boolean; // If true, only show records where is_active = true (default: false)
 };
 export type ListSpec = {
   kind: 'list';
   module: string;
   preset: string;
   width?: 'half' | 'full';
+  activeFilter?: boolean; // If true, only show records where is_active = true (default: false)
 };
 export type MapSpec = { kind: 'map'; title?: string; width?: 'half' | 'full'; fields: [string, string, string] | string[] };
 

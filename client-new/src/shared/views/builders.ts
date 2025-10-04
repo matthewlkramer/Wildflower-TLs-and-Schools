@@ -42,26 +42,30 @@ export function card(fields: string[], opts?: { title?: string; width?: 'half' |
 export function table(
   module: string,
   preset: string,
-  width?: 'half'
+  width?: 'half',
+  activeFilter?: boolean
 ): TableSpec {
   return {
     kind: 'table',
     preset,
     module,
     width: width || 'full',
+    activeFilter: activeFilter ?? false,
   } as TableSpec;
 }
 
 export function list(
   module: string,
   preset: string,
-  width?: 'half'
+  width?: 'half',
+  activeFilter?: boolean
 ): ListSpec {
   return {
     kind: 'list',
     preset,
     module,
     width: width || 'full',
+    activeFilter: activeFilter ?? false,
   } as ListSpec;
 }
 

@@ -176,7 +176,8 @@ const TableBlockRenderer: React.FC<{
       const data = await tableService.loadTableData(
         block.preset,
         entityId,
-        block.module
+        block.module,
+        block.activeFilter
       );
       setTableData(data);
     } catch (error) {
@@ -238,7 +239,8 @@ const ListBlockRenderer: React.FC<{
       const data = await tableService.loadTableData(
         block.preset,
         entityId,
-        block.module
+        block.module,
+        block.activeFilter
       );
       setTableData(data);
     } catch (error) {
