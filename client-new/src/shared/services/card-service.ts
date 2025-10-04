@@ -407,6 +407,21 @@ export class CardService {
   ): string {
     if (value === null || value === undefined) return '';
 
+    // Handle array values
+    if (Array.isArray(value)) {
+      if (options && options.length > 0) {
+        // Map array values to their labels
+        const labels = value
+          .map(v => {
+            const option = options.find(opt => opt.value === String(v));
+            return option ? option.label : String(v);
+          })
+          .filter(Boolean);
+        return labels.join(', ');
+      }
+      return value.join(', ');
+    }
+
     // Handle lookup values
     if (options && options.length > 0) {
       const option = options.find(opt => opt.value === String(value));

@@ -301,12 +301,18 @@ export class TableService {
     // Format display value
     displayValue = this.formatDisplayValue(rawValue, column, options);
 
+    // Determine cell type - if it's an array field, use 'array' type
+    let cellType: CellValue['type'] = column.type || 'string';
+    if (column.array && Array.isArray(rawValue)) {
+      cellType = 'array';
+    }
+
     return {
       raw: rawValue,
       display: displayValue,
       editable: column.editable,
       options,
-      type: column.type || 'string',
+      type: cellType,
       multiline: column.multiline,
       linkToField: column.linkToField,
       attachment: column.attachment,
@@ -326,6 +332,17 @@ export class TableService {
     // Handle arrays
     if (column.array && Array.isArray(value)) {
       const maxEntries = column.maxArrayEntries || 5;
+
+      // Map array values to labels if options are available
+      if (options && options.length > 0) {
+        const displayItems = value.slice(0, maxEntries).map(item => {
+          const option = options.find(opt => opt.value === String(item));
+          return option ? option.label : String(item);
+        }).filter(Boolean);
+        const result = displayItems.join(', ');
+        return value.length > maxEntries ? `${result}... (+${value.length - maxEntries} more)` : result;
+      }
+
       const displayItems = value.slice(0, maxEntries).map(item => String(item)).filter(Boolean);
       const result = displayItems.join(', ');
       return value.length > maxEntries ? `${result}... (+${value.length - maxEntries} more)` : result;

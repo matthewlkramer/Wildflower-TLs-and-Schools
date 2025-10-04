@@ -126,6 +126,39 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
       }
     }
 
+    // Handle array fields with options as multiple badges
+    if (cell.type === 'array' && Array.isArray(cell.raw) && cell.options && cell.options.length > 0) {
+      const values = cell.raw;
+      if (values.length === 0) return null;
+
+      return (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          {values.map((value, index) => {
+            const option = cell.options!.find(opt => opt.value === String(value));
+            const label = option ? option.label : String(value);
+
+            return (
+              <span
+                key={index}
+                style={{
+                  display: 'inline-block',
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                  fontSize: 11,
+                  fontWeight: 500,
+                  backgroundColor: '#e0f2fe',
+                  color: '#075985',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {label}
+              </span>
+            );
+          })}
+        </div>
+      );
+    }
+
     // Handle link to field (e.g., doc_type links to pdf field)
     if (cell.linkToField && row.cells[cell.linkToField]) {
       const linkUrl = row.cells[cell.linkToField].raw;
