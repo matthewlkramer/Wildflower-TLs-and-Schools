@@ -257,6 +257,9 @@ export class CardService {
 
     // Handle attachment fields - convert storage path to public URL
     let processedRawValue = rawValue;
+    if (isAttachment) {
+      console.log('[card-service] Field', fieldName, 'is attachment, rawValue:', rawValue);
+    }
     if (isAttachment && rawValue) {
       // Get bucket from manual metadata, or use field-name-based mapping
       if (!bucket) {

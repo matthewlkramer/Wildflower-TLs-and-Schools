@@ -138,6 +138,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
     } = layout || {};
 
     console.log('[ListRenderer] Rendering card, row.cells keys:', Object.keys(row.cells));
+    console.log('[ListRenderer] Title field cell:', titleField, row.cells[titleField!]);
 
     return (
       <div
