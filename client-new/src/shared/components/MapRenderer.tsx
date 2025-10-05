@@ -121,8 +121,8 @@ export const MapRenderer: React.FC<MapRendererProps> = ({
   // Get Google Maps API key from env
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-  // Generate Google Maps link
-  const mapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  // Use address in the query if available, otherwise use coordinates
+  const mapQuery = address || `${lat},${lng}`;
 
   return (
     <div
@@ -143,36 +143,17 @@ export const MapRenderer: React.FC<MapRendererProps> = ({
 
       {/* Map content */}
       <div style={{ padding: 16 }}>
-        {/* Google Maps embed with API key */}
+        {/* Google Maps embed with address in the query */}
         <div style={{ width: '100%', height: 300, borderRadius: 6, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
           <iframe
             width="100%"
             height="100%"
             frameBorder="0"
             style={{ border: 0 }}
-            src={`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${lat},${lng}&zoom=14`}
+            src={`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(mapQuery)}&zoom=14`}
             allowFullScreen
           />
         </div>
-
-        {/* Address and link */}
-        {address && (
-          <div style={{ marginTop: 12, fontSize: 12, color: '#64748b' }}>
-            <div style={{ marginBottom: 8 }}>{address}</div>
-            <a
-              href={mapsLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                color: '#2563eb',
-                textDecoration: 'none',
-                fontSize: 12,
-              }}
-            >
-              Open in Google Maps →
-            </a>
-          </div>
-        )}
       </div>
     </div>
   );
