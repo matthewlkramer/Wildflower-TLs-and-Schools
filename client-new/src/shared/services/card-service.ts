@@ -261,6 +261,12 @@ export class CardService {
       console.log('[card-service] Field', fieldName, 'is attachment, rawValue:', rawValue);
     }
     if (isAttachment && rawValue) {
+      // If value is already a URL, use it as-is
+      const looksLikeUrl = typeof rawValue === 'string' && /^(https?:)?\/\//i.test(rawValue);
+      if (looksLikeUrl) {
+        processedRawValue = rawValue;
+        displayValue = String(rawValue);
+      } else {
       // Get bucket from manual metadata, or use field-name-based mapping
       if (!bucket) {
         bucket = getStorageBucket(fieldName, actualTable);
@@ -308,6 +314,7 @@ export class CardService {
       displayValue = data.publicUrl;
 
       console.log('[card-service] Generated public URL:', data.publicUrl);
+      }
     }
 
     return {
