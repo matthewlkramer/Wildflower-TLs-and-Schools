@@ -137,6 +137,8 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
       hideLabelsForFields = [],
     } = layout || {};
 
+    console.log('[ListRenderer] Rendering card, row.cells keys:', Object.keys(row.cells));
+
     return (
       <div
         style={{
