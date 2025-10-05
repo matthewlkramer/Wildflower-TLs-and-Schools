@@ -265,18 +265,32 @@ export class CardService {
       console.log('[card-service] Attachment field:', fieldName, 'rawValue:', rawValue, 'bucket:', bucket);
 
       // Query storage.objects to get the actual filename with extension
+      // Try storage.objects first (in storage schema), fall back to storage_object_id_path view
       let filePath = rawValue;
-      const { data: storageObject, error: storageError } = await supabase
-        .from('storage.objects')
+      let { data: storageObject, error: storageError } = await supabase
+        .schema('storage')
+        .from('objects')
         .select('name')
         .eq('id', rawValue)
         .maybeSingle();
 
+      // If storage.objects fails (permissions), try the public view
+      if (storageError || !storageObject) {
+        console.log('[card-service] Trying storage_object_id_path view as fallback');
+        const fallback = await supabase
+          .from('storage_object_id_path')
+          .select('name')
+          .eq('id', rawValue)
+          .maybeSingle();
+        storageObject = fallback.data;
+        storageError = fallback.error;
+      }
+
       if (storageObject && storageObject.name) {
         filePath = storageObject.name;
-        console.log('[card-service] Found filename from storage.objects:', filePath);
+        console.log('[card-service] Found filename:', filePath);
       } else {
-        console.warn('[card-service] Could not find file in storage.objects for UUID:', rawValue, 'Error:', storageError);
+        console.warn('[card-service] Could not find file for UUID:', rawValue, 'Error:', storageError);
       }
 
       // Convert storage path to public URL
