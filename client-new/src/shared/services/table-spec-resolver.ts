@@ -131,7 +131,7 @@ function resolveColumn(columnSpec: string | TableColumnMeta, readSource?: string
     width: (meta as any).width,
     attachment: (meta as any).attachment,
     maxArrayEntries: (meta as any).maxArrayEntries,
-    linkToField: (meta as any).linkToField,
+    linkToField: (meta as any).linkToField || (meta as any).linkToAttachment,
     update: (meta as any).update || 'yes',
     writeTo: (meta as any).writeTo,
     array: generatedMeta?.isArray,

@@ -312,31 +312,38 @@ export class TableService {
       const bucket = getStorageBucket(column.field, tableName);
       console.log('[table-service] Using bucket:', bucket);
 
-      // Query storage.objects to get the actual filename
-      let filePath = rawValue;
-      let { data: storageObject, error: storageError } = await supabase
-        .schema('storage')
-        .from('objects')
-        .select('name')
-        .eq('id', rawValue)
-        .maybeSingle();
-
-      if (storageError || !storageObject) {
-        console.log('[table-service] Trying fallback view');
-        const fallback = await supabase
-          .from('storage_object_id_path')
+      // Resolve storage path from UUID with robust fallbacks
+      let filePath: string = String(rawValue);
+      try {
+        let { data: storageObject } = await supabase
+          .schema('storage')
+          .from('objects')
           .select('name')
           .eq('id', rawValue)
           .maybeSingle();
-        storageObject = fallback.data;
+
+        if (!storageObject) {
+          console.log('[table-service] Trying fallback view');
+          const fallback = await supabase
+            .from('storage_object_id_path')
+            .select('name, path, full_path')
+            .eq('id', rawValue)
+            .maybeSingle();
+          const v = fallback.data as any;
+          if (v) {
+            filePath = v.name || v.path || v.full_path || filePath;
+          }
+        } else if (storageObject?.name) {
+          filePath = storageObject.name;
+        }
+      } catch (e) {
+        console.warn('[table-service] Error resolving storage path:', e);
       }
 
-      if (storageObject && storageObject.name) {
-        filePath = storageObject.name;
-        console.log('[table-service] Found filename:', filePath);
-      }
+      // If the resolved path includes the bucket prefix, strip it for getPublicUrl
+      const relativePath = filePath.startsWith(bucket + '/') ? filePath.slice(bucket.length + 1) : filePath;
 
-      const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
+      const { data } = supabase.storage.from(bucket).getPublicUrl(relativePath);
       processedRawValue = data.publicUrl;
       console.log('[table-service] Generated URL:', processedRawValue);
     }
