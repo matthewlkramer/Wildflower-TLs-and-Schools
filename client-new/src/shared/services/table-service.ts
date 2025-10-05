@@ -302,10 +302,12 @@ export class TableService {
     // Process attachment fields - convert UUID to storage URL
     const isAttachment = column.type === 'attachment' || (column as any).attachment;
     if (isAttachment && rawValue) {
+      console.log('[table-service] Processing attachment field:', column.field, 'table:', tableName, 'rawValue:', rawValue);
       const { getStorageBucket } = await import('../config/storage-buckets');
       const { supabase } = await import('@/core/supabase/client');
 
       const bucket = getStorageBucket(column.field, tableName);
+      console.log('[table-service] Using bucket:', bucket);
 
       // Query storage.objects to get the actual filename
       let filePath = rawValue;
@@ -317,6 +319,7 @@ export class TableService {
         .maybeSingle();
 
       if (storageError || !storageObject) {
+        console.log('[table-service] Trying fallback view');
         const fallback = await supabase
           .from('storage_object_id_path')
           .select('name')
@@ -327,10 +330,12 @@ export class TableService {
 
       if (storageObject && storageObject.name) {
         filePath = storageObject.name;
+        console.log('[table-service] Found filename:', filePath);
       }
 
       const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
       processedRawValue = data.publicUrl;
+      console.log('[table-service] Generated URL:', processedRawValue);
     }
 
     // Format display value
