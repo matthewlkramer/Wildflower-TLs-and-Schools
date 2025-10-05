@@ -261,12 +261,6 @@ export class CardService {
       console.log('[card-service] Field', fieldName, 'is attachment, rawValue:', rawValue);
     }
     if (isAttachment && rawValue) {
-      // If value is already a URL, use it as-is
-      const looksLikeUrl = typeof rawValue === 'string' && /^(https?:)?\/\//i.test(rawValue);
-      if (looksLikeUrl) {
-        processedRawValue = rawValue;
-        displayValue = String(rawValue);
-      } else {
       // Get bucket from manual metadata, or use field-name-based mapping
       if (!bucket) {
         bucket = getStorageBucket(fieldName, actualTable);
@@ -274,47 +268,41 @@ export class CardService {
 
       console.log('[card-service] Attachment field:', fieldName, 'table:', actualTable, 'rawValue:', rawValue, 'bucket:', bucket);
 
-      // Resolve storage path from UUID. Try storage.objects first, then a public fallback view,
-      // and support multiple column names (name, path, full_path). If nothing resolves, fall back to rawValue.
-      let filePath: string = String(rawValue);
-      try {
-        let { data: storageObject } = await supabase
-          .schema('storage')
-          .from('objects')
+      // Query storage.objects to get the actual filename with extension
+      // Try storage.objects first (in storage schema), fall back to storage_object_id_path view
+      let filePath = rawValue;
+      let { data: storageObject, error: storageError } = await supabase
+        .schema('storage')
+        .from('objects')
+        .select('name')
+        .eq('id', rawValue)
+        .maybeSingle();
+
+      // If storage.objects fails (permissions), try the public view
+      if (storageError || !storageObject) {
+        console.log('[card-service] Trying storage_object_id_path view as fallback');
+        const fallback = await supabase
+          .from('storage_object_id_path')
           .select('name')
           .eq('id', rawValue)
           .maybeSingle();
-
-        if (!storageObject) {
-          console.log('[card-service] Trying storage_object_id_path view as fallback');
-          const fallback = await supabase
-            .from('storage_object_id_path')
-            // Try to select commonly used columns
-            .select('name, path, full_path')
-            .eq('id', rawValue)
-            .maybeSingle();
-
-          const v = fallback.data as any;
-          if (v) {
-            filePath = v.name || v.path || v.full_path || filePath;
-          }
-        } else if (storageObject?.name) {
-          filePath = storageObject.name;
-        }
-      } catch (e) {
-        console.warn('[card-service] Error resolving storage path for', fieldName, e);
+        storageObject = fallback.data;
+        storageError = fallback.error;
       }
 
-      // If the resolved path includes the bucket prefix, strip it for getPublicUrl
-      const relativePath = filePath.startsWith(bucket + '/') ? filePath.slice(bucket.length + 1) : filePath;
+      if (storageObject && storageObject.name) {
+        filePath = storageObject.name;
+        console.log('[card-service] Found filename:', filePath);
+      } else {
+        console.warn('[card-service] Could not find file for UUID:', rawValue, 'Error:', storageError);
+      }
 
       // Convert storage path to public URL
-      const { data } = supabase.storage.from(bucket).getPublicUrl(relativePath);
+      const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
       processedRawValue = data.publicUrl;
       displayValue = data.publicUrl;
 
       console.log('[card-service] Generated public URL:', data.publicUrl);
-      }
     }
 
     return {

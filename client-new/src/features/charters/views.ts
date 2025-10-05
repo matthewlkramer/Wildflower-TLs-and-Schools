@@ -21,8 +21,6 @@ export const CHARTER_KANBAN_CONSTANTS_TABLE = 'zref_charter_statuses';
 // Gmail list options imported from shared presets
 
 export const CHARTER_FIELD_METADATA: FieldMetadataMap = {
-  // Generic attachment ID used by docs tables (governance_docs, nine_nineties)
-  object_id: { type: 'attachment' },
   application: { type: 'attachment' },
   auth_decision: { label: 'Authorization Decision'},
   authorizer: { lookup: { table: 'charter_authorizers', valueColumn: 'authorizer_name', labelColumn: 'authorizer_name' } },
@@ -103,5 +101,6 @@ export const CHARTER_VIEW_SPEC: ViewSpec = view(
   tab('action_notes', 'Actions & Notes', list('charters', 'actionSteps', { width: 'half' }), list('charters', 'notes', { width: 'half' })),
   tab('google_sync', 'gmail/gCal', list('charters', 'gmails', { width: 'half' }), list('charters', 'gCal', { width: 'half' }))
 );
+
 
 

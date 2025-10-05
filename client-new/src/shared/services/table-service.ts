@@ -272,7 +272,7 @@ export class TableService {
 
     for (const column of columns) {
       const rawValue = rawRow[column.field];
-      cells[column.field] = await this.transformCellValue(rawRow, rawValue, column, tableName, fieldMetadata);
+      cells[column.field] = await this.transformCellValue(rawValue, column, tableName, fieldMetadata);
     }
 
     return {
@@ -285,7 +285,7 @@ export class TableService {
   /**
    * Transform a single cell value for display
    */
-  private async transformCellValue(rawRow: any, rawValue: any, column: ResolvedTableColumn, tableName: string, fieldMetadata?: import('../types/detail-types').FieldMetadataMap): Promise<CellValue> {
+  private async transformCellValue(rawValue: any, column: ResolvedTableColumn, tableName: string, fieldMetadata?: import('../types/detail-types').FieldMetadataMap): Promise<CellValue> {
     let displayValue = '';
     let options: SelectOption[] | undefined;
     let processedRawValue = rawValue;
@@ -305,65 +305,40 @@ export class TableService {
     const manualMetadata = fieldMetadata?.[column.field];
     const isAttachment = column.type === 'attachment' || (column as any).attachment || (manualMetadata as any)?.type === 'attachment';
     if (isAttachment && rawValue) {
-      // If it's already a URL, use it directly
-      const looksLikeUrl = typeof rawValue === 'string' && /^(https?:)?\/\//i.test(rawValue);
-      if (looksLikeUrl) {
-        processedRawValue = rawValue;
-      } else {
-        console.log('[table-service] Processing attachment field:', column.field, 'table:', tableName, 'rawValue:', rawValue);
-        const { getStorageBucket } = await import('../config/storage-buckets');
-        const { supabase } = await import('@/core/supabase/client');
+      console.log('[table-service] Processing attachment field:', column.field, 'table:', tableName, 'rawValue:', rawValue);
+      const { getStorageBucket } = await import('../config/storage-buckets');
+      const { supabase } = await import('@/core/supabase/client');
 
-        const bucket = getStorageBucket(column.field, tableName);
-        console.log('[table-service] Using bucket:', bucket);
+      const bucket = getStorageBucket(column.field, tableName);
+      console.log('[table-service] Using bucket:', bucket);
 
-        // Resolve storage path from UUID with robust fallbacks
-        let filePath: string = String(rawValue);
-        try {
-          let { data: storageObject } = await supabase
-            .schema('storage')
-            .from('objects')
-            .select('name')
-            .eq('id', rawValue)
-            .maybeSingle();
+      // Query storage.objects to get the actual filename
+      let filePath = rawValue;
+      let { data: storageObject, error: storageError } = await supabase
+        .schema('storage')
+        .from('objects')
+        .select('name')
+        .eq('id', rawValue)
+        .maybeSingle();
 
-          if (!storageObject) {
-            console.log('[table-service] Trying fallback view');
-            const fallback = await supabase
-              .from('storage_object_id_path')
-              .select('name, path, full_path')
-              .eq('id', rawValue)
-              .maybeSingle();
-            const v = fallback.data as any;
-            if (v) {
-              filePath = v.name || v.path || v.full_path || filePath;
-            }
-          } else if (storageObject?.name) {
-            filePath = storageObject.name;
-          }
-        } catch (e) {
-          console.warn('[table-service] Error resolving storage path:', e);
-        }
-
-        // If the resolved path includes the bucket prefix, strip it for getPublicUrl
-        const relativePath = filePath.startsWith(bucket + '/') ? filePath.slice(bucket.length + 1) : filePath;
-
-        const { data } = supabase.storage.from(bucket).getPublicUrl(relativePath);
-        processedRawValue = data.publicUrl;
-        console.log('[table-service] Generated URL:', processedRawValue);
+      if (storageError || !storageObject) {
+        console.log('[table-service] Trying fallback view');
+        const fallback = await supabase
+          .from('storage_object_id_path')
+          .select('name')
+          .eq('id', rawValue)
+          .maybeSingle();
+        storageObject = fallback.data;
       }
 
-      // Fallback: if resolution failed and we still have a UUID-like string, try sibling URL columns
-      const looksLikeUuid = typeof processedRawValue === 'string' && /^[0-9a-fA-F-]{20,}$/.test(processedRawValue);
-      if (looksLikeUuid) {
-        const pdf = rawRow?.pdf;
-        const doc = rawRow?.doc;
-        if (typeof pdf === 'string' && /^(https?:)?\/\//i.test(pdf)) {
-          processedRawValue = pdf;
-        } else if (typeof doc === 'string' && /^(https?:)?\/\//i.test(doc)) {
-          processedRawValue = doc;
-        }
+      if (storageObject && storageObject.name) {
+        filePath = storageObject.name;
+        console.log('[table-service] Found filename:', filePath);
       }
+
+      const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
+      processedRawValue = data.publicUrl;
+      console.log('[table-service] Generated URL:', processedRawValue);
     }
 
     // Format display value
