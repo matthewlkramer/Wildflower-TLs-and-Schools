@@ -117,10 +117,45 @@ export class CardService {
   ): Promise<CardField[]> {
     const fields: CardField[] = [];
 
+    // Check if any fields need data from other tables (via writeTable property)
+    const fieldsNeedingExtraData = fieldNames.filter(fieldName => {
+      const metadata = viewFieldMetadata?.[fieldName];
+      return (metadata as any)?.writeTable;
+    });
+
+    // Load additional table data if needed
+    const extraTableData: Record<string, Record<string, any>> = {};
+    for (const fieldName of fieldsNeedingExtraData) {
+      const metadata = viewFieldMetadata?.[fieldName];
+      const writeTable = (metadata as any)?.writeTable;
+      if (writeTable && !extraTableData[writeTable]) {
+        try {
+          // Load data from the write table using the same entity ID
+          const entityId = entityData.id;
+          const { data } = await fromTable(writeTable)
+            .select('*')
+            .eq('id', entityId)
+            .maybeSingle();
+          extraTableData[writeTable] = data || {};
+          console.log('[card-service] Loaded extra data from', writeTable, ':', data);
+        } catch (error) {
+          console.error(`Failed to load data from ${writeTable}:`, error);
+          extraTableData[writeTable] = {};
+        }
+      }
+    }
+
     for (const fieldName of fieldNames) {
       try {
         const manualMetadata = viewFieldMetadata?.[fieldName];
-        const field = await this.resolveField(fieldName, entityData, editSource, manualMetadata);
+        const writeTable = (manualMetadata as any)?.writeTable;
+
+        // If this field has a writeTable, use data from that table
+        const fieldEntityData = writeTable && extraTableData[writeTable]
+          ? extraTableData[writeTable]
+          : entityData;
+
+        const field = await this.resolveField(fieldName, fieldEntityData, editSource, manualMetadata);
         if (field) {
           fields.push(field);
         }
