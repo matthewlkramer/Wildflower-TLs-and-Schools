@@ -58,7 +58,7 @@ export class TableService {
       const rows = await this.loadRows(spec, entityId, module, activeFilter, appliedFilters, toggleStates);
 
       // Transform to renderable format
-      const renderableRows = rows.map(row => this.transformRow(row, spec.columns));
+      const renderableRows = await Promise.all(rows.map(row => this.transformRow(row, spec.columns, spec.readSource)));
 
       return {
         spec,
@@ -266,12 +266,12 @@ export class TableService {
   /**
    * Transform a raw row into a renderable row
    */
-  private transformRow(rawRow: Record<string, any>, columns: ResolvedTableColumn[]): RenderableRow {
+  private async transformRow(rawRow: Record<string, any>, columns: ResolvedTableColumn[], tableName: string): Promise<RenderableRow> {
     const cells: Record<string, CellValue> = {};
 
     for (const column of columns) {
       const rawValue = rawRow[column.field];
-      cells[column.field] = this.transformCellValue(rawValue, column);
+      cells[column.field] = await this.transformCellValue(rawValue, column, tableName);
     }
 
     return {
@@ -284,9 +284,10 @@ export class TableService {
   /**
    * Transform a single cell value for display
    */
-  private transformCellValue(rawValue: any, column: ResolvedTableColumn): CellValue {
+  private async transformCellValue(rawValue: any, column: ResolvedTableColumn, tableName: string): Promise<CellValue> {
     let displayValue = '';
     let options: SelectOption[] | undefined;
+    let processedRawValue = rawValue;
 
     // Get options for enum/lookup fields
     if (column.type === 'enum') {
@@ -296,6 +297,40 @@ export class TableService {
       } else if (column.options) {
         options = column.options.map(opt => ({ value: opt, label: opt }));
       }
+    }
+
+    // Process attachment fields - convert UUID to storage URL
+    const isAttachment = column.type === 'attachment' || (column as any).attachment;
+    if (isAttachment && rawValue) {
+      const { getStorageBucket } = await import('../config/storage-buckets');
+      const { supabase } = await import('@/core/supabase/client');
+
+      const bucket = getStorageBucket(column.field, tableName);
+
+      // Query storage.objects to get the actual filename
+      let filePath = rawValue;
+      let { data: storageObject, error: storageError } = await supabase
+        .schema('storage')
+        .from('objects')
+        .select('name')
+        .eq('id', rawValue)
+        .maybeSingle();
+
+      if (storageError || !storageObject) {
+        const fallback = await supabase
+          .from('storage_object_id_path')
+          .select('name')
+          .eq('id', rawValue)
+          .maybeSingle();
+        storageObject = fallback.data;
+      }
+
+      if (storageObject && storageObject.name) {
+        filePath = storageObject.name;
+      }
+
+      const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
+      processedRawValue = data.publicUrl;
     }
 
     // Format display value
@@ -308,7 +343,7 @@ export class TableService {
     }
 
     return {
-      raw: rawValue,
+      raw: processedRawValue,
       display: displayValue,
       editable: column.editable,
       options,
