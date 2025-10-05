@@ -314,7 +314,7 @@ export class TableService {
       options,
       type: cellType,
       multiline: column.multiline,
-      linkToField: column.linkToField,
+      linkToField: column.linkToField || (column as any).linkToAttachment,
       attachment: column.attachment,
     };
   }
