@@ -259,10 +259,10 @@ export class CardService {
     if (isAttachment && rawValue) {
       // Get bucket from manual metadata, or use field-name-based mapping
       if (!bucket) {
-        bucket = getStorageBucket(fieldName);
+        bucket = getStorageBucket(fieldName, actualTable);
       }
 
-      console.log('[card-service] Attachment field:', fieldName, 'rawValue:', rawValue, 'bucket:', bucket);
+      console.log('[card-service] Attachment field:', fieldName, 'table:', actualTable, 'rawValue:', rawValue, 'bucket:', bucket);
 
       // Query storage.objects to get the actual filename with extension
       // Try storage.objects first (in storage schema), fall back to storage_object_id_path view

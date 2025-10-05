@@ -31,9 +31,12 @@ export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {
   logo_square: { label: 'Logo (Square)', type: 'attachment' },
   logo_flower_only: { label: 'Logo (Flower Only)', type: 'attachment' },
   logo_rectangle: { label: 'Logo (Rectangle)', type: 'attachment' },
+  membership_agreement: { type: 'attachment' },
+  object_id: { type: 'attachment' }, // Used by governance_docs, nine_nineties, etc.
   physical_lat: { label: 'Latitude', editable: false },
   physical_long: { label: 'Longitude', editable: false },
   planning_album: { writeTable: 'school_ssj_data', type: 'attachment' },
+  self_reflection_doc: { type: 'attachment' },
   stage_status: { editable: false },
   total_grants_issued: { editable: false },
   total_loans_issued: { editable: false },
