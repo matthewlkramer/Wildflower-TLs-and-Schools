@@ -138,6 +138,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTa
         <TableBlockRenderer
           block={block as TableSpec}
           entityId={entityId}
+          fieldMetadata={fieldMetadata}
         />
       )}
 
@@ -145,6 +146,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTa
         <ListBlockRenderer
           block={block as ListSpec}
           entityId={entityId}
+          fieldMetadata={fieldMetadata}
         />
       )}
 
@@ -173,7 +175,8 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTa
 const TableBlockRenderer: React.FC<{
   block: TableSpec;
   entityId: string;
-}> = ({ block, entityId }) => {
+  fieldMetadata?: import('../types/detail-types').FieldMetadataMap;
+}> = ({ block, entityId, fieldMetadata }) => {
   const [tableData, setTableData] = useState<RenderableTableData | null>(null);
 
   useEffect(() => {
@@ -189,7 +192,10 @@ const TableBlockRenderer: React.FC<{
         block.preset,
         entityId,
         block.module,
-        block.activeFilter
+        block.activeFilter,
+        undefined,
+        undefined,
+        fieldMetadata
       );
       setTableData(data);
     } catch (error) {
@@ -236,7 +242,8 @@ const TableBlockRenderer: React.FC<{
 const ListBlockRenderer: React.FC<{
   block: ListSpec;
   entityId: string;
-}> = ({ block, entityId }) => {
+  fieldMetadata?: import('../types/detail-types').FieldMetadataMap;
+}> = ({ block, entityId, fieldMetadata }) => {
   const [tableData, setTableData] = useState<RenderableTableData | null>(null);
 
   useEffect(() => {
@@ -252,7 +259,10 @@ const ListBlockRenderer: React.FC<{
         block.preset,
         entityId,
         block.module,
-        block.activeFilter
+        block.activeFilter,
+        undefined,
+        undefined,
+        fieldMetadata
       );
       setTableData(data);
     } catch (error) {

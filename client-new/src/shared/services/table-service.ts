@@ -45,7 +45,8 @@ export class TableService {
     module?: string,
     activeFilter?: boolean,
     appliedFilters?: FilterExpr[],
-    toggleStates?: Record<string, boolean>
+    toggleStates?: Record<string, boolean>,
+    fieldMetadata?: import('../types/detail-types').FieldMetadataMap
   ): Promise<RenderableTableData> {
     try {
       // Get resolved spec
@@ -58,7 +59,7 @@ export class TableService {
       const rows = await this.loadRows(spec, entityId, module, activeFilter, appliedFilters, toggleStates);
 
       // Transform to renderable format
-      const renderableRows = await Promise.all(rows.map(row => this.transformRow(row, spec.columns, spec.readSource)));
+      const renderableRows = await Promise.all(rows.map(row => this.transformRow(row, spec.columns, spec.readSource, fieldMetadata)));
 
       return {
         spec,
@@ -266,12 +267,12 @@ export class TableService {
   /**
    * Transform a raw row into a renderable row
    */
-  private async transformRow(rawRow: Record<string, any>, columns: ResolvedTableColumn[], tableName: string): Promise<RenderableRow> {
+  private async transformRow(rawRow: Record<string, any>, columns: ResolvedTableColumn[], tableName: string, fieldMetadata?: import('../types/detail-types').FieldMetadataMap): Promise<RenderableRow> {
     const cells: Record<string, CellValue> = {};
 
     for (const column of columns) {
       const rawValue = rawRow[column.field];
-      cells[column.field] = await this.transformCellValue(rawValue, column, tableName);
+      cells[column.field] = await this.transformCellValue(rawValue, column, tableName, fieldMetadata);
     }
 
     return {
@@ -284,7 +285,7 @@ export class TableService {
   /**
    * Transform a single cell value for display
    */
-  private async transformCellValue(rawValue: any, column: ResolvedTableColumn, tableName: string): Promise<CellValue> {
+  private async transformCellValue(rawValue: any, column: ResolvedTableColumn, tableName: string, fieldMetadata?: import('../types/detail-types').FieldMetadataMap): Promise<CellValue> {
     let displayValue = '';
     let options: SelectOption[] | undefined;
     let processedRawValue = rawValue;
@@ -300,7 +301,9 @@ export class TableService {
     }
 
     // Process attachment fields - convert UUID to storage URL
-    const isAttachment = column.type === 'attachment' || (column as any).attachment;
+    // Check field metadata first, then column type
+    const manualMetadata = fieldMetadata?.[column.field];
+    const isAttachment = column.type === 'attachment' || (column as any).attachment || (manualMetadata as any)?.type === 'attachment';
     if (isAttachment && rawValue) {
       console.log('[table-service] Processing attachment field:', column.field, 'table:', tableName, 'rawValue:', rawValue);
       const { getStorageBucket } = await import('../config/storage-buckets');
