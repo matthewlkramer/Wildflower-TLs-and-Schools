@@ -26,6 +26,7 @@ export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {
   address: { multiline: true},
   current_guide_name: { editable: false },
   current_tls: { editable: false },
+  ein: { label: 'EIN' },
   founding_tls: { lookupTable: 'people'},
   logo: { type: 'attachment' },
   logo_square: { label: 'Logo (Square)', type: 'attachment' },
