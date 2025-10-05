@@ -82,6 +82,12 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
     const content = (
       <>
         {/* Handle link to field (e.g., doc_type links to pdf field) */}
+        {(() => {
+          if (cell.linkToField && row.cells[cell.linkToField]) {
+            console.log('[ListRenderer] Field', fieldName, 'links to', cell.linkToField, 'URL:', row.cells[cell.linkToField].raw);
+          }
+          return null;
+        })()}
         {cell.linkToField && row.cells[cell.linkToField] ? (
           <a
             href={row.cells[cell.linkToField].raw}
