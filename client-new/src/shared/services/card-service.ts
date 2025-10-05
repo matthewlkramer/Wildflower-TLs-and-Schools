@@ -262,10 +262,14 @@ export class CardService {
         bucket = getStorageBucket(fieldName);
       }
 
+      console.log('[card-service] Attachment field:', fieldName, 'rawValue:', rawValue, 'bucket:', bucket);
+
       // Convert storage path to public URL
       const { data } = supabase.storage.from(bucket).getPublicUrl(rawValue);
       processedRawValue = data.publicUrl;
       displayValue = data.publicUrl;
+
+      console.log('[card-service] Generated public URL:', data.publicUrl);
     }
 
     return {
