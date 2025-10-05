@@ -175,7 +175,7 @@ export const TABLE_LIST_PRESETS = {
     columns: [
       { field: 'doc_type', label: 'Document Type', lookupTable: 'zref_gov_docs', linkToAttachment: 'object_id', listLayout: 'title'},
       { field: 'upload_date', label: 'Upload Date' , listLayout: 'subtitle'},
-      { field: 'object_id', label: 'File', visibility: 'suppress' }, // Hidden but needed for linkToAttachment
+      { field: 'object_id', label: 'File', attachment: true, visibility: 'suppress' }, // Hidden but needed for linkToAttachment
     ] as const,
     rowActions: ['view_in_modal', 'archive'] as const,
     tableActions: [{id: 'addGovDoc', label: 'Add Document'}] as const,
@@ -188,7 +188,7 @@ export const TABLE_LIST_PRESETS = {
     readSource: 'nine_nineties',
     columns: [
       { field: 'form_year', label: 'Year', linkToAttachment: 'object_id' , listLayout: 'title'},
-      { field: 'object_id', label: 'File', visibility: 'suppress' }, // Hidden but needed for linkToAttachment
+      { field: 'object_id', label: 'File', attachment: true, visibility: 'suppress' }, // Hidden but needed for linkToAttachment
     ] as const,
     rowActions: ['view_in_modal', 'archive'] as const,
     tableActions: [{id: 'addNineNinety', label: 'Add 990'}] as const,
