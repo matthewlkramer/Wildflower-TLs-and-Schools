@@ -264,8 +264,23 @@ export class CardService {
 
       console.log('[card-service] Attachment field:', fieldName, 'rawValue:', rawValue, 'bucket:', bucket);
 
+      // Query storage.objects to get the actual filename with extension
+      let filePath = rawValue;
+      const { data: storageObject, error: storageError } = await supabase
+        .from('storage.objects')
+        .select('name')
+        .eq('id', rawValue)
+        .maybeSingle();
+
+      if (storageObject && storageObject.name) {
+        filePath = storageObject.name;
+        console.log('[card-service] Found filename from storage.objects:', filePath);
+      } else {
+        console.warn('[card-service] Could not find file in storage.objects for UUID:', rawValue, 'Error:', storageError);
+      }
+
       // Convert storage path to public URL
-      const { data } = supabase.storage.from(bucket).getPublicUrl(rawValue);
+      const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
       processedRawValue = data.publicUrl;
       displayValue = data.publicUrl;
 
