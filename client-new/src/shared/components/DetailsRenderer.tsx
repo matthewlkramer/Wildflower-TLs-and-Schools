@@ -45,7 +45,15 @@ export const DetailsRenderer: React.FC<DetailsRendererProps> = ({
       ) : (
         // Multiple tabs
         <Box>
-          <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}>
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => setActiveTab(newValue)}
+            sx={{
+              '& .MuiTab-root': {
+                textTransform: 'none',
+              }
+            }}
+          >
             {tabs.map((tab, index) => (
               <Tab key={tab.id} label={tab.label} />
             ))}
