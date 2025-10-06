@@ -1,3 +1,5 @@
+// This field allows boolean fields to be displayed as self-contained, human readable badges in tables and cards
+
 export type BadgeConfig = {
   field: string;
   trueLabel: string;

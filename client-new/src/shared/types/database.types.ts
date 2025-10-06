@@ -803,6 +803,8 @@ export type Database = {
           id: string
           charter_id: string | null
           school_id: string | null
+          data_docs_object_ids: unknown | null
+          data_docs_public_urls: unknown | null
         }
         Insert: {
           school_year?: string | null
@@ -821,6 +823,8 @@ export type Database = {
           id?: string | null
           charter_id?: string | null
           school_id?: string | null
+          data_docs_object_ids?: unknown | null
+          data_docs_public_urls?: unknown | null
         }
         Update: {
           school_year?: string | null
@@ -839,6 +843,8 @@ export type Database = {
           id?: string | null
           charter_id?: string | null
           school_id?: string | null
+          data_docs_object_ids?: unknown | null
+          data_docs_public_urls?: unknown | null
         }
       }
       annual_enrollment_and_demographics: {
@@ -889,7 +895,7 @@ export type Database = {
           loi_required: boolean | null
           loi_deadline: string | null
           loi_submitted: boolean | null
-          loi: string | null
+          loi_object_ids: unknown | null
           odds_authorization: string | null
           odds_on_time_open: string | null
           charter_app_roles_set: boolean | null
@@ -908,9 +914,9 @@ export type Database = {
           auth_decision: unknown | null
           design_advice_session_complete: boolean | null
           board_membership_signed_date: string | null
-          design_album: string | null
-          budget_exercises: string | null
-          budget_final: string | null
+          design_album_object_ids: unknown | null
+          budget_exercises_object_ids: unknown | null
+          budget_final_object_ids: unknown | null
           most_recent_app: boolean | null
           app_status: unknown | null
           team: string | null
@@ -919,7 +925,10 @@ export type Database = {
           charter_id: string | null
           decision_expected_date: string | null
           is_archived: boolean | null
-          loi_doc: string | null
+          loi_public_urls: unknown | null
+          design_album_public_urls: unknown | null
+          budget_exercises_public_urls: unknown | null
+          budget_final_public_urls: unknown | null
         }
         Insert: {
           old_id?: string | null
@@ -933,7 +942,7 @@ export type Database = {
           loi_required?: boolean | null
           loi_deadline?: string | null
           loi_submitted?: boolean | null
-          loi?: string | null
+          loi_object_ids?: unknown | null
           odds_authorization?: string | null
           odds_on_time_open?: string | null
           charter_app_roles_set?: boolean | null
@@ -952,9 +961,9 @@ export type Database = {
           auth_decision?: unknown | null
           design_advice_session_complete?: boolean | null
           board_membership_signed_date?: string | null
-          design_album?: string | null
-          budget_exercises?: string | null
-          budget_final?: string | null
+          design_album_object_ids?: unknown | null
+          budget_exercises_object_ids?: unknown | null
+          budget_final_object_ids?: unknown | null
           most_recent_app?: boolean | null
           app_status?: unknown | null
           team?: string | null
@@ -963,7 +972,10 @@ export type Database = {
           charter_id?: string | null
           decision_expected_date?: string | null
           is_archived?: boolean | null
-          loi_doc?: string | null
+          loi_public_urls?: unknown | null
+          design_album_public_urls?: unknown | null
+          budget_exercises_public_urls?: unknown | null
+          budget_final_public_urls?: unknown | null
         }
         Update: {
           old_id?: string | null
@@ -977,7 +989,7 @@ export type Database = {
           loi_required?: boolean | null
           loi_deadline?: string | null
           loi_submitted?: boolean | null
-          loi?: string | null
+          loi_object_ids?: unknown | null
           odds_authorization?: string | null
           odds_on_time_open?: string | null
           charter_app_roles_set?: boolean | null
@@ -996,9 +1008,9 @@ export type Database = {
           auth_decision?: unknown | null
           design_advice_session_complete?: boolean | null
           board_membership_signed_date?: string | null
-          design_album?: string | null
-          budget_exercises?: string | null
-          budget_final?: string | null
+          design_album_object_ids?: unknown | null
+          budget_exercises_object_ids?: unknown | null
+          budget_final_object_ids?: unknown | null
           most_recent_app?: boolean | null
           app_status?: unknown | null
           team?: string | null
@@ -1007,7 +1019,10 @@ export type Database = {
           charter_id?: string | null
           decision_expected_date?: string | null
           is_archived?: boolean | null
-          loi_doc?: string | null
+          loi_public_urls?: unknown | null
+          design_album_public_urls?: unknown | null
+          budget_exercises_public_urls?: unknown | null
+          budget_final_public_urls?: unknown | null
         }
       }
       charter_authorization_actions: {
@@ -1068,7 +1083,7 @@ export type Database = {
           short_name: string | null
           full_name: string | null
           initial_target_geo: string | null
-          landscape_analysis: string | null
+          landscape_analysis_object_ids: unknown | null
           application: string | null
           non_tl_roles: string | null
           cohorts: unknown | null
@@ -1090,13 +1105,16 @@ export type Database = {
           membership_status: string | null
           group_exemption_status: unknown | null
           is_archived: boolean | null
+          landscape_analysis_public_urls: unknown | null
+          application_object_ids: unknown | null
+          application_public_urls: unknown | null
         }
         Insert: {
           old_id?: string | null
           short_name?: string | null
           full_name?: string | null
           initial_target_geo?: string | null
-          landscape_analysis?: string | null
+          landscape_analysis_object_ids?: unknown | null
           application?: string | null
           non_tl_roles?: string | null
           cohorts?: unknown | null
@@ -1118,13 +1136,16 @@ export type Database = {
           membership_status?: string | null
           group_exemption_status?: unknown | null
           is_archived?: boolean | null
+          landscape_analysis_public_urls?: unknown | null
+          application_object_ids?: unknown | null
+          application_public_urls?: unknown | null
         }
         Update: {
           old_id?: string | null
           short_name?: string | null
           full_name?: string | null
           initial_target_geo?: string | null
-          landscape_analysis?: string | null
+          landscape_analysis_object_ids?: unknown | null
           application?: string | null
           non_tl_roles?: string | null
           cohorts?: unknown | null
@@ -1146,6 +1167,9 @@ export type Database = {
           membership_status?: string | null
           group_exemption_status?: unknown | null
           is_archived?: boolean | null
+          landscape_analysis_public_urls?: unknown | null
+          application_object_ids?: unknown | null
+          application_public_urls?: unknown | null
         }
       }
       cohort_participation: {
@@ -1277,8 +1301,6 @@ export type Database = {
           short_name: string | null
           full_name: string | null
           initial_target_geo: string | null
-          landscape_analysis: string | null
-          application: string | null
           non_tl_roles: string | null
           status: unknown | null
           ein: string | null
@@ -1303,7 +1325,6 @@ export type Database = {
           loi_required: boolean | null
           loi_deadline: string | null
           loi_submitted: boolean | null
-          loi: string | null
           odds_authorization: string | null
           odds_on_time_open: string | null
           charter_app_roles_set: boolean | null
@@ -1321,9 +1342,6 @@ export type Database = {
           auth_decision: unknown | null
           design_advice_session_complete: boolean | null
           board_membership_signed_date: string | null
-          design_album: string | null
-          budget_exercises: string | null
-          budget_final: string | null
           most_recent_app: boolean | null
           app_status: unknown | null
           team: string | null
@@ -1340,8 +1358,6 @@ export type Database = {
           short_name?: string | null
           full_name?: string | null
           initial_target_geo?: string | null
-          landscape_analysis?: string | null
-          application?: string | null
           non_tl_roles?: string | null
           status?: unknown | null
           ein?: string | null
@@ -1366,7 +1382,6 @@ export type Database = {
           loi_required?: boolean | null
           loi_deadline?: string | null
           loi_submitted?: boolean | null
-          loi?: string | null
           odds_authorization?: string | null
           odds_on_time_open?: string | null
           charter_app_roles_set?: boolean | null
@@ -1384,9 +1399,6 @@ export type Database = {
           auth_decision?: unknown | null
           design_advice_session_complete?: boolean | null
           board_membership_signed_date?: string | null
-          design_album?: string | null
-          budget_exercises?: string | null
-          budget_final?: string | null
           most_recent_app?: boolean | null
           app_status?: unknown | null
           team?: string | null
@@ -1403,8 +1415,6 @@ export type Database = {
           short_name?: string | null
           full_name?: string | null
           initial_target_geo?: string | null
-          landscape_analysis?: string | null
-          application?: string | null
           non_tl_roles?: string | null
           status?: unknown | null
           ein?: string | null
@@ -1429,7 +1439,6 @@ export type Database = {
           loi_required?: boolean | null
           loi_deadline?: string | null
           loi_submitted?: boolean | null
-          loi?: string | null
           odds_authorization?: string | null
           odds_on_time_open?: string | null
           charter_app_roles_set?: boolean | null
@@ -1447,9 +1456,6 @@ export type Database = {
           auth_decision?: unknown | null
           design_advice_session_complete?: boolean | null
           board_membership_signed_date?: string | null
-          design_album?: string | null
-          budget_exercises?: string | null
-          budget_final?: string | null
           most_recent_app?: boolean | null
           app_status?: unknown | null
           team?: string | null
@@ -2032,32 +2038,6 @@ export type Database = {
           logs?: string | null
         }
       }
-      docs_urls: {
-        Row: {
-          school_id: string | null
-          short_name: string | null
-          doc_type: string | null
-          object_id: string | null
-          upload_date: string | null
-          gov_doc_full_url: string | null
-        }
-        Insert: {
-          school_id?: string | null
-          short_name?: string | null
-          doc_type?: string | null
-          object_id?: string | null
-          upload_date?: string | null
-          gov_doc_full_url?: string | null
-        }
-        Update: {
-          school_id?: string | null
-          short_name?: string | null
-          doc_type?: string | null
-          object_id?: string | null
-          upload_date?: string | null
-          gov_doc_full_url?: string | null
-        }
-      }
       document_checklist: {
         Row: {
           document_name: string
@@ -2238,33 +2218,33 @@ export type Database = {
       governance_docs: {
         Row: {
           doc_type: string | null
-          pdf: string | null
           id: string
           school_id: string | null
           charter_id: string | null
           is_archived: boolean | null
           upload_date: string | null
-          object_id: string | null
+          governance_doc_public_urls: unknown | null
+          governance_doc_object_ids: unknown | null
         }
         Insert: {
           doc_type?: string | null
-          pdf?: string | null
           id?: string | null
           school_id?: string | null
           charter_id?: string | null
           is_archived?: boolean | null
           upload_date?: string | null
-          object_id?: string | null
+          governance_doc_public_urls?: unknown | null
+          governance_doc_object_ids?: unknown | null
         }
         Update: {
           doc_type?: string | null
-          pdf?: string | null
           id?: string | null
           school_id?: string | null
           charter_id?: string | null
           is_archived?: boolean | null
           upload_date?: string | null
-          object_id?: string | null
+          governance_doc_public_urls?: unknown | null
+          governance_doc_object_ids?: unknown | null
         }
       }
       grants: {
@@ -2298,8 +2278,8 @@ export type Database = {
           prelim_advice_request_timestamp: string | null
           full_advice_request_timestamp: string | null
           end_of_full_advice_window: string | null
-          unsigned_grant_agreement: string | null
-          signed_grant_agreement: string | null
+          unsigned_grant_agreement_object_ids: unknown | null
+          signed_grant_agreement_object_ids: unknown | null
           grant_advice: string | null
           id: string
           school_id: string | null
@@ -2307,6 +2287,8 @@ export type Database = {
           people_id: string | null
           is_archived: boolean | null
           old_school_id: string | null
+          signed_grant_agreement_public_urls: unknown | null
+          unsigned_grant_agreement_public_urls: unknown | null
         }
         Insert: {
           actual_tls?: string | null
@@ -2338,8 +2320,8 @@ export type Database = {
           prelim_advice_request_timestamp?: string | null
           full_advice_request_timestamp?: string | null
           end_of_full_advice_window?: string | null
-          unsigned_grant_agreement?: string | null
-          signed_grant_agreement?: string | null
+          unsigned_grant_agreement_object_ids?: unknown | null
+          signed_grant_agreement_object_ids?: unknown | null
           grant_advice?: string | null
           id?: string | null
           school_id?: string | null
@@ -2347,6 +2329,8 @@ export type Database = {
           people_id?: string | null
           is_archived?: boolean | null
           old_school_id?: string | null
+          signed_grant_agreement_public_urls?: unknown | null
+          unsigned_grant_agreement_public_urls?: unknown | null
         }
         Update: {
           actual_tls?: string | null
@@ -2378,8 +2362,8 @@ export type Database = {
           prelim_advice_request_timestamp?: string | null
           full_advice_request_timestamp?: string | null
           end_of_full_advice_window?: string | null
-          unsigned_grant_agreement?: string | null
-          signed_grant_agreement?: string | null
+          unsigned_grant_agreement_object_ids?: unknown | null
+          signed_grant_agreement_object_ids?: unknown | null
           grant_advice?: string | null
           id?: string | null
           school_id?: string | null
@@ -2387,6 +2371,8 @@ export type Database = {
           people_id?: string | null
           is_archived?: boolean | null
           old_school_id?: string | null
+          signed_grant_agreement_public_urls?: unknown | null
+          unsigned_grant_agreement_public_urls?: unknown | null
         }
       }
       grid_charter: {
@@ -2522,7 +2508,6 @@ export type Database = {
           notes: string | null
           school_id: string | null
           charter_id: string | null
-          is_archived: boolean | null
         }
         Insert: {
           id?: string | null
@@ -2533,7 +2518,6 @@ export type Database = {
           notes?: string | null
           school_id?: string | null
           charter_id?: string | null
-          is_archived?: boolean | null
         }
         Update: {
           id?: string | null
@@ -2544,7 +2528,6 @@ export type Database = {
           notes?: string | null
           school_id?: string | null
           charter_id?: string | null
-          is_archived?: boolean | null
         }
       }
       guide_assignments: {
@@ -2695,7 +2678,7 @@ export type Database = {
           amount_issued: number | null
           issue_date: string | null
           loan_status: unknown | null
-          loan_docs: string | null
+          loan_docs_object_ids: unknown | null
           notes: string | null
           maturity: string | null
           interest_rate: number | null
@@ -2705,6 +2688,7 @@ export type Database = {
           id: string
           charter_id: string | null
           is_archived: boolean | null
+          loan_docs_public_urls: unknown | null
         }
         Insert: {
           Loan Key?: string | null
@@ -2712,7 +2696,7 @@ export type Database = {
           amount_issued?: number | null
           issue_date?: string | null
           loan_status?: unknown | null
-          loan_docs?: string | null
+          loan_docs_object_ids?: unknown | null
           notes?: string | null
           maturity?: string | null
           interest_rate?: number | null
@@ -2722,6 +2706,7 @@ export type Database = {
           id?: string | null
           charter_id?: string | null
           is_archived?: boolean | null
+          loan_docs_public_urls?: unknown | null
         }
         Update: {
           Loan Key?: string | null
@@ -2729,7 +2714,7 @@ export type Database = {
           amount_issued?: number | null
           issue_date?: string | null
           loan_status?: unknown | null
-          loan_docs?: string | null
+          loan_docs_object_ids?: unknown | null
           notes?: string | null
           maturity?: string | null
           interest_rate?: number | null
@@ -2739,6 +2724,7 @@ export type Database = {
           id?: string | null
           charter_id?: string | null
           is_archived?: boolean | null
+          loan_docs_public_urls?: unknown | null
         }
       }
       locations: {
@@ -2772,7 +2758,8 @@ export type Database = {
           mailable: boolean | null
           physical: boolean | null
           is_archived: boolean | null
-          lease_docs: unknown | null
+          lease_object_ids: unknown | null
+          lease_public_urls: unknown | null
         }
         Insert: {
           charter_id?: string | null
@@ -2804,7 +2791,8 @@ export type Database = {
           mailable?: boolean | null
           physical?: boolean | null
           is_archived?: boolean | null
-          lease_docs?: unknown | null
+          lease_object_ids?: unknown | null
+          lease_public_urls?: unknown | null
         }
         Update: {
           charter_id?: string | null
@@ -2836,7 +2824,8 @@ export type Database = {
           mailable?: boolean | null
           physical?: boolean | null
           is_archived?: boolean | null
-          lease_docs?: unknown | null
+          lease_object_ids?: unknown | null
+          lease_public_urls?: unknown | null
         }
       }
       logo_urls_by_school: {
@@ -3000,10 +2989,9 @@ export type Database = {
           id: string
           school_id: string | null
           charter_id: string | null
-          pdf: string | null
           is_archived: boolean | null
-          doc: string | null
-          object_id: string | null
+          nine_nineties_public_urls: unknown | null
+          nine_nineties_object_ids: unknown | null
         }
         Insert: {
           form_year?: string | null
@@ -3013,10 +3001,9 @@ export type Database = {
           id?: string | null
           school_id?: string | null
           charter_id?: string | null
-          pdf?: string | null
           is_archived?: boolean | null
-          doc?: string | null
-          object_id?: string | null
+          nine_nineties_public_urls?: unknown | null
+          nine_nineties_object_ids?: unknown | null
         }
         Update: {
           form_year?: string | null
@@ -3026,10 +3013,9 @@ export type Database = {
           id?: string | null
           school_id?: string | null
           charter_id?: string | null
-          pdf?: string | null
           is_archived?: boolean | null
-          doc?: string | null
-          object_id?: string | null
+          nine_nineties_public_urls?: unknown | null
+          nine_nineties_object_ids?: unknown | null
         }
       }
       notes: {
@@ -3103,7 +3089,6 @@ export type Database = {
           prior_proj_open_date: string | null
           notes: string | null
           charter_id: string | null
-          is_archived: boolean | null
         }
         Insert: {
           id?: string | null
@@ -3113,7 +3098,6 @@ export type Database = {
           prior_proj_open_date?: string | null
           notes?: string | null
           charter_id?: string | null
-          is_archived?: boolean | null
         }
         Update: {
           id?: string | null
@@ -3123,7 +3107,6 @@ export type Database = {
           prior_proj_open_date?: string | null
           notes?: string | null
           charter_id?: string | null
-          is_archived?: boolean | null
         }
       }
       people: {
@@ -3163,6 +3146,8 @@ export type Database = {
           primary_languages: unknown | null
           is_archived: boolean | null
           montessori_certs: unknown | null
+          headshot_object_ids: unknown | null
+          headshot_public_urls: unknown | null
         }
         Insert: {
           first_name?: string | null
@@ -3200,6 +3185,8 @@ export type Database = {
           primary_languages?: unknown | null
           is_archived?: boolean | null
           montessori_certs?: unknown | null
+          headshot_object_ids?: unknown | null
+          headshot_public_urls?: unknown | null
         }
         Update: {
           first_name?: string | null
@@ -3237,6 +3224,8 @@ export type Database = {
           primary_languages?: unknown | null
           is_archived?: boolean | null
           montessori_certs?: unknown | null
+          headshot_object_ids?: unknown | null
+          headshot_public_urls?: unknown | null
         }
       }
       people_educator_early_cultivation: {
@@ -3274,7 +3263,8 @@ export type Database = {
           personal_email_sent: boolean | null
           personal_email_sent_date: string | null
           is_archived: boolean | null
-          self_reflection_doc: string | null
+          self_reflection_object_ids: unknown | null
+          self_reflection_public_urls: unknown | null
         }
         Insert: {
           old_id?: string | null
@@ -3310,7 +3300,8 @@ export type Database = {
           personal_email_sent?: boolean | null
           personal_email_sent_date?: string | null
           is_archived?: boolean | null
-          self_reflection_doc?: string | null
+          self_reflection_object_ids?: unknown | null
+          self_reflection_public_urls?: unknown | null
         }
         Update: {
           old_id?: string | null
@@ -3346,7 +3337,8 @@ export type Database = {
           personal_email_sent?: boolean | null
           personal_email_sent_date?: string | null
           is_archived?: boolean | null
-          self_reflection_doc?: string | null
+          self_reflection_object_ids?: unknown | null
+          self_reflection_public_urls?: unknown | null
         }
       }
       people_roles_associations: {
@@ -3366,7 +3358,8 @@ export type Database = {
           authorizer_id: string | null
           is_archived: boolean | null
           tl_membership_acknowledgement_date: string | null
-          tl_membership_acknowledgement_doc: string | null
+          tl_membership_acknowledgement_doc_object_ids: unknown | null
+          tl_membership_acknowledgement_doc_public_urls: unknown | null
         }
         Insert: {
           loan_fund?: boolean | null
@@ -3384,7 +3377,8 @@ export type Database = {
           authorizer_id?: string | null
           is_archived?: boolean | null
           tl_membership_acknowledgement_date?: string | null
-          tl_membership_acknowledgement_doc?: string | null
+          tl_membership_acknowledgement_doc_object_ids?: unknown | null
+          tl_membership_acknowledgement_doc_public_urls?: unknown | null
         }
         Update: {
           loan_fund?: boolean | null
@@ -3402,7 +3396,8 @@ export type Database = {
           authorizer_id?: string | null
           is_archived?: boolean | null
           tl_membership_acknowledgement_date?: string | null
-          tl_membership_acknowledgement_doc?: string | null
+          tl_membership_acknowledgement_doc_object_ids?: unknown | null
+          tl_membership_acknowledgement_doc_public_urls?: unknown | null
         }
       }
       people_systems: {
@@ -3482,25 +3477,28 @@ export type Database = {
           id: string | null
           charter_id: string | null
           report_type: string | null
-          attachments: string | null
+          report_docs_object_ids: unknown | null
           school_year: string | null
           is_archived: boolean | null
+          report_docs_public_urls: unknown | null
         }
         Insert: {
           id?: string | null
           charter_id?: string | null
           report_type?: string | null
-          attachments?: string | null
+          report_docs_object_ids?: unknown | null
           school_year?: string | null
           is_archived?: boolean | null
+          report_docs_public_urls?: unknown | null
         }
         Update: {
           id?: string | null
           charter_id?: string | null
           report_type?: string | null
-          attachments?: string | null
+          report_docs_object_ids?: unknown | null
           school_year?: string | null
           is_archived?: boolean | null
+          report_docs_public_urls?: unknown | null
         }
       }
       school_ssj_data: {
@@ -3638,7 +3636,7 @@ export type Database = {
           institutional_partner: string | null
           logo_url: string | null
           school_calendar: unknown | null
-          planning_album: string | null
+          planning_album_object_id: string | null
           tc_school_id: string | null
           school_email: string | null
           email_domain: string | null
@@ -3705,8 +3703,14 @@ export type Database = {
           signed_membership_agreement_date: string | null
           membership_revoked_date: string | null
           membership_agreement_version: string | null
-          visioning_album: string | null
+          visioning_album_object_id: string | null
           logo: string | null
+          visioning_album_public_url: string | null
+          planning_album_public_url: string | null
+          visioning_album_public_urls: unknown | null
+          visioning_album_object_ids: unknown | null
+          planning_album_object_ids: unknown | null
+          planning_album_public_urls: unknown | null
         }
         Insert: {
           long_name?: string | null
@@ -3720,7 +3724,7 @@ export type Database = {
           institutional_partner?: string | null
           logo_url?: string | null
           school_calendar?: unknown | null
-          planning_album?: string | null
+          planning_album_object_id?: string | null
           tc_school_id?: string | null
           school_email?: string | null
           email_domain?: string | null
@@ -3787,8 +3791,14 @@ export type Database = {
           signed_membership_agreement_date?: string | null
           membership_revoked_date?: string | null
           membership_agreement_version?: string | null
-          visioning_album?: string | null
+          visioning_album_object_id?: string | null
           logo?: string | null
+          visioning_album_public_url?: string | null
+          planning_album_public_url?: string | null
+          visioning_album_public_urls?: unknown | null
+          visioning_album_object_ids?: unknown | null
+          planning_album_object_ids?: unknown | null
+          planning_album_public_urls?: unknown | null
         }
         Update: {
           long_name?: string | null
@@ -3802,7 +3812,7 @@ export type Database = {
           institutional_partner?: string | null
           logo_url?: string | null
           school_calendar?: unknown | null
-          planning_album?: string | null
+          planning_album_object_id?: string | null
           tc_school_id?: string | null
           school_email?: string | null
           email_domain?: string | null
@@ -3869,8 +3879,14 @@ export type Database = {
           signed_membership_agreement_date?: string | null
           membership_revoked_date?: string | null
           membership_agreement_version?: string | null
-          visioning_album?: string | null
+          visioning_album_object_id?: string | null
           logo?: string | null
+          visioning_album_public_url?: string | null
+          planning_album_public_url?: string | null
+          visioning_album_public_urls?: unknown | null
+          visioning_album_object_ids?: unknown | null
+          planning_album_object_ids?: unknown | null
+          planning_album_public_urls?: unknown | null
         }
       }
       ssj_fillout_forms: {
@@ -4125,6 +4141,23 @@ export type Database = {
           id?: string | null
           people_id?: string | null
           is_archived?: boolean | null
+        }
+      }
+      storage_object_id_path: {
+        Row: {
+          id: string | null
+          bucket_id: string | null
+          name: string | null
+        }
+        Insert: {
+          id?: string | null
+          bucket_id?: string | null
+          name?: string | null
+        }
+        Update: {
+          id?: string | null
+          bucket_id?: string | null
+          name?: string | null
         }
       }
       zref_assessments_and_metrics: {
@@ -4388,7 +4421,7 @@ export type Database = {
       zref_school_years: {
         Row: {
           value: string
-          fiscal_year: string | null
+          fiscal_year: string
           starting_calendar_year: string
           ending_calendar_year: string
           start_date: string | null

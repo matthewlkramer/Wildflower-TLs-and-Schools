@@ -11,15 +11,6 @@ export const STORAGE_BUCKET_MAPPING: Record<string, string> = {
   // Self-reflection documents
   self_reflection_doc: 'self-reflections',
 
-  // Governance documents
-  governance_doc: 'governance-docs',
-  governance_document: 'governance-docs',
-
-  // 990 tax forms
-  nine_ninety: '990s',
-  nine_ninety_doc: '990s',
-  form_990: '990s',
-
   // Albums
   planning_album: 'albums',
   visioning_album: 'albums',
@@ -29,8 +20,7 @@ export const STORAGE_BUCKET_MAPPING: Record<string, string> = {
   membership_agreement_doc: 'membership-agreements',
 
   // Leases (for location table)
-  lease: 'leases',
-  lease_doc: 'leases',
+  lease_docs: 'leases',
 };
 
 /**

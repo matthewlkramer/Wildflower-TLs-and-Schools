@@ -244,31 +244,29 @@ const ListBlockRenderer: React.FC<{
   entityId: string;
   fieldMetadata?: import('../types/detail-types').FieldMetadataMap;
 }> = ({ block, entityId, fieldMetadata }) => {
-  const [tableData, setTableData] = useState<RenderableTableData | null>(null);
+  const [listData, setListData] = useState<import('../services/card-service').RenderableListData | null>(null);
 
   useEffect(() => {
-    loadTableData();
+    loadListData();
   }, [block.preset, entityId]);
 
-  const loadTableData = async () => {
+  const loadListData = async () => {
     if (!block.preset) return;
 
     try {
-      setTableData({ ...tableData!, loading: true });
-      const data = await tableService.loadTableData(
+      setListData({ ...listData!, loading: true, rows: [], preset: block.preset });
+      const data = await cardService.loadListData(
         block.preset,
         entityId,
         block.module,
         block.activeFilter,
-        undefined,
-        undefined,
         fieldMetadata
       );
-      setTableData(data);
+      setListData(data);
     } catch (error) {
       console.error('Failed to load list data:', error);
-      setTableData({
-        spec: { readSource: '', columns: [], rowActions: [] },
+      setListData({
+        preset: block.preset,
         rows: [],
         loading: false,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -286,7 +284,7 @@ const ListBlockRenderer: React.FC<{
     console.log('Table action:', actionId);
   };
 
-  if (!tableData) {
+  if (!listData) {
     return <div>Loading list...</div>;
   }
 
@@ -296,7 +294,7 @@ const ListBlockRenderer: React.FC<{
 
   return (
     <ListRenderer
-      data={tableData}
+      data={listData}
       layout={listLayout}
       onRowAction={handleRowAction}
       onTableAction={handleTableAction}

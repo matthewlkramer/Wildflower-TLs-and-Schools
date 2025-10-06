@@ -19,6 +19,7 @@ export type ResolvedTableColumn = {
   attachment?: boolean;
   maxArrayEntries?: number;
   linkToField?: string;
+  linkToAttachmentArray?: string; // Points to a text[] field containing public URLs
   update?: 'no' | 'yes' | 'newOnly';
   writeTo?: { schema?: string; table: string; pk?: string; column?: string };
   array?: boolean;
@@ -132,6 +133,7 @@ function resolveColumn(columnSpec: string | TableColumnMeta, readSource?: string
     attachment: (meta as any).attachment,
     maxArrayEntries: (meta as any).maxArrayEntries,
     linkToField: (meta as any).linkToField || (meta as any).linkToAttachment,
+    linkToAttachmentArray: (meta as any).linkToAttachmentArray,
     update: (meta as any).update || 'yes',
     writeTo: (meta as any).writeTo,
     array: generatedMeta?.isArray,

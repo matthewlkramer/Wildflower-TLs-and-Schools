@@ -173,9 +173,10 @@ export const TABLE_LIST_PRESETS = {
     cardLimit: 50,
     readSource: 'governance_docs',
     columns: [
-      { field: 'doc_type', label: 'Document Type', lookupTable: 'zref_gov_docs', linkToAttachment: 'object_id', listLayout: 'title'},
+      { field: 'doc_type', label: 'Document Type', lookupTable: 'zref_gov_docs', linkToAttachmentArray: 'governance_doc_public_urls', listLayout: 'title'},
       { field: 'upload_date', label: 'Upload Date' , listLayout: 'subtitle'},
-      { field: 'object_id', label: 'File', attachment: true, visibility: 'suppress' }, // Hidden but needed for linkToAttachment
+      { field: 'governance_doc_public_urls', label: 'Files', visibility: 'suppress' }, // Hidden array of URLs
+      { field: 'governance_doc_object_ids', label: 'File IDs', visibility: 'suppress' }, // Hidden array of object IDs
     ] as const,
     rowActions: ['view_in_modal', 'archive'] as const,
     tableActions: [{id: 'addGovDoc', label: 'Add Document'}] as const,
@@ -187,8 +188,9 @@ export const TABLE_LIST_PRESETS = {
     cardLimit: 50,
     readSource: 'nine_nineties',
     columns: [
-      { field: 'form_year', label: 'Year', linkToAttachment: 'object_id' , listLayout: 'title'},
-      { field: 'object_id', label: 'File', attachment: true, visibility: 'suppress' }, // Hidden but needed for linkToAttachment
+      { field: 'form_year', label: 'Year', linkToAttachmentArray: 'nine_nineties_public_urls' , listLayout: 'title'},
+      { field: 'nine_nineties_public_urls', label: 'Files', visibility: 'suppress' }, // Hidden array of URLs
+      { field: 'nine_nineties_object_ids', label: 'File IDs', visibility: 'suppress' }, // Hidden array of object IDs
     ] as const,
     rowActions: ['view_in_modal', 'archive'] as const,
     tableActions: [{id: 'addNineNinety', label: 'Add 990'}] as const,

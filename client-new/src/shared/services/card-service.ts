@@ -32,6 +32,7 @@ export type CardField = {
   label: string;
   value: FieldValue;
   metadata: FieldMetadata;
+  linkToAttachmentArray?: string; // Points to another field containing URL array
 };
 
 export type RenderableCard = {
@@ -46,6 +47,22 @@ export type RenderableCard = {
     table: string;
     pk?: string;
   };
+};
+
+export type RenderableListRow = {
+  id: any;
+  originalData: Record<string, any>;
+  fields: Record<string, CardField>; // field name → CardField
+};
+
+export type RenderableListData = {
+  preset: string;
+  rows: RenderableListRow[];
+  loading: boolean;
+  error?: string;
+  totalCount?: number;
+  rowActions?: readonly string[];
+  tableActions?: readonly import('../types/detail-types').TableActionSpec[];
 };
 
 export class CardService {
@@ -84,6 +101,115 @@ export class CardService {
         title: block.title,
         fields: [],
         editable: false,
+        loading: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Load list data for multiple entities (e.g., governance docs, educators)
+   */
+  async loadListData(
+    presetId: string,
+    parentEntityId?: string,
+    module?: string,
+    activeFilter?: boolean,
+    viewFieldMetadata?: import('../types/detail-types').FieldMetadataMap
+  ): Promise<RenderableListData> {
+    try {
+      const { TABLE_LIST_PRESETS } = await import('../config/table-list-presets');
+      const preset = TABLE_LIST_PRESETS[presetId as keyof typeof TABLE_LIST_PRESETS];
+
+      if (!preset) {
+        throw new Error(`Unknown preset: ${presetId}`);
+      }
+
+      const tableName = preset.readSource || presetId;
+
+      // Build query
+      let query = fromTable(tableName).select('*');
+
+      // Apply filters
+      if (parentEntityId && module) {
+        query = query.eq(`${module}_id`, parentEntityId);
+      }
+
+      if (activeFilter && preset.readFilter) {
+        const filter = preset.readFilter as any;
+        if (filter.eq) {
+          query = query.eq(filter.eq.column, filter.eq.value);
+        }
+      }
+
+      // Apply ordering
+      if (preset.orderBy) {
+        const orderConfig = Array.isArray(preset.orderBy) ? preset.orderBy[0] : preset.orderBy;
+        query = query.order(orderConfig.column, { ascending: orderConfig.ascending });
+      }
+
+      // Apply limit
+      const limit = preset.cardLimit || 50;
+      query = query.limit(limit);
+
+      const { data: rawRows, error } = await query;
+
+      if (error) {
+        throw new Error(`Failed to load list data: ${error.message}`);
+      }
+
+      // Get field names from preset columns
+      const fieldNames = (preset.columns || []).map((col: any) =>
+        typeof col === 'string' ? col : col.field
+      );
+
+      // Transform each row into RenderableListRow
+      const rows: RenderableListRow[] = [];
+
+      for (const rawRow of rawRows || []) {
+        const fields: Record<string, CardField> = {};
+
+        // Resolve all fields for this row
+        const resolvedFields = await this.resolveFields(
+          fieldNames,
+          rawRow,
+          { table: tableName },
+          viewFieldMetadata
+        );
+
+        // Convert array of CardFields to Record<string, CardField>
+        // Also add linkToAttachmentArray from preset column metadata
+        for (const field of resolvedFields) {
+          const columnConfig = (preset.columns || []).find((col: any) =>
+            (typeof col === 'string' ? col : col.field) === field.field
+          );
+
+          fields[field.field] = {
+            ...field,
+            linkToAttachmentArray: typeof columnConfig === 'object' ? (columnConfig as any).linkToAttachmentArray : undefined,
+          };
+        }
+
+        rows.push({
+          id: rawRow.id,
+          originalData: rawRow,
+          fields,
+        });
+      }
+
+      return {
+        preset: presetId,
+        rows,
+        loading: false,
+        totalCount: rawRows?.length || 0,
+        rowActions: preset.rowActions,
+        tableActions: preset.tableActions,
+      };
+    } catch (error) {
+      console.error('Failed to load list data:', error);
+      return {
+        preset: presetId,
+        rows: [],
         loading: false,
         error: error instanceof Error ? error.message : 'Unknown error',
       };

@@ -1,12 +1,13 @@
 import React from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { RowActionsMenu } from './RowActionsMenu';
-import type { RenderableTableData, RenderableRow, CellValue } from '../table-service';
-import type { DetailListLayout } from '../detail-types';
+import type { RenderableListData, RenderableListRow, CardField } from '../services/card-service';
+import type { DetailListLayout } from '../types/detail-types';
 import { BADGE_PRESETS } from '../config/badge-presets';
+import { TABLE_LIST_PRESETS } from '../config/table-list-presets';
 
 export type ListRendererProps = {
-  data: RenderableTableData;
+  data: RenderableListData;
   layout?: DetailListLayout;
   onRowAction?: (rowId: any, actionId: string) => Promise<void>;
   onTableAction?: (actionId: string) => Promise<void>;
@@ -20,11 +21,11 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
   onTableAction,
   className = '',
 }) => {
-  const renderBadge = (fieldName: string, cell: CellValue): React.ReactNode | null => {
+  const renderBadge = (fieldName: string, field: CardField): React.ReactNode | null => {
     const badgeConfig = BADGE_PRESETS[fieldName];
     if (!badgeConfig) return null;
 
-    const value = cell.raw;
+    const value = field.value.raw;
 
     // If value is false and no falseLabel, don't show badge
     if (!value && !badgeConfig.falseLabel) {
@@ -57,58 +58,61 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
 
   const renderFieldValue = (
     fieldName: string,
-    cell: CellValue,
-    row: RenderableRow,
+    field: CardField,
+    row: RenderableListRow,
     showLabel: boolean = false,
     isBadgeField: boolean = false
   ): React.ReactNode => {
     // Check if this field should be rendered as a badge
     if (isBadgeField) {
-      const badge = renderBadge(fieldName, cell);
+      const badge = renderBadge(fieldName, field);
       if (!badge) return null;
 
       return showLabel ? (
         <div className="flex" style={{ gap: 6 }}>
           <span style={{ fontWeight: 500, color: '#64748b', fontSize: 12 }} className="min-w-0 flex-shrink-0">
-            {getFieldLabel(fieldName, data)}:
+            {field.label}:
           </span>
           <span className="min-w-0">{badge}</span>
         </div>
       ) : badge;
     }
 
-    if (!cell.display) return null;
+    if (!field.value.display) return null;
+
+    // Check if this field links to an attachment array (multiple files)
+    const attachmentArrayField = field.linkToAttachmentArray;
+    const attachmentUrls = attachmentArrayField && row.fields[attachmentArrayField]?.value.raw;
 
     const content = (
       <>
-        {/* Handle link to field (e.g., doc_type links to pdf field) */}
-        {(() => {
-          if (cell.linkToField && row.cells[cell.linkToField]) {
-            console.log('[ListRenderer] Field', fieldName, 'links to', cell.linkToField, 'URL:', row.cells[cell.linkToField].raw);
-          }
-          return null;
-        })()}
-        {cell.linkToField && row.cells[cell.linkToField] ? (
+        {/* Handle links to attachment arrays (governance_docs, nine_nineties) */}
+        {attachmentArrayField && Array.isArray(attachmentUrls) && attachmentUrls.length > 0 ? (
+          <span className="flex flex-wrap" style={{ gap: 6 }}>
+            {attachmentUrls.map((url: string, index: number) => (
+              <a
+                key={index}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                {field.value.display} {attachmentUrls.length > 1 ? `(${index + 1})` : ''}
+              </a>
+            ))}
+          </span>
+        ) : field.value.type === 'attachment' && field.value.raw ? (
           <a
-            href={row.cells[cell.linkToField].raw}
+            href={field.value.raw}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 hover:underline"
           >
-            {cell.display}
-          </a>
-        ) : cell.attachment && cell.raw ? (
-          <a
-            href={cell.raw}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
-          >
-            📎 {cell.display}
+            📎 {field.value.display}
           </a>
         ) : (
-          <span className={cell.multiline ? "whitespace-pre-wrap" : ""}>
-            {cell.display}
+          <span className={field.value.multiline ? "whitespace-pre-wrap" : ""}>
+            {field.value.display}
           </span>
         )}
       </>
@@ -117,14 +121,14 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
     return showLabel ? (
       <div className="flex" style={{ gap: 6 }}>
         <span style={{ fontWeight: 500, color: '#64748b', fontSize: 12 }} className="min-w-0 flex-shrink-0">
-          {getFieldLabel(fieldName, data)}:
+          {field.label}:
         </span>
         <span className="min-w-0" style={{ fontSize: 12 }}>{content}</span>
       </div>
     ) : content;
   };
 
-  const renderCard = (row: RenderableRow): React.ReactNode => {
+  const renderCard = (row: RenderableListRow): React.ReactNode => {
     const {
       titleField,
       subtitleFields = [],
@@ -137,8 +141,8 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
       hideLabelsForFields = [],
     } = layout || {};
 
-    console.log('[ListRenderer] Rendering card, row.cells keys:', Object.keys(row.cells));
-    console.log('[ListRenderer] Title field cell:', titleField, row.cells[titleField!]);
+    console.log('[ListRenderer] Rendering card, row.fields keys:', Object.keys(row.fields));
+    console.log('[ListRenderer] Title field:', titleField, row.fields[titleField!]);
 
     return (
       <div
@@ -152,10 +156,10 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
         }}
       >
         {/* Row Actions - positioned in upper right */}
-        {data.spec.rowActions.length > 0 && (
+        {data.rowActions && data.rowActions.length > 0 && (
           <div style={{ position: 'absolute', top: 6, right: 6 }}>
             <RowActionsMenu
-              actions={data.spec.rowActions}
+              actions={data.rowActions}
               onAction={(actionId) => onRowAction?.(row.id, actionId)}
             />
           </div>
@@ -164,9 +168,9 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
         {/* Title and Badges Row */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: subtitleFields.length > 0 ? 4 : (bodyFields.length > 0 ? 6 : 0) }}>
           {/* Title */}
-          {titleField && row.cells[titleField] && (
+          {titleField && row.fields[titleField] && (
             <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a', paddingRight: 32, flex: 1, minWidth: 0 }}>
-              {renderFieldValue(titleField, row.cells[titleField], row)}
+              {renderFieldValue(titleField, row.fields[titleField], row)}
             </div>
           )}
 
@@ -174,7 +178,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
           {badgeFields.length > 0 && (
             <div className="flex flex-wrap" style={{ gap: 4, flexShrink: 0 }}>
               {badgeFields.map(field => {
-                const badge = row.cells[field] && renderFieldValue(field, row.cells[field], row, false, true);
+                const badge = row.fields[field] && renderFieldValue(field, row.fields[field], row, false, true);
                 return badge ? <div key={field}>{badge}</div> : null;
               })}
             </div>
@@ -185,9 +189,9 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
         {subtitleFields.length > 0 && (
           <div className="flex flex-col" style={{ gap: 2, marginBottom: bodyFields.length > 0 ? 6 : 0 }}>
             {subtitleFields.map(field =>
-              row.cells[field] && (
+              row.fields[field] && (
                 <div key={field} style={{ color: '#64748b', fontSize: 11 }}>
-                  {renderFieldValue(field, row.cells[field], row, true)}
+                  {renderFieldValue(field, row.fields[field], row, true)}
                 </div>
               )
             )}
@@ -200,9 +204,9 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
             bodyFieldFullWidth ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
           }`} style={{ gap: 6 }}>
             {bodyFields.map(field =>
-              row.cells[field] && (
+              row.fields[field] && (
                 <div key={field} style={{ fontSize: 11 }}>
-                  {renderFieldValue(field, row.cells[field], row, !hideLabelsForFields.includes(field), false)}
+                  {renderFieldValue(field, row.fields[field], row, !hideLabelsForFields.includes(field), false)}
                 </div>
               )
             )}
@@ -213,9 +217,9 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
         {attachmentFields.length > 0 && (
           <div className="flex flex-wrap" style={{ gap: 6, marginBottom: 8 }}>
             {attachmentFields.map(field =>
-              row.cells[field] && (
+              row.fields[field] && (
                 <div key={field}>
-                  {renderFieldValue(field, row.cells[field], row, true)}
+                  {renderFieldValue(field, row.fields[field], row, true)}
                 </div>
               )
             )}
@@ -226,9 +230,9 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
         {footerFields.length > 0 && (
           <div className="flex flex-wrap" style={{ gap: 12, fontSize: 11, color: '#64748b', marginTop: 8 }}>
             {footerFields.map(field =>
-              row.cells[field] && (
+              row.fields[field] && (
                 <span key={field}>
-                  {renderFieldValue(field, row.cells[field], row, true)}
+                  {renderFieldValue(field, row.fields[field], row, true)}
                 </span>
               )
             )}
@@ -273,11 +277,11 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
         }}
       >
         <h3 style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', margin: 0 }}>
-          {data.spec.title || 'List'}
+          {TABLE_LIST_PRESETS[data.preset as keyof typeof TABLE_LIST_PRESETS]?.title || 'List'}
         </h3>
-        {data.spec.tableActions && data.spec.tableActions.length > 0 && (
+        {data.tableActions && data.tableActions.length > 0 && (
           <div className="flex" style={{ gap: 6 }}>
-            {data.spec.tableActions.map(action => (
+            {data.tableActions.map(action => (
               <Button
                 key={action.id}
                 variant="outline"
@@ -316,12 +320,6 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
     </div>
   );
 };
-
-// Helper function to get field label - finds the column label from the spec
-function getFieldLabel(fieldName: string, data: RenderableTableData): string {
-  const column = data.spec.columns.find(col => col.field === fieldName);
-  return column?.label || fieldName;
-}
 
 // Helper functions for row action icons
 
