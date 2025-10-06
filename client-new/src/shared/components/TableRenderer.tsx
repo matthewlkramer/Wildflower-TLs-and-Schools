@@ -313,7 +313,7 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
                             )}
                             {data.spec.rowActions.length > 0 && (
                               <RowActionsMenu
-                                actions={data.spec.rowActions}
+                                actions={[...data.spec.rowActions]}
                                 onAction={(actionId) => onRowAction?.(row.id, actionId)}
                               />
                             )}

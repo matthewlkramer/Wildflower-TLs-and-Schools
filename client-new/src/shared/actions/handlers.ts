@@ -1,5 +1,5 @@
 import { supabase } from '@/core/supabase/client';
-import type { RowActionId } from '../detail-types';
+import type { RowActionId } from '../types/detail-types';
 
 type Ctx = {
   actionId: RowActionId | string;

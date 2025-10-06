@@ -303,7 +303,7 @@ export class TableService {
     // Process attachment fields - convert UUID to storage URL
     // Check field metadata first, then column type
     const manualMetadata = fieldMetadata?.[column.field];
-    const isAttachment = column.type === 'attachment' || (column as any).attachment || (manualMetadata as any)?.type === 'attachment';
+    const isAttachment = column.type === 'attachment' || (manualMetadata as any)?.type === 'attachment';
     if (isAttachment && rawValue) {
       console.log('[table-service] Processing attachment field:', column.field, 'table:', tableName, 'rawValue:', rawValue);
       const { getStorageBucket } = await import('../config/storage-buckets');

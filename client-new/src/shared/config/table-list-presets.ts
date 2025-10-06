@@ -1,5 +1,5 @@
 import { list } from '../views/builders';
-import type { TableColumnMeta, TableActionSpec, RowActionId, TableToggleSpec, FilterExpr } from './detail-types';
+import type { TableColumnMeta, TableActionSpec, RowActionId, TableToggleSpec, FilterExpr } from '../types/detail-types';
 export type TablePreset = {
   title?: string;
   orderBy?: readonly { column: string; ascending: boolean }[] | { column: string; ascending: boolean };
@@ -175,8 +175,8 @@ export const TABLE_LIST_PRESETS = {
     columns: [
       { field: 'doc_type', label: 'Document Type', lookupTable: 'zref_gov_docs', linkToAttachmentArray: 'governance_doc_public_urls', listLayout: 'title'},
       { field: 'upload_date', label: 'Upload Date' , listLayout: 'subtitle'},
-      { field: 'governance_doc_public_urls', label: 'Files', visibility: 'suppress' }, // Hidden array of URLs
-      { field: 'governance_doc_object_ids', label: 'File IDs', visibility: 'suppress' }, // Hidden array of object IDs
+      { field: 'governance_doc_public_urls', label: 'Files', type: 'attachmentArray', visibility: 'suppress' },
+      { field: 'governance_doc_object_ids', label: 'File IDs', visibility: 'suppress' },
     ] as const,
     rowActions: ['view_in_modal', 'archive'] as const,
     tableActions: [{id: 'addGovDoc', label: 'Add Document'}] as const,
@@ -189,8 +189,8 @@ export const TABLE_LIST_PRESETS = {
     readSource: 'nine_nineties',
     columns: [
       { field: 'form_year', label: 'Year', linkToAttachmentArray: 'nine_nineties_public_urls' , listLayout: 'title'},
-      { field: 'nine_nineties_public_urls', label: 'Files', visibility: 'suppress' }, // Hidden array of URLs
-      { field: 'nine_nineties_object_ids', label: 'File IDs', visibility: 'suppress' }, // Hidden array of object IDs
+      { field: 'nine_nineties_public_urls', label: 'Files', type: 'attachmentArray', visibility: 'suppress' },
+      { field: 'nine_nineties_object_ids', label: 'File IDs', visibility: 'suppress' },
     ] as const,
     rowActions: ['view_in_modal', 'archive'] as const,
     tableActions: [{id: 'addNineNinety', label: 'Add 990'}] as const,

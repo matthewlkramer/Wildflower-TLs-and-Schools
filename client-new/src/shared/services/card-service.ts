@@ -2,7 +2,7 @@ import { supabase } from '@/core/supabase/client';
 import { getColumnMetadata, findColumnMetadata } from '@/generated/schema-metadata';
 import { GENERATED_LOOKUPS } from '@/generated/lookups.generated';
 import { ENUM_OPTIONS, FIELD_TYPES } from '@/generated/enums.generated';
-import type { FieldMetadata, LookupException } from './detail-types';
+import type { FieldMetadata, LookupException } from '../types/detail-types';
 import type { CardSpec } from '../views/types';
 import { fromTable } from '../utils/supabase-utils';
 import { getStorageBucket } from '../config/storage-buckets';

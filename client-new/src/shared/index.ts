@@ -37,8 +37,6 @@ export * from './actions/table-handlers';
 
 // ===== HOOKS =====
 export * from './hooks/useSavedViews';
-export * from './hooks/useReferenceLabels';
-export * from './hooks/useSelectOptions';
 
 // ===== UTILITIES =====
 export * from './utils';

@@ -1,4 +1,4 @@
-import type { TableColumnMeta } from '../detail-types';
+import type { TableColumnMeta } from '../types/detail-types';
 
 type Ctx = {
   actionId: string;

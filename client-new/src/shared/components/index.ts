@@ -11,4 +11,4 @@ export { cardService, type RenderableCard, type CardField, type FieldValue } fro
 export { DetailsRenderer } from './DetailsRenderer';
 
 // Export resolver utilities
-export { resolveTableSpec, resolveTableBlock, type ResolvedTableSpec } from '../services/table-spec-resolver';
+export { resolveTableSpec, type ResolvedTableSpec } from '../services/table-spec-resolver';

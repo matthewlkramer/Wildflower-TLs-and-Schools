@@ -1,4 +1,4 @@
-import type { DetailFieldType, TableColumnMeta, FieldMetadata } from "./detail-types";
+import type { DetailFieldType, TableColumnMeta, FieldMetadata } from "../shared/types/detail-types";
 import { schemaMetadata } from "./schema-metadata.generated";
 import type { ColumnMetadata } from "./schema-metadata.generated";
 

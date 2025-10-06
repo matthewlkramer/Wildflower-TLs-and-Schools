@@ -159,7 +159,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
         {data.rowActions && data.rowActions.length > 0 && (
           <div style={{ position: 'absolute', top: 6, right: 6 }}>
             <RowActionsMenu
-              actions={data.rowActions}
+              actions={[...data.rowActions]}
               onAction={(actionId) => onRowAction?.(row.id, actionId)}
             />
           </div>
@@ -262,7 +262,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
     <div
       className={className}
       style={{
-        background: '#b2dfdb',
+        background: '#fff',
         borderRadius: 8,
         boxShadow: '0 4px 16px rgba(15,23,42,0.06)',
         overflow: 'hidden'
@@ -272,7 +272,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
       <div
         className="flex items-center justify-between"
         style={{
-          padding: '12px 16px',
+          padding: '10px 12px',
           borderBottom: '1px solid #e2e8f0'
         }}
       >
@@ -287,7 +287,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={() => onTableAction?.(action.id)}
-                className="h-7 px-2 text-xs"
+                style={{ fontSize: 11, height: 26, padding: '0 10px' }}
               >
                 {action.label}
               </Button>
@@ -297,7 +297,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
       </div>
 
       {/* List Cards */}
-      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {data.rows.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 32, color: '#64748b', fontSize: 12 }}>
             No records found
@@ -313,7 +313,7 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
 
       {/* Footer info */}
       {data.totalCount !== undefined && (
-        <div style={{ padding: '8px 16px', borderTop: '1px solid #e2e8f0', fontSize: 11, color: '#64748b', textAlign: 'center' }}>
+        <div style={{ padding: '8px 12px', borderTop: '1px solid #e2e8f0', fontSize: 11, color: '#64748b', textAlign: 'center' }}>
           Showing {data.rows.length} of {data.totalCount} records
         </div>
       )}

@@ -11,12 +11,11 @@ import type {
 export type ResolvedTableColumn = {
   field: string;
   label: string;
-  type?: 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'attachment';
+  type?: 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'attachment' | 'attachmentArray';
   lookup?: FieldLookup;
   options?: string[];
   multiline?: boolean;
   width?: string;
-  attachment?: boolean;
   maxArrayEntries?: number;
   linkToField?: string;
   linkToAttachmentArray?: string; // Points to a text[] field containing public URLs
@@ -122,6 +121,11 @@ function resolveColumn(columnSpec: string | TableColumnMeta, readSource?: string
   const editable = (meta as any).update !== 'no' &&
                    (meta as any).edit !== false;
 
+  // If column has attachment property, set type to 'attachment'
+  if ((meta as any).attachment && !fieldType) {
+    fieldType = 'attachment';
+  }
+
   return {
     field,
     label: (meta as any).label || labelFromField(field),
@@ -130,7 +134,6 @@ function resolveColumn(columnSpec: string | TableColumnMeta, readSource?: string
     options: enumOptions,
     multiline: (meta as any).multiline,
     width: (meta as any).width,
-    attachment: (meta as any).attachment,
     maxArrayEntries: (meta as any).maxArrayEntries,
     linkToField: (meta as any).linkToField || (meta as any).linkToAttachment,
     linkToAttachmentArray: (meta as any).linkToAttachmentArray,

@@ -2260,7 +2260,7 @@ export type Database = {
           ready_to_issue_grant_letter_flag: string | null
           bill_account: string | null
           guide_first_name: string | null
-          School Grant Name: string | null
+          "School Grant Name": string | null
           grant_status: string | null
           amount: number | null
           issue_date: string | null
@@ -2302,7 +2302,7 @@ export type Database = {
           ready_to_issue_grant_letter_flag?: string | null
           bill_account?: string | null
           guide_first_name?: string | null
-          School Grant Name?: string | null
+          "School Grant Name"?: string | null
           grant_status?: string | null
           amount?: number | null
           issue_date?: string | null
@@ -2344,7 +2344,7 @@ export type Database = {
           ready_to_issue_grant_letter_flag?: string | null
           bill_account?: string | null
           guide_first_name?: string | null
-          School Grant Name?: string | null
+          "School Grant Name"?: string | null
           grant_status?: string | null
           amount?: number | null
           issue_date?: string | null
@@ -2673,7 +2673,7 @@ export type Database = {
       }
       loans: {
         Row: {
-          Loan Key: string | null
+          "Loan Key": string | null
           old_id: string | null
           amount_issued: number | null
           issue_date: string | null
@@ -2691,7 +2691,7 @@ export type Database = {
           loan_docs_public_urls: unknown | null
         }
         Insert: {
-          Loan Key?: string | null
+          "Loan Key"?: string | null
           old_id?: string | null
           amount_issued?: number | null
           issue_date?: string | null
@@ -2709,7 +2709,7 @@ export type Database = {
           loan_docs_public_urls?: unknown | null
         }
         Update: {
-          Loan Key?: string | null
+          "Loan Key"?: string | null
           old_id?: string | null
           amount_issued?: number | null
           issue_date?: string | null
@@ -3897,7 +3897,7 @@ export type Database = {
           last_name: string | null
           full_name: string | null
           email: string | null
-          Link to Start a School: string | null
+          "Link to Start a School": string | null
           race_ethnicity: string | null
           race_ethnicity_other: string | null
           lgbtqia: string | null
@@ -3916,30 +3916,30 @@ export type Database = {
           cert_processing_status: string | null
           currently_montessori_certified: string | null
           currently_seeking_mont_cert: string | null
-          Temp - M Cert Cert 1: string | null
-          Montessori Certification Certifier 1: string | null
-          Temp - M Cert Year 1: string | null
-          Montessori Certification Year 1: string | null
-          Temp - M Cert Level 1: string | null
-          Montessori Certification Level 1: string | null
-          Temp - M Cert Cert 2: string | null
-          Montessori Certification Certifier 2: string | null
-          Temp - M Cert Year 2: string | null
-          Montessori Certification Year 2: string | null
-          Temp - M Cert Level 2: string | null
-          Montessori Certification Level 2: string | null
-          Temp - M Cert Cert 3: string | null
-          Montessori Certification Certifier 3: string | null
-          Temp - M Cert Year 3: string | null
-          Montessori Certification Year 3: string | null
-          Temp - M Cert Level 3: string | null
-          Montessori Certification Level 3: string | null
-          Temp - M Cert Cert 4: string | null
-          Montessori Certification Certifier 4: string | null
-          Temp - M Cert Year 4: string | null
-          Montessori Certification Year 4: string | null
-          Temp - M Cert Level 4: string | null
-          Montessori Certification Level 4: string | null
+          "Temp - M Cert Cert 1": string | null
+          "Montessori Certification Certifier 1": string | null
+          "Temp - M Cert Year 1": string | null
+          "Montessori Certification Year 1": string | null
+          "Temp - M Cert Level 1": string | null
+          "Montessori Certification Level 1": string | null
+          "Temp - M Cert Cert 2": string | null
+          "Montessori Certification Certifier 2": string | null
+          "Temp - M Cert Year 2": string | null
+          "Montessori Certification Year 2": string | null
+          "Temp - M Cert Level 2": string | null
+          "Montessori Certification Level 2": string | null
+          "Temp - M Cert Cert 3": string | null
+          "Montessori Certification Certifier 3": string | null
+          "Temp - M Cert Year 3": string | null
+          "Montessori Certification Year 3": string | null
+          "Temp - M Cert Level 3": string | null
+          "Montessori Certification Level 3": string | null
+          "Temp - M Cert Cert 4": string | null
+          "Montessori Certification Certifier 4": string | null
+          "Temp - M Cert Year 4": string | null
+          "Montessori Certification Year 4": string | null
+          "Temp - M Cert Level 4": string | null
+          "Montessori Certification Level 4": string | null
           city: string | null
           city_standardized: string | null
           state: string | null
@@ -3981,7 +3981,7 @@ export type Database = {
           last_name?: string | null
           full_name?: string | null
           email?: string | null
-          Link to Start a School?: string | null
+          "Link to Start a School"?: string | null
           race_ethnicity?: string | null
           race_ethnicity_other?: string | null
           lgbtqia?: string | null
@@ -4000,30 +4000,30 @@ export type Database = {
           cert_processing_status?: string | null
           currently_montessori_certified?: string | null
           currently_seeking_mont_cert?: string | null
-          Temp - M Cert Cert 1?: string | null
-          Montessori Certification Certifier 1?: string | null
-          Temp - M Cert Year 1?: string | null
-          Montessori Certification Year 1?: string | null
-          Temp - M Cert Level 1?: string | null
-          Montessori Certification Level 1?: string | null
-          Temp - M Cert Cert 2?: string | null
-          Montessori Certification Certifier 2?: string | null
-          Temp - M Cert Year 2?: string | null
-          Montessori Certification Year 2?: string | null
-          Temp - M Cert Level 2?: string | null
-          Montessori Certification Level 2?: string | null
-          Temp - M Cert Cert 3?: string | null
-          Montessori Certification Certifier 3?: string | null
-          Temp - M Cert Year 3?: string | null
-          Montessori Certification Year 3?: string | null
-          Temp - M Cert Level 3?: string | null
-          Montessori Certification Level 3?: string | null
-          Temp - M Cert Cert 4?: string | null
-          Montessori Certification Certifier 4?: string | null
-          Temp - M Cert Year 4?: string | null
-          Montessori Certification Year 4?: string | null
-          Temp - M Cert Level 4?: string | null
-          Montessori Certification Level 4?: string | null
+          "Temp - M Cert Cert 1"?: string | null
+          "Montessori Certification Certifier 1"?: string | null
+          "Temp - M Cert Year 1"?: string | null
+          "Montessori Certification Year 1"?: string | null
+          "Temp - M Cert Level 1"?: string | null
+          "Montessori Certification Level 1"?: string | null
+          "Temp - M Cert Cert 2"?: string | null
+          "Montessori Certification Certifier 2"?: string | null
+          "Temp - M Cert Year 2"?: string | null
+          "Montessori Certification Year 2"?: string | null
+          "Temp - M Cert Level 2"?: string | null
+          "Montessori Certification Level 2"?: string | null
+          "Temp - M Cert Cert 3"?: string | null
+          "Montessori Certification Certifier 3"?: string | null
+          "Temp - M Cert Year 3"?: string | null
+          "Montessori Certification Year 3"?: string | null
+          "Temp - M Cert Level 3"?: string | null
+          "Montessori Certification Level 3"?: string | null
+          "Temp - M Cert Cert 4"?: string | null
+          "Montessori Certification Certifier 4"?: string | null
+          "Temp - M Cert Year 4"?: string | null
+          "Montessori Certification Year 4"?: string | null
+          "Temp - M Cert Level 4"?: string | null
+          "Montessori Certification Level 4"?: string | null
           city?: string | null
           city_standardized?: string | null
           state?: string | null
@@ -4065,7 +4065,7 @@ export type Database = {
           last_name?: string | null
           full_name?: string | null
           email?: string | null
-          Link to Start a School?: string | null
+          "Link to Start a School"?: string | null
           race_ethnicity?: string | null
           race_ethnicity_other?: string | null
           lgbtqia?: string | null
@@ -4084,30 +4084,30 @@ export type Database = {
           cert_processing_status?: string | null
           currently_montessori_certified?: string | null
           currently_seeking_mont_cert?: string | null
-          Temp - M Cert Cert 1?: string | null
-          Montessori Certification Certifier 1?: string | null
-          Temp - M Cert Year 1?: string | null
-          Montessori Certification Year 1?: string | null
-          Temp - M Cert Level 1?: string | null
-          Montessori Certification Level 1?: string | null
-          Temp - M Cert Cert 2?: string | null
-          Montessori Certification Certifier 2?: string | null
-          Temp - M Cert Year 2?: string | null
-          Montessori Certification Year 2?: string | null
-          Temp - M Cert Level 2?: string | null
-          Montessori Certification Level 2?: string | null
-          Temp - M Cert Cert 3?: string | null
-          Montessori Certification Certifier 3?: string | null
-          Temp - M Cert Year 3?: string | null
-          Montessori Certification Year 3?: string | null
-          Temp - M Cert Level 3?: string | null
-          Montessori Certification Level 3?: string | null
-          Temp - M Cert Cert 4?: string | null
-          Montessori Certification Certifier 4?: string | null
-          Temp - M Cert Year 4?: string | null
-          Montessori Certification Year 4?: string | null
-          Temp - M Cert Level 4?: string | null
-          Montessori Certification Level 4?: string | null
+          "Temp - M Cert Cert 1"?: string | null
+          "Montessori Certification Certifier 1"?: string | null
+          "Temp - M Cert Year 1"?: string | null
+          "Montessori Certification Year 1"?: string | null
+          "Temp - M Cert Level 1"?: string | null
+          "Montessori Certification Level 1"?: string | null
+          "Temp - M Cert Cert 2"?: string | null
+          "Montessori Certification Certifier 2"?: string | null
+          "Temp - M Cert Year 2"?: string | null
+          "Montessori Certification Year 2"?: string | null
+          "Temp - M Cert Level 2"?: string | null
+          "Montessori Certification Level 2"?: string | null
+          "Temp - M Cert Cert 3"?: string | null
+          "Montessori Certification Certifier 3"?: string | null
+          "Temp - M Cert Year 3"?: string | null
+          "Montessori Certification Year 3"?: string | null
+          "Temp - M Cert Level 3"?: string | null
+          "Montessori Certification Level 3"?: string | null
+          "Temp - M Cert Cert 4"?: string | null
+          "Montessori Certification Certifier 4"?: string | null
+          "Temp - M Cert Year 4"?: string | null
+          "Montessori Certification Year 4"?: string | null
+          "Temp - M Cert Level 4"?: string | null
+          "Montessori Certification Level 4"?: string | null
           city?: string | null
           city_standardized?: string | null
           state?: string | null
@@ -4488,7 +4488,7 @@ export type Database = {
       admissions_system_options: "TC" | "School Cues"
       advice_panel_stages: "Visioning" | "Planning"
       age_spans: "0-1" | "1-3" | "3-6" | "6-9" | "9-12" | "12-15" | "15-18"
-      ages-grades: "Infants" | "Toddlers" | "PK3" | "PK4" | "K" | "1st" | "2nd" | "3rd" | "4th" | "5th" | "6th" | "7th" | "8th" | "9th" | "10th" | "11th" | "12th"
+      "ages-grades": "Infants" | "Toddlers" | "PK3" | "PK4" | "K" | "1st" | "2nd" | "3rd" | "4th" | "5th" | "6th" | "7th" | "8th" | "9th" | "10th" | "11th" | "12th"
       authorizor_decisions: "Approved" | "Approved, with contingency" | "Deferred decision" | "Denied"
       automation_step_trigger: "Request prelim advice for $3k+" | "Request full advice" | "Waiting for prelim advice" | "Waiting for full advice" | "Proceed" | "Processing" | "Waiting for prereqs" | "Complete"
       budget_utility_options: "WF v4"

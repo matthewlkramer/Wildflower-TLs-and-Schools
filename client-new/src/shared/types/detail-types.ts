@@ -68,6 +68,11 @@ export type FieldMetadata = {
   writeTable?: string;
   // Optional: field-level visibility
   visibleIf?: VisibleIf;
+  // CONSOLIDATED: Links this field to another field (replaces linkToField, linkToAttachment, linkToAttachmentArray)
+  linksTo?: {
+    field: string;  // Name of the field containing the URL(s)
+    type: 'single' | 'array';  // Whether it's one URL or an array
+  };
 };
 
 export type FieldMetadataMap = Record<string, FieldMetadata>;

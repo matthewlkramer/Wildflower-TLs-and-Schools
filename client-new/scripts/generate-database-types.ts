@@ -92,13 +92,15 @@ export type Database = {
       const tableKey = `${table.schema_name}.${table.table_name}`;
       const tableCols = columns_by_table[tableKey] || [];
 
-      output += `      ${table.table_name}: {\n`;
+      const tableName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(table.table_name) ? table.table_name : `"${table.table_name}"`;
+      output += `      ${tableName}: {\n`;
       output += `        Row: {\n`;
 
       // Generate columns
       for (const col of tableCols) {
         const tsType = mapPostgresTypeToTS(col.data_type, col.is_nullable);
-        output += `          ${col.column_name}: ${tsType}\n`;
+        const columnKey = col.column_name.includes(' ') ? `"${col.column_name}"` : col.column_name;
+        output += `          ${columnKey}: ${tsType}\n`;
       }
 
       output += `        }\n`;
@@ -107,7 +109,8 @@ export type Database = {
       // Generate insert types (same as Row but optional)
       for (const col of tableCols) {
         const tsType = mapPostgresTypeToTS(col.data_type, true); // All optional for insert
-        output += `          ${col.column_name}?: ${tsType}\n`;
+        const columnKey = col.column_name.includes(' ') ? `"${col.column_name}"` : col.column_name;
+        output += `          ${columnKey}?: ${tsType}\n`;
       }
 
       output += `        }\n`;
@@ -116,7 +119,8 @@ export type Database = {
       // Generate update types (same as insert)
       for (const col of tableCols) {
         const tsType = mapPostgresTypeToTS(col.data_type, true);
-        output += `          ${col.column_name}?: ${tsType}\n`;
+        const columnKey = col.column_name.includes(' ') ? `"${col.column_name}"` : col.column_name;
+        output += `          ${columnKey}?: ${tsType}\n`;
       }
 
       output += `        }\n`;
@@ -137,7 +141,8 @@ export type Database = {
       const [enumSchema, enumName] = enumKey.split('.');
       if (enumSchema === schemaName) {
         const values = (enumValues as any[]).map(e => `"${e.enum_label}"`).join(' | ');
-        output += `      ${enumName}: ${values}\n`;
+        const enumKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(enumName) ? enumName : `"${enumName}"`;
+        output += `      ${enumKey}: ${values}\n`;
       }
     }
 
