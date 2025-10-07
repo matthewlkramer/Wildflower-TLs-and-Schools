@@ -33,11 +33,15 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
 }) => {
   const { type, options, multiline } = fieldValue;
 
-  // Array/Multi-select dropdown
-  if (Array.isArray(value) && options && options.length > 0) {
+  // Check if we have options to render (select/multi-select)
+  const hasOptions = options && options.length > 0;
+
+  // Array/Multi-select dropdown - check if value is array OR type suggests array
+  if (hasOptions && (Array.isArray(value) || type === 'array')) {
+    const arrayValue = Array.isArray(value) ? value : (value ? [value] : []);
     return (
       <MultiSelectDropdown
-        value={value}
+        value={arrayValue}
         options={options}
         onChange={onChange}
         className={className}
@@ -46,7 +50,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
   }
 
   // Single-select dropdown for enum/lookup fields
-  if (options && options.length > 0) {
+  if (hasOptions) {
     return (
       <Select
         value={String(value || '__null__')}

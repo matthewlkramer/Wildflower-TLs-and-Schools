@@ -14,7 +14,7 @@ export type FieldValue = {
   display: string;
   editable: boolean;
   required?: boolean;
-  type: 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'attachment';
+  type: 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'attachment' | 'array';
   options?: SelectOption[];
   multiline?: boolean;
   bucket?: string; // Supabase storage bucket for attachments
@@ -373,7 +373,7 @@ export class CardService {
       if (GENERATED_LOOKUPS[lookupTable]) {
         const lookupConfig = GENERATED_LOOKUPS[lookupTable];
         options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
-        fieldType = isArrayField ? 'string' : 'enum';
+        fieldType = isArrayField ? 'array' : 'enum';
       }
     }
     // Check for enum options from schema metadata
@@ -382,7 +382,7 @@ export class CardService {
         value: String(value),
         label: String(value)
       }));
-      fieldType = isArrayField ? 'string' : 'enum';
+      fieldType = isArrayField ? 'array' : 'enum';
     }
     // Check FIELD_TYPES mapping for enum fields (text columns with enum-like values)
     else if (!metadata.enumRef && fieldTypeInfo?.baseType === 'enum' && fieldTypeInfo.enumName && ENUM_OPTIONS[fieldTypeInfo.enumName]) {
@@ -390,7 +390,7 @@ export class CardService {
         value: String(value),
         label: String(value)
       }));
-      fieldType = isArrayField ? 'string' : 'enum';
+      fieldType = isArrayField ? 'array' : 'enum';
     }
     // Check for foreign key references
     if (!options && metadata.references && metadata.references.length > 0) {

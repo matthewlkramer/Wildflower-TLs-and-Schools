@@ -101,8 +101,8 @@ export const TABLE_LIST_PRESETS = {
 
   actionSteps: {
     title: 'Action Steps',
-    orderBy: [{ column: 'created_date', ascending: false }] as const,
-    cardLimit: 50,  
+    orderBy: [{ column: 'assigned_date', ascending: false }] as const,
+    cardLimit: 50,
     readSource: 'action_steps',
     columns: [
       { field: 'item', label: 'Item', multiline: true , listLayout: 'title' },
