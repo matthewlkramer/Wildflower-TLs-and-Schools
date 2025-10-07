@@ -132,7 +132,15 @@ export class CardService {
 
       // Apply filters
       if (parentEntityId && module) {
-        query = query.eq(`${module}_id`, parentEntityId);
+        // Map module names to their corresponding foreign key columns
+        // Educators, charter, and other person-based modules use people_id
+        const moduleToForeignKey: Record<string, string> = {
+          'educators': 'people_id',
+          'people': 'people_id',
+        };
+
+        const foreignKeyColumn = moduleToForeignKey[module] || `${module}_id`;
+        query = query.eq(foreignKeyColumn, parentEntityId);
       }
 
       if (activeFilter && preset.readFilter) {
