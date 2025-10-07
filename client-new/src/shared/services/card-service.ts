@@ -133,10 +133,12 @@ export class CardService {
       // Apply filters
       if (parentEntityId && module) {
         // Map module names to their corresponding foreign key columns
-        // Educators, charter, and other person-based modules use people_id
+        // Handle special cases where the module name doesn't match the foreign key column
         const moduleToForeignKey: Record<string, string> = {
           'educators': 'people_id',
           'people': 'people_id',
+          'schools': 'school_id',  // schools table uses school_id, not schools_id
+          'charters': 'charter_id', // charters table uses charter_id, not charters_id
         };
 
         const foreignKeyColumn = moduleToForeignKey[module] || `${module}_id`;
