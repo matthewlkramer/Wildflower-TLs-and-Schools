@@ -165,25 +165,25 @@ export const ListRenderer: React.FC<ListRendererProps> = ({
           </div>
         )}
 
-        {/* Title and Badges Row */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: subtitleFields.length > 0 ? 4 : (bodyFields.length > 0 ? 6 : 0) }}>
+        {/* Title Row */}
+        <div style={{ marginBottom: badgeFields.length > 0 ? 4 : (subtitleFields.length > 0 ? 4 : (bodyFields.length > 0 ? 6 : 0)) }}>
           {/* Title */}
           {titleField && row.fields[titleField] && (
-            <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a', paddingRight: 32, flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a', paddingRight: 32 }}>
               {renderFieldValue(titleField, row.fields[titleField], row)}
             </div>
           )}
-
-          {/* Badge Fields (rendered as badges) - moved up to title row */}
-          {badgeFields.length > 0 && (
-            <div className="flex flex-wrap" style={{ gap: 4, flexShrink: 0 }}>
-              {badgeFields.map(field => {
-                const badge = row.fields[field] && renderFieldValue(field, row.fields[field], row, false, true);
-                return badge ? <div key={field}>{badge}</div> : null;
-              })}
-            </div>
-          )}
         </div>
+
+        {/* Badge Fields Row (below title, above subtitle) */}
+        {badgeFields.length > 0 && (
+          <div className="flex flex-wrap" style={{ gap: 4, marginBottom: subtitleFields.length > 0 ? 4 : (bodyFields.length > 0 ? 6 : 0) }}>
+            {badgeFields.map(field => {
+              const badge = row.fields[field] && renderFieldValue(field, row.fields[field], row, false, true);
+              return badge ? <div key={field}>{badge}</div> : null;
+            })}
+          </div>
+        )}
 
         {/* Subtitle */}
         {subtitleFields.length > 0 && (

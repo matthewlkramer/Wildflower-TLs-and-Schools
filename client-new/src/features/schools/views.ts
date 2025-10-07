@@ -28,6 +28,7 @@ export const SCHOOL_FIELD_METADATA: FieldMetadataMap = {
   current_tls: { editable: false },
   ein: { label: 'EIN' },
   founding_tls: { lookupTable: 'people'},
+  public_funding: { lookupTable: 'zref_public_funding_sources' },
   logo: { type: 'attachment' },
   logo_square: { label: 'Logo (Square)', type: 'attachment' },
   logo_flower_only: { label: 'Logo (Flower Only)', type: 'attachment' },

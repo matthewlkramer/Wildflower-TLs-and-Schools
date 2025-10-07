@@ -25,7 +25,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, serviceRole);
 
     // Process all users that have Google tokens
-    const { data: users } = await supabase.from('gsync.google_auth_tokens').select('user_id');
+    const { data: users } = await supabase.from('ygoogle_auth_tokens').select('user_id');
     // Catch-up queues removed; no prioritization
     const queuedSet = new Set<string>();
     const now = new Date();
@@ -39,7 +39,7 @@ serve(async (req) => {
       const getSince = async (objectType: 'email' | 'event') => {
         try {
           const { data: hist } = await supabase
-            .from('gsync.google_sync_history')
+            .from('ygoogle_sync_history')
             .select('end_of_sync_period, started_at, headers_fetch_successful')
             .eq('user_id', userId)
             .eq('object_type', objectType)
@@ -116,7 +116,7 @@ serve(async (req) => {
             });
           }
           if (rows.length) {
-            await supabase.from('gsync.g_emails').upsert(rows, { onConflict: 'user_id,gmail_message_id' } as any);
+            await supabase.from('yg_emails').upsert(rows, { onConflict: 'user_id,gmail_message_id' } as any);
             stored += rows.length;
           }
           await sleep(150);
@@ -124,7 +124,7 @@ serve(async (req) => {
         await sendConsole(supabase, userId, runId, `Daily Gmail: stored ${stored} headers`, 'info', 'gmail');
         try {
           await supabase
-            .from('gsync.google_sync_history')
+            .from('ygoogle_sync_history')
             .insert({
               user_id: userId,
               start_of_sync_period: since.toISOString(),
@@ -143,7 +143,7 @@ serve(async (req) => {
       // 1b) Gmail backlog catch-up older than 24h (idempotent upserts)
       try {
         // Determine user start date
-        const { data: settings } = await supabase.from('gsync.google_sync_settings').select('sync_start_date').eq('user_id', userId).single();
+        const { data: settings } = await supabase.from('ygoogle_sync_settings').select('sync_start_date').eq('user_id', userId).single();
         const START = settings?.sync_start_date ? new Date(settings.sync_start_date) : null;
         if (START) {
           const olderThanQ = `after:${fmtDate(START)} older_than:1d`;
@@ -175,7 +175,7 @@ serve(async (req) => {
               const sentAt = (headers['date'] ? new Date(headers['date']) : null)?.toISOString() ?? null;
               rows.push({ user_id: userId, gmail_message_id: msg.id, thread_id: msg.threadId, from_email: from, to_emails: to, cc_emails: cc, bcc_emails: bcc, sent_at: sentAt, updated_at: ts() });
             }
-            if (rows.length) await supabase.from('gsync.g_emails').upsert(rows, { onConflict: 'user_id,gmail_message_id', ignoreDuplicates: true } as any);
+            if (rows.length) await supabase.from('yg_emails').upsert(rows, { onConflict: 'user_id,gmail_message_id', ignoreDuplicates: true } as any);
             processed += rows.length;
             if (!pageToken || processed >= MAX) break;
             await sleep(120);
@@ -224,14 +224,14 @@ serve(async (req) => {
               updated_at: ts(),
             };
           });
-          if (rows.length) await supabase.from('gsync.g_events').upsert(rows, { onConflict: 'user_id,google_event_id', ignoreDuplicates: true } as any);
+          if (rows.length) await supabase.from('yg_events').upsert(rows, { onConflict: 'user_id,google_event_id', ignoreDuplicates: true } as any);
           processed += rows.length;
           await sleep(150);
         } while (pageToken);
         await sendConsole(supabase, userId, runId, `Daily Calendar: upserted ~${processed} events`, 'info', 'calendar');
         try {
           await supabase
-            .from('gsync.google_sync_history')
+            .from('ygoogle_sync_history')
             .insert({
               user_id: userId,
               start_of_sync_period: sinceEvent.toISOString(),
@@ -249,11 +249,11 @@ serve(async (req) => {
 
       // Calendar: refresh matching views and backfill from view (attachments)
       try {
-        try { await supabase.from('gsync.google_sync_history').insert({ user_id: userId, start_of_sync_period: sinceEvent.toISOString(), end_of_sync_period: now.toISOString(), object_type: 'event', initiator: 'system', started_at: ts() } as any); } catch {}
-        try { await supabase.from('gsync.refresh_calendar_matching_views' as any); } catch {}
+        try { await supabase.from('ygoogle_sync_history').insert({ user_id: userId, start_of_sync_period: sinceEvent.toISOString(), end_of_sync_period: now.toISOString(), object_type: 'event', initiator: 'system', started_at: ts() } as any); } catch {}
+        try { await supabase.rpc('refresh_calendar_matching_views' as any); } catch {}
         const CALB = Math.max(1, Math.min(200, Number(Deno.env.get('DAILY_GCAL_BACKFILL') || 50)));
         const { data: evs } = await supabase
-          .from('gsync.g_events_full_bodies_to_download')
+          .from('yg_events_full_bodies_to_download')
           .select('user_id, google_event_id, google_calendar_id')
           .eq('user_id', userId)
           .limit(CALB);
@@ -268,7 +268,7 @@ serve(async (req) => {
           const ev: any = await resp.json();
           const summary = ev.summary || null;
           const description = ev.description || null;
-          await supabase.from('gsync.g_events').update({ summary, description, updated_at: ts() }).eq('user_id', userId).eq('google_calendar_id', calId).eq('google_event_id', eid);
+          await supabase.from('yg_events').update({ summary, description, updated_at: ts() }).eq('user_id', userId).eq('google_calendar_id', calId).eq('google_event_id', eid);
           const atts: any[] = Array.isArray(ev.attachments) ? ev.attachments : [];
           if (atts.length) { try { await supabase.storage.createBucket('gcal-attachments', { public: false }); } catch {} }
           for (const a of atts) {
@@ -285,7 +285,7 @@ serve(async (req) => {
                 storagePath = key;
               }
             }
-            await supabase.from('gsync.g_event_attachments').upsert({
+            await supabase.from('yg_event_attachments').upsert({
               user_id: userId,
               google_calendar_id: calId,
               google_event_id: eid,
@@ -299,12 +299,12 @@ serve(async (req) => {
           }
           evUpd++;
         }
-        if (evUpd < CALB) { try { await supabase.from('gsync.refresh_events_with_people_ids' as any); } catch {} }
+        if (evUpd < CALB) { try { await supabase.rpc('refresh_events_with_people_ids' as any); } catch {} }
       } catch {}
 
       // 2b) Calendar backlog catch-up older than 24h
       try {
-        const { data: settings } = await supabase.from('gsync.google_sync_settings').select('sync_start_date').eq('user_id', userId).single();
+        const { data: settings } = await supabase.from('ygoogle_sync_settings').select('sync_start_date').eq('user_id', userId).single();
         const START = settings?.sync_start_date ? new Date(settings.sync_start_date) : null;
         if (START) {
           const timeMin = new Date(Date.UTC(START.getUTCFullYear(), START.getUTCMonth(), START.getUTCDate())).toISOString();
@@ -333,7 +333,7 @@ serve(async (req) => {
               const attendeeEmails = (e.attendees || []).map((a: any) => (a?.email || '').toLowerCase()).filter(Boolean);
               return { user_id: userId, google_calendar_id: CALENDAR_ID, google_event_id: e.id, summary: sanitizeText(e.summary || null), description: sanitizeText(e.description || null), start_time: start, end_time: end, organizer_email: e.organizer?.email || null, attendees: attendeeEmails.length ? attendeeEmails : null, location: e.location || null, status: e.status || null, updated_at: ts() };
             });
-            if (rows.length) await supabase.from('gsync.g_events').upsert(rows, { onConflict: 'user_id,google_event_id' } as any);
+            if (rows.length) await supabase.from('yg_events').upsert(rows, { onConflict: 'user_id,google_event_id' } as any);
             processed += rows.length;
             if (!pageToken || processed >= MAX) break;
             await sleep(120);
@@ -360,7 +360,7 @@ serve(async (req) => {
         const token2 = await getValidAccessTokenOrThrow(supabase, userId);
         // Note: select rows missing subject OR body_text
         const { data: rows } = await supabase
-          .from('gsync.g_emails')
+          .from('yg_emails')
           .select('gmail_message_id, matched_educator_ids, subject, body_text')
           .eq('user_id', userId)
           .or('subject.is.null,body_text.is.null')
@@ -401,7 +401,7 @@ serve(async (req) => {
             return { text: text || undefined, html: html || undefined, attachments };
           };
           const bodies = extractParts(full.payload);
-          await supabase.from('gsync.g_emails').update({ subject: subject || (r as any).subject || null, body_text: bodies.text || null, body_html: bodies.html || null, updated_at: ts() }).eq('user_id', userId).eq('gmail_message_id', mid);
+          await supabase.from('yg_emails').update({ subject: subject || (r as any).subject || null, body_text: bodies.text || null, body_html: bodies.html || null, updated_at: ts() }).eq('user_id', userId).eq('gmail_message_id', mid);
           try { await supabase.storage.createBucket('gmail-attachments', { public: false }); } catch {}
           for (const a of (bodies.attachments || [])) {
             if (!a.id) continue;
@@ -412,7 +412,7 @@ serve(async (req) => {
             const bin = Uint8Array.from(atob(contentBase64), c => c.charCodeAt(0));
             const key = `${userId}/${mid}/${a.id}-${(a.filename || 'attachment').replace(/[^a-zA-Z0-9._-]+/g,'_')}`;
             await supabase.storage.from('gmail-attachments').upload(key, new Blob([bin], { type: a.mimeType || 'application/octet-stream' }), { upsert: true });
-            await supabase.from('gsync.g_email_attachments').upsert({
+            await supabase.from('yg_email_attachments').upsert({
               user_id: userId,
               gmail_message_id: mid,
               attachment_id: a.id,
@@ -429,7 +429,7 @@ serve(async (req) => {
         await sendConsole(supabase, userId, runId, `Daily Backfill: updated ${done} messages`, 'info', 'gmail');
         try {
           await supabase
-            .from('gsync.google_sync_history')
+            .from('ygoogle_sync_history')
             .insert({
               user_id: userId,
               start_of_sync_period: since.toISOString(),

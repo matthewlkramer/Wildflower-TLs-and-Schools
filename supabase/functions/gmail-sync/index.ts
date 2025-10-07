@@ -56,10 +56,8 @@ serve(async (req) => {
     const serviceRole = Deno.env.get('SERVICE_ROLE_KEY') ?? '';
     // User-context clients (forward Authorization) for reads that rely on auth.uid()
     const supabase = createClient(supabaseUrl, serviceRole, { global: { headers: { Authorization: authHeader } } });
-    const supabaseGsync = createClient(supabaseUrl, serviceRole, { db: { schema: 'gsync' }, global: { headers: { Authorization: authHeader } } });
     // Service-role clients for privileged writes (do not forward user Authorization)
     const supabaseSrv = createClient(supabaseUrl, serviceRole);
-    const supabaseSrvGsync = createClient(supabaseUrl, serviceRole, { db: { schema: 'gsync' } });
 
     // Address helpers (no matching here; server-side functions perform matching)
     const extractEmail = (s?: string): string | null => {
@@ -78,7 +76,7 @@ serve(async (req) => {
     switch (action) {
       case 'refresh_matching_views': {
         try {
-          const r = await supabaseGsync.rpc('refresh_email_matching_views', {} as any);
+          const r = await supabase.rpc('refresh_email_matching_views', {} as any);
           if (r.error) return json({ ok: false, source: 'rpc', error: r.error.message, details: (r.error as any).details || null });
           return json({ ok: true, refreshed: true });
         } catch (e: any) {
@@ -88,7 +86,7 @@ serve(async (req) => {
       case 'check_gmail_scope': {
         // Validate current token scopes and a minimal Gmail API call
         try {
-          const tok = await getValidAccessToken(supabaseGsync, userId);
+          const tok = await getValidAccessToken(supabase, userId);
           if (!tok) {
             return json({ ok: false, error: 'No valid access token' });
           }
@@ -119,7 +117,7 @@ serve(async (req) => {
       case 'get_synced_through': {
         // Return the max(sent_at) for this user's emails as the synced-through timestamp
         const { data: rows } = await supabase
-          .from('gsync.g_emails')
+          .from('yg_emails')
           .select('sent_at')
           .eq('user_id', userId)
           .order('sent_at', { ascending: false })
@@ -137,15 +135,15 @@ serve(async (req) => {
         return json({ auth_url: url });
       }
       case 'exchange_code': {
-        await exchangeCode(supabaseGsync, code, userId, finalRedirect);
+        await exchangeCode(supabase, code, userId, finalRedirect);
         await sendConsole(supabase, userId, null, 'Google tokens saved', 'milestone', 'gmail');
         return json({ ok: true });
       }
       case 'get_connection_status': {
-        const tok = await getValidAccessToken(supabaseGsync, userId);
+        const tok = await getValidAccessToken(supabase, userId);
         if (tok) return json({ connected: true });
-        const { data: trow } = await supabaseGsync
-          .from('google_auth_tokens')
+        const { data: trow } = await supabase
+          .from('ygoogle_auth_tokens')
           .select('user_id, access_token, refresh_token')
           .eq('user_id', userId)
           .maybeSingle();
@@ -157,8 +155,8 @@ serve(async (req) => {
           // Fetch Gmail message headers (From/To/Cc/Bcc/Date) from start date to now; no subjects/bodies
           // Optional body.since (ISO string); if absent, read from gsync.google_sync_settings
           const sinceIso = body?.since as string | undefined;
-          const { data: settings } = await supabaseGsync
-            .from('google_sync_settings')
+          const { data: settings } = await supabase
+            .from('ygoogle_sync_settings')
             .select('sync_start_date')
             .eq('user_id', userId)
             .maybeSingle();
@@ -166,8 +164,8 @@ serve(async (req) => {
           // Create history row (user-initiated)
           let histId: number | null = null;
           try {
-            const { data: hist } = await supabaseSrvGsync
-              .from('google_sync_history')
+            const { data: hist } = await supabaseSrv
+              .from('ygoogle_sync_history')
               .insert({
                 user_id: userId,
                 start_of_sync_period: start.toISOString(),
@@ -180,7 +178,7 @@ serve(async (req) => {
               .single();
             histId = (hist as any)?.id ?? null;
           } catch {}
-          const accessToken = await getValidAccessTokenOrThrow(supabaseGsync, userId);
+          const accessToken = await getValidAccessTokenOrThrow(supabase, userId);
           const fmt = (d: Date) => `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2,'0')}/${String(d.getUTCDate()).padStart(2,'0')}`;
           const q = `after:${fmt(start)}`;
           let pageToken: string | undefined = undefined;
@@ -200,8 +198,8 @@ serve(async (req) => {
           const splitAddresses = (v?: string): string[] => (!v ? [] : v.split(',').map(a => extractEmail(a) || '').filter(Boolean));
           const upsertBatch = async () => {
             if (!toInsert.length) return;
-            const { error } = await supabaseSrvGsync
-              .from('g_emails')
+            const { error } = await supabaseSrv
+              .from('yg_emails')
               .upsert(toInsert as any, { onConflict: 'user_id,gmail_message_id', ignoreDuplicates: true } as any);
             if (error) return json({ ok: false, source: 'upsert', status: 0, error: error.message });
             toInsert.length = 0;
@@ -248,11 +246,11 @@ serve(async (req) => {
             if ((Date.now() - startTime) > 6 * 60_000) break; // keep under typical function timeout
           } while (pageToken);
           const r = await upsertBatch(); if (r) return r;
-          try { if (histId) await supabaseSrvGsync.from('google_sync_history').update({ headers_fetched: listed, headers_fetch_successful: true }).eq('id', histId); } catch {}
+          try { if (histId) await supabaseSrv.from('ygoogle_sync_history').update({ headers_fetched: listed, headers_fetch_successful: true }).eq('id', histId); } catch {}
           return json({ ok: true, listed });
         } catch (e: any) {
           try {
-            await supabaseSrvGsync.from('google_sync_history').insert({
+            await supabaseSrv.from('ygoogle_sync_history').insert({
               user_id: userId,
               object_type: 'email',
               initiator: 'user',
@@ -267,10 +265,10 @@ serve(async (req) => {
       
   case 'backfill_bodies_from_view': {
     try {
-      const accessToken = await getValidAccessTokenOrThrow(supabaseGsync, userId);
+      const accessToken = await getValidAccessTokenOrThrow(supabase, userId);
           const batch = Number(body?.limit ?? 100);
-          const { data: rows, error } = await supabaseGsync
-            .from('g_emails_full_bodies_to_download')
+          const { data: rows, error } = await supabase
+            .from('yg_emails_full_bodies_to_download')
             .select('user_id, gmail_message_id')
             .eq('user_id', userId)
             .limit(batch);
@@ -281,15 +279,15 @@ serve(async (req) => {
             const mids = (rows || []).map((r: any) => r.gmail_message_id);
             let startIso: string | null = null; let endIso: string | null = ts();
             if (mids.length) {
-              const { data: bounds } = await supabaseGsync
-                .from('g_emails')
+              const { data: bounds } = await supabase
+                .from('yg_emails')
                 .select('sent_at')
                 .eq('user_id', userId)
                 .in('gmail_message_id', mids)
                 .order('sent_at', { ascending: true })
                 .limit(1);
-              const { data: bounds2 } = await supabaseGsync
-                .from('g_emails')
+              const { data: bounds2 } = await supabase
+                .from('yg_emails')
                 .select('sent_at')
                 .eq('user_id', userId)
                 .in('gmail_message_id', mids)
@@ -298,8 +296,8 @@ serve(async (req) => {
               startIso = (bounds && bounds[0]?.sent_at) || null;
               endIso = (bounds2 && bounds2[0]?.sent_at) || endIso;
             }
-            const { data: ins } = await supabaseSrvGsync
-              .from('google_sync_history')
+            const { data: ins } = await supabaseSrv
+              .from('ygoogle_sync_history')
               .insert({ user_id: userId, start_of_sync_period: startIso, end_of_sync_period: endIso, object_type: 'email', initiator: 'user', started_at: ts() } as any)
               .select('id')
               .single();
@@ -341,7 +339,7 @@ serve(async (req) => {
                 attachments.push({ id: attachId || `${mid}-${attachments.length}`, filename: node.filename, mimeType: mime || undefined, size: node.body?.size });
               }
             }
-            const { error: upErr } = await supabaseSrvGsync.from('g_emails').update({ subject: sanitizeText(subject) || null, body_text: sanitizeText(text) || null, body_html: sanitizeText(html) || null, updated_at: ts() }).eq('user_id', userId).eq('gmail_message_id', mid);
+            const { error: upErr } = await supabaseSrv.from('yg_emails').update({ subject: sanitizeText(subject) || null, body_text: sanitizeText(text) || null, body_html: sanitizeText(html) || null, updated_at: ts() }).eq('user_id', userId).eq('gmail_message_id', mid);
             if (upErr) {
               await sendConsole(supabase, userId, null, `Backfill(view): update failed for ${mid}: ${upErr.message}`, 'error', 'gmail');
               continue;
@@ -358,7 +356,7 @@ serve(async (req) => {
               const safeName = (a.filename || 'attachment').replace(/[^a-zA-Z0-9._-]+/g,'_');
               const key = `${userId}/${mid}/${a.id}-${safeName}`;
               await supabase.storage.from('gmail-attachments').upload(key, new Blob([bin], { type: a.mimeType || 'application/octet-stream' }), { upsert: true });
-              await supabaseSrvGsync.from('g_email_attachments').upsert({
+              await supabaseSrv.from('yg_email_attachments').upsert({
                 user_id: userId,
                 gmail_message_id: mid,
                 attachment_id: a.id,
@@ -373,15 +371,15 @@ serve(async (req) => {
           }
           await sendConsole(supabase, userId, null, `Backfill(view): updated ${updated}`, 'info', 'gmail');
           // Update history
-          try { if (histId) await supabaseSrvGsync.from('google_sync_history').update({ backfill_downloads: updated, backfill_download_successful: true }).eq('id', histId); } catch {}
+          try { if (histId) await supabaseSrv.from('ygoogle_sync_history').update({ backfill_downloads: updated, backfill_download_successful: true }).eq('id', histId); } catch {}
           // If we likely reached the end (updated < batch), trigger final MV refresh (best-effort)
           if (updated < batch) {
-            try { await supabaseGsync.rpc('refresh_emails_with_people_ids', {} as any); } catch {}
+            try { await supabase.rpc('refresh_emails_with_people_ids', {} as any); } catch {}
           }
           return json({ ok: true, updated, candidates });
         } catch (e: any) {
           try {
-            await supabaseSrvGsync.from('google_sync_history').insert({ user_id: userId, object_type: 'email', initiator: 'user', started_at: ts(), backfill_download_successful: false, backfill_error: e?.message || 'backfill from view failed' } as any);
+            await supabaseSrv.from('ygoogle_sync_history').insert({ user_id: userId, object_type: 'email', initiator: 'user', started_at: ts(), backfill_download_successful: false, backfill_error: e?.message || 'backfill from view failed' } as any);
           } catch {}
           return json({ ok: false, source: 'exception', error: e?.message || 'backfill from view failed' });
         }

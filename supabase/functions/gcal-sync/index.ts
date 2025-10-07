@@ -60,18 +60,16 @@ serve(async (req) => {
     const serviceRole = Deno.env.get('SERVICE_ROLE_KEY') ?? '';
     // User-context clients (forward Authorization) for reads that rely on auth.uid()
     const supabase = createClient(supabaseUrl, serviceRole, { global: { headers: { Authorization: authHeader } } });
-    const supabaseGsync = createClient(supabaseUrl, serviceRole, { db: { schema: 'gsync' }, global: { headers: { Authorization: authHeader } } });
     // Service-role clients for privileged writes (do not forward user Authorization)
     const supabaseSrv = createClient(supabaseUrl, serviceRole);
-    const supabaseSrvGsync = createClient(supabaseUrl, serviceRole, { db: { schema: 'gsync' } });
 
     // No matching or allowlist here; DB jobs handle linking later.
 
     switch (action) {
       case 'get_synced_through': {
         // Return the max(start_time) for this user's events as the synced-through timestamp
-        const { data: rows } = await supabaseGsync
-          .from('g_events')
+        const { data: rows } = await supabase
+          .from('yg_events')
           .select('start_time')
           .eq('user_id', userId)
           .order('start_time', { ascending: false })
@@ -90,16 +88,16 @@ serve(async (req) => {
         return json({ auth_url: url, scopes_requested: SCOPES });
       }
       case 'exchange_code': {
-        await exchangeCode(supabaseGsync, code, userId, finalRedirect);
+        await exchangeCode(supabase, code, userId, finalRedirect);
         await sendConsole(supabase, userId, 'Google tokens saved', 'milestone', 'calendar');
         return json({ ok: true });
       }
       case 'get_connection_status': {
-        const tok = await getValidAccessToken(supabaseGsync, userId);
+        const tok = await getValidAccessToken(supabase, userId);
         if (tok) return json({ connected: true });
         // Fallback: consider connected if a token row exists (access or refresh)
-        const { data: trow } = await supabaseGsync
-          .from('google_auth_tokens')
+        const { data: trow } = await supabase
+          .from('ygoogle_auth_tokens')
           .select('user_id, access_token, refresh_token')
           .eq('user_id', userId)
           .maybeSingle();
@@ -107,9 +105,9 @@ serve(async (req) => {
       }
 
       case 'token_health': {
-        const accessValid = !!(await getValidAccessToken(supabaseGsync, userId));
-        const { data: trow } = await supabaseGsync
-          .from('google_auth_tokens')
+        const accessValid = !!(await getValidAccessToken(supabase, userId));
+        const { data: trow } = await supabase
+          .from('ygoogle_auth_tokens')
           .select('refresh_token, expires_at')
           .eq('user_id', userId)
           .maybeSingle();
@@ -119,15 +117,15 @@ serve(async (req) => {
       case 'fetch_headers_range': {
         try {
           const nowIso = ts();
-          const { data: settings } = await supabaseGsync.from('google_sync_settings').select('sync_start_date').eq('user_id', userId).single();
+          const { data: settings } = await supabase.from('ygoogle_sync_settings').select('sync_start_date').eq('user_id', userId).single();
           const calendarId = 'primary';
           let accessToken: string;
           try {
-            accessToken = await getValidAccessTokenOrThrow(supabaseGsync, userId);
+            accessToken = await getValidAccessTokenOrThrow(supabase, userId);
           } catch (e: any) {
             try {
-              const { data: trow } = await supabaseGsync
-                .from('google_auth_tokens')
+              const { data: trow } = await supabase
+                .from('ygoogle_auth_tokens')
                 .select('user_id, expires_at, access_token, refresh_token')
                 .eq('user_id', userId)
                 .maybeSingle();
@@ -145,8 +143,8 @@ serve(async (req) => {
           // History row (user-initiated)
           let histId: number | null = null;
           try {
-            const { data: hist } = await supabaseSrvGsync
-              .from('google_sync_history')
+            const { data: hist } = await supabaseSrv
+              .from('ygoogle_sync_history')
               .insert({ user_id: userId, start_of_sync_period: timeMin, end_of_sync_period: nowIso, object_type: 'event', initiator: 'user', started_at: nowIso } as any)
               .select('id')
               .single();
@@ -156,8 +154,8 @@ serve(async (req) => {
           let upserted = 0;
           const upsert = async (rows: any[]) => {
             if (!rows.length) return;
-            const { error } = await supabaseSrvGsync
-              .from('g_events')
+            const { error } = await supabaseSrv
+              .from('yg_events')
               .upsert(rows, { onConflict: 'user_id,google_event_id' } as any);
             if (error) {
               throw new Error(`upsert g_events failed: ${error.message}`);
@@ -198,12 +196,12 @@ serve(async (req) => {
             });
             await upsert(rows);
           } while (pageToken);
-          try { if (histId) await supabaseSrvGsync.from('google_sync_history').update({ headers_fetched: upserted, headers_fetch_successful: true }).eq('id', histId); } catch {}
+          try { if (histId) await supabaseSrv.from('ygoogle_sync_history').update({ headers_fetched: upserted, headers_fetch_successful: true }).eq('id', histId); } catch {}
           return json({ ok: true, upserted });
         } catch (e: any) {
           try {
-            await supabaseSrvGsync
-              .from('google_sync_history')
+            await supabaseSrv
+              .from('ygoogle_sync_history')
               .insert({ user_id: userId, object_type: 'event', initiator: 'user', started_at: ts(), headers_fetch_successful: false, headers_fetch_error: e?.message || 'fetch headers failed' } as any);
           } catch {}
           return json({ ok: false, source: 'exception', error: e?.message || 'fetch headers failed' });
@@ -211,7 +209,7 @@ serve(async (req) => {
       }
       case 'refresh_matching_views': {
         try {
-          const r = await supabaseGsync.rpc('refresh_calendar_matching_views', {} as any);
+          const r = await supabase.rpc('refresh_calendar_matching_views', {} as any);
           if (r.error) {
             const msg = r.error.message || '';
             const details = (r.error as any).details || null;
@@ -228,8 +226,8 @@ serve(async (req) => {
         try {
           const accessToken = await getValidAccessTokenOrThrow(supabase, userId);
           const batch = Math.max(1, Math.min(100, Number((body && body.limit) || 100)));
-          const { data: rows, error } = await supabaseGsync
-            .from('g_events_full_bodies_to_download')
+          const { data: rows, error } = await supabase
+            .from('yg_events_full_bodies_to_download')
             .select('user_id, google_event_id, google_calendar_id')
             .eq('user_id', userId)
             .limit(batch);
@@ -240,8 +238,8 @@ serve(async (req) => {
             const ids = (rows || []).map((r: any) => r.google_event_id);
             let startIso: string | null = null; let endIso: string | null = ts();
             if (ids.length) {
-              const { data: b1 } = await supabaseGsync.from('g_events').select('start_time').eq('user_id', userId).in('google_event_id', ids).order('start_time', { ascending: true }).limit(1);
-              const { data: b2 } = await supabaseGsync.from('g_events').select('start_time').eq('user_id', userId).in('google_event_id', ids).order('start_time', { ascending: false }).limit(1);
+              const { data: b1 } = await supabase.from('yg_events').select('start_time').eq('user_id', userId).in('google_event_id', ids).order('start_time', { ascending: true }).limit(1);
+              const { data: b2 } = await supabase.from('yg_events').select('start_time').eq('user_id', userId).in('google_event_id', ids).order('start_time', { ascending: false }).limit(1);
               startIso = (b1 && b1[0]?.start_time) || null;
               endIso = (b2 && b2[0]?.start_time) || endIso;
             }
@@ -303,7 +301,7 @@ serve(async (req) => {
           }
           // If likely end of stream, refresh final MV (best-effort)
           if (updated < batch) {
-            try { await supabaseGsync.rpc('refresh_events_with_people_ids', {} as any); } catch {}
+            try { await supabase.rpc('refresh_events_with_people_ids', {} as any); } catch {}
           }
           try { if (histId) await supabase.from('gsync.google_sync_history').update({ backfill_downloads: updated, backfill_download_successful: true }).eq('id', histId); } catch {}
           return json({ ok: true, updated });

@@ -71,8 +71,8 @@ export const TABLE_LIST_PRESETS = {
     title: 'Gmail',
     orderBy: [{ column: 'sent_at', ascending: false }] as const,
     cardLimit: 50,
-    readSource: 'gsync.g_emails_with_people_ids_mv',
-    writeDefaults: {table: 'gsync.g_emails', pkColumn: 'id' },
+    readSource: 'yg_emails_with_people_ids_mv',
+    writeDefaults: {table: 'yg_emails', pkColumn: 'id' },
     columns: [
       { field: 'sent_at', label: 'Sent', update: 'no', width: '120px' , listLayout: 'footer' },
       { field: 'subject', update: 'no', multiline: true, width: '320px' , listLayout: 'title' },
@@ -88,8 +88,8 @@ export const TABLE_LIST_PRESETS = {
     title: 'gCal',
     orderBy: [{ column: 'start_time', ascending: false }] as const,
     cardLimit: 50,
-    readSource: 'gsync.g_events_with_people_ids_mv',
-    writeDefaults: {table: 'gsync.g_events', pkColumn: 'id' },
+    readSource: 'yg_events_with_people_ids_mv',
+    writeDefaults: {table: 'yg_events', pkColumn: 'id' },
     columns: [
       { field: 'summary', update: 'no', listLayout: 'title' },
       { field: 'start_time', update: 'no', listLayout: 'body' },

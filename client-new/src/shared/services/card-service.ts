@@ -1,7 +1,8 @@
 import { supabase } from '@/core/supabase/client';
-import { getColumnMetadata, findColumnMetadata } from '@/generated/schema-metadata';
+import { getColumnMetadata, findColumnMetadata, mergeFieldMetadata } from '@/generated/schema-metadata';
 import { GENERATED_LOOKUPS } from '@/generated/lookups.generated';
-import { ENUM_OPTIONS, FIELD_TYPES } from '@/generated/enums.generated';
+import { ENUM_OPTIONS, FIELD_TYPES, FIELD_TO_ENUM } from '@/generated/enums.generated';
+import { TABLE_LIST_PRESETS } from '../config/table-list-presets';
 import type { FieldMetadata, LookupException } from '../types/detail-types';
 import type { CardSpec } from '../views/types';
 import { fromTable } from '../utils/supabase-utils';
@@ -118,7 +119,6 @@ export class CardService {
     viewFieldMetadata?: import('../types/detail-types').FieldMetadataMap
   ): Promise<RenderableListData> {
     try {
-      const { TABLE_LIST_PRESETS } = await import('../config/table-list-presets');
       const preset = TABLE_LIST_PRESETS[presetId as keyof typeof TABLE_LIST_PRESETS];
 
       if (!preset) {
@@ -145,11 +145,18 @@ export class CardService {
         query = query.eq(foreignKeyColumn, parentEntityId);
       }
 
-      if (activeFilter && preset.readFilter) {
+      // Apply base readFilter (ALWAYS applied - defines what records this preset shows)
+      if (preset.readFilter) {
         const filter = preset.readFilter as any;
         if (filter.eq) {
           query = query.eq(filter.eq.column, filter.eq.value);
         }
+      }
+
+      // Apply toggle filters (only when activeFilter is true)
+      // TODO: Implement toggle filter logic from preset.toggles
+      if (activeFilter && preset.toggles) {
+        // Future: Apply active toggles here
       }
 
       // Apply ordering
@@ -330,7 +337,7 @@ export class CardService {
 
     // Merge manual metadata with schema metadata using the existing merge function
     const mergedMetadata = manualMetadata
-      ? (await import('@/generated/schema-metadata')).mergeFieldMetadata({
+      ? mergeFieldMetadata({
           field: fieldName,
           manual: manualMetadata,
           schema,
@@ -361,25 +368,35 @@ export class CardService {
     let fieldType: FieldValue['type'] = 'string';
     let isArrayField = false;
 
-    // Check if this is an array field from FIELD_TYPES (use actualTable which may differ from source table)
+    // Check if this is an array field from FIELD_TYPES or manual metadata
     const fieldTypeKey = `${schema}.${actualTable}.${fieldName}`;
     const fieldTypeInfo = FIELD_TYPES[fieldTypeKey];
-    if (fieldTypeInfo?.array) {
+    if (fieldTypeInfo?.array || (manualMetadata as any)?.array) {
       isArrayField = true;
     }
 
-    // Check for explicit lookup table in metadata (from view field metadata) - FIRST priority
-    // Check manual metadata first, then merged metadata
-    const lookupTable = (manualMetadata as any)?.lookupTable || (metadata as any)?.lookupTable;
-    if (lookupTable) {
+    // Check for explicit enumName in manual metadata - HIGHEST priority for manual overrides
+    const manualEnumName = (manualMetadata as any)?.enumName;
+    if (manualEnumName && ENUM_OPTIONS[manualEnumName]) {
+      options = ENUM_OPTIONS[manualEnumName].map(value => ({
+        value: String(value),
+        label: String(value)
+      }));
+      fieldType = isArrayField ? 'array' : 'enum';
+    }
+    // Check for explicit lookup table in metadata (from view field metadata)
+    else {
+      const lookupTable = (manualMetadata as any)?.lookupTable || (metadata as any)?.lookupTable;
+      if (lookupTable) {
       if (GENERATED_LOOKUPS[lookupTable]) {
         const lookupConfig = GENERATED_LOOKUPS[lookupTable];
         options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
         fieldType = isArrayField ? 'array' : 'enum';
       }
+      }
     }
     // Check for enum options from schema metadata
-    else if (metadata.enumRef && ENUM_OPTIONS[metadata.enumRef]) {
+    if (!options && metadata.enumRef && ENUM_OPTIONS[metadata.enumRef]) {
       options = ENUM_OPTIONS[metadata.enumRef].map(value => ({
         value: String(value),
         label: String(value)
@@ -393,6 +410,18 @@ export class CardService {
         label: String(value)
       }));
       fieldType = isArrayField ? 'array' : 'enum';
+    }
+    // Check FIELD_TO_ENUM mapping for direct field-to-enum associations
+    if (!options) {
+      const fieldKey = `public.${actualTable}.${fieldName}`;
+      const enumName = FIELD_TO_ENUM[fieldKey];
+      if (enumName && ENUM_OPTIONS[enumName]) {
+        options = ENUM_OPTIONS[enumName].map(value => ({
+          value: String(value),
+          label: String(value)
+        }));
+        fieldType = isArrayField ? 'array' : 'enum';
+      }
     }
     // Check for foreign key references
     if (!options && metadata.references && metadata.references.length > 0) {
@@ -412,11 +441,14 @@ export class CardService {
     // Check if this is an attachment field from manual metadata
     const isAttachment = (manualMetadata as any)?.type === 'attachment';
 
-    // Determine type from manual metadata first, then schema metadata
+    // Determine type from manual metadata first, then schema metadata, then FIELD_TYPES
     if (isAttachment) {
       fieldType = 'attachment';
     } else if (!options && metadata.baseType) {
       fieldType = this.mapSchemaType(metadata.baseType);
+    } else if (!options && fieldTypeInfo?.baseType) {
+      // Fallback to FIELD_TYPES for baseType (handles booleans, numbers, etc.)
+      fieldType = this.mapSchemaType(fieldTypeInfo.baseType);
     }
 
     const rawValue = entityData[fieldName];

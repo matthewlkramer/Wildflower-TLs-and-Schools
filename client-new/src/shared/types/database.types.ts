@@ -10,694 +10,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
   }
-  gsync: {
-    Tables: {
-      email_addresses_filtered_mv: {
-        Row: {
-          email_address: string | null
-          created_at: string | null
-          people_id: string | null
-        }
-        Insert: {
-          email_address?: string | null
-          created_at?: string | null
-          people_id?: string | null
-        }
-        Update: {
-          email_address?: string | null
-          created_at?: string | null
-          people_id?: string | null
-        }
-      }
-      exclusion_emails: {
-        Row: {
-          email: string
-          email_or_domain: string | null
-        }
-        Insert: {
-          email?: string | null
-          email_or_domain?: string | null
-        }
-        Update: {
-          email?: string | null
-          email_or_domain?: string | null
-        }
-      }
-      g_email_attachments: {
-        Row: {
-          id: string
-          user_id: string
-          gmail_message_id: string
-          attachment_id: string
-          filename: string | null
-          mime_type: string | null
-          size_bytes: number | null
-          content_base64: string | null
-          created_at: string
-          storage_path: string | null
-        }
-        Insert: {
-          id?: string | null
-          user_id?: string | null
-          gmail_message_id?: string | null
-          attachment_id?: string | null
-          filename?: string | null
-          mime_type?: string | null
-          size_bytes?: number | null
-          content_base64?: string | null
-          created_at?: string | null
-          storage_path?: string | null
-        }
-        Update: {
-          id?: string | null
-          user_id?: string | null
-          gmail_message_id?: string | null
-          attachment_id?: string | null
-          filename?: string | null
-          mime_type?: string | null
-          size_bytes?: number | null
-          content_base64?: string | null
-          created_at?: string | null
-          storage_path?: string | null
-        }
-      }
-      g_emails: {
-        Row: {
-          user_id: string
-          gmail_message_id: string
-          thread_id: string | null
-          from_email: string | null
-          to_emails: unknown | null
-          cc_emails: unknown | null
-          bcc_emails: unknown | null
-          subject: string | null
-          body_text: string | null
-          body_html: string | null
-          sent_at: string | null
-          created_at: string
-          updated_at: string
-          is_private: boolean | null
-        }
-        Insert: {
-          user_id?: string | null
-          gmail_message_id?: string | null
-          thread_id?: string | null
-          from_email?: string | null
-          to_emails?: unknown | null
-          cc_emails?: unknown | null
-          bcc_emails?: unknown | null
-          subject?: string | null
-          body_text?: string | null
-          body_html?: string | null
-          sent_at?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-          is_private?: boolean | null
-        }
-        Update: {
-          user_id?: string | null
-          gmail_message_id?: string | null
-          thread_id?: string | null
-          from_email?: string | null
-          to_emails?: unknown | null
-          cc_emails?: unknown | null
-          bcc_emails?: unknown | null
-          subject?: string | null
-          body_text?: string | null
-          body_html?: string | null
-          sent_at?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-          is_private?: boolean | null
-        }
-      }
-      g_emails_addresses_unnested_mv: {
-        Row: {
-          gmail_message_id: string | null
-          user_id: string | null
-          address_row: unknown | null
-          email_address: string | null
-        }
-        Insert: {
-          gmail_message_id?: string | null
-          user_id?: string | null
-          address_row?: unknown | null
-          email_address?: string | null
-        }
-        Update: {
-          gmail_message_id?: string | null
-          user_id?: string | null
-          address_row?: unknown | null
-          email_address?: string | null
-        }
-      }
-      g_emails_full_bodies_to_download: {
-        Row: {
-          gmail_message_id: string | null
-          user_id: string | null
-          body_text: string | null
-        }
-        Insert: {
-          gmail_message_id?: string | null
-          user_id?: string | null
-          body_text?: string | null
-        }
-        Update: {
-          gmail_message_id?: string | null
-          user_id?: string | null
-          body_text?: string | null
-        }
-      }
-      g_emails_minus_exclusions: {
-        Row: {
-          user_id: string | null
-          gmail_message_id: string | null
-          thread_id: string | null
-          from_email: string | null
-          to_emails: unknown | null
-          cc_emails: unknown | null
-          bcc_emails: unknown | null
-          subject: string | null
-          body_text: string | null
-          body_html: string | null
-          sent_at: string | null
-          created_at: string | null
-          updated_at: string | null
-          is_private: boolean | null
-        }
-        Insert: {
-          user_id?: string | null
-          gmail_message_id?: string | null
-          thread_id?: string | null
-          from_email?: string | null
-          to_emails?: unknown | null
-          cc_emails?: unknown | null
-          bcc_emails?: unknown | null
-          subject?: string | null
-          body_text?: string | null
-          body_html?: string | null
-          sent_at?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-          is_private?: boolean | null
-        }
-        Update: {
-          user_id?: string | null
-          gmail_message_id?: string | null
-          thread_id?: string | null
-          from_email?: string | null
-          to_emails?: unknown | null
-          cc_emails?: unknown | null
-          bcc_emails?: unknown | null
-          subject?: string | null
-          body_text?: string | null
-          body_html?: string | null
-          sent_at?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-          is_private?: boolean | null
-        }
-      }
-      g_emails_people_ids_mv: {
-        Row: {
-          people_id: string | null
-          user_id: string | null
-          gmail_message_id: string | null
-        }
-        Insert: {
-          people_id?: string | null
-          user_id?: string | null
-          gmail_message_id?: string | null
-        }
-        Update: {
-          people_id?: string | null
-          user_id?: string | null
-          gmail_message_id?: string | null
-        }
-      }
-      g_emails_with_people_ids_mv: {
-        Row: {
-          gmail_message_id: string | null
-          thread_id: string | null
-          user_id: string | null
-          people_id: string | null
-          from_email: string | null
-          to_emails: unknown | null
-          cc_emails: unknown | null
-          bcc_emails: unknown | null
-          subject: string | null
-          body_text: string | null
-          body_html: string | null
-          sent_at: string | null
-          is_private: boolean | null
-          school_id: string | null
-          charter_id: string | null
-        }
-        Insert: {
-          gmail_message_id?: string | null
-          thread_id?: string | null
-          user_id?: string | null
-          people_id?: string | null
-          from_email?: string | null
-          to_emails?: unknown | null
-          cc_emails?: unknown | null
-          bcc_emails?: unknown | null
-          subject?: string | null
-          body_text?: string | null
-          body_html?: string | null
-          sent_at?: string | null
-          is_private?: boolean | null
-          school_id?: string | null
-          charter_id?: string | null
-        }
-        Update: {
-          gmail_message_id?: string | null
-          thread_id?: string | null
-          user_id?: string | null
-          people_id?: string | null
-          from_email?: string | null
-          to_emails?: unknown | null
-          cc_emails?: unknown | null
-          bcc_emails?: unknown | null
-          subject?: string | null
-          body_text?: string | null
-          body_html?: string | null
-          sent_at?: string | null
-          is_private?: boolean | null
-          school_id?: string | null
-          charter_id?: string | null
-        }
-      }
-      g_emails_without_people_ids: {
-        Row: {
-          gmail_message_id: string | null
-          thread_id: string | null
-          user_id: string | null
-          from_email: string | null
-          to_emails: unknown | null
-          cc_emails: unknown | null
-          bcc_emails: unknown | null
-          subject: string | null
-          body_text: string | null
-          body_html: string | null
-          sent_at: string | null
-          is_private: boolean | null
-          school_id: string | null
-          charter_id: string | null
-        }
-        Insert: {
-          gmail_message_id?: string | null
-          thread_id?: string | null
-          user_id?: string | null
-          from_email?: string | null
-          to_emails?: unknown | null
-          cc_emails?: unknown | null
-          bcc_emails?: unknown | null
-          subject?: string | null
-          body_text?: string | null
-          body_html?: string | null
-          sent_at?: string | null
-          is_private?: boolean | null
-          school_id?: string | null
-          charter_id?: string | null
-        }
-        Update: {
-          gmail_message_id?: string | null
-          thread_id?: string | null
-          user_id?: string | null
-          from_email?: string | null
-          to_emails?: unknown | null
-          cc_emails?: unknown | null
-          bcc_emails?: unknown | null
-          subject?: string | null
-          body_text?: string | null
-          body_html?: string | null
-          sent_at?: string | null
-          is_private?: boolean | null
-          school_id?: string | null
-          charter_id?: string | null
-        }
-      }
-      g_event_attachments: {
-        Row: {
-          id: string
-          user_id: string
-          google_calendar_id: string
-          google_event_id: string
-          title: string | null
-          mime_type: string | null
-          file_url: string | null
-          file_id: string | null
-          icon_link: string | null
-          identity_key: string | null
-          created_at: string
-          storage_path: string | null
-        }
-        Insert: {
-          id?: string | null
-          user_id?: string | null
-          google_calendar_id?: string | null
-          google_event_id?: string | null
-          title?: string | null
-          mime_type?: string | null
-          file_url?: string | null
-          file_id?: string | null
-          icon_link?: string | null
-          identity_key?: string | null
-          created_at?: string | null
-          storage_path?: string | null
-        }
-        Update: {
-          id?: string | null
-          user_id?: string | null
-          google_calendar_id?: string | null
-          google_event_id?: string | null
-          title?: string | null
-          mime_type?: string | null
-          file_url?: string | null
-          file_id?: string | null
-          icon_link?: string | null
-          identity_key?: string | null
-          created_at?: string | null
-          storage_path?: string | null
-        }
-      }
-      g_events: {
-        Row: {
-          user_id: string
-          google_calendar_id: string
-          google_event_id: string
-          summary: string | null
-          description: string | null
-          start_time: string | null
-          end_time: string | null
-          organizer_email: string | null
-          location: string | null
-          status: string | null
-          created_at: string
-          updated_at: string
-          attendees: unknown | null
-          is_private: boolean | null
-        }
-        Insert: {
-          user_id?: string | null
-          google_calendar_id?: string | null
-          google_event_id?: string | null
-          summary?: string | null
-          description?: string | null
-          start_time?: string | null
-          end_time?: string | null
-          organizer_email?: string | null
-          location?: string | null
-          status?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-          attendees?: unknown | null
-          is_private?: boolean | null
-        }
-        Update: {
-          user_id?: string | null
-          google_calendar_id?: string | null
-          google_event_id?: string | null
-          summary?: string | null
-          description?: string | null
-          start_time?: string | null
-          end_time?: string | null
-          organizer_email?: string | null
-          location?: string | null
-          status?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-          attendees?: unknown | null
-          is_private?: boolean | null
-        }
-      }
-      g_events_attendees_unnested_mv: {
-        Row: {
-          google_event_id: string | null
-          google_calendar_id: string | null
-          user_id: string | null
-          participant_type: string | null
-          email_address: string | null
-        }
-        Insert: {
-          google_event_id?: string | null
-          google_calendar_id?: string | null
-          user_id?: string | null
-          participant_type?: string | null
-          email_address?: string | null
-        }
-        Update: {
-          google_event_id?: string | null
-          google_calendar_id?: string | null
-          user_id?: string | null
-          participant_type?: string | null
-          email_address?: string | null
-        }
-      }
-      g_events_full_bodies_to_download: {
-        Row: {
-          google_event_id: string | null
-          google_calendar_id: string | null
-          user_id: string | null
-          description: string | null
-        }
-        Insert: {
-          google_event_id?: string | null
-          google_calendar_id?: string | null
-          user_id?: string | null
-          description?: string | null
-        }
-        Update: {
-          google_event_id?: string | null
-          google_calendar_id?: string | null
-          user_id?: string | null
-          description?: string | null
-        }
-      }
-      g_events_people_ids_mv: {
-        Row: {
-          people_id: string | null
-          user_id: string | null
-          google_calendar_id: string | null
-          google_event_id: string | null
-        }
-        Insert: {
-          people_id?: string | null
-          user_id?: string | null
-          google_calendar_id?: string | null
-          google_event_id?: string | null
-        }
-        Update: {
-          people_id?: string | null
-          user_id?: string | null
-          google_calendar_id?: string | null
-          google_event_id?: string | null
-        }
-      }
-      g_events_with_people_ids_mv: {
-        Row: {
-          google_calendar_id: string | null
-          google_event_id: string | null
-          user_id: string | null
-          people_id: string | null
-          organizer_email: string | null
-          attendees: unknown | null
-          location: string | null
-          summary: string | null
-          description: string | null
-          start_time: string | null
-          end_time: string | null
-          is_private: boolean | null
-          school_id: string | null
-          charter_id: string | null
-        }
-        Insert: {
-          google_calendar_id?: string | null
-          google_event_id?: string | null
-          user_id?: string | null
-          people_id?: string | null
-          organizer_email?: string | null
-          attendees?: unknown | null
-          location?: string | null
-          summary?: string | null
-          description?: string | null
-          start_time?: string | null
-          end_time?: string | null
-          is_private?: boolean | null
-          school_id?: string | null
-          charter_id?: string | null
-        }
-        Update: {
-          google_calendar_id?: string | null
-          google_event_id?: string | null
-          user_id?: string | null
-          people_id?: string | null
-          organizer_email?: string | null
-          attendees?: unknown | null
-          location?: string | null
-          summary?: string | null
-          description?: string | null
-          start_time?: string | null
-          end_time?: string | null
-          is_private?: boolean | null
-          school_id?: string | null
-          charter_id?: string | null
-        }
-      }
-      g_events_without_people_ids: {
-        Row: {
-          google_calendar_id: string | null
-          google_event_id: string | null
-          user_id: string | null
-          organizer_email: string | null
-          attendees: unknown | null
-          location: string | null
-          summary: string | null
-          description: string | null
-          start_time: string | null
-          end_time: string | null
-          is_private: boolean | null
-          school_id: string | null
-          charter_id: string | null
-        }
-        Insert: {
-          google_calendar_id?: string | null
-          google_event_id?: string | null
-          user_id?: string | null
-          organizer_email?: string | null
-          attendees?: unknown | null
-          location?: string | null
-          summary?: string | null
-          description?: string | null
-          start_time?: string | null
-          end_time?: string | null
-          is_private?: boolean | null
-          school_id?: string | null
-          charter_id?: string | null
-        }
-        Update: {
-          google_calendar_id?: string | null
-          google_event_id?: string | null
-          user_id?: string | null
-          organizer_email?: string | null
-          attendees?: unknown | null
-          location?: string | null
-          summary?: string | null
-          description?: string | null
-          start_time?: string | null
-          end_time?: string | null
-          is_private?: boolean | null
-          school_id?: string | null
-          charter_id?: string | null
-        }
-      }
-      google_auth_tokens: {
-        Row: {
-          user_id: string
-          access_token: string
-          refresh_token: string
-          expires_at: string
-          updated_at: string
-        }
-        Insert: {
-          user_id?: string | null
-          access_token?: string | null
-          refresh_token?: string | null
-          expires_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          user_id?: string | null
-          access_token?: string | null
-          refresh_token?: string | null
-          expires_at?: string | null
-          updated_at?: string | null
-        }
-      }
-      google_sync_history: {
-        Row: {
-          id: number
-          started_at: string
-          user_id: string | null
-          start_of_sync_period: string | null
-          end_of_sync_period: string | null
-          object_type: unknown | null
-          headers_fetched: number | null
-          headers_fetch_successful: boolean | null
-          headers_fetch_error: string | null
-          backfill_downloads: number | null
-          backfill_download_successful: boolean | null
-          backfill_error: string | null
-          initiator: unknown | null
-        }
-        Insert: {
-          id?: number | null
-          started_at?: string | null
-          user_id?: string | null
-          start_of_sync_period?: string | null
-          end_of_sync_period?: string | null
-          object_type?: unknown | null
-          headers_fetched?: number | null
-          headers_fetch_successful?: boolean | null
-          headers_fetch_error?: string | null
-          backfill_downloads?: number | null
-          backfill_download_successful?: boolean | null
-          backfill_error?: string | null
-          initiator?: unknown | null
-        }
-        Update: {
-          id?: number | null
-          started_at?: string | null
-          user_id?: string | null
-          start_of_sync_period?: string | null
-          end_of_sync_period?: string | null
-          object_type?: unknown | null
-          headers_fetched?: number | null
-          headers_fetch_successful?: boolean | null
-          headers_fetch_error?: string | null
-          backfill_downloads?: number | null
-          backfill_download_successful?: boolean | null
-          backfill_error?: string | null
-          initiator?: unknown | null
-        }
-      }
-      google_sync_settings: {
-        Row: {
-          user_id: string
-          sync_start_date: string
-          updated_at: string
-          backfill_batch_size: number | null
-        }
-        Insert: {
-          user_id?: string | null
-          sync_start_date?: string | null
-          updated_at?: string | null
-          backfill_batch_size?: number | null
-        }
-        Update: {
-          user_id?: string | null
-          sync_start_date?: string | null
-          updated_at?: string | null
-          backfill_batch_size?: number | null
-        }
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      [_ in never]: never
-    }
-    Enums: {
-      address_rows: "from" | "to" | "cc" | "bcc"
-      initiators: "system" | "user"
-      object_types: "event" | "email"
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       action_steps: {
@@ -4158,6 +3470,676 @@ export type Database = {
           id?: string | null
           bucket_id?: string | null
           name?: string | null
+        }
+      }
+      yemail_addresses_filtered_mv: {
+        Row: {
+          email_address: string | null
+          created_at: string | null
+          people_id: string | null
+        }
+        Insert: {
+          email_address?: string | null
+          created_at?: string | null
+          people_id?: string | null
+        }
+        Update: {
+          email_address?: string | null
+          created_at?: string | null
+          people_id?: string | null
+        }
+      }
+      yexclusion_emails: {
+        Row: {
+          email: string
+          email_or_domain: string | null
+        }
+        Insert: {
+          email?: string | null
+          email_or_domain?: string | null
+        }
+        Update: {
+          email?: string | null
+          email_or_domain?: string | null
+        }
+      }
+      yg_email_attachments: {
+        Row: {
+          id: string
+          user_id: string
+          gmail_message_id: string
+          attachment_id: string
+          filename: string | null
+          mime_type: string | null
+          size_bytes: number | null
+          content_base64: string | null
+          created_at: string
+          storage_path: string | null
+        }
+        Insert: {
+          id?: string | null
+          user_id?: string | null
+          gmail_message_id?: string | null
+          attachment_id?: string | null
+          filename?: string | null
+          mime_type?: string | null
+          size_bytes?: number | null
+          content_base64?: string | null
+          created_at?: string | null
+          storage_path?: string | null
+        }
+        Update: {
+          id?: string | null
+          user_id?: string | null
+          gmail_message_id?: string | null
+          attachment_id?: string | null
+          filename?: string | null
+          mime_type?: string | null
+          size_bytes?: number | null
+          content_base64?: string | null
+          created_at?: string | null
+          storage_path?: string | null
+        }
+      }
+      yg_emails: {
+        Row: {
+          user_id: string
+          gmail_message_id: string
+          thread_id: string | null
+          from_email: string | null
+          to_emails: unknown | null
+          cc_emails: unknown | null
+          bcc_emails: unknown | null
+          subject: string | null
+          body_text: string | null
+          body_html: string | null
+          sent_at: string | null
+          created_at: string
+          updated_at: string
+          is_private: boolean | null
+        }
+        Insert: {
+          user_id?: string | null
+          gmail_message_id?: string | null
+          thread_id?: string | null
+          from_email?: string | null
+          to_emails?: unknown | null
+          cc_emails?: unknown | null
+          bcc_emails?: unknown | null
+          subject?: string | null
+          body_text?: string | null
+          body_html?: string | null
+          sent_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          is_private?: boolean | null
+        }
+        Update: {
+          user_id?: string | null
+          gmail_message_id?: string | null
+          thread_id?: string | null
+          from_email?: string | null
+          to_emails?: unknown | null
+          cc_emails?: unknown | null
+          bcc_emails?: unknown | null
+          subject?: string | null
+          body_text?: string | null
+          body_html?: string | null
+          sent_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          is_private?: boolean | null
+        }
+      }
+      yg_emails_addresses_unnested_mv: {
+        Row: {
+          gmail_message_id: string | null
+          user_id: string | null
+          address_row: unknown | null
+          email_address: string | null
+        }
+        Insert: {
+          gmail_message_id?: string | null
+          user_id?: string | null
+          address_row?: unknown | null
+          email_address?: string | null
+        }
+        Update: {
+          gmail_message_id?: string | null
+          user_id?: string | null
+          address_row?: unknown | null
+          email_address?: string | null
+        }
+      }
+      yg_emails_full_bodies_to_download: {
+        Row: {
+          gmail_message_id: string | null
+          user_id: string | null
+          body_text: string | null
+        }
+        Insert: {
+          gmail_message_id?: string | null
+          user_id?: string | null
+          body_text?: string | null
+        }
+        Update: {
+          gmail_message_id?: string | null
+          user_id?: string | null
+          body_text?: string | null
+        }
+      }
+      yg_emails_minus_exclusions: {
+        Row: {
+          user_id: string | null
+          gmail_message_id: string | null
+          thread_id: string | null
+          from_email: string | null
+          to_emails: unknown | null
+          cc_emails: unknown | null
+          bcc_emails: unknown | null
+          subject: string | null
+          body_text: string | null
+          body_html: string | null
+          sent_at: string | null
+          created_at: string | null
+          updated_at: string | null
+          is_private: boolean | null
+        }
+        Insert: {
+          user_id?: string | null
+          gmail_message_id?: string | null
+          thread_id?: string | null
+          from_email?: string | null
+          to_emails?: unknown | null
+          cc_emails?: unknown | null
+          bcc_emails?: unknown | null
+          subject?: string | null
+          body_text?: string | null
+          body_html?: string | null
+          sent_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          is_private?: boolean | null
+        }
+        Update: {
+          user_id?: string | null
+          gmail_message_id?: string | null
+          thread_id?: string | null
+          from_email?: string | null
+          to_emails?: unknown | null
+          cc_emails?: unknown | null
+          bcc_emails?: unknown | null
+          subject?: string | null
+          body_text?: string | null
+          body_html?: string | null
+          sent_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          is_private?: boolean | null
+        }
+      }
+      yg_emails_people_ids_mv: {
+        Row: {
+          people_id: string | null
+          user_id: string | null
+          gmail_message_id: string | null
+        }
+        Insert: {
+          people_id?: string | null
+          user_id?: string | null
+          gmail_message_id?: string | null
+        }
+        Update: {
+          people_id?: string | null
+          user_id?: string | null
+          gmail_message_id?: string | null
+        }
+      }
+      yg_emails_with_people_ids_mv: {
+        Row: {
+          gmail_message_id: string | null
+          thread_id: string | null
+          user_id: string | null
+          people_id: string | null
+          from_email: string | null
+          to_emails: unknown | null
+          cc_emails: unknown | null
+          bcc_emails: unknown | null
+          subject: string | null
+          body_text: string | null
+          body_html: string | null
+          sent_at: string | null
+          is_private: boolean | null
+          school_id: string | null
+          charter_id: string | null
+        }
+        Insert: {
+          gmail_message_id?: string | null
+          thread_id?: string | null
+          user_id?: string | null
+          people_id?: string | null
+          from_email?: string | null
+          to_emails?: unknown | null
+          cc_emails?: unknown | null
+          bcc_emails?: unknown | null
+          subject?: string | null
+          body_text?: string | null
+          body_html?: string | null
+          sent_at?: string | null
+          is_private?: boolean | null
+          school_id?: string | null
+          charter_id?: string | null
+        }
+        Update: {
+          gmail_message_id?: string | null
+          thread_id?: string | null
+          user_id?: string | null
+          people_id?: string | null
+          from_email?: string | null
+          to_emails?: unknown | null
+          cc_emails?: unknown | null
+          bcc_emails?: unknown | null
+          subject?: string | null
+          body_text?: string | null
+          body_html?: string | null
+          sent_at?: string | null
+          is_private?: boolean | null
+          school_id?: string | null
+          charter_id?: string | null
+        }
+      }
+      yg_emails_without_people_ids: {
+        Row: {
+          gmail_message_id: string | null
+          thread_id: string | null
+          user_id: string | null
+          from_email: string | null
+          to_emails: unknown | null
+          cc_emails: unknown | null
+          bcc_emails: unknown | null
+          subject: string | null
+          body_text: string | null
+          body_html: string | null
+          sent_at: string | null
+          is_private: boolean | null
+          school_id: string | null
+          charter_id: string | null
+        }
+        Insert: {
+          gmail_message_id?: string | null
+          thread_id?: string | null
+          user_id?: string | null
+          from_email?: string | null
+          to_emails?: unknown | null
+          cc_emails?: unknown | null
+          bcc_emails?: unknown | null
+          subject?: string | null
+          body_text?: string | null
+          body_html?: string | null
+          sent_at?: string | null
+          is_private?: boolean | null
+          school_id?: string | null
+          charter_id?: string | null
+        }
+        Update: {
+          gmail_message_id?: string | null
+          thread_id?: string | null
+          user_id?: string | null
+          from_email?: string | null
+          to_emails?: unknown | null
+          cc_emails?: unknown | null
+          bcc_emails?: unknown | null
+          subject?: string | null
+          body_text?: string | null
+          body_html?: string | null
+          sent_at?: string | null
+          is_private?: boolean | null
+          school_id?: string | null
+          charter_id?: string | null
+        }
+      }
+      yg_event_attachments: {
+        Row: {
+          id: string
+          user_id: string
+          google_calendar_id: string
+          google_event_id: string
+          title: string | null
+          mime_type: string | null
+          file_url: string | null
+          file_id: string | null
+          icon_link: string | null
+          identity_key: string | null
+          created_at: string
+          storage_path: string | null
+        }
+        Insert: {
+          id?: string | null
+          user_id?: string | null
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          title?: string | null
+          mime_type?: string | null
+          file_url?: string | null
+          file_id?: string | null
+          icon_link?: string | null
+          identity_key?: string | null
+          created_at?: string | null
+          storage_path?: string | null
+        }
+        Update: {
+          id?: string | null
+          user_id?: string | null
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          title?: string | null
+          mime_type?: string | null
+          file_url?: string | null
+          file_id?: string | null
+          icon_link?: string | null
+          identity_key?: string | null
+          created_at?: string | null
+          storage_path?: string | null
+        }
+      }
+      yg_events: {
+        Row: {
+          user_id: string
+          google_calendar_id: string
+          google_event_id: string
+          summary: string | null
+          description: string | null
+          start_time: string | null
+          end_time: string | null
+          organizer_email: string | null
+          location: string | null
+          status: string | null
+          created_at: string
+          updated_at: string
+          attendees: unknown | null
+          is_private: boolean | null
+        }
+        Insert: {
+          user_id?: string | null
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          summary?: string | null
+          description?: string | null
+          start_time?: string | null
+          end_time?: string | null
+          organizer_email?: string | null
+          location?: string | null
+          status?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          attendees?: unknown | null
+          is_private?: boolean | null
+        }
+        Update: {
+          user_id?: string | null
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          summary?: string | null
+          description?: string | null
+          start_time?: string | null
+          end_time?: string | null
+          organizer_email?: string | null
+          location?: string | null
+          status?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          attendees?: unknown | null
+          is_private?: boolean | null
+        }
+      }
+      yg_events_attendees_unnested_mv: {
+        Row: {
+          google_event_id: string | null
+          google_calendar_id: string | null
+          user_id: string | null
+          participant_type: string | null
+          email_address: string | null
+        }
+        Insert: {
+          google_event_id?: string | null
+          google_calendar_id?: string | null
+          user_id?: string | null
+          participant_type?: string | null
+          email_address?: string | null
+        }
+        Update: {
+          google_event_id?: string | null
+          google_calendar_id?: string | null
+          user_id?: string | null
+          participant_type?: string | null
+          email_address?: string | null
+        }
+      }
+      yg_events_full_bodies_to_download: {
+        Row: {
+          google_event_id: string | null
+          google_calendar_id: string | null
+          user_id: string | null
+          description: string | null
+        }
+        Insert: {
+          google_event_id?: string | null
+          google_calendar_id?: string | null
+          user_id?: string | null
+          description?: string | null
+        }
+        Update: {
+          google_event_id?: string | null
+          google_calendar_id?: string | null
+          user_id?: string | null
+          description?: string | null
+        }
+      }
+      yg_events_people_ids_mv: {
+        Row: {
+          people_id: string | null
+          user_id: string | null
+          google_calendar_id: string | null
+          google_event_id: string | null
+        }
+        Insert: {
+          people_id?: string | null
+          user_id?: string | null
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+        }
+        Update: {
+          people_id?: string | null
+          user_id?: string | null
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+        }
+      }
+      yg_events_with_people_ids_mv: {
+        Row: {
+          google_calendar_id: string | null
+          google_event_id: string | null
+          user_id: string | null
+          people_id: string | null
+          organizer_email: string | null
+          attendees: unknown | null
+          location: string | null
+          summary: string | null
+          description: string | null
+          start_time: string | null
+          end_time: string | null
+          is_private: boolean | null
+          school_id: string | null
+          charter_id: string | null
+        }
+        Insert: {
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          user_id?: string | null
+          people_id?: string | null
+          organizer_email?: string | null
+          attendees?: unknown | null
+          location?: string | null
+          summary?: string | null
+          description?: string | null
+          start_time?: string | null
+          end_time?: string | null
+          is_private?: boolean | null
+          school_id?: string | null
+          charter_id?: string | null
+        }
+        Update: {
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          user_id?: string | null
+          people_id?: string | null
+          organizer_email?: string | null
+          attendees?: unknown | null
+          location?: string | null
+          summary?: string | null
+          description?: string | null
+          start_time?: string | null
+          end_time?: string | null
+          is_private?: boolean | null
+          school_id?: string | null
+          charter_id?: string | null
+        }
+      }
+      yg_events_without_people_ids: {
+        Row: {
+          google_calendar_id: string | null
+          google_event_id: string | null
+          user_id: string | null
+          organizer_email: string | null
+          attendees: unknown | null
+          location: string | null
+          summary: string | null
+          description: string | null
+          start_time: string | null
+          end_time: string | null
+          is_private: boolean | null
+          school_id: string | null
+          charter_id: string | null
+        }
+        Insert: {
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          user_id?: string | null
+          organizer_email?: string | null
+          attendees?: unknown | null
+          location?: string | null
+          summary?: string | null
+          description?: string | null
+          start_time?: string | null
+          end_time?: string | null
+          is_private?: boolean | null
+          school_id?: string | null
+          charter_id?: string | null
+        }
+        Update: {
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          user_id?: string | null
+          organizer_email?: string | null
+          attendees?: unknown | null
+          location?: string | null
+          summary?: string | null
+          description?: string | null
+          start_time?: string | null
+          end_time?: string | null
+          is_private?: boolean | null
+          school_id?: string | null
+          charter_id?: string | null
+        }
+      }
+      ygoogle_auth_tokens: {
+        Row: {
+          user_id: string
+          access_token: string
+          refresh_token: string
+          expires_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id?: string | null
+          access_token?: string | null
+          refresh_token?: string | null
+          expires_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          user_id?: string | null
+          access_token?: string | null
+          refresh_token?: string | null
+          expires_at?: string | null
+          updated_at?: string | null
+        }
+      }
+      ygoogle_sync_history: {
+        Row: {
+          id: number
+          started_at: string
+          user_id: string | null
+          start_of_sync_period: string | null
+          end_of_sync_period: string | null
+          object_type: unknown | null
+          headers_fetched: number | null
+          headers_fetch_successful: boolean | null
+          headers_fetch_error: string | null
+          backfill_downloads: number | null
+          backfill_download_successful: boolean | null
+          backfill_error: string | null
+          initiator: unknown | null
+        }
+        Insert: {
+          id?: number | null
+          started_at?: string | null
+          user_id?: string | null
+          start_of_sync_period?: string | null
+          end_of_sync_period?: string | null
+          object_type?: unknown | null
+          headers_fetched?: number | null
+          headers_fetch_successful?: boolean | null
+          headers_fetch_error?: string | null
+          backfill_downloads?: number | null
+          backfill_download_successful?: boolean | null
+          backfill_error?: string | null
+          initiator?: unknown | null
+        }
+        Update: {
+          id?: number | null
+          started_at?: string | null
+          user_id?: string | null
+          start_of_sync_period?: string | null
+          end_of_sync_period?: string | null
+          object_type?: unknown | null
+          headers_fetched?: number | null
+          headers_fetch_successful?: boolean | null
+          headers_fetch_error?: string | null
+          backfill_downloads?: number | null
+          backfill_download_successful?: boolean | null
+          backfill_error?: string | null
+          initiator?: unknown | null
+        }
+      }
+      ygoogle_sync_settings: {
+        Row: {
+          user_id: string
+          sync_start_date: string
+          updated_at: string
+          backfill_batch_size: number | null
+        }
+        Insert: {
+          user_id?: string | null
+          sync_start_date?: string | null
+          updated_at?: string | null
+          backfill_batch_size?: number | null
+        }
+        Update: {
+          user_id?: string | null
+          sync_start_date?: string | null
+          updated_at?: string | null
+          backfill_batch_size?: number | null
         }
       }
       zref_assessments_and_metrics: {

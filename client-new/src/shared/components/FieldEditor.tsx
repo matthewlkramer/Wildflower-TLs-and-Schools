@@ -33,6 +33,11 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
 }) => {
   const { type, options, multiline } = fieldValue;
 
+  // Debug logging
+  if (type === 'enum' || type === 'array') {
+    console.log('[FieldEditor] Enum/Array field:', { type, hasOptions: !!options, optionsLength: options?.length, value });
+  }
+
   // Check if we have options to render (select/multi-select)
   const hasOptions = options && options.length > 0;
 

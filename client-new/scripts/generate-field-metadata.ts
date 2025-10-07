@@ -1,6 +1,23 @@
 import fs from 'fs';
 import path from 'path';
 import ts from 'typescript';
+import { createClient } from '@supabase/supabase-js';
+
+// Load environment variables
+try {
+  const envPath = path.join(process.cwd(), '.env.local');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    for (const line of envContent.split('\n')) {
+      const [key, value] = line.split('=');
+      if (key && value && !process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  }
+} catch (err) {
+  // Ignore
+}
 
 type EnumOptionsMap = Record<string, string[]>;
 
@@ -11,6 +28,7 @@ type FieldInfo = {
 };
 
 type FieldMap = Record<string, FieldInfo>;
+type FieldToEnumMap = Record<string, string>; // field key -> enum name
 
 const SRC_PATH = path.join('src', 'shared', 'types', 'database.types.ts');
 const OUT_PATH = path.join('src', 'generated', 'enums.generated.ts');
@@ -20,59 +38,6 @@ function readSource(filePath: string): ts.SourceFile {
   return ts.createSourceFile(filePath, code, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
 }
 
-function extractObjectLiteral(node: ts.Node, name: string): ts.ObjectLiteralExpression | undefined {
-  if (ts.isVariableStatement(node)) {
-    for (const decl of node.declarationList.declarations) {
-      if (ts.isIdentifier(decl.name) && decl.name.text === name && decl.initializer) {
-        let init = decl.initializer;
-        if (ts.isAsExpression(init)) {
-          init = init.expression;
-        }
-        if (ts.isObjectLiteralExpression(init)) {
-          return init;
-        }
-      }
-    }
-  }
-  return undefined;
-}
-
-function evaluateStringArray(node: ts.Node): string[] {
-  if (!ts.isArrayLiteralExpression(node)) return [];
-  const result: string[] = [];
-  for (const element of node.elements) {
-    if (ts.isStringLiteral(element)) {
-      result.push(element.text);
-    }
-  }
-  return result;
-}
-
-function extractEnumOptions(constantsLiteral: ts.ObjectLiteralExpression): EnumOptionsMap {
-  const publicProp = getProperty(constantsLiteral, 'public');
-  if (!publicProp || !ts.isObjectLiteralExpression(publicProp.initializer)) return {};
-  const enumsProp = getProperty(publicProp.initializer, 'Enums');
-  if (!enumsProp || !ts.isObjectLiteralExpression(enumsProp.initializer)) return {};
-
-  const map: EnumOptionsMap = {};
-  for (const prop of enumsProp.initializer.properties) {
-    if (!ts.isPropertyAssignment(prop)) continue;
-    const key = getPropertyName(prop.name);
-    if (!key) continue;
-    map[key] = evaluateStringArray(prop.initializer);
-  }
-  return map;
-}
-
-function getProperty(object: ts.ObjectLiteralExpression, name: string): ts.PropertyAssignment | undefined {
-  for (const prop of object.properties) {
-    if (ts.isPropertyAssignment(prop)) {
-      const key = getPropertyName(prop.name);
-      if (key === name) return prop;
-    }
-  }
-  return undefined;
-}
 
 function getPropertyName(name: ts.PropertyName): string | undefined {
   if (ts.isIdentifier(name)) return name.text;
@@ -160,25 +125,190 @@ function describeType(typeNode: ts.TypeNode, source: ts.SourceFile): FieldInfo {
   }
 }
 
-function generate() {
-  const sourceFile = readSource(SRC_PATH);
-  let enums: EnumOptionsMap = {};
+function extractEnumsFromDatabase(sourceFile: ts.SourceFile): EnumOptionsMap {
+  const enums: EnumOptionsMap = {};
+
   for (const stmt of sourceFile.statements) {
-    const literal = extractObjectLiteral(stmt, 'Constants');
-    if (literal) {
-      enums = extractEnumOptions(literal);
-      break;
+    if (ts.isTypeAliasDeclaration(stmt) && stmt.name.text === 'Database' && ts.isTypeLiteralNode(stmt.type)) {
+      // Find public schema
+      const publicType = getTypeLiteralProperty(stmt.type, 'public');
+      if (!publicType) continue;
+
+      // Find Enums section
+      const enumsType = getTypeLiteralProperty(publicType, 'Enums');
+      if (!enumsType) continue;
+
+      // Extract each enum
+      for (const member of enumsType.members) {
+        if (!ts.isPropertySignature(member) || !member.type || !member.name) continue;
+        const enumName = getPropertyName(member.name as ts.PropertyName);
+        if (!enumName) continue;
+
+        // Parse union of string literals
+        const values = extractUnionStringLiterals(member.type);
+        if (values.length > 0) {
+          enums[enumName] = values;
+        }
+      }
     }
   }
-  const fields = extractFieldTypes(sourceFile);
+
+  return enums;
+}
+
+function extractUnionStringLiterals(typeNode: ts.TypeNode): string[] {
+  const values: string[] = [];
+
+  if (ts.isUnionTypeNode(typeNode)) {
+    for (const part of typeNode.types) {
+      if (ts.isLiteralTypeNode(part) && ts.isStringLiteral(part.literal)) {
+        values.push(part.literal.text);
+      }
+    }
+  } else if (ts.isLiteralTypeNode(typeNode) && ts.isStringLiteral(typeNode.literal)) {
+    values.push(typeNode.literal.text);
+  }
+
+  return values;
+}
+
+async function fetchEnumMetadataFromEdgeFunction(): Promise<{ enums: EnumOptionsMap; fieldToEnum: FieldToEnumMap; fieldTypes: FieldMap } | null> {
+  try {
+    const supabaseUrl = process.env.VITE_SUPABASE_URL;
+    const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      return null;
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const { data, error } = await supabase.functions.invoke('schema-types-export', {
+      method: 'GET'
+    });
+
+    if (error || !data || !data.enums) {
+      return null;
+    }
+
+    console.log(`📊 Fetched ${data.enums.length} enum values from edge function`);
+
+    // Group enum values by enum type
+    const enums: EnumOptionsMap = {};
+    const fieldToEnum: FieldToEnumMap = {};
+    const fieldTypes: FieldMap = {};
+
+    for (const enumRow of data.enums) {
+      const { enum_schema, enum_type, enum_label } = enumRow;
+
+      if (!enums[enum_type]) {
+        enums[enum_type] = [];
+      }
+      enums[enum_type].push(enum_label);
+    }
+
+    // Map columns to their enum types AND detect array fields
+    if (data.columns_detailed_by_table) {
+      for (const [tableKey, columns] of Object.entries(data.columns_detailed_by_table)) {
+        for (const col of columns as any[]) {
+          const fieldKey = `${col.schema_name}.${col.table_name}.${col.column_name}`;
+
+          // Detect if this is an array field (PostgreSQL array types start with _)
+          const isArray = col.udt_name?.startsWith('_') || col.data_type === 'ARRAY';
+
+          // For array types, the udt_name starts with _ (e.g., _languages for languages[])
+          // Strip the underscore to get the base type name
+          let baseUdtName = col.udt_name;
+          if (isArray && baseUdtName?.startsWith('_')) {
+            baseUdtName = baseUdtName.substring(1); // Remove leading underscore
+          }
+
+          // Map to enum if it has one (check both with and without underscore)
+          let enumName: string | undefined;
+          if (baseUdtName && enums[baseUdtName]) {
+            enumName = baseUdtName;
+            fieldToEnum[fieldKey] = baseUdtName;
+          }
+
+          // Determine base type
+          let baseType: FieldInfo['baseType'] = 'unknown';
+          if (enumName) {
+            baseType = 'enum';
+          } else {
+            switch (col.data_type) {
+              case 'boolean':
+                baseType = 'boolean';
+                break;
+              case 'integer':
+              case 'bigint':
+              case 'smallint':
+              case 'numeric':
+              case 'real':
+              case 'double precision':
+                baseType = 'number';
+                break;
+              case 'text':
+              case 'character varying':
+              case 'character':
+              case 'uuid':
+                baseType = 'string';
+                break;
+              case 'json':
+              case 'jsonb':
+                baseType = 'json';
+                break;
+            }
+          }
+
+          fieldTypes[fieldKey] = {
+            baseType,
+            enumName,
+            array: isArray
+          };
+        }
+      }
+    }
+
+    console.log(`✅ Created ${Object.keys(enums).length} enums, ${Object.keys(fieldToEnum).length} field-to-enum mappings, and ${Object.keys(fieldTypes).length} field types`);
+    return { enums, fieldToEnum, fieldTypes };
+  } catch (err) {
+    console.log('⚠️  Error fetching enum metadata:', err);
+    return null;
+  }
+}
+
+async function generate() {
+  const sourceFile = readSource(SRC_PATH);
+
+  // Try to fetch enum data from edge function
+  const edgeFunctionData = await fetchEnumMetadataFromEdgeFunction();
+
+  let enums: EnumOptionsMap;
+  let fieldToEnum: FieldToEnumMap = {};
+  let fields: FieldMap;
+
+  if (edgeFunctionData) {
+    enums = edgeFunctionData.enums;
+    fieldToEnum = edgeFunctionData.fieldToEnum;
+    fields = edgeFunctionData.fieldTypes;
+  } else {
+    console.log('⚠️  Falling back to TypeScript type parsing');
+    // Extract enums from Database["public"]["Enums"]
+    enums = extractEnumsFromDatabase(sourceFile);
+    // Extract field types from TypeScript
+    fields = extractFieldTypes(sourceFile);
+  }
 
   const file = `// AUTO-GENERATED by scripts/generate-field-metadata.ts. Do not edit.
 export const ENUM_OPTIONS: Record<string, readonly string[]> = ${JSON.stringify(enums, null, 2)};
 export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'boolean' | 'json' | 'enum' | 'unknown'; enumName?: string; array?: boolean }> = ${JSON.stringify(fields, null, 2)};
+export const FIELD_TO_ENUM: Record<string, string> = ${JSON.stringify(fieldToEnum, null, 2)};
 `;
   fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
   fs.writeFileSync(OUT_PATH, file, 'utf8');
-  console.log(`Wrote ${OUT_PATH} with ${Object.keys(enums).length} enums and ${Object.keys(fields).length} fields.`);
+  console.log(`✅ Wrote ${OUT_PATH} with ${Object.keys(enums).length} enums, ${Object.keys(fields).length} fields, and ${Object.keys(fieldToEnum).length} field-to-enum mappings`);
 }
 
-generate();
+generate().catch(err => {
+  console.error('Error generating field metadata:', err);
+  process.exit(1);
+});
