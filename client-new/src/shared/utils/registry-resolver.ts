@@ -8,7 +8,7 @@ import type { FieldMetadataMap } from '../types/detail-types';
 
 /**
  * Convert field registry to FieldMetadataMap format
- * Used to pass registry config to card-service and table-service
+ * Used to pass registry config to card-service
  */
 export function registryToFieldMetadata(
   registry: FieldRegistry,

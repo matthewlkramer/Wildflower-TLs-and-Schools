@@ -6,7 +6,6 @@
 // ===== COMPONENTS =====
 export { DetailsRenderer } from './components/DetailsRenderer';
 export type { DetailsRendererProps } from './components/DetailsRenderer';
-export { TableRenderer } from './components/TableRenderer';
 export { ListRenderer } from './components/ListRenderer';
 export { CardRenderer } from './components/CardRenderer';
 export { GridBase } from './components/GridBase';
@@ -16,9 +15,7 @@ export { default as KanbanBoard } from './components/KanbanBoard';
 export { SavedViewsManager } from './components/SavedViewsManager';
 
 // ===== SERVICES =====
-export * from './services/table-service';
 export * from './services/card-service';
-export * from './services/table-spec-resolver';
 
 // ===== CONFIGURATION =====
 export * from './config/table-list-presets';

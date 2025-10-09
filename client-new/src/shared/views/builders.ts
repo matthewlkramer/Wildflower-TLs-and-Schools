@@ -1,4 +1,4 @@
-import type { BlockSpec, CardSpec, ListSpec, MapSpec, TabSpec, TableSpec, BannerSpec, ViewId, ViewSpec } from './types';
+import type { BlockSpec, CardSpec, ListSpec, MapSpec, TabSpec, BannerSpec, ViewId, ViewSpec } from './types';
 import type { FieldMetadataMap } from '../types/detail-types';
 
 export function view(id: ViewId, ...tabs: TabSpec[]): ViewSpec;
@@ -38,20 +38,6 @@ export function tab(id: string, label: string, ...blocks: BlockSpec[]): TabSpec 
 export function card(fields: string | string[], opts?: { title?: string; width?: 'half' | 'full'; editable?: boolean; multiline?: boolean }): CardSpec {
   const fieldArray = Array.isArray(fields) ? fields : [fields];
   return { kind: 'card', fields: fieldArray, title: opts?.title, width: opts?.width, editable: opts?.editable };
-}
-
-export function table(
-  module: string,
-  preset: string,
-  opts?: { width?: 'half' | 'full'; activeFilter?: boolean }
-): TableSpec {
-  return {
-    kind: 'table',
-    preset,
-    module,
-    width: opts?.width || 'full',
-    activeFilter: opts?.activeFilter ?? false,
-  } as TableSpec;
 }
 
 export function list(

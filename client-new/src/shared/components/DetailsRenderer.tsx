@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, Tab, Box } from '@mui/material';
 import { useLocation } from 'wouter';
-import { TableRenderer } from './TableRenderer';
 import { ListRenderer } from './ListRenderer';
 import { CardRenderer } from './CardRenderer';
 import { BannerRenderer } from './BannerRenderer';
 import { MapRenderer } from './MapRenderer';
-import { tableService, type RenderableTableData } from '../services/table-service';
 import { cardService, type RenderableCard } from '../services/card-service';
-import type { ViewSpec, TabSpec, BlockSpec, CardSpec, TableSpec, ListSpec, MapSpec } from '../views/types';
+import type { ViewSpec, TabSpec, BlockSpec, CardSpec, ListSpec, MapSpec } from '../views/types';
 import { TABLE_LIST_PRESETS } from '../config/table-list-presets';
 import { getViewSourceTable } from '../views/view-table-mapping';
 import { useDialog } from '@/shared/components/ConfirmDialog';
@@ -140,14 +138,6 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTa
     <div style={containerStyle}>
       {/* Title is now handled inside each renderer component */}
 
-      {block.kind === 'table' && (
-        <TableBlockRenderer
-          block={block as TableSpec}
-          entityId={entityId}
-          fieldMetadata={fieldMetadata}
-        />
-      )}
-
       {block.kind === 'list' && (
         <ListBlockRenderer
           block={block as ListSpec}
@@ -174,103 +164,6 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, entityId, sourceTa
         />
       )}
     </div>
-  );
-};
-
-// Table Block Renderer
-const TableBlockRenderer: React.FC<{
-  block: TableSpec;
-  entityId: string;
-  fieldMetadata?: import('../types/detail-types').FieldMetadataMap;
-}> = ({ block, entityId, fieldMetadata }) => {
-  const [tableData, setTableData] = useState<RenderableTableData | null>(null);
-
-  useEffect(() => {
-    loadTableData();
-  }, [block.preset, entityId]);
-
-  const loadTableData = async () => {
-    if (!block.preset) return;
-
-    try {
-      setTableData({ ...tableData!, loading: true });
-      const data = await tableService.loadTableData(
-        block.preset,
-        entityId,
-        block.module,
-        block.activeFilter,
-        undefined,
-        undefined,
-        fieldMetadata
-      );
-      setTableData(data);
-    } catch (error) {
-      console.error('Failed to load table data:', error);
-      setTableData({
-        spec: { readSource: '', columns: [], rowActions: [] },
-        rows: [],
-        loading: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
-  };
-
-  const handleEdit = async (rowId: any, field: string, value: any) => {
-    // TODO: Implement edit logic
-    console.log('Edit:', rowId, field, value);
-  };
-
-  const dialog = useDialog();
-  const [, setLocation] = useLocation();
-
-  const handleRowAction = async (rowId: any, actionId: string) => {
-    const entity = view.entity as 'educator' | 'school' | 'charter';
-
-    try {
-      switch (actionId) {
-        case 'view_in_modal':
-        case 'jump_to_modal':
-          navigate(`/${entity}s/${rowId}`);
-          break;
-        case 'email':
-          // For now, just navigate to compose page
-          // TODO: Get email addresses from row data
-          if (typeof window !== 'undefined') {
-            window.location.assign(`/email/compose?entityId=${rowId}&entityType=${entity}`);
-          }
-          break;
-        default:
-          await dialog.alert('This action is not implemented yet for list items.', {
-            title: 'Not Implemented',
-            variant: 'warning',
-          });
-          break;
-      }
-    } catch (error) {
-      console.error('Row action error:', error);
-      await dialog.alert('Unable to complete the request.', {
-        title: 'Error',
-        variant: 'error',
-      });
-    }
-  };
-
-  const handleTableAction = async (actionId: string) => {
-    // TODO: Implement table action logic
-    console.log('Table action:', actionId);
-  };
-
-  if (!tableData) {
-    return <div>Loading table...</div>;
-  }
-
-  return (
-    <TableRenderer
-      data={tableData}
-      onEdit={handleEdit}
-      onRowAction={handleRowAction}
-      onTableAction={handleTableAction}
-    />
   );
 };
 
