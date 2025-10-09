@@ -27,6 +27,12 @@ export const ENUM_OPTIONS: Record<string, readonly string[]> = {
     "TC",
     "School Cues"
   ],
+  "advice_loop_statuses": [
+    "Not started",
+    "Open",
+    "Complete",
+    "Abandoned"
+  ],
   "advice_panel_stages": [
     "Visioning",
     "Planning"
@@ -576,6 +582,10 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "baseType": "string",
     "array": false
   },
+  "public.action_steps.assigned_by": {
+    "baseType": "string",
+    "array": false
+  },
   "public.advice.id": {
     "baseType": "number",
     "array": false
@@ -613,12 +623,40 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "baseType": "string",
     "array": false
   },
-  "public.advice.advice_doc": {
-    "baseType": "string",
-    "array": false
+  "public.advice.advice_docs_object_ids": {
+    "baseType": "unknown",
+    "array": true
   },
   "public.advice.advice_loop_closed_date": {
     "baseType": "unknown",
+    "array": false
+  },
+  "public.advice.advice_giver_guide_id": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.advice.advice_docs_public_urls": {
+    "baseType": "unknown",
+    "array": true
+  },
+  "public.advice.response_to_advice": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.advice.advice_submitted": {
+    "baseType": "boolean",
+    "array": false
+  },
+  "public.advice.loop_closing_object_ids": {
+    "baseType": "unknown",
+    "array": true
+  },
+  "public.advice.loop_closing_public_urls": {
+    "baseType": "unknown",
+    "array": true
+  },
+  "public.advice.advice_loop_closed": {
+    "baseType": "boolean",
     "array": false
   },
   "public.annual_assessment_and_metrics_data.school_year": {
@@ -1199,10 +1237,15 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "array": false
   },
   "public.details_associations.membership_status": {
-    "baseType": "string",
+    "baseType": "enum",
+    "enumName": "membership_statuses",
     "array": false
   },
   "public.details_associations.projected_open": {
+    "baseType": "unknown",
+    "array": false
+  },
+  "public.details_associations.open_date": {
     "baseType": "unknown",
     "array": false
   },
@@ -1214,6 +1257,31 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
   "public.details_associations.governance_model": {
     "baseType": "enum",
     "enumName": "governance_models",
+    "array": false
+  },
+  "public.details_associations.logo": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.details_associations.logo_square": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.details_associations.primary_email": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.details_associations.gender": {
+    "baseType": "enum",
+    "enumName": "gender_categories",
+    "array": false
+  },
+  "public.details_associations.primary_phone": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.details_associations.geography": {
+    "baseType": "string",
     "array": false
   },
   "public.details_charters.id": {
@@ -2093,6 +2161,10 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "baseType": "boolean",
     "array": false
   },
+  "public.details_schools.projected_open": {
+    "baseType": "unknown",
+    "array": false
+  },
   "public.details_schools.physical_address": {
     "baseType": "string",
     "array": false
@@ -2169,6 +2241,10 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
   "public.details_schools.logo_flower_only_full_url": {
     "baseType": "string",
     "array": false
+  },
+  "public.details_schools.tl_primary_emails": {
+    "baseType": "unknown",
+    "array": true
   },
   "public.developer_notes.id": {
     "baseType": "number",
@@ -2641,6 +2717,10 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "baseType": "string",
     "array": false
   },
+  "public.grid_educator.geography": {
+    "baseType": "string",
+    "array": false
+  },
   "public.grid_educator.has_montessori_cert": {
     "baseType": "boolean",
     "array": false
@@ -2701,6 +2781,11 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "array": true
   },
   "public.grid_school.membership_status": {
+    "baseType": "enum",
+    "enumName": "membership_statuses",
+    "array": false
+  },
+  "public.grid_school.geography": {
     "baseType": "string",
     "array": false
   },
@@ -2708,7 +2793,7 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "baseType": "unknown",
     "array": false
   },
-  "public.grid_school.ages_served_rev": {
+  "public.grid_school.ages_served": {
     "baseType": "enum",
     "enumName": "age_spans",
     "array": true
@@ -2719,6 +2804,10 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "array": false
   },
   "public.grid_school.active_guides": {
+    "baseType": "unknown",
+    "array": true
+  },
+  "public.grid_school.tl_primary_emails": {
     "baseType": "unknown",
     "array": true
   },
@@ -3106,6 +3195,10 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "baseType": "unknown",
     "array": true
   },
+  "public.locations.metro_area": {
+    "baseType": "string",
+    "array": false
+  },
   "public.logo_urls_by_school.school_id": {
     "baseType": "string",
     "array": false
@@ -3212,6 +3305,30 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "array": false
   },
   "public.membership_actions.is_archived": {
+    "baseType": "boolean",
+    "array": false
+  },
+  "public.metro_areas.name": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.metro_areas.short_name": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.metro_areas.sq_miles": {
+    "baseType": "number",
+    "array": false
+  },
+  "public.metro_areas.population_2020": {
+    "baseType": "number",
+    "array": false
+  },
+  "public.metro_areas.population_density_2020": {
+    "baseType": "number",
+    "array": false
+  },
+  "public.metro_areas.is_rural": {
     "baseType": "boolean",
     "array": false
   },
@@ -3382,31 +3499,7 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "baseType": "string",
     "array": false
   },
-  "public.open_date_revisions.id": {
-    "baseType": "string",
-    "array": false
-  },
-  "public.open_date_revisions.created_at": {
-    "baseType": "unknown",
-    "array": false
-  },
-  "public.open_date_revisions.school_id": {
-    "baseType": "string",
-    "array": false
-  },
-  "public.open_date_revisions.proj_open_date": {
-    "baseType": "unknown",
-    "array": false
-  },
-  "public.open_date_revisions.prior_proj_open_date": {
-    "baseType": "unknown",
-    "array": false
-  },
-  "public.open_date_revisions.notes": {
-    "baseType": "string",
-    "array": false
-  },
-  "public.open_date_revisions.charter_id": {
+  "public.notes.location_id": {
     "baseType": "string",
     "array": false
   },
@@ -3847,6 +3940,38 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "baseType": "string",
     "array": false
   },
+  "public.school_projected_open_date_revisions.school_id": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.school_projected_open_date_revisions.charter_id": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.school_projected_open_date_revisions.changed_at": {
+    "baseType": "unknown",
+    "array": false
+  },
+  "public.school_projected_open_date_revisions.projected_open_date_was": {
+    "baseType": "unknown",
+    "array": false
+  },
+  "public.school_projected_open_date_revisions.projected_open_date_now": {
+    "baseType": "unknown",
+    "array": false
+  },
+  "public.school_projected_open_date_revisions.operation": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.school_projected_open_date_revisions.user_id": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.school_projected_open_date_revisions.application_name": {
+    "baseType": "string",
+    "array": false
+  },
   "public.school_reports_and_submissions.id": {
     "baseType": "string",
     "array": false
@@ -4033,11 +4158,25 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "baseType": "boolean",
     "array": false
   },
-  "public.school_ssj_data.visioning_advice_loop_closed": {
-    "baseType": "boolean",
+  "public.school_ssj_data.visioning_advice_loop_status": {
+    "baseType": "enum",
+    "enumName": "advice_loop_statuses",
     "array": false
   },
-  "public.school_ssj_data.planning_advice_loop_closed": {
+  "public.school_ssj_data.planning_advice_loop_status": {
+    "baseType": "enum",
+    "enumName": "advice_loop_statuses",
+    "array": false
+  },
+  "public.school_ssj_data.projected_open": {
+    "baseType": "unknown",
+    "array": false
+  },
+  "public.school_ssj_data.abandoned_date": {
+    "baseType": "unknown",
+    "array": false
+  },
+  "public.school_ssj_data.is_abandoned": {
     "baseType": "boolean",
     "array": false
   },
@@ -4327,11 +4466,8 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "array": false
   },
   "public.schools.membership_status": {
-    "baseType": "string",
-    "array": false
-  },
-  "public.schools.projected_open": {
-    "baseType": "unknown",
+    "baseType": "enum",
+    "enumName": "membership_statuses",
     "array": false
   },
   "public.schools.ages_served": {
@@ -4364,7 +4500,7 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "baseType": "unknown",
     "array": false
   },
-  "public.schools.membership_revoked_date": {
+  "public.schools.disaffiliation_date": {
     "baseType": "unknown",
     "array": false
   },
@@ -5666,6 +5802,14 @@ export const FIELD_TYPES: Record<string, { baseType: 'string' | 'number' | 'bool
     "baseType": "string",
     "array": false
   },
+  "public.zref_states.name": {
+    "baseType": "string",
+    "array": false
+  },
+  "public.zref_states.abbreviation": {
+    "baseType": "string",
+    "array": false
+  },
   "storage.buckets.id": {
     "baseType": "string",
     "array": false
@@ -5909,8 +6053,10 @@ export const FIELD_TO_ENUM: Record<string, string> = {
   "public.charters.initial_target_planes": "developmental_planes",
   "public.charters.group_exemption_status": "group_exemption_status",
   "public.details_associations.race_ethnicity": "race_ethnicity_categories",
+  "public.details_associations.membership_status": "membership_statuses",
   "public.details_associations.ages_served": "age_spans",
   "public.details_associations.governance_model": "governance_models",
+  "public.details_associations.gender": "gender_categories",
   "public.details_charters.status": "charter_status",
   "public.details_charters.current_fy_end": "fiscal_year_end",
   "public.details_charters.initial_target_planes": "developmental_planes",
@@ -5971,7 +6117,8 @@ export const FIELD_TO_ENUM: Record<string, string> = {
   "public.grid_educator.race_ethnicity": "race_ethnicity_categories",
   "public.grid_educator.discovery_status": "discovery_statuses",
   "public.grid_school.current_tls_race_ethnicity": "race_ethnicity_categories",
-  "public.grid_school.ages_served_rev": "age_spans",
+  "public.grid_school.membership_status": "membership_statuses",
+  "public.grid_school.ages_served": "age_spans",
   "public.grid_school.governance_model": "governance_models",
   "public.group_exemption_actions.group_exemption_status_after_action": "group_exemption_status",
   "public.guide_assignments.type": "guide_types",
@@ -6016,6 +6163,8 @@ export const FIELD_TO_ENUM: Record<string, string> = {
   "public.school_ssj_data.ssj_building4good_status": "ssj_building4good_status_enum",
   "public.school_ssj_data.logo_designer": "logo_designer_options",
   "public.school_ssj_data.ssj_ops_guide_support_track": "ssj_ops_guide_support_track_enum",
+  "public.school_ssj_data.visioning_advice_loop_status": "advice_loop_statuses",
+  "public.school_ssj_data.planning_advice_loop_status": "advice_loop_statuses",
   "public.schools.status": "school_statuses",
   "public.schools.governance_model": "governance_models",
   "public.schools.school_calendar": "school_calendar_options",
@@ -6033,6 +6182,7 @@ export const FIELD_TO_ENUM: Record<string, string> = {
   "public.schools.business_insurance": "business_insurance_options",
   "public.schools.legal_structure": "legal_structure_options",
   "public.schools.school_sched": "school_schedule_options",
+  "public.schools.membership_status": "membership_statuses",
   "public.schools.ages_served": "age_spans",
   "public.schools.nonprofit_path": "nonprofit_paths",
   "public.ssj_fillout_forms.form_type": "ssj_form_type",

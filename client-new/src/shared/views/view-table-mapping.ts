@@ -1,14 +1,13 @@
 import type { ViewId } from './types';
 
 /**
- * Maps view IDs to their source database tables.
- * Some views use logical names (e.g., 'educators') while their data
- * comes from a different table (e.g., 'people').
+ * Maps view IDs to their source database tables/views.
+ * Uses the details_* views which have all computed/joined fields.
  */
 export const VIEW_TABLE_MAPPING: Record<ViewId, string> = {
   schools: 'details_schools',
-  educators: 'people',
-  charters: 'charters',
+  educators: 'details_educators',
+  charters: 'details_charters',
 };
 
 /**

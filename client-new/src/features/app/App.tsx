@@ -21,6 +21,7 @@ import { ChartersSplitPage } from '../charters/pages/ChartersSplitPage';
 import { SettingsPage } from '../settings/pages/SettingsPage';
 import { ComposeEmailPage } from '../email/ComposeEmailPage';
 import { DashboardPage } from '../dashboard/pages/DashboardPage';
+import { AdviceSubmissionPage } from '../advice/AdviceSubmissionPage';
 
 export function App() {
   return (
@@ -111,6 +112,10 @@ export function App() {
               <ComposeEmailPage />
             </RequireAuth>
           </Route>
+
+          <Route path="/advice/submit/:token">{(params: any) => (
+            <AdviceSubmissionPage />
+          )}</Route>
 
           <Route>Not found</Route>
         </Switch>

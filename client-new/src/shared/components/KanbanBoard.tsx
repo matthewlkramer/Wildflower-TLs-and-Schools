@@ -94,25 +94,38 @@ export function KanbanBoard<T>(props: KanbanBoardProps<T>) {
           const isCollapsed = collapsed.has(col.key);
           return (
             <div key={col.key} style={colStyle(isCollapsed)} onDragOver={onDragOver} onDrop={(e) => onDrop(e, col.key)} title={isCollapsed ? `${col.label} (${sorted.length})` : undefined}>
+              {/* Expand/collapse arrow at top center when collapsed */}
+              {isCollapsed && (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '4px 0', borderBottom: '1px solid #e2e8f0' }}>
+                  <button type="button" style={{ fontSize: 12, color: '#64748b', border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => toggleCollapsed(col.key)}>▼</button>
+                </div>
+              )}
               <div style={headerStyle}>
                 {isCollapsed ? (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 120, margin: '0 auto' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', gap: 8 }}>
                     <div style={{
                       writingMode: 'vertical-rl',
                       transform: 'rotate(180deg)',
-                      fontSize: 12, fontWeight: 600, color: '#334155',
+                      fontSize: 14, color: '#64748b',
+                    }}>{sorted.length}</div>
+                    <div style={{
+                      writingMode: 'vertical-rl',
+                      transform: 'rotate(180deg)',
+                      fontSize: 14, fontWeight: 600, color: '#334155',
                       whiteSpace: 'nowrap',
                     }}>{col.label}</div>
                   </div>
                 ) : (
-                  <div style={{ minWidth: 0 }}>
-                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#334155', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{col.label}</h3>
-                  </div>
+                  <>
+                    <div style={{ minWidth: 0 }}>
+                      <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#334155', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{col.label}</h3>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 12, color: '#64748b' }}>{sorted.length}</span>
+                      <button type="button" style={{ fontSize: 12, color: '#64748b', border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => toggleCollapsed(col.key)}>◀</button>
+                    </div>
+                  </>
                 )}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 12, color: '#64748b' }}>{sorted.length}</span>
-                  <button type="button" style={{ fontSize: 12, color: '#64748b', border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => toggleCollapsed(col.key)}>{isCollapsed ? '▶' : '◀'}</button>
-                </div>
               </div>
               {!isCollapsed && (
                 <div style={cardsWrapStyle}>

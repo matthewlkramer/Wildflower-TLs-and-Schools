@@ -1,0 +1,96 @@
+  const handleRowAction = async (rowId: any, actionId: string) => {
+    if (!listData || !block.preset) return;
+    const row = listData.rows.find(r => r.id === rowId);
+    if (!row) return;
+    const preset = TABLE_LIST_PRESETS[block.preset as keyof typeof TABLE_LIST_PRESETS];
+    const sourceTable = preset?.sourceTable;
+    try {
+      switch (actionId) {
+        case 'view_in_modal': {
+          await dialog.alert('View details for this specific record.', { title: 'View in Modal', variant: 'info' });
+          break;
+        }
+        case 'jump_to_modal': {
+          const peopleId = row.fields['people_id']?.value.raw || row.fields['person_id']?.value.raw;
+          const schoolId = row.fields['school_id']?.value.raw;
+          const charterId = row.fields['charter_id']?.value.raw;
+          if (peopleId) navigate(`/educators/${peopleId}`);
+          else if (schoolId) navigate(`/schools/${schoolId}`);
+          else if (charterId) navigate(`/charters/${charterId}`);
+          else await dialog.alert('Unable to determine linked record.', { title: 'Error', variant: 'error' });
+          break;
+        }
+        case 'email': {
+          let emails: string[] = [];
+          const primaryEmail = row.fields['primary_email']?.value.raw;
+          if (primaryEmail) emails = [primaryEmail];
+          const emailOrName = row.fields['email_or_name']?.value.raw;
+          if (emailOrName && emailOrName.includes('@')) emails = [emailOrName];
+          const tlPrimaryEmails = row.fields['tl_primary_emails']?.value.raw;
+          if (Array.isArray(tlPrimaryEmails)) emails = tlPrimaryEmails.filter(e => e && e.includes('@'));
+          if (emails.length === 0) { await dialog.alert('No email address is available for this record.', { title: 'No Email', variant: 'warning' }); break; }
+          window.location.assign(`/email/compose?to=${encodeURIComponent(emails.join(','))}`);
+          break;
+        }
+        case 'archive': {
+          const confirmed = await dialog.confirm('Are you sure you want to archive this record? It will no longer appear in any views.', { title: 'Archive Record', variant: 'warning' });
+          if (!confirmed || !sourceTable) break;
+          const { error } = await (supabase as any).from(sourceTable).update({ is_archived: true }).eq('id', rowId);
+          if (error) throw error;
+          await loadListData();
+          break;
+        }
+        case 'end_stint': {
+          const confirmed = await dialog.confirm('Are you sure you want to end this association?', { title: 'End Stint', variant: 'warning' });
+          if (!confirmed || !sourceTable) break;
+          const { error } = await (supabase as any).from(sourceTable).update({ end_date: new Date().toISOString().split('T')[0], is_active: false }).eq('id', rowId);
+          if (error) throw error;
+          await loadListData();
+          break;
+        }
+        case 'end_occupancy': {
+          const confirmed = await dialog.confirm('Are you sure you want to end this occupancy?', { title: 'End Occupancy', variant: 'warning' });
+          if (!confirmed || !sourceTable) break;
+          const { error } = await (supabase as any).from(sourceTable).update({ end_date: new Date().toISOString().split('T')[0] }).eq('id', rowId);
+          if (error) throw error;
+          await loadListData();
+          break;
+        }
+        case 'make_primary': {
+          if (sourceTable !== 'email_addresses') break;
+          const peopleId = row.fields['people_id']?.value.raw;
+          if (!peopleId) break;
+          await (supabase as any).from('email_addresses').update({ is_primary: false }).eq('people_id', peopleId);
+          const { error } = await (supabase as any).from('email_addresses').update({ is_primary: true }).eq('id', rowId);
+          if (error) throw error;
+          await loadListData();
+          break;
+        }
+        case 'toggle_complete': {
+          const currentValue = row.fields['is_complete']?.value.raw;
+          const { error } = await (supabase as any).from(sourceTable).update({ is_complete: !currentValue }).eq('id', rowId);
+          if (error) throw error;
+          await loadListData();
+          break;
+        }
+        case 'toggle_private_public': {
+          const currentValue = row.fields['is_private']?.value.raw;
+          const { error } = await (supabase as any).from(sourceTable).update({ is_private: !currentValue }).eq('id', rowId);
+          if (error) throw error;
+          await loadListData();
+          break;
+        }
+        case 'toggle_valid': {
+          const currentValue = row.fields['is_valid']?.value.raw;
+          const { error } = await (supabase as any).from(sourceTable).update({ is_valid: !currentValue }).eq('id', rowId);
+          if (error) throw error;
+          await loadListData();
+          break;
+        }
+        default: await dialog.alert('This action is not implemented yet for list items.', { title: 'Not Implemented', variant: 'warning' }); break;
+      }
+    } catch (error) {
+      console.error('Row action error:', error);
+      await dialog.alert('Unable to complete the request.', { title: 'Error', variant: 'error' });
+    }
+  };

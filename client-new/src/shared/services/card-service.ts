@@ -7,6 +7,7 @@ import type { FieldMetadata, LookupException } from '../types/detail-types';
 import type { CardSpec } from '../views/types';
 import { fromTable } from '../utils/supabase-utils';
 import { getStorageBucket } from '../config/storage-buckets';
+import { formatFieldLabel } from '../utils/ui-utils';
 
 export type SelectOption = { value: string; label: string };
 
@@ -15,7 +16,7 @@ export type FieldValue = {
   display: string;
   editable: boolean;
   required?: boolean;
-  type: 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'attachment' | 'array';
+  type: 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'attachment' | 'url' | 'array';
   options?: SelectOption[];
   multiline?: boolean;
   bucket?: string; // Supabase storage bucket for attachments
@@ -34,6 +35,7 @@ export type CardField = {
   value: FieldValue;
   metadata: FieldMetadata;
   linkToAttachmentArray?: string; // Points to another field containing URL array
+  showLabel?: boolean; // Whether to show the label when rendering
 };
 
 export type RenderableCard = {
@@ -127,8 +129,14 @@ export class CardService {
 
       const tableName = preset.readSource || presetId;
 
-      // Build query
-      let query = fromTable(tableName).select('*');
+      // Build query - handle special cases that need joins
+      let query;
+      if (presetId === 'educatorEvents') {
+        // Join event_attendance with event_list to get event_date
+        query = fromTable(tableName).select('*, event_list!event_attendance_event_name_fkey(event_date)');
+      } else {
+        query = fromTable(tableName).select('*');
+      }
 
       // Apply filters
       if (parentEntityId && module) {
@@ -180,22 +188,44 @@ export class CardService {
         typeof col === 'string' ? col : col.field
       );
 
+      // Build field metadata from column configs and merge with viewFieldMetadata
+      const columnMetadata: import('../types/detail-types').FieldMetadataMap = {};
+      for (const col of preset.columns || []) {
+        if (typeof col === 'object') {
+          columnMetadata[col.field] = {
+            type: col.type as any,
+            label: col.label,
+            lookupTable: col.lookupTable,
+            multiline: col.multiline,
+          };
+        }
+      }
+      const mergedMetadata = { ...columnMetadata, ...viewFieldMetadata };
+
       // Transform each row into RenderableListRow
       const rows: RenderableListRow[] = [];
 
       for (const rawRow of rawRows || []) {
+        // Flatten nested joins (e.g., event_list object from join)
+        let flattenedRow = { ...rawRow };
+        if (presetId === 'educatorEvents' && rawRow.event_list) {
+          // Extract event_date from the joined event_list object
+          flattenedRow.event_date = rawRow.event_list?.event_date;
+          delete flattenedRow.event_list;
+        }
+
         const fields: Record<string, CardField> = {};
 
         // Resolve all fields for this row
         const resolvedFields = await this.resolveFields(
           fieldNames,
-          rawRow,
+          flattenedRow,
           { table: tableName },
-          viewFieldMetadata
+          mergedMetadata
         );
 
         // Convert array of CardFields to Record<string, CardField>
-        // Also add linkToAttachmentArray from preset column metadata
+        // Also add linkToAttachmentArray and showLabel from preset column metadata
         for (const field of resolvedFields) {
           const columnConfig = (preset.columns || []).find((col: any) =>
             (typeof col === 'string' ? col : col.field) === field.field
@@ -204,6 +234,7 @@ export class CardService {
           fields[field.field] = {
             ...field,
             linkToAttachmentArray: typeof columnConfig === 'object' ? (columnConfig as any).linkToAttachmentArray : undefined,
+            showLabel: typeof columnConfig === 'object' ? (columnConfig as any).showLabel : undefined,
           };
         }
 
@@ -260,6 +291,12 @@ export class CardService {
   ): Promise<CardField[]> {
     const fields: CardField[] = [];
 
+    // Defensive: ensure fieldNames is an array
+    if (!Array.isArray(fieldNames)) {
+      console.error('[CardService] resolveFields received non-array fieldNames:', fieldNames);
+      return fields;
+    }
+
     // Check if any fields need data from other tables (via writeTable property)
     const fieldsNeedingExtraData = fieldNames.filter(fieldName => {
       const metadata = viewFieldMetadata?.[fieldName];
@@ -280,7 +317,6 @@ export class CardService {
             .eq('id', entityId)
             .maybeSingle();
           extraTableData[writeTable] = data || {};
-          console.log('[card-service] Loaded extra data from', writeTable, ':', data);
         } catch (error) {
           console.error(`Failed to load data from ${writeTable}:`, error);
           extraTableData[writeTable] = {};
@@ -319,7 +355,6 @@ export class CardService {
     editSource?: any,
     manualMetadata?: import('../types/detail-types').FieldMetadata
   ): Promise<CardField | null> {
-    console.log('[card-service] Resolving field:', fieldName, 'manualMetadata:', manualMetadata);
     // Get field metadata from schema
     const sourceTable = editSource?.table || 'people';
     const [schema, table] = sourceTable.includes('.') ? sourceTable.split('.') : ['public', sourceTable];
@@ -352,14 +387,14 @@ export class CardService {
       // Create basic metadata for unknown fields
       return {
         field: fieldName,
-        label: this.fieldToLabel(fieldName),
+        label: formatFieldLabel(fieldName),
         value: {
           raw: entityData[fieldName],
           display: String(entityData[fieldName] || ''),
           editable: false,
           type: 'string',
         },
-        metadata: { label: this.fieldToLabel(fieldName) },
+        metadata: { label: formatFieldLabel(fieldName) },
       };
     }
 
@@ -391,6 +426,9 @@ export class CardService {
       if (GENERATED_LOOKUPS[lookupTable]) {
         const lookupConfig = GENERATED_LOOKUPS[lookupTable];
         options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
+        // IMPORTANT: Clone the options array AND objects to prevent cache mutation
+        // The cache returns a reference, so we must deep clone to avoid mutations affecting other fields
+        options = options.map(opt => ({ ...opt }));
         fieldType = isArrayField ? 'array' : 'enum';
       }
       }
@@ -404,7 +442,8 @@ export class CardService {
       fieldType = isArrayField ? 'array' : 'enum';
     }
     // Check FIELD_TYPES mapping for enum fields (text columns with enum-like values)
-    else if (!metadata.enumRef && fieldTypeInfo?.baseType === 'enum' && fieldTypeInfo.enumName && ENUM_OPTIONS[fieldTypeInfo.enumName]) {
+    // IMPORTANT: Only use this if we don't already have options from lookup table
+    else if (!options && !metadata.enumRef && fieldTypeInfo?.baseType === 'enum' && fieldTypeInfo.enumName && ENUM_OPTIONS[fieldTypeInfo.enumName]) {
       options = ENUM_OPTIONS[fieldTypeInfo.enumName].map(value => ({
         value: String(value),
         label: String(value)
@@ -412,6 +451,7 @@ export class CardService {
       fieldType = isArrayField ? 'array' : 'enum';
     }
     // Check FIELD_TO_ENUM mapping for direct field-to-enum associations
+    // SKIP THIS if we already have options from lookup table (lookup tables have better labels)
     if (!options) {
       const fieldKey = `public.${actualTable}.${fieldName}`;
       const enumName = FIELD_TO_ENUM[fieldKey];
@@ -438,12 +478,16 @@ export class CardService {
       options = await this.loadLookupOptions(lookupConfig.table, lookupConfig.valueColumn, lookupConfig.labelColumn);
       fieldType = 'enum';
     }
-    // Check if this is an attachment field from manual metadata
+
+    // Check if this is an attachment or url field from manual metadata
     const isAttachment = (manualMetadata as any)?.type === 'attachment';
+    const isUrl = (manualMetadata as any)?.type === 'url';
 
     // Determine type from manual metadata first, then schema metadata, then FIELD_TYPES
     if (isAttachment) {
       fieldType = 'attachment';
+    } else if (isUrl) {
+      fieldType = 'url';
     } else if (!options && metadata.baseType) {
       fieldType = this.mapSchemaType(metadata.baseType);
     } else if (!options && fieldTypeInfo?.baseType) {
@@ -452,7 +496,7 @@ export class CardService {
     }
 
     const rawValue = entityData[fieldName];
-    let displayValue = this.formatDisplayValue(rawValue, fieldType, options);
+    let displayValue = this.formatDisplayValue(rawValue, fieldType, options, fieldName);
 
     // Get bucket and isImage from manual metadata if available
     let bucket = (manualMetadata as any)?.bucket;
@@ -460,16 +504,12 @@ export class CardService {
 
     // Handle attachment fields - convert storage path to public URL
     let processedRawValue = rawValue;
-    if (isAttachment) {
-      console.log('[card-service] Field', fieldName, 'is attachment, rawValue:', rawValue);
-    }
     if (isAttachment && rawValue) {
       // Get bucket from manual metadata, or use field-name-based mapping
       if (!bucket) {
         bucket = getStorageBucket(fieldName, actualTable);
       }
 
-      console.log('[card-service] Attachment field:', fieldName, 'table:', actualTable, 'rawValue:', rawValue, 'bucket:', bucket);
 
       // Query storage.objects to get the actual filename with extension
       // Try storage.objects first (in storage schema), fall back to storage_object_id_path view
@@ -483,7 +523,6 @@ export class CardService {
 
       // If storage.objects fails (permissions), try the public view
       if (storageError || !storageObject) {
-        console.log('[card-service] Trying storage_object_id_path view as fallback');
         const fallback = await supabase
           .from('storage_object_id_path')
           .select('name')
@@ -495,7 +534,6 @@ export class CardService {
 
       if (storageObject && storageObject.name) {
         filePath = storageObject.name;
-        console.log('[card-service] Found filename:', filePath);
       } else {
         console.warn('[card-service] Could not find file for UUID:', rawValue, 'Error:', storageError);
       }
@@ -505,12 +543,11 @@ export class CardService {
       processedRawValue = data.publicUrl;
       displayValue = data.publicUrl;
 
-      console.log('[card-service] Generated public URL:', data.publicUrl);
     }
 
     return {
       field: fieldName,
-      label: metadata.label || this.fieldToLabel(fieldName),
+      label: metadata.label || formatFieldLabel(fieldName),
       value: {
         raw: processedRawValue,
         display: displayValue,
@@ -642,15 +679,6 @@ export class CardService {
   /**
    * Helper methods
    */
-  private fieldToLabel(fieldName: string): string {
-    return fieldName
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, l => l.toUpperCase())
-      .replace(/Id$/, 'ID')
-      .replace(/Url$/, 'URL')
-      .replace(/Api$/, 'API');
-  }
-
   private mapSchemaType(baseType: string): FieldValue['type'] {
     switch (baseType) {
       case 'boolean': return 'boolean';
@@ -664,7 +692,8 @@ export class CardService {
   private formatDisplayValue(
     value: any,
     type: FieldValue['type'],
-    options?: SelectOption[]
+    options?: SelectOption[],
+    fieldName?: string
   ): string {
     if (value === null || value === undefined) return '';
 
@@ -674,8 +703,9 @@ export class CardService {
         // Map array values to their labels
         const labels = value
           .map(v => {
-            const option = options.find(opt => opt.value === String(v));
-            return option ? option.label : String(v);
+            const strValue = String(v);
+            const option = options.find(opt => opt.value === strValue);
+            return option ? option.label : strValue;
           })
           .filter(Boolean);
         return labels.join(', ');

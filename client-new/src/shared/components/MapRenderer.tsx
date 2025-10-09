@@ -28,13 +28,9 @@ export const MapRenderer: React.FC<MapRendererProps> = ({
   const loadMapData = async () => {
     try {
       setLoading(true);
-      console.log('[MapRenderer] Loading map data for entityId:', entityId, 'sourceTable:', sourceTable);
-      console.log('[MapRenderer] Map spec:', map);
-      console.log('[MapRenderer] Field metadata:', fieldMetadata);
 
       // Load entity data
       const entityData = await cardService.loadEntityData(sourceTable, entityId);
-      console.log('[MapRenderer] Entity data loaded:', entityData);
 
       // Resolve fields
       const resolvedFields = await cardService.resolveFields(
@@ -43,7 +39,6 @@ export const MapRenderer: React.FC<MapRendererProps> = ({
         { table: sourceTable },
         fieldMetadata
       );
-      console.log('[MapRenderer] Resolved fields:', resolvedFields);
 
       setFields(resolvedFields);
       setLoading(false);
@@ -76,20 +71,12 @@ export const MapRenderer: React.FC<MapRendererProps> = ({
   const lngField = fields[1];
   const addressField = fields[2];
 
-  console.log('[MapRenderer] Extracted fields - lat:', latField, 'lng:', lngField, 'address:', addressField);
-  console.log('[MapRenderer] Lat field value:', latField?.value);
-  console.log('[MapRenderer] Lng field value:', lngField?.value);
-  console.log('[MapRenderer] Address field value:', addressField?.value);
-
   const lat = latField?.value?.raw ? parseFloat(String(latField.value.raw)) : null;
   const lng = lngField?.value?.raw ? parseFloat(String(lngField.value.raw)) : null;
   const address = addressField?.value?.display || '';
 
-  console.log('[MapRenderer] Parsed values - lat:', lat, 'lng:', lng, 'address:', address);
-
   // If no coordinates, show address only
   if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
-    console.log('[MapRenderer] No valid coordinates, showing address only');
     return (
       <div
         className={className}

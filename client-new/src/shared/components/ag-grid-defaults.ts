@@ -6,6 +6,20 @@ export const defaultColDef: ColDef = {
   resizable: true,
   flex: 1,
   minWidth: 120,
+  // Disable automatic type detection to prevent AG Grid warning #48 about object types
+  cellDataType: false,
+  // Enable text wrapping with 2-line limit
+  wrapText: true,
+  cellStyle: {
+    lineHeight: '1.3',
+    whiteSpace: 'normal',
+    wordBreak: 'break-word',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+  } as any,
   valueFormatter: (p: any) => {
     const v = p.value;
     if (v == null) return '';
@@ -31,7 +45,6 @@ export const defaultColDef: ColDef = {
 };
 
 export const baseGridOptions: GridOptions = {
-  rowHeight: 42,
   headerHeight: 64,
   animateRows: true,
   suppressCellFocus: true,

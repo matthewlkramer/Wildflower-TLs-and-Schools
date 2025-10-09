@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
@@ -7,7 +8,7 @@ import type { SelectOption } from '../services/card-service';
 
 // Generic field metadata type that works with both FieldValue and CellValue
 export type FieldMetadata = {
-  type: 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'attachment' | 'array';
+  type: 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'attachment' | 'url' | 'array';
   options?: SelectOption[];
   multiline?: boolean;
   bucket?: string; // Supabase storage bucket name
@@ -32,11 +33,6 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
   className = '',
 }) => {
   const { type, options, multiline } = fieldValue;
-
-  // Debug logging
-  if (type === 'enum' || type === 'array') {
-    console.log('[FieldEditor] Enum/Array field:', { type, hasOptions: !!options, optionsLength: options?.length, value });
-  }
 
   // Check if we have options to render (select/multi-select)
   const hasOptions = options && options.length > 0;
@@ -205,13 +201,31 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   const summary = React.useMemo(() => {
     if (selectedSet.size === 0) return '--';
     const labels: string[] = [];
+    const matchedValues = new Set<string>();
+
+    // First pass: match by value
     for (const opt of options) {
-      if (selectedSet.has(opt.value) || selectedSet.has(opt.label)) {
+      if (selectedSet.has(opt.value)) {
         labels.push(opt.label);
+        matchedValues.add(opt.value);
       }
     }
+
+    // Second pass: for unmatched items, try to match by label or show raw value
+    for (const selectedValue of selectedSet) {
+      if (!matchedValues.has(selectedValue)) {
+        const matchedOpt = options.find(opt => opt.label === selectedValue);
+        if (matchedOpt) {
+          labels.push(matchedOpt.label);
+        } else {
+          // Show raw value if no match found
+          labels.push(selectedValue);
+        }
+      }
+    }
+
     const text = labels.join(', ');
-    return text.length > 60 ? text.slice(0, 57) + '...' : text || String(selectedSet.size);
+    return text.length > 60 ? text.slice(0, 57) + '...' : text;
   }, [options, selectedSet]);
 
   const toggleOption = (optValue: string) => {
@@ -242,7 +256,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
           style={{ ...dropdownStyle, backgroundColor: '#fff' }}
         >
           {options.map((opt) => {
-            const checked = selectedSet.has(opt.value) || selectedSet.has(opt.label);
+            const checked = selectedSet.has(opt.value);
             return (
               <label
                 key={opt.value}
@@ -285,6 +299,7 @@ const AttachmentField: React.FC<AttachmentFieldProps> = ({
 }) => {
   const [uploading, setUploading] = React.useState(false);
   const [fileUrl, setFileUrl] = React.useState<string | null>(null);
+  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Get the public URL for the file
@@ -347,64 +362,104 @@ const AttachmentField: React.FC<AttachmentFieldProps> = ({
     }
   };
 
+  const handleAction = (actionId: string) => {
+    if (actionId === 'replace') {
+      fileInputRef.current?.click();
+    } else if (actionId === 'remove') {
+      handleRemove();
+    } else if (actionId === 'upload') {
+      fileInputRef.current?.click();
+    }
+  };
+
   if (value && fileUrl) {
     return (
-      <div className={`flex items-center gap-2 ${className}`}>
-        {isImage ? (
-          <img src={fileUrl} alt="Attachment" className="h-20 w-20 object-cover rounded border border-slate-200" />
-        ) : (
-          <a
-            href={fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline text-xs"
-          >
-            📎 View Document
-          </a>
-        )}
-        <div className="flex gap-1">
-          <Button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            variant="outline"
-            size="sm"
-            className="h-6 px-2 text-xs"
-          >
-            Replace
-          </Button>
-          <Button
-            type="button"
-            onClick={handleRemove}
-            variant="outline"
-            size="sm"
-            className="h-6 px-2 text-xs text-red-600 hover:text-red-700"
-          >
-            Remove
-          </Button>
+      <>
+        <div className={`flex items-center gap-2 ${className}`}>
+          {isImage ? (
+            <img
+              src={fileUrl}
+              alt="Attachment"
+              className="object-contain rounded cursor-pointer hover:opacity-80 transition-opacity"
+              style={{ maxWidth: '100px', maxHeight: '100px' }}
+              onClick={() => {
+                console.log('Logo clicked! URL:', fileUrl);
+                setImagePreview(fileUrl);
+              }}
+            />
+          ) : (
+            <a
+              href={fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline text-xs"
+            >
+              📎 View Document
+            </a>
+          )}
+          <Select value="" onValueChange={handleAction}>
+            <SelectTrigger className="h-7 w-24 text-xs" style={{ fontWeight: 'normal', fontSize: 11 }}>
+              <SelectValue placeholder="Actions" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="replace" className="text-xs">
+                Replace
+              </SelectItem>
+              <SelectItem value="remove" className="text-xs">
+                Remove
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={isImage ? 'image/*' : '.pdf,.doc,.docx'}
+            onChange={handleFileSelect}
+            className="hidden"
+          />
         </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={isImage ? 'image/*' : '.pdf,.doc,.docx'}
-          onChange={handleFileSelect}
-          className="hidden"
-        />
-      </div>
+
+        {/* Image Preview Modal */}
+        {imagePreview && createPortal(
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75"
+            style={{ zIndex: 9999 }}
+            onClick={() => setImagePreview(null)}
+          >
+            <div className="relative max-w-[90vw] max-h-[90vh] bg-white p-4 rounded-lg">
+              <img
+                src={imagePreview}
+                alt="Full size preview"
+                className="max-w-full max-h-[90vh] object-contain"
+                onClick={(e) => e.stopPropagation()}
+              />
+              <button
+                onClick={() => setImagePreview(null)}
+                className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                style={{ width: 32, height: 32 }}
+              >
+                ✕
+              </button>
+            </div>
+          </div>,
+          document.body
+        )}
+      </>
     );
   }
 
   return (
     <div className={className}>
-      <Button
-        type="button"
-        onClick={() => fileInputRef.current?.click()}
-        variant="outline"
-        size="sm"
-        className="h-8 px-3 text-xs"
-        disabled={uploading}
-      >
-        {uploading ? 'Uploading...' : `Upload ${isImage ? 'Image' : 'Document'}`}
-      </Button>
+      <Select value="" onValueChange={handleAction}>
+        <SelectTrigger className="h-7 w-32 text-xs" style={{ fontWeight: 'normal', fontSize: 11 }}>
+          <SelectValue placeholder={uploading ? 'Uploading...' : 'Actions'} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="upload" className="text-xs" disabled={uploading}>
+            {`Upload ${isImage ? 'Image' : 'Document'}`}
+          </SelectItem>
+        </SelectContent>
+      </Select>
       <input
         ref={fileInputRef}
         type="file"

@@ -35,8 +35,9 @@ export function tab(id: string, label: string, ...blocks: BlockSpec[]): TabSpec 
   return { id, label, blocks };
 }
 
-export function card(fields: string[], opts?: { title?: string; width?: 'half' | 'full'; editable?: boolean }): CardSpec {
-  return { kind: 'card', fields, title: opts?.title, width: opts?.width, editable: opts?.editable };
+export function card(fields: string | string[], opts?: { title?: string; width?: 'half' | 'full'; editable?: boolean; multiline?: boolean }): CardSpec {
+  const fieldArray = Array.isArray(fields) ? fields : [fields];
+  return { kind: 'card', fields: fieldArray, title: opts?.title, width: opts?.width, editable: opts?.editable };
 }
 
 export function table(

@@ -5,6 +5,7 @@
 
 import { schemaMetadata } from '@/generated/schema-metadata.generated';
 import { GENERATED_LOOKUPS, type LookupConfig } from '@/generated/lookups.generated';
+import { formatFieldLabel } from './ui-utils';
 
 export type FieldType =
   | 'string'
@@ -184,13 +185,11 @@ export function getAllGeneratedFields(table: string): string[] {
 }
 
 /**
- * Humanize field name (e.g., 'doc_type' → 'Doc Type')
+ * Humanize field name (e.g., 'doc_type' → 'Doc Type', 'ssj_id' → 'SSJ ID')
+ * Uses formatFieldLabel to preserve abbreviations
  */
 export function humanizeFieldName(field: string): string {
-  return field
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+  return formatFieldLabel(field);
 }
 
 /**

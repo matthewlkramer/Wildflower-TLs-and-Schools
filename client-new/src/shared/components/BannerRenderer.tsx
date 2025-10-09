@@ -28,21 +28,19 @@ export const BannerRenderer: React.FC<BannerRendererProps> = ({
   const loadBannerData = async () => {
     try {
       setLoading(true);
-      console.log('[BannerRenderer] Loading banner data for entityId:', entityId, 'sourceTable:', sourceTable);
-      console.log('[BannerRenderer] Banner spec:', banner);
-      console.log('[BannerRenderer] Field metadata:', fieldMetadata);
 
       // Build list of all fields to load
+      // Always try to load logo_rectangle and short_name for fallback
       const allFields = [
+        'logo_rectangle', // Always load rectangle logo for fallback
+        'short_name', // Load short_name for text fallback
         ...(banner.image ? [banner.image] : []),
         banner.title,
         ...banner.fields,
       ];
-      console.log('[BannerRenderer] All fields to load:', allFields);
 
       // Load entity data
       const entityData = await cardService.loadEntityData(sourceTable, entityId);
-      console.log('[BannerRenderer] Entity data loaded:', entityData);
 
       // Resolve fields
       const resolvedFields = await cardService.resolveFields(
@@ -51,7 +49,6 @@ export const BannerRenderer: React.FC<BannerRendererProps> = ({
         { table: sourceTable },
         fieldMetadata
       );
-      console.log('[BannerRenderer] Resolved fields:', resolvedFields);
 
       setFields(resolvedFields);
       setLoading(false);
@@ -82,6 +79,15 @@ export const BannerRenderer: React.FC<BannerRendererProps> = ({
   const imageField = banner.image ? fields.find(f => f.field === banner.image) : undefined;
   const titleField = fields.find(f => f.field === banner.title);
   const statFields = fields.filter(f => banner.fields.includes(f.field));
+  const shortNameField = fields.find(f => f.field === 'short_name');
+
+  // Check for rectangle logo first, fallback to the specified image field
+  const rectangleLogoField = fields.find(f => f.field === 'logo_rectangle');
+  const logoField = (rectangleLogoField && rectangleLogoField.value.raw) ? rectangleLogoField : imageField;
+
+  // Determine if we should show logo image or text fallback
+  const hasLogo = logoField && logoField.value.raw;
+  const shortName = shortNameField?.value.display || '';
 
   return (
     <div
@@ -95,20 +101,47 @@ export const BannerRenderer: React.FC<BannerRendererProps> = ({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24 }}>
-        {/* Image */}
-        {imageField && imageField.value.raw && (
-          <div style={{ flexShrink: 0 }}>
-            <img
-              src={imageField.value.raw}
-              alt={titleField?.value.display || ''}
-              style={{
-                width: 80,
-                height: 80,
-                objectFit: 'cover',
-                borderRadius: 8,
-                border: '1px solid #e2e8f0',
-              }}
-            />
+        {/* Logo or Short Name Fallback */}
+        {(hasLogo || shortName) && (
+          <div
+            style={{
+              flexShrink: 0,
+              width: 160,
+              height: 80,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: '#f8fafc',
+              borderRadius: 8,
+              border: '1px solid #e2e8f0',
+              padding: 8,
+            }}
+          >
+            {hasLogo ? (
+              <img
+                src={logoField.value.raw}
+                alt={titleField?.value.display || ''}
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  objectFit: 'contain',
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  fontSize: 24,
+                  fontWeight: 700,
+                  color: '#64748b',
+                  textAlign: 'center',
+                  lineHeight: 1.2,
+                  wordWrap: 'break-word',
+                  maxWidth: '100%',
+                }}
+              >
+                {shortName}
+              </div>
+            )}
           </div>
         )}
 

@@ -1,4 +1,5 @@
 import type { TableColumnMeta } from '../types/detail-types';
+import { formatFieldLabel } from '../utils/ui-utils';
 
 type Ctx = {
   actionId: string;
@@ -38,20 +39,11 @@ export async function handleTableAction(ctx: Ctx): Promise<boolean> {
     }
     setCreateValues(init);
     setCreateError('');
-    setCreateTitle(toTitleCase(actionId));
+    setCreateTitle(formatFieldLabel(actionId));
     setShowCreate(true);
     return true;
   }
 
   return false;
-}
-
-function toTitleCase(id: string): string {
-  return id
-    .replace(/_/g, ' ')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 

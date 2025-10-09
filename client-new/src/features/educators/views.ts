@@ -1,6 +1,7 @@
 import { view, tab, card, table, list, banner } from '@/shared/views/builders';
 import type { ViewSpec } from '@/shared/views/types';
 import type { GridColumnConfig, FieldMetadataMap } from '@/shared/types/detail-types';
+import { lookup } from 'dns';
 
 // Grid + Kanban
 export const EDUCATOR_GRID: GridColumnConfig[] = [
@@ -8,6 +9,7 @@ export const EDUCATOR_GRID: GridColumnConfig[] = [
   { field: 'current_role_at_active_school', headerName: 'Role at Curr. School' },
   { field: 'active_school', headerName: 'Curr. School', visibility: 'hide' },
   { field: 'current_role', headerName: 'Curr. Role', visibility: 'hide', valueType: 'select' },
+  { field: 'geography', headerName: 'Geography', valueType: 'string' },
   { field: 'discovery_status', headerName: 'Discovery', valueType: 'select', enumName: 'discovery_statuses' },
   { field: 'race_ethnicity', headerName: 'Race/Ethnicity', valueType: 'multi', lookupField: 'zref_race_and_ethnicity.label' },
   { field: 'has_montessori_cert', headerName: 'Trained?', valueType: 'boolean' },
@@ -28,7 +30,7 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
   secondary_phone_other_info: { label: 'Extension or other info (for Secondary Phone)' },
   home_address: { multiline: true },
   educ_attainment: { label: 'Educational Attainment' },
-  race_ethnicity: { label: 'Race/Ethnicity', lookupTable: 'zref_race_and_ethnicity' },
+  race_ethnicity: { label: 'Race/Ethnicity', lookupTable: 'zref_race_and_ethnicity', array: true },
   race_ethnicity_other: { label: 'Race/Ethnicity - if Other, please specify', visibleIf: { field: 'race_ethnicity', in: ['other', 'Other'] } },
   gender_other: { label: 'Gender - if Other, please specify', visibleIf: { field: 'gender', in: ['Other'] } },
   hh_income: { label: 'Household Income' },
@@ -71,15 +73,22 @@ export const EDUCATOR_FIELD_METADATA: FieldMetadataMap = {
 // Create Educator Modal configuration (declarative)
 // Inserts into people; related records (emails) via postInsert
 export const ADD_NEW_EDUCATOR_INPUT = [
-  { id: 'full_name', required: true },
+  { id: 'first_name', required: true },
+  { id: 'nickname' },
+  { id: 'middle_name' },
+  { id: 'last_name', required: true },
   { id: 'primary_phone' },
   { id: 'home_address', multiline: true },
-  { id: 'race_ethnicity' },
-  {
-    id: 'personal_email',
-    label: 'Personal Email',
+  { id: 'race_ethnicity', array: true, lookupTable: 'zref_race_and_ethnicity' },
+  { id: 'email', label: 'Emails', required: true, fields:
+    [{id: 'primary_email', label: 'Primary Email'},{id: 'category', label: 'Type', enumName: 'email_address_categories', defaultValue: 'Personal'}],
     directWrite: false,
-    postInsert: { table: 'email_addresses', columns: { people_id: '$newId', email_address: 'personal_email' , category: 'Personal' } },
+    postInsert: { table: 'email_addresses', columns: { people_id: '$newId', email_address: '$email.primary_email' , category: '$category' } },
+  },
+  { id: 'school', label: 'Schools', visibility: 'clickToOpen', fields:
+    [{id: 'long_name', label: 'School Name', lookupTable: 'schools'},{id: 'current_role', label: 'Current Role', lookupTable: 'zref_roles', defaultValue: 'TL'},{id: 'start_date', label: 'Start Date', type: 'date', defaultValue: 'today'}],
+    directWrite: false,
+    postInsert: { table: 'people_roles_associations', columns: { people_id: '$newId', school_id: '$school.long_name', current_role: '$school.current_role', active: true } },
   },
 ] as const;
 
@@ -99,7 +108,7 @@ export const EDUCATOR_VIEW_SPEC: ViewSpec = view(
     card('home_address', { title: 'Address', multiline: true, editable: true }),
   //  card(['most_recent_fillout_form_date', 'most_recent_event_name', 'most_recent_event_date', 'most_recent_note', 'most_recent_note_date', 'most_recent_note_from'], { title: 'Recent Activity' }),
   ),
-  tab('schools', 'Schools', list('educators', 'schools', { width: 'half' })),
+  tab('schools', 'Schools', list('educators', 'schools', { width: 'full' })),
   tab('certifications_events', 'Certs & Events', list('educators', 'educatorMontessoriCerts', { width: 'half' }), list('educators', 'educatorEvents', { width: 'half' })),
   tab(
     'early_cultivation',

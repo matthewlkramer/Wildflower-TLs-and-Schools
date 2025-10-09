@@ -4,6 +4,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { useAuth } from '@/features/auth/auth-context';
 import { supabase } from '@/core/supabase/client';
+import { useDialog } from '@/shared/components/ConfirmDialog';
 
 function parseList(value: string | null): string[] {
   if (!value) return [];
@@ -16,6 +17,7 @@ function parseList(value: string | null): string[] {
 export function ComposeEmailPage() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
+  const dialog = useDialog();
 
   const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const toPreset = parseList(params.get('to'));
@@ -51,20 +53,49 @@ export function ComposeEmailPage() {
     try {
       if (orDraft === 'send') {
         try {
-          const { error: fnErr } = await (supabase as any).functions.invoke('gmail-send', {
+          const { data, error: fnErr } = await (supabase as any).functions.invoke('gmail-send', {
             body: { ...payload, draft: false },
           });
-          if (!fnErr) {
-            setInfo('Email sent.'); setSending(false); return;
+          if (!fnErr && data?.ok) {
+            setSending(false);
+            await dialog.alert('Email sent successfully!', {
+              title: 'Success',
+              variant: 'success',
+            });
+            navigate('/educators');
+            return;
           }
-        } catch {}
+          if (fnErr) {
+            console.error('Gmail send error:', fnErr);
+            setError(fnErr.message || 'Failed to send email');
+            setSending(false);
+            return;
+          }
+        } catch (err) {
+          console.error('Gmail send exception:', err);
+        }
       } else {
         try {
-          const { error: fnErr } = await (supabase as any).functions.invoke('gmail-send', {
+          const { data, error: fnErr } = await (supabase as any).functions.invoke('gmail-send', {
             body: { ...payload, draft: true },
           });
-          if (!fnErr) { setInfo('Draft saved.'); setSending(false); return; }
-        } catch {}
+          if (!fnErr && data?.ok) {
+            setInfo('Draft saved successfully.');
+            setSending(false);
+            return;
+          }
+          if (fnErr) {
+            console.error('Gmail draft error:', fnErr);
+            setError(fnErr.message || 'Failed to save draft');
+            setSending(false);
+            return;
+          }
+        } catch (err) {
+          console.error('Gmail draft exception:', err);
+          setError('Failed to save draft');
+          setSending(false);
+          return;
+        }
       }
       // Edge Function not available or failed: fall back to mailto for send only
       if (orDraft === 'send') {
@@ -82,6 +113,7 @@ export function ComposeEmailPage() {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
+      {dialog.DialogComponent}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <h1 style={{ fontSize: 18, fontWeight: 600 }}>Compose Email</h1>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -107,12 +139,14 @@ export function ComposeEmailPage() {
         <LabeledInput label="From">
           <Input value={from} readOnly disabled aria-readonly />
         </LabeledInput>
-        <LabeledInput label="To">
-          <Input value={to} onChange={(e) => setTo(e.target.value)} placeholder="comma-separated emails" />
-        </LabeledInput>
-        <LabeledInput label="Cc">
-          <Input value={cc} onChange={(e) => setCc(e.target.value)} placeholder="comma-separated emails" />
-        </LabeledInput>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <LabeledInput label="To">
+            <Input value={to} onChange={(e) => setTo(e.target.value)} placeholder="comma-separated emails" />
+          </LabeledInput>
+          <LabeledInput label="Cc">
+            <Input value={cc} onChange={(e) => setCc(e.target.value)} placeholder="comma-separated emails" />
+          </LabeledInput>
+        </div>
         <LabeledInput label="Bcc">
           <Input value={bcc} onChange={(e) => setBcc(e.target.value)} placeholder="comma-separated emails" />
         </LabeledInput>

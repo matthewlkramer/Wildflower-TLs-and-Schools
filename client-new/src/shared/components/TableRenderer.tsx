@@ -190,6 +190,33 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
       );
     }
 
+    // Handle URL fields (website, facebook, instagram)
+    if (cell.type === 'url' && cell.raw) {
+      const url = cell.raw.startsWith('http') ? cell.raw : `https://${cell.raw}`;
+      return (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline"
+        >
+          {cell.display}
+        </a>
+      );
+    }
+
+    // Handle email fields - make them clickable to compose email
+    if (fieldName && fieldName.toLowerCase().includes('email') && cell.raw && typeof cell.raw === 'string' && cell.raw.includes('@')) {
+      return (
+        <a
+          href={`/email/compose?to=${encodeURIComponent(cell.raw)}`}
+          className="text-blue-600 hover:underline"
+        >
+          {cell.display}
+        </a>
+      );
+    }
+
     // Regular display
     return (
       <span className={cell.multiline ? "whitespace-pre-wrap" : ""}>

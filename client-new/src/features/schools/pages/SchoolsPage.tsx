@@ -5,9 +5,9 @@ import { createGridActionColumn } from '@/shared/components/GridRowActionsCell';
 import type { ColDef } from 'ag-grid-community';
 import { useGridSchools } from '../api/queries';
 import { useLocation } from 'wouter';
-import { SCHOOL_GRID, SCHOOL_FIELD_METADATA } from '../views';
+import { SCHOOL_GRID, SCHOOL_FIELD_METADATA, ADD_NEW_SCHOOL_INPUT } from '../views';
 // Removed unused constants import
-import { CreateSchoolModal } from '../components/CreateSchoolModal';
+import { CreateEntityModal } from '@/shared/components/CreateEntityModal';
 import { supabase } from '@/core/supabase/client';
 import { GridPageHeader } from '@/shared/components/GridPageHeader';
 import type { SavedView } from '@/shared/hooks/useSavedViews';
@@ -132,7 +132,7 @@ export function SchoolsPage() {
 
     // Automatic selection column is provided by baseGridOptions; no manual checkbox column here
 
-    // Simple badge renderer for arrays (used for ages_served)
+    // Simple badge renderer for arrays (used for ages_served, tl_ethnicity)
     const BadgesRenderer: React.FC<ICellRendererParams & { map?: Record<string, string> }> = (p) => {
       const map = (p as any).map as Record<string, string> | undefined;
       const arr = Array.isArray(p.value) ? p.value : (p.value != null ? [p.value] : []);
@@ -159,6 +159,44 @@ export function SchoolsPage() {
       );
     };
 
+    // Colored badge renderer for stage_status
+    const StageStatusRenderer: React.FC<ICellRendererParams> = (p) => {
+      const value = p.value;
+      if (!value) return <></>;
+
+      const val = String(value).toLowerCase();
+      let bgColor = '#f1f5f9'; // light gray (placeholder default)
+      let textColor = '#64748b';
+
+      if (val === 'open') {
+        bgColor = '#22c55e'; // saturated green
+        textColor = '#ffffff';
+      } else if (val === 'startup' || val === 'visioning' || val === 'planning') {
+        bgColor = '#d1fae5'; // lighter green
+        textColor = '#065f46';
+      } else if (val === 'paused') {
+        bgColor = '#fed7aa'; // light orange
+        textColor = '#9a3412';
+      }
+
+      return (
+        <span
+          style={{
+            display: 'inline-block',
+            fontSize: 12,
+            background: bgColor,
+            color: textColor,
+            borderRadius: 999,
+            padding: '2px 8px',
+            lineHeight: 1.2,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {value}
+        </span>
+      );
+    };
+
     for (const config of SCHOOL_GRID) {
       if (!keySet.has(config.field)) continue;
       if (config.visibility === 'suppress') continue;
@@ -178,7 +216,7 @@ export function SchoolsPage() {
           break;
         }
         case 'multi': {
-          if (config.field === 'ages_served') {
+          if (config.field === 'ages_served' || config.field === 'tl_ethnicity' || config.field === 'current_tls_race_ethnicity') {
             def.filter = 'agSetColumnFilter';
             const values = lookupOptions[config.field] ?? getUniqueValuesFromData(config.field);
             if (values.length) {
@@ -267,6 +305,11 @@ export function SchoolsPage() {
         def.cellRendererParams = undefined;
       }
 
+      // Stage status: use colored badge renderer
+      if (config.field === 'stage_status') {
+        def.cellRenderer = StageStatusRenderer as any;
+      }
+
       // Current TLs: render comma-separated links using parallel people_id array
       if (config.field === 'current_tls') {
         def.cellRenderer = (p: any) => {
@@ -299,9 +342,8 @@ export function SchoolsPage() {
         col.sort = 'asc';
       }
     } else {
-      const nameCol = defs.find((d) => d.field === 'full_name' || d.field === 'name' || d.field === 'short_name');
+      const nameCol = defs.find((d) => d.field === 'school_name');
       if (nameCol) {
-        nameCol.headerName = 'Name';
         nameCol.sortable = true;
         nameCol.sort = 'asc';
       }
@@ -411,13 +453,15 @@ export function SchoolsPage() {
           }
         }}
       />
-      <CreateSchoolModal
+      <CreateEntityModal
         open={showCreate}
         onClose={() => setShowCreate(false)}
         onCreated={(id) => {
-          // After create, navigate to detail page
           navigate(`/schools/${id}`);
         }}
+        title="Create School"
+        table="schools"
+        inputSpec={ADD_NEW_SCHOOL_INPUT}
       />
       <GridBase
         columnDefs={cols}
@@ -436,6 +480,16 @@ export function SchoolsPage() {
           onGridReady: (params) => {
             setGridApi(params.api);
             params.api.setSideBarVisible(false);
+
+            // Set default filter to exclude "Paused" and "Placeholder" stage_status
+            const filterModel = {
+              stage_status: {
+                filterType: 'set',
+                values: ['Visioning', 'Planning', 'Startup', 'Open', 'Closed', null, ''],
+              },
+            };
+            params.api.setFilterModel(filterModel);
+
             params.api.closeToolPanel();
             try {
               const usp = new URLSearchParams(window.location.search);

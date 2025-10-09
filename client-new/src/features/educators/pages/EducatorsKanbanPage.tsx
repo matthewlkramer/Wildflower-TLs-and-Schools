@@ -7,6 +7,7 @@ import { EDUCATOR_KANBAN_CONSTANTS_TABLE, EDUCATOR_GRID } from '../views';
 import { GridPageHeader } from '@/shared/components/GridPageHeader';
 import { useLocation } from 'wouter';
 import type { SavedView } from '@/shared/hooks/useSavedViews';
+import { formatFieldLabel } from '@/shared/utils/ui-utils';
 
 export function EducatorsKanbanPage() {
   const { data = [], isLoading } = useGridEducators();
@@ -120,7 +121,7 @@ export function EducatorsKanbanPage() {
   const primarySort = useMemo(() => (EDUCATOR_GRID.find((c: any) => c.sortKey)?.field) || 'full_name', []);
   const columns = useMemo(() => groupKeys.map((k) => ({
     key: k,
-    label: k === '__UNSPECIFIED__' ? 'Unspecified' : (constMap.get(k)?.label ?? k),
+    label: k === '__UNSPECIFIED__' ? 'Unspecified' : formatFieldLabel(constMap.get(k)?.label ?? k),
     sortBy: (a: any, b: any) => String(a?.[primarySort] ?? '').localeCompare(String(b?.[primarySort] ?? '')),
   })), [groupKeys, primarySort, constMap]);
 
@@ -200,7 +201,7 @@ export function EducatorsKanbanPage() {
               <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {cardFields.map((f) => (
                   <div key={f} style={{ fontSize: 11, color: '#334155' }}>
-                    <span style={{ color: '#64748b' }}>{(EDUCATOR_GRID.find((c: any) => c.field === f)?.headerName) || f}: </span>
+                    <span style={{ color: '#64748b' }}>{formatFieldLabel((EDUCATOR_GRID.find((c: any) => c.field === f)?.headerName) || f)}: </span>
                     <span>{renderFieldValue((t as any)[f])}</span>
                   </div>
                 ))}
@@ -227,7 +228,7 @@ export function EducatorsKanbanPage() {
                         return Array.from(set);
                       });
                     }} />
-                    <span>{c.headerName || c.field}</span>
+                    <span>{formatFieldLabel(c.headerName || c.field)}</span>
                   </label>
                 );
               })}
@@ -252,7 +253,7 @@ export function EducatorsKanbanPage() {
                 const sel = new Set(filters[c.field] || []);
                 return (
                   <div key={c.field}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 6 }}>{c.headerName || c.field}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 6 }}>{formatFieldLabel(c.headerName || c.field)}</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {uniq.map((val) => (
                         <label key={String(val)} style={{ border: '1px solid #cbd5e1', borderRadius: 999, padding: '2px 8px', fontSize: 12, cursor: 'pointer' }}>

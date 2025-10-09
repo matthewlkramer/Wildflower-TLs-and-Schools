@@ -134,9 +134,8 @@ export function ChartersPage() {
         col.sort = 'asc';
       }
     } else {
-      const nameCol = defs.find((d) => d.field === 'full_name' || d.field === 'name' || d.field === 'short_name');
+      const nameCol = defs.find((d) => d.field === 'charter_name');
       if (nameCol) {
-        nameCol.headerName = 'Name';
         nameCol.sortable = true;
         nameCol.sort = 'asc';
       }

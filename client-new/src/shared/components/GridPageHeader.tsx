@@ -29,9 +29,9 @@ interface GridPageHeaderProps {
 }
 
 const ENTITY_LABELS: Record<EntityType, string> = {
-  educator: 'educator',
-  school: 'school', 
-  charter: 'charter'
+  educator: 'Educator',
+  school: 'School',
+  charter: 'Charter'
 };
 
 const ENTITY_ROUTES: Record<EntityType, string> = {
@@ -211,7 +211,7 @@ export function GridPageHeader({
             '&:hover': { backgroundColor: '#0b6e71' },
           }}
         >
-          Add new {ENTITY_LABELS[entityType]}
+          Add New {ENTITY_LABELS[entityType]}
         </MButton>
         <FormControl size="small" sx={{ m: 0, alignSelf: 'center' }}>
           <MButton

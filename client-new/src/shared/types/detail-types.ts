@@ -136,6 +136,8 @@ export type DetailListLayout = {
   attachmentFields?: readonly string[];
   bodyFieldFullWidth?: boolean;
   hideLabelsForFields?: readonly string[]; // Fields that should not show labels
+  logoField?: string; // Field to display as logo image
+  containerWidth?: 'half' | 'full'; // Width of the container
 };
 
 // Visibility DSL
@@ -161,6 +163,7 @@ export type CreateNoteConfig = {
   createType: 'note';
   table: string;
   schema?: string;
+  titleField?: string;
   textField: string;
   fkField: string;
   fkSourceField?: string;

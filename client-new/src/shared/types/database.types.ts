@@ -26,6 +26,7 @@ export type Database = {
           charter_id: string | null
           is_archived: boolean | null
           guide_email_or_name: string | null
+          assigned_by: string | null
         }
         Insert: {
           item?: string | null
@@ -40,6 +41,7 @@ export type Database = {
           charter_id?: string | null
           is_archived?: boolean | null
           guide_email_or_name?: string | null
+          assigned_by?: string | null
         }
         Update: {
           item?: string | null
@@ -54,6 +56,7 @@ export type Database = {
           charter_id?: string | null
           is_archived?: boolean | null
           guide_email_or_name?: string | null
+          assigned_by?: string | null
         }
       }
       advice: {
@@ -67,8 +70,15 @@ export type Database = {
           advice_requested_date: string | null
           advice_given_date: string | null
           advice_text: string | null
-          advice_doc: string | null
+          advice_docs_object_ids: unknown | null
           advice_loop_closed_date: string | null
+          advice_giver_guide_id: string | null
+          advice_docs_public_urls: unknown | null
+          response_to_advice: string | null
+          advice_submitted: boolean | null
+          loop_closing_object_ids: unknown | null
+          loop_closing_public_urls: unknown | null
+          advice_loop_closed: boolean | null
         }
         Insert: {
           id?: number | null
@@ -80,8 +90,15 @@ export type Database = {
           advice_requested_date?: string | null
           advice_given_date?: string | null
           advice_text?: string | null
-          advice_doc?: string | null
+          advice_docs_object_ids?: unknown | null
           advice_loop_closed_date?: string | null
+          advice_giver_guide_id?: string | null
+          advice_docs_public_urls?: unknown | null
+          response_to_advice?: string | null
+          advice_submitted?: boolean | null
+          loop_closing_object_ids?: unknown | null
+          loop_closing_public_urls?: unknown | null
+          advice_loop_closed?: boolean | null
         }
         Update: {
           id?: number | null
@@ -93,8 +110,15 @@ export type Database = {
           advice_requested_date?: string | null
           advice_given_date?: string | null
           advice_text?: string | null
-          advice_doc?: string | null
+          advice_docs_object_ids?: unknown | null
           advice_loop_closed_date?: string | null
+          advice_giver_guide_id?: string | null
+          advice_docs_public_urls?: unknown | null
+          response_to_advice?: string | null
+          advice_submitted?: boolean | null
+          loop_closing_object_ids?: unknown | null
+          loop_closing_public_urls?: unknown | null
+          advice_loop_closed?: boolean | null
         }
       }
       annual_assessment_and_metrics_data: {
@@ -557,10 +581,17 @@ export type Database = {
           race_ethnicity: unknown | null
           school_name: string | null
           stage_status: string | null
-          membership_status: string | null
+          membership_status: unknown | null
           projected_open: string | null
+          open_date: string | null
           ages_served: unknown | null
           governance_model: unknown | null
+          logo: string | null
+          logo_square: string | null
+          primary_email: string | null
+          gender: unknown | null
+          primary_phone: string | null
+          geography: string | null
         }
         Insert: {
           people_id?: string | null
@@ -579,10 +610,17 @@ export type Database = {
           race_ethnicity?: unknown | null
           school_name?: string | null
           stage_status?: string | null
-          membership_status?: string | null
+          membership_status?: unknown | null
           projected_open?: string | null
+          open_date?: string | null
           ages_served?: unknown | null
           governance_model?: unknown | null
+          logo?: string | null
+          logo_square?: string | null
+          primary_email?: string | null
+          gender?: unknown | null
+          primary_phone?: string | null
+          geography?: string | null
         }
         Update: {
           people_id?: string | null
@@ -601,10 +639,17 @@ export type Database = {
           race_ethnicity?: unknown | null
           school_name?: string | null
           stage_status?: string | null
-          membership_status?: string | null
+          membership_status?: unknown | null
           projected_open?: string | null
+          open_date?: string | null
           ages_served?: unknown | null
           governance_model?: unknown | null
+          logo?: string | null
+          logo_square?: string | null
+          primary_email?: string | null
+          gender?: unknown | null
+          primary_phone?: string | null
+          geography?: string | null
         }
       }
       details_charters: {
@@ -1064,6 +1109,7 @@ export type Database = {
           logo_designer: unknown | null
           name_selection_proposal: string | null
           trademark_filed: boolean | null
+          projected_open: string | null
           physical_address: string | null
           physical_lat: number | null
           physical_long: number | null
@@ -1083,6 +1129,7 @@ export type Database = {
           logo_square_full_url: string | null
           logo_rectangle_full_url: string | null
           logo_flower_only_full_url: string | null
+          tl_primary_emails: unknown | null
         }
         Insert: {
           id?: string | null
@@ -1176,6 +1223,7 @@ export type Database = {
           logo_designer?: unknown | null
           name_selection_proposal?: string | null
           trademark_filed?: boolean | null
+          projected_open?: string | null
           physical_address?: string | null
           physical_lat?: number | null
           physical_long?: number | null
@@ -1195,6 +1243,7 @@ export type Database = {
           logo_square_full_url?: string | null
           logo_rectangle_full_url?: string | null
           logo_flower_only_full_url?: string | null
+          tl_primary_emails?: unknown | null
         }
         Update: {
           id?: string | null
@@ -1288,6 +1337,7 @@ export type Database = {
           logo_designer?: unknown | null
           name_selection_proposal?: string | null
           trademark_filed?: boolean | null
+          projected_open?: string | null
           physical_address?: string | null
           physical_lat?: number | null
           physical_long?: number | null
@@ -1307,6 +1357,7 @@ export type Database = {
           logo_square_full_url?: string | null
           logo_rectangle_full_url?: string | null
           logo_flower_only_full_url?: string | null
+          tl_primary_emails?: unknown | null
         }
       }
       developer_notes: {
@@ -1727,6 +1778,7 @@ export type Database = {
           current_role: string | null
           active_school: string | null
           active_school_id: string | null
+          geography: string | null
           has_montessori_cert: boolean | null
           race_ethnicity: unknown | null
           discovery_status: unknown | null
@@ -1742,6 +1794,7 @@ export type Database = {
           current_role?: string | null
           active_school?: string | null
           active_school_id?: string | null
+          geography?: string | null
           has_montessori_cert?: boolean | null
           race_ethnicity?: unknown | null
           discovery_status?: unknown | null
@@ -1757,6 +1810,7 @@ export type Database = {
           current_role?: string | null
           active_school?: string | null
           active_school_id?: string | null
+          geography?: string | null
           has_montessori_cert?: boolean | null
           race_ethnicity?: unknown | null
           discovery_status?: unknown | null
@@ -1775,11 +1829,13 @@ export type Database = {
           people_id: unknown | null
           current_tl_pairs: Json | null
           current_tls_race_ethnicity: unknown | null
-          membership_status: string | null
+          membership_status: unknown | null
+          geography: string | null
           open: string | null
-          ages_served_rev: unknown | null
+          ages_served: unknown | null
           governance_model: unknown | null
           active_guides: unknown | null
+          tl_primary_emails: unknown | null
         }
         Insert: {
           id?: string | null
@@ -1789,11 +1845,13 @@ export type Database = {
           people_id?: unknown | null
           current_tl_pairs?: Json | null
           current_tls_race_ethnicity?: unknown | null
-          membership_status?: string | null
+          membership_status?: unknown | null
+          geography?: string | null
           open?: string | null
-          ages_served_rev?: unknown | null
+          ages_served?: unknown | null
           governance_model?: unknown | null
           active_guides?: unknown | null
+          tl_primary_emails?: unknown | null
         }
         Update: {
           id?: string | null
@@ -1803,11 +1861,13 @@ export type Database = {
           people_id?: unknown | null
           current_tl_pairs?: Json | null
           current_tls_race_ethnicity?: unknown | null
-          membership_status?: string | null
+          membership_status?: unknown | null
+          geography?: string | null
           open?: string | null
-          ages_served_rev?: unknown | null
+          ages_served?: unknown | null
           governance_model?: unknown | null
           active_guides?: unknown | null
+          tl_primary_emails?: unknown | null
         }
       }
       group_exemption_actions: {
@@ -2072,6 +2132,7 @@ export type Database = {
           is_archived: boolean | null
           lease_object_ids: unknown | null
           lease_public_urls: unknown | null
+          metro_area: string | null
         }
         Insert: {
           charter_id?: string | null
@@ -2105,6 +2166,7 @@ export type Database = {
           is_archived?: boolean | null
           lease_object_ids?: unknown | null
           lease_public_urls?: unknown | null
+          metro_area?: string | null
         }
         Update: {
           charter_id?: string | null
@@ -2138,6 +2200,7 @@ export type Database = {
           is_archived?: boolean | null
           lease_object_ids?: unknown | null
           lease_public_urls?: unknown | null
+          metro_area?: string | null
         }
       }
       logo_urls_by_school: {
@@ -2245,6 +2308,32 @@ export type Database = {
           is_archived?: boolean | null
         }
       }
+      metro_areas: {
+        Row: {
+          name: string
+          short_name: string | null
+          sq_miles: number | null
+          population_2020: number | null
+          population_density_2020: number | null
+          is_rural: boolean | null
+        }
+        Insert: {
+          name?: string | null
+          short_name?: string | null
+          sq_miles?: number | null
+          population_2020?: number | null
+          population_density_2020?: number | null
+          is_rural?: boolean | null
+        }
+        Update: {
+          name?: string | null
+          short_name?: string | null
+          sq_miles?: number | null
+          population_2020?: number | null
+          population_density_2020?: number | null
+          is_rural?: boolean | null
+        }
+      }
       montessori_certs: {
         Row: {
           year: string | null
@@ -2350,6 +2439,7 @@ export type Database = {
           montessori_cert_id: string | null
           is_archived: boolean | null
           full_text: string | null
+          location_id: string | null
         }
         Insert: {
           title?: string | null
@@ -2370,6 +2460,7 @@ export type Database = {
           montessori_cert_id?: string | null
           is_archived?: boolean | null
           full_text?: string | null
+          location_id?: string | null
         }
         Update: {
           title?: string | null
@@ -2390,35 +2481,7 @@ export type Database = {
           montessori_cert_id?: string | null
           is_archived?: boolean | null
           full_text?: string | null
-        }
-      }
-      open_date_revisions: {
-        Row: {
-          id: string
-          created_at: string
-          school_id: string | null
-          proj_open_date: string | null
-          prior_proj_open_date: string | null
-          notes: string | null
-          charter_id: string | null
-        }
-        Insert: {
-          id?: string | null
-          created_at?: string | null
-          school_id?: string | null
-          proj_open_date?: string | null
-          prior_proj_open_date?: string | null
-          notes?: string | null
-          charter_id?: string | null
-        }
-        Update: {
-          id?: string | null
-          created_at?: string | null
-          school_id?: string | null
-          proj_open_date?: string | null
-          prior_proj_open_date?: string | null
-          notes?: string | null
-          charter_id?: string | null
+          location_id?: string | null
         }
       }
       people: {
@@ -2784,6 +2847,38 @@ export type Database = {
           people_id?: string | null
         }
       }
+      school_projected_open_date_revisions: {
+        Row: {
+          school_id: string | null
+          charter_id: string | null
+          changed_at: string | null
+          projected_open_date_was: string | null
+          projected_open_date_now: string | null
+          operation: string | null
+          user_id: string | null
+          application_name: string | null
+        }
+        Insert: {
+          school_id?: string | null
+          charter_id?: string | null
+          changed_at?: string | null
+          projected_open_date_was?: string | null
+          projected_open_date_now?: string | null
+          operation?: string | null
+          user_id?: string | null
+          application_name?: string | null
+        }
+        Update: {
+          school_id?: string | null
+          charter_id?: string | null
+          changed_at?: string | null
+          projected_open_date_was?: string | null
+          projected_open_date_now?: string | null
+          operation?: string | null
+          user_id?: string | null
+          application_name?: string | null
+        }
+      }
       school_reports_and_submissions: {
         Row: {
           id: string | null
@@ -2851,8 +2946,11 @@ export type Database = {
           trademark_filed: boolean | null
           ssj_ops_guide_support_track: unknown | null
           is_archived: boolean | null
-          visioning_advice_loop_closed: boolean | null
-          planning_advice_loop_closed: boolean | null
+          visioning_advice_loop_status: unknown | null
+          planning_advice_loop_status: unknown | null
+          projected_open: string | null
+          abandoned_date: string | null
+          is_abandoned: boolean | null
         }
         Insert: {
           school_id?: string | null
@@ -2891,8 +2989,11 @@ export type Database = {
           trademark_filed?: boolean | null
           ssj_ops_guide_support_track?: unknown | null
           is_archived?: boolean | null
-          visioning_advice_loop_closed?: boolean | null
-          planning_advice_loop_closed?: boolean | null
+          visioning_advice_loop_status?: unknown | null
+          planning_advice_loop_status?: unknown | null
+          projected_open?: string | null
+          abandoned_date?: string | null
+          is_abandoned?: boolean | null
         }
         Update: {
           school_id?: string | null
@@ -2931,8 +3032,11 @@ export type Database = {
           trademark_filed?: boolean | null
           ssj_ops_guide_support_track?: unknown | null
           is_archived?: boolean | null
-          visioning_advice_loop_closed?: boolean | null
-          planning_advice_loop_closed?: boolean | null
+          visioning_advice_loop_status?: unknown | null
+          planning_advice_loop_status?: unknown | null
+          projected_open?: string | null
+          abandoned_date?: string | null
+          is_abandoned?: boolean | null
         }
       }
       schools: {
@@ -3004,8 +3108,7 @@ export type Database = {
           public_funding: unknown | null
           founding_tls: unknown | null
           is_archived: boolean | null
-          membership_status: string | null
-          projected_open: string | null
+          membership_status: unknown | null
           ages_served: unknown | null
           logo_square: string | null
           logo_flower_only: string | null
@@ -3013,7 +3116,7 @@ export type Database = {
           nonprofit_status: boolean | null
           nonprofit_path: unknown | null
           signed_membership_agreement_date: string | null
-          membership_revoked_date: string | null
+          disaffiliation_date: string | null
           membership_agreement_version: string | null
           visioning_album_object_id: string | null
           logo: string | null
@@ -3092,8 +3195,7 @@ export type Database = {
           public_funding?: unknown | null
           founding_tls?: unknown | null
           is_archived?: boolean | null
-          membership_status?: string | null
-          projected_open?: string | null
+          membership_status?: unknown | null
           ages_served?: unknown | null
           logo_square?: string | null
           logo_flower_only?: string | null
@@ -3101,7 +3203,7 @@ export type Database = {
           nonprofit_status?: boolean | null
           nonprofit_path?: unknown | null
           signed_membership_agreement_date?: string | null
-          membership_revoked_date?: string | null
+          disaffiliation_date?: string | null
           membership_agreement_version?: string | null
           visioning_album_object_id?: string | null
           logo?: string | null
@@ -3180,8 +3282,7 @@ export type Database = {
           public_funding?: unknown | null
           founding_tls?: unknown | null
           is_archived?: boolean | null
-          membership_status?: string | null
-          projected_open?: string | null
+          membership_status?: unknown | null
           ages_served?: unknown | null
           logo_square?: string | null
           logo_flower_only?: string | null
@@ -3189,7 +3290,7 @@ export type Database = {
           nonprofit_status?: boolean | null
           nonprofit_path?: unknown | null
           signed_membership_agreement_date?: string | null
-          membership_revoked_date?: string | null
+          disaffiliation_date?: string | null
           membership_agreement_version?: string | null
           visioning_album_object_id?: string | null
           logo?: string | null
@@ -4457,6 +4558,20 @@ export type Database = {
           label?: string | null
         }
       }
+      zref_states: {
+        Row: {
+          name: string
+          abbreviation: string
+        }
+        Insert: {
+          name?: string | null
+          abbreviation?: string | null
+        }
+        Update: {
+          name?: string | null
+          abbreviation?: string | null
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -4468,6 +4583,7 @@ export type Database = {
       action_step_status: "Complete" | "Incomplete"
       active_inactive: "Active" | "Inactive" | "Removed"
       admissions_system_options: "TC" | "School Cues"
+      advice_loop_statuses: "Not started" | "Open" | "Complete" | "Abandoned"
       advice_panel_stages: "Visioning" | "Planning"
       age_spans: "0-1" | "1-3" | "3-6" | "6-9" | "9-12" | "12-15" | "15-18"
       "ages-grades": "Infants" | "Toddlers" | "PK3" | "PK4" | "K" | "1st" | "2nd" | "3rd" | "4th" | "5th" | "6th" | "7th" | "8th" | "9th" | "10th" | "11th" | "12th"

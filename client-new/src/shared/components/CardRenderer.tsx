@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/shared/components/ui/button';
 import { FieldEditor } from './FieldEditor';
 import type { RenderableCard, CardField, FieldValue } from '../services/card-service';
@@ -22,6 +23,11 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
   const [editValues, setEditValues] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log('imagePreview state changed:', imagePreview);
+  }, [imagePreview]);
 
   const handleStartEdit = () => {
     setIsEditing(true);
@@ -151,6 +157,24 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
 
     // Handle attachment fields
     if (fieldValue.type === 'attachment' && fieldValue.raw) {
+      // Check if this is a logo/image field by name or isImage flag
+      const isLogo = fieldName.toLowerCase().includes('logo') || fieldValue.isImage;
+
+      if (isLogo) {
+        return (
+          <img
+            src={fieldValue.raw}
+            alt={fieldValue.display}
+            className="object-contain rounded cursor-pointer hover:opacity-80 transition-opacity"
+            style={{ maxWidth: '100px', maxHeight: '100px' }}
+            onClick={() => {
+              console.log('Logo clicked in CardRenderer! URL:', fieldValue.raw);
+              setImagePreview(fieldValue.raw);
+            }}
+          />
+        );
+      }
+
       return (
         <a
           href={fieldValue.raw}
@@ -159,6 +183,33 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
           className="text-blue-600 hover:underline"
         >
           📎 {fieldValue.display}
+        </a>
+      );
+    }
+
+    // Handle URL fields (website, facebook, instagram)
+    if (fieldValue.type === 'url' && fieldValue.raw) {
+      const url = fieldValue.raw.startsWith('http') ? fieldValue.raw : `https://${fieldValue.raw}`;
+      return (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline"
+        >
+          {fieldValue.display}
+        </a>
+      );
+    }
+
+    // Handle email fields - make them clickable to compose email
+    if (fieldName.toLowerCase().includes('email') && fieldValue.raw && typeof fieldValue.raw === 'string' && fieldValue.raw.includes('@')) {
+      return (
+        <a
+          href={`/email/compose?to=${encodeURIComponent(fieldValue.raw)}`}
+          className="text-blue-600 hover:underline"
+        >
+          {fieldValue.display}
         </a>
       );
     }
@@ -311,6 +362,35 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
           </div>
         )}
       </div>
+
+      {/* Image Preview Modal */}
+      {imagePreview && createPortal(
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75"
+          style={{ zIndex: 9999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+          onClick={() => {
+            console.log('Modal background clicked, closing');
+            setImagePreview(null);
+          }}
+        >
+          <div className="relative max-w-[90vw] max-h-[90vh] bg-white p-4 rounded-lg">
+            <img
+              src={imagePreview}
+              alt="Full size preview"
+              className="max-w-full max-h-[90vh] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button
+              onClick={() => setImagePreview(null)}
+              className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+              style={{ width: 32, height: 32 }}
+            >
+              ✕
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

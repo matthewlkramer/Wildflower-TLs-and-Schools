@@ -2,12 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { useQueryClient } from '@tanstack/react-query';
-import { Button as MButton, Menu, MenuItem } from '@mui/material';
 
 import { supabase } from '@/core/supabase/client';
 import type { RowActionId } from '@/shared/types/detail-types';
 import { useAuth } from '@/features/auth/auth-context';
 import type { CreateNoteConfig, CreateTaskConfig } from '@/shared/types/detail-types';
+import { formatFieldLabel } from '@/shared/utils/ui-utils';
+import { RowActionsMenu } from '@/shared/components/RowActionsMenu';
+import { useDialog } from '@/shared/components/ConfirmDialog';
 
 type GridRowEntity = 'educator' | 'school' | 'charter';
 
@@ -26,14 +28,14 @@ const ACTION_LABELS: Record<RowActionId, string> = {
   make_primary: 'Make primary',
   archive: 'Archive',
   end_stint: 'End stint',
-  add_note: 'Add note',
-  add_task: 'Add task',
+  add_note: 'Add Note',
+  add_task: 'Add Task',
   email: 'Email',
 };
 
 const GRID_ACTIONS: Record<GridRowEntity, RowActionId[]> = {
-  educator: ['email', 'add_note', 'add_task', 'archive'],
-  school: ['add_note', 'add_task', 'archive'],
+  educator: ['inline_edit', 'email', 'add_note', 'add_task', 'archive'],
+  school: ['inline_edit', 'email', 'add_note', 'add_task', 'archive'],
   charter: ['add_note', 'add_task', 'archive'],
 };
 
@@ -48,7 +50,8 @@ const CREATE_CONFIGS: Record<
     add_note: {
       createType: 'note',
       table: 'notes',
-      textField: 'note',
+      titleField: 'title',
+      textField: 'full_text',
       fkField: 'people_id',
       useEntityId: true,
       createdByField: 'created_by',
@@ -63,7 +66,7 @@ const CREATE_CONFIGS: Record<
       fkField: 'people_id',
       useEntityId: true,
       assignedToField: 'assignee',
-      assignedByField: 'created_by',
+      assignedByField: 'assigned_by',
       dueDateField: 'due_date',
       createdAtField: 'assigned_date',
       statusField: 'item_status',
@@ -75,7 +78,8 @@ const CREATE_CONFIGS: Record<
     add_note: {
       createType: 'note',
       table: 'notes',
-      textField: 'note',
+      titleField: 'title',
+      textField: 'full_text',
       fkField: 'school_id',
       useEntityId: true,
       createdByField: 'created_by',
@@ -90,7 +94,7 @@ const CREATE_CONFIGS: Record<
       fkField: 'school_id',
       useEntityId: true,
       assignedToField: 'assignee',
-      assignedByField: 'created_by',
+      assignedByField: 'assigned_by',
       dueDateField: 'due_date',
       createdAtField: 'assigned_date',
       statusField: 'item_status',
@@ -102,7 +106,8 @@ const CREATE_CONFIGS: Record<
     add_note: {
       createType: 'note',
       table: 'notes',
-      textField: 'note',
+      titleField: 'title',
+      textField: 'full_text',
       fkField: 'charter_id',
       useEntityId: true,
       createdByField: 'created_by',
@@ -117,7 +122,7 @@ const CREATE_CONFIGS: Record<
       fkField: 'charter_id',
       useEntityId: true,
       assignedToField: 'assignee',
-      assignedByField: 'created_by',
+      assignedByField: 'assigned_by',
       dueDateField: 'due_date',
       createdAtField: 'assigned_date',
       statusField: 'item_status',
@@ -158,6 +163,7 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
   const [formValues, setFormValues] = React.useState<Record<string, any>>({});
   const [submitting, setSubmitting] = React.useState(false);
   const { user } = useAuth();
+  const dialog = useDialog();
 
   React.useEffect(() => {
     if (!modalState) {
@@ -169,6 +175,7 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
     if (config.createType === 'note') {
       const noteConfig = config as CreateNoteConfig;
       setFormValues({
+        ...(noteConfig.titleField ? { [noteConfig.titleField]: '' } : {}),
         [noteConfig.textField]: '',
         ...(noteConfig.privateField
           ? { [noteConfig.privateField]: Boolean(noteConfig.defaults?.[noteConfig.privateField]) }
@@ -202,7 +209,10 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
         return modalState.row?.id ?? modalState.recordId;
       })();
       if (linkedId == null || linkedId === '') {
-        window.alert('Unable to determine which record to link.');
+        await dialog.alert('Unable to determine which record to link.', {
+          title: 'Error',
+          variant: 'error',
+        });
         return;
       }
       const client = createTableClient(config.schema, config.table);
@@ -210,12 +220,24 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
         setSubmitting(true);
         if (config.createType === 'note') {
           const noteConfig = config as CreateNoteConfig;
+          const titleValue = noteConfig.titleField ? String(formValues[noteConfig.titleField] ?? '').trim() : '';
           const textValue = String(formValues[noteConfig.textField] ?? '').trim();
+          if (noteConfig.titleField && !titleValue) {
+            await dialog.alert('Please enter a note title.', {
+              title: 'Required Field',
+              variant: 'warning',
+            });
+            return;
+          }
           if (!textValue) {
-            window.alert('Please enter note text.');
+            await dialog.alert('Please enter note text.', {
+              title: 'Required Field',
+              variant: 'warning',
+            });
             return;
           }
           const payload: Record<string, any> = {
+            ...(noteConfig.titleField ? { [noteConfig.titleField]: titleValue } : {}),
             [noteConfig.textField]: textValue,
             [noteConfig.fkField]: linkedId,
             ...(noteConfig.defaults ?? {}),
@@ -234,18 +256,27 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
           const taskConfig = config as CreateTaskConfig;
           const textValue = String(formValues[taskConfig.textField] ?? '').trim();
           if (!textValue) {
-            window.alert('Task text is required.');
+            await dialog.alert('Task text is required.', {
+              title: 'Required Field',
+              variant: 'warning',
+            });
             return;
           }
           const assigneeValue = formValues[taskConfig.assignedToField];
           if (!assigneeValue) {
-            window.alert('Please select an assignee.');
+            await dialog.alert('Please select an assignee.', {
+              title: 'Required Field',
+              variant: 'warning',
+            });
             return;
           }
           const dueDateRaw = formValues[taskConfig.dueDateField];
           const dueDateValue = dueDateRaw ? String(dueDateRaw) : '';
           if (!dueDateValue) {
-            window.alert('Please provide a due date.');
+            await dialog.alert('Please provide a due date.', {
+              title: 'Required Field',
+              variant: 'warning',
+            });
             return;
           }
           const payload: Record<string, any> = {
@@ -264,7 +295,10 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
         setModalState(null);
       } catch (error) {
         console.error('Failed to create record from grid action', error);
-        window.alert('Unable to complete the request.');
+        await dialog.alert('Unable to complete the request.', {
+          title: 'Error',
+          variant: 'error',
+        });
       } finally {
         setSubmitting(false);
       }
@@ -292,20 +326,26 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
           break;
         }
         case 'email': {
-          const email = await resolveEmailAddress(data as any, entity);
-          if (!email) {
-            window.alert('No email address is available for this record.');
+          const emails = await resolveEmailAddresses(data as any, entity);
+          if (!emails || emails.length === 0) {
+            await dialog.alert('No email address is available for this record.', {
+              title: 'No Email',
+              variant: 'warning',
+            });
             break;
           }
           if (typeof window !== 'undefined') {
-            const to = encodeURIComponent(email);
+            const to = encodeURIComponent(emails.join(','));
             window.location.assign(`/email/compose?to=${to}`);
           }
           break;
         }
         case 'add_note': {
           if (!data?.id) {
-            window.alert('Unable to determine which record to open.');
+            await dialog.alert('Unable to determine which record to open.', {
+              title: 'Error',
+              variant: 'error',
+            });
             break;
           }
           setModalState({ action: 'add_note', entity, recordId: String(data.id), row: data ?? undefined });
@@ -313,19 +353,25 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
         }
         case 'add_task': {
           if (!data?.id) {
-            window.alert('Unable to determine which record to open.');
+            await dialog.alert('Unable to determine which record to open.', {
+              title: 'Error',
+              variant: 'error',
+            });
             break;
           }
           setModalState({ action: 'add_task', entity, recordId: String(data.id), row: data ?? undefined });
           break;
         }
         case 'archive': {
-          await archiveRecord(entity, data as Record<string, any> | undefined);
+          await archiveRecord(entity, data as Record<string, any> | undefined, dialog);
           await queryClient.invalidateQueries({ queryKey: GRID_QUERY_KEYS[entity] });
           break;
         }
         default: {
-          window.alert('This action is not implemented yet.');
+          await dialog.alert('This action is not implemented yet.', {
+            title: 'Not Implemented',
+            variant: 'warning',
+          });
           break;
         }
       }
@@ -334,80 +380,15 @@ export function GridRowActionsCell(params: GridRowActionsCellParams) {
     }
   };
 
-  // Main grids: always show the Actions menu (no inline edit UI here)
-
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-  
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  // Main grids: use RowActionsMenu component
 
   return (
     <>
-      <MButton
-        variant="contained"
-        size="small"
-        onClick={handleClick}
-        sx={{
-          height: 24,
-          minHeight: 24,
-          textTransform: 'none',
-          fontSize: 14,
-          fontFamily: 'inherit',
-          fontWeight: 400,
-          borderRadius: '6px',
-          px: 1.5,
-          boxShadow: 'none',
-          backgroundColor: '#0f8a8d',
-          color: '#ffffff',
-          '&:hover': { 
-            backgroundColor: '#0b6e71',
-            boxShadow: 'none'
-          },
-        }}
-        onMouseDown={(event) => event.stopPropagation()}
-        onMouseUp={(event) => event.stopPropagation()}
-      >
-        Actions
-        <span style={{ marginLeft: 8, opacity: 0.9 }}>▾</span>
-      </MButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        elevation={2}
-        MenuListProps={{ dense: true }}
-        PaperProps={{ 
-          sx: { 
-            borderRadius: 1, 
-            mt: 0.5,
-            minWidth: 120
-          } 
-        }}
-      >
-        {actions.map((id) => (
-          <MenuItem 
-            key={id}
-            onClick={() => {
-              handleClose();
-              handleChange(id);
-            }}
-            sx={{ 
-              fontSize: '0.75rem', 
-              py: 0.5, 
-              minHeight: 'auto' 
-            }}
-          >
-            {ACTION_LABELS[id]}
-          </MenuItem>
-        ))}
-      </Menu>
+      {dialog.DialogComponent}
+      <RowActionsMenu
+        actions={actions}
+        onAction={handleChange}
+      />
       {modalState ? (
         <CreateActionModal
           label={ACTION_LABELS[modalState.action]}
@@ -523,14 +504,29 @@ function CreateActionModal({
             <>
               {(() => {
                 const noteConfig = config as CreateNoteConfig;
+                if (!noteConfig.titleField) return null;
                 return (
                   <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <span style={{ color: '#475569', fontSize: 12 }}>{formatLabel(noteConfig.textField)}</span>
+                    <span style={{ color: '#475569', fontSize: 12 }}>{formatFieldLabel(noteConfig.titleField)}</span>
+                    <input
+                      type="text"
+                      value={values[noteConfig.titleField] ?? ''}
+                      onChange={(event) => onChange(noteConfig.titleField, event.target.value)}
+                      autoFocus
+                    />
+                  </label>
+                );
+              })()}
+              {(() => {
+                const noteConfig = config as CreateNoteConfig;
+                return (
+                  <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <span style={{ color: '#475569', fontSize: 12 }}>{formatFieldLabel(noteConfig.textField)}</span>
                     <textarea
                       rows={8}
                       value={values[noteConfig.textField] ?? ''}
                       onChange={(event) => onChange(noteConfig.textField, event.target.value)}
-                      autoFocus
+                      autoFocus={!noteConfig.titleField}
                       style={{ minHeight: 140 }}
                     />
                   </label>
@@ -547,7 +543,7 @@ function CreateActionModal({
                       checked={Boolean(values[field])}
                       onChange={(event) => onChange(field, event.target.checked)}
                     />
-                    <span>{formatLabel(field)}</span>
+                    <span>{formatFieldLabel(field)}</span>
                   </label>
                 );
               })()}
@@ -558,7 +554,7 @@ function CreateActionModal({
               return (
                 <>
                   <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <span style={{ color: '#475569', fontSize: 12 }}>{formatLabel(taskConfig.textField)}</span>
+                    <span style={{ color: '#475569', fontSize: 12 }}>{formatFieldLabel(taskConfig.textField)}</span>
                     <textarea
                       rows={8}
                       value={values[taskConfig.textField] ?? ''}
@@ -568,10 +564,17 @@ function CreateActionModal({
                     />
                   </label>
                   <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <span style={{ color: '#475569', fontSize: 12 }}>{formatLabel(taskConfig.assignedToField)}</span>
+                    <span style={{ color: '#475569', fontSize: 12 }}>{formatFieldLabel(taskConfig.assignedToField)}</span>
                     <select
                       value={values[taskConfig.assignedToField] ?? ''}
                       onChange={(event) => onChange(taskConfig.assignedToField, event.target.value)}
+                      style={{
+                        appearance: 'none',
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 8px center',
+                        paddingRight: '28px',
+                      }}
                     >
                       <option value="">--</option>
                       {guideOptions.map((g) => (
@@ -580,7 +583,7 @@ function CreateActionModal({
                     </select>
                   </label>
                   <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <span style={{ color: '#475569', fontSize: 12 }}>{formatLabel(taskConfig.dueDateField)}</span>
+                    <span style={{ color: '#475569', fontSize: 12 }}>{formatFieldLabel(taskConfig.dueDateField)}</span>
                     <input
                       type="date"
                       value={values[taskConfig.dueDateField] ?? ''}
@@ -637,6 +640,8 @@ export function createGridActionColumn(entity: GridRowEntity): ColDef<any> {
 
 function navigateToDetail(entity: GridRowEntity, identifier: any, options?: { action?: RowActionId; section?: string }) {
   if (!identifier) {
+    // This function is called outside of React component, so we can't use dialog here
+    // Keep the window.alert for now or handle this differently
     window.alert('Unable to determine which record to open.');
     return;
   }
@@ -655,20 +660,38 @@ function navigateToDetail(entity: GridRowEntity, identifier: any, options?: { ac
   }
 }
 
-async function archiveRecord(entity: GridRowEntity, record: Record<string, any> | null | undefined) {
+async function archiveRecord(
+  entity: GridRowEntity,
+  record: Record<string, any> | null | undefined,
+  dialog: ReturnType<typeof useDialog>
+) {
   if (!record?.id) {
-    window.alert('Unable to archive this record because it is missing an id.');
+    await dialog.alert('Unable to archive this record because it is missing an id.', {
+      title: 'Error',
+      variant: 'error',
+    });
     return;
   }
 
-  if (!window.confirm('Archive this record?')) return;
+  const confirmed = await dialog.confirm('Are you sure you want to archive this record?', {
+    title: 'Archive Record',
+    confirmText: 'Archive',
+    cancelText: 'Cancel',
+    variant: 'warning',
+  });
+
+  if (!confirmed) return;
+
   const table = ARCHIVE_TABLES[entity];
   const client = supabase as any;
   const { error } = await client.from(table).update({ is_archived: true }).eq('id', record.id);
 
   if (error) {
     console.error('Failed to archive record', error);
-    window.alert('Unable to archive this record.');
+    await dialog.alert('Unable to archive this record.', {
+      title: 'Error',
+      variant: 'error',
+    });
   }
 }
 
@@ -680,12 +703,7 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
-function formatLabel(field: string): string {
-  return field
-    .split('_')
-    .map((part) => (part.length > 0 ? part[0].toUpperCase() + part.slice(1) : part))
-    .join(' ');
-}
+// Use centralized formatFieldLabel - removed duplicate function
 
 function getDetailPath(entity: GridRowEntity, id: string | number): string {
   const identifier = encodeURIComponent(String(id));
@@ -716,16 +734,35 @@ function findEmailAddress(record: Record<string, any> | null | undefined): strin
   return null;
 }
 
-async function resolveEmailAddress(record: Record<string, any> | null | undefined, entity?: GridRowEntity): Promise<string | null> {
+async function resolveEmailAddresses(record: Record<string, any> | null | undefined, entity?: GridRowEntity): Promise<string[]> {
+  if (!record) return [];
+
+  // For schools, use the tl_primary_emails array field directly
+  if (entity === 'school') {
+    const primaryEmails = record['tl_primary_emails'];
+    if (Array.isArray(primaryEmails) && primaryEmails.length > 0) {
+      return primaryEmails.filter(Boolean).map((email: string) => email.trim());
+    }
+    return [];
+  }
+
+  // For educators, get single email
   const direct = findEmailAddress(record);
-  if (direct) return direct;
-  if (!record) return null;
+  if (direct) return [direct];
+
   let pid = record['people_id'] ?? record['person_id'] ?? record['educator_id'];
   if (pid == null && entity === 'educator' && record['id']) pid = record['id'];
-  if (pid == null) return null;
+  if (pid == null) return [];
+
   try {
     const { data, error } = await (supabase as any).from('primary_emails').select('email_address').eq('people_id', pid).maybeSingle();
-    if (!error && data?.email_address) return String(data.email_address);
+    if (!error && data?.email_address) return [String(data.email_address)];
   } catch {}
-  return null;
+
+  return [];
+}
+
+async function resolveEmailAddress(record: Record<string, any> | null | undefined, entity?: GridRowEntity): Promise<string | null> {
+  const emails = await resolveEmailAddresses(record, entity);
+  return emails.length > 0 ? emails[0] : null;
 }

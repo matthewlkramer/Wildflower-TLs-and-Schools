@@ -5,11 +5,12 @@ import { createGridActionColumn } from '@/shared/components/GridRowActionsCell';
 import type { ColDef } from 'ag-grid-community';
 import { useGridEducators } from '../api/queries';
 import { useLocation } from 'wouter';
-import { EDUCATOR_GRID } from '../views';
+import { EDUCATOR_GRID, ADD_NEW_EDUCATOR_INPUT } from '../views';
 // Removed unused constants import
 import { supabase } from '@/core/supabase/client';
 import { GridPageHeader } from '@/shared/components/GridPageHeader';
 import type { SavedView } from '@/shared/hooks/useSavedViews';
+import { CreateEntityModal } from '@/shared/components/CreateEntityModal';
 
 export function EducatorsPage() {
   const { data = [], isLoading } = useGridEducators();
@@ -18,6 +19,7 @@ export function EducatorsPage() {
   const [gridApi, setGridApi] = useState<any>(null);
   const [selectedCount, setSelectedCount] = useState(0);
   const [lookups, setLookups] = useState<Record<string, Record<string, string>>>({});
+  const [showCreate, setShowCreate] = useState(false);
 
   // Preload lookup maps for columns that specify `lookupField` (table.labelColumn).
   // Load on mount; refresh cells when lookups change or grid becomes ready.
@@ -90,6 +92,64 @@ export function EducatorsPage() {
             </span>
           ))}
         </div>
+      );
+    };
+
+    // Icon renderer for boolean fields (green checkmark / red X)
+    const BooleanIconRenderer: React.FC<ICellRendererParams> = (p) => {
+      const isTrue = p.value === true || p.value === 'true' || p.value === 1;
+      const isFalse = p.value === false || p.value === 'false' || p.value === 0;
+
+      if (!isTrue && !isFalse) {
+        return <span style={{ color: '#94a3b8' }}>-</span>;
+      }
+
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+          {isTrue ? (
+            <span style={{ color: '#22c55e', fontSize: 18, fontWeight: 'bold' }}>✓</span>
+          ) : (
+            <span style={{ color: '#ef4444', fontSize: 18, fontWeight: 'bold' }}>✕</span>
+          )}
+        </div>
+      );
+    };
+
+    // Colored badge renderer for discovery_status
+    const DiscoveryStatusRenderer: React.FC<ICellRendererParams> = (p) => {
+      const value = p.value;
+      if (!value) return <></>;
+
+      const val = String(value).toLowerCase();
+      let bgColor = '#f1f5f9'; // light gray (default)
+      let textColor = '#64748b';
+
+      if (val === 'complete' || val === 'completed') {
+        bgColor = '#22c55e'; // saturated green
+        textColor = '#ffffff';
+      } else if (val === 'in process' || val === 'in-process' || val === 'inprocess') {
+        bgColor = '#d1fae5'; // light green
+        textColor = '#065f46';
+      } else if (val === 'paused') {
+        bgColor = '#fed7aa'; // light orange
+        textColor = '#9a3412';
+      }
+
+      return (
+        <span
+          style={{
+            display: 'inline-block',
+            fontSize: 12,
+            background: bgColor,
+            color: textColor,
+            borderRadius: 999,
+            padding: '2px 8px',
+            lineHeight: 1.2,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {value}
+        </span>
       );
     };
 
@@ -179,6 +239,8 @@ export function EducatorsPage() {
         case 'boolean':
           def.filter = 'agSetColumnFilter';
           def.filterParams = { values: ['Yes', 'No'] } as any;
+          def.cellRenderer = BooleanIconRenderer as any;
+          // Keep valueFormatter for export/filter display
           def.valueFormatter = (p: any) => {
             const v = p.value;
             if (v === true || v === 'true' || v === 1) return 'Yes';
@@ -194,6 +256,11 @@ export function EducatorsPage() {
           break;
         default:
           break;
+      }
+
+      // Apply colored badge renderer for discovery_status
+      if (config.field === 'discovery_status') {
+        def.cellRenderer = DiscoveryStatusRenderer as any;
       }
 
       // Make school names clickable
@@ -311,9 +378,8 @@ export function EducatorsPage() {
         col.sort = 'asc';
       }
     } else {
-      const nameCol = defs.find((d) => d.field === 'full_name' || d.field === 'name' || d.field === 'short_name');
+      const nameCol = defs.find((d) => d.field === 'full_name');
       if (nameCol) {
-        nameCol.headerName = 'Name';
         nameCol.sortable = true;
         nameCol.sort = 'asc';
       }
@@ -327,7 +393,7 @@ export function EducatorsPage() {
     }
     defs.push(createGridActionColumn('educator'));
     return defs;
-  }, [data]);
+  }, [data, lookups]);
 
 
   if (isLoading) return <div>Loading educators.</div>;
@@ -393,7 +459,7 @@ export function EducatorsPage() {
         selectedCount={selectedCount}
         currentViewMode="table"
         onViewModeChange={handleViewModeChange}
-        onAddNew={() => console.log('Add new educator')}
+        onAddNew={() => setShowCreate(true)}
         onApplySavedView={handleApplySavedView}
         onSaveCurrentView={handleSaveCurrentView}
         onOpenColumnsPanel={() => {
@@ -449,6 +515,15 @@ export function EducatorsPage() {
             setGridApi(params.api);
             // Hide the side bar icon rail by default; open via header buttons
             params.api.setSideBarVisible(false);
+
+            // Set default filter to exclude "Paused" discovery_status
+            const filterModel = {
+              discovery_status: {
+                filterType: 'set',
+                values: ['Complete', 'In process', null, ''],
+              },
+            };
+            params.api.setFilterModel(filterModel);
             params.api.closeToolPanel();
             try {
               const usp = new URLSearchParams(window.location.search);
@@ -477,6 +552,18 @@ export function EducatorsPage() {
             navigate(`/educators/${e.data.id}`);
           },
         }}
+      />
+
+      <CreateEntityModal
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        onCreated={(id) => {
+          setShowCreate(false);
+          navigate(`/educators/${id}`);
+        }}
+        title="Create Educator"
+        table="people"
+        inputSpec={ADD_NEW_EDUCATOR_INPUT}
       />
     </div>
   );
